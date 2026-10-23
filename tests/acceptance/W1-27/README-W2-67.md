@@ -15,6 +15,7 @@ run `gov` with `support.REPO_ROOT` as the code root or with the suite's copy of 
 | 1. Every per-test copy commits with `gc.auto=0` or copies the working files without `.git`; a planted 7,000-object tree runs every copying case green in parallel (I3 F9, I4 F5, I4 §2.1) | `test_w2_67_copies.py`: `test_w1_07_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc`, `test_w1_25_…`, `test_w1_27_…`; `test_a_per_test_copy_from_the_working_files_carries_no_copied_git_while_gc_runs[W1-26-FullProject, W1-26-Project-copy_tree, W1-27-copy_working_tree-per-test]` | 3 red, 3 green (guards) |
 | 1. W1-27's old-path case gets a project of its own (I4 §2.1) | `test_w1_27_path_compliance_r2.py::test_old_path_inside_its_new_path_is_not_stale` (revised) | green |
 | 4. pytest's own retention of three base folders; no per-run `--basetemp`; a full run leaves at most three base folders behind (DEC-898) | `test_w2_67_temp_folders.py`: `test_the_pytest_configuration_passes_no_basetemp_and_keeps_three_base_folders`, `test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention`, `test_a_run_after_older_runs_leaves_at_most_three_base_folders`, `test_a_run_after_killed_runs_leaves_at_most_three_base_folders`, `test_a_base_folder_of_a_run_still_going_is_kept` | 1 red, 4 green (guards) |
+| 4. The same, across PID namespaces (batch 5, from the round's review) | `test_w2_67_sweep_namespaces.py`: `test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace` (×15), `test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid` (×4) | 11 red, 8 green (guards), on `f1c743b3` |
 | 5. Each weak case revised: red against a planted fault, then green on the head, with a `Rewrite-Reason` (P-IS-7 (a); I4 F1) | the revised W1-27 cases below | green; red under their plants |
 
 KPIs 2 (the unit close nested runs) and 3 (W2-50's limits, the guard unit test's `/tmp`) and the other weak-case
@@ -452,10 +453,142 @@ before.
 argument list is not seen. The refusal file's other three forms (lines 92, 94, 95) are f-strings, and the guard never
 reported them. Closing that gap is a separate strengthening, returned in the designer's return.
 
+## KPI 4, Batch 5: the clean-up across PID namespaces (`test_w2_67_sweep_namespaces.py`)
+
+Independent test designer (MR-3), batch 5, 2026-10-23, from the round's independent review (described, DEC-136; the
+root `tests/conftest.py` not read). New files only: batches 1, 3 and 4's files are unchanged.
+
+**The finding.** The round's root conftest makes every run of the suites remove, at its end, the older base folders
+under the same `pytest-of-<user>` folder that are past pytest's retention of three and whose run it judges to be over.
+In a sandboxed session each Bash command runs in a PID namespace of its own, with a `/proc` of its own (a command's
+first process is pid 3; seen here, a command's `/proc` lists pids 1 to 5 only), while the commands share one `TMPDIR`.
+A pid read from another run's `.lock` names a process of another namespace. So:
+
+1. **A run still going loses its base folder** when a passing run of the suites in another command ends: its
+   `.lock`'s pid holds no process in the sweeping run's namespace. A run that holds the folder then fails, its temp
+   folder gone. Under `-o tmp_path_retention_policy=none` the sweeping run takes every other folder as past the
+   retention, so no three newer folders are needed.
+2. **A killed run's folder is kept or removed by pid coincidence:** kept when the sweeping run's pytest has, in its
+   own namespace, the pid the killed run's `.lock` names; removed otherwise.
+
+**What must hold.**
+
+- A base folder whose run is still going is kept by every other run's clean-up, whatever Bash command or PID
+  namespace that run is in, whether or not it loads the root conftest, at any point of the run from the moment its
+  base folder exists, and under any retention policy the sweeping run is given.
+- The base folder of a killed run of this repository's suites is removed by a later run's clean-up once it is past
+  the retention of three, whatever pid the later run has in its own namespace, so that a full run still leaves at
+  most three base folders behind (KPI 4). **A killed foreign run** (one that did not load the root conftest) may be
+  kept, since pytest's own rule removes it after three days. No case here asks for its removal.
+- Nothing outside pytest's own numbered base folders is removed.
+
+**How the namespaces are laid out.**
+
+- **Each run is started as** `unshare --user --map-current-user --pid --fork --mount-proc --kill-child python3
+  w2_67_ns_launch.py <pid> -- <command>`. `--mount-proc` gives the namespace a `/proc` of its own, as the sandbox
+  gives each Bash command.
+- **The launcher (`w2_67_ns_launch.py`) is pid 1.** It forks children that end at once until the next pid is the
+  one asked, then starts the command as that pid. It reaps every process and ends with the command's exit code; when
+  it ends, the kernel ends the namespace.
+- **The pids are set by the case, never by chance:**
+  - the live run, or the killed run, is pid 3, a sandboxed command's first process. For gov close's runner the
+    driver is pid 3, and the runner's pytest controller, whose pid its `.lock` names, is then pid 5;
+  - the sweeping run's pytest is the next pid after the one the live run's `.lock` names (4, or 6 for the close
+    runner), as the sandbox numbers its next command. Every pid a live run's `.lock` can name is then free in the
+    sweeping run's namespace;
+  - in the killed cases the sweeping run's pytest is pid 3 (`same-pid`, the killed run's) or pid 4 (`next-pid`).
+- **All runs of a case share the case's own `TMPDIR`** (in its `tmp_path`); the live run's base folder is
+  `pytest-0`.
+- **A live run is held live by the case.** The probe writes a ready file once its base folder exists, then waits for
+  a release file. The case writes that file after the sweeping run's process has ended, when its clean-up is done.
+  No result waits on a sleep.
+- **Every run is bounded:**
+  - one tiny case and one worker (`-p no:xdist`; the close runner's own `-n 1`);
+  - time limits: 180 s for each run, 120 s to get ready, 150 s for the probe's own wait;
+  - the case's fixture ends every run: SIGKILL to its `unshare`'s process group, with `--kill-child` and the pid-1
+    launcher ending the rest. No process was left after any run (`ps`).
+- **The fixture first checks that the machine allows these namespaces.** Where it does not, the cases fail; they
+  never skip.
+
+**The live forms:**
+
+- `close-runner`: `gov.close.command._run_tests(root, root / "tests", 180, workers=1)` on a small project of the
+  case's own, as the unit close tests call it, with this worktree's code. Its nested run has the session's `TMPDIR`
+  and pytest's default retention.
+- `foreign-project`: a pytest run of a project of its own (its own `pytest.ini`), which never loads this repository's
+  conftest.
+- `suite-in-setup`, `suite-mid-test`, `suite-in-teardown`: runs of the repository's suites, which load the root
+  conftest. They run the probe `w2_67_ns_probe.py` and are held in a session fixture before the first case's own
+  temp folder, in the middle of the case, or in the session fixture's teardown after the case.
+
+**The killed runs:** the probe ends its own pytest with SIGKILL, once its base folder exists, in the middle of its
+case (`mid-test`) or in its first case's setup (`in-setup`).
+
+**The planted entries:**
+
+- **Finished runs' folders.** Under `all` and `failed`, three folders (no `.lock`) are planted, numbered after the
+  live or killed run's own, so it is past the retention. Under `none` nothing is planted.
+- **Entries that are not base folders.** In the killed cases these are `keep-me/left.txt` and `notes.txt` in the
+  user's folder, and `other-tool/left.txt` in `TMPDIR`. They are not named `pytest-*` or `garbage-*`, since pytest's
+  own clean-up takes those names as its own.
+
+**The policies:**
+
+- the live cases' sweeping run is given each policy (`all`, `failed`, `none`);
+- the killed cases' sweeping run keeps pytest's default (`all`), as batch 1's runs do. A kept killed folder then
+  shows in the count of three too: under `failed` a passing run removes its own folder, and three would be left
+  even with the killed folder kept.
+
+| Case | On the head (`f1c743b3`, seen 2026-10-23) |
+|---|---|
+| `test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[close-runner-all]`, `[…-failed]`, `[…-none]` | **red**: `the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4']`. The same under `failed` (after `['pytest-1', 'pytest-2', 'pytest-3']`) and under `none` (before `['pytest-0']`, after `[]`). The runner, once released, reports `FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ... vanished while the run was going` |
+| `[foreign-project-all]`, `[…-failed]`, `[…-none]` | **red**: the same, its `.lock` naming pid 3; the released run fails the same way |
+| `[suite-in-setup-all]`, `[…-failed]`, `[…-none]` | **red**: the same, pid 3. Once released, the run errors: `the run's base folder … vanished while the run was in its first test's setup` |
+| `[suite-mid-test-all]`, `[…-failed]`, `[…-none]` | green on the head: a guard |
+| `[suite-in-teardown-all]`, `[…-failed]`, `[…-none]` | green on the head: a guard |
+| `test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid[mid-test-same-pid]`, `[in-setup-same-pid]` | **red**: `the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace; 4 base folders left behind, more than 3 (DEC-898). Base folders before the sweep ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-0', 'pytest-2', 'pytest-3', 'pytest-4']` |
+| `[mid-test-next-pid]`, `[in-setup-next-pid]` | green on the head: a guard. The killed folder is removed, at most three are left, and the entries that are not base folders stay |
+
+On the head: 11 red and 8 green, in 22.7 s serially and 13.8 s with `-n 2`, the same cases each time.
+
+**Each case can pass and can fail (a control).**
+
+- **The control:** a throwaway file in the designer's scratchpad, never committed, imported this file and gave only
+  the sweeping run `--noconftest`, so that pytest's own rule alone swept.
+- **The result:** the 15 live cases passed, since a `.lock` younger than three days keeps its folder. The 4 killed
+  cases failed, since the same rule keeps a killed run's locked folder for three days. In all, 15 passed and 4
+  failed.
+- **So:** the live cases go green once the root conftest's clean-up keeps a run it cannot see as ended, and the
+  killed cases need the root conftest's clean-up itself.
+
+**Batch 1's killed-runs case** (`test_a_run_after_killed_runs_leaves_at_most_three_base_folders`, green on the head)
+**is named, not changed.**
+
+- **What it plants:** folders that hold only pytest's own `.lock`, naming a pid above `pid_max` (4194304 here, the
+  kernel's limit). Nothing in them says the root conftest was loaded, so they look like a killed foreign run's
+  folders, which this batch lets a clean-up keep.
+- **No conflict:** a pid above the kernel's limit names no process in any namespace, so a clean-up may still take
+  those folders as ended, and batch 1's case stays green.
+- **The constraint on a fix:** a fix that removes only the folders of runs it sees as ended by some sign other than
+  the pid would turn batch 1's case red.
+
+**Not covered:**
+
+- a live run in the moment between pytest's making its base folder and writing its `.lock` (pytest's own race);
+- a sweep while a live run has made no base folder yet.
+
+**After batch 5**, the three earlier KPI files (`test_w2_67_temp_folders.py`, `test_w2_67_basetemp_refusal.py`,
+`test_w2_67_copies.py`, `-n 2 --dist loadfile`): 24 passed in 56.8 s, as at the round's checkpoint. Only their static
+guard reads the new files, and it stays green.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
 - `w2_67_tmp_probe.py`: the one case the nested runs start (not collected by a run of `tests`).
+- Batch 5: `test_w2_67_sweep_namespaces.py` (19 cases: 15 live-run cases, 4 killed-run cases);
+  `w2_67_ns_launch.py`, the pid-1 launcher that starts a run as the pid asked in a fresh PID namespace; and
+  `w2_67_ns_probe.py`, the one case its runs of the suites start. Neither of the last two is collected by a run of
+  `tests`.
 - `w2_67_doctor.py`: reading doctor's sections; a small committed project; doctor with this worktree's code.
 - `w2_67b_support.py` (batch 1b): files of a small project, a moved path, `moved_references`, the tiny rebuild project
   and `gov rebuild` with this worktree's code, and a read of the store.
