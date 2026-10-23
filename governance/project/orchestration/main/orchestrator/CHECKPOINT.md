@@ -54,6 +54,12 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **W2-07 run 1 returned PACKAGES (head `44062fec`, implementation complete, 40/40 own):** P1 `packages/P-W2-07-A-B.md`
+  (`17e5c3a9`), PINGED: A = the lead budget vs a full run (1,062,156 inodes at 13.6 %; rec (a) pytest
+  `-o tmp_path_retention_policy=failed` after a measured trial + (b) a 5,000,000 / 50 GB verification cap meanwhile
+  + (c) an allow rule for a lead to rm its own temp at the settings regeneration; I remove `/tmp/gov-os-lead-W2-07/`
+  on approval); B = widen W2-07's designer batch (W1-30 fixture green at gov check: 175; 20 gate-order cases; 1
+  repair-ticket case). C delegated (six readings). W2-66 and W2-69 will meet A at their full verification.
 - **SWEEP lists 3 + 5 PENDING a quiet moment** (no `claude -p`, close, nightly or trial):
   `python3 tools/sweep.py --apply --only pytest-runs,code-graph` (dry run: 49 + 10,118 would go; skips: <24 h,
   held open, the 14 live roots' code-graph folders). Report what it skipped and why. Weekly sweep: Mondays.
