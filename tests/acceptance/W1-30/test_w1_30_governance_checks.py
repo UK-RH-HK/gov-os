@@ -44,9 +44,12 @@ def _declaration(check_id, command, severity):
             f'command: "{command}"\n')
 
 
-def _ready(project, files):
-    """The ticket's work, with ``files`` changed by its engineer, and the checkpoint: returns ``HEAD``."""
+def _ready(project, files, told=None):
+    """The ticket's work, with ``files`` changed by its engineer, and the checkpoint: returns ``HEAD``. With
+    ``told`` the ticket's acceptance test tells into that folder whenever it runs."""
     support.start_ticket(project, TICKET, WBS)
+    if told is not None:
+        project.write(f"tests/acceptance/{WBS}/test_pass.py", support.telling_test("test_pass", told))
     support.engineer_commit(project, TICKET, {"src/example/feature.py": "# feature\n", **files})
     return support.checkpointed(project, TICKET)
 
@@ -128,16 +131,22 @@ def test_a_failing_check_of_severity_warning_refuses_nothing(project_with_checks
     assert support.ticket_status(project.root, TICKET) == "closed"
 
 
-def test_a_refusal_for_a_red_check_is_counted(project_with_checks, sandbox, interface):
+def test_a_refusal_for_a_red_check_is_counted(project_with_checks, sandbox, interface, tmp_path):
+    """Revised for W2-07 (DEC-868 item 3): a red hard-block check is the pre-close gate's finding. The close
+    refuses at once, naming the check, before any test runs, and spends no attempt: the count stays 0."""
+    told = tmp_path / "told"
+    told.mkdir()
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
-    _ready(project, {NOTES: "note: one\n"})
+    _ready(project, {NOTES: "note: one\n"}, told)
     _one_red(project, sandbox, "license-present")
 
     run = support.run_close(project, sandbox, TICKET)
 
     _refused_naming(run, interface, "license-present")
-    assert support.iteration_count(project.root, TICKET) == 1, \
-        f"the close refused for a red check is not counted as one iteration\n{run.describe()}"
+    assert support.told_by(told) == {}, \
+        f"a red check refused and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+    support.assert_nothing_counted(project, TICKET, run)
+    support.assert_not_closed(project, TICKET)
 
 
 def test_a_refusal_for_a_red_check_opens_a_dependent_repair_ticket(project_with_checks, sandbox, interface):

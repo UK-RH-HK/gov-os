@@ -384,7 +384,11 @@ def test_regression_includes_other_acceptance_folders(project, sandbox, interfac
 
 
 def test_regression_runs_to_end_all_failures_collected(project, sandbox, interface):
-    """A2: regression tests run to the end; all failures are collected, not just the first."""
+    """A2: regression tests run to the end; all failures are collected, not just the first.
+
+    Revised for W2-07 (DEC-868 item 3): a ticket without its checkpoint is refused by the pre-close gate before
+    any test, so the ticket is checkpointed, as every ticket is before its close, and the close reaches its
+    regression."""
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
@@ -393,6 +397,8 @@ def test_regression_runs_to_end_all_failures_collected(project, sandbox, interfa
     support.write(project.root, "tests/unit/test_reg_b.py",
                   "def test_reg_b():\n    assert False, 'reg B'\n")
     project.commit("implement with two reg failures", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
