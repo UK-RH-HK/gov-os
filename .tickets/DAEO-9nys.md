@@ -47,7 +47,7 @@ acceptance_tests:
   path: tests/acceptance/W1-27/
   author: independent-test-designer (MR-3); the revisions of other tickets' acceptance tests, each with a Rewrite-Reason
 track: A
-list_rows: [W2-L373]
+list_rows: []
 ---
 # W2-67 Test hygiene: per-test copies, nested runs, temp folders, and the weak tests' revisions
 
@@ -72,4 +72,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-67), from DEC-889 item 7 (P-H-5), DEC-89
   - W2-65: the unit hooks;
   - W2-44: containment's PF-7 case;
   - W2-04: W1-24's.
-- **W2-L373's rename** rides in W2-69 if P-IS-5 (a) is taken; otherwise here.
+- **W2-L373's rename** is W2-69's (P-IS-5 (a), DEC-899).
