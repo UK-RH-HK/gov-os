@@ -28,13 +28,14 @@ kpis:
     evidence [AR-9, W2-L018].
   - B-dev's canaries run and hit [AR-9].
   - On a store freshly rebuilt with embeddings, a-dev's gov check is green on context reproducibility, claims and schema [AR-9].
-  - Governance-share.json holds a measured share for ORION and for ARGUS, each ≤ 15 %, from the counter after clean closes, with every part measured. W1-42's share case is green [F-M1, W2-H053, W2-L324].
+  - Governance-share.json holds a measured share for ORION and for ARGUS, each ≤ 15 %, from the counter after clean closes, with every part measured; this evidence holds the requirement, W1-42's share case being retired (DEC-900) [F-M1, W2-H053, W2-L324, DEC-900].
   - ORION's test_exact_agreement is green, or named with its owner [W2-L341].
   failure:
   - Any clone held under /tmp or the workbench; a programme merge made by a lead.
 profile: FULL
 sources:
 - DEC-723
+- DEC-900
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -61,6 +62,6 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-14), as approved (DEC-729). The list row
   - b-dev is adopted far enough that its store holds the ticket's sources. ARGUS's implementation ticket closes with `gov close` at exit 0, then `gov ci` and the owner's merge after green CI; each is kept as evidence [AR-9, W2-L018].
   - b-dev's canaries run and hit [AR-9].
   - On a store freshly rebuilt with embeddings, a-dev's `gov check` is green on context reproducibility, claims and schema [AR-9].
-  - `governance-share.json` holds a measured share for ORION and for ARGUS, each ≤ 15 %, from the counter after clean closes, with every part measured. W1-42's share case is green [F-M1, W2-H053, W2-L324].
+  - `governance-share.json` holds a measured share for ORION and for ARGUS, each ≤ 15 %, from the counter after clean closes, with every part measured; this evidence holds the requirement, W1-42's share case being retired (DEC-900) [F-M1, W2-H053, W2-L324, DEC-900].
   - ORION's `test_exact_agreement` is green, or named with its owner [W2-L341].
 - **Failure:** any clone held under `/tmp` or the workbench; a programme merge made by a lead.
