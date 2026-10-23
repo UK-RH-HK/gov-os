@@ -6,23 +6,16 @@ links: []
 created: 2026-10-23T13:03:15Z
 type: task
 priority: 1
-assignee: independent-test-designer
+assignee: engineer
 external-ref: W2-67
 tags: [wave-2, tests, hygiene, revision, full]
 wbs_id: W2-67
 title: 'Test hygiene: per-test copies, nested runs, temp folders, and the weak tests'' revisions'
 class: test-revision
 state_class: AUTHORITATIVE
-role: independent-test-designer
+role: engineer
 depends_on: []
 allowed_paths:
-- tests/acceptance/W1-07/w1_07_support.py
-- tests/acceptance/W1-25/**
-- tests/acceptance/W1-26/**
-- tests/acceptance/W1-27/**
-- tests/acceptance/W1-30/**
-- tests/acceptance/W2-02/**
-- tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py
 - tests/unit/close/**
 - tests/unit/guard/**
 - tests/conftest.py
@@ -33,6 +26,7 @@ kpis:
   - 'W2-50''s large-store and hang cases run against a declared short limit; the guard unit test''s fixed /tmp folder becomes tmp_path [I1 F-11, I1 §2.3]'
   - 'The suites keep pytest''s own retention of three base folders and nothing passes a per-run --basetemp; a full run leaves at most three base folders behind [DEC-898]'
   - 'Each weak case revised is first shown red against a planted fault, then green on the head, each with a Rewrite-Reason; in this order: gov doctor''s 40 W1-27 cases (before W2-22, W2-18 or W2-09 changes doctor); W1-26''s 45 planted-defect cases, their fixture shown green before any defect; W1-30''s 13 first-round cases; W2-02''s unmeasured case; I3''s T-A3 rows (their folders named in this file when it is written) [P-IS-7 (a), I2 F2, F3, I4 F1]'
+  - 'The root tests/conftest.py refuses, at the start, a run given a per-run --basetemp, naming DEC-898; one opt-out stays, the environment flag GOV_ALLOW_BASETEMP=1, for a measured trial [DEC-907 item 2]'
   failure:
   - A revised case that cannot fail for its fault; an expectation lowered; a copy that still races gc; an unbounded nested run; a per-run base folder; a test changed in a folder this file does not name.
 profile: FULL
@@ -42,6 +36,7 @@ sources:
 - DEC-898
 - DEC-899
 - DEC-904
+- DEC-907
 est_loc: 750
 acceptance_tests:
   path: tests/acceptance/W1-27/
@@ -73,3 +68,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-67), from DEC-889 item 7 (P-H-5), DEC-89
   - W2-44: containment's PF-7 case;
   - W2-04: W1-24's.
 - **W2-L373's rename** is W2-69's (P-IS-5 (a), DEC-899).
+- **Roles (DEC-907):** the ticket is an engineer's, for its builder files (`tests/unit/guard/**`, `tests/conftest.py`, and `tests/unit/close/**` in round 2). Its test designers write the acceptance files, named here, not in `allowed_paths` (MR-3): `tests/acceptance/W1-07/w1_07_support.py`, `tests/acceptance/W1-25/**`, `tests/acceptance/W1-26/**`, `tests/acceptance/W1-27/**`, `tests/acceptance/W1-30/**`, `tests/acceptance/W2-02/**`, `tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`. The copying fixtures are changed by a second, fresh test designer with `Rewrite-Reason: the copy races git's background gc (I3 F9, I4 F5)`. It runs batch 1's `test_w2_67_*` files, `w2_67_tmp_probe.py` and `README-W2-67.md`, but never reads them.

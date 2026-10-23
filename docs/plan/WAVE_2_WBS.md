@@ -1089,7 +1089,8 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 #### W2-70 Retire the two nested reruns: W1-05's switch-over case and W1-47's builder rerun (LITE, independent-test-designer; DEC-899, P-IS-3 (a))
 - **Why:** W1-05's switch-over case re-runs three suites the same close has already run (14.6 minutes of every close). W1-47's builder case re-runs `tests/unit/guard`. Both block worksteal (I1 F-5, DEC-892 a). Ticket `DAEO-uzme`.
 - **Starts now; merges early; closes** once W2-07's test-revision class is pinned (DEC-896 item 3), as W2-63 does. The 15 unit nested runs are bounded in W2-67.
-- **Allowed paths:** `tests/acceptance/W1-05/**`, `tests/acceptance/W1-47/**`, `tests/acceptance/serial-only.txt`, W1-30's r11 file.
+- **Allowed paths:** `tests/acceptance/W1-05/**`, `tests/acceptance/W1-47/**`, `tests/acceptance/serial-only.txt`, W1-30's r11 file; **(DEC-906)** W1-01's `test_w1_01_history.py` and `w1_01_support.py`.
+- **(DEC-906) W1-01's history case** reads the path map's `acceptance_exemptions` (exact commits, beside `accepted_history`), whose only entry is `c9a08678` citing DEC-900; any other commit touching `tests/acceptance/` without the designer's role stays red, an owner's included. W2-70 merges early, so the red leaves `w2/integrate` then.
 - **KPIs, success:**
   - both cases retired in one commit with a `Retire-Reason:` naming DEC-899;
   - the switch-over line out of `serial-only.txt`, and W1-30's r11 test updated;
@@ -1154,6 +1155,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - **pytest's temp folders are not cleaned:** `/tmp/pytest-of-usain` holds 61 run folders since 2026-10-20. One auditor's per-run base folders filled the disk's inodes on 2026-10-22 (DEC-898).
   - **About 277 weak or outdated functions** cannot fail for the fault they claim to catch, or encode an old rule (I-SYNTHESIS §5.2).
 - **Place (owner, DEC-904 item 5):** the next free slot. Ticket `DAEO-9nys`. Round 1 now, on the folders no ticket in flight holds; round 2 (W1-30 and `tests/unit/close`) after W2-07 and W2-66 merge; round 3 (W2-50's cases) after W2-69 merges. Its acceptance revisions close after W2-07 is pinned (DEC-892 item 1, DEC-896 item 3); the two acceptance reruns are W2-70's.
+- **Roles (DEC-907):** an engineer's ticket for its builder files (`tests/unit/guard/**`, `tests/conftest.py`, `tests/unit/close/**`); its acceptance files are its test designers', named in the ticket file (MR-3); the copying fixtures by a second, fresh test designer. The conftest refuses a per-run `--basetemp` with one opt-out flag.
 - **Allowed paths:**
   - for the engineer: the fixtures and helpers that make whole-tree copies (`tests/acceptance/W1-07/w1_07_support.py`, `tests/acceptance/W1-25/**`, the W1-27 old-path case's fixture);
   - `tests/unit/close/**` (the 15 nested-run functions only; it runs after W2-07, which holds that folder);

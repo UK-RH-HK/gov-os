@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.289 (the version table at the end of each section gives the history)
+**Version:** 0.293 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -4962,7 +4962,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
     No second rule set is written anywhere.
 
 ### DEC-454 — What `gov close` measures where its KPI lines left the mechanism open
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn any point) · **Basis:** W1-30's second return (six packages for the owner) and the orchestrator's reading of the code against each KPI clause (DEC-449): the disposition of every finding was a constant, a context that could not be built was replaced by a hash of the ticket file, "the regression tests" were two folders of unit tests, the reviewer's "wrote nothing" was the record's own word, a fourth iteration had no owner's decision to wait for, and the stale-evidence rule measured nothing · **Under:** DEC-096, DEC-136, DEC-137, DEC-413, DEC-425
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn any point) · **Basis:** W1-30's second return (six packages for the owner) and the orchestrator's reading of the code against each KPI clause (DEC-449): the disposition of every finding was a constant, a context that could not be built was replaced by a hash of the ticket file, "the regression tests" were two folders of unit tests, the reviewer's "wrote nothing" was the record's own word, a fourth iteration had no owner's decision to wait for, and the stale-evidence rule measured nothing · **Under:** DEC-096, DEC-136, DEC-137, DEC-413, DEC-425 · **Changed by:** DEC-908 (for one part): an identical refusal reuses and names its repair ticket (W2-07's KPI 10, W2-M252).
 - **Decision:**
   - **The regression tests** of a close are every test under the project's `tests/` outside the ticket's own
     acceptance folder. All run to their end. A failure, a collection error or a time limit reached refuses the
@@ -4989,7 +4989,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 113. One delegated decision: where the owner's choice after an escalation is recorded (register v0.113, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-455 — The owner's choice after an escalation is the register entry; `gov close` records its id, and every refusal for a finding counts
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a · **Changed by:** DEC-868 item 3 and DEC-908 (for one part): a broken context is refused at once by the pre-close `gov check`, uncounted, not a counted iteration.
 - **Decision:**
   - The owner's choice is recorded where the owner records decisions: in the register entry itself, in its text.
     `gov close` takes that entry's id as an argument, accepts it only when the ticket is escalated and W1-11's
@@ -5255,7 +5255,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 122. One delegated decision on W1-30: `gov close` refuses on what `gov check` blocks on (register v0.122, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-480 — For a governance-changing ticket, `gov close` refuses on exactly the checks `gov check` reports red at hard-block; it holds no rule of its own about checks
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-476 (strict, no baseline inside `gov close`). W1-30's test designer (round 6, commit `fd7ad4f0`) returned three points no source settles: a warning check that cannot run, the time limit of a check, and a built-in hard-block check that the runner reports yellow where its tool is absent. As for containment (DEC-453), the close gate takes the judgement of the component that owns it: W1-26's runner is the authority on a check's status.
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-476 (strict, no baseline inside `gov close`). W1-30's test designer (round 6, commit `fd7ad4f0`) returned three points no source settles: a warning check that cannot run, the time limit of a check, and a built-in hard-block check that the runner reports yellow where its tool is absent. As for containment (DEC-453), the close gate takes the judgement of the component that owns it: W1-26's runner is the authority on a check's status. · **Changed by:** DEC-868 item 1 (b) and DEC-908 (for one part): `gov check` runs on every close (W2-07's KPI 5), not only when governance files change.
 - **Decision:**
   - When a ticket's commits change a governance file, `gov close` runs the checks at the commit being closed through W1-26's runner and refuses when the runner reports any hard-block check red, naming each. That is the same condition on which `gov check` blocks a merge.
   - A check of severity warning refuses nothing, whether it ran and failed or could not run: the runner gives both the same status, and `gov close` does not read more into it. The designer's case that expected a refusal for a warning check whose command is absent is reversed.
@@ -9380,7 +9380,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
   6. **Where `Role: owner` is still read** (the check of item 5 of the owner's rule, 2026-10-20): the close's ratchet (`src/gov/close/ratchet.py:104-111`) and its escalation lift (`src/gov/close/state.py:172-200`) count an owner's entry only from a commit with `Role: owner` alone, and the decisions checker (DEC-360) will when decision files exist. How they should read `Decided-by` was package P-W2-51, answered by DEC-862: those two kinds stay the owner's own `Role: owner` commits until W2-12 lands.
 
 ### DEC-862 — P-W2-51 (a) now, (b) later, (c) never: ratchet entries and escalation lifts stay the owner's commits until W2-12 makes the push the acceptance
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-861, DEC-757, DEC-766, DEC-360, DEC-724 · **Basis:** P-W2-51 (`governance/project/orchestration/packages/P-W2-51.md`): the close's ratchet (`src/gov/close/ratchet.py:104-111`) and its escalation lift (`src/gov/close/state.py:172-200`) read the owner's acceptance only from a `Role: owner` commit.
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-861, DEC-757, DEC-766, DEC-360, DEC-724 · **Basis:** P-W2-51 (`governance/project/orchestration/packages/P-W2-51.md`): the close's ratchet (`src/gov/close/ratchet.py:104-111`) and its escalation lift (`src/gov/close/state.py:172-200`) read the owner's acceptance only from a `Role: owner` commit. · **Changed by:** DEC-906 item 1: the owner's own `Role: owner` commits are the ratchet entries, the accepted-history entries and the `acceptance_exemptions` entries; every change under `tests/acceptance/` is a test designer's commit.
 - **Decision:**
   1. **(a), now:** the orchestrator commits DEC-861 and every later decision record itself, under DEC-861, **except ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts:** those stay the owner's own `Role: owner` commits. The orchestrator prepares each ready to commit and pings `ACT`; the operator commits it.
   2. **(b), later, in W2-12** (its card and ticket file carry it as a KPI): the close counts a ratchet entry or an escalation lift from a commit carrying `Task: decision-record` and `Decided-by: owner` only once that commit is in the owner's pushed `origin/w2/integrate`, so that the owner's push becomes the acceptance in git. W2-12's paths gain `src/gov/close/ratchet.py` and `src/gov/close/state.py` (the owner-entry reading only) and their unit tests. Until W2-12 lands, (a) holds.
@@ -10052,7 +10052,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 278. The owner's answer of 2026-10-21 on P-W2-62-H, and a standing rule on accepted history (register v0.278, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-891 — W2-62's claim commit 162f17ea9caf accepted as history; accepted-history entries for record-only commits recorded by the orchestrator, entries for code, test or kernel commits stay the owner's own commits
-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-734, DEC-487, DEC-436, DEC-871, DEC-861, DEC-862 (a), DEC-851 · **Basis:** package P-W2-62-H (`governance/project/orchestration/packages/P-W2-62-H.md`). On 2026-10-21 at 22:39 the queue's gate (e) stopped W2-62 before its close: its claim commit `162f17ea9caf` ("W2-62 (DAEO-juee): claimed", 2026-10-19), the orchestrator's, carries `Task:` and `Role:` but no `Implements:`. It changes only `.tickets/DAEO-juee.md` (one line).
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-734, DEC-487, DEC-436, DEC-871, DEC-861, DEC-862 (a), DEC-851 · **Basis:** package P-W2-62-H (`governance/project/orchestration/packages/P-W2-62-H.md`). On 2026-10-21 at 22:39 the queue's gate (e) stopped W2-62 before its close: its claim commit `162f17ea9caf` ("W2-62 (DAEO-juee): claimed", 2026-10-19), the orchestrator's, carries `Task:` and `Role:` but no `Implements:`. It changes only `.tickets/DAEO-juee.md` (one line). · **Changed by:** DEC-906: beside `accepted_history`, the path map's `acceptance_exemptions` lists exact commits W1-01's history case accepts (owner commits only).
 - **Decision:**
   1. **P-W2-62-H (a).** The commit `162f17ea9caf` (full id `162f17ea9cafeec96687d2a83c43c060c08d3e1b`) is accepted as history. The path map's `accepted_history` gains `{commit: 162f17ea9cafeec96687d2a83c43c060c08d3e1b, decision: DEC-891}`, committed by the orchestrator: the close reads the entry under this ACCEPTED owner decision, which names the commit (`gov/close/history.py`, DEC-734). W2-62 closes after queue run 6.
   2. **The standing rule (owner, standing):**
@@ -10376,7 +10376,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - Next free id: DEC-900.
 
 ### DEC-900 — The AR-9 ruling: RETR-X-02's accepted outcome is the stated gap; W1-42's two accepted reds retired with their entries (P-IS-8 (b))
-- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-718 item 11, DEC-713, DEC-714, DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-889 item 16 d · **Basis:** lens I's P-IS-8 (`docs/assessment/2026-10/I-SYNTHESIS.md`; I2 F1, I3 F1 and R1).
+- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-718 item 11, DEC-713, DEC-714, DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-889 item 16 d · **Basis:** lens I's P-IS-8 (`docs/assessment/2026-10/I-SYNTHESIS.md`; I2 F1, I3 F1 and R1). · **Changed by:** DEC-906 item 1 (its form): a retirement is a test designer's commit from now on; `c9a08678` stays in history, exempted by exact sha.
   - Both W1-42 cases read only the frozen Wave 1 exit record.
   - W2-13's and W2-14's paths cannot reach them.
   - The kept bundle fails both possible rulings.
@@ -10489,7 +10489,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 289. The owner's answers of 2026-10-23 on P-W2-07-A-B (register v0.289, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-904 — A full verification run against the scratch budget: the retention trial, a lead's own clean-up rule, a bridge cap with one run at a time; W2-67 forward; W2-07's test-designer batch widened to the 196 cases
-- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-898, DEC-902, DEC-880 item 2 (b), DEC-889 items 6 and 7, DEC-868, DEC-896, DEC-899, DEC-903, DEC-866, MR-3 · **Basis:** package P-W2-07-A-B with its addendum (`governance/project/orchestration/packages/P-W2-07-A-B.md`). W2-07's and W2-66's leads stopped their full verification runs at DEC-898's lead budget: 1,062,156 inodes at about 13.6 % of W2-07's run; 5,306,782 inodes and 47 GB for W2-66's.
+- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-898, DEC-902, DEC-880 item 2 (b), DEC-889 items 6 and 7, DEC-868, DEC-896, DEC-899, DEC-903, DEC-866, MR-3 · **Basis:** package P-W2-07-A-B with its addendum (`governance/project/orchestration/packages/P-W2-07-A-B.md`). W2-07's and W2-66's leads stopped their full verification runs at DEC-898's lead budget: 1,062,156 inodes at about 13.6 % of W2-07's run; 5,306,782 inodes and 47 GB for W2-66's. · **Changed by:** DEC-905: the trial held; the option is the default, the bridge cap ends, the lock stays.
 - **Decision:**
   1. **A (a), the retention trial.** pytest's `tmp_path_retention_policy=failed` is tried on one full run in the close's form, measured:
      - the peak inodes and size of the run's temp folder;
@@ -10545,3 +10545,133 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.289 | 2026-10-23 | Owner (recorded by the orchestrator, DEC-861): DEC-904 (P-W2-07-A-B with its addendum: the retention trial, measured, then the default for the close, the nightly and the leads; a lead's own temp clean-up by literal path at the settings regeneration; the bridge cap of 6,000,000 inodes and 60 GB per verification run, one at a time under a lock, the disk floor still enforced; the two stopped runs' temp folders removed; W2-67 forward to the next free slot; W2-07's test-designer batch widened to the 196 cases; DEC-490 and DEC-493 marked; P-W2-07-C and DEC-903 accepted; W2-07's verification first, then W2-66's). Next free id: DEC-905. |
+
+## 290. The retention trial's result of 2026-10-23, applied (register v0.290, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-905 — The retention trial held: `-o tmp_path_retention_policy=failed` is the default for the close, the nightly run and the leads; the bridge cap ends; the lock stays
+- **Status:** ACCEPTED. Items 1 to 3 are the owner's conditional decision (DEC-904 item 1: "if it holds, it becomes the default"), applied by the orchestrator on the trial's evidence. Item 4 is delegated: stricter only, under the prompt §7. `Task: decision-record`, `Role: orchestrator`. The owner may overturn either. · **Under:** DEC-904, DEC-898, DEC-902, DEC-880 item 2 (b) · **Basis:** the trial (`.gov-runtime/scratch/orchestrator/tools/retention_trial.sh`; results kept in the orchestrator's `log/retention-trial-2026-10-23.txt` and its samples). · **Changed by:** DEC-906 item 3: the lock stays until W2-67 lands; then the resource gate decides.
+  - One full parallel run in the close's form, on a clone of `de2b5bf1`, with the option, under the verification lock, at a load of about 25 (W2-69's lead running).
+  - **Peak:** 165,707 files and folders and 0.91 GB, sampled every 30 seconds; 129,629 after the run. W2-66's lead's run without the option made 5,306,782 and 47 GB.
+  - **The planted failing test's folder was kept.**
+  - **The results:** 15,464 passed and 30 skipped (the same 30 tests as the rehearsal of 2026-10-21's full run). The three reds and one error are not the option's:
+    - the planted failure;
+    - W1-01's MR-3 history case (`test_only_the_test_designer_commits_to_acceptance_tests`), red on `w2/integrate` since the owner's commit `c9a08678` (package P-W1-01-H);
+    - W2-58's two launched-session cases, whose sandbox could not create its bridge sockets under the trial's long `TMPDIR` (`/tmp/gov-os-trial-retention/tmp`). They passed with the option under `/tmp` and under a lead-length path (`/tmp/gov-os-lead-W2-99`), 3 of 3 each.
+  - **Time:** 2,459 s at a load of about 25, against W2-50's close's parallel run of 2,046 s at 2.7. No evidence of a cost; not a clean comparison.
+- **Decision:**
+  1. **The option is the default** for the leads' full verification (the common lead brief's commands), the nightly run (`nightly.sh`) and the close (W2-66's KPI, in its close command in `src/gov/close/command.py`).
+  2. **The bridge cap of DEC-904 item 3 ends.** A lead's full run fits DEC-898's 20 GB and 1,000,000 again.
+  3. **The disk floor and DEC-898's budgets stand.**
+  4. **The lock stays (delegated, stricter only):** one verification run at a time across the machine, under `flock /tmp/gov-os-verify.lock`. It keeps two full runs from loading the machine at once, which also keeps the timing cases' runs quiet. The owner may lift it.
+  5. **A session's own `TMPDIR`** (DEC-898) stays short, at most a lead-length path such as `/tmp/gov-os-lead-<W2 id>`, so the launcher's sandbox can create its sockets.
+- **Where it goes (DEC-851):**
+  - this register, with DEC-904's status line marked;
+  - the prompt §15 (the default; the cap ended; the lock), v3.22;
+  - `LEAD-w2-common.md` (the commands);
+  - RESUME HERE;
+  - W2-66's ticket file (its own commit);
+  - `nightly.sh`.
+- Next free id: DEC-906.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.290 | 2026-10-23 | DEC-905 (the retention trial held: peak 165,707 inodes and 0.91 GB against 5.3 million and 47 GB, a failing test's folder kept, results unchanged; the option the default for the close, the nightly run and the leads; the bridge cap ended; the lock kept, delegated and stricter only; a session's TMPDIR kept short). Next free id: DEC-906. |
+
+## 291. The owner's answer of 2026-10-23 on P-W1-01-H (register v0.291, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-906 — Only an independent test designer commits under tests/acceptance/ (standing); W1-01's history case reads an exact-commit exemption list holding c9a08678 alone; the lock until W2-67 lands
+- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; item 1 standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** MR-3, DEC-253, DEC-889 item 16 d, DEC-891, DEC-862 (a), DEC-895, DEC-900, DEC-905, DEC-861, DEC-851 · **Basis:** package P-W1-01-H (`governance/project/orchestration/packages/P-W1-01-H.md`). `tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests` has been red on `w2/integrate` since the owner's `Role: owner` commit `c9a08678644485a7528bc875164e110881b63d93` (DEC-900's retirement of W1-42's two cases).
+- **Decision:**
+  1. **(c), standing.**
+     - From now on, test retirements and any other change under `tests/acceptance/` are committed by an independent test designer, under the owner's named decision.
+     - Only ratchet entries (`accepted_reds`, `load_sensitive`) and `accepted_history` entries stay the owner's own `Role: owner` commits.
+     - Any owner commit that touches tests is validated with a full run in the close's form before the ACT ping.
+  2. **(a), narrowed to a list, not a rule.** A `Role: owner` trailer is only text until W2-44 binds trailers to the launch, so W1-01's history case must not trust it as a standing rule.
+     - **The list:** W2-70's test designer revises the case to read an owner-committed exemption list naming exact commits: the path map's `acceptance_exemptions`, beside `accepted_history`. Each entry is `{commit: <full sha>, decision: <DEC id>}`.
+     - **Its only entry:** `c9a08678644485a7528bc875164e110881b63d93`, citing DEC-900.
+     - **Everything else stays red:** any other owner commit touching `tests/acceptance/`, and any commit not listed by its exact sha.
+     - **The entry** is the owner's own `Role: owner` commit, prepared by the orchestrator and validated first with a full run in the close's form (item 1).
+     - **W2-70 merges early,** so the red leaves `w2/integrate` then.
+     - **Until then,** leads report W1-01's case by name as known and not theirs, and the orchestrator does not count it against them.
+  3. **The one-run-at-a-time lock** (`flock /tmp/gov-os-verify.lock`, DEC-904 item 3, kept by DEC-905 item 4) stays until W2-67 lands. Then the resource gate decides.
+- **Changes:**
+  - DEC-862 (a) and DEC-891 (which owner commits stay `Role: owner`: the ratchet and accepted-history entries, plus this exemption list's entries);
+  - DEC-900 (its form: a retirement is a test-designer commit from now on);
+  - DEC-905 item 4 (the lock's end).
+- **Where it goes (DEC-851):**
+  - this register, with DEC-862's, DEC-891's, DEC-900's and DEC-905's status lines marked;
+  - the prompt §5 (the owner's commits) and §15 (the lock), v3.23;
+  - `LEAD-w2-common.md` (W1-01's case as a known red until W2-70 merges; acceptance changes by test designers only);
+  - RESUME HERE;
+  - W2-70's ticket file and card (its own commit);
+  - the prepared owner entry.
+- Next free id: DEC-907.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.291 | 2026-10-23 | Owner (recorded by the orchestrator, DEC-861): DEC-906 (standing: changes under tests/acceptance/ only by an independent test designer under the owner's named decision; only ratchet and accepted-history entries stay Role: owner commits; an owner commit touching tests validated with a full run first; W1-01's history case reads an exact-commit exemption list, acceptance_exemptions, holding c9a08678 alone (DEC-900), by W2-70's test designer; the lock until W2-67 lands). Next free id: DEC-907. |
+
+## 292. Delegated decisions of 2026-10-23 from W2-67's round 1 (register v0.292, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-907 — W2-67's ticket role is engineer, its acceptance files named for its test designers; four of its leads' readings accepted (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible, the lead's recommendation and mine agree, confidence medium or higher; it changes nothing in the Charter, the master rules or the Contract's scope, and does not weaken the guard; item 2 is stricter only; `Task: decision-record`, `Role: orchestrator`). The owner may overturn any part. · **Under:** DEC-899, DEC-904 item 5, DEC-906, MR-3, DEC-069, DEC-315, DEC-898, DEC-440, DEC-338 · **Basis:** W2-67's round 1 return (`log/W2-67-A5-run1.json`; its packages in the worktree's `.gov-runtime/scratch/lead/packages/`).
+  - The round's test design is done and red as its README states.
+  - The implementation could not start: `gov launch: LAUNCH_REFUSED: ticket 'DAEO-9nys' is a ticket of another role ('independent-test-designer'), not of 'engineer'`. The guard also gives no engineer `tests/acceptance/**`.
+  - The ticket file I wrote set the role to test designer, while its card puts the builder tests on an engineer: my slip, a contradiction between the card and the guard (DEC-105).
+- **Decision:**
+  1. **P-W2-67-1 (a).**
+     - **The ticket's role is `engineer`.** Its `allowed_paths` hold only builder files: `tests/unit/guard/**`, `tests/conftest.py`, and `tests/unit/close/**` (round 2).
+     - **Its acceptance files are named in the body for its test designers** (MR-3, as for W2-66, W2-07, W2-57, W2-65 and W2-69): the copying fixtures (`tests/acceptance/W1-07/w1_07_support.py`, W1-25's, W1-27's) and the revised suites.
+     - **The copying fixtures are changed by a second, fresh test designer,** with `Rewrite-Reason: the copy races git's background gc (I3 F9, I4 F5)`. It runs batch 1's `test_w2_67_*` files, `w2_67_tmp_probe.py` and `README-W2-67.md`, but never reads them.
+     - Test designers still launch on an engineer's ticket.
+  2. **P-W2-67-TD1-A (stricter only):** the root `tests/conftest.py` refuses, at the start, a run given a per-run `--basetemp`, naming DEC-898. One opt-out stays, an explicit environment flag (`GOV_ALLOW_BASETEMP=1`), for a measured trial.
+  3. **P-W2-67-TD1B-A:** "a rebuild needs only git" admits gitleaks for the secrets filter (DEC-440), as committed.
+  4. **P-W2-67-TD1C-A:** the code-graph daemon's per-run folders.
+     - The fixtures' clean-up goes to W2-67's round 2.
+     - The module's side is a row for W1-16's code-graph owner.
+     - `/tmp/gov-cbm-<uid>` is counted in DEC-898's temp-folder measure and swept under DEC-902.
+  5. **To the owner's daily digest (low confidence, not delegated):**
+     - P-W2-67-TD1B-B: may a pinned version's local label (`+cu130`) differ from the version read? The lead recommends strict equality unless the label is recorded on purpose.
+     - P-W2-67-TD2-A: should every change to `readiness-dimensions.yaml` need its own CIT-E record?
+- **Where it goes (DEC-851):** this register; W2-67's ticket file and card (its own commit, `Task: DAEO-9nys`); RESUME HERE; the next daily digest (item 5). No brief changes.
+- Next free id: DEC-908.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.292 | 2026-10-23 | Delegated (orchestrator): DEC-907 (W2-67's role engineer, its acceptance files named for its test designers, the copying fixtures by a second fresh designer; the conftest refuses a per-run --basetemp with one opt-out; rebuild admits gitleaks; the code-graph folders' clean-up split; two low-confidence readings to the owner's digest). Next free id: DEC-908. |
+
+## 293. Delegated decisions of 2026-10-23 from W2-07's run 2 (register v0.293, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-908 — W2-07's test-designer batch gains the 14 W1-30 cases its KPIs also change; DEC-455, DEC-480 and DEC-454 marked; W1-01's merge case read through DEC-906's list (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible, the lead's recommendation and mine agree, confidence medium-high; it applies the owner's DEC-904 item 6 and DEC-906 to cases of the same kind; it changes nothing in the Charter, the master rules or the Contract's scope; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it. · **Under:** DEC-904 item 6, DEC-906, DEC-868 items 1 (b) and 3, DEC-866, MR-3 · **Basis:** W2-07's run 2 return (`log/W2-07-A5-run2.json`).
+  - The widened batch is done and green, and `gov check` is all green.
+  - No gap in the implementation.
+  - The W1-30 fixture was RED at 7 hard-block checks, not 3, and now declares the 13 that a project built from scratch can pass.
+  - 14 W1-30 cases still hold rules the KPIs changed: 13 of run 1's 175, which the fixture alone did not clear, and 1 newly exposed.
+- **Decision:**
+  1. **P-W2-07-T2 (a): the batch is widened to the 14,** each with a `Rewrite-Reason:` naming its decision, and no other expectation lowered:
+     - **8 in `test_w1_30_context_failures.py`,** to DEC-868 item 3: a broken context turns context-reproducibility RED, so the pre-close `gov check` refuses at once, naming it, uncounted.
+     - **5 to DEC-868 item 1 (b) and KPI 5** (the check runs on every close, and the record states it):
+       - `test_w1_30_governance_checks.py` ×2;
+       - `test_w1_30_r8_commits.py` ×2;
+       - `test_w1_30_r13_installed_skills.py` (refused naming core-authority).
+     - **1 to KPI 10 (W2-M252):** `test_w1_30_iteration.py::test_each_refusal_opens_repair_ticket`, since an identical refusal reuses and names its ticket.
+  2. **Marked under DEC-866:**
+     - DEC-455's "counted iteration" for a context failure, changed by DEC-868 item 3;
+     - DEC-480's "the checks only when governance files change", changed by DEC-868 item 1 (b) and W2-07's KPI 5;
+     - DEC-454's "each refusal opens a repair ticket", changed by W2-07's KPI 10 (W2-M252).
+  3. **P-W2-07-T3 is already decided by DEC-906.**
+     - W1-01's history cases are a known red until W2-70 merges. They are reported by name, and do not stop W2-07's DONE.
+     - The integration-merge case (`test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass`) reads the same exact-commit list, through `merge_offences` in `w1_01_support.py`.
+     - W2-70's ticket gains that case. No `accepted_reds` entry: the owner chose the list (DEC-906).
+  4. **A row, W2-L416:** in the W1-30 fixture, repeated closes pass without a fresh checkpoint after the close's own repair-ticket commit. W2-07's checkpoint gate takes it if the fix is small; otherwise it is a row for W2-24.
+- **Where it goes (DEC-851):**
+  - this register, with DEC-455's, DEC-480's and DEC-454's status lines marked;
+  - W2-07's ticket file and W2-70's ticket file (each in its own commit);
+  - the Wave 2 list (row W2-L416);
+  - RESUME HERE.
+- Next free id: DEC-909.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.293 | 2026-10-23 | Delegated (orchestrator): DEC-908 (W2-07's test-designer batch gains 14 W1-30 cases its KPIs also change; DEC-455, DEC-480 and DEC-454 marked; W1-01's merge case read through DEC-906's list in W2-70; row W2-L416). Next free id: DEC-909. |
