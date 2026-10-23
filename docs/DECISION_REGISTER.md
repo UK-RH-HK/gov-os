@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.292 (the version table at the end of each section gives the history)
+**Version:** 0.293 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -4962,7 +4962,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
     No second rule set is written anywhere.
 
 ### DEC-454 — What `gov close` measures where its KPI lines left the mechanism open
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn any point) · **Basis:** W1-30's second return (six packages for the owner) and the orchestrator's reading of the code against each KPI clause (DEC-449): the disposition of every finding was a constant, a context that could not be built was replaced by a hash of the ticket file, "the regression tests" were two folders of unit tests, the reviewer's "wrote nothing" was the record's own word, a fourth iteration had no owner's decision to wait for, and the stale-evidence rule measured nothing · **Under:** DEC-096, DEC-136, DEC-137, DEC-413, DEC-425
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn any point) · **Basis:** W1-30's second return (six packages for the owner) and the orchestrator's reading of the code against each KPI clause (DEC-449): the disposition of every finding was a constant, a context that could not be built was replaced by a hash of the ticket file, "the regression tests" were two folders of unit tests, the reviewer's "wrote nothing" was the record's own word, a fourth iteration had no owner's decision to wait for, and the stale-evidence rule measured nothing · **Under:** DEC-096, DEC-136, DEC-137, DEC-413, DEC-425 · **Changed by:** DEC-908 (for one part): an identical refusal reuses and names its repair ticket (W2-07's KPI 10, W2-M252).
 - **Decision:**
   - **The regression tests** of a close are every test under the project's `tests/` outside the ticket's own
     acceptance folder. All run to their end. A failure, a collection error or a time limit reached refuses the
@@ -4989,7 +4989,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 113. One delegated decision: where the owner's choice after an escalation is recorded (register v0.113, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-455 — The owner's choice after an escalation is the register entry; `gov close` records its id, and every refusal for a finding counts
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a · **Changed by:** DEC-868 item 3 and DEC-908 (for one part): a broken context is refused at once by the pre-close `gov check`, uncounted, not a counted iteration.
 - **Decision:**
   - The owner's choice is recorded where the owner records decisions: in the register entry itself, in its text.
     `gov close` takes that entry's id as an argument, accepts it only when the ticket is escalated and W1-11's
@@ -5255,7 +5255,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 122. One delegated decision on W1-30: `gov close` refuses on what `gov check` blocks on (register v0.122, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-480 — For a governance-changing ticket, `gov close` refuses on exactly the checks `gov check` reports red at hard-block; it holds no rule of its own about checks
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-476 (strict, no baseline inside `gov close`). W1-30's test designer (round 6, commit `fd7ad4f0`) returned three points no source settles: a warning check that cannot run, the time limit of a check, and a built-in hard-block check that the runner reports yellow where its tool is absent. As for containment (DEC-453), the close gate takes the judgement of the component that owns it: W1-26's runner is the authority on a check's status.
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-476 (strict, no baseline inside `gov close`). W1-30's test designer (round 6, commit `fd7ad4f0`) returned three points no source settles: a warning check that cannot run, the time limit of a check, and a built-in hard-block check that the runner reports yellow where its tool is absent. As for containment (DEC-453), the close gate takes the judgement of the component that owns it: W1-26's runner is the authority on a check's status. · **Changed by:** DEC-868 item 1 (b) and DEC-908 (for one part): `gov check` runs on every close (W2-07's KPI 5), not only when governance files change.
 - **Decision:**
   - When a ticket's commits change a governance file, `gov close` runs the checks at the commit being closed through W1-26's runner and refuses when the runner reports any hard-block check red, naming each. That is the same condition on which `gov check` blocks a merge.
   - A check of severity warning refuses nothing, whether it ran and failed or could not run: the runner gives both the same status, and `gov close` does not read more into it. The designer's case that expected a refusal for a warning check whose command is absent is reversed.
@@ -10639,3 +10639,39 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.292 | 2026-10-23 | Delegated (orchestrator): DEC-907 (W2-67's role engineer, its acceptance files named for its test designers, the copying fixtures by a second fresh designer; the conftest refuses a per-run --basetemp with one opt-out; rebuild admits gitleaks; the code-graph folders' clean-up split; two low-confidence readings to the owner's digest). Next free id: DEC-908. |
+
+## 293. Delegated decisions of 2026-10-23 from W2-07's run 2 (register v0.293, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-908 — W2-07's test-designer batch gains the 14 W1-30 cases its KPIs also change; DEC-455, DEC-480 and DEC-454 marked; W1-01's merge case read through DEC-906's list (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible, the lead's recommendation and mine agree, confidence medium-high; it applies the owner's DEC-904 item 6 and DEC-906 to cases of the same kind; it changes nothing in the Charter, the master rules or the Contract's scope; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it. · **Under:** DEC-904 item 6, DEC-906, DEC-868 items 1 (b) and 3, DEC-866, MR-3 · **Basis:** W2-07's run 2 return (`log/W2-07-A5-run2.json`).
+  - The widened batch is done and green, and `gov check` is all green.
+  - No gap in the implementation.
+  - The W1-30 fixture was RED at 7 hard-block checks, not 3, and now declares the 13 that a project built from scratch can pass.
+  - 14 W1-30 cases still hold rules the KPIs changed: 13 of run 1's 175, which the fixture alone did not clear, and 1 newly exposed.
+- **Decision:**
+  1. **P-W2-07-T2 (a): the batch is widened to the 14,** each with a `Rewrite-Reason:` naming its decision, and no other expectation lowered:
+     - **8 in `test_w1_30_context_failures.py`,** to DEC-868 item 3: a broken context turns context-reproducibility RED, so the pre-close `gov check` refuses at once, naming it, uncounted.
+     - **5 to DEC-868 item 1 (b) and KPI 5** (the check runs on every close, and the record states it):
+       - `test_w1_30_governance_checks.py` ×2;
+       - `test_w1_30_r8_commits.py` ×2;
+       - `test_w1_30_r13_installed_skills.py` (refused naming core-authority).
+     - **1 to KPI 10 (W2-M252):** `test_w1_30_iteration.py::test_each_refusal_opens_repair_ticket`, since an identical refusal reuses and names its ticket.
+  2. **Marked under DEC-866:**
+     - DEC-455's "counted iteration" for a context failure, changed by DEC-868 item 3;
+     - DEC-480's "the checks only when governance files change", changed by DEC-868 item 1 (b) and W2-07's KPI 5;
+     - DEC-454's "each refusal opens a repair ticket", changed by W2-07's KPI 10 (W2-M252).
+  3. **P-W2-07-T3 is already decided by DEC-906.**
+     - W1-01's history cases are a known red until W2-70 merges. They are reported by name, and do not stop W2-07's DONE.
+     - The integration-merge case (`test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass`) reads the same exact-commit list, through `merge_offences` in `w1_01_support.py`.
+     - W2-70's ticket gains that case. No `accepted_reds` entry: the owner chose the list (DEC-906).
+  4. **A row, W2-L416:** in the W1-30 fixture, repeated closes pass without a fresh checkpoint after the close's own repair-ticket commit. W2-07's checkpoint gate takes it if the fix is small; otherwise it is a row for W2-24.
+- **Where it goes (DEC-851):**
+  - this register, with DEC-455's, DEC-480's and DEC-454's status lines marked;
+  - W2-07's ticket file and W2-70's ticket file (each in its own commit);
+  - the Wave 2 list (row W2-L416);
+  - RESUME HERE.
+- Next free id: DEC-909.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.293 | 2026-10-23 | Delegated (orchestrator): DEC-908 (W2-07's test-designer batch gains 14 W1-30 cases its KPIs also change; DEC-455, DEC-480 and DEC-454 marked; W1-01's merge case read through DEC-906's list in W2-70; row W2-L416). Next free id: DEC-909. |
