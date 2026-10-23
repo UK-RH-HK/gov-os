@@ -47,7 +47,7 @@ def test_a_collection_error_is_a_finding(tmp_path):
     findings, counts = _run_tests(tmp_path, tests, 60)
     assert findings and counts["errors"] >= 1
     with pytest.raises(_Finding) as refused:
-        check_collection(tmp_path, [tests], 60)
+        check_collection(tmp_path, [(tests, None)], 60)
     assert refused.value.code == "COLLECTION_FAILED"
     assert any(line.startswith("collect") and "tests/unit/test_a.py" in line for line in refused.value.findings)
 
