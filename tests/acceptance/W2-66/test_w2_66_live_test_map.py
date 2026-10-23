@@ -161,9 +161,15 @@ def _held(targets, target, whole=True):
 
 # -- the files exist and are valid ---------------------------------------------
 
+def _schema():
+    path = ROOT / support.TEST_MAP_SCHEMA_REL
+    assert path.is_file(), f"{support.TEST_MAP_SCHEMA_REL} does not exist"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def test_the_schema_exists_and_is_a_valid_json_schema():
     jsonschema = pytest.importorskip("jsonschema")
-    schema = json.loads((ROOT / support.TEST_MAP_SCHEMA_REL).read_text(encoding="utf-8"))
+    schema = _schema()
     jsonschema.Draft202012Validator.check_schema(schema)
     assert schema.get("$schema", "").endswith("2020-12/schema"), "the schema is not draft 2020-12, as its siblings"
 
@@ -171,14 +177,14 @@ def test_the_schema_exists_and_is_a_valid_json_schema():
 @pytest.mark.parametrize("rel", [support.TEST_MAP_REL, support.TEMPLATE_TEST_MAP_REL])
 def test_the_test_map_and_the_template_s_copy_are_valid_against_the_schema(rel):
     jsonschema = pytest.importorskip("jsonschema")
-    schema = json.loads((ROOT / support.TEST_MAP_SCHEMA_REL).read_text(encoding="utf-8"))
+    schema = _schema()
     errors = sorted(e.message for e in jsonschema.Draft202012Validator(schema).iter_errors(_load(rel)))
     assert not errors, f"{rel} is not valid against {support.TEST_MAP_SCHEMA_REL}: {errors}"
 
 
 def test_the_schema_refuses_a_map_without_a_shared_core_or_with_a_wrong_type():
     jsonschema = pytest.importorskip("jsonschema")
-    schema = json.loads((ROOT / support.TEST_MAP_SCHEMA_REL).read_text(encoding="utf-8"))
+    schema = _schema()
     validator = jsonschema.Draft202012Validator(schema)
     good = _load(support.TEST_MAP_REL)
     for bad in ({k: v for k, v in good.items() if k != "shared_core"}, {**good, "shared_core": 7},
