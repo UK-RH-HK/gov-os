@@ -23,8 +23,6 @@ allowed_paths:
 - src/gov/telemetry/**
 - tests/unit/close/**
 - tests/unit/telemetry/**
-- tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py
-- tests/acceptance/W1-30/test_w1_30_collection*
 kpis:
   success:
   - 'gov close judges a ticket by its class [W2-H045]: an implementation ticket on its acceptance tests; a specification ticket on its closed readiness record and its acceptance tests; an audit ticket on its report and the audit validator; a research ticket on its evidence record; an integration or coordination ticket on its named evidence files'
@@ -101,3 +99,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729), with DEC-868
 - **Allowed paths:** `src/gov/close/**`, except W2-66's and W2-68's new modules (`select.py`, `nightly.py`, `evidence.py`, `batch.py`, `fingerprint.py`). Also `src/gov/telemetry/**`, `tests/unit/close/**` and `tests/unit/telemetry/**`, and, for its test designer only, the W1-30 cases named above.
 - **It unblocks** the test-revision tickets: W2-63, W2-67's revisions and W2-70 close on its class once it is pinned.
 - **Row W2-M263 (DEC-738 item 4):** RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.
+- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py`, `tests/acceptance/W1-30/test_w1_30_collection*`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.
