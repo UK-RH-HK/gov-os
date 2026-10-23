@@ -1,0 +1,339 @@
+"""Part 2: this repository's test map, its schema and the template's copy (KPI 2, 3, 5, 8, 9; DEC-896 item 2).
+
+Read only. The lists are judged by the paths they place in this repository's tracked tree, read with the
+grammar of a ticket's ``allowed_paths`` (README, "Interface"). README, "Part 2".
+"""
+
+import json
+import re
+import subprocess
+
+import pytest
+import yaml
+
+import w2_66_support as support
+
+ROOT = support.REPO_ROOT
+
+RETRIEVAL_CORE = tuple(f"src/gov/retrieval/{name}.py" for name in
+                       ("__init__", "chunking", "lexical", "semantic", "ollama", "rerank", "fusion", "retrieve"))
+WIDEST = ("src/gov/config/loader.py", "src/gov/tasks/tickets.py", "src/gov/store/loader.py")
+# ``src/gov/errors.py`` of the KPI line does not exist; the envelope's error module is ``src/gov/cli/errors.py``
+# (I4 F12 counts it under the CLI). README, "Discoveries".
+CLI_CORE = ("src/gov/cli/main.py", "src/gov/cli/errors.py")
+SHARED_CORE_FOLDERS = ("src/gov/close", "src/gov/guard", "src/gov/check", "src/gov/records",
+                       "template/governance/kernel/hooks", "src/gov/hooks")
+MAPS = (support.PATH_MAP_REL, support.TEST_MAP_REL)
+
+# DEC-891's record places. "The plan files" are the plan's documents, not the code kept beside them.
+RECORD_PLACES = (".tickets/", "docs/checkpoints/", "docs/close/", "docs/probes/", "docs/DECISION_REGISTER.md",
+                 "docs/plan/", "governance/project/orchestration/")
+# DEC-891's code, tests and kernel.
+CODE_PLACES = ("src/", "tests/", "template/", ".rulesync/", ".claude/", "schemas/", "fixtures/")
+CODE_SUFFIXES = (".py", ".sh", ".js", ".ts", ".toml", ".cfg", ".ini")
+
+# The record-reading set's first list: DEC-889 item 2's start, and lens I's readers of a DEC-891 record path
+# (I2 F6, I3 F5, I4 F6, I1 §4.1), filtered by KPI 5's rule. ``(target, whole)``: ``whole`` targets must be held
+# whole; the others by any entry within them (the reports name only some of their cases).
+RECORD_READERS = (
+    ("tests/acceptance/W1-06/test_w1_06_approvals.py", True),          # gate (f): the register's approvals
+    ("tests/acceptance/W1-08/test_w1_08_path_map.py", True),           # gate (f)
+    ("tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py", True), # gate (f): scans the tree
+    ("tests/acceptance/W1-07/test_w1_07_envelope.py", True),           # gate (f): every command on the tree
+    ("tests/acceptance/W2-54/test_w2_54_green_here.py", True),         # DEC-889 item 2
+    ("tests/acceptance/W1-33/test_w1_33_agent_definitions.py", True),  # DEC-889 item 2
+    ("tests/acceptance/W1-49/test_w1_49_threshold.py", True),          # DEC-889 item 2: W1-49's window
+    ("tests/acceptance/W1-10/test_w1_10_register.py::"
+     "test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails", True),   # I3 F5
+    ("tests/acceptance/W1-10/test_w1_10_completeness.py::"
+     "test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph", True),          # I3 F5
+    ("tests/acceptance/W2-02/test_w2_02_green_here.py", True),         # I4 F6: .tickets/ and docs/
+    ("tests/acceptance/W1-08/test_w1_08_ticket.py", True),             # I4 F6: the ticket files
+    ("tests/acceptance/W1-08/test_w1_08_probe.py", True),              # I4 F6: the probe records
+    ("tests/acceptance/W1-06/test_w1_06_install_approvals.py", True),  # I4 F6: the register's approvals
+    ("tests/acceptance/W1-07/test_w1_07_config.py", True),             # I4 F6: the tickets
+    ("tests/acceptance/W1-07/test_w1_07_config_details.py", True),     # I4 F6: the tickets
+    ("tests/acceptance/W1-27/test_w1_27_doctor.py", True),             # I4 F6: the whole tree's text
+    ("tests/acceptance/W1-42", False),                                 # I2 F6: the tickets, the exit record
+    ("tests/acceptance/W1-26/test_w1_26_probe_records.py", False),     # I2 F6: docs/probes
+    ("tests/acceptance/W1-48", False),                                 # I2 F6: the register's approvals
+)
+
+EVERY_CLOSE = ("tests/acceptance/W1-07/test_w1_07_envelope.py", "tests/acceptance/W1-07/test_w1_07_read_act.py",
+               "tests/acceptance/W1-07/test_w1_07_registry.py")
+
+# KPI 3's couplings and the synthesis's §4 lines: (a tracked path the coupling reads, the suites it must reach).
+COUPLINGS = (
+    ("src/gov/cli/main.py", ("tests/acceptance/W1-42",)),                                  # text read
+    ("template/governance/kernel/templates/brief-lead.md", ("tests/acceptance/W1-42",)),   # text read
+    (support.SERIAL_ONLY_REL, ("tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",)),  # text read
+    ("src/gov/retrieval/rerank_worker.py", ("tests/acceptance/W1-19/test_w1_19_real_models.py",
+                                             "tests/acceptance/W1-21/test_w1_21_dev_tier.py",
+                                             "tests/unit/semantic/test_rerank_process.py")),  # its own process
+    ("src/gov/hooks/stop.py", ("tests/acceptance/W1-29", "tests/acceptance/W1-49", "tests/acceptance/W2-62",
+                               "tests/unit/hooks")),
+    ("template/governance/kernel/hooks/stop.py", ("tests/acceptance/W1-29", "tests/acceptance/W1-49",
+                                                  "tests/acceptance/W2-62", "tests/unit/hooks")),
+    ("template/governance/kernel/hooks/sessionstart.py", ("tests/acceptance/W1-31", "tests/acceptance/W1-37",
+                                                          "tests/acceptance/W1-38", "tests/unit/telemetry")),
+    ("template/governance/kernel/hooks/precompact.py", ("tests/acceptance/W1-31", "tests/acceptance/W1-37",
+                                                        "tests/acceptance/W1-38", "tests/unit/telemetry")),
+    (support.PATH_MAP_REL, tuple(f"tests/acceptance/{w}" for w in
+                                 ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+    (".gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
+                             ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+    ("template/.gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
+                                      ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+    ("src/gov/checkpoint/record.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-31")),
+    ("src/gov/decisions/checker.py", ("tests/acceptance/W1-30",)),
+    ("src/gov/closure/command.py", ("tests/acceptance/W1-30",)),
+    ("src/gov/adapters/portability.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-26")),
+    ("src/gov/context/command.py", ("tests/acceptance/W1-31",)),
+    ("src/gov/secrets/__init__.py", ("tests/acceptance/W1-40",)),
+    ("src/gov/retrieval/validate.py", ("tests/unit/validate",)),
+    ("src/gov/retrieval/canary.py", ("tests/unit/validate",)),
+    ("template/governance/kernel/roles/engineer.md", ("tests/acceptance/W1-38",)),
+    ("template/governance/kernel/skills/planning/SKILL.md", ("tests/acceptance/W1-38",)),
+)
+
+
+def _tracked():
+    out = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"], capture_output=True, text=True, check=True)
+    return [path for path in out.stdout.split("\0") if path]
+
+
+@pytest.fixture(scope="module")
+def tracked():
+    return _tracked()
+
+
+def _load(rel):
+    path = ROOT / rel
+    assert path.is_file(), f"{rel} does not exist"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    assert isinstance(data, dict), f"{rel} is not a YAML mapping"
+    return data
+
+
+_MISSING = "__missing__"
+
+
+@pytest.fixture(scope="module")
+def test_map():
+    """The live test map; a marker where it cannot be read, so that each case fails on it (not an error)."""
+    try:
+        return _load(support.TEST_MAP_REL)
+    except (AssertionError, yaml.YAMLError) as e:
+        return {_MISSING: str(e)}
+
+
+def _need(test_map):
+    assert _MISSING not in test_map, test_map.get(_MISSING)
+    return test_map
+
+
+def _patterns(test_map, key):
+    _need(test_map)
+    patterns = test_map.get(key)
+    assert isinstance(patterns, list) and patterns, f"the test map has no list under {key!r}"
+    unread = [p for p in patterns if not support.readable_pattern(p)]
+    assert not unread, f"{key} holds patterns outside the allowed_paths grammar (README, 'Interface'): {unread}"
+    return patterns
+
+
+def _placed(patterns, path):
+    return any(support.matches(pattern, path) for pattern in patterns)
+
+
+def _targets(test_map, key):
+    _need(test_map)
+    targets = test_map.get(key)
+    assert isinstance(targets, list) and all(isinstance(t, str) and t for t in targets), \
+        f"the test map has no list of pytest targets under {key!r}: {targets!r}"
+    return targets
+
+
+def _held(targets, target, whole=True):
+    if any(support.covers(entry, target) for entry in targets):
+        return True
+    return not whole and any(support.covers(target, entry) for entry in targets)
+
+
+# -- the files exist and are valid ---------------------------------------------
+
+def test_the_schema_exists_and_is_a_valid_json_schema():
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = json.loads((ROOT / support.TEST_MAP_SCHEMA_REL).read_text(encoding="utf-8"))
+    jsonschema.Draft202012Validator.check_schema(schema)
+    assert schema.get("$schema", "").endswith("2020-12/schema"), "the schema is not draft 2020-12, as its siblings"
+
+
+@pytest.mark.parametrize("rel", [support.TEST_MAP_REL, support.TEMPLATE_TEST_MAP_REL])
+def test_the_test_map_and_the_template_s_copy_are_valid_against_the_schema(rel):
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = json.loads((ROOT / support.TEST_MAP_SCHEMA_REL).read_text(encoding="utf-8"))
+    errors = sorted(e.message for e in jsonschema.Draft202012Validator(schema).iter_errors(_load(rel)))
+    assert not errors, f"{rel} is not valid against {support.TEST_MAP_SCHEMA_REL}: {errors}"
+
+
+def test_the_schema_refuses_a_map_without_a_shared_core_or_with_a_wrong_type():
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = json.loads((ROOT / support.TEST_MAP_SCHEMA_REL).read_text(encoding="utf-8"))
+    validator = jsonschema.Draft202012Validator(schema)
+    good = _load(support.TEST_MAP_REL)
+    for bad in ({k: v for k, v in good.items() if k != "shared_core"}, {**good, "shared_core": 7},
+                {**good, "record_only": "docs/close/**"}):
+        assert list(validator.iter_errors(bad)), f"the schema accepts a map it must refuse: {sorted(bad)}"
+
+
+# -- KPI 2: the shared core ------------------------------------------------------
+
+def test_the_shared_core_holds_every_named_member(test_map, tracked):
+    core = _patterns(test_map, "shared_core")
+    missing = []
+    for folder in SHARED_CORE_FOLDERS:
+        files = [p for p in tracked if p.startswith(folder + "/")]
+        assert files, f"the fixture is wrong: no tracked file under {folder}"
+        missing += [p for p in files if not _placed(core, p)]
+    missing += [p for p in RETRIEVAL_CORE + WIDEST + CLI_CORE + MAPS if not _placed(core, p)]
+    assert not missing, f"the shared core does not hold: {missing}"
+
+
+def test_the_retrieval_core_is_its_eight_modules_not_the_whole_package(test_map, tracked):
+    core = _patterns(test_map, "shared_core")
+    wider = [p for p in tracked if p.startswith("src/gov/retrieval/") and p not in RETRIEVAL_CORE
+             and _placed(core, p)]
+    assert not wider, f"the shared core holds retrieval files beyond the eight modules (P-IS-1 (a)): {wider}"
+
+
+# -- DEC-891: the record-only paths ----------------------------------------------
+
+def test_the_record_only_paths_are_dec_891_s_places_and_nothing_else(test_map, tracked):
+    records = _patterns(test_map, "record_only")
+    outside = [p for p in tracked if _placed(records, p) and not p.startswith(RECORD_PLACES)]
+    assert not outside, f"record-only patterns place paths outside DEC-891's list: {outside[:20]}"
+
+
+def test_the_record_only_list_hides_no_code_path(test_map, tracked):
+    """Failure line 3: a code file kept in a record place (``sync_context.py``, the plan's tools) is code."""
+    records = _patterns(test_map, "record_only")
+    hidden = [p for p in tracked if _placed(records, p) and (p.endswith(CODE_SUFFIXES) or p.startswith(CODE_PLACES))]
+    assert not hidden, f"the record-only list hides code paths: {hidden}"
+
+
+@pytest.mark.parametrize("place", RECORD_PLACES)
+def test_every_record_of_each_of_dec_891_s_places_is_record_only(test_map, tracked, place):
+    records = _patterns(test_map, "record_only")
+    files = [p for p in tracked if p.startswith(place) and not p.endswith(CODE_SUFFIXES)
+             and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))]
+    assert files, f"the fixture is wrong: no tracked record under {place}"
+    unplaced = [p for p in files if not _placed(records, p)]
+    assert not unplaced, f"records of {place} the record-only list leaves out: {unplaced[:20]}"
+
+
+@pytest.mark.parametrize("path", ["governance/project/tool-registry.yaml", support.PATH_MAP_REL,
+                                  "governance/project/roster.yaml", "docs/adr/ADR-0001-threat-model.md"])
+def test_paths_dec_891_does_not_name_are_not_record_only(test_map, path):
+    assert not _placed(_patterns(test_map, "record_only"), path), f"{path} is record-only, against DEC-891's list"
+
+
+# -- KPI 5: the record-reading set -----------------------------------------------
+
+@pytest.mark.parametrize("target,whole", RECORD_READERS, ids=[t for t, _ in RECORD_READERS])
+def test_the_record_reading_set_holds_each_reader_of_a_record_path(test_map, target, whole):
+    assert (ROOT / target.split("::")[0]).exists(), f"the fixture is wrong: {target} does not exist"
+    assert _held(_targets(test_map, "record_reading"), target, whole), \
+        f"the record-reading set does not hold {target}"
+
+
+def test_every_record_reading_target_exists(test_map):
+    missing = [t for t in _targets(test_map, "record_reading") if not (ROOT / t.split("::")[0]).exists()]
+    assert not missing, f"the record-reading set names targets that do not exist: {missing}"
+
+
+# -- KPI 3: the every-close files and the couplings ------------------------------
+
+def test_w1_07_s_three_contract_files_run_on_every_close(test_map):
+    every = _targets(test_map, "every_close")
+    missing = [t for t in EVERY_CLOSE if not _held(every, t)]
+    assert not missing, f"the every-close list does not hold W1-07's contract files: {missing}"
+
+
+def _couplings(test_map):
+    _need(test_map)
+    couplings = test_map.get("couplings")
+    assert isinstance(couplings, list) and couplings, "the test map declares no couplings"
+    for entry in couplings:
+        assert isinstance(entry, dict) and entry.get("paths") and entry.get("suites") and entry.get("why"), \
+            f"a coupling lacks paths, suites or why: {entry!r}"
+        assert all(support.readable_pattern(p) for p in entry["paths"]), f"a coupling's pattern: {entry!r}"
+    return couplings
+
+
+@pytest.mark.parametrize("path,suites", COUPLINGS, ids=[p for p, _ in COUPLINGS])
+def test_each_coupling_imports_cannot_see_is_declared(test_map, path, suites):
+    assert (ROOT / path).exists(), f"the fixture is wrong: {path} does not exist"
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
+    missing = [s for s in suites if not _held(reached, s, whole=False)]
+    assert not missing, f"no coupling takes a change of {path} to {missing}"
+
+
+@pytest.mark.parametrize("unit", ["deploy/gov-index.service", "gov.socket", "a/b/gov-nightly.timer"])
+def test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared(test_map, unit):
+    """W1-18 lists every service, socket and timer unit of the working tree (I3 §4.1 item 6): a new one, at any
+    depth, reaches it. The tree holds none today, so the paths are examples."""
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], unit) for t in entry["suites"]]
+    assert _held(reached, "tests/acceptance/W1-18", whole=False), f"no coupling takes a change of {unit} to W1-18"
+
+
+def _declared_modules():
+    """The source file of every module a kernel check declaration runs (``python3 -m gov.<module>``)."""
+    found = set()
+    for declaration in sorted((ROOT / "template/governance/kernel/checks").glob("*.yaml")):
+        command = str((yaml.safe_load(declaration.read_text(encoding="utf-8")) or {}).get("command", ""))
+        match = re.search(r"-m\s+(gov(?:\.\w+)+)", command)
+        if not match:
+            continue
+        base = ROOT / "src" / match.group(1).replace(".", "/")
+        for candidate in (base.with_suffix(".py"), base / "__main__.py", base / "__init__.py"):
+            if candidate.is_file():
+                found.add(candidate.relative_to(ROOT).as_posix())
+                break
+    return sorted(found)
+
+
+def test_every_module_a_declared_check_runs_reaches_w1_26(test_map):
+    core = _patterns(test_map, "shared_core")
+    modules = _declared_modules()
+    assert modules, "the fixture is wrong: no declared check runs a gov module"
+    missing = []
+    for module in modules:
+        if _placed(core, module):
+            continue
+        reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], module) for t in entry["suites"]]
+        if not _held(reached, "tests/acceptance/W1-26", whole=False):
+            missing.append(module)
+    assert not missing, f"modules a declared check runs that reach neither the shared core nor W1-26: {missing}"
+
+
+# -- DEC-896 item 2: test_inputs moved; KPI 8 and 9: the settings -----------------
+
+def test_the_path_map_s_test_inputs_are_in_the_test_map(test_map):
+    inputs = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
+    if inputs is None:
+        pytest.skip("the path map no longer holds test_inputs (the orchestrator's edit is done)")
+    moved = _need(test_map).get("test_inputs")
+    assert isinstance(moved, list) and set(inputs) <= set(moved), \
+        f"the test map does not hold the path map's test_inputs {inputs}: {moved!r}"
+
+
+def test_the_per_test_limit_is_above_the_slowest_test_measured(test_map):
+    limit = _need(test_map).get(support.PER_TEST_TIMEOUT_KEY, support.DEFAULT_PER_TEST_TIMEOUT)
+    assert isinstance(limit, (int, float)) and not isinstance(limit, bool) and limit >= 900, \
+        f"the per-test limit is not above the slowest measured test (900 s held in the trial): {limit!r}"
+
+
+def test_the_distribution_mode_stays_the_default_and_is_not_worksteal(test_map):
+    mode = _need(test_map).get(support.DISTRIBUTION_KEY, support.DEFAULT_DISTRIBUTION)
+    assert mode == support.DEFAULT_DISTRIBUTION, \
+        f"the distribution mode is {mode!r}: worksteal waits until the nested reruns are gone (DEC-892 a)"
