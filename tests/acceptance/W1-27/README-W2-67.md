@@ -317,10 +317,43 @@ The code index's daemon folder (`/tmp/gov-cbm-<uid>`, I4's second place) is not 
 sandbox it is read-only (`[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/…'`, the code index's reason on
 every rebuild here), so what the mode writes there could not be seen; it is left open in the designer's return.
 
+### Batch 1b: what is left, and what was found
+
+Batch 1b revises the cases batch 1 listed as not revised (above), except one:
+
+- **Left: `test_w1_27_rebuild_r4.py::test_rebuild_codeintel_reason_is_measured`.** I4's revision ("the measured status
+  and reason") needs an input that changes what the code index answers. In this session's sandbox every rebuild's
+  code index stops at its daemon folder (`/tmp/gov-cbm-<uid>`, read-only here, a fixed path that `TMPDIR` does not
+  move) with the same reason, with or without its tool on PATH, so no revision could be shown both green and red
+  under a plant here. It is unchanged; a session that can write `/tmp/gov-cbm-<uid>` can revise it.
+
+Findings on the head (not asserted red; for the tickets that own the code):
+
+- `test_doctor_real_registry_every_entry_reported`: doctor counts `reranker-venv` ok with the version read
+  `… torch 2.14.1 …` against the pin `… torch 2.14.1+cu130 …` and `sha256_match` false. Whether DEC-452's "the version
+  read equals the pin" allows a local version label to differ is doctor's owner's question; the case's ok half reads
+  "a version read, or the hash matched", which holds on the head.
+- `test_rebuild_needs_only_git`: with git alone on PATH, rebuild fails closed on the secrets filter's gitleaks
+  (DEC-440). The case holds git and gitleaks alone; whether the failure KPI's "needs only git" admits that tool is
+  returned as a package.
+- After a rebuild and a change, doctor's `index_freshness.stale` also lists files under `.gov-runtime/` (the store and
+  the code index's copies) when the project does not ignore that folder; the index-freshness case asserts only the
+  changed and unchanged documents.
+- With the lexical canary passing and the semantic one unavailable because no namespace is embedded, the `canaries`
+  section is `fail` (both unavailable: `unmeasured`); the canaries case does not assert the section's status after the
+  rebuild.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
 - `w2_67_tmp_probe.py`: the one case the nested runs start (not collected by a run of `tests`).
 - `w2_67_doctor.py`: reading doctor's sections; a small committed project; doctor with this worktree's code.
+- `w2_67b_support.py` (batch 1b): files of a small project, a moved path, `moved_references`, the tiny rebuild project
+  and `gov rebuild` with this worktree's code, and a read of the store.
+- Revised in place by batch 1b: `test_w1_27_path_compliance.py` (3), `test_w1_27_path_compliance_r2.py` (3),
+  `test_w1_27_doctor.py` (8), `test_w1_27_doctor_r5.py` (1), `test_w1_27_doctor_r7.py` (1, ×4 parameters),
+  `test_w1_27_isolation_r2.py` (1), `test_w1_27_drift.py` (6), `test_w1_27_rebuild.py` (5),
+  `test_w1_27_rebuild_r2.py` (2), `test_w1_27_rebuild_r3.py` (1), `test_w1_27_rebuild_r8_no_embeddings.py` (1),
+  `test_w1_27_recovery_check_r2.py` (3).
 - Revised in place: `test_w1_27_path_compliance_r2.py` (1 case), `test_w1_27_held_out.py` (2 cases),
   `test_w1_27_adoption.py` (3 cases).
