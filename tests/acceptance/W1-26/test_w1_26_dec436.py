@@ -234,7 +234,7 @@ def test_family_only_unmeasured_check_not_green(project, sandbox, interface):
 
 # --- 2a. RECORD_PATHS: a record in a new directory is discovered ---
 
-def test_record_in_new_directory_discovered_by_schema_check(project, sandbox, interface):
+def test_record_in_new_directory_discovered_by_schema_check(green_project, sandbox, interface):
     """A record placed in a non-standard directory (not ``.tickets/`` or
     ``docs/adr/``) is discovered by the schema check, proving it derives
     record paths from the repo rather than a hardcoded list.
@@ -242,13 +242,20 @@ def test_record_in_new_directory_discovered_by_schema_check(project, sandbox, in
     The record is placed under ``docs/custom-records/``, a directory that
     no existing list mentions.  The schema check should find it and
     validate it (or flag it).
+
+    Revised (W2-67, I2 §2.7): "the output changed" always held (the output
+    carries the commit id). On the green base, ``core-schema`` is GREEN with no
+    finding with the well-formed record, and RED with a finding that names the
+    defective one and its missing field once it is added.
     """
+    project = green_project
     project.write("docs/custom-records/REC-NEW-001.md",
                   "---\nid: REC-NEW-001\ntype: decision\nstatus: ACTIVE\n"
                   "state_class: AUTHORITATIVE\ntitle: Custom record\n---\n"
                   "# REC-NEW-001\n")
     project.commit()
     run1 = support.run_check(project, sandbox)
+    support.assert_check_green(run1, interface, "core-schema")
 
     project.write("docs/custom-records/REC-BAD-001.md",
                   "---\nid: REC-BAD-001\ntype: decision\n"
@@ -256,17 +263,7 @@ def test_record_in_new_directory_discovered_by_schema_check(project, sandbox, in
                   "# REC-BAD-001\n")
     project.commit()
     run2 = support.run_check(project, sandbox)
-
-    output_changed = run2.stdout != run1.stdout or run2.returncode != run1.returncode
-    envelope2 = support.envelope_of(run2, interface)
-    result2 = envelope2.get("result") or envelope2.get("error", {}).get("details", {})
-    schema_status = support.family_status(result2, "schema/invariants")
-
-    assert output_changed or schema_status == support.RED, (
-        f"adding a defective record in docs/custom-records/ did not change the "
-        f"check output or make schema/invariants RED — the check uses a hardcoded "
-        f"list of record directories\n{run2.describe()}"
-    )
+    support.assert_check_red_naming(run2, interface, "core-schema", "docs/custom-records/REC-BAD-001.md", "status")
 
 
 def test_record_in_nested_path_discovered_by_graph_check(project, sandbox, interface):
@@ -293,30 +290,24 @@ def test_record_in_nested_path_discovered_by_graph_check(project, sandbox, inter
 
 # --- 2b. SCHEMA_MAP: a record with an unknown type is not silently skipped ---
 
-def test_record_with_unknown_type_not_silently_skipped(project, sandbox, interface):
+def test_record_with_unknown_type_not_silently_skipped(green_project, sandbox, interface):
     """A record whose ``type`` is not in the schema map (e.g. ``type: almanac``)
     must not be silently skipped: the check should either validate its base
-    fields or report the unknown type."""
+    fields or report the unknown type.
+
+    Revised (W2-67, I2 §2.7): "not silently green" held on a base that was never
+    green (I2 R1), and the output always holds a commit id. On the green base,
+    ``core-schema`` is RED with a finding that names the record: today the unknown
+    type is refused (W2-02's ``test_a_record_with_an_unknown_type_is_still_refused``).
+    """
+    project = green_project
     project.write("docs/adr/UNK-TYPE-001.md",
                   "---\nid: UNK-TYPE-001\ntype: almanac\nstatus: ACTIVE\n"
                   "state_class: AUTHORITATIVE\ntitle: Unknown type record\n---\n"
                   "# UNK-TYPE-001\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    output_text = json.dumps(result) + run.stdout
-
-    silently_green = (
-        envelope.get("ok") is True
-        and run.returncode == support.EXIT_OK
-        and "UNK-TYPE-001" not in output_text
-        and "almanac" not in output_text.lower()
-    )
-    assert not silently_green, (
-        f"a record with unknown type 'almanac' was silently skipped; the check "
-        f"passed without mentioning the record or its type\n{run.describe()}"
-    )
+    support.assert_check_red_naming(run, interface, "core-schema", "docs/adr/UNK-TYPE-001.md")
 
 
 # --- 2c. Command module discovery ---
