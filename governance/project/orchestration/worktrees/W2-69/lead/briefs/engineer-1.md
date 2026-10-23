@@ -72,7 +72,9 @@ Each suite to its end, in the foreground, never with `-x`:
 - the ticket's acceptance tests: `PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH TMPDIR=/tmp/gov-os-lead-W2-69/td PYTHONPATH=/home/usain/gov-os-worktrees/W2-69/src python3 -m pytest tests/acceptance/W2-69 -q -p no:cacheprovider -rs`, until they pass;
 - the earlier suites of this check, the same way: `tests/acceptance/W1-15`, `tests/acceptance/W2-50` (its secrets files at least: `test_w2_50_secrets_scan_scale.py`, `test_w2_50_never_indexed.py`, `test_w2_50_last_review.py`), and `tests/acceptance/W1-16`;
 - the builder tests: `tests/unit/secrets_check`, `tests/unit/rebuild`, and `tests/unit` as a whole collected once: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-69/src python3 -m pytest tests --collect-only -q -p no:cacheprovider --no-header` must end with no collection error.
-<TEST-DESIGNER-NOTES>
+- The W2-69 suite is heavy (thousands of gitleaks runs): run it with `-n 8` added, file by file if you need to stay inside the two-hour limit of one command. Its case `test_w2_69_deleted_text_after_rebuild.py::test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild` starts the codebase-memory daemon: run it alone, without `-n`.
+- Before each long run, check that the machine is not loaded: `until awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done` (other sessions share it), and that the file `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING` does not exist (if it does, wait until it is gone: `until [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING ]; do sleep 60; done`).
+- **The check's gitleaks call is shared** with the pre-index filter and the judgement of a path name in the same module. Keep all three on that one call, so the way gitleaks is given its input is the same for each; no separate code for the other two.
 
 ## Commit
 
