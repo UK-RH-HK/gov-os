@@ -646,6 +646,12 @@ No case of this suite asserts a time: the ticket's KPI lines name none, and no c
 - **W1-07 revised cases**: 6
 - **Total**: 114
 
+## W2-67: test hygiene (DAEO-9nys, round 1)
+
+W2-67's test designer added the KPI tests for per-test copies and temp folders (`test_w2_67_copies.py`,
+`test_w2_67_temp_folders.py`) and revised weak cases of this suite, each with a `Rewrite-Reason` and shown red
+against a planted fault and green on the head. The map, the red reasons and the plants: `README-W2-67.md`.
+
 ## Fixture (W2-54, DEC-798, 2026-10-19)
 
 DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
