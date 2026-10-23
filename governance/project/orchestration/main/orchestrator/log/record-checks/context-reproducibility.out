@@ -2,4 +2,5 @@ ERROR: DAEO-9nys: .tickets/DAEO-9nys.md is a file of the ticket folder that the 
 ERROR: DAEO-1ahb: mandatory input 'DEC-902' not found in the store
 ERROR: DAEO-c1uz: mandatory input 'DEC-903' not found in the store
 ERROR: DAEO-r9ss: mandatory input 'DEC-903' not found in the store
-context-reproducibility: 0 ticket(s) failed, 4 error(s)
+ERROR: DAEO-uzme: mandatory input 'DEC-906' not found in the store
+context-reproducibility: 0 ticket(s) failed, 5 error(s)

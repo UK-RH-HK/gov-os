@@ -54,6 +54,13 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **DEC-906 (owner) `4bffc276`** on P-W1-01-H: STANDING: changes under tests/acceptance/ only by a test designer
+  (retirements too); only ratchet, accepted-history and acceptance_exemptions entries stay Role: owner commits; an
+  owner commit touching tests gets a full run first. W1-01's case reads `acceptance_exemptions` (exact shas), only
+  entry c9a08678 / DEC-900, via W2-70 (`83a3867e`; claimed `23518192`; lead QUEUED, `log/W2-70-A5-run1.json`).
+  **The entry's patch + validation RUNNING** (`tools/validate_exemption.sh`: pin readers + full run under the lock;
+  results `/tmp/gov-os-exempt/out/run.txt`, patch `drafts/OWNER-C-acceptance-exemption.patch`) -> then ACT ping.
+  Lock kept until W2-67 lands.
 - **DEC-905 `ac119c37`: the retention trial HELD** (peak 165,707 inodes / 0.91 GB vs 5.3M / 47 GB; failing test's
   folder kept; 30 skips = rehearsal's). The option is the default (LEAD-common, nightly.sh, W2-66 KPI `bfddcb07`);
   bridge cap ENDED; lock KEPT (delegated); TMPDIR kept short (a long one breaks W2-58's sandbox sockets).
