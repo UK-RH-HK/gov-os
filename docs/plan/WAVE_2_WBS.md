@@ -1068,7 +1068,9 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - `src/gov/secrets/**`;
   - `src/gov/rebuild/command.py`: the compaction step after each store's build only;
   - `tests/unit/secrets/**`, `tests/unit/rebuild/test_compaction*`;
-  - `docs/research/W2-69-secrets-scan.md`.
+  - `docs/research/W2-69-secrets-scan.md`;
+  - **(P-IS-5 (a), DEC-899)** `tests/unit/secrets_check/**`: W2-L373's rename, so the folder no longer shadows the standard library's `secrets`;
+  - **(P-IS-5 (a), DEC-899)** for its test designer only, with `Rewrite-Reason: DEC-897`: W2-50's secrets-scan scale cases (`test_w2_50_secrets_scan_scale.py`, `w2_50_scan_support.py`) and the secrets cases of `test_w2_50_never_indexed.py` and `test_w2_50_last_review.py`, revised only where scanning rows as text or compacting changes what they expect.
 - **KPIs, success:**
   - A real token is found at every offset and in every form the stores hold it (a stored value, a row read as text, UTF-16 text, across every read or split boundary), at a word boundary as the rule defines it.
   - An embedded fragment of a longer identifier is not flagged, at every offset relative to any read edge, for every rule with a leading word boundary.
