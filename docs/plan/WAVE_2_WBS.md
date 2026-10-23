@@ -276,23 +276,38 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - A re-index never empties the semantic index; a model-less re-index reports the semantic facet unavailable instead [DEC-719].
 - **KPIs, failure:** a re-index that fails leaves the previous index and reports the failure; it never leaves no index [W2-M088].
 
-#### W2-07 `gov close` by ticket class; complete, tracked repair tickets; a share for every close (STANDARD, engineer)
-- **Allowed paths:** `src/gov/close/**` (except W2-66's and W2-68's new modules, `select.py`, `nightly.py`, `batch.py` and `fingerprint.py`; W2-48's `cache*` was withdrawn, DEC-880), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
-- **KPIs, success:**
-  - The probe gate accepts a failed probe record whose every finding is named, with its row, in an ACCEPTED owner decision that names the record and its probed commit; any finding not so named still refuses [W2-M371, DEC-790].
-  - `gov close` judges a ticket by its class [W2-H045]:
-    - an implementation ticket on its acceptance tests;
-    - a specification ticket on its closed readiness record and its acceptance tests;
-    - an audit ticket on its report and the audit validator;
-    - a research ticket on its evidence record;
-    - an integration or coordination ticket on its named evidence files;
-    - a test-revision ticket on the acceptance tests its ticket file names in `acceptance_tests.path` (another ticket's folder), not on a folder of its own (DEC-892; W2-63 waits for this).
-  - A refused close writes a complete repair ticket (role, allowed paths, KPIs) that stays tracked in `.tickets/` [F-m8, W2-L209, W2-L236, AR-9].
-  - The close record carries the measured governance share [W2-M166, W2-M286].
-  - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
-  - An interrupted close leaves nothing that blocks the next close [W2-M158].
-  - **The pre-close gate, inside `gov close` (DEC-868, owner, 2026-10-20):** before its regression, the close collects every suite it will run, in one process, as it runs them (`pytest --collect-only`), runs `gov check` with no commit since the rebuild, and checks that the ticket's checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt. Failure: a tree with a collection error (an import or name clash, as `tests/unit/secrets` shadowing the standard library), a RED `gov check` or a stale checkpoint is refused within minutes, not after the regression.
-- **KPIs, failure:** a research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
+#### W2-07 `gov close` by ticket class; the commit gates before any test; complete, tracked repair tickets; a share for every close (STANDARD, engineer; DEC-868, DEC-892, DEC-896 item 3, DEC-898; keystone 1)
+- **Place (DEC-896 item 3):** comes forward to sit with W2-66, before the first re-pin, and rides in it.
+  - It shares `src/gov/close/command.py` with W2-66: W2-66 writes the record's evidence lines, W2-07 the gates.
+  - **The merge order (owner, DEC-899 item 2):** the two are built in parallel, and **W2-07 merges first.** Then W2-66 merges `w2/integrate` back, re-verifies and gets a fresh FULL probe before the re-pin.
+  - Its close is judged by the pin, so its own gates help from the re-pin on.
+- **Allowed paths:** `src/gov/close/**` (except W2-66's and W2-68's new modules `select.py`, `nightly.py`, `evidence.py`, `batch.py`, `fingerprint.py`), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`, `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py` and W1-30's collection-error cases (one named revision batch for its test designer).
+- **KPIs, success (the existing ones kept):**
+  - judged by its class:
+    - implementation on its acceptance tests;
+    - specification on its readiness record and tests;
+    - audit on its report and validator;
+    - research on its evidence record;
+    - integration or coordination on its named evidence files;
+  - a complete, tracked repair ticket;
+  - the measured governance share;
+  - adoption-gap and baseline refusals not counted;
+  - an interrupted close blocks nothing;
+  - the probe gate's named-finding acceptance (W2-M371, DEC-790);
+  - DEC-868's pre-close gate inside `gov close`.
+- **Added by DEC-896 item 3 (owner):**
+  - **Decision records measured by their decision:** a decision-record commit that changes only governance records, under an ACCEPTED decision, counts as measured for the work-without-a-task gate. A decision-close would hide the gap and is not this.
+  - **Test-revision tickets** are judged on their declared `acceptance_tests.path` (DEC-892). W2-63, W2-67's revisions and W2-70 wait for this.
+  - **A stale probe is named before the close spends its run** (W2-M403).
+- **Added from lens I (P-IS-4 (a), for the owner's decision):**
+  - **The commit gates run first,** and stop before any test when one refuses, spending no ratchet attempt (DEC-868 item 3). They are the trailers, task-less work, accepted history, the probe gate, and the ratchet's own reading of both lists' entries. On 2026-10-22 two closes spent about 70 minutes each before refusing on commit findings (I2 F13, I4 F14, F17).
+  - **Named for its test designer** (cases this ticket turns red): `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py` (3 functions, 6 cases) and `test_collection_error_refuses_close`. **For its engineer:** the unit `test_a_collection_error_is_a_finding` (I2 F9).
+  - **Optional:** the missing case for the close record's packet hash, made a constant in a planted fault that nothing caught (I2 PF9).
+- **Added by DEC-898 (owner):** before its regression, `gov close` reads the shared disk's free space and free inodes (W2-20's reading once it lands; until then the same floors, 100 GiB and 10,000,000 inodes, from the configuration). Below the floor it refuses at once, naming the reading, and spends no attempt.
+- **KPIs, failure:**
+  - a research ticket without an evidence record, or an audit ticket whose report fails the validator, closes;
+  - a tree with a collection error, a red `gov check`, a stale checkpoint, a stale probe, an unmeasured commit, a ratchet entry the ratchet would not count, or a disk below the floor is refused only after the regression;
+  - a decision-record commit outside an ACCEPTED decision counts as measured.
 
 #### W2-08 Hooks back on (STANDARD, orchestrator, with the independent test designer)
 - **Allowed paths:** `docs/plan/wave-2/hooks-back-on/**` (evidence), `tests/acceptance/W1-40/**` (test designer only).
