@@ -652,6 +652,9 @@ W2-67's test designer added the KPI tests for per-test copies and temp folders (
 `test_w2_67_temp_folders.py`) and revised weak cases of this suite, each with a `Rewrite-Reason` and shown red
 against a planted fault and green on the head. The map, the red reasons and the plants: `README-W2-67.md`.
 
+Batch 3 (the second, fresh designer, DEC-907): the copying fixtures' `gc.auto=0` and the `--basetemp` refusal's
+cases (`test_w2_67_basetemp_refusal.py`): `README-W2-67-fixtures.md`.
+
 ## Fixture (W2-54, DEC-798, 2026-10-19)
 
 DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
