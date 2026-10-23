@@ -1,0 +1,1403 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="39" skipped="0" tests="47" time="170.696" timestamp="2026-10-23T11:36:45.953704+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_research_ticket_closes_on_its_evidence_record" time="1.271"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-rsch --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-rsch&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-rsch: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-xgok&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd76c800&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_research_ticket_closes_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_research_ticket_closes_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_research_ticket_closes_on_its_evidence_record(project, sandbox, interface):
+        _class_ticket(project, RESEARCH, "research", RESEARCH_PATHS, [RECORD_REL],
+                      {RECORD_REL: support.research_record("EXP-w9")})
+&gt;       _closed_cleanly(project, sandbox, interface, RESEARCH)
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_by_class.py:39: in _closed_cleanly
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rsch', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-xgok"}}}\n', stderr='', seconds=0.503290833090432)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rsch --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/"], "ticket": "PROJ-rsch", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-rsch: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-xgok"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_research_ticket_without_its_evidence_record_is_refused" time="1.266"><failure message="AssertionError: the refusal does not name the missing evidence record&#10;  gov close PROJ-rsch --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-rsch&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-rsch: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-y0p4&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert False&#10; +  where False = &lt;function names_any at 0x7e12dd7213a0&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'docs/research/W9/EXP-w9.md', 'evidence')&#10; +    where &lt;function names_any at 0x7e12dd7213a0&gt; = support.names_any">project = &lt;w2_07_support.Project object at 0x7e12dd68c8f0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_research_ticket_without0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_research_ticket_without0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_research_ticket_without_its_evidence_record_is_refused(project, sandbox, interface):
+        """Failure KPI 1: the record the ticket names is not there; its work wrote notes, not a record."""
+        _class_ticket(project, RESEARCH, "research", RESEARCH_PATHS, [RECORD_REL],
+                      {"docs/research/W9/notes.txt": "notes, not an evidence record\n"})
+        run, error = _refused_not_closed(project, sandbox, interface, RESEARCH)
+&gt;       assert support.names_any(error, RECORD_REL, "evidence"), \
+            f"the refusal does not name the missing evidence record\n{run.describe()}"
+E       AssertionError: the refusal does not name the missing evidence record
+E         gov close PROJ-rsch --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/"], "ticket": "PROJ-rsch", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-rsch: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-y0p4"}}}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = &lt;function names_any at 0x7e12dd7213a0&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-rsch in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'docs/research/W9/EXP-w9.md', 'evidence')
+E        +    where &lt;function names_any at 0x7e12dd7213a0&gt; = support.names_any
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:72: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_audit_ticket_is_judged_on_its_report_and_the_audit_validator[report-passes-the-validator]" time="1.524"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-audt --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-audt&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-audt: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-oy2x&quot;}}}&#10;&#10;stderr:">valid = True, project = &lt;w2_07_support.Project object at 0x7e12dd68dfa0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_audit_ticket_is_judged0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_audit_ticket_is_judged0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("valid", [True, False], ids=["report-passes-the-validator", "report-fails-the-validator"])
+    def test_an_audit_ticket_is_judged_on_its_report_and_the_audit_validator(valid, project, sandbox, interface):
+        """Failure KPI 1: an audit ticket whose report fails the validator does not close (an invalid class)."""
+        audited = support.head_of(project)
+        rows = [("The README", "OK" if valid else "BOGUS", "README.md")]
+        _class_ticket(project, AUDIT, "audit", AUDIT_PATHS, [REPORT_REL], {REPORT_REL: support.audit_report(audited, rows)})
+        code, said = support.audit_validator(project, sandbox, REPORT_REL)
+        assert code == (0 if valid else 1), f"the fixture is wrong: the validator answers {code}\n{said}"
+        if valid:
+&gt;           _closed_cleanly(project, sandbox, interface, AUDIT)
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_by_class.py:39: in _closed_cleanly
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-audt', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-oy2x"}}}\n', stderr='', seconds=0.6252029890893027)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-audt --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/"], "ticket": "PROJ-audt", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-audt: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-oy2x"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_audit_ticket_is_judged_on_its_report_and_the_audit_validator[report-fails-the-validator]" time="1.343"><failure message="AssertionError: the refusal does not name the audit validator's finding&#10;  gov close PROJ-audt --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-audt&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-audt: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-tov1&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert False&#10; +  where False = &lt;function names_any at 0x7e12dd7213a0&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'AUDIT_INVALID_CLASS', 'validator')&#10; +    where &lt;function names_any at 0x7e12dd7213a0&gt; = support.names_any">valid = False, project = &lt;w2_07_support.Project object at 0x7e12dd68f9e0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_audit_ticket_is_judged1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_audit_ticket_is_judged1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("valid", [True, False], ids=["report-passes-the-validator", "report-fails-the-validator"])
+    def test_an_audit_ticket_is_judged_on_its_report_and_the_audit_validator(valid, project, sandbox, interface):
+        """Failure KPI 1: an audit ticket whose report fails the validator does not close (an invalid class)."""
+        audited = support.head_of(project)
+        rows = [("The README", "OK" if valid else "BOGUS", "README.md")]
+        _class_ticket(project, AUDIT, "audit", AUDIT_PATHS, [REPORT_REL], {REPORT_REL: support.audit_report(audited, rows)})
+        code, said = support.audit_validator(project, sandbox, REPORT_REL)
+        assert code == (0 if valid else 1), f"the fixture is wrong: the validator answers {code}\n{said}"
+        if valid:
+            _closed_cleanly(project, sandbox, interface, AUDIT)
+        else:
+            run, error = _refused_not_closed(project, sandbox, interface, AUDIT)
+&gt;           assert support.names_any(error, "AUDIT_INVALID_CLASS", "validator"), \
+                f"the refusal does not name the audit validator's finding\n{run.describe()}"
+E           AssertionError: the refusal does not name the audit validator's finding
+E             gov close PROJ-audt --json
+E             exit code: 3
+E             stdout:
+E             {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/"], "ticket": "PROJ-audt", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-audt: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-tov1"}}}
+E             
+E             stderr:
+E             
+E           assert False
+E            +  where False = &lt;function names_any at 0x7e12dd7213a0&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-audt in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'AUDIT_INVALID_CLASS', 'validator')
+E            +    where &lt;function names_any at 0x7e12dd7213a0&gt; = support.names_any
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:97: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_closes_on_its_named_evidence_files[integration]" time="1.258"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-intg --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-intg&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-intg: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-534p&quot;}}}&#10;&#10;stderr:">cls = 'integration', project = &lt;w2_07_support.Project object at 0x7e12dd68e2a0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("cls", ["integration", "coordination"])
+    def test_an_integration_or_coordination_ticket_closes_on_its_named_evidence_files(cls, project, sandbox, interface):
+        ticket = "PROJ-intg" if cls == "integration" else "PROJ-cord"
+        _class_ticket(project, ticket, cls, EVIDENCE_PATHS, NAMED,
+                      {NAMED[0]: "# Gate evidence\n\nEach line passed.\n", NAMED[1]: "run 1: passed\n"})
+&gt;       _closed_cleanly(project, sandbox, interface, ticket)
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_by_class.py:39: in _closed_cleanly
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-intg', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-534p"}}}\n', stderr='', seconds=0.5299501200206578)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-intg --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/"], "ticket": "PROJ-intg", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-intg: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-534p"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_closes_on_its_named_evidence_files[coordination]" time="1.433"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-cord --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-cord&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-cord: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-jqna&quot;}}}&#10;&#10;stderr:">cls = 'coordination', project = &lt;w2_07_support.Project object at 0x7e12dd793860&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("cls", ["integration", "coordination"])
+    def test_an_integration_or_coordination_ticket_closes_on_its_named_evidence_files(cls, project, sandbox, interface):
+        ticket = "PROJ-intg" if cls == "integration" else "PROJ-cord"
+        _class_ticket(project, ticket, cls, EVIDENCE_PATHS, NAMED,
+                      {NAMED[0]: "# Gate evidence\n\nEach line passed.\n", NAMED[1]: "run 1: passed\n"})
+&gt;       _closed_cleanly(project, sandbox, interface, ticket)
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_by_class.py:39: in _closed_cleanly
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-cord', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-jqna"}}}\n', stderr='', seconds=0.5751293200301006)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-cord --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/"], "ticket": "PROJ-cord", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-cord: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-jqna"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused[integration]" time="1.277"><failure message="AssertionError: the refusal does not name the missing evidence file&#10;  gov close PROJ-intg --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-intg&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-intg: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-45x0&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert False&#10; +  where False = &lt;function names at 0x7e12dd721300&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'docs/plan/W9/run.log')&#10; +    where &lt;function names at 0x7e12dd721300&gt; = support.names">cls = 'integration', project = &lt;w2_07_support.Project object at 0x7e12dd790380&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin2/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("cls", ["integration", "coordination"])
+    def test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused(cls, project, sandbox,
+                                                                                           interface):
+        ticket = "PROJ-intg" if cls == "integration" else "PROJ-cord"
+        _class_ticket(project, ticket, cls, EVIDENCE_PATHS, NAMED, {NAMED[0]: "# Gate evidence\n\nEach line passed.\n"})
+        run, error = _refused_not_closed(project, sandbox, interface, ticket)
+&gt;       assert support.names(error, NAMED[1]), f"the refusal does not name the missing evidence file\n{run.describe()}"
+E       AssertionError: the refusal does not name the missing evidence file
+E         gov close PROJ-intg --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/"], "ticket": "PROJ-intg", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-intg: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-45x0"}}}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = &lt;function names at 0x7e12dd721300&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-intg in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'docs/plan/W9/run.log')
+E        +    where &lt;function names at 0x7e12dd721300&gt; = support.names
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:123: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused[coordination]" time="1.310"><failure message="AssertionError: the refusal does not name the missing evidence file&#10;  gov close PROJ-cord --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/&quot;], &quot;ticket&quot;: &quot;PROJ-cord&quot;, &quot;wbs&quot;: &quot;W9-clss&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-cord: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-b76t&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert False&#10; +  where False = &lt;function names at 0x7e12dd721300&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'docs/plan/W9/run.log')&#10; +    where &lt;function names at 0x7e12dd721300&gt; = support.names">cls = 'coordination', project = &lt;w2_07_support.Project object at 0x7e12dd65fe30&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin3/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_integration_or_coordin3/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("cls", ["integration", "coordination"])
+    def test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused(cls, project, sandbox,
+                                                                                           interface):
+        ticket = "PROJ-intg" if cls == "integration" else "PROJ-cord"
+        _class_ticket(project, ticket, cls, EVIDENCE_PATHS, NAMED, {NAMED[0]: "# Gate evidence\n\nEach line passed.\n"})
+        run, error = _refused_not_closed(project, sandbox, interface, ticket)
+&gt;       assert support.names(error, NAMED[1]), f"the refusal does not name the missing evidence file\n{run.describe()}"
+E       AssertionError: the refusal does not name the missing evidence file
+E         gov close PROJ-cord --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/"], "ticket": "PROJ-cord", "wbs": "W9-clss", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-cord: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-b76t"}}}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = &lt;function names at 0x7e12dd721300&gt;({'code': 'NO_ACCEPTANCE_TESTS', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['no accep...ssage': 'no acceptance tests for PROJ-cord in tests/acceptance/W9-clss/; findings are unclassed and await disposition'}, 'docs/plan/W9/run.log')
+E        +    where &lt;function names at 0x7e12dd721300&gt; = support.names
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:123: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_specification_ticket_is_judged_on_its_readiness_record_and_its_tests[readiness-closed]" time="4.046" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_specification_ticket_is_judged_on_its_readiness_record_and_its_tests[a-required-row-open]" time="4.142"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-spec --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-spec&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-spec/CL-PROJ-spec.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-spec/CP-PROJ-spec-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.86, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.82, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">closed_record = False
+project = &lt;w2_07_support.Project object at 0x7e12dd5dc260&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_specification_ticket_is1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_specification_ticket_is1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("closed_record", [True, False], ids=["readiness-closed", "a-required-row-open"])
+    def test_a_specification_ticket_is_judged_on_its_readiness_record_and_its_tests(closed_record, project, sandbox,
+                                                                                   interface):
+        """The readiness record is closed when ``gov readiness --ticket`` passes (no required row open, DEC-085); its
+        acceptance tests are its own telling test, which must have run in a close that passes."""
+        project.write(support.READINESS_SCHEMA_REL, support.readiness_schema_text())
+        project.setup_commit("the feature-readiness schema")
+        support.create_ticket(project, SPEC_TICKET, WBS, cls="specification",
+                              allowed_paths=(f"openspec/changes/{CHANGE}/**",), specification=SPEC_ID)
+        support.work(project, SPEC_TICKET, support.specification_files(SPEC_ID, CHANGE, () if closed_record else (1,)),
+                     role="product-spec")
+        support.checkpointed(project, SPEC_TICKET)
+        assert support.readiness(project, sandbox, SPEC_TICKET) == (0 if closed_record else 3), \
+            "the fixture is wrong: gov readiness does not judge the record as intended"
+        if closed_record:
+            _closed_cleanly(project, sandbox, interface, SPEC_TICKET)
+            assert support.ACCEPTANCE_MARK in project.ran(), "the specification ticket closed without running its tests"
+        else:
+&gt;           run, error = _refused_not_closed(project, sandbox, interface, SPEC_TICKET)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_by_class.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_by_class.py:47: in _refused_not_closed
+    error = support.refused(run, interface)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-spec', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...ot measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.091058759018779)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def refused(run, interface):
+        """The close was refused (``ok`` false, a non-zero exit code, not ``NOT_IMPLEMENTED``). Returns ``error``."""
+        envelope = base.envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-spec --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-spec", "close_record": "docs/close/PROJ-spec/CL-PROJ-spec.md", "checkpoint": "docs/checkpoints/PROJ-spec/CP-PROJ-spec-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.86, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.82, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:349: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_implementation_ticket_naming_evidence_but_without_acceptance_tests_is_refused" time="1.333" /><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_commit_without_its_trailers_stops_the_close_before_any_test" time="3.972"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-gate --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;TRAILER_MISSING&quot;, &quot;message&quot;: &quot;commit 5d7caa9930e1 lacks Implements: trailer; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 5d7caa9930e1 lacks Implements: trailer&quot;], &quot;commit&quot;: &quot;5d7caa9930e1&quot;, &quot;commits&quot;: [&quot;5d7caa9930e1&quot;], &quot;ticket&quot;: &quot;PROJ-gate&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.75, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.9, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-xm6d&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd5dcd40&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_commit_without_its_trai0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_commit_without_its_trai0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_commit_without_its_trailers_stops_the_close_before_any_test(project, sandbox, interface):
+        support.with_regression_mark(project)
+        support.create_ticket(project, TICKET, WBS)
+        support.work(project, TICKET, {"src/example/feature.py": "# feature\n"},
+                     trailers=(f"Task: {TICKET}", "Role: engineer"))
+        support.checkpointed(project, TICKET)
+&gt;       _assert_stopped_before_any_test(project, sandbox, interface, "TRAILER_MISSING")
+
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:30: in _assert_stopped_before_any_test
+    support.assert_no_test_ran(project, run)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd5dcd40&gt;
+run = Run(args=('close', 'PROJ-gate', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-xm6d"}}}\n', stderr='', seconds=3.112903911038302)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-gate --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "TRAILER_MISSING", "message": "commit 5d7caa9930e1 lacks Implements: trailer; findings are unclassed and await disposition", "details": {"findings": ["commit 5d7caa9930e1 lacks Implements: trailer"], "commit": "5d7caa9930e1", "commits": ["5d7caa9930e1"], "ticket": "PROJ-gate", "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.75, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.9, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-xm6d"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_work_without_a_task_stops_the_close_before_any_test" time="4.270"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-gate --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit d7331dd81a86 names no task and changes src/example/other.py: work on PROJ-gate that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit d7331dd81a86 names no task and changes src/example/other.py: work on PROJ-gate that no ticket measured&quot;], &quot;commit&quot;: &quot;d7331dd81a86&quot;, &quot;paths&quot;: [&quot;src/example/other.py&quot;], &quot;ticket&quot;: &quot;PROJ-gate&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;d7331dd81a86&quot;, &quot;paths&quot;: [&quot;src/example/other.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.8, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.97, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-m27d&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd5df380&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_work_without_a_task_stops0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_work_without_a_task_stops0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_work_without_a_task_stops_the_close_before_any_test(project, sandbox, interface):
+        support.with_regression_mark(project)
+        support.ready_ticket(project, TICKET, WBS)
+        project.write("src/example/other.py", "# work no ticket measured\n")
+        project.commit("work without a task", who=support.AGENT, trailers=(), exact=True)
+        support.checkpointed(project, TICKET)
+&gt;       _assert_stopped_before_any_test(project, sandbox, interface, "WORK_WITHOUT_TASK")
+
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:30: in _assert_stopped_before_any_test
+    support.assert_no_test_ran(project, run)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd5df380&gt;
+run = Run(args=('close', 'PROJ-gate', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-m27d"}}}\n', stderr='', seconds=3.2834441929589957)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-gate --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit d7331dd81a86 names no task and changes src/example/other.py: work on PROJ-gate that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit d7331dd81a86 names no task and changes src/example/other.py: work on PROJ-gate that no ticket measured"], "commit": "d7331dd81a86", "paths": ["src/example/other.py"], "ticket": "PROJ-gate", "work_without_task": [{"commit": "d7331dd81a86", "paths": ["src/example/other.py"]}], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.8, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.97, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-m27d"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_refused_accepted_history_entry_stops_the_close_before_any_test" time="4.321"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-gate --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;ACCEPTED_HISTORY_REFUSED&quot;, &quot;message&quot;: &quot;the accepted-history entry e9168dbfd17603afb5384b7c511c458112aaf9f4 (DEC-777) is refused: the register holds no entry DEC-777; its commit stays judged; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;the accepted-history entry e9168dbfd17603afb5384b7c511c458112aaf9f4 (DEC-777) is refused: the register holds no entry DEC-777; its commit stays judged&quot;], &quot;refused&quot;: [{&quot;code&quot;: &quot;ACCEPTED_HISTORY_REFUSED&quot;, &quot;commit&quot;: &quot;e9168dbfd17603afb5384b7c511c458112aaf9f4&quot;, &quot;decision&quot;: &quot;DEC-777&quot;, &quot;message&quot;: &quot;the accepted-history entry e9168dbfd17603afb5384b7c511c458112aaf9f4 (DEC-777) is refused: the register holds no entry DEC-777; its commit stays judged&quot;}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.87, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.95, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-eqvu&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd65f290&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refused_accepted_histor0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refused_accepted_histor0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_refused_accepted_history_entry_stops_the_close_before_any_test(project, sandbox, interface):
+        """The entry names a decision the register does not hold (DEC-734: refused, ``ACCEPTED_HISTORY_REFUSED``)."""
+        support.with_regression_mark(project)
+        done = support.ready_ticket(project, TICKET, WBS)
+        project.set_path_map(**{support.ACCEPTED_KEY: [{"commit": done, "decision": "DEC-777"}]})
+&gt;       _assert_stopped_before_any_test(project, sandbox, interface, "ACCEPTED_HISTORY_REFUSED")
+
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:30: in _assert_stopped_before_any_test
+    support.assert_no_test_ran(project, run)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd65f290&gt;
+run = Run(args=('close', 'PROJ-gate', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-eqvu"}}}\n', stderr='', seconds=3.4498331430368125)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-gate --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "ACCEPTED_HISTORY_REFUSED", "message": "the accepted-history entry e9168dbfd17603afb5384b7c511c458112aaf9f4 (DEC-777) is refused: the register holds no entry DEC-777; its commit stays judged; findings are unclassed and await disposition", "details": {"findings": ["the accepted-history entry e9168dbfd17603afb5384b7c511c458112aaf9f4 (DEC-777) is refused: the register holds no entry DEC-777; its commit stays judged"], "refused": [{"code": "ACCEPTED_HISTORY_REFUSED", "commit": "e9168dbfd17603afb5384b7c511c458112aaf9f4", "decision": "DEC-777", "message": "the accepted-history entry e9168dbfd17603afb5384b7c511c458112aaf9f4 (DEC-777) is refused: the register holds no entry DEC-777; its commit stays judged"}], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.87, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.95, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-eqvu"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_stale_probe_is_named_before_any_test_runs" time="4.112"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-gate --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;PROBE_INVALID&quot;, &quot;message&quot;: &quot;ticket commit 0fd8882ebc3b changes src/example/more.py after the probed commit; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;ticket commit 0fd8882ebc3b changes src/example/more.py after the probed commit&quot;], &quot;ticket&quot;: &quot;PROJ-gate&quot;, &quot;commit&quot;: &quot;0fd8882ebc3b&quot;, &quot;path&quot;: &quot;src/example/more.py&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.79, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.94, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;what the probe gate of PROJ-gate asks after this finding: not measured, the gate ends at its first&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-pve4&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd793f50&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_stale_probe_is_named_be0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_stale_probe_is_named_be0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_stale_probe_is_named_before_any_test_runs(project, sandbox, interface):
+        """W2-M403: the FULL ticket's probe judged its first commit; a later commit of the ticket changes its paths, so
+        the probe is stale (``PROBE_INVALID``). The close names it before the regression, not after it."""
+        support.with_regression_mark(project)
+        support.create_ticket(project, TICKET, WBS, profile="FULL")
+        first = support.work(project, TICKET, {"src/example/feature.py": "# feature\n"})
+        support.probe_recorded(project, TICKET, first)
+        support.work(project, TICKET, {"src/example/more.py": "# more, after the probe\n"})
+        support.checkpointed(project, TICKET)
+&gt;       error = _assert_stopped_before_any_test(project, sandbox, interface, "PROBE_INVALID")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:30: in _assert_stopped_before_any_test
+    support.assert_no_test_ran(project, run)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd793f50&gt;
+run = Run(args=('close', 'PROJ-gate', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-pve4"}}}\n', stderr='', seconds=3.227561609004624)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-gate --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "PROBE_INVALID", "message": "ticket commit 0fd8882ebc3b changes src/example/more.py after the probed commit; findings are unclassed and await disposition", "details": {"findings": ["ticket commit 0fd8882ebc3b changes src/example/more.py after the probed commit"], "ticket": "PROJ-gate", "commit": "0fd8882ebc3b", "path": "src/example/more.py", "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.79, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.94, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "not_measured": ["what the probe gate of PROJ-gate asks after this finding: not measured, the gate ends at its first"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-pve4"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_ratchet_entry_the_ratchet_would_not_count_stops_the_close_before_any_test[accepted_reds-ACCEPTED_RED_REFUSED]" time="4.144"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-gate --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;the accepted_reds entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing&quot;], &quot;accepted_reds&quot;: [], &quot;load_sensitive&quot;: [], &quot;red_findings&quot;: [{&quot;code&quot;: &quot;ACCEPTED_RED_REFUSED&quot;, &quot;test&quot;: &quot;tests/unit/test_w207_regression_mark.py::test_w207_regression_mark&quot;, &quot;message&quot;: &quot;the accepted_reds entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing&quot;}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.88, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.94, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-juod&quot;}}}&#10;&#10;stderr:">key = 'accepted_reds', code = 'ACCEPTED_RED_REFUSED'
+project = &lt;w2_07_support.Project object at 0x7e12dd5de480&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ratchet_entry_the_ratch0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ratchet_entry_the_ratch0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("key, code", [("accepted_reds", "ACCEPTED_RED_REFUSED"),
+                                           ("load_sensitive", "LOAD_SENSITIVE_REFUSED")])
+    def test_a_ratchet_entry_the_ratchet_would_not_count_stops_the_close_before_any_test(key, code, project, sandbox,
+                                                                                         interface):
+        """The entry's decision is ACCEPTED by the owner, but its text names neither the test's file nor its name (I2
+        F11: the ratchet refuses such an entry, "it covers nothing")."""
+        support.with_regression_mark(project)
+        project.record_decision("DEC-601", support.OWNER_ACCEPTED, "A case of the fixture is accepted for a while.")
+        entry = (support.red_entry if key == "accepted_reds" else support.quarantine_entry)(support.REGRESSION_MARK_ID,
+                                                                                            "DEC-601")
+        project.set_path_map(**{key: [entry]})
+        support.ready_ticket(project, TICKET, WBS)
+&gt;       error = _assert_stopped_before_any_test(project, sandbox, interface, code)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:30: in _assert_stopped_before_any_test
+    support.assert_no_test_ran(project, run)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd5de480&gt;
+run = Run(args=('close', 'PROJ-gate', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-juod"}}}\n', stderr='', seconds=3.3527045469963923)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-gate --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the accepted_reds entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing"], "accepted_reds": [], "load_sensitive": [], "red_findings": [{"code": "ACCEPTED_RED_REFUSED", "test": "tests/unit/test_w207_regression_mark.py::test_w207_regression_mark", "message": "the accepted_reds entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing"}], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.88, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.94, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-juod"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_ratchet_entry_the_ratchet_would_not_count_stops_the_close_before_any_test[load_sensitive-LOAD_SENSITIVE_REFUSED]" time="4.163"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-gate --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;the load_sensitive entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing&quot;], &quot;accepted_reds&quot;: [], &quot;load_sensitive&quot;: [], &quot;red_findings&quot;: [{&quot;code&quot;: &quot;LOAD_SENSITIVE_REFUSED&quot;, &quot;test&quot;: &quot;tests/unit/test_w207_regression_mark.py::test_w207_regression_mark&quot;, &quot;message&quot;: &quot;the load_sensitive entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing&quot;}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.84, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.96, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-d8sd&quot;}}}&#10;&#10;stderr:">key = 'load_sensitive', code = 'LOAD_SENSITIVE_REFUSED'
+project = &lt;w2_07_support.Project object at 0x7e12dd76ea20&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ratchet_entry_the_ratch1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ratchet_entry_the_ratch1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("key, code", [("accepted_reds", "ACCEPTED_RED_REFUSED"),
+                                           ("load_sensitive", "LOAD_SENSITIVE_REFUSED")])
+    def test_a_ratchet_entry_the_ratchet_would_not_count_stops_the_close_before_any_test(key, code, project, sandbox,
+                                                                                         interface):
+        """The entry's decision is ACCEPTED by the owner, but its text names neither the test's file nor its name (I2
+        F11: the ratchet refuses such an entry, "it covers nothing")."""
+        support.with_regression_mark(project)
+        project.record_decision("DEC-601", support.OWNER_ACCEPTED, "A case of the fixture is accepted for a while.")
+        entry = (support.red_entry if key == "accepted_reds" else support.quarantine_entry)(support.REGRESSION_MARK_ID,
+                                                                                            "DEC-601")
+        project.set_path_map(**{key: [entry]})
+        support.ready_ticket(project, TICKET, WBS)
+&gt;       error = _assert_stopped_before_any_test(project, sandbox, interface, code)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_commit_gates.py:30: in _assert_stopped_before_any_test
+    support.assert_no_test_ran(project, run)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd76ea20&gt;
+run = Run(args=('close', 'PROJ-gate', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...it their class; use --disposition to classify", "repair_ticket": "pro-d8sd"}}}\n', stderr='', seconds=3.34660975006409)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-gate --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the load_sensitive entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing"], "accepted_reds": [], "load_sensitive": [], "red_findings": [{"code": "LOAD_SENSITIVE_REFUSED", "test": "tests/unit/test_w207_regression_mark.py::test_w207_regression_mark", "message": "the load_sensitive entry tests/unit/test_w207_regression_mark.py::test_w207_regression_mark (DEC-601) is refused: DEC-601 does not name the test tests/unit/test_w207_regression_mark.py::test_w207_regression_mark; it covers nothing"}], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.84, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.96, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-d8sd"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured" time="4.165"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit e980bb3d4ed7 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit e980bb3d4ed7 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;e980bb3d4ed7&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;e980bb3d4ed7&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.87, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.91, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-muik&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd76e450&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_decision_record_of_gove0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_decision_record_of_gove0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured(project, sandbox,
+                                                                                                  interface):
+        _ticket_naming_the_path_map(project)
+        record = _decision_record(project, "DEC-501")
+        changed = sorted(support.git(project, "show", "--name-only", "--format=", record).split())
+        assert changed == sorted([support.PATH_MAP_REL, support.REGISTER]), f"the fixture is wrong: {changed}"
+        support.checkpointed(project, TICKET)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+&gt;       support.closed(run, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-muik"}}}\n', stderr='', seconds=3.4022704870440066)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit e980bb3d4ed7 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit e980bb3d4ed7 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured"], "commit": "e980bb3d4ed7", "paths": ["governance/project/path-map.yaml"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "e980bb3d4ed7", "paths": ["governance/project/path-map.yaml"]}], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.87, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.91, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-muik"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured" time="4.107" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_naming_no_decision_counts_as_unmeasured" time="4.076" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_code_tests_or_the_kernel_counts_as_unmeasured[code]" time="4.287" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_code_tests_or_the_kernel_counts_as_unmeasured[tests]" time="4.036" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_code_tests_or_the_kernel_counts_as_unmeasured[kernel]" time="4.609" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_collection_error_in_any_suite_refuses_before_any_test[regression]" time="4.437"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-pcg1 --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;ERROR tests/unit/test_w207_broken.py - /home/usain/.local/lib/python3.12/site...&quot;], &quot;tests_run&quot;: {&quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 1, &quot;skipped&quot;: 0}, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.91, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.06, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 1, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-43d4&quot;}}}&#10;&#10;stderr:">where = 'regression', project = &lt;w2_07_support.Project object at 0x7e12dd68d970&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_collection_error_in_any0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_collection_error_in_any0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("where", ["regression", "acceptance"])
+    def test_a_collection_error_in_any_suite_refuses_before_any_test(where, project, sandbox, interface):
+        """A test file that cannot be imported, in the regression (``tests/unit/``) or in the ticket's own acceptance
+        folder: collecting every suite the close runs finds it before any test runs."""
+        support.with_regression_mark(project)
+        if where == "regression":
+            project.write("tests/unit/test_w207_broken.py", BROKEN)
+            project.setup_commit("a broken regression test")
+            support.ready_ticket(project, TICKET, WBS)
+        else:
+            support.create_ticket(project, TICKET, WBS)
+            project.write(f"tests/acceptance/{WBS}/test_w207_broken.py", BROKEN)
+            project.commit("a broken acceptance test", who=support.TEST_DESIGNER,
+                           trailers=support.trailers_of(TICKET, role="independent-test-designer"), exact=True)
+            support.work(project, TICKET, {"src/example/feature.py": "# feature\n"})
+            support.checkpointed(project, TICKET)
+&gt;       run, error = _assert_refused_before(project, sandbox, interface)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:35: in _assert_refused_before
+    support.assert_no_test_ran(project, run, which)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd68d970&gt;
+run = Run(args=('close', 'PROJ-pcg1', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-43d4"}}}\n', stderr='', seconds=3.501041241106577)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-pcg1 --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["ERROR tests/unit/test_w207_broken.py - /home/usain/.local/lib/python3.12/site..."], "tests_run": {"passed": 1, "failed": 0, "errors": 1, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.91, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.06, "passed": 1, "failed": 0, "errors": 1, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-43d4"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_collection_error_in_any_suite_refuses_before_any_test[acceptance]" time="4.284"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-pcg1 --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;ERROR tests/acceptance/W9-pcg1/test_w207_broken.py - /home/usain/.local/lib/p...&quot;], &quot;tests_run&quot;: {&quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 1, &quot;skipped&quot;: 0}, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.95, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 1, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.04, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-fyux&quot;}}}&#10;&#10;stderr:">where = 'acceptance', project = &lt;w2_07_support.Project object at 0x7e12dd76edb0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_collection_error_in_any1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_collection_error_in_any1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("where", ["regression", "acceptance"])
+    def test_a_collection_error_in_any_suite_refuses_before_any_test(where, project, sandbox, interface):
+        """A test file that cannot be imported, in the regression (``tests/unit/``) or in the ticket's own acceptance
+        folder: collecting every suite the close runs finds it before any test runs."""
+        support.with_regression_mark(project)
+        if where == "regression":
+            project.write("tests/unit/test_w207_broken.py", BROKEN)
+            project.setup_commit("a broken regression test")
+            support.ready_ticket(project, TICKET, WBS)
+        else:
+            support.create_ticket(project, TICKET, WBS)
+            project.write(f"tests/acceptance/{WBS}/test_w207_broken.py", BROKEN)
+            project.commit("a broken acceptance test", who=support.TEST_DESIGNER,
+                           trailers=support.trailers_of(TICKET, role="independent-test-designer"), exact=True)
+            support.work(project, TICKET, {"src/example/feature.py": "# feature\n"})
+            support.checkpointed(project, TICKET)
+&gt;       run, error = _assert_refused_before(project, sandbox, interface)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:35: in _assert_refused_before
+    support.assert_no_test_ran(project, run, which)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd76edb0&gt;
+run = Run(args=('close', 'PROJ-pcg1', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-fyux"}}}\n', stderr='', seconds=3.473452448961325)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-pcg1 --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["ERROR tests/acceptance/W9-pcg1/test_w207_broken.py - /home/usain/.local/lib/p..."], "tests_run": {"passed": 1, "failed": 0, "errors": 1, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.95, "passed": 1, "failed": 0, "errors": 1, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.04, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-fyux"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_red_gov_check_refuses_before_any_test" time="4.538"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-pcg1 --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-pcg1&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-pcg1/CL-PROJ-pcg1.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.84, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.24, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd5dea50&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_red_gov_check_refuses_b0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_red_gov_check_refuses_b0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_red_gov_check_refuses_before_any_test(project, sandbox, interface):
+        """The project declares a hard-block check that is RED. The ticket's commits change no governance file, so
+        today's close does not run the checks at all (DEC-480); the pre-close gate runs ``gov check`` on every close."""
+        project.add_check("w207-red", "false")
+        project.setup_commit("a check that is red")
+        support.with_regression_mark(project)
+        support.ready_ticket(project, TICKET, WBS)
+        check = support.base.run_check(project, sandbox)
+        assert check.returncode == support.EXIT_CHECK_FAILED, f"the fixture is wrong: gov check is not RED\n{check.describe()}"
+&gt;       run, error = _assert_refused_before(project, sandbox, interface)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:34: in _assert_refused_before
+    error = support.refused(run, interface)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-pcg1', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...t measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.4564925980521366)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def refused(run, interface):
+        """The close was refused (``ok`` false, a non-zero exit code, not ``NOT_IMPLEMENTED``). Returns ``error``."""
+        envelope = base.envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-pcg1 --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-pcg1", "close_record": "docs/close/PROJ-pcg1/CL-PROJ-pcg1.md", "checkpoint": "docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.84, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.24, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:349: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_stale_checkpoint_refuses_before_any_test" time="3.904"><failure message="AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']&#10;gov close PROJ-pcg1 --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECKPOINT_STALE&quot;, &quot;message&quot;: &quot;the latest checkpoint of PROJ-pcg1 is stale: age, ticket-transition; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;the latest checkpoint of PROJ-pcg1 is stale: age, ticket-transition&quot;], &quot;path&quot;: &quot;docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0001.md&quot;, &quot;ticket&quot;: &quot;PROJ-pcg1&quot;, &quot;age_minutes&quot;: 75518, &quot;commits&quot;: 0, &quot;reasons&quot;: [&quot;age&quot;, &quot;ticket-transition&quot;], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.79, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.02, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-2zpt&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd793200&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_stale_checkpoint_refuse0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_stale_checkpoint_refuse0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_stale_checkpoint_refuses_before_any_test(project, sandbox, interface):
+        support.with_regression_mark(project)
+        support.create_ticket(project, TICKET, WBS)
+        support.work(project, TICKET, {"src/example/feature.py": "# feature\n"})
+        _stale_checkpoint(project, TICKET)
+&gt;       run, error = _assert_refused_before(project, sandbox, interface)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:35: in _assert_refused_before
+    support.assert_no_test_ran(project, run, which)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd793200&gt;
+run = Run(args=('close', 'PROJ-pcg1', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-2zpt"}}}\n', stderr='', seconds=3.394708525040187)
+which = None
+
+    def assert_no_test_ran(project, run, which=None):
+        """No telling test of the project ran (``which``: only these names are looked for)."""
+        ran = project.ran()
+        if which is not None:
+            ran = [name for name in ran if name in which]
+&gt;       assert not ran, f"tests ran before the close refused: {ran}\n{run.describe()}"
+               ^^^^^^^
+E       AssertionError: tests ran before the close refused: ['test_w207_acceptance_mark', 'test_w207_regression_mark']
+E       gov close PROJ-pcg1 --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECKPOINT_STALE", "message": "the latest checkpoint of PROJ-pcg1 is stale: age, ticket-transition; findings are unclassed and await disposition", "details": {"findings": ["the latest checkpoint of PROJ-pcg1 is stale: age, ticket-transition"], "path": "docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0001.md", "ticket": "PROJ-pcg1", "age_minutes": 75518, "commits": 0, "reasons": ["age", "ticket-transition"], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.79, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.02, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-2zpt"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:370: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_disk_below_a_floor_refuses_before_the_regression_naming_the_reading[space]" time="3.922"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-pcg1 --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-pcg1&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-pcg1/CL-PROJ-pcg1.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.73, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.94, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">floor = 'space', project = &lt;w2_07_support.Project object at 0x7e12dd68e1e0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_disk_below_a_floor_refu0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_disk_below_a_floor_refu0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("floor", ["space", "inodes"])
+    def test_a_disk_below_a_floor_refuses_before_the_regression_naming_the_reading(floor, project, sandbox, interface):
+        """The floor the path map sets is far above what any disk has free; the other floor stays low."""
+        free_gib, free_inodes = support.free_on_disk(project.root)
+        huge = {"space": 10 ** 9, "inodes": 10 ** 15}[floor]
+        assert huge &gt; (free_gib if floor == "space" else free_inodes), "the fixture is wrong: the disk is above the floor"
+        key = support.FLOOR_GIB_KEY if floor == "space" else support.FLOOR_INODES_KEY
+        project.set_path_map(**{key: huge})
+        support.with_regression_mark(project)
+        support.ready_ticket(project, TICKET, WBS)
+&gt;       run, error = _assert_refused_before(project, sandbox, interface, which=[support.REGRESSION_MARK])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:34: in _assert_refused_before
+    error = support.refused(run, interface)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-pcg1', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...ot measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.109855444985442)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def refused(run, interface):
+        """The close was refused (``ok`` false, a non-zero exit code, not ``NOT_IMPLEMENTED``). Returns ``error``."""
+        envelope = base.envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-pcg1 --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-pcg1", "close_record": "docs/close/PROJ-pcg1/CL-PROJ-pcg1.md", "checkpoint": "docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.73, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.94, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:349: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_disk_below_a_floor_refuses_before_the_regression_naming_the_reading[inodes]" time="4.142"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-pcg1 --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-pcg1&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-pcg1/CL-PROJ-pcg1.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.92, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.01, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">floor = 'inodes', project = &lt;w2_07_support.Project object at 0x7e12dd56c4a0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_disk_below_a_floor_refu1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_disk_below_a_floor_refu1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("floor", ["space", "inodes"])
+    def test_a_disk_below_a_floor_refuses_before_the_regression_naming_the_reading(floor, project, sandbox, interface):
+        """The floor the path map sets is far above what any disk has free; the other floor stays low."""
+        free_gib, free_inodes = support.free_on_disk(project.root)
+        huge = {"space": 10 ** 9, "inodes": 10 ** 15}[floor]
+        assert huge &gt; (free_gib if floor == "space" else free_inodes), "the fixture is wrong: the disk is above the floor"
+        key = support.FLOOR_GIB_KEY if floor == "space" else support.FLOOR_INODES_KEY
+        project.set_path_map(**{key: huge})
+        support.with_regression_mark(project)
+        support.ready_ticket(project, TICKET, WBS)
+&gt;       run, error = _assert_refused_before(project, sandbox, interface, which=[support.REGRESSION_MARK])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_pre_close_gate.py:34: in _assert_refused_before
+    error = support.refused(run, interface)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-pcg1', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...t measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.3398109449772164)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def refused(run, interface):
+        """The close was refused (``ok`` false, a non-zero exit code, not ``NOT_IMPLEMENTED``). Returns ``error``."""
+        envelope = base.envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-pcg1 --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-pcg1", "close_record": "docs/close/PROJ-pcg1/CL-PROJ-pcg1.md", "checkpoint": "docs/checkpoints/PROJ-pcg1/CP-PROJ-pcg1-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.92, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.01, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:349: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_probe_findings" name="test_a_failed_probe_whose_every_finding_an_accepted_owner_decision_names_lets_the_ticket_close" time="4.033"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-pfnd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;PROBE_INVALID&quot;, &quot;message&quot;: &quot;the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;the probe's judgement is 'fail', not pass or passed&quot;], &quot;ticket&quot;: &quot;PROJ-pfnd&quot;, &quot;judgement&quot;: &quot;fail&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.7, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.11, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;what the probe gate of PROJ-pfnd asks after this finding: not measured, the gate ends at its first&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-e91c&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd56fcb0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_failed_probe_whose_ever0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_failed_probe_whose_ever0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_failed_probe_whose_every_finding_an_accepted_owner_decision_names_lets_the_ticket_close(project, sandbox,
+                                                                                                    interface):
+        probed = _failed_probe(project)
+        _owner_decision(project, "DEC-701", probed, list(FINDINGS))
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+&gt;       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_probe_findings.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-pfnd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-e91c"}}}\n', stderr='', seconds=3.279213251080364)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-pfnd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "PROBE_INVALID", "message": "the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition", "details": {"findings": ["the probe's judgement is 'fail', not pass or passed"], "ticket": "PROJ-pfnd", "judgement": "fail", "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.7, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.11, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "not_measured": ["what the probe gate of PROJ-pfnd asks after this finding: not measured, the gate ends at its first"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-e91c"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_probe_findings" name="test_a_finding_the_decision_does_not_name_still_refuses" time="4.291"><failure message="AssertionError: the refusal does not name the probe finding no decision accepts&#10;  gov close PROJ-pfnd --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;PROBE_INVALID&quot;, &quot;message&quot;: &quot;the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;the probe's judgement is 'fail', not pass or passed&quot;], &quot;ticket&quot;: &quot;PROJ-pfnd&quot;, &quot;judgement&quot;: &quot;fail&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.83, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.86, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;what the probe gate of PROJ-pfnd asks after this finding: not measured, the gate ends at its first&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qvm1&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert (True and False)&#10; +  where True = &lt;function names at 0x7e12dd721300&gt;({'code': 'PROBE_INVALID', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': [&quot;the probe's ju..., ...}, 'message': &quot;the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition&quot;}, 'probe')&#10; +    where &lt;function names at 0x7e12dd721300&gt; = support.names&#10; +  and   False = &lt;function names at 0x7e12dd721300&gt;({'code': 'PROBE_INVALID', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': [&quot;the probe's ju..., ...}, 'message': &quot;the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition&quot;}, 'F2')&#10; +    where &lt;function names at 0x7e12dd721300&gt; = support.names">project = &lt;w2_07_support.Project object at 0x7e12dd68dfd0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_finding_the_decision_do0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_finding_the_decision_do0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_finding_the_decision_does_not_name_still_refuses(project, sandbox, interface):
+        probed = _failed_probe(project)
+        _owner_decision(project, "DEC-702", probed, ["F1"])
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        error = support.refused(run, interface)
+&gt;       assert support.names(error, "probe") and support.names(error, "F2"), \
+            f"the refusal does not name the probe finding no decision accepts\n{run.describe()}"
+E       AssertionError: the refusal does not name the probe finding no decision accepts
+E         gov close PROJ-pfnd --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "PROBE_INVALID", "message": "the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition", "details": {"findings": ["the probe's judgement is 'fail', not pass or passed"], "ticket": "PROJ-pfnd", "judgement": "fail", "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.83, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.86, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "not_measured": ["what the probe gate of PROJ-pfnd asks after this finding: not measured, the gate ends at its first"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qvm1"}}}
+E         
+E         stderr:
+E         
+E       assert (True and False)
+E        +  where True = &lt;function names at 0x7e12dd721300&gt;({'code': 'PROBE_INVALID', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ["the probe's ju..., ...}, 'message': "the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition"}, 'probe')
+E        +    where &lt;function names at 0x7e12dd721300&gt; = support.names
+E        +  and   False = &lt;function names at 0x7e12dd721300&gt;({'code': 'PROBE_INVALID', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ["the probe's ju..., ...}, 'message': "the probe's judgement is 'fail', not pass or passed; findings are unclassed and await disposition"}, 'F2')
+E        +    where &lt;function names at 0x7e12dd721300&gt; = support.names
+
+tests/acceptance/W2-07/test_w2_07_probe_findings.py:68: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_probe_findings" name="test_a_decision_that_is_not_accepted_does_not_accept_the_findings" time="4.256" /><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_a_refused_close_writes_a_complete_schema_valid_repair_ticket" time="3.827"><failure message="AssertionError: the repair ticket has no role: {'id': 'pro-cj66', 'status': 'open', 'deps': ['PROJ-rpar'], 'links': [], 'created': datetime.datetime(2026, 10, 23, 10, 38, 49, tzinfo=datetime.timezone.utc), 'type': 'task', 'priority': 2, 'parent': 'PROJ-rpar', 'state_class': 'AUTHORITATIVE', 'disposition': 'unclassed'}&#10;assert (False)&#10; +  where False = isinstance(None, str)&#10; +    where None = &lt;built-in method get of dict object at 0x7e12dd51f600&gt;('role')&#10; +      where &lt;built-in method get of dict object at 0x7e12dd51f600&gt; = {'created': datetime.datetime(2026, 10, 23, 10, 38, 49, tzinfo=datetime.timezone.utc), 'deps': ['PROJ-rpar'], 'disposition': 'unclassed', 'id': 'pro-cj66', ...}.get">project = &lt;w2_07_support.Project object at 0x7e12dd791670&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refused_close_writes_a_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refused_close_writes_a_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_refused_close_writes_a_complete_schema_valid_repair_ticket(project, sandbox, interface):
+        _ticket_with_a_failing_test(project)
+        run, _ = _refused_for_the_test(project, sandbox, interface)
+        repair = _the_repair_ticket(project, run)
+        front = support.frontmatter_of(repair)
+&gt;       assert isinstance(front.get("role"), str) and front["role"].strip(), f"the repair ticket has no role: {front}"
+E       AssertionError: the repair ticket has no role: {'id': 'pro-cj66', 'status': 'open', 'deps': ['PROJ-rpar'], 'links': [], 'created': datetime.datetime(2026, 10, 23, 10, 38, 49, tzinfo=datetime.timezone.utc), 'type': 'task', 'priority': 2, 'parent': 'PROJ-rpar', 'state_class': 'AUTHORITATIVE', 'disposition': 'unclassed'}
+E       assert (False)
+E        +  where False = isinstance(None, str)
+E        +    where None = &lt;built-in method get of dict object at 0x7e12dd51f600&gt;('role')
+E        +      where &lt;built-in method get of dict object at 0x7e12dd51f600&gt; = {'created': datetime.datetime(2026, 10, 23, 10, 38, 49, tzinfo=datetime.timezone.utc), 'deps': ['PROJ-rpar'], 'disposition': 'unclassed', 'id': 'pro-cj66', ...}.get
+
+tests/acceptance/W2-07/test_w2_07_repair_and_escalation.py:59: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_the_repair_ticket_stays_tracked_and_blocks_no_later_close" time="4.068"><failure message="AssertionError: git does not track the repair ticket .tickets/pro-op2j.md&#10;  gov close PROJ-rpar --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;FAILED tests/acceptance/W9-rpar/test_w207_fails.py::test_w207_fails - Asserti...&quot;], &quot;tests_run&quot;: {&quot;passed&quot;: 1, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0}, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.81, &quot;passed&quot;: 1, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.95, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-op2j&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert False&#10; +  where False = &lt;function tracked at 0x7e12dd721580&gt;(&lt;w2_07_support.Project object at 0x7e12dd76ff80&gt;, '.tickets/pro-op2j.md')&#10; +    where &lt;function tracked at 0x7e12dd721580&gt; = support.tracked">project = &lt;w2_07_support.Project object at 0x7e12dd76ff80&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_the_repair_ticket_stays_t0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_the_repair_ticket_stays_t0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_the_repair_ticket_stays_tracked_and_blocks_no_later_close(project, sandbox, interface):
+        _ticket_with_a_failing_test(project)
+        run, _ = _refused_for_the_test(project, sandbox, interface)
+        repair = _the_repair_ticket(project, run)
+        rel = repair.relative_to(project.root).as_posix()
+        assert rel.startswith(".tickets/"), f"the repair ticket is not in .tickets/: {rel}"
+&gt;       assert support.tracked(project, rel), f"git does not track the repair ticket {rel}\n{run.describe()}"
+E       AssertionError: git does not track the repair ticket .tickets/pro-op2j.md
+E         gov close PROJ-rpar --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["FAILED tests/acceptance/W9-rpar/test_w207_fails.py::test_w207_fails - Asserti..."], "tests_run": {"passed": 1, "failed": 1, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.81, "passed": 1, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.95, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-op2j"}}}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = &lt;function tracked at 0x7e12dd721580&gt;(&lt;w2_07_support.Project object at 0x7e12dd76ff80&gt;, '.tickets/pro-op2j.md')
+E        +    where &lt;function tracked at 0x7e12dd721580&gt; = support.tracked
+
+tests/acceptance/W2-07/test_w2_07_repair_and_escalation.py:75: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_adoption_gap_refusals_do_not_count_toward_escalation" time="4.442"><failure message="AssertionError: the refusal spent an attempt: the count is 1, not 0&#10;gov close PROJ-rpar --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;TRAILER_MISSING&quot;, &quot;message&quot;: &quot;commit 73aa84e4af88 lacks Implements: trailer; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 73aa84e4af88 lacks Implements: trailer&quot;], &quot;commit&quot;: &quot;73aa84e4af88&quot;, &quot;commits&quot;: [&quot;73aa84e4af88&quot;], &quot;ticket&quot;: &quot;PROJ-rpar&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.89, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.07, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-o263&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd56c080&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_adoption_gap_refusals_do_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_adoption_gap_refusals_do_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_adoption_gap_refusals_do_not_count_toward_escalation(project, sandbox, interface):
+        """Four closes, each refused for a commit without ``Implements:`` alone (DEC-492's first adoption gap): the count
+        stays 0, no escalation is written, and the fourth is not blocked (exit code 4)."""
+        support.create_ticket(project, TICKET, WBS)
+        support.work(project, TICKET, {"src/example/feature.py": "# feature\n"},
+                     trailers=(f"Task: {TICKET}", "Role: engineer"))
+        support.checkpointed(project, TICKET)
+        for attempt in range(4):
+            run = support.run_close(project, sandbox, TICKET)
+            error = support.refused(run, interface)
+            assert run.returncode != support.EXIT_BLOCKED, \
+                f"attempt {attempt + 1} is blocked: adoption-gap refusals reached an escalation\n{run.describe()}"
+            assert support.names(error, "Implements"), f"attempt {attempt + 1} was refused for something else\n{run.describe()}"
+&gt;           support.assert_no_attempt_spent(project, TICKET, run)
+
+tests/acceptance/W2-07/test_w2_07_repair_and_escalation.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd56c080&gt;, ticket = 'PROJ-rpar'
+run = Run(args=('close', 'PROJ-rpar', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-o263"}}}\n', stderr='', seconds=3.703508442034945)
+count = 0
+
+    def assert_no_attempt_spent(project, ticket, run, count=0):
+        """The refusal spent no ratchet attempt: the ticket's iteration count is still ``count``, and no escalation
+        was written."""
+&gt;       assert iteration_count(project.root, ticket) == count, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the refusal spent an attempt: the count is {iteration_count(project.root, ticket)}, not {count}\n"
+            f"{run.describe()}")
+E       AssertionError: the refusal spent an attempt: the count is 1, not 0
+E       gov close PROJ-rpar --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "TRAILER_MISSING", "message": "commit 73aa84e4af88 lacks Implements: trailer; findings are unclassed and await disposition", "details": {"findings": ["commit 73aa84e4af88 lacks Implements: trailer"], "commit": "73aa84e4af88", "commits": ["73aa84e4af88"], "ticket": "PROJ-rpar", "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.89, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.07, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-o263"}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-07/w2_07_support.py:376: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_a_repeated_identical_refusal_reuses_its_repair_ticket" time="6.495"><failure message="AssertionError: one repair ticket is expected, found ['pro-47vo.md', 'pro-lth7.md']&#10;  gov close PROJ-rpar --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;FAILED tests/acceptance/W9-rpar/test_w207_fails.py::test_w207_fails - Asserti...&quot;], &quot;tests_run&quot;: {&quot;passed&quot;: 1, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0}, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.94, &quot;passed&quot;: 1, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.89, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-47vo&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert 2 == 1&#10; +  where 2 = len([PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_repeated_identical_refu0/project/.tickets/pro-47vo....ixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_repeated_identical_refu0/project/.tickets/pro-lth7.md')])">project = &lt;w2_07_support.Project object at 0x7e12dd56dee0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_repeated_identical_refu0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_repeated_identical_refu0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_repeated_identical_refusal_reuses_its_repair_ticket(project, sandbox, interface):
+        _ticket_with_a_failing_test(project)
+        first, first_error = _refused_for_the_test(project, sandbox, interface)
+        repair = _the_repair_ticket(project, first)
+        support.commit_what_a_refusal_left(project)
+    
+        second, second_error = _refused_for_the_test(project, sandbox, interface)
+    
+&gt;       assert _the_repair_ticket(project, second) == repair, "the second refusal did not reuse the repair ticket"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_repair_and_escalation.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = &lt;w2_07_support.Project object at 0x7e12dd56dee0&gt;
+run = Run(args=('close', 'PROJ-rpar', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-47vo"}}}\n', stderr='', seconds=2.2111667699646205)
+
+    def _the_repair_ticket(project, run):
+        repairs = support.other_tickets(project.root, TICKET)
+&gt;       assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
+E       AssertionError: one repair ticket is expected, found ['pro-47vo.md', 'pro-lth7.md']
+E         gov close PROJ-rpar --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["FAILED tests/acceptance/W9-rpar/test_w207_fails.py::test_w207_fails - Asserti..."], "tests_run": {"passed": 1, "failed": 1, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 0.94, "passed": 1, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.89, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-47vo"}}}
+E         
+E         stderr:
+E         
+E       assert 2 == 1
+E        +  where 2 = len([PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_repeated_identical_refu0/project/.tickets/pro-47vo....ixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_repeated_identical_refu0/project/.tickets/pro-lth7.md')])
+
+tests/acceptance/W2-07/test_w2_07_repair_and_escalation.py:46: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_an_interrupted_close_leaves_nothing_that_blocks_the_next_close" time="4.717"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-rpar --json&#10;exit code: 1&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;TREE_NOT_COMMITTED&quot;, &quot;message&quot;: &quot;the working tree is not the commit being closed, so the close would measure another tree than it records: docs/checkpoints/PROJ-rpar/CP-PROJ-rpar-0002.md, docs/close/PROJ-rpar/CL-PROJ-rpar.md&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;PROJ-rpar&quot;, &quot;paths&quot;: [&quot;docs/checkpoints/PROJ-rpar/CP-PROJ-rpar-0002.md&quot;, &quot;docs/close/PROJ-rpar/CL-PROJ-rpar.md&quot;]}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd5741d0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_interrupted_close_leav0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_interrupted_close_leav0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_an_interrupted_close_leav0')
+
+    def test_an_interrupted_close_leaves_nothing_that_blocks_the_next_close(project, sandbox, interface, tmp_path):
+        """The ticket tool kills the close that called it while it closes the ticket: the close ends with SIGKILL after
+        it wrote its records. With the real tool back (only the tool's file committed, so whatever the interrupted close
+        left stays where it left it), the next close closes the ticket."""
+        support.ready_ticket(project, TICKET, WBS)
+        keep = tmp_path / "real-tool" / "tk"
+        support.install_interrupting_tool(project, TICKET, keep)
+    
+        interrupted = support.run_close(project, sandbox, TICKET)
+        assert interrupted.returncode not in (support.EXIT_OK, support.EXIT_GOV_ERROR, support.EXIT_CHECK_FAILED), \
+            f"the fixture is wrong: the close was not interrupted\n{interrupted.describe()}"
+        assert support.ticket_status(project.root, TICKET) == "in_progress", "the fixture is wrong: the ticket closed"
+    
+        support.restore_tool(project, keep)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+&gt;       support.closed(run, interface)
+
+tests/acceptance/W2-07/test_w2_07_repair_and_escalation.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rpar', '--json'), returncode=1, stdout='{"ok": false, "command": "close", "result": {}, "sess...PROJ-rpar/CP-PROJ-rpar-0002.md", "docs/close/PROJ-rpar/CL-PROJ-rpar.md"]}}}\n', stderr='', seconds=0.08200783492065966)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rpar --json
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "TREE_NOT_COMMITTED", "message": "the working tree is not the commit being closed, so the close would measure another tree than it records: docs/checkpoints/PROJ-rpar/CP-PROJ-rpar-0002.md, docs/close/PROJ-rpar/CL-PROJ-rpar.md", "details": {"ticket": "PROJ-rpar", "paths": ["docs/checkpoints/PROJ-rpar/CP-PROJ-rpar-0002.md", "docs/close/PROJ-rpar/CL-PROJ-rpar.md"]}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_share" name="test_a_close_by_class_carries_the_measured_governance_share" time="1.268"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-shar --json --ticket-session 11111111-1111-4111-8111-111111111111=engineer --ticket-session 22222222-2222-4222-8222-222222222222=independent-test-designer&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-shar in tests/acceptance/W9-shar/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-shar in tests/acceptance/W9-shar/&quot;], &quot;ticket&quot;: &quot;PROJ-shar&quot;, &quot;wbs&quot;: &quot;W9-shar&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-shar: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qeak&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd5768d0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_close_by_class_carries_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_close_by_class_carries_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+logs = PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_close_by_class_carries_0/claude-config')
+
+    def test_a_close_by_class_carries_the_measured_governance_share(project, sandbox, interface, logs):
+        support.create_ticket(project, TICKET, WBS, cls="research", allowed_paths=("docs/research/W9/**",), tests=False,
+                              acceptance=support.judged_by_class("research", [RECORD_REL]))
+        support.work(project, TICKET, {RECORD_REL: support.research_record("EXP-shar")}, role="research")
+        support.checkpointed(project, TICKET)
+        env = {**support.base.sandbox_env(sandbox), "CLAUDE_CONFIG_DIR": str(logs)}
+        env["PATH"] = f"{telemetry.ccusage_dir()}{os.pathsep}{env['PATH']}"
+        named = [argument for session in telemetry.ROLED for argument in ("--ticket-session", session)]
+    
+        run = support.run_close(project, sandbox, TICKET, *named, env=env)
+    
+&gt;       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_share.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-shar', '--json', '--ticket-session', '11111111-1111-4111-8111-111111111111=engineer', '--tick... their class; use --disposition to classify", "repair_ticket": "pro-qeak"}}}\n', stderr='', seconds=0.5095985670341179)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-shar --json --ticket-session 11111111-1111-4111-8111-111111111111=engineer --ticket-session 22222222-2222-4222-8222-222222222222=independent-test-designer
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-shar in tests/acceptance/W9-shar/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-shar in tests/acceptance/W9-shar/"], "ticket": "PROJ-shar", "wbs": "W9-shar", "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-shar: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qeak"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_test_revision" name="test_a_test_revision_ticket_closes_on_the_tests_its_ticket_file_names" time="3.168"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-revs --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/&quot;], &quot;ticket&quot;: &quot;PROJ-revs&quot;, &quot;wbs&quot;: &quot;W9-rev&quot;, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.91, &quot;passed&quot;: 2, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-revs: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-6e5h&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x7e12dd56e6c0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_test_revision_ticket_cl0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_test_revision_ticket_cl0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_test_revision_ticket_closes_on_the_tests_its_ticket_file_names(project, sandbox, interface):
+        _revision_ticket(project, support.base.telling_test(REVISED_NAME, project.told))
+    
+        run = support.run_close(project, sandbox, REVISION)
+    
+&gt;       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-07/test_w2_07_test_revision.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/w2_07_support.py:343: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-revs', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-6e5h"}}}\n', stderr='', seconds=2.386477694963105)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-revs --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/; findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/"], "ticket": "PROJ-revs", "wbs": "W9-rev", "disposition": "unclassed", "test_runs": [{"run": "regression", "form": "parallel", "seconds": 1.91, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-revs: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-6e5h"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_test_revision" name="test_a_test_revision_ticket_whose_named_tests_fail_is_refused_on_its_acceptance_run" time="3.389"><failure message="AssertionError: the refusal states no acceptance run of the declared folder that failed&#10;  gov close PROJ-revs --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;2 findings refuse the close of PROJ-revs (CHECK_FAILED, NO_ACCEPTANCE_TESTS); findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/&quot;, &quot;FAILED tests/acceptance/W9-old/test_w207_revised.py::test_w207_revised - Asse...&quot;], &quot;parts&quot;: [{&quot;code&quot;: &quot;NO_ACCEPTANCE_TESTS&quot;, &quot;message&quot;: &quot;no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/&quot;, &quot;ticket&quot;: &quot;PROJ-revs&quot;, &quot;wbs&quot;: &quot;W9-rev&quot;}, {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed&quot;, &quot;tests_run&quot;: {&quot;passed&quot;: 1, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0}}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 2.09, &quot;passed&quot;: 1, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;not_measured&quot;: [&quot;the acceptance run of PROJ-revs: not measured, it has no acceptance tests&quot;], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-igo5&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert ([])">project = &lt;w2_07_support.Project object at 0x7e12dd56ca70&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_test_revision_ticket_wh0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_test_revision_ticket_wh0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_test_revision_ticket_whose_named_tests_fail_is_refused_on_its_acceptance_run(project, sandbox, interface):
+        """The failing revised test refuses the close as the ticket's own acceptance test, not only as a red of the
+        regression."""
+        _revision_ticket(project, f"def {REVISED_NAME}():\n    assert False, 'the revision is wrong'\n")
+    
+        run = support.run_close(project, sandbox, REVISION)
+    
+        error = support.refused(run, interface)
+        assert run.returncode == support.EXIT_CHECK_FAILED, f"a failing acceptance test is a finding (exit 3)\n{run.describe()}"
+        assert support.names(error, REVISED_NAME), f"the refusal does not name the failing test\n{run.describe()}"
+        runs = _acceptance_runs(error.get("details") or {})
+&gt;       assert runs and sum(r.get("failed", 0) + r.get("errors", 0) for r in runs) &gt;= 1, \
+            f"the refusal states no acceptance run of the declared folder that failed\n{run.describe()}"
+E       AssertionError: the refusal states no acceptance run of the declared folder that failed
+E         gov close PROJ-revs --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "2 findings refuse the close of PROJ-revs (CHECK_FAILED, NO_ACCEPTANCE_TESTS); findings are unclassed and await disposition", "details": {"findings": ["no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/", "FAILED tests/acceptance/W9-old/test_w207_revised.py::test_w207_revised - Asse..."], "parts": [{"code": "NO_ACCEPTANCE_TESTS", "message": "no acceptance tests for PROJ-revs in tests/acceptance/W9-rev/", "ticket": "PROJ-revs", "wbs": "W9-rev"}, {"code": "CHECK_FAILED", "message": "tests or checks failed", "tests_run": {"passed": 1, "failed": 1, "errors": 0, "skipped": 0}}], "disposition": "unclassed", "test_runs": [{"run": "regression", "form": "parallel", "seconds": 2.09, "passed": 1, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "not_measured": ["the acceptance run of PROJ-revs: not measured, it has no acceptance tests"], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-igo5"}}}
+E         
+E         stderr:
+E         
+E       assert ([])
+
+tests/acceptance/W2-07/test_w2_07_test_revision.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_no_acceptance_tests" name="test_a_ticket_without_acceptance_tests_is_refused_and_nothing_is_closed[no-folder]" time="4.777"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-noat --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-noat&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-noat/CL-PROJ-noat.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.85, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.0, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">folder = False, project = &lt;w1_30_support.Project object at 0x7e12dd793440&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ticket_without_acceptan0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ticket_without_acceptan0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @FORMS
+    def test_a_ticket_without_acceptance_tests_is_refused_and_nothing_is_closed(folder, project, sandbox, interface):
+        _without_tests(project, folder)
+&gt;       _refused_for_the_tests(project, sandbox, interface)
+
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:55: in _refused_for_the_tests
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-noat', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...ot measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.339495427091606)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+exit_code = 3
+
+    def refused(run, interface, exit_code):
+        """The close was refused with ``exit_code``; returns the ``error`` object."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-noat --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-noat", "close_record": "docs/close/PROJ-noat/CL-PROJ-noat.md", "checkpoint": "docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.85, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.0, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:698: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_no_acceptance_tests" name="test_a_ticket_without_acceptance_tests_is_refused_and_nothing_is_closed[folder-without-a-test]" time="4.536"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-noat --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-noat&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-noat/CL-PROJ-noat.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 2.05, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.05, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">folder = True, project = &lt;w1_30_support.Project object at 0x7e12dd793d40&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ticket_without_acceptan1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_ticket_without_acceptan1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @FORMS
+    def test_a_ticket_without_acceptance_tests_is_refused_and_nothing_is_closed(folder, project, sandbox, interface):
+        _without_tests(project, folder)
+&gt;       _refused_for_the_tests(project, sandbox, interface)
+
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:55: in _refused_for_the_tests
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-noat', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...t measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.6041307989507914)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+exit_code = 3
+
+    def refused(run, interface, exit_code):
+        """The close was refused with ``exit_code``; returns the ``error`` object."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-noat --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-noat", "close_record": "docs/close/PROJ-noat/CL-PROJ-noat.md", "checkpoint": "docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 2.05, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.05, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:698: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_no_acceptance_tests" name="test_a_refusal_for_no_acceptance_tests_is_counted[no-folder]" time="4.498"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-noat --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-noat&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-noat/CL-PROJ-noat.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 2.01, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.9, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">folder = False, project = &lt;w1_30_support.Project object at 0x7e12dd577890&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @FORMS
+    def test_a_refusal_for_no_acceptance_tests_is_counted(folder, project, sandbox, interface):
+        _without_tests(project, folder)
+&gt;       run = _refused_for_the_tests(project, sandbox, interface)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:55: in _refused_for_the_tests
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-noat', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...ot measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.466003313078545)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+exit_code = 3
+
+    def refused(run, interface, exit_code):
+        """The close was refused with ``exit_code``; returns the ``error`` object."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-noat --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-noat", "close_record": "docs/close/PROJ-noat/CL-PROJ-noat.md", "checkpoint": "docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 2.01, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.9, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:698: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_no_acceptance_tests" name="test_a_refusal_for_no_acceptance_tests_is_counted[folder-without-a-test]" time="4.089"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-noat --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-noat&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-noat/CL-PROJ-noat.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.81, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.91, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">folder = True, project = &lt;w1_30_support.Project object at 0x7e12dd5dc260&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @FORMS
+    def test_a_refusal_for_no_acceptance_tests_is_counted(folder, project, sandbox, interface):
+        _without_tests(project, folder)
+&gt;       run = _refused_for_the_tests(project, sandbox, interface)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:55: in _refused_for_the_tests
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-noat', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...t measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.1594594148918986)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+exit_code = 3
+
+    def refused(run, interface, exit_code):
+        """The close was refused with ``exit_code``; returns the ``error`` object."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-noat --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-noat", "close_record": "docs/close/PROJ-noat/CL-PROJ-noat.md", "checkpoint": "docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.81, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.91, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:698: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_no_acceptance_tests" name="test_a_refusal_for_no_acceptance_tests_opens_a_dependent_repair_ticket[no-folder]" time="4.079"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-noat --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-noat&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-noat/CL-PROJ-noat.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.8, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.89, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">folder = False, project = &lt;w1_30_support.Project object at 0x7e12dd56e510&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan2/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @FORMS
+    def test_a_refusal_for_no_acceptance_tests_opens_a_dependent_repair_ticket(folder, project, sandbox, interface):
+        _without_tests(project, folder)
+&gt;       run = _refused_for_the_tests(project, sandbox, interface)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:55: in _refused_for_the_tests
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-noat', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...ot measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.174814414931461)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+exit_code = 3
+
+    def refused(run, interface, exit_code):
+        """The close was refused with ``exit_code``; returns the ``error`` object."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-noat --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-noat", "close_record": "docs/close/PROJ-noat/CL-PROJ-noat.md", "checkpoint": "docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.8, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.89, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:698: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_no_acceptance_tests" name="test_a_refusal_for_no_acceptance_tests_opens_a_dependent_repair_ticket[folder-without-a-test]" time="4.170"><failure message="AssertionError: gov close was not refused&#10;gov close PROJ-noat --json&#10;exit code: 0&#10;stdout:&#10;{&quot;ok&quot;: true, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;PROJ-noat&quot;, &quot;close_record&quot;: &quot;docs/close/PROJ-noat/CL-PROJ-noat.md&quot;, &quot;checkpoint&quot;: &quot;docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.84, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 0.96, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;governance_share&quot;: {&quot;measured&quot;: &quot;not measured&quot;, &quot;estimated&quot;: &quot;not measured&quot;, &quot;total&quot;: &quot;not measured&quot;}, &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: []}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">folder = True, project = &lt;w1_30_support.Project object at 0x7e12dd56f050&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan3/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_a_refusal_for_no_acceptan3/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @FORMS
+    def test_a_refusal_for_no_acceptance_tests_opens_a_dependent_repair_ticket(folder, project, sandbox, interface):
+        _without_tests(project, folder)
+&gt;       run = _refused_for_the_tests(project, sandbox, interface)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py:55: in _refused_for_the_tests
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-noat', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...t measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n', stderr='', seconds=3.2618584159063175)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+exit_code = 3
+
+    def refused(run, interface, exit_code):
+        """The close was refused with ``exit_code``; returns the ``error`` object."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close was not refused
+E       gov close PROJ-noat --json
+E       exit code: 0
+E       stdout:
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-noat", "close_record": "docs/close/PROJ-noat/CL-PROJ-noat.md", "checkpoint": "docs/checkpoints/PROJ-noat/CP-PROJ-noat-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.84, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.96, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:698: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-30.test_w1_30_close" name="test_collection_error_refuses_close" time="4.238"><failure message="AssertionError: the refusal does not name the collection error as its cause&#10;  gov close PROJ-aaaa --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;ERROR tests/unit/test_syntax_error.py - /home/usain/.local/lib/python3.12/sit...&quot;], &quot;tests_run&quot;: {&quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 1, &quot;skipped&quot;: 0}, &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [{&quot;run&quot;: &quot;acceptance&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.85, &quot;passed&quot;: 1, &quot;failed&quot;: 0, &quot;errors&quot;: 0, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}, {&quot;run&quot;: &quot;regression&quot;, &quot;form&quot;: &quot;parallel&quot;, &quot;seconds&quot;: 1.02, &quot;passed&quot;: 0, &quot;failed&quot;: 0, &quot;errors&quot;: 1, &quot;skipped&quot;: 0, &quot;workers&quot;: 2}], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qp0h&quot;}}}&#10;  &#10;  stderr:&#10;  &#10;assert 'collect' in '{&quot;code&quot;: &quot;check_failed&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;...epted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qp0h&quot;}}'&#10; +  where '{&quot;code&quot;: &quot;check_failed&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;...epted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qp0h&quot;}}' = &lt;built-in method lower of str object at 0xa55f520&gt;()&#10; +    where &lt;built-in method lower of str object at 0xa55f520&gt; = '{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;...epted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qp0h&quot;}}'.lower&#10; +      where '{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;tests or checks failed; findings are unclassed and await disposition&quot;, &quot;details&quot;...epted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;repair_ticket&quot;: &quot;pro-qp0h&quot;}}' = &lt;function error_text at 0x7e12dd71b920&gt;({'code': 'CHECK_FAILED', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['ERROR tests/uni...se --disposition to classify', ...}, 'message': 'tests or checks failed; findings are unclassed and await disposition'})&#10; +        where &lt;function error_text at 0x7e12dd71b920&gt; = support.error_text">project = &lt;w1_30_support.Project object at 0x7e12dd577d40&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_collection_error_refuses_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_collection_error_refuses_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/test_collection_error_refuses_0')
+
+    def test_collection_error_refuses_close(project, sandbox, interface, tmp_path):
+        """A2: a collection error (syntax error in test file) refuses the close.
+    
+        Revised for W2-07 (DEC-868 item 3): a collection error is a refusal of the pre-close gate inside ``gov
+        close``: it refuses at once, naming its cause, before any test runs, and spends no ratchet attempt. The
+        ticket's acceptance test tells, into a folder outside the project, whenever it runs; the broken regression
+        file is the owner's, outside the ticket's work, so the collection error is the one cause.
+        """
+        told = tmp_path / "told"
+        told.mkdir()
+        support.write(project.root, "tests/unit/test_syntax_error.py",
+                      "def test_syntax_error(\n    # missing closing paren\n")
+        project.commit("a regression test file with a syntax error", who=support.OWNER)
+        project.add_ticket(TICKET, WBS)
+        support.write(project.root, f"tests/acceptance/{WBS}/test_pass.py", support.telling_test("test_pass", told))
+        project.write("src/example/feature.py", "# feature\n")
+        project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+        project.add_checkpoint(TICKET)
+        project.commit("checkpoint", who=support.ORCHESTRATOR)
+        run = support.run_close(project, sandbox, TICKET)
+        envelope = support.envelope_of(run, interface)
+        assert envelope["ok"] is False, \
+            "a collection error (syntax error) in a regression test file must refuse the close"
+&gt;       assert "collect" in support.error_text(envelope["error"]).lower(), \
+            f"the refusal does not name the collection error as its cause\n{run.describe()}"
+E       AssertionError: the refusal does not name the collection error as its cause
+E         gov close PROJ-aaaa --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["ERROR tests/unit/test_syntax_error.py - /home/usain/.local/lib/python3.12/sit..."], "tests_run": {"passed": 0, "failed": 0, "errors": 1, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.85, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.02, "passed": 0, "failed": 0, "errors": 1, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qp0h"}}}
+E         
+E         stderr:
+E         
+E       assert 'collect' in '{"code": "check_failed", "message": "tests or checks failed; findings are unclassed and await disposition", "details"...epted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qp0h"}}'
+E        +  where '{"code": "check_failed", "message": "tests or checks failed; findings are unclassed and await disposition", "details"...epted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qp0h"}}' = &lt;built-in method lower of str object at 0xa55f520&gt;()
+E        +    where &lt;built-in method lower of str object at 0xa55f520&gt; = '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"...epted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qp0h"}}'.lower
+E        +      where '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"...epted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-qp0h"}}' = &lt;function error_text at 0x7e12dd71b920&gt;({'code': 'CHECK_FAILED', 'details': {'accepted_history': [], 'disposition': 'unclassed', 'findings': ['ERROR tests/uni...se --disposition to classify', ...}, 'message': 'tests or checks failed; findings are unclassed and await disposition'})
+E        +        where &lt;function error_text at 0x7e12dd71b920&gt; = support.error_text
+
+tests/acceptance/W1-30/test_w1_30_close.py:428: AssertionError</failure></testcase></testsuite></testsuites>

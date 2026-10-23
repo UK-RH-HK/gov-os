@@ -50,9 +50,13 @@
   gates (a)-(h) predict a pass; DEC-897 (b); **the interim skip guard (DEC-899 item 7): close_queue.sh stops after a
   close whose regression skip count is not 31, outputs uncommitted (`tools/skip_gate.py`)**.
 - **W2-58, W2-63 merged-not-closed, wait for the first re-pin.** W2-70 to start (LITE, test designer) in a slot.
-- **Owner acts pending (ACT pinged with them):** commit A (p95 entries out) then B (W1-42 retirement, accepted_reds
-  empty), `drafts/ACT-owner-commits-2026-10-23.md` (validated with the pin: 30 load_sensitive counted, 0 findings);
-  the pytest-timeout install; the disk cleanup proposal (`drafts/CLEANUP-PROPOSAL-2026-10-23.md`).
+- **Owner acts DONE (10-23):** commits A `596870bd` + B `c9a08678` (Role: owner; accepted_reds EMPTY,
+  load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
+  `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
+  (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **SWEEP lists 3 + 5 PENDING a quiet moment** (no `claude -p`, close, nightly or trial):
+  `python3 tools/sweep.py --apply --only pytest-runs,code-graph` (dry run: 49 + 10,118 would go; skips: <24 h,
+  held open, the 14 live roots' code-graph folders). Report what it skipped and why. Weekly sweep: Mondays.
 - **Later packages:** P-IS-13 when W2-32 starts (owner leans (a)); P-IS-9..12, 14, 15 before their tickets.
 
 ### Where things stand (10-23 10:37)
@@ -75,7 +79,7 @@
 1. Owner's ACT: the two commits (A then B), the install, the cleanup approval. After A and B: record checks.
 2. Lead returns: W2-07 first -> merge; W2-66 -> merge back + fresh probe; W2-69 -> merge. probe_impact each.
 3. W2-70's lead in a free slot; the nightly in a quiet window; the daily digest.
-4. Next free: DEC-902; ticket W2-71; rows W2-M405, W2-L415, W2-H063.
+4. Next free: DEC-903; ticket W2-71; rows W2-M406, W2-L416, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
