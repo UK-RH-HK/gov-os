@@ -996,7 +996,12 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 #### W2-65 The guard's hook lines refuse a call when the guard program cannot run (LITE, engineer; DEC-880 item 3; keystone 1)
 - **Why:** P-W2-59-8 (W2-59's second review, R2-D1): Claude Code blocks a PreToolUse call only on exit 2 or a deny decision, and the hook lines pass their program's exit code on, so a guard program that cannot run (a half-finished edit) exits 1 and the call goes through. Ordinary work, fails open; it predates W2-59. Ticket `DAEO-e82f`.
 - **Starts (DEC-884):** built stacked on `w2/W2-59` (both change `.rulesync/hooks.jsonc`; DEC-786), in a slot W2-66 does not need; it merges together with W2-59 just before the one combined re-pin, and the owner's settings regeneration follows the re-pin.
-- **Allowed paths:** `.rulesync/hooks.jsonc` and `template/.rulesync/hooks.jsonc` (the preToolUse and containment lines' exit mapping only), `tests/unit/hooks/**`.
+- **Allowed paths:**
+  - `.rulesync/hooks.jsonc` and `template/.rulesync/hooks.jsonc` (the preToolUse and containment lines' exit mapping only);
+  - `template/governance/kernel/hooks/subagentstop.py`, and **(P-IS-5 (a), DEC-899)** `src/gov/hooks/subagentstop.py`, kept byte-identical to the template's copy, as W1-29's `TestHookCopiesIdentical` requires;
+  - `tests/unit/hooks/**` (its engineer; the weak unit hook cases ride along, P-IS-7 (a));
+  - **(DEC-899)** `tests/acceptance/W1-29/test_session_hooks.py`, for its test designer only: W1-29's SubagentStop case accepts the undocumented form this ticket removes (I3 F4), revised with `Rewrite-Reason: DEC-889 item 8`.
+  - A note for its test designer: the launcher recognises the guard by `hooks/pretooluse.py`, and the new hook line keeps that (I1 §2.3).
 - **KPIs, success:** the preToolUse and containment lines end with exit 2 whenever their program ends with anything but 0 or 2, naming the program; 0, 2 and a deny decision pass through; the template's hook source does the same; one acceptance case per line.
   - **P-H-7 rides along (DEC-889 item 8):** the SubagentStop hook gives its block reason as Claude Code reads it (on standard error, or as `{"decision": "block", "reason": …}`), so a helper whose final message lacks the twelve fields learns what is missing; one acceptance case.
 - Its paths gain `template/governance/kernel/hooks/subagentstop.py` (P-H-7, DEC-889).
