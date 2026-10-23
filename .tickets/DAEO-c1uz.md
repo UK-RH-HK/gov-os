@@ -26,7 +26,6 @@ allowed_paths:
 - tests/unit/close/test_select*
 - tests/unit/close/test_nightly*
 - tests/unit/close/test_evidence*
-- tests/acceptance/W1-30/test_w1_30_regression*
 - docs/research/W2-66-scoped-close.md
 kpis:
   success:
@@ -110,3 +109,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-66), from DEC-880 item 2, DEC-883, DEC-8
   - the serial-only list's rework and the load fixes (W2-57);
   - the commit gates before any test, and the disk gate in the close (W2-07);
   - the test hygiene (W2-67).
+- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-30/test_w1_30_regression*`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.
