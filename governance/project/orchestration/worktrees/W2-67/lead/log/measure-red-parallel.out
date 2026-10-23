@@ -1,0 +1,201 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 25%]
+........................................................................ [ 34%]
+........................................................................ [ 43%]
+........................................................................ [ 51%]
+.s...................................................................... [ 60%]
+........................................................................ [ 69%]
+........................................................................ [ 77%]
+........................................................................ [ 86%]
+........................................................................ [ 95%]
+.....................FF.....FF.........                                  [100%]
+=================================== FAILURES ===================================
+________ test_a_run_after_killed_runs_leaves_at_most_three_base_folders ________
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw8/test_a_run_after_killed_runs_l0')
+
+    def test_a_run_after_killed_runs_leaves_at_most_three_base_folders(tmp_path):
+        """Five runs that were killed left their base folders with their ``.lock``, naming processes that no longer
+        exist. A full run leaves at most three base folders behind (DEC-898)."""
+        tmpdir, home = tmp_path / "tmp", tmp_path / "home"
+        home.mkdir()
+        root = _user_root(tmpdir)
+        dead = _dead_pid()
+        for number in range(OLD_RUNS):
+            _plant_run(root, number, lock_pid=dead)
+        _run_probe(tmpdir, home)
+        left = _base_folders(root)
+>       assert len(left) <= KEEP, (
+            f"{len(left)} base folders left behind, more than {KEEP} (DEC-898): {left}. Each older one holds a .lock "
+            f"naming pid {dead}, which no process holds: the runs that wrote them were killed."
+        )
+E       AssertionError: 6 base folders left behind, more than 3 (DEC-898): ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3', 'pytest-4', 'pytest-5']. Each older one holds a .lock naming pid 4194305, which no process holds: the runs that wrote them were killed.
+E       assert 6 <= 3
+E        +  where 6 = len(['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3', 'pytest-4', 'pytest-5'])
+
+tests/acceptance/W1-27/test_w2_67_temp_folders.py:210: AssertionError
+_____ test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc _____
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+planted = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/w2-67-planted0/source')
+point_copier_at = <function point_copier_at.<locals>._point at 0x727f1de24180>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0')
+
+    def test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc(planted, point_copier_at, tmp_path):
+        """W1-25: ``live`` (copy_working_tree and its fixture tickets) and ``_copy`` (the copytree behind
+        ``raw_project`` and ``project``; ``built`` and the live-session case copy the same ``live`` the same way)."""
+        conftest = conftest_of("W1-25")
+        point_copier_at(planted)
+        session = body(conftest.live)(_Factory(tmp_path / "session"))
+>       judge_chain("W1-25 (conftest live -> _copy)", session,
+                    lambda index: conftest._copy(session, tmp_path / f"test-{index}"),
+                    [tmp_path / "session", *(tmp_path / f"test-{index}" for index in range(WORKERS))])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'W1-25 (conftest live -> _copy)'
+session = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo')
+make_copy = <function test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc.<locals>.<lambda> at 0x727f1de254e0>
+folders = [PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session'), Posix...est-0'), PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/test-1')]
+
+    def judge_chain(label, session, make_copy, folders):
+        """The KPI's either/or for a session copy and the per-test copies made from it."""
+        try:
+            if (session / ".git").is_dir():
+                (session / ".git" / SESSION_MARK).write_text("session copy\n", encoding="utf-8")
+            copies, errors = copies_at_once(make_copy)
+            gc = automatic_gc(session)
+            carried = [copy for copy in copies if (copy / ".git" / SESSION_MARK).exists()]
+            broken = {str(copy): problem for copy in copies if (copy / ".git").is_dir() and (problem := fsck(copy))}
+            races = bool(gc) and (bool(carried) or bool(errors))
+>           assert not errors and not broken and not races, (
+                f"{label}: per-test copies of a planted tree of {PLANTED_FILES} objects race git's garbage collection.\n"
+                f"- automatic gc in the session copy after its commit: {gc or 'none'}\n"
+                f"- per-test copies that carry the session copy's .git: {len(carried)} of {WORKERS}\n"
+                f"- copies that raised: {errors or 'none'}\n"
+                f"- copies with objects missing (git fsck): {broken or 'none'}\n"
+                "The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git "
+                "(I3 F9, I4 F5)."
+            )
+E           AssertionError: W1-25 (conftest live -> _copy): per-test copies of a planted tree of 7200 objects race git's garbage collection.
+E             - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)
+E             - per-test copies that carry the session copy's .git: 0 of 2
+E             - copies that raised: ['Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/23\', \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/test-0/repo/.git/objects/23\', "[Errno 2] No such file or directory: \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/23\'"), (\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/87\', \'/tmp/gov-os-lead-W2-67/pytest-of-usa', 'Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/81\', \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/test-1/repo/.git/objects/81\', "[Errno 2] No such file or directory: \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/81\'"), (\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/2d\', \'/tmp/gov-os-lead-W2-67/pytest-of-usa']
+E             - copies with objects missing (git fsck): none
+E             The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).
+E           assert (not ["Error: [('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-li...n-gw6/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/2d', '/tmp/gov-os-lead-W2-67/pytest-of-usa"])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:218: AssertionError
+_____ test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc _____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+planted = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/w2-67-planted0/source')
+point_copier_at = <function point_copier_at.<locals>._point at 0x7b9e4d4e9b20>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0')
+
+    def test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc(planted, point_copier_at, tmp_path):
+        """W1-27: ``live`` (copy_working_tree) and ``project`` (a copytree of it), from its conftest."""
+        conftest = conftest_of("W1-27")
+        point_copier_at(planted)
+        session = body(conftest.live)(_Factory(tmp_path / "session"))
+>       judge_chain("W1-27 (conftest live -> project)", session,
+                    lambda index: body(conftest.project)(session, tmp_path / f"test-{index}"),
+                    [tmp_path / "session", *(tmp_path / f"test-{index}" for index in range(WORKERS))])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'W1-27 (conftest live -> project)'
+session = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo')
+make_copy = <function test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc.<locals>.<lambda> at 0x7b9e4d4ea2a0>
+folders = [PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session'), Posix...est-0'), PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/test-1')]
+
+    def judge_chain(label, session, make_copy, folders):
+        """The KPI's either/or for a session copy and the per-test copies made from it."""
+        try:
+            if (session / ".git").is_dir():
+                (session / ".git" / SESSION_MARK).write_text("session copy\n", encoding="utf-8")
+            copies, errors = copies_at_once(make_copy)
+            gc = automatic_gc(session)
+            carried = [copy for copy in copies if (copy / ".git" / SESSION_MARK).exists()]
+            broken = {str(copy): problem for copy in copies if (copy / ".git").is_dir() and (problem := fsck(copy))}
+            races = bool(gc) and (bool(carried) or bool(errors))
+>           assert not errors and not broken and not races, (
+                f"{label}: per-test copies of a planted tree of {PLANTED_FILES} objects race git's garbage collection.\n"
+                f"- automatic gc in the session copy after its commit: {gc or 'none'}\n"
+                f"- per-test copies that carry the session copy's .git: {len(carried)} of {WORKERS}\n"
+                f"- copies that raised: {errors or 'none'}\n"
+                f"- copies with objects missing (git fsck): {broken or 'none'}\n"
+                "The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git "
+                "(I3 F9, I4 F5)."
+            )
+E           AssertionError: W1-27 (conftest live -> project): per-test copies of a planted tree of 7200 objects race git's garbage collection.
+E             - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)
+E             - per-test copies that carry the session copy's .git: 0 of 2
+E             - copies that raised: ['Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/23/3b06dbf86955f21d1e1e1d94552b7dfda271ca\', \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/test-0/repo/.git/objects/23/3b06dbf86955f21d1e1e1d94552b7dfda271ca\', "[Errno 2] No such file or directory: \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/23/3b06dbf86955f21d1e1e1d94552b7dfda271ca\'"), (\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/pope', 'Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/23\', \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/test-1/repo/.git/objects/23\', "[Errno 2] No such file or directory: \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/23\'"), (\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/60\', \'/tmp/gov-os-lead-W2-67/pytest-of-usa']
+E             - copies with objects missing (git fsck): none
+E             The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).
+E           assert (not ['Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-l...n-gw0/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/60', '/tmp/gov-os-lead-W2-67/pytest-of-usa"])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:218: AssertionError
+_____ test_w1_07_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc _____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+planted = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/w2-67-planted0/source')
+point_copier_at = <function point_copier_at.<locals>._point at 0x7a9950845bc0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0')
+
+    def test_w1_07_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc(planted, point_copier_at, tmp_path):
+        """W1-07: ``live`` (copy_working_tree) and ``project`` (a copytree of it), from its conftest."""
+        conftest = conftest_of("W1-07")
+        point_copier_at(planted)
+        session = body(conftest.live)(_Factory(tmp_path / "session"))
+>       judge_chain("W1-07 (conftest live -> project)", session,
+                    lambda index: body(conftest.project)(session, tmp_path / f"test-{index}"),
+                    [tmp_path / "session", *(tmp_path / f"test-{index}" for index in range(WORKERS))])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'W1-07 (conftest live -> project)'
+session = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo')
+make_copy = <function test_w1_07_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc.<locals>.<lambda> at 0x7a9950846a20>
+folders = [PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session'), Posix...est-0'), PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/test-1')]
+
+    def judge_chain(label, session, make_copy, folders):
+        """The KPI's either/or for a session copy and the per-test copies made from it."""
+        try:
+            if (session / ".git").is_dir():
+                (session / ".git" / SESSION_MARK).write_text("session copy\n", encoding="utf-8")
+            copies, errors = copies_at_once(make_copy)
+            gc = automatic_gc(session)
+            carried = [copy for copy in copies if (copy / ".git" / SESSION_MARK).exists()]
+            broken = {str(copy): problem for copy in copies if (copy / ".git").is_dir() and (problem := fsck(copy))}
+            races = bool(gc) and (bool(carried) or bool(errors))
+>           assert not errors and not broken and not races, (
+                f"{label}: per-test copies of a planted tree of {PLANTED_FILES} objects race git's garbage collection.\n"
+                f"- automatic gc in the session copy after its commit: {gc or 'none'}\n"
+                f"- per-test copies that carry the session copy's .git: {len(carried)} of {WORKERS}\n"
+                f"- copies that raised: {errors or 'none'}\n"
+                f"- copies with objects missing (git fsck): {broken or 'none'}\n"
+                "The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git "
+                "(I3 F9, I4 F5)."
+            )
+E           AssertionError: W1-07 (conftest live -> project): per-test copies of a planted tree of 7200 objects race git's garbage collection.
+E             - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)
+E             - per-test copies that carry the session copy's .git: 0 of 2
+E             - copies that raised: ['Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/2d\', \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/test-0/repo/.git/objects/2d\', "[Errno 2] No such file or directory: \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/2d\'"), (\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/3e\', \'/tmp/gov-os-lead-W2-67/pytest-of-usa', 'Error: [(\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/2d\', \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/test-1/repo/.git/objects/2d\', "[Errno 2] No such file or directory: \'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/2d\'"), (\'/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/3e\', \'/tmp/gov-os-lead-W2-67/pytest-of-usa']
+E             - copies with objects missing (git fsck): none
+E             The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).
+E           assert (not ["Error: [('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-7/popen-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-li...n-gw5/test_w1_07_per_test_copies_of_0/session/w1-07-live/repo/.git/objects/3e', '/tmp/gov-os-lead-W2-67/pytest-of-usa"])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:218: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+4 failed, 826 passed, 1 skipped in 204.35s (0:03:24)

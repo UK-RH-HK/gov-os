@@ -1,0 +1,6 @@
+label=red start=2026-10-23T17:36:56+01:00 tmp_before_inodes=28305
+parallel peak_inodes=2309537 peak_kb=19974516
+parallel exit=1 seconds=233
+serial peak_inodes=2246075 peak_kb=19985380
+serial exit=0 seconds=15
+end=2026-10-23T17:41:04+01:00 tmp_after_inodes=2271118 tmp_after=20G basefolders=4

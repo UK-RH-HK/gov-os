@@ -54,6 +54,11 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **W2-67 round 1 returned PACKAGES (test design done, head `60f71c42`):** the launcher refused an engineer on a
+  test-designer ticket (my ticket-file slip). **DEC-907 (delegated) `82e86d54`** + ticket `a6af5bb1`: role engineer,
+  acceptance files in the body; the fixtures by a second fresh designer; conftest refuses per-run --basetemp (opt-out
+  GOV_ALLOW_BASETEMP=1); TD1B-B and TD2-A to the owner's DIGEST. Its temp removed (2.34M inodes). **Run 2 QUEUED**
+  (`log/W2-67-A5-run2.json`).
 - **DEC-906 (owner) `4bffc276`** on P-W1-01-H: STANDING: changes under tests/acceptance/ only by a test designer
   (retirements too); only ratchet, accepted-history and acceptance_exemptions entries stay Role: owner commits; an
   owner commit touching tests gets a full run first. W1-01's case reads `acceptance_exemptions` (exact shas), only
