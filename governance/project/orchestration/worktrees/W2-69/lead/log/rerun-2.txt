@@ -1,0 +1,13 @@
+== tests/unit/guard/test_heldout_limit.py::test_a_megabyte_of_path_like_text_is_answered_at_once 22:52:08 8.55
+....                                                                     [100%]
+4 passed in 0.58s
+== tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook 22:52:09 8.27
+.........                                                                [100%]
+9 passed in 39.71s
+== tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 22:52:52 6.71
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:181: AssertionError
+1 failed in 82.55s (0:01:22)
+== tests/acceptance/W1-46/test_w1_46_live_sessions.py 22:54:41 12.41
+....................................                                     [100%]
+36 passed in 28.18s

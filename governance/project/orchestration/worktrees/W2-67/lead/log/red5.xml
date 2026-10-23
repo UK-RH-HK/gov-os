@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="0" tests="19" time="23.061" timestamp="2026-10-23T23:36:52.995319+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[close-runner-none]" time="3.484"><failure message="AssertionError: the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=none: base folders before ['pytest-0'], after [].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -c import json, sys&#10;  from pathlib import Path&#10;  from gov.close.command import _run_tests&#10;  root = Path(sys.argv[1])&#10;  findings, counts = _run_tests(root, root / &quot;tests&quot;, int(sys.argv[2]), workers=1)&#10;  print(json.dumps({&quot;findings&quot;: findings, &quot;counts&quot;: counts}))&#10;  sys.exit(1 if findings else 0)&#10;   /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i0/project 180&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  {&quot;findings&quot;: [&quot;FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...&quot;], &quot;counts&quot;: {&quot;passed&quot;: 0, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0}}&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=none: base folders before ['pytest-0'], after [].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -c import json, sys
+      from pathlib import Path
+      from gov.close.command import _run_tests
+      root = Path(sys.argv[1])
+      findings, counts = _run_tests(root, root / "tests", int(sys.argv[2]), workers=1)
+      print(json.dumps({"findings": findings, "counts": counts}))
+      sys.exit(1 if findings else 0)
+       /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i0/project 180
+      exit code: 1
+      output (last 1500 characters):
+      {"findings": ["FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ..."], "counts": {"passed": 0, "failed": 1, "errors": 0, "skipped": 0}}
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[close-runner-all]" time="3.405"><failure message="AssertionError: the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4'].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -c import json, sys&#10;  from pathlib import Path&#10;  from gov.close.command import _run_tests&#10;  root = Path(sys.argv[1])&#10;  findings, counts = _run_tests(root, root / &quot;tests&quot;, int(sys.argv[2]), workers=1)&#10;  print(json.dumps({&quot;findings&quot;: findings, &quot;counts&quot;: counts}))&#10;  sys.exit(1 if findings else 0)&#10;   /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i0/project 180&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  {&quot;findings&quot;: [&quot;FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...&quot;], &quot;counts&quot;: {&quot;passed&quot;: 0, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0}}&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4'].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -c import json, sys
+      from pathlib import Path
+      from gov.close.command import _run_tests
+      root = Path(sys.argv[1])
+      findings, counts = _run_tests(root, root / "tests", int(sys.argv[2]), workers=1)
+      print(json.dumps({"findings": findings, "counts": counts}))
+      sys.exit(1 if findings else 0)
+       /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i0/project 180
+      exit code: 1
+      output (last 1500 characters):
+      {"findings": ["FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ..."], "counts": {"passed": 0, "failed": 1, "errors": 0, "skipped": 0}}
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[close-runner-failed]" time="3.919"><failure message="AssertionError: the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=failed: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-1', 'pytest-2', 'pytest-3'].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -c import json, sys&#10;  from pathlib import Path&#10;  from gov.close.command import _run_tests&#10;  root = Path(sys.argv[1])&#10;  findings, counts = _run_tests(root, root / &quot;tests&quot;, int(sys.argv[2]), workers=1)&#10;  print(json.dumps({&quot;findings&quot;: findings, &quot;counts&quot;: counts}))&#10;  sys.exit(1 if findings else 0)&#10;   /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i1/project 180&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  {&quot;findings&quot;: [&quot;FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...&quot;], &quot;counts&quot;: {&quot;passed&quot;: 0, &quot;failed&quot;: 1, &quot;errors&quot;: 0, &quot;skipped&quot;: 0}}&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (close-runner, pytest-0, its .lock naming pid 5 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=failed: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-1', 'pytest-2', 'pytest-3'].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -c import json, sys
+      from pathlib import Path
+      from gov.close.command import _run_tests
+      root = Path(sys.argv[1])
+      findings, counts = _run_tests(root, root / "tests", int(sys.argv[2]), workers=1)
+      print(json.dumps({"findings": findings, "counts": counts}))
+      sys.exit(1 if findings else 0)
+       /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i1/project 180
+      exit code: 1
+      output (last 1500 characters):
+      {"findings": ["FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ..."], "counts": {"passed": 0, "failed": 1, "errors": 0, "skipped": 0}}
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[foreign-project-all]" time="2.110"><failure message="AssertionError: the base folder of a run still going (foreign-project, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4'].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/test_held.py --rootdir=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i1/project -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  pPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x73a1f6c2b680&gt;, _basetemp=PosixP.../popen-gw1/test_a_live_runs_base_folder_i1/tmp/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='all')&#10;  &#10;      def test_held(tmp_path, tmp_path_factory):&#10;          (tmp_path / &quot;held.txt&quot;).write_text(&quot;held\n&quot;, encoding=&quot;utf-8&quot;)&#10;          part = Path(str(READY) + &quot;.part&quot;)&#10;          part.write_text(str(tmp_path_factory.getbasetemp()) + &quot;\n&quot;, encoding=&quot;utf-8&quot;)&#10;          os.replace(part, READY)&#10;          deadline = time.monotonic() + 150&#10;          while not RELEASE.exists():&#10;              assert time.monotonic() &lt; deadline, &quot;no release within 150 s&quot;&#10;              time.sleep(0.05)&#10;  &gt;       assert (tmp_path / &quot;held.txt&quot;).is_file(), f&quot;the run's temp folder {tmp_path} vanished while the run was going&quot;&#10;  E       AssertionError: the run's temp folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i1/tmp/pytest-of-usain/pytest-0/test_held0 vanished while the run was going&#10;  E       assert False&#10;  E        +  where False = is_file()&#10;  E        +    where is_file = (PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i1/tmp/pytest-of-usain/pytest-0/test_held0') / 'held.txt').is_file&#10;  &#10;  tests/test_held.py:18: AssertionError&#10;  =========================== short test summary info ============================&#10;  FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...&#10;  1 failed in 1.01s&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (foreign-project, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4'].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/test_held.py --rootdir=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i1/project -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly
+      exit code: 1
+      output (last 1500 characters):
+      pPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x73a1f6c2b680&gt;, _basetemp=PosixP.../popen-gw1/test_a_live_runs_base_folder_i1/tmp/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='all')
+      
+          def test_held(tmp_path, tmp_path_factory):
+              (tmp_path / "held.txt").write_text("held\n", encoding="utf-8")
+              part = Path(str(READY) + ".part")
+              part.write_text(str(tmp_path_factory.getbasetemp()) + "\n", encoding="utf-8")
+              os.replace(part, READY)
+              deadline = time.monotonic() + 150
+              while not RELEASE.exists():
+                  assert time.monotonic() &lt; deadline, "no release within 150 s"
+                  time.sleep(0.05)
+      &gt;       assert (tmp_path / "held.txt").is_file(), f"the run's temp folder {tmp_path} vanished while the run was going"
+      E       AssertionError: the run's temp folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i1/tmp/pytest-of-usain/pytest-0/test_held0 vanished while the run was going
+      E       assert False
+      E        +  where False = is_file()
+      E        +    where is_file = (PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i1/tmp/pytest-of-usain/pytest-0/test_held0') / 'held.txt').is_file
+      
+      tests/test_held.py:18: AssertionError
+      =========================== short test summary info ============================
+      FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...
+      1 failed in 1.01s
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-in-setup-all]" time="2.162"><failure message="AssertionError: the base folder of a run still going (suite-in-setup, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4'].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_ns_probe.py --rootdir=/home/usain/gov-os-worktrees/W2-67 -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ &#10;  &#10;  base = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0')&#10;  where = &quot;in its first test's setup&quot;&#10;  &#10;      def _hold(base, where):&#10;          &quot;&quot;&quot;Say the run got here, then wait for the release (or die by SIGKILL, in a ``kill-`` mode).&quot;&quot;&quot;&#10;          _ready(base)&#10;          if MODE.startswith(&quot;kill-&quot;):&#10;              os.kill(os.getpid(), signal.SIGKILL)&#10;          deadline = time.monotonic() + HOLD_S&#10;          while not Path(RELEASE).exists():&#10;              if time.monotonic() &gt; deadline:&#10;                  pytest.fail(f&quot;no release within {HOLD_S} s&quot;)&#10;              time.sleep(0.05)&#10;  &gt;       assert base.is_dir(), f&quot;the run's base folder {base} vanished while the run was {where}&quot;&#10;  E       AssertionError: the run's base folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0 vanished while the run was in its first test's setup&#10;  E       assert False&#10;  E        +  where False = is_dir()&#10;  E        +    where is_dir = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0').is_dir&#10;  &#10;  tests/acceptance/W1-27/w2_67_ns_probe.py:49: AssertionError&#10;  =========================== short test summary info ============================&#10;  ERROR tests/acceptance/W1-27/w2_67_ns_probe.py::test_probe - AssertionError: ...&#10;  1 error in 1.18s&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (suite-in-setup, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=all: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-2', 'pytest-3', 'pytest-4'].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_ns_probe.py --rootdir=/home/usain/gov-os-worktrees/W2-67 -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly
+      exit code: 1
+      output (last 1500 characters):
+      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+      
+      base = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0')
+      where = "in its first test's setup"
+      
+          def _hold(base, where):
+              """Say the run got here, then wait for the release (or die by SIGKILL, in a ``kill-`` mode)."""
+              _ready(base)
+              if MODE.startswith("kill-"):
+                  os.kill(os.getpid(), signal.SIGKILL)
+              deadline = time.monotonic() + HOLD_S
+              while not Path(RELEASE).exists():
+                  if time.monotonic() &gt; deadline:
+                      pytest.fail(f"no release within {HOLD_S} s")
+                  time.sleep(0.05)
+      &gt;       assert base.is_dir(), f"the run's base folder {base} vanished while the run was {where}"
+      E       AssertionError: the run's base folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0 vanished while the run was in its first test's setup
+      E       assert False
+      E        +  where False = is_dir()
+      E        +    where is_dir = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0').is_dir
+      
+      tests/acceptance/W1-27/w2_67_ns_probe.py:49: AssertionError
+      =========================== short test summary info ============================
+      ERROR tests/acceptance/W1-27/w2_67_ns_probe.py::test_probe - AssertionError: ...
+      1 error in 1.18s
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[foreign-project-failed]" time="2.263"><failure message="AssertionError: the base folder of a run still going (foreign-project, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=failed: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-1', 'pytest-2', 'pytest-3'].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/test_held.py --rootdir=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i2/project -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  pPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x7bd212f12120&gt;, _basetemp=PosixP.../popen-gw0/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='all')&#10;  &#10;      def test_held(tmp_path, tmp_path_factory):&#10;          (tmp_path / &quot;held.txt&quot;).write_text(&quot;held\n&quot;, encoding=&quot;utf-8&quot;)&#10;          part = Path(str(READY) + &quot;.part&quot;)&#10;          part.write_text(str(tmp_path_factory.getbasetemp()) + &quot;\n&quot;, encoding=&quot;utf-8&quot;)&#10;          os.replace(part, READY)&#10;          deadline = time.monotonic() + 150&#10;          while not RELEASE.exists():&#10;              assert time.monotonic() &lt; deadline, &quot;no release within 150 s&quot;&#10;              time.sleep(0.05)&#10;  &gt;       assert (tmp_path / &quot;held.txt&quot;).is_file(), f&quot;the run's temp folder {tmp_path} vanished while the run was going&quot;&#10;  E       AssertionError: the run's temp folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0/test_held0 vanished while the run was going&#10;  E       assert False&#10;  E        +  where False = is_file()&#10;  E        +    where is_file = (PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0/test_held0') / 'held.txt').is_file&#10;  &#10;  tests/test_held.py:18: AssertionError&#10;  =========================== short test summary info ============================&#10;  FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...&#10;  1 failed in 1.20s&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (foreign-project, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=failed: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-1', 'pytest-2', 'pytest-3'].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/test_held.py --rootdir=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i2/project -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly
+      exit code: 1
+      output (last 1500 characters):
+      pPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x7bd212f12120&gt;, _basetemp=PosixP.../popen-gw0/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='all')
+      
+          def test_held(tmp_path, tmp_path_factory):
+              (tmp_path / "held.txt").write_text("held\n", encoding="utf-8")
+              part = Path(str(READY) + ".part")
+              part.write_text(str(tmp_path_factory.getbasetemp()) + "\n", encoding="utf-8")
+              os.replace(part, READY)
+              deadline = time.monotonic() + 150
+              while not RELEASE.exists():
+                  assert time.monotonic() &lt; deadline, "no release within 150 s"
+                  time.sleep(0.05)
+      &gt;       assert (tmp_path / "held.txt").is_file(), f"the run's temp folder {tmp_path} vanished while the run was going"
+      E       AssertionError: the run's temp folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0/test_held0 vanished while the run was going
+      E       assert False
+      E        +  where False = is_file()
+      E        +    where is_file = (PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i2/tmp/pytest-of-usain/pytest-0/test_held0') / 'held.txt').is_file
+      
+      tests/test_held.py:18: AssertionError
+      =========================== short test summary info ============================
+      FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...
+      1 failed in 1.20s
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-in-setup-failed]" time="2.017"><failure message="AssertionError: the base folder of a run still going (suite-in-setup, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=failed: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-1', 'pytest-2', 'pytest-3'].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_ns_probe.py --rootdir=/home/usain/gov-os-worktrees/W2-67 -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ &#10;  &#10;  base = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0')&#10;  where = &quot;in its first test's setup&quot;&#10;  &#10;      def _hold(base, where):&#10;          &quot;&quot;&quot;Say the run got here, then wait for the release (or die by SIGKILL, in a ``kill-`` mode).&quot;&quot;&quot;&#10;          _ready(base)&#10;          if MODE.startswith(&quot;kill-&quot;):&#10;              os.kill(os.getpid(), signal.SIGKILL)&#10;          deadline = time.monotonic() + HOLD_S&#10;          while not Path(RELEASE).exists():&#10;              if time.monotonic() &gt; deadline:&#10;                  pytest.fail(f&quot;no release within {HOLD_S} s&quot;)&#10;              time.sleep(0.05)&#10;  &gt;       assert base.is_dir(), f&quot;the run's base folder {base} vanished while the run was {where}&quot;&#10;  E       AssertionError: the run's base folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0 vanished while the run was in its first test's setup&#10;  E       assert False&#10;  E        +  where False = is_dir()&#10;  E        +    where is_dir = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0').is_dir&#10;  &#10;  tests/acceptance/W1-27/w2_67_ns_probe.py:49: AssertionError&#10;  =========================== short test summary info ============================&#10;  ERROR tests/acceptance/W1-27/w2_67_ns_probe.py::test_probe - AssertionError: ...&#10;  1 error in 1.21s&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (suite-in-setup, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=failed: base folders before ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-1', 'pytest-2', 'pytest-3'].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_ns_probe.py --rootdir=/home/usain/gov-os-worktrees/W2-67 -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly
+      exit code: 1
+      output (last 1500 characters):
+      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+      
+      base = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0')
+      where = "in its first test's setup"
+      
+          def _hold(base, where):
+              """Say the run got here, then wait for the release (or die by SIGKILL, in a ``kill-`` mode)."""
+              _ready(base)
+              if MODE.startswith("kill-"):
+                  os.kill(os.getpid(), signal.SIGKILL)
+              deadline = time.monotonic() + HOLD_S
+              while not Path(RELEASE).exists():
+                  if time.monotonic() &gt; deadline:
+                      pytest.fail(f"no release within {HOLD_S} s")
+                  time.sleep(0.05)
+      &gt;       assert base.is_dir(), f"the run's base folder {base} vanished while the run was {where}"
+      E       AssertionError: the run's base folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0 vanished while the run was in its first test's setup
+      E       assert False
+      E        +  where False = is_dir()
+      E        +    where is_dir = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0').is_dir
+      
+      tests/acceptance/W1-27/w2_67_ns_probe.py:49: AssertionError
+      =========================== short test summary info ============================
+      ERROR tests/acceptance/W1-27/w2_67_ns_probe.py::test_probe - AssertionError: ...
+      1 error in 1.21s
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[foreign-project-none]" time="2.326"><failure message="AssertionError: the base folder of a run still going (foreign-project, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=none: base folders before ['pytest-0'], after [].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/test_held.py --rootdir=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i3/project -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  pPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x74365fa15790&gt;, _basetemp=PosixP.../popen-gw0/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='all')&#10;  &#10;      def test_held(tmp_path, tmp_path_factory):&#10;          (tmp_path / &quot;held.txt&quot;).write_text(&quot;held\n&quot;, encoding=&quot;utf-8&quot;)&#10;          part = Path(str(READY) + &quot;.part&quot;)&#10;          part.write_text(str(tmp_path_factory.getbasetemp()) + &quot;\n&quot;, encoding=&quot;utf-8&quot;)&#10;          os.replace(part, READY)&#10;          deadline = time.monotonic() + 150&#10;          while not RELEASE.exists():&#10;              assert time.monotonic() &lt; deadline, &quot;no release within 150 s&quot;&#10;              time.sleep(0.05)&#10;  &gt;       assert (tmp_path / &quot;held.txt&quot;).is_file(), f&quot;the run's temp folder {tmp_path} vanished while the run was going&quot;&#10;  E       AssertionError: the run's temp folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0/test_held0 vanished while the run was going&#10;  E       assert False&#10;  E        +  where False = is_file()&#10;  E        +    where is_file = (PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0/test_held0') / 'held.txt').is_file&#10;  &#10;  tests/test_held.py:18: AssertionError&#10;  =========================== short test summary info ============================&#10;  FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...&#10;  1 failed in 1.32s&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (foreign-project, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=none: base folders before ['pytest-0'], after [].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/test_held.py --rootdir=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i3/project -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly
+      exit code: 1
+      output (last 1500 characters):
+      pPathFactory(_given_basetemp=None, _trace=&lt;pluggy._tracing.TagTracerSub object at 0x74365fa15790&gt;, _basetemp=PosixP.../popen-gw0/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='all')
+      
+          def test_held(tmp_path, tmp_path_factory):
+              (tmp_path / "held.txt").write_text("held\n", encoding="utf-8")
+              part = Path(str(READY) + ".part")
+              part.write_text(str(tmp_path_factory.getbasetemp()) + "\n", encoding="utf-8")
+              os.replace(part, READY)
+              deadline = time.monotonic() + 150
+              while not RELEASE.exists():
+                  assert time.monotonic() &lt; deadline, "no release within 150 s"
+                  time.sleep(0.05)
+      &gt;       assert (tmp_path / "held.txt").is_file(), f"the run's temp folder {tmp_path} vanished while the run was going"
+      E       AssertionError: the run's temp folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0/test_held0 vanished while the run was going
+      E       assert False
+      E        +  where False = is_file()
+      E        +    where is_file = (PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw0/test_a_live_runs_base_folder_i3/tmp/pytest-of-usain/pytest-0/test_held0') / 'held.txt').is_file
+      
+      tests/test_held.py:18: AssertionError
+      =========================== short test summary info ============================
+      FAILED tests/test_held.py::test_held - AssertionError: the run's temp folder ...
+      1 failed in 1.32s
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-in-setup-none]" time="2.072"><failure message="AssertionError: the base folder of a run still going (suite-in-setup, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=none: base folders before ['pytest-0'], after [].&#10;  The live run, released afterwards:&#10;  command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_ns_probe.py --rootdir=/home/usain/gov-os-worktrees/W2-67 -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly&#10;  exit code: 1&#10;  output (last 1500 characters):&#10;  _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ &#10;  &#10;  base = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i4/tmp/pytest-of-usain/pytest-0')&#10;  where = &quot;in its first test's setup&quot;&#10;  &#10;      def _hold(base, where):&#10;          &quot;&quot;&quot;Say the run got here, then wait for the release (or die by SIGKILL, in a ``kill-`` mode).&quot;&quot;&quot;&#10;          _ready(base)&#10;          if MODE.startswith(&quot;kill-&quot;):&#10;              os.kill(os.getpid(), signal.SIGKILL)&#10;          deadline = time.monotonic() + HOLD_S&#10;          while not Path(RELEASE).exists():&#10;              if time.monotonic() &gt; deadline:&#10;                  pytest.fail(f&quot;no release within {HOLD_S} s&quot;)&#10;              time.sleep(0.05)&#10;  &gt;       assert base.is_dir(), f&quot;the run's base folder {base} vanished while the run was {where}&quot;&#10;  E       AssertionError: the run's base folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i4/tmp/pytest-of-usain/pytest-0 vanished while the run was in its first test's setup&#10;  E       assert False&#10;  E        +  where False = is_dir()&#10;  E        +    where is_dir = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i4/tmp/pytest-of-usain/pytest-0').is_dir&#10;  &#10;  tests/acceptance/W1-27/w2_67_ns_probe.py:49: AssertionError&#10;  =========================== short test summary info ============================&#10;  ERROR tests/acceptance/W1-27/w2_67_ns_probe.py::test_probe - AssertionError: ...&#10;  1 error in 1.09s&#10;  &#10;assert False">E   AssertionError: the base folder of a run still going (suite-in-setup, pytest-0, its .lock naming pid 3 in its own namespace) was removed by a passing run of the suites in another PID namespace, given tmp_path_retention_policy=none: base folders before ['pytest-0'], after [].
+      The live run, released afterwards:
+      command (pid 3 in its namespace): /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_ns_probe.py --rootdir=/home/usain/gov-os-worktrees/W2-67 -q --no-header -p no:cacheprovider -p no:xdist -p no:randomly
+      exit code: 1
+      output (last 1500 characters):
+      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+      
+      base = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i4/tmp/pytest-of-usain/pytest-0')
+      where = "in its first test's setup"
+      
+          def _hold(base, where):
+              """Say the run got here, then wait for the release (or die by SIGKILL, in a ``kill-`` mode)."""
+              _ready(base)
+              if MODE.startswith("kill-"):
+                  os.kill(os.getpid(), signal.SIGKILL)
+              deadline = time.monotonic() + HOLD_S
+              while not Path(RELEASE).exists():
+                  if time.monotonic() &gt; deadline:
+                      pytest.fail(f"no release within {HOLD_S} s")
+                  time.sleep(0.05)
+      &gt;       assert base.is_dir(), f"the run's base folder {base} vanished while the run was {where}"
+      E       AssertionError: the run's base folder /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i4/tmp/pytest-of-usain/pytest-0 vanished while the run was in its first test's setup
+      E       assert False
+      E        +  where False = is_dir()
+      E        +    where is_dir = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-28/popen-gw1/test_a_live_runs_base_folder_i4/tmp/pytest-of-usain/pytest-0').is_dir
+      
+      tests/acceptance/W1-27/w2_67_ns_probe.py:49: AssertionError
+      =========================== short test summary info ============================
+      ERROR tests/acceptance/W1-27/w2_67_ns_probe.py::test_probe - AssertionError: ...
+      1 error in 1.09s
+      
+    assert False</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-mid-test-failed]" time="2.777" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-mid-test-all]" time="3.118" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-mid-test-none]" time="2.884" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-in-teardown-all]" time="2.836" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-in-teardown-failed]" time="1.928" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_live_runs_base_folder_is_kept_by_a_sweep_from_another_pid_namespace[suite-in-teardown-none]" time="2.271" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid[mid-test-same-pid]" time="1.550"><failure message="AssertionError: the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace; 4 base folders left behind, more than 3 (DEC-898). Base folders before the sweep ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-0', 'pytest-2', 'pytest-3', 'pytest-4'].&#10;assert not [&quot;the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace&quot;, '4 base folders left behind, more than 3 (DEC-898)']">E   AssertionError: the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace; 4 base folders left behind, more than 3 (DEC-898). Base folders before the sweep ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-0', 'pytest-2', 'pytest-3', 'pytest-4'].
+    assert not ["the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace", '4 base folders left behind, more than 3 (DEC-898)']</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid[mid-test-next-pid]" time="1.079" /><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid[in-setup-same-pid]" time="0.755"><failure message="AssertionError: the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace; 4 base folders left behind, more than 3 (DEC-898). Base folders before the sweep ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-0', 'pytest-2', 'pytest-3', 'pytest-4'].&#10;assert not [&quot;the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace&quot;, '4 base folders left behind, more than 3 (DEC-898)']">E   AssertionError: the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace; 4 base folders left behind, more than 3 (DEC-898). Base folders before the sweep ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3'], after ['pytest-0', 'pytest-2', 'pytest-3', 'pytest-4'].
+    assert not ["the killed run's folder pytest-0 (its .lock naming pid 3 in a namespace that has ended) was kept by a sweep whose pytest is pid 3 in its own namespace", '4 base folders left behind, more than 3 (DEC-898)']</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_sweep_namespaces" name="test_a_killed_suite_runs_base_folder_is_removed_past_retention_whatever_the_sweepers_pid[in-setup-next-pid]" time="0.750" /></testsuite></testsuites>

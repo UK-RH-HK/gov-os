@@ -1,0 +1,20 @@
+raw bytes 244146176
+table lexical_file: 182833 bytes of rows, token found: False
+table lexical_parent: 1617399 bytes of rows, token found: False
+table lexical_chunk: 4513769 bytes of rows, token found: False
+table lexical_fts: 24680970 bytes of rows, token found: False
+table lexical_fts_data: 30304521 bytes of rows, token found: False
+table lexical_fts_idx: 37075 bytes of rows, token found: False
+table lexical_fts_content: 24928537 bytes of rows, token found: False
+table lexical_fts_docsize: 568314 bytes of rows, token found: False
+table lexical_fts_config: 9 bytes of rows, token found: False
+table semantic_vector: 447939643 bytes of rows, token found: False
+table semantic_manifest: 151 bytes of rows, token found: False
+table records: 89211 bytes of rows, token found: False
+table edges: 18833 bytes of rows, token found: False
+table commits: 112093 bytes of rows, token found: False
+table trailers: 188018 bytes of rows, token found: False
+table commit_paths: 4462722 bytes of rows, token found: False
+table register_entries: 174203 bytes of rows, token found: False
+rows hit tables: []
+raw bytes token found: True

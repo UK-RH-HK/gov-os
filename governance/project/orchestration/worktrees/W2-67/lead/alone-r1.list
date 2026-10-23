@@ -1,0 +1,14 @@
+tests/acceptance/W1-02/test_w1_02_fix_round_time.py::test_each_of_the_reviewer_s_inputs_is_decided_within_the_bound[13-shell-a-pipeline-of-4000-fed-searches]
+tests/acceptance/W1-02/test_w1_02_fix_round_time.py::test_each_new_form_of_the_round_at_the_length_bound_is_decided_within_the_bound[a-numbered-redirect-repeated-after-a-search]
+tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py::test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project
+tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95

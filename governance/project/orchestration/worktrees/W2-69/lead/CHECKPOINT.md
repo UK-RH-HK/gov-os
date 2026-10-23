@@ -39,9 +39,32 @@
   Tripwire 5: here only its commits + acceptance folder W2-69.
 - Lead red-2 (log/red-2.*): 27 failed, 226 passed (brief-lock twin passed: R11 load timing, as the designer warned).
 
+## Engineer 2
+- engineer-2 (session 7204c9cb-9b0c-46f1-a922-95bf5d4835a3, old form, high), iteration 2: DONE, commit 8663196d
+  (Task/Role: engineer/Implements: engineer/Co-Authored-By); +188/-21 in 5 files. W2-69 253/253; W1-15 123/1 under
+  -n 8 (time case; alone passes); W2-50 secrets 54; W1-16 167; unit 42. _FORM 3; pieces 24,000, overlap 9,216;
+  blank line -> form feed; FTS5 terms whole; 10 s busy wait; no raw-fallback clean recorded; relative root fixed;
+  stderr report. No retrieve (brief named files). 0 read refusals. 95 MB stand-in left in its scratch (rm refused).
+  Tripwire 6: only 8663196d here.
+
+## Verification at 8663196d
+- rebuild-3 exit 0, digest 5e0f1e8c..., all 4 stores compacted, stderr empty. gov.__file__ in this worktree.
+- gov check (check-2) exit 0, secrets-indexing GREEN; same 2 YELLOW (decision-citations warning, openspec absent).
+- parallel-2 (45.5 min): 3 failed (2 W1-42 accepted_reds; unit guard test_heldout_limit megabyte timing 2.16 s > 1 s),
+  15727 passed, 30 skipped. W1-15 time case passed.
+- serial-2 (53.8 min, load ~31): 3 failed (W1-05 live hooks p95 Glob/NotebookEdit; W1-19 warm p95) + 23 errors
+  (W1-46 live sessions at setup), 237 passed. All load/timing; rerun-2 alone at load < 10 (log/rerun-2.*).
+- collect-2: "16023/16025 tests collected (2 deselected) in 13.26s".
+
+- rerun-2 alone: guard heldout megabyte 4 passed; W1-05 live hooks 9 passed; W1-46 live sessions 36 passed;
+  W1-19 warm p95 failed alone 3x (CPU embedder contention); A/B at load ~5-7: base src passed 66.3 s, this src
+  passed 64.6 s (log/ab-w1-19.txt). Timed path (fusion search, refresh False) runs no ticket code.
+- Lead commit cfea8a26 = CP-DAEO-rmbe-0006 = HEAD TO PROBE for review 2.
+
 ## Now
-- engineer-2 (fresh, old form, high), iteration 2: brief `briefs/engineer-2.md` (failing output only),
-  log `log/engineer-2.json`, tripwire-before-6.
+- review 2 (LAST, DEC-413) running: brief `briefs/reviewer-2.md`, log `log/reviewer-2.json`, tripwire-before-7.
+- If PASS: write docs/probes/DAEO-rmbe/PR-DAEO-rmbe.md, commit (only that), DEC-868 collect check, return DONE.
+- If FAIL: no third review; findings -> return (residuals / package), draft under probes/.
 - Then: red check of the new cases; engineer-2 (fresh, old form) with the failing output only; verify (rebuild,
   close-form suites, gov check); review 2 = the second and LAST review (DEC-413); probe record if pass.
 

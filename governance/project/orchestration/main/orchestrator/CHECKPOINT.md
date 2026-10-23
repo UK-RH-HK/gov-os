@@ -54,6 +54,10 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **W2-70 DONE and MERGED `efdc4188`** (tree == merge-tree; probe_impact 0): the two nested reruns retired; W1-01's
+  history and merge cases read `acceptance_exemptions` (owner commit C `18ad2382`); final run 15,476 passed, 0
+  failed; serial 262 passed. **W1-01's red has LEFT integrate.** Merged-not-closed: closes once W2-07 is pinned.
+  Rows W2-L417 (stale texts) + W2-L418 (W1-50 timing case) `7c3638c0`. Its temp removed.
 - **W2-07 run 2 returned PACKAGES (head `d2eee219`, batch of 196 green, gov check green):** 14 more W1-30 cases ->
   **DEC-908 (delegated) `e4b745a6`** (ticket `2d32b7bb`; DEC-455/480/454 marked; row W2-L416); T3 = DEC-906 (W1-01
   known; W2-70 also covers the merge case, `488972e4`). Its temp removed. **Run 3 QUEUED** (`log/W2-07-A5-run3.json`).
