@@ -73,7 +73,12 @@ the full regression, never less.
    - every close record `docs/close/*/CL-*.md` whose `evidence.scope` is `full` (its `evidence.head`);
    - every nightly record `docs/close/nightly/*.json` whose `verdict` is `green` (its `head`).
    No such record, or none naming a commit of `HEAD`'s history: the base is unknown (`base: null`) and the run is
-   full (`BASE_UNKNOWN`). **The change** is every path `git diff --name-only <base> HEAD` names.
+   full (`BASE_UNKNOWN`). **The change** is every path `git diff --name-only <base> HEAD` names, with git's rename
+   detection off (`--no-renames`): **a moved file is in the change at both its paths**, the path it left and the
+   path it reached, and every rule of item 3 and the full-run reasons read both (a file moved out of the shared
+   core runs the full regression, `SHARED_CORE` naming the path it left; a file moved away from a ticket's
+   `allowed_paths` selects that ticket's suite, `OVERLAP` naming the path it left). The evidence's `changed`
+   names both.
 3. **The selection.** The ticket's acceptance run stays as it is. The regression run keeps the full run's form:
    `pytest tests` with `--ignore=<path>` (and `--deselect=<node id>` where a target is finer than a file) for
    what is left out, never a list of folders. It runs: `tests/unit`; each acceptance suite
@@ -183,6 +188,18 @@ close), and the evidence block does not name it.
 | S10 the nightly | `test_w2_66_nightly.py` (5): the branch's head with JUnit XML; bisect P1; flaky candidate; selection miss with the map corrected; the weekly coverage map across child processes (coverage 7.16.2 is installed in the test interpreter; the case skips where it is not) | (c); the selection-miss case first fails at its scoped close (a) |
 | S11 the report | `test_w2_66_research.py` (3) | (f) |
 | S13 W1-30's revision | `tests/acceptance/W1-30/test_w1_30_close.py::test_regression_includes_other_acceptance_folders` (revised, green on the base and after: a project without a test map runs everything); `tests/acceptance/W1-30/test_w1_30_regression_scope.py` (4) | the new file: (a), (b) |
+
+### Part 4 — the FULL review of 9174e358 (described behaviours, DEC-136)
+
+Written by a fresh test designer after the implementation was built, from the review's described behaviours; no
+implementation read. Expected red reason on the built head `9174e358`: **(i)** the change is read with git's rename
+detection, so a moved file is in it at the path it reached only (`changed` lacks the path it left; a file moved out
+of the shared core runs `scoped`; the suite of the ticket whose paths the file left is `NOT_REACHED` and the close
+passes).
+
+| KPI line | Tests | Red on the built head |
+|---|---|---|
+| S1, S2 + F1 a moved file at both its paths (Interface item 2) | `test_w2_66_moved_files.py` (3): `::test_a_file_moved_out_of_the_shared_core_runs_the_full_regression`, `::test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite`, `::test_a_file_moved_into_the_shared_core_runs_the_full_regression` | (i); the last runs full today and is red only on `changed` lacking the path the file left |
 
 ### Expected green on the base
 

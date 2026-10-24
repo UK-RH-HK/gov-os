@@ -314,6 +314,20 @@ class Fixture:
             self.write(rel, text)
         return self._commit(message, close_support.OWNER, ())
 
+    def moved(self, old, new, message="another ticket's merged work: a file moved"):
+        """``git mv old new``, merged since the base as ``merged`` is: the file's text is unchanged, so git's rename
+        detection pairs the two paths."""
+        (self.root / new).parent.mkdir(parents=True, exist_ok=True)
+        close_support.git(self.root, "mv", old, new)
+        return self._commit(message, close_support.OWNER, ())
+
+    def based(self, files, message="work merged before the base"):
+        """Work merged, then a green nightly record naming it: the files are in the base, not in the change."""
+        self.merged(files, message)
+        base = self.head()
+        self.plant_green_night(base)
+        return base
+
     def record_commit(self, files, message="a record"):
         """The orchestrator's record-only commit."""
         for rel, text in files.items():
