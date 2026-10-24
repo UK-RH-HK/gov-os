@@ -25,25 +25,28 @@ def _plant(fixture, fail=True):
 
 @pytest.fixture(scope="module")
 def refused_close(module_dir):
+    """The refused close, and the commit it closed: read before the close, since a refused close commits its own
+    repair ticket after it (DEC-904 item 6, DEC-903 item 3)."""
     fixture = support.Fixture(module_dir / "project", module_dir / "told")
     sandbox = support.cli_support.make_sandbox(module_dir / "sandbox")
     _plant(fixture)
     support.widget_change(fixture, sandbox)
-    return fixture, fixture.close(sandbox)
+    head = fixture.head()
+    return fixture, fixture.close(sandbox), head
 
 
 def test_a_refused_close_states_its_evidence_and_says_scoped(refused_close):
-    fixture, run = refused_close
+    fixture, run, head = refused_close
     support.refused(run)
     evidence = support.evidence_of(run)
     assert evidence.get("scope") == support.SCOPED, f"a scoped run is stated {evidence.get('scope')!r}"
-    assert evidence.get("head") == fixture.head() and evidence.get("tree") == support.tree_of(fixture.root), \
-        f"the refused close's evidence does not state its head and tree: {evidence}"
+    assert evidence.get("head") == head and evidence.get("tree") == support.tree_of(fixture.root, head), \
+        f"the refused close's evidence does not state the head and tree it closed ({head}): {evidence}"
     assert evidence.get("base") == fixture.initial, f"the refused close's evidence states no base: {evidence}"
 
 
 def test_every_failing_test_is_named_with_its_failure_text_kept(refused_close):
-    _, run = refused_close
+    _, run, _ = refused_close
     evidence = support.evidence_of(run)
     failures = [f for f in evidence.get("failures") or [] if f.get("test") == FAILING]
     assert failures, f"the failing test is not named: {evidence.get('failures')}"
@@ -51,7 +54,7 @@ def test_every_failing_test_is_named_with_its_failure_text_kept(refused_close):
 
 
 def test_every_skip_is_named_with_its_reason_and_counted(refused_close):
-    _, run = refused_close
+    _, run, _ = refused_close
     evidence = support.evidence_of(run)
     skips = evidence.get("skips")
     assert isinstance(skips, list), f"the evidence names no skips: {evidence}"
@@ -62,7 +65,7 @@ def test_every_skip_is_named_with_its_reason_and_counted(refused_close):
 
 
 def test_the_junit_xml_of_a_refused_close_holds_the_failure_text_and_the_skip(refused_close):
-    fixture, run = refused_close
+    fixture, run, _ = refused_close
     cases = support.junit_cases(fixture.root, support.evidence_of(run))
     assert cases.get("test_bb_fails", ("", ""))[0] in ("failure", "error") and \
         FAIL_TEXT in cases["test_bb_fails"][1], f"the JUnit XML does not hold the failure with its text: {cases}"
@@ -70,7 +73,7 @@ def test_the_junit_xml_of_a_refused_close_holds_the_failure_text_and_the_skip(re
 
 
 def test_a_refused_close_names_every_suite_it_left_out(refused_close):
-    fixture, run = refused_close
+    fixture, run, _ = refused_close
     evidence = support.evidence_of(run)
     missing = [wbs for wbs in support.NOT_REACHED_BY_A_WIDGET_CHANGE
                if not support.suite_named_left_out(fixture, evidence, wbs)]
@@ -79,7 +82,7 @@ def test_a_refused_close_names_every_suite_it_left_out(refused_close):
 
 def test_a_refused_close_leaves_nothing_untracked_but_its_repair_ticket(refused_close):
     """Its JUnit XML is kept where git ignores it (DEC-490: a refusal leaves only its repair ticket)."""
-    fixture, run = refused_close
+    fixture, run, _ = refused_close
     left = [rel for rel in support.close_support.untracked_paths(fixture)
             if not (rel.startswith(".tickets/") and rel.endswith(".md"))]
     assert not left, f"the refused close left untracked files in the tree: {left}"
