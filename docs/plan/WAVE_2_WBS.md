@@ -1203,6 +1203,20 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a finding printed or written;
   - a file no longer scanned.
 
+#### W2-72 Containment's merge rule matches DEC-912 (FULL, engineer; DEC-918)
+- **Why:** the close's containment gate refuses W2-66's and W2-65's closes on their DEC-912 merge-backs; DEC-410 DP-24 reads a both-changed acceptance file in git's own clean merge as the merge's own. Ticket `DAEO-ye2a`.
+- **Starts** at once; **rides the first re-pin** (DEC-918 item 3).
+- **Allowed paths:** `src/gov/guard/containment.py`, `src/gov/guard/containment_merge.py`, `tests/unit/guard/test_w2_72_*.py`. Acceptance tests: `tests/acceptance/W2-72/` and W1-50's DP-24 cases, by its test designer.
+- **KPIs, success:**
+  - a merge-back acceptance file equal to git's own merge is neither restored, refused nor flagged;
+  - any other file is still caught, failing closed when merge-tree cannot run;
+  - nothing else changes;
+  - `03f470a5` and `4ef3293a` judge clean.
+- **KPIs, failure:**
+  - a file differing from git's own merge passes;
+  - a file equal to it is caught;
+  - another rule changes.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
