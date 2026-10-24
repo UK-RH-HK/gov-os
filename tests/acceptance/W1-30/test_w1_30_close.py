@@ -87,23 +87,45 @@ def test_close_sets_ticket_status(project, sandbox, interface):
 # S1: Runs acceptance tests (CAP-38.a)
 # --------------------------------------------------------------------------
 
-def test_close_runs_acceptance_tests(project, sandbox, interface):
-    """KPI S1, CAP-38.a: gov close runs tests/acceptance/<ticket>/."""
+def _passed_by_runs(holder, where, kind):
+    """The passes ``holder`` (the answer, or a refusal's details) states for its ``kind`` runs (acceptance or
+    regression), each run checked for its form."""
+    return sum(run["passed"] for run in support.runs_stated_by(holder, where) if run["run"] == kind)
+
+
+def test_close_runs_acceptance_tests(project, sandbox, interface, tmp_path):
+    """KPI S1, CAP-38.a: gov close runs tests/acceptance/<ticket>/.
+
+    Revised for W2-67 (I2 F2, PF5): ``ok`` alone holds whether the acceptance run was made. The ticket's acceptance
+    test tells, into a folder outside the project, each time it runs: the close succeeds, the test ran once, and the
+    answer states an acceptance run that passed it."""
+    told = tmp_path / "told"
+    told.mkdir()
     project.add_ticket(TICKET, WBS)
-    project.add_passing_test(WBS)
+    project.write(f"tests/acceptance/{WBS}/test_pass.py", support.telling_test("test_pass", told))
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is True
+    result = support.result_of(run, interface)
+    ran = support.told_by(told)
+    assert list(ran) == ["test_pass"] and len(ran["test_pass"]) == 1, \
+        f"the ticket's acceptance test did not run once in the close: {ran}\n{run.describe()}"
+    assert _passed_by_runs(result, "the answer", support.ACCEPTANCE_RUN) == 1, \
+        f"the answer does not state the acceptance run that passed the ticket's test\n{run.describe()}"
 
 
-def test_close_runs_regression_tests_when_present(project, sandbox, interface):
-    """KPI S1, CAP-38.a: regression tests under tests/unit/ are run too."""
+def test_close_runs_regression_tests_when_present(project, sandbox, interface, tmp_path):
+    """KPI S1, CAP-38.a: regression tests under tests/unit/ are run too.
+
+    Revised for W2-67 (I2 F2, PF16): ``ok`` alone holds whether the regression was run. The regression test tells,
+    into a folder outside the project, each time it runs: the close succeeds, the test ran once, and the answer
+    states a regression run that passed it."""
+    told = tmp_path / "told"
+    told.mkdir()
     support.write(project.root, "tests/unit/close/test_regression.py",
-                  "def test_regression():\n    assert True\n")
+                  support.telling_test("test_regression", told))
     project.commit("a regression test", who=support.ORCHESTRATOR)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
@@ -112,8 +134,12 @@ def test_close_runs_regression_tests_when_present(project, sandbox, interface):
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is True
+    result = support.result_of(run, interface)
+    ran = support.told_by(told)
+    assert list(ran) == ["test_regression"] and len(ran["test_regression"]) == 1, \
+        f"the regression test did not run once in the close: {ran}\n{run.describe()}"
+    assert _passed_by_runs(result, "the answer", support.REGRESSION_RUN) == 1, \
+        f"the answer does not state the regression run that passed the regression test\n{run.describe()}"
 
 
 # --------------------------------------------------------------------------
@@ -268,15 +294,20 @@ def test_close_record_empty_skill_versions_when_none(project, sandbox, interface
 # --------------------------------------------------------------------------
 
 def test_close_refuses_when_acceptance_tests_fail(project, sandbox, interface):
-    """KPI F1: a ticket closes with a failing acceptance test — this must be refused."""
+    """KPI F1: a ticket closes with a failing acceptance test — this must be refused.
+
+    Revised for W2-67 (I2 F2, PF5): the ticket has its checkpoint, so it is not refused for the missing checkpoint;
+    the refusal names the failing acceptance test and its failure."""
     project.add_ticket(TICKET, WBS)
     project.add_failing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    support.checkpointed(project, TICKET)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, "gov close must refuse when acceptance tests fail"
-    assert run.returncode == support.EXIT_CHECK_FAILED
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert f"tests/acceptance/{WBS}/test_fail.py::test_fail" in text and "planted failure" in text, \
+        f"the refusal does not name the failing acceptance test test_fail\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
 # --------------------------------------------------------------------------
@@ -408,24 +439,32 @@ def test_regression_runs_to_end_all_failures_collected(project, sandbox, interfa
 
     Revised for W2-07 (DEC-868 item 3): a ticket without its checkpoint is refused by the pre-close gate before
     any test, so the ticket is checkpointed, as every ticket is before its close, and the close reaches its
-    regression."""
+    regression.
+
+    Revised for W2-67 (I2 F2, PF11, PF12, PF16): the failing tests were the engineer's, outside the ticket's paths, so
+    containment refused and named their files whatever the regression did, and one name of two was enough. They are
+    now the owner's, committed before the ticket's work, and there are more of them than the close's workers take at
+    once (eight, ``support.SUITE_WORKERS`` two): the refusal names every one, and the regression run it states
+    counts every one as failed. A run that stopped at its first failure names and counts fewer."""
+    names = [f"test_reg_{index}" for index in range(8)]
+    for name in names:
+        support.write(project.root, f"tests/unit/{name}.py", f"def {name}():\n    assert False, '{name} broke'\n")
+    project.commit("the owner's regression tests, failing", who=support.OWNER)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    support.write(project.root, "tests/unit/test_reg_a.py",
-                  "def test_reg_a():\n    assert False, 'reg A'\n")
-    support.write(project.root, "tests/unit/test_reg_b.py",
-                  "def test_reg_b():\n    assert False, 'reg B'\n")
-    project.commit("implement with two reg failures", who=IMPL, trailers=TRAILERS_GOOD)
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False
-    error = envelope.get("error", {})
-    error_text = json.dumps(error).lower()
-    assert "reg_a" in error_text or "reg_b" in error_text, \
-        f"the error should name the failing regression tests: {error}"
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    text = support.error_text(error)
+    unnamed = [name for name in names if f"tests/unit/{name}.py::{name}" not in text]
+    assert not unnamed, f"the refusal does not name the failing regression tests {unnamed}\n{run.describe()}"
+    failed = sum(entry["failed"] for entry in support.runs_stated_by(error["details"], "the refusal")
+                 if entry["run"] == support.REGRESSION_RUN)
+    assert failed == len(names), \
+        f"the regression run the refusal states counts {failed} failed, not {len(names)}\n{run.describe()}"
 
 
 def test_collection_error_refuses_close(project, sandbox, interface, tmp_path):
@@ -459,17 +498,25 @@ def test_collection_error_refuses_close(project, sandbox, interface, tmp_path):
 
 
 def test_regression_failure_blocks_close(project, sandbox, interface):
-    """A2, S1: a failing regression test under tests/unit/ blocks close."""
+    """A2, S1: a failing regression test under tests/unit/ blocks close.
+
+    Revised for W2-67 (I2 F2, PF12, PF16): the ticket had no checkpoint, and its engineer committed the failing test
+    outside the ticket's paths, so it was refused whatever the regression did. The failing test is now the owner's,
+    committed before the ticket's work, and the ticket has its checkpoint: the refusal names the failing regression
+    test."""
+    support.write(project.root, "tests/unit/close/test_regression_fail.py",
+                  "def test_regression_fail():\n    assert False, 'regression broke'\n")
+    project.commit("the owner's regression test, failing", who=support.OWNER)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    support.write(project.root, "tests/unit/close/test_regression_fail.py",
-                  "def test_regression_fail():\n    assert False, 'regression broke'\n")
-    project.commit("implement with broken regression", who=IMPL, trailers=TRAILERS_GOOD)
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    support.checkpointed(project, TICKET)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "gov close must refuse when a regression test under tests/unit/ fails"
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert "tests/unit/close/test_regression_fail.py::test_regression_fail" in text, \
+        f"gov close must refuse when a regression test under tests/unit/ fails, naming it\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
 def test_close_record_lists_test_counts(project, sandbox, interface):
