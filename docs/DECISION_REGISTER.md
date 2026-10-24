@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.294 (the version table at the end of each section gives the history)
+**Version:** 0.295 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10700,3 +10700,19 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.294 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-909 (P-W2-69-R2-1 (a) with P-3 and P-4, the owner's exception to DEC-413: each key block to gitleaks whole up to 24 KB, tests for 9 to 24 KB blocks at every boundary and the index filter's cases, two daemon cases serial by the test designer, blocks over 24 KB a residual row, the chance red not brought back; the last round, any further fail-open finding a package; W2-69 keeps its place in the first re-pin). Next free id: DEC-910. |
+
+## 295. The owner's answer of 2026-10-24 on R3-A (register v0.295, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-910 — R3-A, W2-69's third review: encoded key exports past the 24 KiB bound are a residual row, as the reviewer judged
+- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-909 items 5 and 7, DEC-880 item 3 · **Basis:** W2-69's third review (`docs/probes/DAEO-rmbe/PR-DAEO-rmbe.md`), which passed and judged R3-A not ordinary work: the 24 KiB bound of DEC-909 item 5 applies after encoding and after the form feeds. A key export wrapped as one word over 24,000 bytes (base64 once from a block of about 18 KB; base64 twice or hex from about 12 to 14 KB; gitleaks decodes each by default) is missed by the check and the filter at every placement, even standalone, where the code before W2-69 found every standalone file tested; typical RSA-4096 exports with subkeys (10.4 to 13.6 KB) wrapped once are found at every placement. A 24,576-byte block with a blank line after every line is missed (severity low). Ordinary work: no; consequence: fails open.
+- **Decision:**
+  1. **R3-A is a row, not ordinary work:** row W2-L419 is widened to cover it. It does not count as DEC-909 item 7's further finding, so no package and no fourth round.
+  2. **The fix stays Wave 3:** a stream reader that does not cut a block, as row W2-L419 says.
+  3. **W2-69 keeps its merge (`2d5a829a`) and its place in the first re-pin.**
+- **Changes:** row W2-L419 (widened).
+- **Where it goes (DEC-851):** this register; the Wave 2 list (row W2-L419); RESUME HERE (the digest item removed). No brief, ticket or card changes.
+- Next free id: DEC-911.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.295 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-910 (R3-A, W2-69's third review, a row as the reviewer judged: row W2-L419 widened to encoded key exports and double-spaced blocks past the 24 KiB bound; the fix stays a Wave 3 stream reader; not DEC-909 item 7's further finding). Next free id: DEC-911. |
