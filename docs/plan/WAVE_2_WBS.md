@@ -1079,6 +1079,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - Deleted text does not survive a rebuild: neither in the rows nor in free pages.
   - The design question is answered with evidence.
   - Every file under `.gov-runtime/` scanned today is still scanned, with every rule set. A scan that cannot finish fails closed. DEC-853's clean-result reuse stays, and a finding is never reused.
+- **DEC-909 (owner), the last round:** each BEGIN…END key block goes to gitleaks whole, up to 24 KB, tested for 9 to 24 KB blocks at every boundary position and for the pre-index filter; the two daemon-starting cases join `serial-only.txt` by its test designer; blocks over 24 KB are row W2-L419; the chance red must not come back. A third review, the last; any further fail-open finding is a package.
 - **KPIs, failure:**
   - a real token missed at any offset or in any form;
   - a word-internal fragment flagged at a read edge;
