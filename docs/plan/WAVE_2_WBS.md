@@ -1079,6 +1079,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - Deleted text does not survive a rebuild: neither in the rows nor in free pages.
   - The design question is answered with evidence.
   - Every file under `.gov-runtime/` scanned today is still scanned, with every rule set. A scan that cannot finish fails closed. DEC-853's clean-result reuse stays, and a finding is never reused.
+- **DEC-909 (owner), the last round:** each BEGIN…END key block goes to gitleaks whole, up to 24 KB, tested for 9 to 24 KB blocks at every boundary position and for the pre-index filter; the two daemon-starting cases join `serial-only.txt` by its test designer; blocks over 24 KB are row W2-L419; the chance red must not come back. A third review, the last; any further fail-open finding is a package.
 - **KPIs, failure:**
   - a real token missed at any offset or in any form;
   - a word-internal fragment flagged at a read edge;
@@ -1185,6 +1186,22 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a per-run base folder;
   - a test changed in a folder this card does not name.
 - About 600 to 900 lines of test code (I2's estimate for its share), and about 150 to 200 functions, most one fixture line and one assertion each.
+
+#### W2-71 The secrets check passes a real commit hash of this repository for row W2-L423's rule only (FULL, engineer; DEC-911 item 4)
+- **Why:** one gitleaks default rule takes a bare 40-hex string for a token beside its keyword, so a full commit hash in a log under `.gov-runtime/` can turn the hard-block check red (row W2-L423, P-W2-L423-A). The check strips allowlists (DEC-298, DEC-347), so the exemption is written in the check.
+- **Starts** in a free slot after the first re-pin, when no ticket in flight holds `src/gov/secrets/`; merges before the second re-pin, which carries it with W2-68.
+- **Allowed paths:** `src/gov/secrets/**`, `tests/unit/secrets_check/**`. Acceptance tests: `tests/acceptance/W2-71/`, by its test designer (MR-3).
+- **KPIs, success:**
+  - that rule's match of exactly 40 hex digits naming a commit object of this repository is no finding, in a file and in a stored value, for the check and the pre-index filter;
+  - a real token of that vendor still fails, in each of the rule's forms, built at test time;
+  - every other case stays a finding: any other rule, 39 or 41 digits, a short hash, another repository's commit, a tree or blob id, a verification that cannot run;
+  - no match printed or written; every file scanned today still scanned with every rule set;
+  - the rule's id and keywords written only in parts in tracked files.
+- **KPIs, failure:**
+  - a real token let through;
+  - a match let through that names no commit object here;
+  - a finding printed or written;
+  - a file no longer scanned.
 
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.

@@ -149,6 +149,9 @@ def test_a_test_not_on_load_sensitive_is_never_run_again(listed, project, sandbo
 
 def test_an_entry_the_owner_did_not_add_is_refused_naming_it_and_its_test_is_not_run_again(
         project, sandbox, interface, told):
+    """Revised for W2-07 (DEC-868 item 3): the ratchet's reading of ``load_sensitive`` is a commit gate. An
+    entry that does not count refuses the close at once, naming it, before any test: its test is not run at
+    all, let alone again, and the refusal spends no attempt."""
     _stand_ins(project, told)
     added = _quarantined(project, HOOK_TEST, role="orchestrator")
     _ticket_done(project)
@@ -159,6 +162,8 @@ def test_an_entry_the_owner_did_not_add_is_refused_naming_it_and_its_test_is_not
     found = support.naming(support.findings_coded(error, support.LOAD_SENSITIVE_REFUSED), HOOK_FUNCTION, added[:7])
     assert found, f"no {support.LOAD_SENSITIVE_REFUSED} finding names the entry {HOOK_TEST} and its commit\n" \
                   f"{run.describe()}"
-    assert len(support.told_runs(told, HOOK_FUNCTION)) == 1, \
-        f"{HOOK_TEST}, whose entry does not count, was run again: {support.told_runs(told, HOOK_FUNCTION)}"
+    assert len(support.told_runs(told, HOOK_FUNCTION)) == 0, \
+        f"{HOOK_TEST} ran although a commit gate refused first: {support.told_runs(told, HOOK_FUNCTION)}"
+    assert support.base.iteration_count(project.root, TICKET) == 0, \
+        f"the refusal of a commit gate was counted\n{run.describe()}"
     support.base.assert_not_closed(project, TICKET)

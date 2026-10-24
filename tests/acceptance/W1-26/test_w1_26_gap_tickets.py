@@ -3,6 +3,12 @@
 Fails a specification with a required open readiness row that has no linked gap
 ticket. The gap_ticket field is reported as written by the readiness checker
 (W1-13); this ticket's check validates the link.
+
+Revised (W2-67, I2 §2.7 R1): the four RED cases plant their specification on the
+green base whose first commit holds the readiness dimensions
+(``green_project_with_dimensions``) and assert ``core-claims``'s own entry RED
+with a finding on the specification's readiness record, not that ``gov check``
+failed (the base was red before any defect).
 """
 
 from __future__ import annotations
@@ -14,18 +20,28 @@ import w1_26_support as support
 # A required MISSING row with no gap_ticket -> RED
 # --------------------------------------------------------------------------
 
-def test_required_missing_row_no_gap_ticket_is_red(project, sandbox, interface):
-    """A specification with a required MISSING row and no gap_ticket fails."""
+def _gap_findings(run, interface, change, *values):
+    """``core-claims`` is RED with a finding on the specification's readiness record that names ``values``."""
+    return support.assert_check_red_naming(run, interface, "core-claims",
+                                           f"openspec/changes/{change}/readiness.yaml", *values)
+
+
+def test_required_missing_row_no_gap_ticket_is_red(green_project_with_dimensions, sandbox, interface):
+    """A specification with a required MISSING row and no gap_ticket fails: ``core-claims`` is RED with a finding
+    on the specification's readiness record."""
+    project = green_project_with_dimensions
     rows = support.fresh_rows()
     project.add_specification(rows, spec_id="SPEC-gp01", change="gp01-gap")
     project.add_readiness_dimensions()
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    _gap_findings(run, interface, "gp01-gap")
 
 
-def test_required_missing_row_with_unlinked_gap_ticket_is_red(project, sandbox, interface):
-    """A specification with a required MISSING row whose gap_ticket is UNLINKED fails."""
+def test_required_missing_row_with_unlinked_gap_ticket_is_red(green_project_with_dimensions, sandbox, interface):
+    """A specification with a required MISSING row whose gap_ticket is UNLINKED fails: ``core-claims`` is RED with
+    a finding on the specification's readiness record that names ``UNLINKED``."""
+    project = green_project_with_dimensions
     rows = support.fresh_rows()
     for row in rows:
         row["gap_ticket"] = "UNLINKED"
@@ -33,7 +49,7 @@ def test_required_missing_row_with_unlinked_gap_ticket_is_red(project, sandbox, 
     project.add_readiness_dimensions()
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    _gap_findings(run, interface, "gp02-gap", "UNLINKED")
 
 
 # --------------------------------------------------------------------------
@@ -65,8 +81,10 @@ def test_required_missing_row_with_valid_gap_ticket_passes(project, sandbox, int
 # A gap_ticket naming a closed ticket -> RED
 # --------------------------------------------------------------------------
 
-def test_gap_ticket_naming_closed_ticket_is_red(project, sandbox, interface):
-    """A gap_ticket that names a closed ticket fails."""
+def test_gap_ticket_naming_closed_ticket_is_red(green_project_with_dimensions, sandbox, interface):
+    """A gap_ticket that names a closed ticket fails: ``core-claims`` is RED with a finding on the
+    specification's readiness record that names the closed ticket."""
+    project = green_project_with_dimensions
     rows = support.fresh_rows()
     for row in rows:
         if row["state"] == "MISSING":
@@ -79,15 +97,17 @@ def test_gap_ticket_naming_closed_ticket_is_red(project, sandbox, interface):
                   "kpis:\n  success:\n  - works\n  failure: []\n---\n# CLOSED-aaaa\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    _gap_findings(run, interface, "gp04-gap", "CLOSED-aaaa")
 
 
 # --------------------------------------------------------------------------
 # A gap_ticket naming a nonexistent ticket -> RED
 # --------------------------------------------------------------------------
 
-def test_gap_ticket_naming_nonexistent_ticket_is_red(project, sandbox, interface):
-    """A gap_ticket that names a ticket that does not exist fails."""
+def test_gap_ticket_naming_nonexistent_ticket_is_red(green_project_with_dimensions, sandbox, interface):
+    """A gap_ticket that names a ticket that does not exist fails: ``core-claims`` is RED with a finding on the
+    specification's readiness record that names the missing ticket."""
+    project = green_project_with_dimensions
     rows = support.fresh_rows()
     for row in rows:
         if row["state"] == "MISSING":
@@ -96,7 +116,7 @@ def test_gap_ticket_naming_nonexistent_ticket_is_red(project, sandbox, interface
     project.add_readiness_dimensions()
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    _gap_findings(run, interface, "gp05-gap", "NOPE-zzzz")
 
 
 # --------------------------------------------------------------------------
