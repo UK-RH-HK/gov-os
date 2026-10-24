@@ -181,11 +181,25 @@ def test_only_six_disposition_names_accepted(project, sandbox, interface):
         "an invented disposition name must be refused"
 
 
-def test_all_six_dispositions_recognized():
-    """A3, S6: all six short-name dispositions are defined."""
-    assert len(support.DISPOSITIONS) == 6
+def test_all_six_dispositions_recognized(built, tmp_path, sandbox, interface):
+    """A3, S6: all six short-name dispositions are defined.
+
+    Revised for W2-67 (I2 F2, PF1): the case read this suite's own tuple, not the close's. Each of the six names is
+    now given to ``gov close`` itself, on a project of its own whose acceptance test fails: the close takes the
+    name (it is refused for the failing test, exit code 3, not for the argument) and the repair ticket records
+    that class."""
+    not_taken = {}
     for name in ("repair", "reuse", "delete", "narrow", "defer", "owner"):
-        assert name in support.DISPOSITIONS
+        project = support.Project(tmp_path / name)
+        _project_with_finding(project)
+        run = support.run_close(project, sandbox, TICKET, "--disposition", name)
+        error = support.envelope_of(run, interface).get("error") or {}
+        recorded = [_repair_frontmatter(path).get("disposition") or _repair_frontmatter(path).get("finding_disposition")
+                    for path in _repair_tickets(project)]
+        if run.returncode != support.EXIT_CHECK_FAILED or "planted failure" not in support.error_text(error) \
+                or recorded != [name]:
+            not_taken[name] = {"exit": run.returncode, "code": error.get("code"), "recorded": recorded}
+    assert not not_taken, f"gov close does not take these dispositions as a class: {not_taken}"
 
 
 # --------------------------------------------------------------------------
