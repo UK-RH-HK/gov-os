@@ -1,0 +1,8 @@
+Merge w2/integrate into w2/W2-66 (run 3, second): W2-70 round 2, W1-01's merge rule per DEC-912 item 1 (3ff8ba51b3ed)
+
+Clean merge: the tree equals git merge-tree --write-tree of its parents.
+
+Task: DAEO-c1uz
+Implements: DEC-912
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

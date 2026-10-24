@@ -1,0 +1,360 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 42%]
+........FFFF...F.F..F................................................... [ 84%]
+..............F.....FFFFF.                                               [100%]
+=================================== FAILURES ===================================
+_ test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[other-module] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'other-module', path = 'tests/acceptance/W1-47/w1_47_hook_time_limit.py'
+tracked_today = True
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+>       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-47/w1_47_hook_time_limit.py (other-module), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError
+_ test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[conftest] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'conftest', path = 'tests/acceptance/W1-05/conftest.py'
+tracked_today = True
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+>       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-05/conftest.py (conftest), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError
+_ test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[new-suite-folder] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'new-suite-folder', path = 'tests/acceptance/W3-99/test_w3_99_first.py'
+tracked_today = False
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+>       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W3-99/test_w3_99_first.py (new-suite-folder), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError
+_ test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[new-suite-folder-conftest] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'new-suite-folder-conftest', path = 'tests/acceptance/W3-99/conftest.py'
+tracked_today = False
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+>       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W3-99/conftest.py (new-suite-folder-conftest), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError
+_ test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[test-file] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'test-file', path = 'tests/acceptance/W1-05/test_w1_05_live_hooks.py'
+tracked_today = True
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+>       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-05/test_w1_05_live_hooks.py (test-file), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError
+_ test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[below-a-suite-folder] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'below-a-suite-folder'
+path = 'tests/acceptance/W1-05/fixtures/w1_05_tree.py', tracked_today = False
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+>       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-05/fixtures/w1_05_tree.py (below-a-suite-folder), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError
+________ test_every_python_source_w1_28_s_scan_reads_selects_its_check _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+tracked = ['.claude/agents/engineer.md', '.claude/agents/independent-auditor.md', '.claude/agents/independent-test-designer.md', '.claude/agents/orchestrator.md', '.claude/agents/product-spec.md', '.claude/agents/research.md', ...]
+
+    def test_every_python_source_w1_28_s_scan_reads_selects_its_check(test_map, tracked):
+        """KPI 15 over the whole tracked tree: every ``*.py`` under tests/acceptance/ (``__pycache__`` aside)."""
+        _w1_28_fixture_holds()
+        scanned = [p for p in tracked if p.startswith("tests/acceptance/") and p.endswith(".py")
+                   and "__pycache__" not in p.split("/")]
+        assert len(scanned) > 100, f"the fixture is wrong: only {len(scanned)} Python sources under tests/acceptance/"
+        missed = [p for p in scanned if not _runs_w1_28_s_check(_reached_by(test_map, p))]
+        every = not missed
+>       assert every, (f"{len(missed)} of the {len(scanned)} Python sources W1-28's scan reads do not select "
+                       f"{W1_28_CHECK}, among them {missed[:6]}")
+E       AssertionError: 643 of the 732 Python sources W1-28's scan reads do not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py, among them ['tests/acceptance/W1-01/conftest.py', 'tests/acceptance/W1-01/test_w1_01_bootstrap_record.py', 'tests/acceptance/W1-01/test_w1_01_history.py', 'tests/acceptance/W1-01/test_w1_01_integration_merges.py', 'tests/acceptance/W1-01/test_w1_01_settings_deny.py', 'tests/acceptance/W1-02/conftest.py']
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:419: AssertionError
+____ test_a_renamed_every_close_file_widens_the_run_to_the_full_regression _____
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+fixture = <w2_66_support.Fixture object at 0x751c090cc350>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_every_close_fil0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_every_close_fil0/sandbox/elsewhere'))
+
+    def test_a_renamed_every_close_file_widens_the_run_to_the_full_regression(fixture, sandbox):
+        """The map's every-close list names W1-ec's contract file; it is renamed in its folder. The base is green
+        after the rename; then the ticket's ordinary one-module change."""
+        _move_at_the_base(fixture, support.EC_CONTRACT, EC_RENAMED)
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+>       _assert_widened(run, fixture, support.EC_CONTRACT, support.FILE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":..._free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=6.5392505440395325)
+fixture = <w2_66_support.Fixture object at 0x751c090cc350>
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+>       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError
+_ test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+make_fixture = <function make_fixture.<locals>.make at 0x78399bb032e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw2/test_a_renamed_record_reading_0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw2/test_a_renamed_record_reading_0/sandbox/elsewhere'))
+renamed = 'renamed'
+
+    @pytest.mark.parametrize("renamed", sorted(RR_RENAMED))
+    def test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression(make_fixture, sandbox, renamed):
+        """The map names one case of W1-rr by its node id; W1-rr's test designer renames the function (the file stays).
+        The base is green after the rename; then the ticket's ordinary one-module change."""
+        fixture = make_fixture(test_map=_map(record_reading=[RR_NODE]))
+        _rename_rr_case_at_the_base(fixture, RR_RENAMED[renamed])
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+>       _assert_widened(run, fixture, RR_NODE, support.CASE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...e_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=5.656551307067275)
+fixture = <w2_66_support.Fixture object at 0x78399bac7a70>
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+>       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError
+_____ test_a_red_the_renamed_record_reading_case_catches_refuses_the_close _____
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+make_fixture = <function make_fixture.<locals>.make at 0x764479a08a40>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw9/test_a_red_the_renamed_record_0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw9/test_a_red_the_renamed_record_0/sandbox/elsewhere'))
+
+    def test_a_red_the_renamed_record_reading_case_catches_refuses_the_close(make_fixture, sandbox):
+        """Failure line 3 through a renamed target: a record-only commit breaks the register; the renamed record-reading
+        case catches it. Only a run that reaches the renamed case (the full regression) refuses the close; a run that
+        selects the old node id runs nothing of W1-rr and passes."""
+        renamed = RR_RENAMED["renamed"]
+        fixture = make_fixture(test_map=_map(record_reading=[RR_NODE]))
+        _rename_rr_case_at_the_base(fixture, renamed)
+        fixture.record_commit({support.REGISTER_REL: f"# The decision register\n\n{support.BROKEN}\n"})
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        evidence = support.evidence_of(run)
+>       assert fixture.ran(renamed), (f"the renamed record-reading case {renamed} did not run: the close passed a red "
+                                      f"it would catch (scope {evidence.get('scope')!r})")
+E       AssertionError: the renamed record-reading case test_rr_checks_the_register did not run: the close passed a red it would catch (scope 'scoped')
+E       assert False
+E        +  where False = ran('test_rr_checks_the_register')
+E        +    where ran = <w2_66_support.Fixture object at 0x7644799c3e60>.ran
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:150: AssertionError
+_ test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed-longer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+make_fixture = <function make_fixture.<locals>.make at 0x797fab59b100>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw1/test_a_renamed_record_reading_0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw1/test_a_renamed_record_reading_0/sandbox/elsewhere'))
+renamed = 'renamed-longer'
+
+    @pytest.mark.parametrize("renamed", sorted(RR_RENAMED))
+    def test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression(make_fixture, sandbox, renamed):
+        """The map names one case of W1-rr by its node id; W1-rr's test designer renames the function (the file stays).
+        The base is green after the rename; then the ticket's ordinary one-module change."""
+        fixture = make_fixture(test_map=_map(record_reading=[RR_NODE]))
+        _rename_rr_case_at_the_base(fixture, RR_RENAMED[renamed])
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+>       _assert_widened(run, fixture, RR_NODE, support.CASE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...e_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=6.035708545008674)
+fixture = <w2_66_support.Fixture object at 0x797fab742c00>
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+>       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError
+_____ test_a_renamed_coupling_target_widens_the_run_to_the_full_regression _____
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+make_fixture = <function make_fixture.<locals>.make at 0x751c090eb1a0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_coupling_target0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_coupling_target0/sandbox/elsewhere'))
+
+    def test_a_renamed_coupling_target_widens_the_run_to_the_full_regression(make_fixture, sandbox):
+        """The map couples ``src/gov/textread/data.txt`` to W1-cp's test file; the file is renamed. The base is green
+        after the rename; then the change touches the coupled path, and the ticket's ordinary one-module change."""
+        fixture = make_fixture(test_map=_map(couplings=_coupled_to(CP_FILE)))
+        _move_at_the_base(fixture, CP_FILE, CP_RENAMED)
+        fixture.merged({support.COUPLED_INPUT: "data, changed\n"})
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+>       _assert_widened(run, fixture, CP_FILE, support.FILE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...se_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=5.85805903095752)
+fixture = <w2_66_support.Fixture object at 0x751c090cecf0>
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+>       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError
+________ test_a_red_the_renamed_coupled_file_catches_refuses_the_close _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+make_fixture = <function make_fixture.<locals>.make at 0x75e4cb8884a0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw5/test_a_red_the_renamed_coupled0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw5/test_a_red_the_renamed_coupled0/sandbox/elsewhere'))
+
+    def test_a_red_the_renamed_coupled_file_catches_refuses_the_close(make_fixture, sandbox):
+        """W1-cp's coupled file reads ``src/gov/textread/data.txt``; it is renamed at the base, and the change breaks
+        the data. Only a run that reaches the renamed file (the full regression) refuses the close."""
+        body = (f"text = open({support.COUPLED_INPUT!r}, encoding='utf-8').read()\n"
+                f"    assert {support.BROKEN!r} not in text, 'the coupled data is broken: ' + text")
+        fixture = make_fixture(test_map=_map(couplings=_coupled_to(CP_FILE)))
+        _move_at_the_base(fixture, CP_FILE, CP_RENAMED, body=support._telling(CP_CASE, fixture.told, body=body))
+        fixture.merged({support.COUPLED_INPUT: f"data, {support.BROKEN}\n"})
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        evidence = support.evidence_of(run)
+>       assert fixture.ran(CP_CASE), (f"the renamed coupled file {CP_RENAMED} did not run: the close passed a red it "
+                                      f"would catch (scope {evidence.get('scope')!r})")
+E       AssertionError: the renamed coupled file tests/acceptance/W1-cp/test_cp_text.py did not run: the close passed a red it would catch (scope 'scoped')
+E       assert False
+E        +  where False = ran('test_in_W1_cp')
+E        +    where ran = <w2_66_support.Fixture object at 0x75e4cb8a4620>.ran
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:171: AssertionError
+13 failed, 157 passed in 55.94s

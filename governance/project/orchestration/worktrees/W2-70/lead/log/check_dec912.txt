@@ -1,0 +1,5 @@
+03f470a595d1: merge_offences = []
+4ef3293adef3: merge_offences = []
+hand-edited fixture fae55eb84f52: merge_offences = ['the merge commit itself changes tests/acceptance/X/test_x.py']
+clean fixture 1f6a89c85404: merge_offences = []
+RESULT: PASS

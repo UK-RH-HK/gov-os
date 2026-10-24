@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="13" skipped="0" tests="170" time="55.937" timestamp="2026-10-24T16:00:12.823646+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-66.test_w2_66_lead_verification" name="test_a_project_s_test_map_changes_nothing_a_plain_run_collects" time="2.989" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_red_night_is_no_base" time="12.960" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_test_map_that_cannot_be_read_runs_the_full_regression[not-a-mapping]" time="12.149" /><testcase classname="tests.acceptance.W2-66.test_w2_66_limits" name="test_the_distribution_mode_is_one_setting_and_the_runs_follow_it" time="12.410" /><testcase classname="tests.acceptance.W2-66.test_w2_66_declared_folders" name="test_the_overlap_rule_selects_a_ticket_s_declared_folder" time="12.756" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_change_under_the_shared_core_runs_the_full_regression" time="12.183" /><testcase classname="tests.acceptance.W2-66.test_w2_66_followed_couplings" name="test_a_declared_coupling_selects_its_suites_and_names_why" time="12.947" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_changed_file_no_mapping_places_runs_the_full_regression" time="12.955" /><testcase classname="tests.acceptance.W2-66.test_w2_66_limits" name="test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit[parallel]" time="16.616" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_without_a_record_of_a_green_commit_the_base_is_unknown_and_the_run_is_full" time="8.007" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_change_to_the_path_map_runs_the_full_regression" time="7.765" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_schema_exists_and_is_a_valid_json_schema" time="0.120" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_every_failing_test_is_named_with_its_failure_text_kept" time="12.482" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_every_skip_is_named_with_its_reason_and_counted" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_the_junit_xml_of_a_refused_close_holds_the_failure_text_and_the_skip" time="0.009" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_a_refused_close_names_every_suite_it_left_out" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_schema_refuses_a_map_without_a_shared_core_or_with_a_wrong_type" time="0.242" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_test_map_and_the_template_s_copy_are_valid_against_the_schema[governance/project/test-map.yaml]" time="0.017" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_test_map_and_the_template_s_copy_are_valid_against_the_schema[template/governance/project/test-map.yaml]" time="0.017" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_retrieval_core_is_its_eight_modules_not_the_whole_package" time="0.069" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_only_paths_are_dec_891_s_places_and_nothing_else" time="0.170" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_shared_core_holds_every_named_member" time="0.023" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_conftest_every_run_of_the_suites_loads_is_shared_core[tests/acceptance/conftest.py]" time="0.012" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_conftest_every_run_of_the_suites_loads_is_shared_core[tests/conftest.py]" time="0.005" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[docs/close/]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[docs/probes/]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[docs/DECISION_REGISTER.md]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[docs/plan/]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]" time="0.007" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_paths_dec_891_does_not_name_are_not_record_only[governance/project/tool-registry.yaml]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_paths_dec_891_does_not_name_are_not_record_only[governance/project/path-map.yaml]" time="0.005" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_paths_dec_891_does_not_name_are_not_record_only[governance/project/roster.yaml]" time="0.003" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_paths_dec_891_does_not_name_are_not_record_only[docs/adr/ADR-0001-threat-model.md]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_a_refused_close_leaves_nothing_untracked_but_its_repair_ticket" time="12.841" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_only_list_hides_no_code_path" time="0.131" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-06/test_w1_06_approvals.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-08/test_w1_08_path_map.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-07/test_w1_07_envelope.py]" time="0.006" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W2-54/test_w2_54_green_here.py]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-33/test_w1_33_agent_definitions.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-49/test_w1_49_threshold.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_declared_folders" name="test_the_own_suite_is_the_closing_ticket_s_declared_folder" time="8.133" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W2-02/test_w2_02_green_here.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-08/test_w1_08_ticket.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-08/test_w1_08_probe.py]" time="0.010" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-06/test_w1_06_install_approvals.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-07/test_w1_07_config.py]" time="0.006" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-07/test_w1_07_config_details.py]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-27/test_w1_27_doctor.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-42]" time="0.009" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_missing_test_map_runs_the_full_regression" time="7.711" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[.tickets/]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-26/test_w1_26_probe_records.py]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_record_reading_set_holds_each_reader_of_a_record_path[tests/acceptance/W1-48]" time="0.011" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_reading_target_exists" time="0.005" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_record_of_each_of_dec_891_s_places_is_record_only[docs/checkpoints/]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/cli/main.py]" time="0.008" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_w1_07_s_three_contract_files_run_on_every_close" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/governance/kernel/templates/brief-lead.md]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_a_passed_close_names_its_skips_in_the_result_and_the_record" time="7.408" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/retrieval/rerank_worker.py]" time="0.011" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/hooks/stop.py]" time="0.006" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[tests/acceptance/serial-only.txt]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/governance/kernel/hooks/sessionstart.py]" time="0.006" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/governance/kernel/hooks/precompact.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/governance/kernel/hooks/stop.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[.gitleaks.toml]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[governance/project/path-map.yaml]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/decisions/checker.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/.gitleaks.toml]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/closure/command.py]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/checkpoint/record.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/secrets/__init__.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/adapters/portability.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/context/command.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/retrieval/canary.py]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[src/gov/retrieval/validate.py]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/governance/kernel/skills/planning/SKILL.md]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_each_coupling_imports_cannot_see_is_declared[template/governance/kernel/roles/engineer.md]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it[W1-25]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it[W1-07]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it[W1-27]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[support-module]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[conftest]" time="0.002"><failure message="AssertionError: a change to tests/acceptance/W1-05/conftest.py (conftest), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'conftest', path = 'tests/acceptance/W1-05/conftest.py'
+tracked_today = True
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+&gt;       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-05/conftest.py (conftest), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_full_runs_the_full_regression_and_the_record_says_so" time="7.415" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[other-module]" time="0.002"><failure message="AssertionError: a change to tests/acceptance/W1-47/w1_47_hook_time_limit.py (other-module), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'other-module', path = 'tests/acceptance/W1-47/w1_47_hook_time_limit.py'
+tracked_today = True
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+&gt;       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-47/w1_47_hook_time_limit.py (other-module), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_followed_couplings" name="test_a_record_only_commit_widens_nothing" time="7.746" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[new-suite-folder]" time="0.002"><failure message="AssertionError: a change to tests/acceptance/W3-99/test_w3_99_first.py (new-suite-folder), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'new-suite-folder', path = 'tests/acceptance/W3-99/test_w3_99_first.py'
+tracked_today = False
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+&gt;       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W3-99/test_w3_99_first.py (new-suite-folder), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[test-file]" time="0.002"><failure message="AssertionError: a change to tests/acceptance/W1-05/test_w1_05_live_hooks.py (test-file), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'test-file', path = 'tests/acceptance/W1-05/test_w1_05_live_hooks.py'
+tracked_today = True
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+&gt;       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-05/test_w1_05_live_hooks.py (test-file), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[new-suite-folder-conftest]" time="0.001"><failure message="AssertionError: a change to tests/acceptance/W3-99/conftest.py (new-suite-folder-conftest), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'new-suite-folder-conftest', path = 'tests/acceptance/W3-99/conftest.py'
+tracked_today = False
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+&gt;       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W3-99/conftest.py (new-suite-folder-conftest), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared[deploy/gov-index.service]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared[gov.socket]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared[a/b/gov-nightly.timer]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_module_a_declared_check_runs_reaches_w1_26" time="0.013" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[below-a-suite-folder]" time="0.007"><failure message="AssertionError: a change to tests/acceptance/W1-05/fixtures/w1_05_tree.py (below-a-suite-folder), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+kind = 'below-a-suite-folder'
+path = 'tests/acceptance/W1-05/fixtures/w1_05_tree.py', tracked_today = False
+
+    @pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+    def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+        """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+        that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+        From the second FULL review (DEC-136). README, "Part 5"."""
+        _w1_28_fixture_holds()
+        assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+        # Boolean asserts: a failure names the path and the check, never the map's entries.
+        reached = _reached_by(test_map, path)
+        selects = _runs_w1_28_s_check(reached)
+&gt;       assert selects, \
+            f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+E       AssertionError: a change to tests/acceptance/W1-05/fixtures/w1_05_tree.py (below-a-suite-folder), which W1-28's scan reads, does not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py's scanning cases
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:404: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_path_map_s_test_inputs_are_in_the_test_map" time="0.047" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_every_python_source_w1_28_s_scan_reads_selects_its_check" time="0.501"><failure message="AssertionError: 643 of the 732 Python sources W1-28's scan reads do not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py, among them ['tests/acceptance/W1-01/conftest.py', 'tests/acceptance/W1-01/test_w1_01_bootstrap_record.py', 'tests/acceptance/W1-01/test_w1_01_history.py', 'tests/acceptance/W1-01/test_w1_01_integration_merges.py', 'tests/acceptance/W1-01/test_w1_01_settings_deny.py', 'tests/acceptance/W1-02/conftest.py']&#10;assert False">test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+tracked = ['.claude/agents/engineer.md', '.claude/agents/independent-auditor.md', '.claude/agents/independent-test-designer.md', '.claude/agents/orchestrator.md', '.claude/agents/product-spec.md', '.claude/agents/research.md', ...]
+
+    def test_every_python_source_w1_28_s_scan_reads_selects_its_check(test_map, tracked):
+        """KPI 15 over the whole tracked tree: every ``*.py`` under tests/acceptance/ (``__pycache__`` aside)."""
+        _w1_28_fixture_holds()
+        scanned = [p for p in tracked if p.startswith("tests/acceptance/") and p.endswith(".py")
+                   and "__pycache__" not in p.split("/")]
+        assert len(scanned) &gt; 100, f"the fixture is wrong: only {len(scanned)} Python sources under tests/acceptance/"
+        missed = [p for p in scanned if not _runs_w1_28_s_check(_reached_by(test_map, p))]
+        every = not missed
+&gt;       assert every, (f"{len(missed)} of the {len(scanned)} Python sources W1-28's scan reads do not select "
+                       f"{W1_28_CHECK}, among them {missed[:6]}")
+E       AssertionError: 643 of the 732 Python sources W1-28's scan reads do not select tests/acceptance/W1-28/test_w1_28_fixture_copies.py, among them ['tests/acceptance/W1-01/conftest.py', 'tests/acceptance/W1-01/test_w1_01_bootstrap_record.py', 'tests/acceptance/W1-01/test_w1_01_history.py', 'tests/acceptance/W1-01/test_w1_01_integration_merges.py', 'tests/acceptance/W1-01/test_w1_01_settings_deny.py', 'tests/acceptance/W1-02/conftest.py']
+E       assert False
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:419: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_per_test_limit_is_above_the_slowest_test_measured" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_moved_files" name="test_a_file_moved_out_of_the_shared_core_runs_the_full_regression" time="7.413" /><testcase classname="tests.acceptance.W2-66.test_w2_66_live_test_map" name="test_the_distribution_mode_stays_the_default_and_is_not_worksteal" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_moved_files" name="test_a_file_moved_into_the_shared_core_runs_the_full_regression" time="7.324" /><testcase classname="tests.acceptance.W2-66.test_w2_66_limits" name="test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit[serial-afterwards]" time="8.848" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_change_to_the_test_map_runs_the_full_regression" time="6.631" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_green_record_naming_no_commit_of_the_history_leaves_the_base_unknown[no-such-commit]" time="6.558" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_a_full_close_names_every_suite_it_ran_and_its_junit_xml_holds_every_case" time="6.458" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_passed_full_close_is_the_base_of_the_next_scoped_close" time="11.575" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_test_map_that_cannot_be_read_runs_the_full_regression[not-yaml]" time="6.614" /><testcase classname="tests.acceptance.W2-66.test_w2_66_moved_files" name="test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite" time="6.640" /><testcase classname="tests.acceptance.W2-66.test_w2_66_followed_couplings" name="test_a_record_reading_test_turned_red_by_a_record_only_commit_refuses_the_scoped_close" time="6.528" /><testcase classname="tests.acceptance.W2-66.test_w2_66_deselected_cases" name="test_a_case_left_out_by_deselection_is_named_with_why" time="6.512" /><testcase classname="tests.acceptance.W2-66.test_w2_66_nightly" name="test_one_command_runs_the_full_regression_on_the_branch_s_head_with_junit_xml" time="3.790" /><testcase classname="tests.acceptance.W2-66.test_w2_66_nightly" name="test_a_red_that_passes_alone_is_a_flaky_candidate_and_is_not_bisected" time="4.408" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_shared_core_change_in_the_ticket_s_own_commit_runs_the_full_regression" time="6.815" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_green_record_naming_no_commit_of_the_history_leaves_the_base_unknown[not-a-commit-id]" time="6.612" /><testcase classname="tests.acceptance.W2-66.test_w2_66_followed_couplings" name="test_a_changed_helper_selects_every_suite_that_imports_it_directly_or_through_another_helper" time="6.592" /><testcase classname="tests.acceptance.W2-66.test_w2_66_full_widening" name="test_a_test_map_that_cannot_be_read_runs_the_full_regression[not-the-schema]" time="6.649" /><testcase classname="tests.acceptance.W2-66.test_w2_66_followed_couplings" name="test_the_record_reading_set_reads_the_pre_close_gate_s_own_check_result" time="7.304" /><testcase classname="tests.acceptance.W2-66.test_w2_66_nightly" name="test_a_red_that_fails_alone_is_a_p1_package_with_git_bisect_over_the_commits_since_the_last_green_night" time="5.609" /><testcase classname="tests.acceptance.W2-66.test_w2_66_limits" name="test_without_pytest_timeout_the_close_does_not_pass_silently" time="3.891" /><testcase classname="tests.acceptance.W2-66.test_w2_66_nightly" name="test_a_red_a_scoped_close_since_the_last_green_night_left_out_is_a_p1_package_with_the_map_corrected" time="11.681" /><testcase classname="tests.acceptance.W2-66.test_w2_66_lead_verification" name="test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes" time="0.010" /><testcase classname="tests.acceptance.W2-66.test_w2_66_research" name="test_the_report_states_a_typical_scoped_close_s_time_against_the_full_close" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_research" name="test_the_report_states_the_catch_rate_on_lens_h_s_planted_faults_with_the_three_widest_modules" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_nightly" name="test_the_weekly_coverage_run_writes_the_measured_map_across_child_processes" time="6.815" /><testcase classname="tests.acceptance.W2-66.test_w2_66_evidence" name="test_a_refused_close_states_its_evidence_and_says_scoped" time="6.886" /><testcase classname="tests.acceptance.W2-66.test_w2_66_research" name="test_the_report_states_the_15_minute_target_as_reached_by_the_four_together" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_the_refused_close_s_evidence_names_the_option" time="7.403" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays[parallel]" time="7.444" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_the_nightly_run_s_test_runs_are_given_the_retention_option" time="4.472" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_one_module_change_is_stated_scoped_never_full" time="7.405" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_base_is_the_last_fully_green_commit" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W2-ii]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W1-cp]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W2-zz]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_selection_keeps_the_full_runs_form_so_a_bare_conftest_import_still_collects" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_record_reading_set_runs_on_a_scoped_close_and_is_named" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_every_close_files_run_and_are_named" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_serial_cases_of_the_selected_suites_run_alone_and_only_those" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_record_says_which_serial_cases_ran" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_close_record_holds_the_same_evidence_block" time="0.075" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_junit_xml_holds_every_case_run_and_no_case_left_out" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_scoped_close_states_its_settings_defaults" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_suiteless_tickets" name="test_a_path_only_suiteless_tickets_hold_runs_the_full_regression" time="7.061" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_record_only_commits_since_the_base_are_inside_the_change" time="7.726" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_head_and_the_tree_are_stated" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_every_test_run_of_the_close_is_given_the_retention_option[parallel]" time="8.137" /><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_renamed_every_close_file_widens_the_run_to_the_full_regression" time="7.153"><failure message="AssertionError: the run is not stated full: scope 'scoped'">fixture = &lt;w2_66_support.Fixture object at 0x751c090cc350&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_every_close_fil0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_every_close_fil0/sandbox/elsewhere'))
+
+    def test_a_renamed_every_close_file_widens_the_run_to_the_full_regression(fixture, sandbox):
+        """The map's every-close list names W1-ec's contract file; it is renamed in its folder. The base is green
+        after the rename; then the ticket's ordinary one-module change."""
+        _move_at_the_base(fixture, support.EC_CONTRACT, EC_RENAMED)
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+&gt;       _assert_widened(run, fixture, support.EC_CONTRACT, support.FILE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":..._free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=6.5392505440395325)
+fixture = &lt;w2_66_support.Fixture object at 0x751c090cc350&gt;
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+&gt;       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_every_test_run_of_the_close_is_given_the_retention_option[acceptance]" time="7.818" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_every_test_run_of_the_close_is_given_the_retention_option[serial-afterwards]" time="7.752" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_whose_ticket_paths_overlap_the_change_runs_and_is_named_with_why[W2-bz]" time="7.956" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W2-cc]" time="0.001" /><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_selected_targets_that_resolve_change_nothing" time="6.863" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_a_passed_close_names_the_option_in_its_result_and_its_record" time="7.367" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_own_suite_runs_and_is_named" time="6.919" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W1-hh]" time="0.002" /><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed]" time="6.255"><failure message="AssertionError: the run is not stated full: scope 'scoped'">make_fixture = &lt;function make_fixture.&lt;locals&gt;.make at 0x78399bb032e0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw2/test_a_renamed_record_reading_0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw2/test_a_renamed_record_reading_0/sandbox/elsewhere'))
+renamed = 'renamed'
+
+    @pytest.mark.parametrize("renamed", sorted(RR_RENAMED))
+    def test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression(make_fixture, sandbox, renamed):
+        """The map names one case of W1-rr by its node id; W1-rr's test designer renames the function (the file stays).
+        The base is green after the rename; then the ticket's ordinary one-module change."""
+        fixture = make_fixture(test_map=_map(record_reading=[RR_NODE]))
+        _rename_rr_case_at_the_base(fixture, RR_RENAMED[renamed])
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+&gt;       _assert_widened(run, fixture, RR_NODE, support.CASE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...e_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=5.656551307067275)
+fixture = &lt;w2_66_support.Fixture object at 0x78399bac7a70&gt;
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+&gt;       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_scoped_close_passes" time="6.912" /><testcase classname="tests.acceptance.W2-66.test_w2_66_retention" name="test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays[serial-afterwards]" time="7.027" /><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed-longer]" time="6.636"><failure message="AssertionError: the run is not stated full: scope 'scoped'">make_fixture = &lt;function make_fixture.&lt;locals&gt;.make at 0x797fab59b100&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw1/test_a_renamed_record_reading_0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw1/test_a_renamed_record_reading_0/sandbox/elsewhere'))
+renamed = 'renamed-longer'
+
+    @pytest.mark.parametrize("renamed", sorted(RR_RENAMED))
+    def test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression(make_fixture, sandbox, renamed):
+        """The map names one case of W1-rr by its node id; W1-rr's test designer renames the function (the file stays).
+        The base is green after the rename; then the ticket's ordinary one-module change."""
+        fixture = make_fixture(test_map=_map(record_reading=[RR_NODE]))
+        _rename_rr_case_at_the_base(fixture, RR_RENAMED[renamed])
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+&gt;       _assert_widened(run, fixture, RR_NODE, support.CASE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...e_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=6.035708545008674)
+fixture = &lt;w2_66_support.Fixture object at 0x797fab742c00&gt;
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+&gt;       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_red_the_renamed_record_reading_case_catches_refuses_the_close" time="6.539"><failure message="AssertionError: the renamed record-reading case test_rr_checks_the_register did not run: the close passed a red it would catch (scope 'scoped')&#10;assert False&#10; +  where False = ran('test_rr_checks_the_register')&#10; +    where ran = &lt;w2_66_support.Fixture object at 0x7644799c3e60&gt;.ran">make_fixture = &lt;function make_fixture.&lt;locals&gt;.make at 0x764479a08a40&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw9/test_a_red_the_renamed_record_0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw9/test_a_red_the_renamed_record_0/sandbox/elsewhere'))
+
+    def test_a_red_the_renamed_record_reading_case_catches_refuses_the_close(make_fixture, sandbox):
+        """Failure line 3 through a renamed target: a record-only commit breaks the register; the renamed record-reading
+        case catches it. Only a run that reaches the renamed case (the full regression) refuses the close; a run that
+        selects the old node id runs nothing of W1-rr and passes."""
+        renamed = RR_RENAMED["renamed"]
+        fixture = make_fixture(test_map=_map(record_reading=[RR_NODE]))
+        _rename_rr_case_at_the_base(fixture, renamed)
+        fixture.record_commit({support.REGISTER_REL: f"# The decision register\n\n{support.BROKEN}\n"})
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        evidence = support.evidence_of(run)
+&gt;       assert fixture.ran(renamed), (f"the renamed record-reading case {renamed} did not run: the close passed a red "
+                                      f"it would catch (scope {evidence.get('scope')!r})")
+E       AssertionError: the renamed record-reading case test_rr_checks_the_register did not run: the close passed a red it would catch (scope 'scoped')
+E       assert False
+E        +  where False = ran('test_rr_checks_the_register')
+E        +    where ran = &lt;w2_66_support.Fixture object at 0x7644799c3e60&gt;.ran
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:150: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_renamed_coupling_target_widens_the_run_to_the_full_regression" time="6.434"><failure message="AssertionError: the run is not stated full: scope 'scoped'">make_fixture = &lt;function make_fixture.&lt;locals&gt;.make at 0x751c090eb1a0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_coupling_target0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw6/test_a_renamed_coupling_target0/sandbox/elsewhere'))
+
+    def test_a_renamed_coupling_target_widens_the_run_to_the_full_regression(make_fixture, sandbox):
+        """The map couples ``src/gov/textread/data.txt`` to W1-cp's test file; the file is renamed. The base is green
+        after the rename; then the change touches the coupled path, and the ticket's ordinary one-module change."""
+        fixture = make_fixture(test_map=_map(couplings=_coupled_to(CP_FILE)))
+        _move_at_the_base(fixture, CP_FILE, CP_RENAMED)
+        fixture.merged({support.COUPLED_INPUT: "data, changed\n"})
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        support.passed(run)
+&gt;       _assert_widened(run, fixture, CP_FILE, support.FILE_GONE)
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:84: in _assert_widened
+    evidence = support.assert_full(run, fixture, support.UNRESOLVED_TARGET)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=0, stdout='{"ok": true, "command": "close", "result": {"ticket":...se_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}\n', stderr='', seconds=5.85805903095752)
+fixture = &lt;w2_66_support.Fixture object at 0x751c090cecf0&gt;
+reason = 'UNRESOLVED_TARGET', path = None
+
+    def assert_full(run, fixture, reason, path=None):
+        """The close ran the full regression, said so, and said why; every suite ran."""
+        evidence = evidence_of(run)
+&gt;       assert evidence.get("scope") == FULL, f"the run is not stated full: scope {evidence.get('scope')!r}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the run is not stated full: scope 'scoped'
+
+tests/acceptance/W2-66/w2_66_support.py:481: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_the_unit_tests_run_and_are_named" time="6.938" /><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_red_the_renamed_coupled_file_catches_refuses_the_close" time="6.384"><failure message="AssertionError: the renamed coupled file tests/acceptance/W1-cp/test_cp_text.py did not run: the close passed a red it would catch (scope 'scoped')&#10;assert False&#10; +  where False = ran('test_in_W1_cp')&#10; +    where ran = &lt;w2_66_support.Fixture object at 0x75e4cb8a4620&gt;.ran">make_fixture = &lt;function make_fixture.&lt;locals&gt;.make at 0x75e4cb8884a0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw5/test_a_red_the_renamed_coupled0/sand...sixPath('/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-0/popen-gw5/test_a_red_the_renamed_coupled0/sandbox/elsewhere'))
+
+    def test_a_red_the_renamed_coupled_file_catches_refuses_the_close(make_fixture, sandbox):
+        """W1-cp's coupled file reads ``src/gov/textread/data.txt``; it is renamed at the base, and the change breaks
+        the data. Only a run that reaches the renamed file (the full regression) refuses the close."""
+        body = (f"text = open({support.COUPLED_INPUT!r}, encoding='utf-8').read()\n"
+                f"    assert {support.BROKEN!r} not in text, 'the coupled data is broken: ' + text")
+        fixture = make_fixture(test_map=_map(couplings=_coupled_to(CP_FILE)))
+        _move_at_the_base(fixture, CP_FILE, CP_RENAMED, body=support._telling(CP_CASE, fixture.told, body=body))
+        fixture.merged({support.COUPLED_INPUT: f"data, {support.BROKEN}\n"})
+        support.widget_change(fixture, sandbox)
+        run = fixture.close(sandbox)
+        evidence = support.evidence_of(run)
+&gt;       assert fixture.ran(CP_CASE), (f"the renamed coupled file {CP_RENAMED} did not run: the close passed a red it "
+                                      f"would catch (scope {evidence.get('scope')!r})")
+E       AssertionError: the renamed coupled file tests/acceptance/W1-cp/test_cp_text.py did not run: the close passed a red it would catch (scope 'scoped')
+E       assert False
+E        +  where False = ran('test_in_W1_cp')
+E        +    where ran = &lt;w2_66_support.Fixture object at 0x75e4cb8a4620&gt;.ran
+
+tests/acceptance/W2-66/test_w2_66_unresolved_targets.py:171: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_whose_ticket_paths_overlap_the_change_runs_and_is_named_with_why[W1-bb]" time="6.891" /><testcase classname="tests.acceptance.W2-66.test_w2_66_unresolved_targets" name="test_a_gone_coupling_target_the_change_does_not_reach_widens_nothing" time="6.217" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W1-gg]" time="6.548" /><testcase classname="tests.acceptance.W2-66.test_w2_66_scoped_selection" name="test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why[W1-dd]" time="6.515" /></testsuite></testsuites>

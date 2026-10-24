@@ -1,0 +1,8 @@
+Merge w2/integrate into w2/W2-66 (run 3): DEC-912, W2-70 round 2's KPI, W2-66's run 3 KPIs (P1, P2), DEC-910, DEC-911
+
+Clean merge: the tree equals git merge-tree --write-tree of its parents.
+
+Task: DAEO-c1uz
+Implements: DEC-912
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,5 +1,38 @@
 # W2-66 (DAEO-c1uz) lead checkpoint
 
+## RUN 3 (2026-10-24, the last round; DEC-912 M1 (a), R2 (a)) — progress log
+- Start: 5634d430, clean; identity orchestrator/DAEO-c1uz checked; hooks: only *.sample.
+- Step 1 DONE: merge 02b62e03 (w2/integrate b2632d76 into w2/W2-66), clean; tree 7e43ed27357d = merge-tree.
+  Trailers Task/Implements DEC-912/Role orchestrator/Co-Authored-By. Ticket file now has the two KPI lines (P1, P2).
+- rebuild-r3a started (log/rebuild-r3a.*). Flag W2-70-R2-MERGED absent at 15:40.
+- Brief td-4 written (briefs/td-4.md): P1 (record-reading, every-close, coupling renamed -> full, named), P2 (W1-28 coupling live-map).
+- rebuild-r3a exit 0 (lexical/semantic/codeintel recreated).
+- td-4 DONE (gov launch sandboxed xhigh, session 8361d3c0-03d3-42bc-8d34-38c9c9f0b581, 12 fields, gov retrieve used once,
+  0 read refusals, 1 guard refusal (backticks), 1 rm permission). e9c639f1 (P1: test_w2_66_unresolved_targets.py, 8 cases,
+  UNRESOLVED_TARGET FILE_GONE/CASE_GONE), 952193ae (P2: 8 live-map cases). No rewrites. Trailers ok. Tripwire 10: this tree
+  head + W2-66 folder; W2-65 placeholders gone; W2-70 head moved (its own round 2). Risk named: renamed parameter id counts
+  as resolved (outside KPI line) -> residual candidate.
+- red-4 (lead): 13 failed / 157 passed in 56 s; reasons (n) x6, (o) x7. gov.__file__ in worktree.
+- eng-5 DONE (gov launch sandboxed high, session 095ec0a8-8144-4df2-a2aa-090c7fb19b86, 12 fields, no gov retrieve,
+  1 read refusal (grep -r over tests/acceptance), 1 call refused twice (quoted format), 1 rm permission).
+  73a40277 (P1: select.unresolved via git ls-tree/show HEAD + ast; plan() adds UNRESOLVED_TARGET), 0f0f6cb2 (P2: map
+  tests/acceptance/**.py -> W1-28/test_w1_28_fixture_copies.py). +95/-4. Its runs: ticket set 193p, unit/close 417p,
+  W2-07 40p, W1-30 515p, W1-28 151p, W1-07 223p, W1-39 71p, W2-01 88p, W2-53 57p. Tripwire 11: this tree head only.
+- Loop: converging (eng-5 answered review 2's P1/P2).
+- Pre-merge parallel run started 17:01 but queued on the lock behind W2-65's parallel and W2-70's serial runs; withdrawn
+  (killed while waiting, exit 143, never ran a test) to keep the shared lock free. Flag wait started 16:32.
+- Flag W2-70-R2-MERGED seen 18:13: 3ff8ba51b3ed. Merge 2: 052a3b9b, clean, tree dd1adcc9f6d1 = merge-tree, trailers.
+- 6eb5a93f: CP-DAEO-c1uz-0015 committed (Task/Implements DEC-912/Role orchestrator/Co-Authored-By). VERIFICATION HEAD.
+- keyword_warn: 3 hits, all rebuilt index copies of W2-69's tracked files (codeintel/files/docs/research/W2-69-secrets-scan.md,
+  codeintel/files/tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py, store.db); none in lead scratch.
+- rebuild-r3b exit 0 (all recreated); gov.__file__ in worktree; collect-r3 "16426/16428 tests collected (2 deselected)
+  in 6.88s" no error; check-r3 exit 0, YELLOW core-decision-citations, openspec-validate (as run 2).
+- parallel-r3 started (log/parallel-r3.*), then serial-r3 (run-serial.py serial-r3), then rev-3 (briefs/rev-3.md: fill
+  HEADSHORT/MERGE2LINE/CPLINE/VERIFYLINE).
+- (old) Next: wait for flag; then merge 2 -> gov checkpoint
+  commit -> rebuild -> collect/check/parallel/serial -> rev-3 (briefs/rev-3.md).
+- Note: checkpoint commits 9174e358 and 5634d430 carry "Implements: engineer" (gov checkpoint's own commit), not DEC-n.
+
 ## RUN 2 END (2026-10-24): returned PACKAGES (P-W2-66-M1, P-W2-66-R2)
 - Branch head 5634d430 (nothing committed after the last probed head). Probe records NOT committed (both reviews failed):
   probes/PR-DAEO-c1uz-review1-fail-draft.md, probes/PR-DAEO-c1uz-review2-fail-draft.md.
