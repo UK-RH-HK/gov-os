@@ -30,7 +30,18 @@
 - parallel-r3 (head 6eb5a93f, lock, retention): 16131 passed, 30 skipped, 0 failed in 2986.84 s (49:46); W1-01's two
   cases PASSED. Scratch peak sampled 145,916 inodes; 126,238 / 1.1G near end; 8 / 28K after.
 - serial-r3 (lock, retention): 265 passed, 1 warning in 968.50 s (16:08), exit 0.
-- Next: rev-3 (gov launch independent-auditor, max, tripwire 12); commit probe record only if pass.
+- rev-3 DONE (gov launch independent-auditor sandboxed, max, session e72d5ea1-4a16-4a13-807d-6e7b1aeadd8f, 12 fields after
+  one preamble sentence, 0 guard/read refusals, gov retrieve used once). VERDICT PASS at 6eb5a93f4332: F1-F6, P1, P2
+  answered; rows R5-R9 new (R5/R6/R7 no/fails open, R8 no/loses work, R9 yes/other), R1-R4 carried (R2 reason updated:
+  W2-59 holds pyproject.toml), feature-gated row. Lead agrees (checked R7 premise: W2-71 holds src/gov/secrets/** only).
+  Tripwire 12: this tree only the lead's probe file; main tree head, W2-00-record, W2-65's own work changed.
+- d738898f: probe record docs/probes/DAEO-c1uz/PR-DAEO-c1uz.md committed (lead trailers). Final head.
+- After it: collect "16426/16428 tests collected (2 deselected) in 6.33s"; gov check exit 3 (index freshness + recovery
+  digest: the new record not indexed) -> rebuild-r3c exit 0 -> check-r3c exit 0 (YELLOW x2 as before).
+- keyword_warn: split the keyword in my logs collect-r3.out, parallel-r3.xml (W2-69 test names); only store.db remains
+  (index of tracked W2-69 content).
+- STATE: DONE, ready to merge. A resume has nothing to do; the orchestrator merges.
+- Temp /tmp/gov-os-lead-W2-66: 7 inodes / 28K (orchestrator removes).
 - (done) parallel-r3 started (log/parallel-r3.*), then serial-r3 (run-serial.py serial-r3), then rev-3 (briefs/rev-3.md: fill
   HEADSHORT/MERGE2LINE/CPLINE/VERIFYLINE).
 - (old) Next: wait for flag; then merge 2 -> gov checkpoint

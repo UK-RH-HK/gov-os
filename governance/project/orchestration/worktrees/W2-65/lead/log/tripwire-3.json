@@ -1,0 +1,33 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "fd813dfad6bb",
+   "after": "38e415e00ea9"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "744221c298bd",
+   "after": "7ba776f21af0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-65",
+   "change": "head",
+   "before": "4183848a18a0",
+   "after": "03d9aa08148e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-65",
+   "change": "acceptance folder",
+   "folder": "W1-27"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66",
+   "change": "head",
+   "before": "6eb5a93f4332",
+   "after": "d738898fd138"
+  }
+ ]
+}
