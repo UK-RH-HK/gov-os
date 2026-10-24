@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.303 (the version table at the end of each section gives the history)
+**Version:** 0.304 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -4360,7 +4360,7 @@ built or makes the check report more; none makes it report less. The findings of
 The owner was told on 2026-10-05.
 
 ### DEC-410 — W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a path both sides changed is the merge commit's own; 24 parents at most
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401 · **Changed by:** DEC-918: under `tests/acceptance/`, a path both parents changed is not the merge commit's own change when the merge holds exactly git's own merge of that file
 - **Decision:**
   - DP-21: a change to a file under `.tickets/**` that a merge commit itself makes (its own change, by the helper)
     is a finding whatever the merge commit's trailers, also with orchestrator trailers or none.
@@ -10837,3 +10837,20 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 |---|---|---|
 | 0.302 | 2026-10-24 | Delegated (orchestrator, DEC-102; the owner's acceptance asked): DEC-917 (P-W2-65-4 (b): W1-38 holds the three guard lines to the exit-mapping form and the four lifecycle lines to DEC-608's plain form, by W2-65's test designer; no hook behaviour change; rows W2-L438 and W2-L439). Next free id: DEC-918. |
 | 0.303 | 2026-10-24 | Owner: DEC-917 accepted (status line marked; recorded by the orchestrator, DEC-861). Next free id: DEC-918. |
+
+## 302. The owner's answer of 2026-10-24 on P-W2-L437-B (register v0.304, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-918 — Containment's merge rule matches DEC-912 exactly: a merge-back file equal to git's own merge is no change; W2-72 rides the first re-pin
+- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-912, DEC-410, DEC-421, DEC-572, DEC-453, DEC-750, DEC-754, DEC-884, DEC-906 · **Basis:** packages P-W2-L437-A and P-W2-L437-B (`governance/project/orchestration/packages/`). The close's containment gate (`judge_commits`, every finding refuses) reads, under `tests/acceptance/**`, every path both parents changed as the merge commit's own change (DEC-410 DP-24), so it refuses W2-66's and W2-65's closes on their DEC-912 merge-backs (`03f470a5`, `4ef3293a`); the live hook flags them.
+- **Decision:**
+  1. **(a1), the owner's principle exactly:** containment's merge rule matches DEC-912. A merge-back file under `tests/acceptance/` equal to git's own merge of its parents (`git merge-tree --write-tree`) is neither reverted, refused nor counted as a change, by the live hook or by the close's gate. Any file that differs from git's own merge (a hand edit, a conflict resolution) is still caught as before.
+  2. **Not (a2):** the bringing commits are already judged at their own closes and by W1-01 under DEC-912.
+  3. **Ticket W2-72 (FULL, engineer) rides the first re-pin,** since every close after it is judged by the pinned containment, and the tickets due to close before the second re-pin hold such merges. The orchestrator checked the owner's exception and could not show it: W2-66's range holds `03f470a5` and W2-65's holds `4ef3293a`, both due to close before the second re-pin; W2-67, W2-57 and the held tickets will merge `w2/integrate` back again over shared test folders (W1-30, W1-26, W1-38). The first re-pin moves back by about 5 hours.
+  4. **The tests DEC-410 DP-24 set** (W1-50's merge cases that read a clean merge of a both-changed acceptance file as the merge's own) are revised by W2-72's test designer, `Rewrite-Reason: DEC-918`; the rule for ticket files (DEC-421, DEC-572) and for every other path is unchanged.
+- **Changes:** DEC-410 (DP-24, for acceptance tests); DEC-884 and DEC-899 item 4 (the first re-pin also carries W2-72).
+- **Where it goes (DEC-851):** this register, with DEC-410's status line marked; the w2 prompt (section 3's re-pin line); W2-72's ticket file and WBS card (their own commit, `Task: DAEO-ye2a`); W2-72's brief; RESUME HERE.
+- Next free id: DEC-919.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.304 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-918 (P-W2-L437-B (a1): containment's merge rule matches DEC-912 exactly, a merge-back acceptance file equal to git's own merge neither reverted, refused nor counted, any other still caught; not (a2); W2-72 rides the first re-pin, the exception not shown; W1-50's DP-24 cases revised by its test designer). Next free id: DEC-919. |
