@@ -26,8 +26,6 @@ ACCEPTANCE = "tests/acceptance"
 NAMED_IN_THE_TIMED_SUITES = {
     f"{ACCEPTANCE}/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms": 5,
     f"{ACCEPTANCE}/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook": 9,
-    f"{ACCEPTANCE}/W1-05/test_w1_05_switch_over_record.py::"
-    "test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over": 1,
     f"{ACCEPTANCE}/W1-50/test_w1_50_review_of_the_symmetric_rule.py::"
     "test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought": 1,
     f"{ACCEPTANCE}/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays": 1,

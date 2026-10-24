@@ -13,6 +13,12 @@ failed: a close refused only for a trailer or for the probe, with every test gre
 Each project has one acceptance case that runs in parallel, one that the project declares serial-only, and one
 unit test as the regression run. The twin of a project is the same project without the finding: it closes, and
 what it states of its runs is what the refused one must state, the seconds apart.
+
+**Revised for W2-07 (DEC-868 item 3).** A trailer's finding and the probe's are commit gates: the close stops
+at once, before any test, names its cause and spends no attempt. So the close refused for a failing test has no
+other finding; and a close refused only for a trailer or for the probe states that it ran no test (its
+``test_runs`` is empty, and the project's tests, which tell into a folder outside it whenever they run, did not
+run), while its twin still closes and states its three runs.
 """
 
 import pytest
@@ -26,19 +32,21 @@ DECLARED = f"{ACCEPTANCE}/test_apart.py::test_apart"
 FINDINGS = ("a commit without Implements", "no probe record")
 
 
-def _build(project, failing=False, finding=None):
+def _build(project, failing=False, finding=None, told=None):
     """The regression test (the orchestrator's), the ticket with its two acceptance cases, one of them
     declared serial-only, and the engineer's work. ``failing`` adds a failing acceptance case; ``finding`` is
     the one thing wrong beside the tests: the engineer's second commit lacks ``Implements:``, or the ticket is
     FULL and has no probe record. Without the finding the same second commit carries the trailer and the FULL
-    ticket has its probe record."""
-    project.write("tests/unit/test_unit_one.py", "def test_unit_one():\n    assert True\n")
+    ticket has its probe record. With ``told`` the three passing cases tell into that folder whenever they run."""
+    def passing(name):
+        return support.telling_test(name, told) if told else f"def {name}():\n    assert True\n"
+    project.write("tests/unit/test_unit_one.py", passing("test_unit_one"))
     project.write(support.SERIAL_ONLY_REL, f"{DECLARED}  # latency: planted\n")
     project.commit("regression tests", who=support.ORCHESTRATOR)
     full = finding in (None, "no probe record")
     project.add_ticket(TICKET, WBS, profile="FULL" if full else "STANDARD")
-    project.add_passing_test(WBS)
-    project.add_passing_test(WBS, name="test_apart")
+    project.write(f"{ACCEPTANCE}/test_pass.py", passing("test_pass"))
+    project.write(f"{ACCEPTANCE}/test_apart.py", passing("test_apart"))
     if failing:
         project.add_failing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
@@ -59,10 +67,6 @@ def _runs_of_the_refusal(run, interface):
     return error, support.runs_stated_by(details, "the refusal's details")
 
 
-def _without_seconds(runs):
-    return [{key: value for key, value in run.items() if key != "seconds"} for run in runs]
-
-
 def _assert_each_run(runs, failed):
     """The three runs of the project, each with its form, its workers or its cases, and its counts."""
     parallel = support.the_run(runs, support.ACCEPTANCE_RUN, support.PARALLEL)
@@ -78,7 +82,9 @@ def _assert_each_run(runs, failed):
 
 
 def test_a_close_refused_for_a_failing_test_states_each_run(project, sandbox, interface):
-    _build(project, failing=True, finding="a commit without Implements")
+    """The failing test is the one finding: a commit gate's finding beside it would refuse first, before any
+    test (DEC-868 item 3)."""
+    _build(project, failing=True, finding="none")
 
     run = support.run_close(project, sandbox, TICKET)
 
@@ -88,12 +94,19 @@ def test_a_close_refused_for_a_failing_test_states_each_run(project, sandbox, in
     support.assert_not_closed(project, TICKET)
 
 
+# What names the cause of each commit gate's refusal in the answer.
+CAUSE_WORDS = {"a commit without Implements": "implements", "no probe record": "probe"}
+
+
 @pytest.mark.parametrize("finding", FINDINGS)
 def test_a_close_refused_with_every_test_green_states_each_run_as_a_passed_close_does(finding, project, sandbox,
                                                                                       interface, tmp_path):
-    """The only finding is a trailer's or the probe's. The twin without it closes; the refused close states
-    the runs the twin states."""
-    _build(project, finding=finding)
+    """The only finding is a trailer's or the probe's, a commit gate (DEC-868 item 3): the close stops at once,
+    names its cause, runs no test, states no run and is not counted. The twin without it closes and states its
+    three runs."""
+    told = tmp_path / "told"
+    told.mkdir()
+    _build(project, finding=finding, told=told)
     twin = support.Project(tmp_path / "twin")
     _build(twin, finding=None if finding == "no probe record" else "none")
 
@@ -102,10 +115,14 @@ def test_a_close_refused_with_every_test_green_states_each_run_as_a_passed_close
 
     passed = support.runs_stated_by(support.result_of(twin_run, interface), "the twin's result")
     _assert_each_run(passed, failed=0)
-    error, runs = _runs_of_the_refusal(run, interface)
-    assert "test_" not in " ".join(error["details"].get("findings", [])), \
-        f"the fixture is wrong: a test is among the findings\n{run.describe()}"
-    _assert_each_run(runs, failed=0)
-    assert _without_seconds(runs) == _without_seconds(passed), \
-        f"the refused close does not state its runs as the passed one does:\n{runs}\n{passed}"
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    findings = " ".join(error["details"].get("findings", []))
+    assert "test_" not in findings, f"the fixture is wrong: a test is among the findings\n{run.describe()}"
+    assert CAUSE_WORDS[finding] in findings.lower(), \
+        f"the refusal does not name its cause ({finding}) among its findings\n{run.describe()}"
+    assert error["details"].get(support.TEST_RUNS_KEY) == [], \
+        f"a commit gate refused and the refusal states test runs\n{run.describe()}"
+    assert support.told_by(told) == {}, \
+        f"a commit gate refused and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+    support.assert_nothing_counted(project, TICKET, run)
     support.assert_not_closed(project, TICKET)

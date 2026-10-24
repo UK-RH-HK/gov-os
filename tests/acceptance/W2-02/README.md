@@ -197,3 +197,9 @@ Notes on these cases:
 - Now: they are exactly the probe record and the task record (`docs/records/PROJ-0001.md`, type `task`), each `SCHEMA_UNREADABLE`, compared without order. This is stricter: both records are reported and nothing is green. It follows from this ticket's KPI line 3 (a type with no schema file is reported unmeasured).
 - Its own commit carries a `Rewrite-Reason:` trailer.
 - It passes against run 1's implementation.
+
+## W2-67 (DAEO-9nys): the unmeasured case names the type
+
+W2-67's test designer (round 1, batch 2) revised `test_w2_02_unmeasured.py::test_a_type_whose_schema_file_is_absent_is_reported_unmeasured_and_not_green`
+so that it fails when the finding does not name the type whose schema file is absent (I4 F7): red under a planted
+fault, green on the head, with a `Rewrite-Reason:` trailer. The plant and the evidence: `README-W2-67.md`.

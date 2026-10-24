@@ -49,7 +49,7 @@ acceptance_tests:
   path: tests/acceptance/W2-57/
   author: independent-test-designer (MR-3); written before implementation
 track: A
-list_rows: [W2-M364, W2-M384, W2-M332, W2-L352, W2-L409]
+list_rows: [W2-M364, W2-M384, W2-M332, W2-L352, W2-L409, W2-L415]
 ---
 # W2-57 Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry
 

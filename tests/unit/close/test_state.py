@@ -167,8 +167,14 @@ def test_an_escalation_file_that_cannot_be_read_is_named(root, content):
 
 
 def test_the_third_refusal_records_where_the_escalation_began(project):
-    head = project.git("rev-parse", "HEAD").strip()
+    """The third refusal is made at the commit of the repair ticket the first one committed alone and the next two
+    reused (KPI 8, AR-9): that commit is where the escalation began."""
+    before = project.git("rev-parse", "HEAD").strip()
     counted = _escalated(project)
+    head = project.git("rev-parse", "HEAD~1").strip()  # _escalated commits once more, after the refusals
+    assert project.git("rev-parse", f"{head}~1").strip() == before
+    [repair] = project.git("diff-tree", "--no-commit-id", "--name-only", "-r", head).split()
+    assert repair.startswith(".tickets/") and repair != f".tickets/{TICKET}.md"
     assert counted["escalated_at"] == head
     package = read_escalation(project.root, TICKET)
     assert package["escalated_at"] == head and package["decisions_used"] == []

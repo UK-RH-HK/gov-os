@@ -50,6 +50,10 @@ sources:
 - DEC-892
 - DEC-896
 - DEC-898
+- DEC-899
+- DEC-903
+- DEC-904
+- DEC-908
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-07/
@@ -99,4 +103,24 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729), with DEC-868
 - **Allowed paths:** `src/gov/close/**`, except W2-66's and W2-68's new modules (`select.py`, `nightly.py`, `evidence.py`, `batch.py`, `fingerprint.py`). Also `src/gov/telemetry/**`, `tests/unit/close/**` and `tests/unit/telemetry/**`, and, for its test designer only, the W1-30 cases named above.
 - **It unblocks** the test-revision tickets: W2-63, W2-67's revisions and W2-70 close on its class once it is pinned.
 - **Row W2-M263 (DEC-738 item 4):** RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.
+- **The test designer's batch, widened (owner, DEC-904 item 6):** each revision carries a `Rewrite-Reason:` naming its decision, and no expectation is lowered.
+  - W1-30's shared fixture, `tests/acceptance/W1-30/w1_30_support.py` and `tests/acceptance/W1-30/conftest.py`: its fixture projects green under the in-close `gov check` (`Rewrite-Reason: DEC-868 item 1 (b)`). This clears 175 cases.
+  - The 20 gate-order cases, to DEC-868 item 3's order (`Rewrite-Reason: DEC-868 item 3`):
+    - `test_w1_30_r9_every_finding.py` (8);
+    - `test_w1_30_r13_refused_runs.py` (3);
+    - `test_w1_30_check_blocks.py::test_a_refusal_where_gov_check_blocks_is_counted`;
+    - `test_w1_30_governance_checks.py::test_a_refusal_for_a_red_check_is_counted`;
+    - `test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected`;
+    - `test_w1_30_containment_places.py` (2);
+    - `test_w1_30_iteration.py::test_mixed_causes_reach_escalation`;
+    - `test_w1_30_repair_ticket.py` (2);
+    - `tests/acceptance/W2-53/test_w2_53_load_sensitive.py::test_an_entry_the_owner_did_not_add_is_refused_naming_it_and_its_test_is_not_run_again`.
+  - The repair-ticket case to KPI 8: `test_w1_30_r8_tree.py::test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured` (`Rewrite-Reason: KPI 8, AR-9, W2-L209`).
+  - The superseded expectations are marked under DEC-866: DEC-492, DEC-490 (one part), DEC-493 (one part).
+- **The batch, widened again (DEC-908, delegated):** 14 W1-30 cases the KPIs also change, each with its `Rewrite-Reason:`:
+  - 8 in `test_w1_30_context_failures.py` (DEC-868 item 3);
+  - `test_w1_30_governance_checks.py` ×2, `test_w1_30_r8_commits.py` ×2, `test_w1_30_r13_installed_skills.py` (DEC-868 item 1 (b), KPI 5);
+  - `test_w1_30_iteration.py::test_each_refusal_opens_repair_ticket` (KPI 10, W2-M252).
+- **W1-01's history and merge cases** are a known red until W2-70 merges (DEC-906, DEC-908): report them by name; they do not stop DONE.
+- **The verification run (DEC-904 item 3):** under `flock /tmp/gov-os-verify.lock`, within 6,000,000 files and folders and 60 GB, and before W2-66's (it merges first).
 - **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py`, `tests/acceptance/W1-30/test_w1_30_collection*`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.
