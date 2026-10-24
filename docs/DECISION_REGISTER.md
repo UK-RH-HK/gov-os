@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.304 (the version table at the end of each section gives the history)
+**Version:** 0.305 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10854,3 +10854,20 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.304 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-918 (P-W2-L437-B (a1): containment's merge rule matches DEC-912 exactly, a merge-back acceptance file equal to git's own merge neither reverted, refused nor counted, any other still caught; not (a2); W2-72 rides the first re-pin, the exception not shown; W1-50's DP-24 cases revised by its test designer). Next free id: DEC-919. |
+
+## 303. W2-65's run 3 return (register v0.305, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-919 — W2-66's lead-verification case is a known red on a ticket branch that changes a plain run's configuration; W2-68's test designer narrows it
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; for the owner's digest) · **Under:** DEC-880 item 2 (b), DEC-866, DEC-906, DEC-899 item 4 · **Basis:** W2-65's run 3 return (`log/W2-65-A5-run3.json`, head `f6881547`, DONE). `tests/acceptance/W2-66/test_w2_66_lead_verification.py::test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes` (W2-66's KPI 12, merged `c60c9704`) diffs `w2/integrate...HEAD` and fails on any change to `pyproject.toml`, `pytest.ini`, `tox.ini`, `setup.cfg`, the serial-only list or a conftest outside W2-66's folder. It states a property of W2-66's own change but runs on every branch: red on W2-65's branch for W2-59's own commits (`771e9a0c`, `912ddc63`, `922dd542`), and on any ticket branch that changes those files legitimately; green on `w2/integrate`, in the nightly's clone and in main-tree closes, where the diff is empty. Ordinary work: yes; consequence: other (a false red in a lead's verification; it fails closed and blocks no merge, re-pin or close).
+- **Decision:**
+  1. **A known red in a lead's verification** on a ticket branch that changes one of those files: the lead names it with its cause and it does not stop DONE (the common lead brief).
+  2. **Row W2-L440:** W2-68's test designer, which inherits W2-66's folder and test map, narrows the case to W2-66's own commits (by their Task trailer) or to the close's own change, with `Rewrite-Reason: DEC-919`.
+  3. **Row W2-L441:** the READMEs that still describe DEC-608's single form (`tests/acceptance/W1-38/README.md`, and `tests/acceptance/W2-59/README.md` if it does), by the next test designer of each folder.
+  4. **W2-65 is held at `f6881547`** and merges with W2-59 just before the first re-pin, after W2-72 (DEC-884, DEC-918).
+- **Changes:** none to earlier decisions.
+- **Where it goes (DEC-851):** this register; `LEAD-w2-common.md` (the known red); the Wave 2 list (rows W2-L440, W2-L441); RESUME HERE; the owner's digest.
+- Next free id: DEC-920.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.305 | 2026-10-24 | Delegated (orchestrator, DEC-102): DEC-919 (W2-66's lead-verification case a known red on a ticket branch that changes a plain run's configuration; W2-68's test designer narrows it, row W2-L440; stale DEC-608 README text, row W2-L441; W2-65 held at `f6881547`). Next free id: DEC-920. |
