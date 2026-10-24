@@ -271,7 +271,14 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
     shares = {"measured": share(counted["total"], denominator), "estimated": share(estimate["total"], denominator),
               "total": share(_total((counted["total"], estimate["total"])), denominator)}
     commits = _commits(root, ticket)
-    versions = list(dict.fromkeys(version for log in logs for version in log["versions"] or [None]))
+    versions = list(dict.fromkeys(version for log in logs for version in log["versions"]))
+    for entry, log in zip(entries, logs):  # W2-L208: each session's own versions, as its log carries them
+        entry["versions"] = list(log["versions"]) or NOT_MEASURED
+    # W2-L196, W2-L197: one version only where every named log carries that one; otherwise, with the reason
+    unversioned = [entry["session"] for entry in entries if entry["versions"] == NOT_MEASURED]
+    version_reason = (f"no line of the log of {', '.join(unversioned)} carries a version" if unversioned else
+                      f"the sessions carry more than one version ({', '.join(versions)}): each session's own "
+                      "versions are under sessions (DEC-663 G)" if len(versions) > 1 else None)
     profile = str(front.get("profile")).upper()
     return {
         "ticket": ticket,
@@ -292,9 +299,10 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
                       for commit, trailers in commits]},
         **dict.fromkeys(UNDECIDED, NOT_MEASURED),
         "latency": {API_DURATION: _total(entry[API_DURATION] for entry in entries)},
-        # DEC-655: the version that was read. Not decided (package G): logs that carry more than one version,
-        # in one log or across the sessions. None is picked: the version is then "not measured".
-        "agent": {"harness": HARNESS, "version": versions[0] if len(versions) == 1 else NOT_MEASURED},
+        # DEC-655: the version that was read. DEC-663 G: logs that carry more than one version, in one log or
+        # across the sessions: none is picked, the version is "not measured", and the record says why.
+        "agent": {"harness": HARNESS, "version": NOT_MEASURED if version_reason else versions[0],
+                  **({"version_reason": version_reason} if version_reason else {})},
         "learning_metrics": {"kpi_disputes": _disputes(root, ticket),
                              "acceptance_tests_rewritten": NOT_MEASURED if commits is None else _rewrites(commits),
                              "governance_share": dict(shares)},

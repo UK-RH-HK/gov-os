@@ -2,6 +2,12 @@
 
 Fails a change to the capability taxonomy or to ``readiness-dimensions.yaml``
 that has no linked CIT-E record.
+
+Revised (W2-67, I2 §2.7 R1): the two RED cases change the file on the green
+base whose first commit holds it (``green_project_with_dimensions``; held green
+by ``test_w1_26_green_base.py``) and assert ``core-claims``'s own entry RED with
+a finding that names the file, not that ``gov check`` failed (the base was red
+before any defect, and adding the file was itself reported).
 """
 
 from __future__ import annotations
@@ -18,8 +24,10 @@ DIMENSIONS_REL = support.READINESS_DIMENSIONS_REL
 # readiness-dimensions.yaml changed without a linked CIT-E -> RED
 # --------------------------------------------------------------------------
 
-def test_dimensions_changed_without_cite_is_red(project, sandbox, interface):
-    """Changing readiness-dimensions.yaml without a linked CIT-E record fails."""
+def test_dimensions_changed_without_cite_is_red(green_project_with_dimensions, sandbox, interface):
+    """Changing readiness-dimensions.yaml without a linked CIT-E record fails: ``core-claims`` is RED with a
+    finding that names the file, on a base whose first commit holds it (green before the change)."""
+    project = green_project_with_dimensions
     project.add_readiness_dimensions()
     project.commit("add dimensions")
     dims_path = project.root / DIMENSIONS_REL
@@ -27,7 +35,7 @@ def test_dimensions_changed_without_cite_is_red(project, sandbox, interface):
     dims_path.write_text(text + "\n# An unlinked change.\n", encoding="utf-8")
     project.commit("change dimensions without CIT-E")
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-claims", DIMENSIONS_REL)
 
 
 def test_dimensions_changed_with_cite_passes(project, sandbox, interface):
@@ -56,8 +64,10 @@ def test_dimensions_changed_with_cite_passes(project, sandbox, interface):
 # Capability taxonomy changed without CIT-E -> RED
 # --------------------------------------------------------------------------
 
-def test_taxonomy_field_changed_without_cite_is_red(project, sandbox, interface):
-    """Adding a new capability type to the taxonomy without a CIT-E record fails."""
+def test_taxonomy_field_changed_without_cite_is_red(green_project_with_dimensions, sandbox, interface):
+    """Adding a new capability type to the taxonomy without a CIT-E record fails: ``core-claims`` is RED with a
+    finding that names the file, on a base whose first commit holds it (green before the change)."""
+    project = green_project_with_dimensions
     project.add_readiness_dimensions()
     project.commit("add dimensions")
     dims_path = project.root / DIMENSIONS_REL
@@ -66,7 +76,7 @@ def test_taxonomy_field_changed_without_cite_is_red(project, sandbox, interface)
     dims_path.write_text(text, encoding="utf-8")
     project.commit("extend taxonomy without CIT-E")
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-claims", DIMENSIONS_REL)
 
 
 # --------------------------------------------------------------------------

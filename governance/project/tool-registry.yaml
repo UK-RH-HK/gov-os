@@ -202,6 +202,14 @@ tools:
     date: "2026-10-08"
     approved_by: "DEC-514"
     note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/xdist, installed by the orchestrator for the trial of parallel test runs (DEC-514); sha256 of its wheel pytest_xdist-3.8.0-py3-none-any.whl from PyPI. The install brought its one dependency execnet 2.1.2 (wheel execnet-2.1.2-py3-none-any.whl, sha256 67fba928dd5a544b783f6056f449e5e3931a5c378b128bc18501f7ea79e296ec). pytest loads the plugin in every run from now on; without -n it changes no run."
+  - name: pytest-timeout
+    version: "2.4.0"
+    sha256: "c42667e5cdadb151aeb5b26d114aff6bdf5a907f176a007a30b940d3d865b5c2"
+    install: "/usr/bin/python3 -m pip install --user --break-system-packages --require-hashes -r pytest-timeout-requirements.txt (one line: pytest-timeout==2.4.0 with the hash above)"
+    uninstall: "/usr/bin/python3 -m pip uninstall --break-system-packages pytest-timeout"
+    date: "2026-10-23"
+    approved_by: "DEC-892"
+    note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/pytest_timeout.py, installed by the owner (hash checked) for W2-66's per-test limit with the signal method (DEC-892 b, DEC-889 item 11 b, DEC-902 item 4); sha256 of its wheel pytest_timeout-2.4.0-py3-none-any.whl from PyPI, the same wheel the tool trials measured (DEC-889 item 13). Installed, it changes no run that does not pass --timeout. The first re-pin's environment gets the same wheel."
   - name: pytest-testmon
     version: "2.2.0"
     sha256: "2604ca44a54d61a2e830d9ce828b41a837075e4ebc1f81b148add8e90d34815b"

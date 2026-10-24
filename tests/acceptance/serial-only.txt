@@ -17,7 +17,6 @@
 # --- named by the measuring agent in the suites it timed (DEC-514)
 tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms  # latency: p95 under 100 ms over 40 hook processes
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook  # latency: p95 under 100 ms
-tests/acceptance/W1-05/test_w1_05_switch_over_record.py::test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over  # latency: its child run holds the five p95 cases of W1-02 (W1-05's README, "Inside a full regression")
 tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought  # latency: an answer within a third of the hook's time limit
 tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays  # live-session: launches a real worker session
 tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path  # live-session: launches a real worker session
