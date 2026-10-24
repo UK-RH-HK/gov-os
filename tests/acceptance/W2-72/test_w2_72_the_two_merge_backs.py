@@ -26,9 +26,15 @@ ticket file or an acceptance test", naming ``tests/acceptance/W1-30/test_w1_30_c
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import pytest
 
-import w2_72_support as support
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import w2_72_support as support  # noqa: E402
+from w2_72_support import judge, read_merge  # noqa: E402,F401  fixtures
 
 ROOT = support.REPO_ROOT
 

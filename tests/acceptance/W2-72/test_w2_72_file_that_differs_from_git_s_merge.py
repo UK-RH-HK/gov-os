@@ -28,9 +28,15 @@ fails them.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import pytest
 
-import w2_72_support as support
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import w2_72_support as support  # noqa: E402
+from w2_72_support import call, guard_hook, hook, judge, project, sandbox  # noqa: E402,F401  fixtures
 
 check_support = support.check_support
 

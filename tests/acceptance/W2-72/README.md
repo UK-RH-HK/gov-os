@@ -23,6 +23,10 @@ PYTHONPATH=/home/usain/gov-os-worktrees/W2-72/src python3 -m pytest tests/accept
 - The live check runs as the harness runs it: the kernel's PreToolUse and PostToolUse hooks from
   `template/governance/kernel/hooks/`, copied into a throw-away project, with this repository's `src/` on the
   hooks' `PYTHONPATH` (`tests/acceptance/W1-03/w1_03_support.py`, which W1-50's suite uses too).
+- The folder has no `conftest.py` of its own (DEC-880, W2-66's KPI 12 case). The fixtures (`hook`, `guard_hook`,
+  `sandbox`, `project`, `call`, `judge`, `read_merge`) are defined at the end of `w2_72_support.py`. Each test
+  module puts its own folder first on `sys.path`, then imports `w2_72_support` and the fixtures it uses by name,
+  as W1-50's freeze cases import theirs.
 - `judge_commits` and `read_merge` are imported in the test process from this repository's `src/`
   (`monkeypatch.syspath_prepend`). Each fixture asserts that the module came from there. The fail-closed
   `judge_commits` case runs `judge_commits` in a new Python process with `PYTHONPATH` set to that `src/` and
@@ -38,8 +42,7 @@ PYTHONPATH=/home/usain/gov-os-worktrees/W2-72/src python3 -m pytest tests/accept
 
 | File | What it holds |
 |---|---|
-| `w2_72_support.py` | The histories (one builder per merge), the guards from git's own answers (`assert_shape`, `git_s_own_merge`), the failing `git` of the fail-closed cases, and `judge_in_a_process` |
-| `conftest.py` | The hooks, the throw-away project, `call` (one Bash call between the two hooks; `check_environment` replaces variables of the PostToolUse hook's environment only), `judge` and `read_merge` |
+| `w2_72_support.py` | The histories (one builder per merge), the guards from git's own answers (`assert_shape`, `git_s_own_merge`), the failing `git` of the fail-closed cases, `judge_in_a_process`, and the fixtures: the hooks, the throw-away project, `call` (one Bash call between the two hooks; `check_environment` replaces variables of the PostToolUse hook's environment only), `judge` and `read_merge` |
 | `test_w2_72_clean_merge_of_an_acceptance_file.py` | KPI 1 |
 | `test_w2_72_file_that_differs_from_git_s_merge.py` | KPI 2, every shape except merge-tree that cannot run |
 | `test_w2_72_merge_tree_that_cannot_run.py` | KPI 2, fail closed |
@@ -213,3 +216,7 @@ Docstring lines only, no expectation changed:
 
 No other W1-50 case reads git's own clean merge of a both-changed acceptance test through the check or through
 `judge_commits`.
+
+## Revisions
+
+- `conftest.py` folded into the support module: its fixtures and helpers into `w2_72_support.py`, the import path it set up into the top of each test module. Rewrite-Reason: DEC-880 (W2-66's KPI 12 case). No expectation changed.
