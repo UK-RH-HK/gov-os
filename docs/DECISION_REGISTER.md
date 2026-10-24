@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.298 (the version table at the end of each section gives the history)
+**Version:** 0.299 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10758,7 +10758,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 298. W2-65's run 1 packages (register v0.298, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-913 — W2-65: the kernel template's three hook lines map exits as the template's source does; W1-27's doctor fixture gets the kernel's canary declarations; its merge-back is judged by DEC-912
-- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; the owner's acceptance is asked, before the W2-59 + W2-65 merge) · **Under:** DEC-880 item 3, DEC-608, DEC-835, DEC-912, DEC-906, DEC-802, DEC-884 · **Basis:** W2-65's run 1 return (`log/W2-65-A5-run1.json`, branch head `20d72c19`), three packages.
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; **accepted by the owner, 2026-10-24, in the chat**: the kernel template's three hook lines take the stricter, fail-closed form, which is W2-65's purpose and what adopted projects must inherit; W1-27's fixture gets the kernel's canary declarations, with no expectation lowered; the untracked `pytest-of-usain/` in W2-65's worktree stays and goes with the worktree after W2-65's close) · **Under:** DEC-880 item 3, DEC-608, DEC-835, DEC-912, DEC-906, DEC-802, DEC-884 · **Basis:** W2-65's run 1 return (`log/W2-65-A5-run1.json`, branch head `20d72c19`), three packages.
   - **P-W2-65-1:** the engineer made `template/.rulesync/hooks.jsonc`'s preToolUse and two containment lines map any exit other than 0 or 2 to 2 (DEC-880 item 3). DEC-608 holds those lines to the kernel template's form exactly (`template/governance/kernel/settings.json`), which is outside the ticket's paths, so six W1-38 equality cases are red and the kernel template keeps the fail-open lines. Ordinary work: yes; fails open (in the kernel template).
   - **P-W2-65-2:** W2-65's merge-back `4ef3293a` is git's own clean merge of two test designers' W1-26 edits; W1-01's two cases were red at its verification (17:00 to 17:52), before W2-70's round 2 merged (`3ff8ba51`).
   - **P-W2-65-3:** W2-59's canaries read the project's own declarations (DEC-835); W2-67's revised W1-27 doctor case builds a project with none, so `test_doctor_report_mentions_canaries` is red on the merged head. The behaviour fails closed; a fixture gap.
@@ -10774,3 +10774,4 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.298 | 2026-10-24 | Delegated (orchestrator, DEC-102; the owner's acceptance asked): DEC-913 (W2-65's run 1: the kernel template's three hook lines join its paths and take the template's form, stricter only; its merge-back judged by DEC-912, no exemption; W1-27's doctor fixture named for its test designer; rows W2-L427 to W2-L429). Next free id: DEC-914. |
+| 0.299 | 2026-10-24 | Owner: DEC-913 accepted (status line marked; recorded by the orchestrator, DEC-861). Next free id: DEC-914. |
