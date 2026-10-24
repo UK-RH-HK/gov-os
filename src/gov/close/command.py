@@ -219,7 +219,7 @@ def run(root: Path, args, config: dict):
     gate(_check_containment, root, commits)
     if kind == _gates.SPECIFICATION_CLASS:
         gate(_gates.check_specification, root, ticket)
-    evidence = gate(_gates.check_evidence, root, ticket, front) if kind in _gates.EVIDENCE_CLASSES else None
+    judged_on = gate(_gates.check_evidence, root, ticket, front) if kind in _gates.EVIDENCE_CLASSES else None
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end, in parallel, and the cases the project declares
     # as serial-only afterwards (DEC-527); ``test_runs`` are the runs as they were made.
@@ -263,7 +263,7 @@ def run(root: Path, args, config: dict):
     }
     record.update(checked)
     record.update(reds or {})
-    judged = _judged_by(kind, evidence, accepted_probes, disk)  # what this close judged besides its tests
+    judged = _judged_by(kind, judged_on, accepted_probes, disk)  # what this close judged besides its tests
     record.update(judged)
     record[SHARE_KEY] = dict.fromkeys(SHARE_PARTS, NOT_MEASURED)
     record["created"] = _now()  # one time of the record, whether or not it is written again with its share
@@ -288,12 +288,13 @@ def run(root: Path, args, config: dict):
             _evidence.KEY: evidence, **judged}
 
 
-def _judged_by(kind: str, evidence: list[str] | None, accepted_probes: dict, disk: dict) -> dict:
+def _judged_by(kind: str, judged_on: list[str] | None, accepted_probes: dict, disk: dict) -> dict:
     """What the close record and the answer state of the gates of W2-07: the ticket's class, the evidence it was
-    judged on, the decisions that accepted a failed probe's findings, the disk's reading."""
+    judged on (``class_evidence``: ``evidence`` is the regression's evidence block, W2-66), the decisions that
+    accepted a failed probe's findings, the disk's reading."""
     judged = {"ticket_class": kind or "implementation", "disk": disk}
-    if evidence is not None:
-        judged["evidence"] = evidence
+    if judged_on is not None:
+        judged["class_evidence"] = judged_on
     if accepted_probes:
         judged["probe_accepted_by"] = accepted_probes
     return judged

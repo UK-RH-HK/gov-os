@@ -32,3 +32,11 @@ def test_a_missing_file_states_nothing_and_the_block_counts_its_skips(tmp_path):
     block = evidence.block(plan, runs, ["one.xml", "two.xml"])
     assert block["skip_count"] == 2 and block["failures"] == [{"test": "c", "text": "x"}]
     assert block["junit_xml"] == ["one.xml", "two.xml"] and block["scope"] == "scoped"
+
+
+def test_the_paths_a_class_is_judged_on_do_not_take_the_evidence_blocks_key():
+    from gov.close.command import _judged_by
+
+    judged = _judged_by("research", ["docs/research/W9/EXP-w9.md"], {}, {"state": "ok"})
+    assert evidence.KEY not in judged and judged["class_evidence"] == ["docs/research/W9/EXP-w9.md"]
+    assert "class_evidence" not in _judged_by("implementation", None, {}, {"state": "ok"})
