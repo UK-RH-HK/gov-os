@@ -816,7 +816,9 @@ def _move_commits(root: str, old: str, new: str) -> list:
     appear (repair 7); a merge commit lists only its own change, as
     ``read_merge`` reads it (DEC-269; DEC-394, DP-18; DEC-403): the
     paths where it differs from a parent and no other parent brought,
-    and the acceptance tests two parents both changed (DEC-410, DP-24).
+    and the acceptance tests two parents both changed (DEC-410, DP-24),
+    of which ``_judge_commit`` then leaves out those git's own merge of
+    the parents writes as the merge commit holds them (DEC-918).
 
     Everything is separated by NUL, the one byte no trailer and no file
     name can hold, and nothing is unquoted.  The token after a commit's
@@ -974,6 +976,52 @@ def _lifted(root, commit, path, head, decide_fn, closes):
         return ""
 
 
+def _git_merged(root, commit, closes) -> set:
+    """The acceptance tests among the merge commit's own paths that are
+    not its own change by DEC-918: both parents changed the path against
+    their one merge base, and the merge commit holds exactly the entry
+    (blob and mode, or absence) that git's own merge of the two parents
+    (``git merge-tree --write-tree``) writes for it, with no conflict on
+    it.
+
+    Empty where it cannot be shown: an octopus merge, parents with
+    several merge bases or none, a merge-tree that fails or whose output
+    cannot be read.  At most five git processes, counted against
+    ``_LIFT_PROCESSES``, and none for a merge commit with no own
+    acceptance test.
+    """
+    parents = list(dict.fromkeys(commit[1]))
+    acc = {p for p in commit[4] if p.startswith(ACCEPTANCE + "/")}
+    if len(parents) != 2 or not acc:
+        return set()
+
+    def git(*args, ok=(0,)):
+        closes[_LIFT_LEFT] = closes.get(_LIFT_LEFT, _LIFT_PROCESSES) - 1
+        if closes[_LIFT_LEFT] < 0:
+            raise _GitError("too many git processes for the lifts")
+        return _git(root, *args, ok=ok)
+
+    def changed(a, b):
+        return set(git("diff-tree", "-r", "-z", "--name-only", "--no-renames",
+                       "--ignore-submodules=none", a, b).split("\0"))
+
+    try:
+        bases = git("merge-base", "--all", *parents, ok=(0, 1)).split()
+        if len(bases) != 1:
+            return set()
+        acc &= changed(bases[0], parents[0]) & changed(bases[0], parents[1])
+        if not acc:
+            return set()
+        # The tree id, then the conflicted paths; exit 1 is a conflict.
+        out = git("merge-tree", "--write-tree", "--no-messages", "-z",
+                  "--name-only", *parents, ok=(0, 1)).split("\0")
+        if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", out[0]):
+            return set()
+        return acc - set(out[1:]) - changed(out[0], commit[0])
+    except (_GitError, _NotARepo, ValueError):
+        return set()
+
+
 def _judge_commit(root, commit, role, tid, sub, orch_own, head,
                   decide_fn, closes, lift=True):
     """``(paths, why)`` when *commit* of a forward move is a finding,
@@ -983,9 +1031,17 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
     own ``Role`` and ``Task`` trailers; in any other call it is judged
     against the caller, and another role's trailer is a finding
     (DEC-319, DEC-327).
+
+    An acceptance test a merge commit holds exactly as git's own merge
+    of its parents writes it (``_git_merged``) is not judged at all,
+    neither as the merge commit's own change nor against the scope
+    (DEC-918).
     """
     from gov.guard.decide import (
         FREEZE_FLAG, _load_ticket, _path_allowed)
+    if len(commit[1]) > 1:
+        same = _git_merged(root, commit, closes)
+        commit = (*commit[:4], [p for p in commit[4] if p not in same])
     sha, _, roles, tasks, paths = commit
     rr = os.path.realpath(root)
 
