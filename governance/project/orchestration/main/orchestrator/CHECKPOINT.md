@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-23 10:37 BST — review point passed (DEC-899..901); W2-66, W2-07, W2-69 IN FLIGHT; ACT pending: owner commits A and B, install, cleanup; next free DEC-902)
+## RESUME HERE (2026-10-24 08:40 BST — W2-07, W2-70, W2-67 r1 merged; W2-66 run 2 and W2-69's last round queued; next free DEC-910)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -34,104 +34,40 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`.
 - **Supersession (DEC-866):** mark at once, sweep by id and value.
 
-### Plan in force (DEC-896, DEC-897, DEC-899, DEC-900)
-- **Review point PASSED (DEC-899, `2f048613`).** Confirmed and committed, each ticket file with its Task:
-  - W2-66 `DAEO-c1uz` `eaabff01`; W2-07 `DAEO-r9ss` `6ec371c4`; W2-57 `DAEO-cy5o` (new) `e51689e5`;
-  - W2-70 `DAEO-uzme` (new, LITE) `a9aa5d55`; W2-68 + W2-67 cards `f4064457` (their ticket files when W2-66 merges);
-  - W2-13 `d48bdd92` + `120f6c72` (AR-9 ruled; quote fix); W2-14 `8c828e85`; W2-65 `d562ad04`; W2-69 `306d11c2`;
-  - MR-3 fixes `6a7995a5 b7bf96c8 230dc88a 2359abf0 b930ed41` (no tests/acceptance in an engineer's allowed_paths:
-    the test designer's files named in the body).
-- **IN FLIGHT (3 leads, started about 10:37 on `c2d539c6`):** W2-66 (`log/W2-66-A5-run1.json`), W2-07
-  (`log/W2-07-A5-run1.json`), W2-69 (`log/W2-69-A5-run1.json`). **W2-07 MERGES FIRST; then W2-66 merges integrate
-  back, re-verifies, fresh FULL probe** (owner exception to the overlap rule, DEC-899 item 2). W2-66 needs
-  pytest-timeout (owner install package, in the ACT ping). On each return: merge per §3, probe_impact, sync.
-- **First re-pin:** W2-58, W2-59, W2-65, W2-66, W2-07, W2-69 (W2-59 + W2-65 merge together just before it); the
-  settings regeneration drops `docs/source` read-deny rules (P-I1-2). Second: W2-68. Until then: no close unless
-  gates (a)-(h) predict a pass; DEC-897 (b); **the interim skip guard (DEC-899 item 7): close_queue.sh stops after a
-  close whose regression skip count is not 31, outputs uncommitted (`tools/skip_gate.py`)**.
-- **W2-58, W2-63 merged-not-closed, wait for the first re-pin.** W2-70 to start (LITE, test designer) in a slot.
-- **Owner acts DONE (10-23):** commits A `596870bd` + B `c9a08678` (Role: owner; accepted_reds EMPTY,
-  load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
-  `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
-  (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
-- **W2-69 run 1 returned PACKAGES (head `cfea8a26`):** the chance red fixed (rows read value by value, freed space
-  as backstop, pieces pinned by blank lines, compaction), 253/253 own cases, gov check green, W2-L373 done; review 2
-  (last, DEC-413) failed on F1': 10-14 KB key blocks missed at piece edges (fails open). **P1 `packages/
-  P-W2-69-R2-1.md` (`f47c3c47`) PINGED:** rec (a) one more round + one probe beyond DEC-413 (owner exception), with
-  P-3 (filter cases) and P-4 (two daemon cases to serial-only.txt by its designer). Its temp removed.
-- **W2-70 DONE and MERGED `efdc4188`** (tree == merge-tree; probe_impact 0): the two nested reruns retired; W1-01's
-  history and merge cases read `acceptance_exemptions` (owner commit C `18ad2382`); final run 15,476 passed, 0
-  failed; serial 262 passed. **W1-01's red has LEFT integrate.** Merged-not-closed: closes once W2-07 is pinned.
-  Rows W2-L417 (stale texts) + W2-L418 (W1-50 timing case) `7c3638c0`. Its temp removed.
-- **W2-07 run 2 returned PACKAGES (head `d2eee219`, batch of 196 green, gov check green):** 14 more W1-30 cases ->
-  **DEC-908 (delegated) `e4b745a6`** (ticket `2d32b7bb`; DEC-455/480/454 marked; row W2-L416); T3 = DEC-906 (W1-01
-  known; W2-70 also covers the merge case, `488972e4`). Its temp removed. **Run 3 QUEUED** (`log/W2-07-A5-run3.json`).
-- **Owner commit C MADE `18ad2382` (Role: owner; pushed with record/w2), was VALIDATED:** `drafts/ACT-owner-commit-C-2026-10-23.md`,
-  patch `OWNER-C-acceptance-exemption.patch` (applies to `488972e4`); pin readers pass; full run: 15,466 passed, 30
-  skipped, only W1-01's known red (`log/exemption-validation-2026-10-23.txt`). After it: tell W2-70 the entry is in.
-- **W2-67 round 1 returned PACKAGES (test design done, head `60f71c42`):** the launcher refused an engineer on a
-  test-designer ticket (my ticket-file slip). **DEC-907 (delegated) `82e86d54`** + ticket `a6af5bb1`: role engineer,
-  acceptance files in the body; the fixtures by a second fresh designer; conftest refuses per-run --basetemp (opt-out
-  GOV_ALLOW_BASETEMP=1); TD1B-B and TD2-A to the owner's DIGEST. Its temp removed (2.34M inodes). **Run 2 QUEUED**
-  (`log/W2-67-A5-run2.json`).
-- **DEC-906 (owner) `4bffc276`** on P-W1-01-H: STANDING: changes under tests/acceptance/ only by a test designer
-  (retirements too); only ratchet, accepted-history and acceptance_exemptions entries stay Role: owner commits; an
-  owner commit touching tests gets a full run first. W1-01's case reads `acceptance_exemptions` (exact shas), only
-  entry c9a08678 / DEC-900, via W2-70 (`83a3867e`; claimed `23518192`; lead QUEUED, `log/W2-70-A5-run1.json`).
-  **The entry's patch + validation RUNNING** (`tools/validate_exemption.sh`: pin readers + full run under the lock;
-  results `/tmp/gov-os-exempt/out/run.txt`, patch `drafts/OWNER-C-acceptance-exemption.patch`) -> then ACT ping.
-  Lock kept until W2-67 lands.
-- **DEC-905 `ac119c37`: the retention trial HELD** (peak 165,707 inodes / 0.91 GB vs 5.3M / 47 GB; failing test's
-  folder kept; 30 skips = rehearsal's). The option is the default (LEAD-common, nightly.sh, W2-66 KPI `bfddcb07`);
-  bridge cap ENDED; lock KEPT (delegated); TMPDIR kept short (a long one breaks W2-58's sandbox sockets).
-  **P1 `packages/P-W1-01-H.md` PINGED:** W1-01's MR-3 history case red on integrate since the owner's `c9a08678`
-  (my slip: B validated without the full regression). Rec (a): W2-70 widened to revise it (narrow owner-commit
-  exemption) + (c) future retirements as designer commits. Leads report it as known, not theirs.
-- **DEC-904 (owner) `6b496169`** on P-W2-07-A-B: retention trial (`tools/retention_trial.sh`, RUNNING, results in
-  `/tmp/gov-os-trial-retention/out/run.txt`; if it holds -> the option becomes the default for close, nightly, leads);
-  allow rule for a lead's own temp at the settings regeneration; bridge cap 6,000,000 / 60 GB per verification run,
-  ONE AT A TIME under `flock /tmp/gov-os-verify.lock` (nightly.sh + LEAD-common + trial use it); W2-67 forward
-  (`DAEO-9nys` `de2b5bf1`, claimed `f9cf898e`, round 1 lead QUEUED behind the gate, `log/W2-67-A5-run1.json`);
-  W2-07's batch widened (`3b5b04b5`); W2-07 run 2 QUEUED behind the gate (`log/W2-07-A5-run2.json`), then W2-66's
-  run 2 (verification after W2-07's). Both stopped runs' temps REMOVED after the holder re-check (disk 130 -> 75 GiB, inodes 8,057,115 -> 1,927,340).
-- **W2-07 run 1 returned PACKAGES (head `44062fec`, implementation complete, 40/40 own):** P1 `packages/P-W2-07-A-B.md`
-  (`17e5c3a9`), PINGED: A = the lead budget vs a full run (1,062,156 inodes at 13.6 %; rec (a) pytest
-  `-o tmp_path_retention_policy=failed` after a measured trial + (b) a 5,000,000 / 50 GB verification cap meanwhile
-  + (c) an allow rule for a lead to rm its own temp at the settings regeneration; I remove `/tmp/gov-os-lead-W2-07/`
-  on approval); B = widen W2-07's designer batch (W1-30 fixture green at gov check: 175; 20 gate-order cases; 1
-  repair-ticket case). C delegated (six readings, DEC-903).
-- **W2-66 run 1 returned PACKAGES (head `ba38ab8d`; tests 134, impl built):** its full run left 5,306,782 inodes /
-  47 GB in `/tmp/gov-os-lead-W2-66/` (addendum to P-W2-07-A-B `7df69957`: bridge cap 6,000,000 / 60 GB, one run at a
-  time; approve removing both leads' temps). P-W2-66-T1 decided as delegated **DEC-903** (`f4165cee`, ticket
-  `a0197576`: W1-39 overlay case for its designer; `src/gov/cli/errors.py`). Its next round: serial run, the report +
-  fixture trial (`briefs/eng-2.md` in its worktree), the review. At W2-66's merge: remove `test_inputs` from the path map.
-  W2-69 is still running and will meet A at its full verification.
-- **SWEEP lists 3 + 5 PENDING a quiet moment** (no `claude -p`, close, nightly or trial):
-  `python3 tools/sweep.py --apply --only pytest-runs,code-graph` (dry run: 49 + 10,118 would go; skips: <24 h,
-  held open, the 14 live roots' code-graph folders). Report what it skipped and why. Weekly sweep: Mondays.
-- **Later packages:** P-IS-13 when W2-32 starts (owner leans (a)); P-IS-9..12, 14, 15 before their tickets.
+### Plan in force (DEC-896..DEC-909)
+- **First re-pin:** W2-58, W2-59, W2-65, W2-66, W2-07, W2-69 (W2-59 + W2-65 merge together just before; settings
+  regeneration drops `docs/source` read-deny rules and adds a lead's own-temp allow rule). Second: W2-68. Until the
+  first: no close unless gates (a)-(h) predict a pass; DEC-897 (b) one proven re-run; the interim skip guard (31).
+- **Merged, not closed:** W2-58, W2-63, W2-70 (`efdc4188`), W2-07 (`2a9d1a11`), W2-67 round 1 (`4da40b60`).
+- **In flight:** W2-66 run 2 (merges integrate WITH W2-07, keeps both sides of `command.py`; W1-39 case; the
+  retention KPI; report + fixture trial; fresh FULL probe; `log/W2-66-A5-run2.json`). W2-69 run 2, its LAST round
+  (DEC-909: key blocks whole up to 24 KB; filter cases; two serial cases; a further fail-open finding = package, no
+  fourth round; `log/W2-69-A5-run2.json`). W2-67 rounds 2 (after W2-66 merges: W1-30 13 cases + unit close nested
+  runs + rows W2-L420, F4 guard) and 3 (after W2-69: W2-50 cases); its next designer removes the untracked
+  `tests/acceptance/W1-27/w2_67_td4_plant.py` in its worktree.
+- **At W2-66's merge:** remove `test_inputs` from the path map (DEC-903 item 4), record edit.
+- **Standing (summary):** full runs pass `-o tmp_path_retention_policy=failed` under `flock /tmp/gov-os-verify.lock`
+  (DEC-905; lock until W2-67 lands, DEC-906); changes under tests/acceptance/ only by test designers (DEC-906); owner
+  Role: owner commits = ratchet, accepted_history, acceptance_exemptions entries, validated first with a full run;
+  remove each returned lead's temp folder after a holder check (DEC-904 item 2); weekly sweep (DEC-902; lists 3 + 5
+  still to run in a quiet moment: `tools/sweep.py --apply --only pytest-runs,code-graph`).
 
-### Where things stand (10-23 10:37)
-- **Owner pushed through `18ad2382` (w2/integrate) and record/w2 (10-23).** Since then all of DEC-893..DEC-901 and the commits above (unpushed).
-- **Closed (gov close):** W2-01 (tk), W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed /
-  2 merged-not-closed / 10 built and held / 3 in flight / 39 not started, of 60 (58 + W2-69, added 10-22 and
-  missed in two reports' totals, + W2-70; W2-57, W2-67, W2-68 were cards already counted); keystones 0 / 8 / 1.
-- **Lens H's raw files archived** `record/w2` `f8525d6a` (main/evidence/lens-H, sha256 in its README); the share's
-  README + SHA256SUMS `9e9c5768`; every share file has a committed original; **the share DELETED**.
-- **My slips today, fixed:** W2-13's KPI unquoted colon (ticket schema red) and five MR-3 paths (core-mutation red),
-  both from committing with core-schema only; record_checks.sh now runs W1-08's ticket test. Run the FULL
-  record_checks.sh before every ticket commit.
-- **Disk:** 332 GB used, 30.4M inodes. Inventory: `scratchpad/disk-inventory.tsv` (+ disk_inventory2.py output).
-- **Candidate rows:** W1-38's two rulesync cases red under load (W2-50 run 9); the inode exhaustion of 10-22.
-- **Trials:** redo trial d in a quiet window, then REMOVE /tmp/gov-os-tooltrial and show it.
-- **Path map placeholder:** the W1-38 load_sensitive reason's time (real: between 00:12 and 00:16 on 10-22).
-- **`.git/config.lock`:** leave alone. **W2-48's worktree** to remove after a sync (branch kept, `2c3c46b5`).
+### Where things stand (10-24 08:40)
+- **Owner pushed through `18ad2382`** (commit C). Since: DEC-907 `82e86d54`, DEC-908 `e4b745a6`, DEC-909 `5ee86abf`,
+  the W2-70 / W2-07 / W2-67 merges, rows `7c3638c0` `a00ae32d`, tickets `a6af5bb1` `2d32b7bb` `488972e4` `9394c4fa`,
+  packages P-W2-69-R2-1 `f47c3c47`.
+- **Closed:** W2-01, W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed / 5 merged-not-
+  closed / 10 built and held / 3 in flight (W2-66, W2-69, W2-67) / 36 not started, of 60; keystones 0 / 8 / 1.
+- **Owner's digest items:** P-W2-67-TD1B-B (pinned version local label), P-W2-67-TD2-A (CIT-E per readiness change).
+- **Disk:** check with `df -i /`; leads' temps removed on return; the sweep's lists 3 + 5 pending.
+- **Credentials:** only two tracked fixtures (W2-M398). **`.git/config.lock`:** leave alone.
 
 ### Next
-1. Owner's ACT: the two commits (A then B), the install, the cleanup approval. After A and B: record checks.
-2. Lead returns: W2-07 first -> merge; W2-66 -> merge back + fresh probe; W2-69 -> merge. probe_impact each.
-3. W2-70's lead in a free slot; the nightly in a quiet window; the daily digest.
-4. Next free: DEC-903; ticket W2-71; rows W2-M406, W2-L416, W2-H063.
+1. On W2-66's return: merge (after W2-07, done), probe_impact, test_inputs removal; then the re-pin's ladder.
+2. On W2-69's return: DONE -> merge; PACKAGES -> to the owner (no fourth round).
+3. Then W2-67 round 2; W2-59 + W2-65 together; the re-pin ACT.
+4. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
+5. Next free: DEC-910; ticket W2-71; rows W2-M406, W2-L422, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2

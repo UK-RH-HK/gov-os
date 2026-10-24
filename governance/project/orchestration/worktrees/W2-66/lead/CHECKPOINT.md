@@ -1,5 +1,18 @@
 # W2-66 (DAEO-c1uz) lead checkpoint
 
+## RUN 2 (2026-10-24) — current state
+- Start: ba38ab8d, clean. Identity orchestrator/DAEO-c1uz checked.
+- Step 1 DONE: merge 03f470a5 (w2/integrate 4da40b60 into w2/W2-66), trailers Task/Implements DEC-899/Role orchestrator/Co-Authored-By.
+  Tree 8bbbe2b4 = merge-tree 88c7f617 except src/gov/close/command.py = recorded resolution blob 612ff57d
+  (.gov-runtime/scratch/lead/merge/resolved.py; conflict.py has the 5 diff3 hunks; all resolved keeping both sides).
+  Containment flagged the merge's own change to tests/acceptance/W1-30/test_w1_30_close.py (git's auto-merge of both sides).
+- LEFT FOR eng-2 (semantic clash, not a textual conflict): run() has two locals named `evidence`
+  (W2-07's check_evidence list at the class gate; W2-66's `evidence = _scope_evidence(root, scope)` overwrites it before
+  `_judged_by(kind, evidence, ...)`), and both write record/answer key "evidence" (_evidence.KEY; _judged_by's
+  judged["evidence"], applied after). W2-07's card: "W2-66 writes the record's evidence lines, W2-07 the gates".
+  No test on integrate reads W2-07's record key "evidence".
+- Next: td-2 (W1-39 overlay case DEC-903, retention KPI DEC-905), eng-2, verify, review A3 max.
+
 ## State: STOPPED on the scratch budget (DEC-898), returned PACKAGES (run 1)
 - Branch w2/W2-66, code head a384480a (eng-1), then the lead's checkpoint commit made at this stop (see git log).
 - Base c2d539c6. Commits: td-1 14cd488a, 32cd885f (W1-30, Rewrite-Reason), 4c22e4aa, 6c45acd6, c05a31a5, 967f6205;
