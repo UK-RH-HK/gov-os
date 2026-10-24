@@ -1,9 +1,10 @@
 ERROR: DAEO-9nys: .tickets/DAEO-9nys.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
 ERROR: DAEO-e8f0: .tickets/DAEO-e8f0.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+ERROR: DAEO-ye2a: .tickets/DAEO-ye2a.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
 ERROR: DAEO-1ahb: mandatory input 'DEC-902' not found in the store
 ERROR: DAEO-c1uz: mandatory input 'DEC-912' not found in the store
 ERROR: DAEO-e82f: mandatory input 'DEC-917' not found in the store
 ERROR: DAEO-r9ss: mandatory input 'DEC-903' not found in the store
 ERROR: DAEO-rmbe: mandatory input 'DEC-909' not found in the store
 ERROR: DAEO-uzme: mandatory input 'DEC-906' not found in the store
-context-reproducibility: 0 ticket(s) failed, 8 error(s)
+context-reproducibility: 0 ticket(s) failed, 9 error(s)
