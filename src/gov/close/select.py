@@ -7,7 +7,8 @@ base, the newest commit a green record names that is ``HEAD`` or an ancestor of 
 
 Anything unknown or unreadable widens to the full regression, never less: a changed path under the shared core
 (``SHARED_CORE``), one nothing places (``UNPLACED``), a test map that is missing or invalid
-(``TEST_MAP_MISSING``, ``TEST_MAP_UNREADABLE``), no base (``BASE_UNKNOWN``) and ``--full`` (``FULL_ASKED``).
+(``TEST_MAP_MISSING``, ``TEST_MAP_UNREADABLE``), a selected map target the head does not hold
+(``UNRESOLVED_TARGET``, DEC-912 item 3), no base (``BASE_UNKNOWN``) and ``--full`` (``FULL_ASKED``).
 
 The selection keeps the full run's form: ``pytest tests`` with ``--ignore=`` for what is left out and
 ``--deselect=`` where a target is finer than a file.
@@ -271,6 +272,59 @@ def _helper_reach(root: Path, suites: list[str], changed_paths: list[str]) -> di
 
 
 # ---------------------------------------------------------------------------
+# The map's targets at the head
+# ---------------------------------------------------------------------------
+
+def unresolved(root: Path, targets: list[str]) -> list[tuple[str, str]]:
+    """``(target, detail)`` for each target the tree closed (``HEAD`` as committed) does not hold: ``FILE_GONE``
+    where its file or folder is not there, ``CASE_GONE`` where its file is there and holds no case its node id
+    names, or cannot be read as Python. A node id (or its beginning) resolves through the names its file defines:
+    ``f::test_x[p]``, ``f::test_x``, ``f::TestC`` and ``f::TestC::test_m``."""
+    if not targets:
+        return []
+    files = set(filter(None, _git(root, "-c", "core.quotePath=false", "ls-tree", "-r", "-z", "--name-only",
+                                  "HEAD").split("\0")))
+    found = []
+    for target in targets:
+        path, _, case = target.partition("::")
+        path = _norm(path)
+        if path not in files and not (not case and any(f.startswith(path + "/") for f in files)):
+            found.append((target, "FILE_GONE"))
+        elif case and not _holds(_committed(root, path), [re.sub(r"\[.*\]$", "", n) for n in case.split("::")]):
+            found.append((target, "CASE_GONE"))
+    return found
+
+
+def _committed(root: Path, path: str) -> ast.Module | None:
+    """The file as ``HEAD`` holds it, parsed; None where it cannot be read or parsed."""
+    try:
+        return ast.parse(_git(root, "show", f"HEAD:./{path}", ok=(0, 128)))
+    except (UnicodeDecodeError, SyntaxError, ValueError):
+        return None
+
+
+def _holds(node, names: list[str]) -> bool:
+    """Whether ``node``'s body defines ``names[0]``, and that definition, a class, ``names[1:]`` in turn."""
+    if node is None:
+        return False
+    for child in getattr(node, "body", []):
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and child.name == names[0]:
+            return len(names) == 1 or (isinstance(child, ast.ClassDef) and _holds(child, names[1:]))
+        if len(names) == 1 and names[0] in _bound(child):
+            return True
+    return False
+
+
+def _bound(node) -> set[str]:
+    """The names a statement binds other than by ``def`` or ``class``: assignments and imports."""
+    if isinstance(node, (ast.Import, ast.ImportFrom)):
+        return {(a.asname or a.name).split(".")[0] for a in node.names}
+    targets = node.targets if isinstance(node, ast.Assign) else [node.target] if isinstance(node, ast.AnnAssign) \
+        else []
+    return {t.id for t in targets if isinstance(t, ast.Name)}
+
+
+# ---------------------------------------------------------------------------
 # The plan
 # ---------------------------------------------------------------------------
 
@@ -317,6 +371,11 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False, ticket: str | None =
             or any(_any(p, c["paths"]) for c in couplings) or any(t[4] and _any(p, t[2]) for t in tickets))]
         if unplaced:
             why_full.append({"reason": "UNPLACED", "paths": unplaced})
+        # DEC-912 item 3: a selected map target the tree closed does not hold (renamed or gone) runs everything
+        mapped = [t for c in couplings if any(_any(p, c["paths"]) for p in paths) for t in c["suites"]]
+        mapped += list(test_map.get("every_close") or []) + list(test_map.get("record_reading") or [])
+        why_full.extend({"reason": "UNRESOLVED_TARGET", "target": target, "detail": detail}
+                        for target, detail in unresolved(root, list(dict.fromkeys(mapped))))
 
     if why_full:
         select(FULL_TARGET, {"reason": "FULL"})

@@ -118,6 +118,38 @@ def test_the_shared_core_an_unplaced_path_and_full_asked_widen_to_the_full_run(r
     assert plan["tmp_path_retention_policy"] == "failed"
 
 
+def test_a_selected_target_the_head_does_not_hold_widens_and_one_not_selected_widens_nothing(repo):
+    gone = {"paths": ["data/gone.txt"], "suites": ["tests/acceptance/W1-gone/"], "why": "never reached"}
+    test_map = {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py::test_zz[p]"],
+                "couplings": MAP["couplings"] + [gone]}
+    _green(repo, _project(repo, test_map))
+    repo.commit("work", files={"src/a/x.py": "x = 2\n"})
+    assert select.plan(repo.root, "W1-own")["scope"] == "scoped"  # a parameter set is its function; W1-gone unreached
+    repo.git("rm", "-q", "tests/acceptance/W1-cc/test_cc.py")
+    repo.commit("rename", files={"tests/acceptance/W1-rr/test_rr.py": "def test_reads_renamed():\n    pass\n",
+                                 "data/t.txt": "u\n"})
+    (repo.root / "tests/acceptance/W1-cc").mkdir()
+    (repo.root / "tests/acceptance/W1-cc/test_cc.py").write_text("def test_cc():\n    pass\n")  # not committed
+    plan = select.plan(repo.root, "W1-own")
+    assert plan["scope"] == "full" and _targets(plan)["tests"] == ["FULL"]
+    assert plan["why_full"] == [
+        {"reason": "UNRESOLVED_TARGET", "target": "tests/acceptance/W1-cc/", "detail": "FILE_GONE"},
+        {"reason": "UNRESOLVED_TARGET", "target": "tests/acceptance/W1-rr/test_rr.py::test_reads", "detail": "CASE_GONE"}]
+
+
+def test_a_node_id_resolves_through_what_its_committed_file_defines(repo):
+    repo.commit("base", files={"t/test_f.py": "import os\n\nclass TestC:\n    def test_m(self):\n        pass\n\n"
+                                              "def test_x():\n    pass\n\ntest_y = test_x\n",
+                               "t/test_bad.py": "def test_x(:\n"})
+    ids = ["t/test_f.py", "t/", "t/test_f.py::TestC", "t/test_f.py::TestC::test_m", "t/test_f.py::TestC::test_m[a-b]",
+           "t/test_f.py::test_x[1]", "t/test_f.py::test_y", "t/test_f.py::TestC::test_x", "t/test_f.py::test_m",
+           "t/test_f.py::test_x::test_m", "t/test_bad.py::test_x", "t/test_bad.py", "t/test_g.py::test_x", "u/"]
+    assert select.unresolved(repo.root, ids) == [
+        ("t/test_f.py::TestC::test_x", "CASE_GONE"), ("t/test_f.py::test_m", "CASE_GONE"),
+        ("t/test_f.py::test_x::test_m", "CASE_GONE"), ("t/test_bad.py::test_x", "CASE_GONE"),
+        ("t/test_g.py::test_x", "FILE_GONE"), ("u/", "FILE_GONE")]
+
+
 def test_a_moved_file_is_in_the_change_at_both_its_paths(repo):
     _green(repo, _project(repo))
     repo.git("config", "diff.renames", "true")  # rename detection asked for by the repository is not followed
