@@ -60,6 +60,10 @@ NOT_REACHED = "NOT_REACHED"
 # Why a close ran the full regression.
 FULL_ASKED, SHARED_CORE, UNPLACED, TEST_MAP_MISSING, TEST_MAP_UNREADABLE, BASE_UNKNOWN = (
     "FULL_ASKED", "SHARED_CORE", "UNPLACED", "TEST_MAP_MISSING", "TEST_MAP_UNREADABLE", "BASE_UNKNOWN")
+# A selected test-map target that does not resolve at the head, and why it does not (README, "Interface", items 3
+# and 6; DEC-912 item 3): its file is not in the tree closed, or its file holds no case its node id names.
+UNRESOLVED_TARGET = "UNRESOLVED_TARGET"
+FILE_GONE, CASE_GONE = "FILE_GONE", "CASE_GONE"
 
 FULL_OPTION = "--full"
 CHECK_RESULT_OPTION = "--check-result"

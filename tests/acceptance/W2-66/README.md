@@ -92,8 +92,18 @@ the full regression, never less.
    `acceptance_tests.path` (DEC-892; W2-67, W2-63 and W2-70 declare `tests/acceptance/W1-27/`, `W1-49/` and
    `W1-05/`), else `tests/acceptance/<wbs_id>/`; a ticket **has a suite** when that folder holds a test file
    (`test_*.py`). The closing ticket's own suite is its suite: `selected` names that folder with `OWN`, and none
-   of its files is in `left_out` (the acceptance run runs it whole). Every target `selected` names exists in the
-   tree closed. It runs: `tests/unit`; the suite of each ticket (any wave) whose `allowed_paths` match a changed
+   of its files is in `left_out` (the acceptance run runs it whole). **A selected test-map target that does not
+   resolve at the head widens the run** (DEC-912 item 3): the targets of `record_reading` and `every_close` are
+   selected on every close, a coupling's `suites` when one of its `paths` matches a changed path. A target
+   **resolves** when the tree closed holds it: a folder or a file, that path; a node id (or its beginning), its
+   file, holding the case the id names or begins: the function or class named after the file, the method named
+   after a class, a parameter set (`[…]`) read as its function (`f::test_x[p]`, `f::test_x`, `f::TestC`,
+   `f::TestC::test_m` each resolve when `f` defines what they name). A selected target that does not resolve (its
+   file or test function renamed or gone) runs the full regression, `UNRESOLVED_TARGET` naming it (item 6):
+   `FILE_GONE` when its file (or folder) is not in the tree closed, `CASE_GONE` when its file is there and holds
+   no case its node id names. A coupling whose `paths` match no changed path is not selected: its targets,
+   resolved or not, widen nothing. So every target a scoped run's `selected` names exists in the tree closed.
+   It runs: `tests/unit`; the suite of each ticket (any wave) whose `allowed_paths` match a changed
    path (`OVERLAP` naming that ticket, whatever folder its suite is); a suite holding
    a changed file; a suite that imports a helper module of a suite whose folder holds a changed file, directly or
    through another helper (imports read from the test files: `sys.path` folders of other suites and `import x`);
@@ -114,8 +124,12 @@ the full regression, never less.
    close (the same object), and under `error.details.evidence` of a refused close (as `test_runs` is today).
    No change to `close.schema.json` (W2-64's line). Fields:
    - `scope`: `scoped` or `full`; `why_full`: list of `{reason, paths?}` with `reason` one of `FULL_ASKED`,
-     `SHARED_CORE`, `UNPLACED`, `TEST_MAP_MISSING`, `TEST_MAP_UNREADABLE`, `BASE_UNKNOWN` (`paths` names the
-     changed paths for `SHARED_CORE` and `UNPLACED`); empty or absent for a scoped run.
+     `SHARED_CORE`, `UNPLACED`, `TEST_MAP_MISSING`, `TEST_MAP_UNREADABLE`, `BASE_UNKNOWN`, `UNRESOLVED_TARGET`
+     (`paths` names the changed paths for `SHARED_CORE` and `UNPLACED`); empty or absent for a scoped run.
+     `UNRESOLVED_TARGET`'s entry is `{reason: UNRESOLVED_TARGET, target, detail}`, one for each selected target
+     that does not resolve (item 3): `target` the target as the test map names it, character for character;
+     `detail` `FILE_GONE` (its file or folder is not in the tree closed) or `CASE_GONE` (its file is there and holds
+     no case its node id names). Beside other reasons, if any.
    - `base` (full commit id or `null`), `head` (full commit id), `tree` (`HEAD^{tree}`), `changed` (list of paths).
    - `selected`: list of `{target, why: [{reason, …}]}`, one for each target run, the own suite included. Reasons:
      `OWN`; `UNIT`; `OVERLAP` with `ticket` and `paths` (the changed paths its `allowed_paths` hold);
@@ -228,6 +242,19 @@ it is placed and runs scoped); **(m)** a case left out by `--deselect` is named 
 | S2 + F1 a path only suiteless tickets hold is unplaced (Interface item 3) | `test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression` (one close: one ticket declares its WBS id's folder, which does not exist; one declares a folder with a README and no test) | (k) |
 | S2 + F1 the conftests above every suite are shared core; S3 conftests loaded by file path are couplings (Interface item 1) | `test_w2_66_live_test_map.py::test_a_conftest_every_run_of_the_suites_loads_is_shared_core[tests/conftest.py]`, `[tests/acceptance/conftest.py]`; `::test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it[W1-07]`, `[W1-25]`, `[W1-27]` | (l); `[W1-27]` is green on the built head (its suite folder holds the file that loads it) |
 | S6 + F2 every case left out by deselection named (Interface item 6) | `test_w2_66_deselected_cases.py::test_a_case_left_out_by_deselection_is_named_with_why` (the fixture's every-close target is one case of a file with two) | (m) |
+
+### Part 5 — the second FULL review (DEC-912 item 3: P1, P2; described behaviours, DEC-136)
+
+Written by a fresh test designer after the implementation was built, from the second review's described behaviours
+and the two KPI lines DEC-912 item 3 added (S14 and S15, the ticket's last two success lines); no implementation
+read. Expected red reason on the built head `02b62e033a10`: **(n)** a selected test-map target that does not
+resolve is still named under `selected`, runs nothing, and the close stays `scoped`: `scope` is `scoped`,
+`why_full` names no `UNRESOLVED_TARGET`, and the renamed case or file is left out, so a red it would catch passes
+the close.
+
+| KPI line | Tests | Red on the built head |
+|---|---|---|
+| S14 + F1 a selected target (record-reading, every-close or coupling) that cannot be resolved at the head widens the run to the full regression; the record names the target and the reason (Interface items 3 and 6) | `test_w2_66_unresolved_targets.py` (8): `::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed]`, `[renamed-longer]` (the map names one case by its node id; the function is renamed, the file stays: `CASE_GONE`; `renamed-longer`'s new name begins with the old one as text, not at a node id's boundary); `::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression` (`FILE_GONE`); `::test_a_renamed_coupling_target_widens_the_run_to_the_full_regression` (the change touches the coupled path: `FILE_GONE`); the effect on the outcome: `::test_a_red_the_renamed_record_reading_case_catches_refuses_the_close` (a record-only commit breaks the register), `::test_a_red_the_renamed_coupled_file_catches_refuses_the_close` (the change breaks the coupled data); only a *selected* target counts: `::test_a_gone_coupling_target_the_change_does_not_reach_widens_nothing`; a target that resolves changes nothing: `::test_selected_targets_that_resolve_change_nothing` (a class's method, one parameter set, a parametrised function, a class) | (n): the first four "the run is not stated full: scope 'scoped'"; the two outcome cases "the renamed … did not run: the close passed a red it would catch"; the last two **green on the built head by design** (they turn red only if an unselected or resolving target widens the run) |
 
 ### Expected green on the base
 
