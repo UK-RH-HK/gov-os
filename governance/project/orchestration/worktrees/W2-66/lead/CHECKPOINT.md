@@ -70,7 +70,10 @@
   d3650169 (declared folder outside tests/ = no suite). +109/-18. 177 acceptance passed; unit/close 415; W2-07 40; W1-30 515;
   W2-01 88; W2-53 57; W1-07 223; W2-54 96p/1f (sandboxed worker case: API blocked in sandbox; lead's run decides). Tripwire 8 ok.
 - 5634d430: CP-DAEO-c1uz-0011 committed. Loop: converging (eng-4 answered review 1).
-- Next: rebuild-3 (running), collect, check, parallel-3, serial-3, rev-2 (LAST), probe record if pass, return PACKAGES (M1).
+- At 5634d430: rebuild-3 exit 0 (all recreated); collect-3 "16041/16043 tests collected (2 deselected) in 6.01s", no error;
+  check-3 exit 0 (same two YELLOWs); parallel-3: 2 failed (W1-01 x2 = M1), 15747 passed, 30 skipped, 1753 s (29:13),
+  load 7.15 at start; scratch 142,447 inodes peak sampled, 121,037 / 1.1G at end. serial-3: 262 passed in 916 s (15:15).
+- Next: rev-2 (briefs/rev-2.md, LAST, DEC-413, tripwire 9); probe record committed only if pass; return PACKAGES (M1).
 
 ## State: STOPPED on the scratch budget (DEC-898), returned PACKAGES (run 1)
 - Branch w2/W2-66, code head a384480a (eng-1), then the lead's checkpoint commit made at this stop (see git log).
