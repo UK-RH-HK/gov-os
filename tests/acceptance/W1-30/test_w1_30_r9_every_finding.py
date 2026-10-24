@@ -19,6 +19,17 @@ still reports what it could establish, here the red check.
 
 **Could not measure.** DEC-490 stands: a tree that is not its commit ends the run before anything is measured,
 however many findings the ticket holds (exit code 1, not counted, no repair ticket).
+
+**Revised for W2-07 (DEC-868 item 3; DEC-492 is changed by it, DEC-866).** The commit gates (the trailers, the
+probe gate) and the pre-close gate (``gov check``) now refuse at once, before any test, and spend no attempt;
+"every finding in one counted refusal" holds within the findings of the work (containment, the acceptance tests,
+the regression tests). So the combined refusal is of three findings of the work: the containment finding, the
+failing acceptance test and a failing regression test (the owner's), with every commit carrying its trailers and
+every check green. An early finding of a commit gate refuses at once, names its cause, runs no test (the failing
+acceptance test tells, into a folder outside the project, whenever it runs) and is not counted; it still opens
+its repair ticket. Containment is a finding of the work: it is still named beside the failing test. A ticket
+without acceptance tests and with a red check is refused first for the check, at once and not counted; once the
+check is green, the next close says the acceptance run was not measured.
 """
 
 import re
@@ -76,6 +87,35 @@ def _four_findings(project, sandbox):
     }
 
 
+REGRESSION = "tests/unit/test_reg_fail.py"
+REGRESSION_TEST = "test_reg_fail"
+
+
+def _findings_of_the_work(project, sandbox):
+    """The ticket with three findings of its work, checkpointed: a commit outside its paths, a failing
+    acceptance test and a failing regression test (the owner's). Every commit of the ticket carries its
+    trailers and every check is green, so no gate refuses first. Returns what names each in an answer."""
+    project.write("LICENSE", "A licence.\n")
+    project.write(REGRESSION, f"def {REGRESSION_TEST}():\n    assert False, 'planted regression failure'\n")
+    project.commit("the licence and a regression test", who=support.OWNER)
+    project.add_ticket(TICKET, WBS, allowed_paths=list(support.GOVERNANCE_TICKET_PATHS))
+    project.add_failing_test(WBS)
+    support.engineer_commit(project, TICKET, {FEATURE: "# feature\n", NOTES: "note: one\n"})
+    outside = _outside_the_paths(project)
+    support.checkpointed(project, TICKET)
+
+    judged = support.judged_by_w1_50(project, sandbox, support.ticket_commits(project.root, TICKET))
+    assert [(f["commit"], f["paths"]) for f in judged] == [(outside, [OUTSIDE])], \
+        f"the fixture is wrong: W1-50's judgement of the ticket's commits is {judged}"
+    red = support.red_hard_blocks(support.checks_at_head(project, sandbox))
+    assert red == [], f"the fixture is wrong: the red hard-block checks are {red}"
+    return {
+        "the containment finding": (outside[:7], OUTSIDE),
+        "the failing acceptance test": (FAILING_TEST,),
+        "the failing regression test": (REGRESSION_TEST,),
+    }
+
+
 def _missing(text, named):
     """The findings ``text`` does not name: every word of a finding must be in it."""
     return [finding for finding, words in named.items() if not all(word in text for word in words)]
@@ -95,7 +135,7 @@ def _refused_naming_all(project, sandbox, interface, named):
 
 def test_one_refusal_names_every_finding_of_the_ticket(project_with_checks, sandbox, interface):
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
-    named = _four_findings(project, sandbox)
+    named = _findings_of_the_work(project, sandbox)
 
     _refused_naming_all(project, sandbox, interface, named)
     support.assert_not_closed(project, TICKET)
@@ -103,18 +143,18 @@ def test_one_refusal_names_every_finding_of_the_ticket(project_with_checks, sand
 
 def test_the_refusal_for_several_findings_is_counted_once(project_with_checks, sandbox, interface):
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
-    named = _four_findings(project, sandbox)
+    named = _findings_of_the_work(project, sandbox)
 
     run = _refused_naming_all(project, sandbox, interface, named)
     assert support.iteration_count(project.root, TICKET) == 1, \
-        f"one refusal with four findings is counted {support.iteration_count(project.root, TICKET)} times\n" \
+        f"one refusal with three findings is counted {support.iteration_count(project.root, TICKET)} times\n" \
         f"{run.describe()}"
 
 
 def test_the_refusal_for_several_findings_opens_one_repair_ticket_that_lists_them_all(
         project_with_checks, sandbox, interface):
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
-    named = _four_findings(project, sandbox)
+    named = _findings_of_the_work(project, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
     support.refused(run, interface, support.EXIT_CHECK_FAILED)
@@ -128,41 +168,65 @@ def test_the_refusal_for_several_findings_opens_one_repair_ticket_that_lists_the
 # 2. Each early finding beside a failing acceptance test: both are named
 # --------------------------------------------------------------------------
 
-def _no_probe_record(project):
-    support.build_ticket(project, TICKET, WBS, failing=True, profile="FULL")
+def _telling_failing_test(project, told):
+    """The ticket's failing acceptance test, ``test_fail``, telling into ``told`` whenever it runs; written
+    before ``build_ticket``, which commits it with the ticket's passing test."""
+    project.write(f"tests/acceptance/{WBS}/{FAILING_TEST}.py",
+                  support.telling_test(FAILING_TEST, told, body="assert False, 'planted failure'"))
+
+
+def _no_probe_record(project, told):
+    _telling_failing_test(project, told)
+    support.build_ticket(project, TICKET, WBS, profile="FULL")
     assert not (project.root / "docs" / "probes" / TICKET).exists(), "the fixture is wrong: a probe record exists"
     return [re.compile("probe", re.IGNORECASE)]
 
 
-def _a_commit_without_implements(project):
-    support.build_ticket(project, TICKET, WBS, failing=True)
+def _a_commit_without_implements(project, told):
+    _telling_failing_test(project, told)
+    support.build_ticket(project, TICKET, WBS)
     bare = _without_implements(project)
     support.checkpointed(project, TICKET)
     return [re.compile(re.escape(bare[:7])), re.compile("Implements")]
 
 
-def _a_containment_finding(project):
-    support.build_ticket(project, TICKET, WBS, failing=True)
+def _a_containment_finding(project, told):
+    _telling_failing_test(project, told)
+    support.build_ticket(project, TICKET, WBS)
     outside = _outside_the_paths(project)
     support.checkpointed(project, TICKET)
     return [re.compile(re.escape(outside[:7])), re.compile(re.escape(OUTSIDE))]
 
 
+# The early findings that are commit gates (DEC-868 item 3): they refuse at once, before any test.
+COMMIT_GATES = (_no_probe_record, _a_commit_without_implements)
+
+
 @pytest.mark.parametrize("early", [_no_probe_record, _a_commit_without_implements, _a_containment_finding],
                          ids=["no-probe-record", "no-implements", "containment"])
-def test_an_early_finding_does_not_hide_the_failing_acceptance_test(early, project, sandbox, interface):
-    patterns = early(project)
+def test_an_early_finding_does_not_hide_the_failing_acceptance_test(early, project, sandbox, interface, tmp_path):
+    """Containment is a finding of the work: it is named beside the failing acceptance test, counted once. A
+    commit gate's finding is named alone: the close stops at once, runs no test and is not counted (DEC-868
+    item 3); its refusal still opens its repair ticket."""
+    told = tmp_path / "told"
+    told.mkdir()
+    patterns = early(project, told)
 
     run = support.run_close(project, sandbox, TICKET)
 
     text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
     for pattern in patterns:
         assert pattern.search(text), f"the answer does not name the early finding ({pattern.pattern})\n{run.describe()}"
-    assert FAILING_TEST in text, \
-        f"the answer names the early finding and not the failing acceptance test: the tests were not reached\n" \
-        f"{run.describe()}"
-    assert support.iteration_count(project.root, TICKET) == 1, \
-        f"the refusal is counted {support.iteration_count(project.root, TICKET)} times\n{run.describe()}"
+    if early in COMMIT_GATES:
+        assert support.told_by(told) == {}, \
+            f"a commit gate refused and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+        support.assert_nothing_counted(project, TICKET, run)
+    else:
+        assert FAILING_TEST in text, \
+            f"the answer names the early finding and not the failing acceptance test: the tests were not reached\n" \
+            f"{run.describe()}"
+        assert support.iteration_count(project.root, TICKET) == 1, \
+            f"the refusal is counted {support.iteration_count(project.root, TICKET)} times\n{run.describe()}"
     support.assert_dependent_repair_ticket(project, TICKET, run)
 
 
@@ -180,9 +244,22 @@ def _no_acceptance_tests_and_a_red_check(project, sandbox):
     assert red == [RED_CHECK], f"the fixture is wrong: the red hard-block checks are {red}"
 
 
+def _the_check_made_green(project, sandbox):
+    """The owner adds the licence the red check asks for, and the orchestrator checkpoints the new head: no
+    hard-block check is red at the commit being closed."""
+    project.write("LICENSE", "A licence.\n")
+    project.commit("the licence", who=support.OWNER)
+    support.checkpointed(project, TICKET)
+    red = support.red_hard_blocks(support.checks_at_head(project, sandbox))
+    assert red == [], f"the fixture is wrong: the red hard-block checks are {red}"
+
+
 def test_without_acceptance_tests_the_acceptance_run_is_said_as_not_measured(project_with_checks, sandbox, interface):
+    """The red check would refuse first, at once (DEC-868 item 3): it is made green, so the close reaches the
+    acceptance run."""
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
     _no_acceptance_tests_and_a_red_check(project, sandbox)
+    _the_check_made_green(project, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
 
@@ -195,25 +272,34 @@ def test_without_acceptance_tests_the_acceptance_run_is_said_as_not_measured(pro
 
 
 def test_without_acceptance_tests_the_governance_checks_are_still_reported(project_with_checks, sandbox, interface):
-    """The checks do not depend on the acceptance tests: the red check is a finding of the same run."""
+    """The checks do not depend on the acceptance tests: the red check is reported though the ticket has none.
+    It is the pre-close gate's finding, so it refuses at once and is not counted (DEC-868 item 3); once it is
+    green, the next close is refused for the missing acceptance tests and counted."""
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
     _no_acceptance_tests_and_a_red_check(project, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
 
     text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
-    assert "acceptance" in text.lower(), f"the answer does not name the missing acceptance tests\n{run.describe()}"
     assert RED_CHECK in text, \
         f"the answer does not name the red hard-block check {RED_CHECK}: the checks were not reached\n{run.describe()}"
+    support.assert_nothing_counted(project, TICKET, run)
+
+    _the_check_made_green(project, sandbox)
+    run = support.run_close(project, sandbox, TICKET)
+
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert "acceptance" in text.lower(), f"the answer does not name the missing acceptance tests\n{run.describe()}"
     assert support.iteration_count(project.root, TICKET) == 1, \
         f"the refusal is counted {support.iteration_count(project.root, TICKET)} times\n{run.describe()}"
 
 
 def test_a_measured_part_is_not_said_as_not_measured(project_with_checks, sandbox, interface):
-    """The other side: the four-finding ticket has acceptance tests and they ran, so nothing says of the
-    acceptance run that it was not measured. An answer that says it of every part, whatever ran, fails here."""
+    """The other side: the ticket with findings of its work has acceptance tests and they ran, so nothing says
+    of the acceptance run that it was not measured. An answer that says it of every part, whatever ran, fails
+    here."""
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
-    _four_findings(project, sandbox)
+    _findings_of_the_work(project, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
 

@@ -38,8 +38,18 @@ def test_every_failing_test_is_a_finding(tmp_path):
 
 
 def test_a_collection_error_is_a_finding(tmp_path):
-    findings, counts = _run_tests(tmp_path, _tests(tmp_path, test_a="def test_a(:\n"), 60)
+    """A run that meets one still names it; the close refuses on it before any run, in its pre-close gate's one
+    collection of every suite, naming the file it cannot collect (DEC-868 item 3)."""
+    from gov.close.command import _Finding
+    from gov.close.gates import check_collection
+
+    tests = _tests(tmp_path, test_a="def test_a(:\n")
+    findings, counts = _run_tests(tmp_path, tests, 60)
     assert findings and counts["errors"] >= 1
+    with pytest.raises(_Finding) as refused:
+        check_collection(tmp_path, [(tests, None)], 60)
+    assert refused.value.code == "COLLECTION_FAILED"
+    assert any(line.startswith("collect") and "tests/unit/test_a.py" in line for line in refused.value.findings)
 
 
 def test_a_run_over_the_time_limit_is_a_finding_not_an_error(tmp_path):

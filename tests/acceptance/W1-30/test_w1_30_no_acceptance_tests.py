@@ -12,6 +12,12 @@ ticket is opened.
 The projects are complete but for the tests: the orchestrator's ticket file and checkpoint, the engineer's
 commit with its trailers inside the ticket's paths. Every case holds first that the answer is about the
 acceptance tests.
+
+Revised for W2-07 (DEC-892 item 1, DEC-896 item 3): the close reads the folder a ticket's file declares in
+``acceptance_tests.path``, not a folder derived from its WBS id. The ticket here is an implementation ticket
+(judged on its acceptance tests, W2-07's KPI 1) that declares ``tests/acceptance/W1-noat-declared/``; that folder
+holds no test, while ``tests/acceptance/W1-noat/`` holds a passing one, which is not the ticket's declared
+acceptance test and does not stand in for it. The expectations are unchanged.
 """
 
 import shutil
@@ -22,19 +28,26 @@ import w1_30_support as support
 
 TICKET = "PROJ-noat"
 WBS = "W1-noat"
+DECLARED = "tests/acceptance/W1-noat-declared/"
 
 
 def _without_tests(project, folder):
-    """``folder`` False: the ticket has no acceptance folder. True: the folder holds its README and no test."""
-    project.add_ticket(TICKET, WBS)
-    if not folder:
-        shutil.rmtree(project.root / "tests" / "acceptance" / WBS)
+    """``folder`` False: the ticket's declared acceptance folder does not exist. True: it holds its README and no
+    test. In both, the folder named after the ticket's WBS id holds a passing test the ticket does not declare."""
+    project.add_ticket(TICKET, WBS, acceptance=DECLARED)
+    shutil.rmtree(project.root / "tests" / "acceptance" / WBS)
+    project.write(f"tests/acceptance/{WBS}/test_noat_undeclared.py", "def test_noat_undeclared():\n    assert True\n")
+    if folder:
+        project.write(f"{DECLARED}README.md", "# The declared acceptance folder\n")
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=support.IMPLEMENTER, trailers=support.trailers_of(TICKET))
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    tests = list((project.root / "tests" / "acceptance").glob(f"{WBS}/**/test_*.py"))
-    assert not tests and (project.root / "tests" / "acceptance" / WBS).is_dir() is folder, "the fixture is wrong"
+    declared = project.root / DECLARED
+    tests = list(declared.glob("**/test_*.py"))
+    assert not tests and declared.is_dir() is folder, "the fixture is wrong"
+    assert support.read_ticket_frontmatter(project.root, TICKET)["acceptance_tests"]["path"] == DECLARED, \
+        "the fixture is wrong: the ticket does not declare its acceptance folder"
 
 
 def _refused_for_the_tests(project, sandbox, interface):
