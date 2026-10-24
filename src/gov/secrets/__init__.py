@@ -49,11 +49,18 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 3  # the form of the record and of what a scan reads; another form is never trusted
+_FORM = 4  # the form of the record and of what a scan reads; another form is never trusted
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
 _PIECE, _OVERLAP = 24_000, 9_216
+# A BEGIN...END key block (PEM or armoured PGP) of up to 24 KiB, from its BEGIN marker to its END marker, also goes as
+# a piece of its own (DEC-909), so it is whole in one read wherever the pieces are cut. A larger block is read as the
+# rest of the text is (row W2-L419). A key piece begins and ends with a dash, no word byte, so no read seems to begin or
+# end a word there; its blank lines get a form feed as the rest do, and it stays under gitleaks' peek of 25,000 bytes.
+_BLOCK, _BLOCK_READ = 24_576, 24_900
+_BEGIN = re.compile(rb"-----BEGIN", re.IGNORECASE)
+_END = re.compile(rb"-----END[ A-Za-z0-9_-]{0,100}?-----", re.IGNORECASE)
 _SPACES = tuple(bytes([byte]) for byte in b" \t\n\v\f\r")
 _LAST_NON_WORD = re.compile(rb"(?s:.*)[^0-9A-Za-z_]")
 _INSIDE = b"_"  # stands for the rest of a word cut where no boundary was found, so no read seems to begin a word
@@ -110,10 +117,23 @@ def _cut(chunk: bytes, low: int, high: int) -> tuple[int, bool]:
     return (found.end(), True) if found else (high, False)
 
 
+def _key_blocks(chunk: bytes):
+    """Each BEGIN...END key block of ``chunk`` of at most ``_BLOCK`` bytes, its blank lines kept from ending a read: from
+    each BEGIN marker to the first END marker after it."""
+    for begin in _BEGIN.finditer(chunk):
+        end = _END.search(chunk, begin.end(), begin.start() + _BLOCK)
+        if end is not None:
+            block = _BLANK.sub(rb"\1\f", chunk[begin.start():end.end()])
+            if len(block) <= _BLOCK_READ:
+                yield block
+
+
 def _pieces(chunk: bytes):
     """``chunk``, its blank lines kept from ending a read, in pieces of at most ``_PIECE`` bytes, each overlapping the
-    next by at least ``_OVERLAP``."""
-    chunk = _BLANK.sub(rb"\1\f", chunk)
+    next by at least ``_OVERLAP``; where it is longer than one piece, also each of its key blocks whole."""
+    whole, chunk = chunk, _BLANK.sub(rb"\1\f", chunk)
+    if len(chunk) > _PIECE:
+        yield from _key_blocks(whole)
     start, lead = 0, b""
     while len(chunk) - start > _PIECE:
         end, edge = _cut(chunk, start + 2 * _OVERLAP, start + _PIECE)
