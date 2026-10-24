@@ -315,15 +315,23 @@ def test_close_refuses_when_acceptance_tests_fail(project, sandbox, interface):
 # --------------------------------------------------------------------------
 
 def test_containment_blocks_close_for_out_of_scope_commit(project, sandbox, interface):
-    """MWA-04, A1: a commit changes a path outside the ticket's allowed_paths; close is refused."""
+    """MWA-04, A1: a commit changes a path outside the ticket's allowed_paths; close is refused.
+
+    Revised for W2-67 (I2 F2, PF4): the ticket has its checkpoint, so it is not refused for the missing checkpoint;
+    W1-50's judgement flags the commit and that path alone, and the refusal is containment's, naming both."""
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/other/oops.py", "# out of scope\n")
-    project.commit("implement out of scope", who=IMPL, trailers=TRAILERS_GOOD)
+    commit = project.commit("implement out of scope", who=IMPL, trailers=TRAILERS_GOOD)
+    support.checkpointed(project, TICKET)
+    judged = support.judged_by_w1_50(project, sandbox, support.ticket_commits(project.root, TICKET))
+    assert [(f["commit"], f["paths"]) for f in judged] == [(commit, ["src/other/oops.py"])], \
+        f"the fixture is wrong: W1-50's judgement of the ticket's commits is {judged}"
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "gov close must refuse when a commit changes files outside allowed_paths"
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert commit[:12] in text and "src/other/oops.py" in text, \
+        f"the refusal does not name the commit {commit[:12]} and the path outside allowed_paths\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
 # No acceptance tests (S1, F1, DEC-425): ``test_w1_30_no_acceptance_tests.py``.
