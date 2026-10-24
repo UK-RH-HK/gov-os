@@ -1318,7 +1318,7 @@ def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
         except OSError as e:
             raise GovError("CHECK_RESULT_UNREADABLE", f"the check result {given} cannot be read: {e}",
                             {"check_result": str(given)})
-    scope = _select.plan(root, wbs, full_asked=bool(getattr(args, "full", False)))
+    scope = _select.plan(root, wbs, full_asked=bool(getattr(args, "full", False)), ticket=ticket)
     folder = f"{_evidence.JUNIT_DIR}/{ticket}/{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')}"
     (root / folder).mkdir(parents=True, exist_ok=True)
     check = None

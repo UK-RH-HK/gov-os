@@ -168,8 +168,28 @@ def suite_of(path: str) -> str | None:
     return None
 
 
-def _tickets(root: Path) -> list[tuple[str, str, list]]:
-    """``(id, wbs, allowed_paths)`` of every ticket of the project, any wave."""
+def suite_folder(root: Path, front: dict, wbs: str) -> str:
+    """A ticket's suite: its acceptance folder as W2-07's gate reads it (``gates.acceptance_folder``: the folder
+    its file declares in ``acceptance_tests.path``, DEC-892, else ``tests/acceptance/<wbs>/``), relative to the
+    project, ending in ``/``."""
+    from gov.close.gates import acceptance_folder
+
+    folder = acceptance_folder(root, front, wbs)
+    try:
+        return folder.relative_to(root).as_posix().rstrip("/") + "/"
+    except ValueError:  # an absolute path elsewhere: the default folder's name, which then holds no test
+        return f"{ACCEPTANCE}/{wbs}/"
+
+
+def has_suite(root: Path, folder: str) -> bool:
+    """Whether the folder, inside the project, holds a test file (``test_*.py``)."""
+    from gov.close.gates import has_tests
+
+    return not folder.startswith("../") and has_tests(Path(root) / folder)
+
+
+def _tickets(root: Path) -> list[tuple[str, str, list, str, bool]]:
+    """``(id, wbs, allowed_paths, suite, has_suite)`` of every ticket of the project, any wave."""
     from gov.tasks.tickets import TICKETS_REL, frontmatter
 
     found = []
@@ -177,11 +197,20 @@ def _tickets(root: Path) -> list[tuple[str, str, list]]:
         front = frontmatter(path) or {}
         patterns = front.get("allowed_paths") or []
         if not isinstance(patterns, list):
-            continue
+            patterns = []
         tid = str(front.get("id") or path.stem)
         wbs = str(front.get("wbs_id") or front.get("external-ref") or tid)
-        found.append((tid, wbs, [p for p in patterns if isinstance(p, str)]))
+        folder = suite_folder(root, front, wbs)
+        found.append((tid, wbs, [p for p in patterns if isinstance(p, str)], folder, has_suite(root, folder)))
     return found
+
+
+def _own(tickets: list, ticket: str | None, wbs: str) -> str:
+    """The closing ticket's suite: the acceptance folder of its ticket file (found by its id, else by its WBS
+    id), else ``tests/acceptance/<wbs>/``."""
+    mine = [t for t in tickets if t[0] == ticket] if ticket is not None else []
+    mine = mine or [t for t in tickets if t[1] == wbs]
+    return mine[0][3] if mine else f"{ACCEPTANCE}/{wbs}/"
 
 
 def _suites(root: Path) -> list[str]:
@@ -243,10 +272,12 @@ def _helper_reach(root: Path, suites: list[str], changed_paths: list[str]) -> di
 # The plan
 # ---------------------------------------------------------------------------
 
-def plan(root: Path, wbs: str, *, full_asked: bool = False) -> dict:
-    """What the close's regression run selects, and the evidence of it (the scope's part of the block)."""
+def plan(root: Path, wbs: str, *, full_asked: bool = False, ticket: str | None = None) -> dict:
+    """What the close's regression run selects, and the evidence of it (the scope's part of the block). The
+    closing ticket is ``ticket`` (its id), else the ticket of ``wbs``."""
     root = Path(root)
-    own = f"{ACCEPTANCE}/{wbs}/"
+    tickets = _tickets(root)
+    own = _own(tickets, ticket, wbs)
     test_map, map_reason = load_map(root)
     timeout, distribution = settings(test_map)
     head = _git(root, "rev-parse", "HEAD").strip()
@@ -271,16 +302,17 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False) -> dict:
         if why not in selected[entry]:
             selected[entry].append(why)
 
-    select(own, {"reason": "OWN"})
+    if (root / own).is_dir():  # every target named exists in the tree closed
+        select(own, {"reason": "OWN"})
     if test_map is not None:
         core = [p for p in paths if _any(p, test_map.get("shared_core"))]
         if core:
             why_full.append({"reason": "SHARED_CORE", "paths": core})
-        tickets = _tickets(root)
         couplings = test_map.get("couplings") or []
+        # a ticket without a suite maps a path to no suite: its allowed_paths place nothing
         unplaced = [p for p in paths if p not in core and not (
             suite_of(p) or _any(p, test_map.get("record_only"))
-            or any(_any(p, c["paths"]) for c in couplings) or any(_any(p, t[2]) for t in tickets))]
+            or any(_any(p, c["paths"]) for c in couplings) or any(t[4] and _any(p, t[2]) for t in tickets))]
         if unplaced:
             why_full.append({"reason": "UNPLACED", "paths": unplaced})
 
@@ -293,10 +325,10 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False) -> dict:
 
     suites = _suites(root)
     select(UNIT, {"reason": "UNIT"})
-    for tid, twbs, patterns in tickets:
+    for tid, _, patterns, folder, held_tests in tickets:
         hit = [p for p in paths if _any(p, patterns)]
-        if hit and f"{ACCEPTANCE}/{twbs}/" in suites:
-            select(f"{ACCEPTANCE}/{twbs}/", {"reason": "OVERLAP", "ticket": tid, "paths": hit})
+        if hit and held_tests:
+            select(folder, {"reason": "OVERLAP", "ticket": tid, "paths": hit})
     held = {}
     for p in paths:
         if suite_of(p):

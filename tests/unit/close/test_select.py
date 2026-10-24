@@ -125,6 +125,29 @@ def test_a_moved_file_is_in_the_change_at_both_its_paths(repo):
     assert plan["scope"] == "full" and plan["why_full"] == [{"reason": "SHARED_CORE", "paths": ["src/core/z.py"]}]
 
 
+def test_a_ticket_s_suite_is_the_folder_its_file_declares(repo):
+    declared = "---\nid: P-W1-dd\nwbs_id: W1-dd\nacceptance_tests:\n  path: tests/acceptance/W1-zz/\n" \
+               "allowed_paths:\n- src/d/**\n---\n"
+    _project(repo)
+    _green(repo, repo.commit("declared", files={".tickets/P-W1-dd.md": declared, "src/d/w.py": "w = 1\n"}))
+    repo.commit("work", files={"src/d/w.py": "w = 2\n"})
+    targets = _targets(select.plan(repo.root, "W1-own"))
+    assert targets["tests/acceptance/W1-zz/"] == ["OVERLAP"] and "tests/acceptance/W1-dd/" not in targets
+    plan = select.plan(repo.root, "W1-dd", ticket="P-W1-dd")
+    assert _targets(plan)["tests/acceptance/W1-zz/"] == ["OWN", "OVERLAP"]
+    assert not any(e["target"].startswith("tests/acceptance/W1-zz/") for e in plan["left_out"])
+    assert plan["ignore"][0] == "tests/acceptance/W1-zz/"
+
+
+def test_a_path_only_suiteless_tickets_hold_is_unplaced(repo):
+    _project(repo)
+    _green(repo, repo.commit("suiteless", files={".tickets/P-W1-nn.md": _ticket("W1-nn", "scripts/**"),
+                                                 "tests/acceptance/W1-nn/nn_support.py": "N = 1\n"}))
+    repo.commit("work", files={"scripts/s.py": "s = 1\n"})
+    plan = select.plan(repo.root, "W1-own")
+    assert plan["scope"] == "full" and plan["why_full"] == [{"reason": "UNPLACED", "paths": ["scripts/s.py"]}]
+
+
 def test_every_run_of_a_close_is_given_the_retention_option_with_its_per_test_limit(tmp_path):
     import os
     import sys
