@@ -44,9 +44,12 @@ def _declaration(check_id, command, severity):
             f'command: "{command}"\n')
 
 
-def _ready(project, files):
-    """The ticket's work, with ``files`` changed by its engineer, and the checkpoint: returns ``HEAD``."""
+def _ready(project, files, told=None):
+    """The ticket's work, with ``files`` changed by its engineer, and the checkpoint: returns ``HEAD``. With
+    ``told`` the ticket's acceptance test tells into that folder whenever it runs."""
     support.start_ticket(project, TICKET, WBS)
+    if told is not None:
+        project.write(f"tests/acceptance/{WBS}/test_pass.py", support.telling_test("test_pass", told))
     support.engineer_commit(project, TICKET, {"src/example/feature.py": "# feature\n", **files})
     return support.checkpointed(project, TICKET)
 
@@ -128,16 +131,22 @@ def test_a_failing_check_of_severity_warning_refuses_nothing(project_with_checks
     assert support.ticket_status(project.root, TICKET) == "closed"
 
 
-def test_a_refusal_for_a_red_check_is_counted(project_with_checks, sandbox, interface):
+def test_a_refusal_for_a_red_check_is_counted(project_with_checks, sandbox, interface, tmp_path):
+    """Revised for W2-07 (DEC-868 item 3): a red hard-block check is the pre-close gate's finding. The close
+    refuses at once, naming the check, before any test runs, and spends no attempt: the count stays 0."""
+    told = tmp_path / "told"
+    told.mkdir()
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
-    _ready(project, {NOTES: "note: one\n"})
+    _ready(project, {NOTES: "note: one\n"}, told)
     _one_red(project, sandbox, "license-present")
 
     run = support.run_close(project, sandbox, TICKET)
 
     _refused_naming(run, interface, "license-present")
-    assert support.iteration_count(project.root, TICKET) == 1, \
-        f"the close refused for a red check is not counted as one iteration\n{run.describe()}"
+    assert support.told_by(told) == {}, \
+        f"a red check refused and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+    support.assert_nothing_counted(project, TICKET, run)
+    support.assert_not_closed(project, TICKET)
 
 
 def test_a_refusal_for_a_red_check_opens_a_dependent_repair_ticket(project_with_checks, sandbox, interface):
@@ -242,36 +251,60 @@ def test_a_change_under_each_governance_prefix_has_the_checks_run(prefix, projec
 
 
 # --------------------------------------------------------------------------
-# 3. No governance file changed: no check result is needed and none is claimed
+# 3. No governance file changed: the ticket is not refused for that, and the checks still run
+#
+# Revised for W2-07 (DEC-868 item 1 (b), KPI 5; DEC-480's "the checks only when governance files change" changed,
+# DEC-908): ``gov check`` runs on every close, whatever files the ticket changed, and the close record states the
+# result at the commit being closed. A red hard-block check now refuses every close (section 1 and the pre-close
+# gate's cases hold that), so the project here is green at hard-block, with a warning check that fails; the point
+# kept is that a ticket that changes no governance file closes, not refused for changing none.
 # --------------------------------------------------------------------------
 
 def _no_governance_change(project_with_checks, sandbox):
-    """A project with a red hard-block check, and a ticket that changes no governance file."""
-    project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
+    """A project with no red hard-block check and a failing warning check, and a ticket that changes no
+    governance file. Returns ``(project, HEAD, the runner's statuses at HEAD)``."""
+    project = project_with_checks(README_PRESENT, LICENSE_WANTED)
     support.build_ticket(project, TICKET, WBS)
-    _one_red(project, sandbox, "license-present")
-    return project
+    head = support.head_of(project)
+    changed = sorted({rel for commit in support.ticket_commits(project.root, TICKET)
+                      for rel in support.git(project.root, "diff-tree", "--no-commit-id", "--name-only", "-r",
+                                             commit).split()})
+    assert changed and not any(rel.startswith(support.GOVERNANCE_PREFIXES) for rel in changed), \
+        f"the fixture is wrong: the ticket's commits change a governance file: {changed}"
+    expected = support.statuses(_none_red(project, sandbox))
+    assert expected["license-wanted"] == support.YELLOW, f"the fixture is wrong: {expected}"
+    return project, head, expected
 
 
 def test_a_ticket_that_changes_no_governance_file_needs_no_check_result(project_with_checks, sandbox, interface):
-    project = _no_governance_change(project_with_checks, sandbox)
+    """The ticket closes, and the checks were run at the commit being closed all the same."""
+    project, head, _ = _no_governance_change(project_with_checks, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
 
     support.result_of(run, interface)
     assert support.ticket_status(project.root, TICKET) == "closed"
+    front = support.the_close_record(project, TICKET)
+    assert front.get(support.CHECK_COMMIT_KEY) == head, \
+        f"the checks were not run at the commit being closed although they run on every close: " \
+        f"{support.CHECK_COMMIT_KEY} is {front.get(support.CHECK_COMMIT_KEY)!r}, not {head}"
 
 
 def test_the_close_record_of_a_ticket_that_changes_no_governance_file_claims_no_check_result(
         project_with_checks, sandbox, interface):
-    project = _no_governance_change(project_with_checks, sandbox)
+    """The close record states the check result of the commit it closed: that commit and every check's status
+    as W1-26's runner gives it there."""
+    project, head, expected = _no_governance_change(project_with_checks, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
 
     support.result_of(run, interface)
     front = support.the_close_record(project, TICKET)
-    claimed = {key: front[key] for key in (support.CHECK_COMMIT_KEY, support.CHECK_RESULT_KEY) if front.get(key)}
-    assert not claimed, f"the close record claims a check result although no governance file changed: {claimed}"
+    assert front.get(support.CHECK_COMMIT_KEY) == head, \
+        f"the close record names {front.get(support.CHECK_COMMIT_KEY)!r} as the commit of the checks, not {head}"
+    recorded = support.recorded_check_statuses(front)
+    assert recorded == expected, \
+        f"the close record states {recorded}; W1-26's runner gave {expected} at the commit being closed"
 
 
 # --------------------------------------------------------------------------

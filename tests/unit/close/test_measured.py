@@ -554,17 +554,17 @@ def test_a_record_that_cannot_be_taken_back_is_named_in_the_error(root, monkeypa
 
 
 def test_a_finding_and_could_not_measure_are_two_ways_out(root):
-    """A finding is counted with a repair ticket (exit code 3); what precedes the measuring is neither."""
+    """A finding refuses with a repair ticket (exit code 3), uncounted when a commit gate finds it before any test
+    (DEC-868 item 3); what precedes the measuring is neither."""
     with patch.object(command, "_ticket_commits", return_value=[]), patch.object(command, "_commits_since",
                                                                                return_value=[]):
         with pytest.raises(GovError) as raised:
             run(root, _args(), {})
-    # every gate was asked (DEC-492): the one refusal holds each gate's finding, counted once
-    assert (raised.value.code, raised.value.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
-    assert [part["code"] for part in raised.value.details["parts"]] == [
-        "TRAILER_MISSING", "NO_ACCEPTANCE_TESTS", "CHECKPOINT_MISSING", "CONTEXT_FAILED"]
-    assert len(raised.value.details["findings"]) == 4
+    # every commit gate was asked (DEC-492): the refusal holds the commit gates' finding, before any test
+    assert (raised.value.code, raised.value.exit_code) == ("TRAILER_MISSING", EXIT_CHECK_FAILED)
+    assert "parts" not in raised.value.details and raised.value.details["test_runs"] == []
+    assert len(raised.value.details["findings"]) == 1
     assert [part.split(":")[0] for part in raised.value.details["not_measured"]] == [
-        f"the containment of the commits of {TICKET}", f"the acceptance run of {TICKET}"]
-    assert json.loads(_count_path(root, TICKET).read_text(encoding="utf-8"))["count"] == 1
+        f"the containment of the commits of {TICKET}"]
+    assert not _count_path(root, TICKET).exists() and raised.value.details["counted"] is False
     assert len(list((root / ".tickets").glob("*.md"))) == 2

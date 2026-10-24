@@ -41,10 +41,10 @@ def project(tmp_path):
 
 @pytest.fixture()
 def scanned(monkeypatch):
-    """The contents given to gitleaks, in the order they were judged."""
+    """The contents given to gitleaks, in the order they were judged: of a file that is no store, its bytes."""
     seen = []
-    real = secrets._holds_secret
-    monkeypatch.setattr(secrets, "_holds_secret", lambda rules, content: seen.append(content) or real(rules, content))
+    real = secrets._scan
+    monkeypatch.setattr(secrets, "_scan", lambda rules, chunks: seen.append(chunks[0]) or real(rules, chunks))
     return seen
 
 
@@ -65,7 +65,9 @@ def test_the_limit_of_each_gitleaks_run_grows_with_what_it_reads(project, monkey
     assert secrets._holds_secret(rules, b"x\n" * 3_000_000) is False
     assert secrets._holds_secret(rules, b"short\0text\n") is False  # UTF-16: the zero-free copy counts too
     assert [limit for _, limit in limits] == [60 + size / 1_000_000 for size, _ in limits]
-    assert limits[0][0] == 6_000_001 and limits[-1][0] == len(b"\nshort\0text\n\nshorttext\n")
+    # in pieces, a blank line after each (DEC-897): the first input is longer than the content by the overlaps
+    assert limits[0][0] == 1 + sum(len(piece) + 2 for piece in secrets._pieces(b"x\n" * 3_000_000)) > 6_000_001
+    assert limits[-1][0] == len(b"\nshort\0text\n\n\nshorttext\n\n\n")
 
 
 def test_an_unchanged_clean_store_is_reused_and_labelled_a_changed_one_scanned(project, scanned, capsys):
@@ -112,7 +114,7 @@ def test_a_record_that_is_not_whole_and_current_is_not_trusted(project, scanned,
         body["clean"].append(hashlib.sha256(b"another store").hexdigest())
         record.write_text(json.dumps(body))
     elif damage == "other-form":
-        record.write_text(text.replace('"form": 1', '"form": 2'))
+        record.write_text(text.replace(f'"form": {secrets._FORM}', f'"form": {secrets._FORM - 1}'))
     else:
         config = project / ".gitleaks.toml"
         config.write_text(config.read_text() + "\n[[rules]]\nid = 'w2-50-unit'\nregex = '''never-in-a-store-zq'''\n")

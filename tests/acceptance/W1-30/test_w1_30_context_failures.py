@@ -26,6 +26,13 @@ given its store by its fixture (``support.run_close`` loads it before the close,
 
 Last, a failing close that is given a class (DEC-454: "with it, the context is built first and its hash is
 recorded"): when that context cannot be built, the answer and the repair ticket say so and carry no hash.
+
+**Revised for W2-07 (DEC-868 item 3; DEC-455's "counted iteration" for a context failure changed, DEC-908).** A
+context that cannot be built turns the kernel's ``context-reproducibility`` check RED, and ``gov check`` runs on
+every close as the pre-close gate. So the close refuses at once, naming that check, before any test runs (the
+ticket's acceptance test tells into a folder outside the project whenever it runs, and does not), states no test
+run, and spends no attempt (``counted: false``, the count stays 0). The refusal still names the record and the
+context's reason where the check carries them.
 """
 
 import re
@@ -46,59 +53,100 @@ def _decisions(project, **records):
     project.commit("decision records", who=support.OWNER)
 
 
-def _refused_for_the_context(project, sandbox, interface, code, *named):
-    """The otherwise green ticket's context gives ``code``; the close is refused for it and counted."""
+CONTEXT_CHECK = "context-reproducibility"
+
+
+def _telling(project, told, body="assert True"):
+    """The ticket's acceptance test ``test_told``, which tells into ``told`` whenever it runs; written before
+    ``support.build_ticket``, which commits it with the ticket's other acceptance test."""
+    project.write(f"tests/acceptance/{WBS}/test_told.py", support.telling_test("test_told", told, body=body))
+
+
+def _refused_at_once_for_the_context(run, error, told):
+    """DEC-868 item 3: the pre-close ``gov check`` refuses at once, naming ``context-reproducibility``; no test
+    ran, the refusal states no test run and is not counted."""
+    details = error.get("details") or {}
+    findings = details.get("findings") or []
+    assert any(finding.startswith(f"governance check {CONTEXT_CHECK} is RED at commit ") for finding in findings), \
+        f"the refusal does not name the RED {CONTEXT_CHECK} check\n{run.describe()}"
+    assert details.get(support.TEST_RUNS_KEY) == [], \
+        f"the pre-close gate refused and the refusal states test runs\n{run.describe()}"
+    assert support.told_by(told) == {}, \
+        f"the pre-close gate refused and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+    assert details.get("counted") is False, f"the pre-close gate's refusal is counted\n{run.describe()}"
+
+
+def _refused_for_the_context(project, sandbox, interface, told, code, *named):
+    """The otherwise green ticket's context gives ``code``; the close is refused for it at once, before any
+    test, and not counted (DEC-868 item 3)."""
     error = support.context_error(project, sandbox, TICKET)
     assert error["code"] == code, f"the fixture is wrong: gov context gives {error}"
 
     run = support.run_close(project, sandbox, TICKET, store=False)
-    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    refusal = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    text = support.error_text(refusal)
     assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
     for record_id in named:
         assert record_id in text, f"the refusal does not name {record_id}\n{run.describe()}"
+    _refused_at_once_for_the_context(run, refusal, told)
     support.assert_not_closed(project, TICKET)
-    assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+    support.assert_nothing_counted(project, TICKET, run)
 
 
-def test_a_missing_mandatory_input_refuses_the_close(project, sandbox, interface):
+def test_a_missing_mandatory_input_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: the ticket names a source no record has."""
+    told = tmp_path / "told"
+    told.mkdir()
+    _telling(project, told)
     support.build_ticket(project, TICKET, WBS, sources=["DEC-gone"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, "BLOCKED", "DEC-gone")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-gone")
 
 
-def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface):
+def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: an id under ``depends_on`` is a mandatory input too (W1-24 S4)."""
+    told = tmp_path / "told"
+    told.mkdir()
+    _telling(project, told)
     support.build_ticket(project, TICKET, WBS, depends_on=["W1-gone"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, "BLOCKED", "W1-gone")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "W1-gone")
 
 
-def test_a_superseded_source_refuses_the_close(project, sandbox, interface):
+def test_a_superseded_source_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: the ticket's source is superseded; the error names it."""
+    told = tmp_path / "told"
+    told.mkdir()
     _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
                DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _telling(project, told)
     support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, "BLOCKED", "DEC-old")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-old")
 
 
-def test_a_source_superseded_by_several_records_refuses_the_close(project, sandbox, interface):
+def test_a_source_superseded_by_several_records_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: more than one record supersedes the ticket's source."""
+    told = tmp_path / "told"
+    told.mkdir()
     _decisions(project, DEC_old=("SUPERSEDED", {}),
                DEC_new1=("ACTIVE", {"supersedes": ["DEC-old"]}),
                DEC_new2=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _telling(project, told)
     support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, "BLOCKED", "DEC-old")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-old")
 
 
-def test_two_contradicting_sources_refuse_the_close(project, sandbox, interface):
+def test_two_contradicting_sources_refuse_the_close(project, sandbox, interface, tmp_path):
     """CONTRADICTION: two active decisions among the ticket's sources, neither superseding the other."""
+    told = tmp_path / "told"
+    told.mkdir()
     _decisions(project, DEC_other=("ACTIVE", {}))
+    _telling(project, told)
     support.build_ticket(project, TICKET, WBS, sources=[BASE, "DEC-other"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, "CONTRADICTION", BASE, "DEC-other")
+    _refused_for_the_context(project, sandbox, interface, told, "CONTRADICTION", BASE, "DEC-other")
 
 
 def test_a_decision_checker_that_cannot_run_refuses_the_close(project, sandbox, interface, tmp_path):
@@ -128,8 +176,11 @@ def test_a_decision_checker_that_cannot_run_refuses_the_close(project, sandbox, 
 STORE_MISSING = "STORE_MISSING"
 
 
-def _close_without_a_store(project, sandbox, interface):
-    """An otherwise green ticket in a project whose record store was never loaded."""
+def _close_without_a_store(project, sandbox, interface, told=None):
+    """An otherwise green ticket in a project whose record store was never loaded. With ``told`` the ticket's
+    acceptance test also tells into that folder whenever it runs."""
+    if told is not None:
+        _telling(project, told)
     support.build_ticket(project, TICKET, WBS)
     error = support.context_error(project, sandbox, TICKET)
     assert error["code"] == STORE_MISSING, f"the fixture is wrong: gov context gives {error}"
@@ -137,21 +188,36 @@ def _close_without_a_store(project, sandbox, interface):
     return run, support.refused(run, interface, support.EXIT_CHECK_FAILED), error
 
 
-def test_a_project_without_a_record_store_refuses_the_close(project, sandbox, interface):
+def test_a_project_without_a_record_store_refuses_the_close(project, sandbox, interface, tmp_path):
     """Refused with the context's reason: the answer says the context failed and carries the code
-    ``gov context`` gives; no close record, the ticket in progress."""
-    run, error, of_context = _close_without_a_store(project, sandbox, interface)
+    ``gov context`` gives, or its message; no close record, the ticket in progress.
+
+    Revised for W2-07 (DEC-868 item 3): the refusal is the pre-close ``gov check``'s, naming
+    ``context-reproducibility``, at once and before any test. The check states the context's message as far as
+    ``gov check`` keeps a check's output (its first 200 characters, W1-26), and the message ends with the
+    project's path: the reason it carries is the message up to that path (``<store>: no store``)."""
+    told = tmp_path / "told"
+    told.mkdir()
+    run, error, of_context = _close_without_a_store(project, sandbox, interface, told)
     text = support.error_text(error)
     assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
-    assert STORE_MISSING in text or of_context["message"] in text, \
+    reason = of_context["message"].split(" at ", 1)[0]
+    assert STORE_MISSING in text or of_context["message"] in text or reason in text, \
         f"the refusal does not give the context's reason ({of_context})\n{run.describe()}"
+    _refused_at_once_for_the_context(run, error, told)
     support.assert_not_closed(project, TICKET)
 
 
-def test_a_refusal_for_no_record_store_is_counted(project, sandbox, interface):
-    """DEC-455: the refusal is one iteration."""
-    _close_without_a_store(project, sandbox, interface)
-    assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+def test_a_refusal_for_no_record_store_is_counted(project, sandbox, interface, tmp_path):
+    """DEC-455: the refusal is one iteration.
+
+    Revised for W2-07 (DEC-868 item 3; DEC-455's "counted iteration" for a context failure changed, DEC-908): the
+    refusal is the pre-close gate's, at once and before any test, and spends no attempt: the count stays 0."""
+    told = tmp_path / "told"
+    told.mkdir()
+    run, error, _ = _close_without_a_store(project, sandbox, interface, told)
+    _refused_at_once_for_the_context(run, error, told)
+    support.assert_nothing_counted(project, TICKET, run)
 
 
 def test_a_refusal_for_no_record_store_carries_no_hash(project, sandbox, interface):
@@ -180,9 +246,12 @@ def test_the_same_project_closes_once_it_has_a_record_store(project, sandbox, in
 # A failing close with a class, whose context cannot be built
 # --------------------------------------------------------------------------
 
-def _failing_close_with_a_class_and_no_context(project, sandbox, interface):
+def _failing_close_with_a_class_and_no_context(project, sandbox, interface, told=None):
+    """With ``told`` the ticket also has a failing acceptance test that tells into that folder whenever it runs."""
     _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
                DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    if told is not None:
+        _telling(project, told, body="assert False, 'planted failure'")
     support.build_ticket(project, TICKET, WBS, failing=True, sources=["DEC-old"])
     support.load_store(project, sandbox)
     assert support.context_error(project, sandbox, TICKET)["code"] == "BLOCKED"
@@ -190,14 +259,21 @@ def _failing_close_with_a_class_and_no_context(project, sandbox, interface):
     return run, support.refused(run, interface, support.EXIT_CHECK_FAILED)
 
 
-def test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed(project, sandbox, interface):
-    """The answer names the failing test (the finding) and, beside it, that the context failed and why; it
-    carries no hash."""
-    run, error = _failing_close_with_a_class_and_no_context(project, sandbox, interface)
+def test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed(project, sandbox, interface, tmp_path):
+    """The answer says that the context failed and why; it carries no hash.
+
+    Revised for W2-07 (DEC-868 item 3): the broken context is the pre-close ``gov check``'s finding
+    (``context-reproducibility`` RED), so the close refuses at once, before any test: the failing tests do not
+    run (they tell when they run, and do not), the answer states no test run and is not counted, so it does not
+    name a failing test as a finding beside the context."""
+    told = tmp_path / "told"
+    told.mkdir()
+    run, error = _failing_close_with_a_class_and_no_context(project, sandbox, interface, told)
     text = support.error_text(error)
-    assert "test_fail" in text, f"the answer does not name the failing test\n{run.describe()}"
     assert "context" in text.lower() and "DEC-old" in text, \
         f"the answer does not say the context failed for DEC-old\n{run.describe()}"
+    _refused_at_once_for_the_context(run, error, told)
+    support.assert_nothing_counted(project, TICKET, run)
     assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
 
 

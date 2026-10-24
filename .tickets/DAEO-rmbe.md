@@ -31,6 +31,8 @@ kpis:
   - 'Every file under .gov-runtime/ the check scans today is still scanned, with every rule set; a scan that cannot finish still fails closed; the reuse of a clean result keyed on the store''s hash (DEC-853) stays, and a finding is never reused [DEC-853, DEC-290]'
   - 'The earlier tests this change affects are named for the test designer and revised only where scanning the rows as text or compacting the stores changes what they expect, each with Rewrite-Reason: DEC-897: W2-50''s secrets-scan scale cases (test_w2_50_secrets_scan_scale.py, w2_50_scan_support.py) and the secrets cases of test_w2_50_never_indexed.py and test_w2_50_last_review.py [DEC-899, P-IS-5 (a), P-I1-7]'
   - 'tests/unit/secrets/ is renamed tests/unit/secrets_check/, so it no longer shadows the standard library''s secrets module under plugins that import it first; collection is clean with pytest-rerunfailures and pytest-randomly loaded [W2-L373, I2 F8, DEC-899]'
+  - 'Each BEGIN...END key block (PEM or armoured PGP) goes to gitleaks whole, as its own piece, up to 24 KB; a block of 9 to 24 KB is found at every boundary position, in a long document and in every stored form; an embedded fragment of a longer identifier stays unflagged at every read edge (the chance red not brought back) [DEC-909 items 2, 3 and 6]'
+  - 'The pre-index filter, which shares the check''s gitleaks call, finds the same tokens and key blocks at every boundary and keeps a file that holds one out of the index [DEC-909 item 3, P-3]'
   failure:
   - A real token at a word boundary that the check misses, at any offset or in any stored form.
   - A word-internal fragment flagged at a read edge (the chance red of W2-62's queue, 2026-10-22).
@@ -42,6 +44,7 @@ sources:
 - DEC-853
 - DEC-290
 - DEC-899
+- DEC-909
 - DEC-868
 - DEC-896
 est_loc: 150
@@ -54,6 +57,7 @@ closes:
 list_rows:
 - W2-M404
 - W2-L373
+- W2-L419
 ---
 # W2-69 The secrets check reads what the stores hold: no chance red from where a scan begins
 
@@ -91,3 +95,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-69), from DEC-897 (owner, 2026-10-22, P-
   - a file no longer scanned;
   - an unfinished scan passing as clean.
 - **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`, `tests/acceptance/W2-50/w2_50_scan_support.py`, `tests/acceptance/W2-50/test_w2_50_never_indexed.py`, `tests/acceptance/W2-50/test_w2_50_last_review.py`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.
+- **DEC-909, the last round (owner's exception to DEC-413):** one more round and one more review. Its test designer also adds the two daemon-starting W2-69 cases to `tests/acceptance/serial-only.txt` (P-4; named here, MR-3). A key block over 24 KB is residual row W2-L419. If the third review finds another fail-open case an honest agent can hit, no fourth round: a package to the owner.

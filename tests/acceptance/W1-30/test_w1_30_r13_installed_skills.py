@@ -69,14 +69,37 @@ def test_a_vendored_skill_of_an_installed_kernel_is_listed_without_a_version(pro
 
 
 def test_an_installed_skill_whose_frontmatter_cannot_be_read_is_listed_as_not_measured(project, sandbox,
-                                                                                       interface):
+                                                                                       interface, tmp_path):
+    """Revised for W2-07 (DEC-868 item 1 (b), KPI 5; DEC-908): ``gov check`` runs on every close, and the
+    kernel's ``core-authority`` check is RED on a skill file whose frontmatter cannot be read. So the close is
+    refused at once by the pre-close gate, naming ``core-authority`` and the unreadable skill file under its
+    folder's name, before any test runs, and is not counted. No close record is written, so there is no list in
+    which the skill could stand as "not measured"; the refusal names the file instead."""
+    told = tmp_path / "told"
+    told.mkdir()
+    broken = f"{INSTALLED}/skills/broken/SKILL.md"
     _installed_skill(project, "change", "1.0.0")
-    project.write(f"{INSTALLED}/skills/broken/SKILL.md", "---\nname: [not closed\n---\n# broken\n")
+    project.write(broken, "---\nname: [not closed\n---\n# broken\n")
+    project.commit("the kernel's skills", who=support.ORCHESTRATOR)
+    project.write(f"tests/acceptance/{WBS}/test_told.py", support.telling_test("test_told", told))
+    support.build_ticket(project, TICKET, WBS)
 
-    listed = _listed(project, sandbox, interface)
+    run = support.run_close(project, sandbox, TICKET)
 
-    assert listed == [("broken", NOT_MEASURED), ("change", "1.0.0")], \
-        f"the skill whose file cannot be read is not listed under its folder's name as {NOT_MEASURED!r}: {listed}"
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    details = error.get("details") or {}
+    findings = details.get("findings") or []
+    named = [finding for finding in findings if finding.startswith("governance check core-authority is RED at commit ")]
+    assert named, f"the refusal does not name the RED core-authority check\n{run.describe()}"
+    assert any(broken in finding for finding in named), \
+        f"the refusal does not name the skill file whose frontmatter cannot be read ({broken})\n{run.describe()}"
+    assert details.get(support.TEST_RUNS_KEY) == [], \
+        f"the pre-close gate refused and the refusal states test runs\n{run.describe()}"
+    assert support.told_by(told) == {}, \
+        f"the pre-close gate refused and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+    assert details.get("counted") is False, f"the pre-close gate's refusal is counted\n{run.describe()}"
+    support.assert_nothing_counted(project, TICKET, run)
+    support.assert_not_closed(project, TICKET)
 
 
 def test_a_project_with_both_layouts_lists_the_skills_of_both(project, sandbox, interface):

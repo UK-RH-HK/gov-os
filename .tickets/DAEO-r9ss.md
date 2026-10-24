@@ -53,6 +53,7 @@ sources:
 - DEC-899
 - DEC-903
 - DEC-904
+- DEC-908
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-07/
@@ -116,5 +117,10 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729), with DEC-868
     - `tests/acceptance/W2-53/test_w2_53_load_sensitive.py::test_an_entry_the_owner_did_not_add_is_refused_naming_it_and_its_test_is_not_run_again`.
   - The repair-ticket case to KPI 8: `test_w1_30_r8_tree.py::test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured` (`Rewrite-Reason: KPI 8, AR-9, W2-L209`).
   - The superseded expectations are marked under DEC-866: DEC-492, DEC-490 (one part), DEC-493 (one part).
+- **The batch, widened again (DEC-908, delegated):** 14 W1-30 cases the KPIs also change, each with its `Rewrite-Reason:`:
+  - 8 in `test_w1_30_context_failures.py` (DEC-868 item 3);
+  - `test_w1_30_governance_checks.py` ×2, `test_w1_30_r8_commits.py` ×2, `test_w1_30_r13_installed_skills.py` (DEC-868 item 1 (b), KPI 5);
+  - `test_w1_30_iteration.py::test_each_refusal_opens_repair_ticket` (KPI 10, W2-M252).
+- **W1-01's history and merge cases** are a known red until W2-70 merges (DEC-906, DEC-908): report them by name; they do not stop DONE.
 - **The verification run (DEC-904 item 3):** under `flock /tmp/gov-os-verify.lock`, within 6,000,000 files and folders and 60 GB, and before W2-66's (it merges first).
 - **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py`, `tests/acceptance/W1-30/test_w1_30_collection*`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.

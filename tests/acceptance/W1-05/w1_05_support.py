@@ -60,7 +60,6 @@ READ_ONLY_TOOLS = ("Read", "Grep", "Glob")
 OTHER_TOOLS = ("Agent", "Task", "TodoWrite", "WebFetch", "WebSearch", "mcp__github__create_issue",
                "ToolAddedAfterTheSwitchOver")
 EVERY_TOOL = WRITE_TOOLS + READ_ONLY_TOOLS + OTHER_TOOLS
-DEPENDENCIES = ("W1-02", "W1-03", "W1-04")
 
 COMMAND_TIMEOUT_S = 30.0
 SESSION_ID = "w1-05-acceptance-session"
