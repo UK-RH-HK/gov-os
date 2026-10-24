@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.299 (the version table at the end of each section gives the history)
+**Version:** 0.300 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10775,3 +10775,20 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 |---|---|---|
 | 0.298 | 2026-10-24 | Delegated (orchestrator, DEC-102; the owner's acceptance asked): DEC-913 (W2-65's run 1: the kernel template's three hook lines join its paths and take the template's form, stricter only; its merge-back judged by DEC-912, no exemption; W1-27's doctor fixture named for its test designer; rows W2-L427 to W2-L429). Next free id: DEC-914. |
 | 0.299 | 2026-10-24 | Owner: DEC-913 accepted (status line marked; recorded by the orchestrator, DEC-861). Next free id: DEC-914. |
+
+## 299. W2-67's rounds 2 and 3 (register v0.300, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-914 — W2-67's rounds 2 and 3 run together as its run 3, with round 1's ride-alongs; its review waits for the owner's answer on DEC-413
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; item 4 is the owner's, asked in package P-W2-67-R23) · **Under:** DEC-904 item 5, DEC-907, DEC-802, DEC-413, DEC-906, DEC-866 · **Basis:** W2-67's ticket (rounds 2 and 3 wait for W2-07 and W2-66, and for W2-69); all three are merged (`2a9d1a11`, `c60c9704`, `2d5a829a`). W2-67's run 2 return (round 1, merged `4da40b60`) proposed the ride-alongs below and used both of DEC-413's reviews (`docs/probes/DAEO-9nys/PR-DAEO-9nys.md`: the second and last passed).
+- **Decision:**
+  1. **Rounds 2 and 3 run together, as W2-67's run 3,** since no ticket in flight holds their folders: W1-30's 13 first-round cases and row W2-L420 (W1-30's context-failures case and two docstrings follow DEC-868 and DEC-908); the 15 nested-run unit close functions (`tests/unit/close/**`); W2-50's large-store and hang cases (`tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`), on W2-69's merged code.
+  2. **Round 1's ride-alongs (DEC-802), accepted:** P-W2-67-TD4-A (the root conftest's static guard also catches an f-string `--basetemp=`); the engineer's P1, option A (the time-limit case in `tests/unit/close` gets a `TMPDIR` of its own); TD1C-A (the fixtures remove the code-graph folders they make); review F3 (ordinary yes / other). The next test designer removes the inert untracked `tests/acceptance/W1-27/w2_67_td4_plant.py`.
+  3. **W1-05's nested run and the retention option:** re-checked by the lead against the code (DEC-718), since W2-70 retired W1-05's switch-over case; a row only if a nested run is left.
+  4. **The review (the owner's):** the run stops after its full verification, with no review, until the owner answers P-W2-67-R23.
+- **Changes:** none to earlier decisions.
+- **Where it goes (DEC-851):** this register; W2-67's run 3 brief; package P-W2-67-R23; RESUME HERE. No ticket, card or standing brief changes.
+- Next free id: DEC-915.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.300 | 2026-10-24 | Delegated (orchestrator, DEC-102): DEC-914 (W2-67's rounds 2 and 3 together as run 3, round 1's ride-alongs accepted, W1-05's nested run re-checked; the review waits for the owner's answer on P-W2-67-R23). Next free id: DEC-915. |
