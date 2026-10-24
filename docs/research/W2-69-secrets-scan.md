@@ -396,3 +396,21 @@ Bytes given to gitleaks:
 |---|---|---|---|
 | The store | 69.7 | 59.6 | Terms in place of whole leaf pages and their doclists |
 | The files | 31.2 | 37.4 | The wider overlap |
+
+**The last round (DEC-909, 2026-10-24, the engineer after `ed2de0eb`).** A key block longer than the overlap of 9,216 bytes was missed wherever a piece's cut fell inside it. One repair:
+
+- **Each key block of up to 24 KiB also goes to gitleaks whole, as a piece of its own.**
+  - Where a text is longer than one piece, each BEGIN marker (`-----BEGIN`, any case) is followed to the first END marker after it (`-----END`, a label, `-----`). If that span is at most 24,576 bytes, it is added as one more piece: from the first dash of BEGIN to the last dash of END, its blank lines given a form feed as the rest are.
+  - The text's own pieces are cut as before. So every read edge they make is unchanged, and the added piece begins and ends with a dash, which is not a word byte. No read begins or ends inside a word there, which covers a BEGIN in mid-line, two blocks back to back and a block with text after its END.
+  - A BEGIN with no END inside 24 KiB adds nothing. Nor does an END with no BEGIN, or a text short enough to be one piece already (that piece holds the block whole). A block over 24 KiB is read as before (row W2-L419).
+  - The added piece and its separator stay under gitleaks' peek of 25,000 bytes, so it is whole in one read (section 4).
+  - The change is in `_pieces`, which the check, the pre-index filter and the judgement of a path name share. Both rule sets still run on every input, and a scan that cannot decide still raises.
+  - `_FORM` goes to 4, so no clean result recorded before the change is trusted.
+- **Tests.** Every case in `tests/acceptance/W2-69` passes: 352, including this batch's 99. W1-15, W1-16 and the secrets files of W2-50 pass too.
+- **Time on a large stand-in.** A 31 MB FTS5 store built with the lexical tokenizer from three copies of the repository's clean `docs/` and `src/gov/` texts, plus 300 text files of 70 KB each. The two versions were run alternately, at a load average of 21 to 27:
+  - before: 17.7 s and 16.4 s;
+  - after: 17.2 s and 16.1 s.
+- **Seen on that stand-in: keyword gating varies with the pipe (section 14).**
+  - On one input, `sourcegraph-access-token` flagged twelve 40-hex terms (commit hashes) when the word `sourcegraph` shared a gitleaks read with them.
+  - Reads end only at the blank lines between pieces, but which pieces share a read still varies with how the pipe delivers the bytes. Both runs of the earlier check flagged the store; one of the two runs of this check did not. Three probe runs of one fixed input all found the same twelve.
+  - That is not a read edge inside a word, and this round does not change it.
