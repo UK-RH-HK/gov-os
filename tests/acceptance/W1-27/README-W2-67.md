@@ -602,6 +602,122 @@ expectation only.
   own parameter, so `test_w2_67_basetemp_refusal.py` is unchanged and keeps its result. No other source of round 1's
   folders passes an f-string `--basetemp`.
 
+## Batch 8: the fixtures remove the code-graph daemon folders they make (TD1C-A, DEC-914 item 2)
+
+Independent test designer (MR-3), run 3, batch 8, 2026-10-24, outside the sandbox (it makes `/tmp/gov-cbm-<uid>`
+read-only). Batch 1c's finding: every run of the code index for a project makes `/tmp/gov-cbm-<uid>/<the first 16
+hex digits of the sha256 of the project's resolved root>/` (`gov.codeintel.daemon_dir`; DEC-338), even with no
+tool on PATH and in the `--no-embeddings` mode, and nothing removed it. Here the head is `1d17c7d1`.
+
+### How the cases were found
+
+- **What reaches the code index** (read in `src/gov`): `gov rebuild` (`gov.rebuild.command.run` calls
+  `gov.codeintel.index` in every mode), `gov adopt`'s code-graph stage, and `gov closure` (and `gov retrieve` over
+  ids) for a start id that is no record. The kernel checks a tree copy runs (`recovery-rebuild`,
+  `retrieval-regression`) do not: the first reads the store only.
+- **Measured, not guessed:** a pytest plugin kept in `.gov-runtime/scratch/td-8/w2_67_cbm_trace.py` (`-p`, never
+  under `tests/`) maps, after each case's call and before its fixtures end, every git project under the run's
+  `TMPDIR` (this designer's own, so every project is this run's) to its daemon folder, and writes those that exist,
+  with the processes whose environment names the folder (`CBM_RUNTIME_DIR`). A folder is the case's whose own
+  `tmp_path` holds the project. No entry "new since the run began" is used: other workers make theirs meanwhile
+  (the entry counts below move by more than the traced folders twice).
+- **Traced, with no daemon folder:** `W1-30/test_w1_30_r11_rebuild_mode.py` (2 passed: its rebuild ends before the
+  code index), `W1-30/test_w1_30_close.py` (33), `W1-26/test_w1_26_green_base.py` (3),
+  `W2-02/test_w2_02_green_here.py` (5), `W1-25/test_w1_25_command.py` (5),
+  `W2-50/test_w2_50_secrets_scan_scale.py` (23; its `codeintel/home` is a planted store, the code index is never
+  run). No source in `W1-25/`, `W1-26/`, `W2-02/` or the rest of `W1-30/` runs `rebuild`, `adopt`, `closure` or a
+  retrieve over ids.
+- **W1-07, from its results only** (its support module is not this batch's to read): of its `rebuild` and `closure`
+  parameters (18 cases traced), one makes a folder:
+  `test_w1_07_config_details.py::test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[rebuild]`
+  (`small-repo`, `e2b37feb70659b58`). It is not changed here: returned.
+
+### The cases found: 31 cases of 8 W1-27 files, 34 folders (on the head, all passed, every folder left)
+
+| File | Cases that make a folder (project, folder) |
+|---|---|
+| `test_w1_27_rebuild.py` (6 of 6) | `test_rebuild_is_an_act_command` (repo, `52b92d1c02d4c862`); `test_rebuild_recreates_derived_stores` (repo, `6c1b431fe1f732f7`); `test_two_rebuilds_give_the_same_digest` (repo, `3b0173657a24dbc4`); `test_fresh_clone_doctor_rebuild` (clone, `1a6bc995d295b45c`; the origin is never rebuilt); `test_rebuild_needs_only_git` (repo, `7522dd308b619427`); `test_rebuild_digest_matches_store_loader` (repo, `e0a79a8348ef5b1d`) |
+| `test_w1_27_rebuild_r2.py` (3 of 3) | `test_rebuild_recreates_lexical_index` (`afc9480149c65461`); `test_rebuild_does_not_silently_drop_lexical_tables` (`98ac8ea82c8d0323`); `test_rebuild_result_names_unreconstructed_stores` (`3869ac03705d5ee5`), each its repo |
+| `test_w1_27_rebuild_r3.py` (3 of 4) | `test_rebuild_lexical_index_is_fresh` (`70e8ebec79523068`); `test_rebuild_lexical_search_finds_tracked_text` (`177b34fcd296fb14`); `test_rebuild_result_names_derived_stores_with_measured_status` (`79fbdf0f71cd3537`) |
+| `test_w1_27_rebuild_r4.py` (5 of 5, 7 folders) | `test_rebuild_secret_file_not_in_lexical_index` (`ff27ffcebe17a61f`); `test_rebuild_lexical_digest_matches_owner_refresh` (`1d8424bdc117666b`; its `repo_b` is never rebuilt); `test_rebuild_stores_hold_no_secret` (`f9d7993c23dd91c5`); `test_rebuild_codeintel_reason_is_measured` (answers, fails, absent: `68f0ad3db3e0b4bd`, `fbd8f4ad0cdb53c9`, `1d248310b1979bc4`); `test_rebuild_codeintel_is_recreated_when_tool_answers` (`151b18abc2a95e46`) |
+| `test_w1_27_recovery_check.py` (1 of 5) | `test_derived_state_deleted_and_rebuilt_gives_same_digest` (`d429850490b12af8`) |
+| `test_w1_27_recovery_check_r2.py` (2 of 3) | `test_recovery_rebuild_command_not_unconditionally_exit_zero`, `test_recovery_rebuild_command_exits_nonzero_on_tampered_store` (`78573f9c2fb4e681`, `36e7f746b674c18e`) |
+| `test_w1_27_doctor.py` (2 of 12) | `test_doctor_report_mentions_index_freshness` (`1592355d022c0079`); `test_doctor_report_mentions_canaries` (`a151b4d13181f991`) |
+| `test_w1_27_rebuild_r8_no_embeddings.py` (9 of 9, 10 folders) | every case's `tiny` repo; `test_the_mode_builds_everything_else_a_rebuild_builds` also its `twin` clone (`2046917aa3fafaa5`, `124ef160e4926f68`) |
+
+`test_w1_27_rebuild_r5.py` (10 cases) uses the builders and makes none. Every project above is built by
+`w1_27_support.make_rebuild_project` (directly, through `w2_67b_support.rebuild_project` or through the conftest's
+`rebuild_project` fixture), except the two clones made in a case's body (`clone`, `twin`).
+
+The daemon outlives the command: at the start of a case's teardown the tool's processes often still name the
+folder (`codebase-memory-mcp --cbm-daemon-internal`, with `CBM_RUNTIME_DIR` in its environment); it stops by itself
+after its last session (about 5 to 6 s here, from the cases' durations below). `gov.codeintel` has no public stop:
+its public `daemon_dir` names the folder.
+
+### The case first, red on the head (`test_w2_67_codegraph_folders.py`, commit `279b08e8`)
+
+Each case runs one of W1-27's rebuild-reaching cases in a nested run (one worker, one case, no per-run base
+folder, 600 s limit; `w2_67_codegraph_probe.py` loaded with `-p`) whose `TMPDIR` is in the case's `tmp_path`, so
+every git project under it is that nested case's. The probe records, before the nested case's fixtures end, each
+project's folder and that at least one was there (the case reached the code index; an empty result cannot pass).
+
+- `test_no_daemon_folder_of_a_project_the_case_made_is_left`, ×4, one per way a project is built:
+  `w2_67b-rebuild-project` (`test_rebuild_is_an_act_command`), `conftest-rebuild-project`
+  (`test_rebuild_recreates_lexical_index`), `make-rebuild-project-and-a-clone` (r8's
+  `test_the_mode_builds_everything_else_a_rebuild_builds`), `origin-and-its-clone`
+  (`test_fresh_clone_doctor_rebuild`). **Red on `1d17c7d1`, 4 of 4** (`red-codegraph.xml`), e.g. `…
+  test_rebuild_is_an_act_command is over, and the daemon folder of 1 project(s) it made is left under
+  /tmp/gov-cbm-1000 …: ['/tmp/gov-cbm-1000/35db6dd99d13d3df (project …/test_rebuild_is_an_act_command0/repo)']`;
+  r8's case: 2 left (repo and twin).
+- `test_a_daemon_folder_the_case_did_not_make_is_never_removed`: while the nested case runs (its call, after its
+  fixtures are set up), the probe plants two folders of "another worker": `w2-67-foreign-<16 hex>` (a name no daemon
+  folder can have) and 16 random hex digits, checked to be the folder of none of the case's projects. Both must be
+  there afterwards; the case then removes its two plants by their exact names. **Green on the head: a guard**
+  against a clean-up keyed on entries new since the case began.
+
+### The fixtures (commit `26ed33b0`, `Rewrite-Reason: TD1C-A (DEC-914 item 2): the fixtures left the code-graph daemon folders they made`)
+
+- `w2_67_codegraph.py` (new): `note(root)` records, before a project is built, its daemon folder (the
+  `daemon_dir` rule) and whether it was already there; `release(since)` takes the roots noted from `since` on and,
+  for each folder that was not there before its project was built (a 16-hex name under `/tmp/gov-cbm-<uid>`, a real
+  directory of this user), waits until no process names it in `CBM_RUNTIME_DIR` (up to 60 s; one still there is sent
+  SIGTERM, then SIGKILL, 5 s each; one left keeps the folder and fails the case's teardown), then removes it. Nothing
+  else under `/tmp/gov-cbm-<uid>` is ever touched.
+- `w1_27_support.make_rebuild_project` and `make_rebuild_project_no_path_map` note their destination first.
+- `conftest.py`: an autouse fixture `codegraph_folders` (set up first, so it ends last) marks where the case's notes
+  begin and releases them when the case is over; notes made before the case (another folder's, a wider fixture's)
+  are not its.
+- `test_w1_27_rebuild.py::test_fresh_clone_doctor_rebuild` and r8's
+  `test_the_mode_builds_everything_else_a_rebuild_builds` note their clone before `git clone` (one line each). No
+  expectation changed.
+
+### Runs (`-n 4`, by file, `-o tmp_path_retention_policy=failed`, `TMPDIR=/tmp/gov-os-lead-W2-67/td-8`)
+
+| File | On `1d17c7d1` (before) | After `26ed33b0` |
+|---|---|---|
+| `test_w2_67_codegraph_folders.py` | 4 failed, 1 passed in 24.1 s | 5 passed in 28.9 s (each nested case 5 to 6 s longer: the wait for the daemon) |
+| `test_w1_27_rebuild.py` | 6 passed in 38.6 s | 6 passed in 31.8 s |
+| `test_w1_27_rebuild_r2.py` | 3 passed in 22.3 s | 3 passed in 19.9 s |
+| `test_w1_27_rebuild_r3.py` | 4 passed in 15.8 s | 4 passed in 12.4 s |
+| `test_w1_27_rebuild_r4.py` | 5 passed in 23.4 s | 5 passed in 23.1 s |
+| `test_w1_27_rebuild_r5.py` | 10 passed in 2.8 s | 10 passed in 7.0 s |
+| `test_w1_27_recovery_check.py` | 5 passed in 21.5 s | 5 passed in 25.0 s |
+| `test_w1_27_recovery_check_r2.py` | 3 passed in 11.2 s | 3 passed in 11.0 s |
+| `test_w1_27_doctor.py` | 12 passed in 27.4 s | 12 passed in 30.2 s |
+| `test_w1_27_rebuild_r8_no_embeddings.py` | 9 passed in 75.2 s | 9 passed in 73.2 s |
+| `test_w2_67_temp_folders.py`, `test_w2_67_basetemp_refusal.py` | — | 5 passed; 13 passed |
+
+No case's result changed (JUnit XML compared case by case, `.gov-runtime/scratch/td-8/before-*.xml`,
+`after-*.xml`). The other W1-27 files never call the builders: for them the autouse fixture releases nothing.
+
+**Entries of `/tmp/gov-cbm-1000`:** 12,742 when this batch began. The traced runs on the head added their 34
+folders (and the W1-07 run its one): +10 (r8), then +7, +5, +3, +7, 0, +1, +2, +3 for `rebuild`, `r2`, `r3`,
+`r4`, `r5`, `recovery_check`, `recovery_check_r2` and `doctor` (38 in all: each count also takes in other workers'
+rebuilds). The red run added 7 (its 6 leftovers and the guard's
+nested case's one). After the fixtures, the same 9 files' traced runs made the same 34 folders (seen at the start of
+each teardown) and left none: 12,790 before and after every run (another session removed 23 entries between the
+red and the green runs; this batch removed none by hand). The 42 folders this batch's runs on the head left stay.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
@@ -622,3 +738,7 @@ expectation only.
   `test_w1_27_adoption.py` (3 cases).
 - Revised in place by batch 1c: `test_w1_27_rebuild_r4.py` (1 case); `test_w1_27_rebuild_r8_no_embeddings.py`
   (the write-scope case's comment only).
+- Batch 8: `test_w2_67_codegraph_folders.py` (5 cases), `w2_67_codegraph_probe.py` (its nested runs' plugin, not
+  collected), `w2_67_codegraph.py` (the daemon folders' note and release); changed: `conftest.py` (the autouse
+  `codegraph_folders`), `w1_27_support.py` (the two builders note), `test_w1_27_rebuild.py` and
+  `test_w1_27_rebuild_r8_no_embeddings.py` (a clone noted, one line each).
