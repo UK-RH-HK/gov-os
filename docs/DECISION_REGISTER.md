@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.294 (the version table at the end of each section gives the history)
+**Version:** 0.298 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -2451,7 +2451,7 @@ Owner decisions of 2026-10-04, on the orchestrator's P1 package (the W1-37 merge
 `test_only_the_test_designer_commits_to_acceptance_tests` of W1-01 fail) and its package on containment findings.
 
 ### DEC-253 — The W1-01 history test accepts an integration merge of test-designer commits
-- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the P1 package, option (a) · **Under:** MR-3, DEC-235, DEC-106
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the P1 package, option (a) · **Under:** MR-3, DEC-235, DEC-106 · **Changed by:** DEC-912 item 1: a merge whose every changed acceptance file equals git's own merge of its parents also passes
 - **Decision:**
   - A test designer revises `test_only_the_test_designer_commits_to_acceptance_tests` so that an integration merge
     commit passes when every change it brings under `tests/acceptance/` comes from commits on the merged side
@@ -4407,7 +4407,7 @@ fourth round.
     `PAUSE_NOT_SET` and `PAUSE_NOT_LIFTED`, and the flag's mode 0600.
 
 ### DEC-413 — Review rounds: at most two per FULL ticket; what is fixed after that; W1-50 keeps its seventh round
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220 · **Changed by:** DEC-880 makes one exception, for W2-58 only: a third review limited to its narrow extra round · **Changed by:** DEC-909 (for W2-69 only): the owner allows a third review, the last.
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220 · **Changed by:** DEC-880 makes one exception, for W2-58 only: a third review limited to its narrow extra round · **Changed by:** DEC-909 (for W2-69 only): the owner allows a third review, the last. · **Changed by:** DEC-912 item 3 (for W2-66 only): the owner allows a third review, the last.
 - **Decision:**
   - A FULL ticket has at most two review rounds.
   - After the second, only two kinds of finding are fixed: fail-open holes, and silent changes to tests or ticket
@@ -10700,3 +10700,77 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.294 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-909 (P-W2-69-R2-1 (a) with P-3 and P-4, the owner's exception to DEC-413: each key block to gitleaks whole up to 24 KB, tests for 9 to 24 KB blocks at every boundary and the index filter's cases, two daemon cases serial by the test designer, blocks over 24 KB a residual row, the chance red not brought back; the last round, any further fail-open finding a package; W2-69 keeps its place in the first re-pin). Next free id: DEC-910. |
+
+## 295. The owner's answer of 2026-10-24 on R3-A (register v0.295, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-910 — R3-A, W2-69's third review: encoded key exports past the 24 KiB bound are a residual row, as the reviewer judged
+- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-909 items 5 and 7, DEC-880 item 3 · **Changed by:** DEC-911 item 5 (the row notes that it is narrower than the code before W2-69, so its fix stays in Wave 3) · **Basis:** W2-69's third review (`docs/probes/DAEO-rmbe/PR-DAEO-rmbe.md`), which passed and judged R3-A not ordinary work: the 24 KiB bound of DEC-909 item 5 applies after encoding and after the form feeds. A key export wrapped as one word over 24,000 bytes (base64 once from a block of about 18 KB; base64 twice or hex from about 12 to 14 KB; gitleaks decodes each by default) is missed by the check and the filter at every placement, even standalone, where the code before W2-69 found every standalone file tested; typical RSA-4096 exports with subkeys (10.4 to 13.6 KB) wrapped once are found at every placement. A 24,576-byte block with a blank line after every line is missed (severity low). Ordinary work: no; consequence: fails open.
+- **Decision:**
+  1. **R3-A is a row, not ordinary work:** row W2-L419 is widened to cover it. It does not count as DEC-909 item 7's further finding, so no package and no fourth round.
+  2. **The fix stays Wave 3:** a stream reader that does not cut a block, as row W2-L419 says.
+  3. **W2-69 keeps its merge (`2d5a829a`) and its place in the first re-pin.**
+- **Changes:** row W2-L419 (widened).
+- **Where it goes (DEC-851):** this register; the Wave 2 list (row W2-L419); RESUME HERE (the digest item removed). No brief, ticket or card changes.
+- Next free id: DEC-911.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.295 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-910 (R3-A, W2-69's third review, a row as the reviewer judged: row W2-L419 widened to encoded key exports and double-spaced blocks past the 24 KiB bound; the fix stays a Wave 3 stream reader; not DEC-909 item 7's further finding). Next free id: DEC-911. |
+
+## 296. The owner's answer of 2026-10-24 on P-W2-L423-A and on DEC-910's row (register v0.296, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-911 — Row W2-L423: short hashes and none of the rule's keywords under `.gov-runtime/`, a paths-only early warning, the gate as the backstop, and W2-71's exemption for real commits of this repository in the second re-pin
+- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-298, DEC-347, DEC-853, DEC-897, DEC-105 · **Basis:** package P-W2-L423-A (`governance/project/orchestration/packages/P-W2-L423-A.md`). One gitleaks default rule takes a bare 40-hex string for a token when one of its two keywords is in the same text, so a full commit hash beside a keyword in a file under `.gov-runtime/` turns the hard-block secrets-indexing check red (W2-69's run 2 met it on three of its own review logs). The check strips every allowlist (DEC-298, DEC-347), so a `.gitleaks.toml` allowlist would do nothing. Ordinary work: yes; consequence: fails closed.
+- **Decision:**
+  1. **(b), now, standing:** under `.gov-runtime/`, commit hashes are written as 12 digits in records, briefs, returns and logs, and none of the rule's keywords is written there; the rule is named "row W2-L423's rule". The orchestrator keeps the keywords and full hashes apart in its tracked records too, and writes the keywords only in parts in any tool or test.
+  2. **The early warning:** `tools/keyword_warn.py` lists, by path only and never content, every file under a tree's `.gov-runtime/` that holds a keyword; `record_checks.sh` prints it, and the close queue runs it after each rebuild and stops before the close on a hit.
+  3. **(e), the backstop:** gate (b) still fails closed on such a red; the remedy is to shorten the hashes in the file the locator names (positions and rule ids only), then one proven re-run under DEC-897 (b) while it stands.
+  4. **(a), as ticket W2-71 (FULL, engineer), carried by the second re-pin with W2-68:** the check exempts only that one rule's matches that are exactly 40 hex digits naming a real commit object of this repository; any other rule, any other match, an unverified string or a verification that cannot run stays a finding; a test shows that a real token of that vendor still fails. The pre-index filter, which shares the check's gitleaks call, behaves the same.
+  5. **Not (c) and not (d):** `.gov-runtime/scratch/` stays in the check, and the rule stays on with no allowlist.
+  6. **DEC-910's row:** W2-L419 states that, for a key export wrapped as one word over 24,000 bytes, the check is narrower than the code before W2-69, so its stream reader is due in Wave 3 and does not slip past it.
+- **Changes:** DEC-910 (its row's note); row W2-L423 (routed); row W2-L419 (the note); the second re-pin's contents (W2-68 and W2-71).
+- **Where it goes (DEC-851):** this register, with DEC-910's status line marked; the w2 prompt (v3.24: section 3's re-pins, section 15's rule); `LEAD-w2-common.md` and `AUDITOR-common.md` (the rule in every brief); the Wave 2 list (rows W2-L419 and W2-L423); the WBS card and the ticket file of W2-71 (its own commit, `Task:` its ticket); the orchestrator's tools (`keyword_warn.py`, `record_checks.sh`, `close_queue.sh`); RESUME HERE.
+- Next free id: DEC-912.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.296 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-911 (P-W2-L423-A: (b) now, 12-digit hashes and none of row W2-L423's rule's keywords under `.gov-runtime/`, with a paths-only early warning in the record checks and the close queue; (e) the gate failing closed as the backstop; (a) as W2-71, only that rule's exact 40-hex matches naming a real commit of this repository, a real token of that vendor still failing, in the second re-pin with W2-68; not (c) or (d); DEC-910's row notes it is narrower than the code before W2-69, its fix due in Wave 3). Next free id: DEC-912. |
+
+## 297. The owner's answer of 2026-10-24 on P-W2-66-M1-R2 (register v0.297, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-912 — W1-01's merge rule passes a merge whose acceptance files equal git's own merge of its parents; W2-66's third and last review for P1 and P2
+- **Status:** ACCEPTED (owner, 2026-10-24, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-24)`) · **Under:** DEC-906, DEC-750, DEC-754, DEC-253, DEC-413, DEC-909, MR-3 · **Basis:** package P-W2-66-M1-R2 (`governance/project/orchestration/packages/P-W2-66-M1-R2.md`). M1: W2-66's ordered merge-back `03f470a5` and W2-65's `4ef3293a` each hold acceptance files equal to neither parent but exactly git's own clean merge of two test designers' edits, so W1-01's history and integration-merges cases are red on both branches. R2: W2-66's second and last review failed on P1 (a renamed test-map target counted as selected but running nothing, with no widening; yes / fails open, medium) and P2 (W1-28's held-out copy check coupled to `**_support.py` only; yes / fails open, low).
+- **Decision:**
+  1. **M1 (a): W1-01's merge rule is revised.** A merge commit passes when every file it changes under `tests/acceptance/` equals git's own merge of its parents (`git merge-tree --write-tree`; no hand edits), consistent with DEC-750 and DEC-754, and every brought commit that touches the folder is still a test designer's or listed (DEC-906 item 2). Any file that differs from git's own merge (a hand edit, a conflict resolution) stays a refusal.
+  2. **Who and where:** a test designer makes the revision (DEC-906 item 1), in W2-70 (a short round) or in W2-66's resume, whichever lands sooner. It must land before W2-66's verification and before the W2-59 + W2-65 merge, so both go green. The orchestrator routes it to W2-70's round 2, which starts at once; W2-66's run 3 merges `w2/integrate` back once it has merged, before its verification.
+  3. **R2 (a), the owner's exception to DEC-413:** one more round and a third, last review, in the same resume as M1 (W2-66's run 3).
+     - **P1:** a selected test-map target that cannot be resolved at the head widens the run to the full regression and is named in the record, with tests.
+     - **P2** rides in the same round: W1-28's coupling reaches every file its scan reads.
+  4. **The last round:** if the third review finds another fail-open case an honest agent can hit, no fourth round starts: the orchestrator brings the owner a package.
+- **Changes:** DEC-253 (its rule widened, item 1); DEC-413 (for W2-66 only: a third review); DEC-899 item 2 (the merge-back is judged by item 1).
+- **Where it goes (DEC-851):** this register, with DEC-253's and DEC-413's status lines marked; W2-70's ticket file (a KPI line, its own commit, `Task: DAEO-uzme`); W2-66's ticket file (two KPI lines, its own commit, `Task: DAEO-c1uz`); W2-70's run 2 and W2-66's run 3 briefs; RESUME HERE. No standing brief changes.
+- Next free id: DEC-913.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.297 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-912 (P-W2-66-M1-R2: M1 (a), W1-01's merge rule passes a merge whose every changed acceptance file equals git's own merge of its parents, any other file still refused, by a test designer in W2-70's round 2, landing before W2-66's verification and the W2-59 + W2-65 merge; R2 (a), the owner's exception to DEC-413 for W2-66: one more round and a third, last review, P1 widening the run for an unresolvable target with tests, P2 riding; a further fail-open finding a package, no fourth round). Next free id: DEC-913. |
+
+## 298. W2-65's run 1 packages (register v0.298, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-913 — W2-65: the kernel template's three hook lines map exits as the template's source does; W1-27's doctor fixture gets the kernel's canary declarations; its merge-back is judged by DEC-912
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; the owner's acceptance is asked, before the W2-59 + W2-65 merge) · **Under:** DEC-880 item 3, DEC-608, DEC-835, DEC-912, DEC-906, DEC-802, DEC-884 · **Basis:** W2-65's run 1 return (`log/W2-65-A5-run1.json`, branch head `20d72c19`), three packages.
+  - **P-W2-65-1:** the engineer made `template/.rulesync/hooks.jsonc`'s preToolUse and two containment lines map any exit other than 0 or 2 to 2 (DEC-880 item 3). DEC-608 holds those lines to the kernel template's form exactly (`template/governance/kernel/settings.json`), which is outside the ticket's paths, so six W1-38 equality cases are red and the kernel template keeps the fail-open lines. Ordinary work: yes; fails open (in the kernel template).
+  - **P-W2-65-2:** W2-65's merge-back `4ef3293a` is git's own clean merge of two test designers' W1-26 edits; W1-01's two cases were red at its verification (17:00 to 17:52), before W2-70's round 2 merged (`3ff8ba51`).
+  - **P-W2-65-3:** W2-59's canaries read the project's own declarations (DEC-835); W2-67's revised W1-27 doctor case builds a project with none, so `test_doctor_report_mentions_canaries` is red on the merged head. The behaviour fails closed; a fixture gap.
+- **Decision:**
+  1. **P-W2-65-1 (a):** `template/governance/kernel/settings.json` joins W2-65's `allowed_paths`, for its three command lines (PreToolUse, PostToolUse, PostToolUseFailure) only: they take the template's source form exactly, so DEC-608's single form holds and the kernel template no longer fails open. Stricter only, inside the owner's DEC-880 item 3. No live settings change: the main tree's hooks change only at the owner's regeneration after the re-pin.
+  2. **P-W2-65-2:** no exemption entry. DEC-912's rule passes `4ef3293a` (W2-70's round 2 checked it); W2-65's run 2 merges `w2/integrate` back and re-verifies.
+  3. **P-W2-65-3 (a):** `tests/acceptance/W1-27/test_w1_27_doctor.py` (and its conftest, if the fixture lives there) is named in W2-65's ticket body for its test designer (DEC-906 item 1): the fixture project holds the kernel's canary declarations, as `912ddc63` did for W1-22, with `Rewrite-Reason: DEC-835`. It rides in W2-65's run 2 (DEC-802).
+  4. **Rows:** W2-L427 (W1-29's "once" untested), W2-L428 (W1-38's support reads SubagentStop's stdout record), W2-L429 (W2-54's context-reproducibility case times out at 600 s under parallel load).
+- **Changes:** W2-65's `allowed_paths` and ticket body.
+- **Where it goes (DEC-851):** this register; W2-65's ticket file (its own commit, `Task: DAEO-e82f`); the Wave 2 list (rows W2-L427 to W2-L429); W2-65's run 2 brief; RESUME HERE; the owner's digest. No standing brief changes.
+- Next free id: DEC-914.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.298 | 2026-10-24 | Delegated (orchestrator, DEC-102; the owner's acceptance asked): DEC-913 (W2-65's run 1: the kernel template's three hook lines join its paths and take the template's form, stricter only; its merge-back judged by DEC-912, no exemption; W1-27's doctor fixture named for its test designer; rows W2-L427 to W2-L429). Next free id: DEC-914. |
