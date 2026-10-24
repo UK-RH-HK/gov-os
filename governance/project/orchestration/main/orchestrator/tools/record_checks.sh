@@ -33,4 +33,9 @@ python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestr
 code=$?
 echo "placeholder scan exit $code: $(tail -1 "$OUT/placeholders.out")"
 [ "$code" -eq 0 ] || { status=1; grep '^placeholder:' "$OUT/placeholders.out" | head -10; }
+# DEC-911 (b) (owner, standing): row W2-L423's early warning, paths only. A warning, not a gate here: what it names lies
+# under .gov-runtime/, which no record commit carries; I shorten the hashes or drop the keyword before the next close.
+python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/keyword_warn.py > "$OUT/keyword-warn.out" 2>&1
+echo "keyword warning exit $?: $(tail -1 "$OUT/keyword-warn.out")"
+grep -v ' file(s) hold ' "$OUT/keyword-warn.out" | head -10
 exit $status

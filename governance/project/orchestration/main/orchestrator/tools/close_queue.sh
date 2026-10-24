@@ -32,6 +32,10 @@ for item in "$@"; do
     > "$LOG/checkpoint-commit-$ticket.txt" 2>&1 || stop "the checkpoint could not be committed"
   date '+%F %T rebuild before '"$ticket" >> "$LOG/queue.txt"
   gov rebuild > "$LOG/rebuild-$ticket.json" 2> "$LOG/rebuild-$ticket.err" || stop "gov rebuild failed"
+  # DEC-911 (b): row W2-L423's early warning, after the rebuild so the stores are as the check will read them; a file
+  # holding the rule's keyword stops the queue before any close is spent (paths only; the backstop is gate (b), (e)).
+  python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/keyword_warn.py \
+    > "$LOG/keyword-warn-$ticket.txt" 2>&1 || stop "row W2-L423's early warning: $(head -5 "$LOG/keyword-warn-$ticket.txt" | tr '\n' ' ')"
   # (a) collection, in one process, as the close runs the regression (its environment: the tree's src).
   env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src \
     python3 -m pytest tests --collect-only -q -p no:cacheprovider --no-header > "$LOG/collect-$ticket.txt" 2>&1

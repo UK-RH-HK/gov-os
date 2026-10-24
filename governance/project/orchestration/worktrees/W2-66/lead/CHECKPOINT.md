@@ -1,6 +1,16 @@
 # W2-66 (DAEO-c1uz) lead checkpoint
 
-## RUN 2 (2026-10-24) — current state
+## RUN 2 END (2026-10-24): returned PACKAGES (P-W2-66-M1, P-W2-66-R2)
+- Branch head 5634d430 (nothing committed after the last probed head). Probe records NOT committed (both reviews failed):
+  probes/PR-DAEO-c1uz-review1-fail-draft.md, probes/PR-DAEO-c1uz-review2-fail-draft.md.
+- Packages: P-W2-66-M1.md (W1-01 DEC-253 vs the ordered merge 03f470a5), P-W2-66-R2.md (review 2: P1 stale map
+  targets, P2 W1-28 coupling; DEC-413 last review).
+- A resume must: wait for the orchestrator's answers; if R2 (a): td batch (P1 widen on missing target; P2 W1-28
+  coupling if the check stays), engineer, full verification, third review (owner exception); if M1 (a): a test
+  designer's W1-01 revision (named in the ticket body), re-verify W1-01 and a full run.
+- Temp: /tmp/gov-os-lead-W2-66 2,038 inodes / 27M (eng-3 subfolder 2,010 / 27M) for the orchestrator to remove.
+
+## RUN 2 (2026-10-24) — progress log
 - Start: ba38ab8d, clean. Identity orchestrator/DAEO-c1uz checked.
 - Step 1 DONE: merge 03f470a5 (w2/integrate 4da40b60 into w2/W2-66), trailers Task/Implements DEC-899/Role orchestrator/Co-Authored-By.
   Tree 8bbbe2b4 = merge-tree 88c7f617 except src/gov/close/command.py = recorded resolution blob 612ff57d
