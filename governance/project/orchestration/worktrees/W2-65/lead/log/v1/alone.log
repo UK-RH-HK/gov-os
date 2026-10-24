@@ -1,0 +1,11 @@
+== tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95 19.57 33.69 36.27 4/956 3936089
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+1 failed in 133.90s (0:02:13)
+== tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_canaries 17.54 29.56 34.36 35/1233 3980106
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_canaries
+1 failed in 0.94s
+== tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here 17.54 29.56 34.36 8/1080 3980568
+.                                                                        [100%]
+1 passed in 250.46s (0:04:10)

@@ -27,7 +27,11 @@
   codeintel/files/tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py, store.db); none in lead scratch.
 - rebuild-r3b exit 0 (all recreated); gov.__file__ in worktree; collect-r3 "16426/16428 tests collected (2 deselected)
   in 6.88s" no error; check-r3 exit 0, YELLOW core-decision-citations, openspec-validate (as run 2).
-- parallel-r3 started (log/parallel-r3.*), then serial-r3 (run-serial.py serial-r3), then rev-3 (briefs/rev-3.md: fill
+- parallel-r3 (head 6eb5a93f, lock, retention): 16131 passed, 30 skipped, 0 failed in 2986.84 s (49:46); W1-01's two
+  cases PASSED. Scratch peak sampled 145,916 inodes; 126,238 / 1.1G near end; 8 / 28K after.
+- serial-r3 (lock, retention): 265 passed, 1 warning in 968.50 s (16:08), exit 0.
+- Next: rev-3 (gov launch independent-auditor, max, tripwire 12); commit probe record only if pass.
+- (done) parallel-r3 started (log/parallel-r3.*), then serial-r3 (run-serial.py serial-r3), then rev-3 (briefs/rev-3.md: fill
   HEADSHORT/MERGE2LINE/CPLINE/VERIFYLINE).
 - (old) Next: wait for flag; then merge 2 -> gov checkpoint
   commit -> rebuild -> collect/check/parallel/serial -> rev-3 (briefs/rev-3.md).

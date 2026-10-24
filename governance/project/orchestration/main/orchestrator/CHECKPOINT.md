@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-24 18:20 BST — W2-70 round 2 merged `3ff8ba51`, flag written; W2-66 run 3 (P1, P2 built; merge-back, full run, third and last review next) and W2-65 run 1 in flight; next free DEC-913)
+## RESUME HERE (2026-10-24 20:15 BST — W2-70 round 2 merged `3ff8ba51`; W2-66 run 3 at its full run and third review (head `6eb5a93f`); W2-65 run 1 PACKAGES -> DEC-913 (delegated, owner's acceptance asked), run 2 launched; next free DEC-914)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -52,8 +52,12 @@
   - **W2-66 run 3** (task b58cregy1, `log/W2-66-A5-run3.json`, from `5634d430`): merge integrate, td P1/P2, engineer,
     wait for the flag, merge integrate again, full run (W1-01 green), third FULL review. Rows R1-R4 at DONE; note
     `class_evidence` for W2-07's readers.
-  - **W2-65:** its verification will show W1-01's 2 reds (its `4ef3293a`, old rule); after W2-70 lands it merges
-    integrate again and re-verifies before the W2-59 + W2-65 merge.
+  - **W2-65 run 1 PACKAGES** (head `20d72c19`): P-W2-65-1 kernel template settings.json's 3 hook lines (W1-38 x6
+    red), P-W2-65-2 its merge-back on W1-01 (answered by DEC-912, no exemption), P-W2-65-3 W1-27 doctor fixture
+    (W2-59 x W2-67). **DEC-913** (`3e27836d`, delegated, owner's acceptance asked; ticket `fd813dfa`): (a), none,
+    (a); rows W2-L427..429. **Run 2** (task bls9benwf, `log/W2-65-A5-run2.json`): merge integrate, td W1-27, engineer
+    kernel lines, full run. Stray untracked `W2-65/pytest-of-usain/` (guard refuses my rm; not merged) for the
+    owner or a later cleanup; `/tmp/gov-os-lead-W2-65/verify-v1` kept (JUnit evidence, holds fixture tokens).
 - **In flight: W2-65 run 1** (DAEO-e82f, claimed `cbc7d08e`, stacked on
   W2-59 `1cad6aa0`, merged integrate `4ef3293a`; tests `ce70eb73` + W1-29 revision `d8f1af7d`; engineer next;
   estimate 3 to 4 h from 14:51; held unmerged, merges with W2-59 just before the re-pin; `log/W2-65-A5-run1.json`,
@@ -85,10 +89,10 @@
 ### Next
 1. W2-66 run 3 DONE: merge, probe_impact, test_inputs removal, temp folder; then the re-pin's ladder. PACKAGES: to
    the owner (no fourth round).
-2. W2-65's return: its W1-01 reds from `4ef3293a` are M1's; it re-merges integrate after W2-70 (a short run).
+2. W2-65 run 2 DONE: hold unmerged; W2-59 + W2-65 merge together just before the re-pin (after W2-66's merge).
 3. Then W2-67 rounds 2 and 3; on W2-65's return W2-59 + W2-65 merge together; the re-pin ACT.
 4. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
-5. Next free: DEC-913; ticket W2-72; rows W2-M406, W2-L426, W2-H063.
+5. Next free: DEC-914; ticket W2-72; rows W2-M406, W2-L430, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
