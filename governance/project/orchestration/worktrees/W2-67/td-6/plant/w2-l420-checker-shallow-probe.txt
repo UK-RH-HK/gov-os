@@ -1,0 +1,130 @@
+checker {'error': 'DECISIONS_OBJECT_UNREADABLE'}
+gov check exit 0
+   audit-reproducibility hard-block YELLOW []
+   core-decision-citations warning YELLOW [{"unmeasured": true, "reason": "git log failed in /tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-5u7_d5hc/claude-1000/td6-probe-lw7mwu9d/shallow: hint: Support for <GIT_DIR>/info/grafts is deprecated hint: and will be removed in a future Git version. hint: hint: Please use \"git replace --convert-graft-file\" hint: to convert the grafts into replace refs. hint: hint: Turn this message off by running hint: \"git config advice.graftFileDeprecated false\" error: Could not read 086cb16ee2a4 fatal: Failed to traverse parents of commit 721c503c71c25f86a0db96
+   product-traceability-trailers hard-block YELLOW []
+   openspec-validate hard-block YELLOW [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}]
+context {"ok": true, "command": "context", "result": {"ticket": "PROJ-aaaa", "authority": [{"id": "DEC-000", "sha256": "3b539a943f99a8d2af7384e1a65ac62af87c581560d5e5e52e2f7e0d20024a52", "authority": "decision", "lifecycle": "ACTIVE", "constraint": "3b539a943f99a8d2af7384e1a65ac62af87c581560d5e5e52e2f7e0d20024a52", "reason": "declared in sources"}], "mandatory": [{"id": "DEC-000", "sha256": "3b539a943f99a8d2af7384e1a65ac62af87c581560d5e5e52e2f7e0d20024a52", "authority": "decision", "lifecycle": "ACTIVE", "constraint": "3b539a943f99a8d2af7384e1a65ac62af87c581560d5e5e52e2f7e0d20024a52", "reason": "declared in sources"}], "supplementary": [], "dropped": [], "hash": "a1489fe50fa0ac1d41d5e27c114db355eeb43e7298cd2ffd0f0128941e238802", "tokens": 37, "budget": {"limit": 6000, "used": 37}}, "session": ""}
+
+exit 3
+{
+ "ok": false,
+ "command": "close",
+ "result": {},
+ "session": "",
+ "error": {
+  "code": "CONTEXT_FAILED",
+  "message": "the context of PROJ-aaaa cannot be built: the decisions could not be checked: DECISIONS_OBJECT_UNREADABLE: 086cb16ee2a4:docs/adr/DEC-000.md: git names the object and /tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-5u7_d5hc/claude-1000/td6-probe-lw7mwu9d/shallow does not hold it; findings are unclassed and await disposition",
+  "details": {
+   "findings": [
+    "the context of PROJ-aaaa cannot be built: the decisions could not be checked: DECISIONS_OBJECT_UNREADABLE: 086cb16ee2a4:docs/adr/DEC-000.md: git names the object and /tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-5u7_d5hc/claude-1000/td6-probe-lw7mwu9d/shallow does not hold it"
+   ],
+   "ticket": "PROJ-aaaa",
+   "decisions_error": "DECISIONS_OBJECT_UNREADABLE",
+   "root": "/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-5u7_d5hc/claude-1000/td6-probe-lw7mwu9d/shallow",
+   "object": "086cb16ee2a4:docs/adr/DEC-000.md",
+   "disposition": "unclassed",
+   "test_runs": [
+    {
+     "run": "acceptance",
+     "form": "parallel",
+     "seconds": 0.55,
+     "passed": 1,
+     "failed": 0,
+     "errors": 0,
+     "skipped": 0,
+     "workers": 2,
+     "distribution": "load"
+    },
+    {
+     "run": "regression",
+     "form": "parallel",
+     "seconds": 0.5,
+     "passed": 0,
+     "failed": 0,
+     "errors": 0,
+     "skipped": 0,
+     "workers": 2,
+     "distribution": "load"
+    }
+   ],
+   "trailers_base": null,
+   "accepted_history": [],
+   "evidence": {
+    "scope": "full",
+    "why_full": [
+     {
+      "reason": "TEST_MAP_MISSING"
+     },
+     {
+      "reason": "BASE_UNKNOWN"
+     }
+    ],
+    "base": null,
+    "head": "a0f92ccda894",
+    "tree": "d284e9ca63a2",
+    "changed": [],
+    "selected": [
+     {
+      "target": "tests/acceptance/W1-test/",
+      "why": [
+       {
+        "reason": "OWN"
+       }
+      ]
+     },
+     {
+      "target": "tests",
+      "why": [
+       {
+        "reason": "FULL"
+       }
+      ]
+     }
+    ],
+    "left_out": [],
+    "skips": [],
+    "skip_count": 0,
+    "failures": [],
+    "junit_xml": [
+     ".gov-runtime/close/PROJ-aaaa/20261024T202328556850Z/01-acceptance-parallel.xml",
+     ".gov-runtime/close/PROJ-aaaa/20261024T202328556850Z/02-regression-parallel.xml"
+    ],
+    "per_test_timeout": 900,
+    "distribution": "load",
+    "tmp_path_retention_policy": "failed"
+   },
+   "note": "findings await their class; use --disposition to classify",
+   "repair_ticket": "sha-36cz"
+  }
+ }
+}
+count 1
+--- other ticket sha-36cz.md
+---
+id: sha-36cz
+status: open
+deps: [PROJ-aaaa]
+links: []
+created: 2026-10-24T20:23:29Z
+type: task
+priority: 2
+parent: PROJ-aaaa
+state_class: AUTHORITATIVE
+disposition: unclassed
+role: engineer
+allowed_paths:
+- src/example/**
+kpis:
+  success:
+  - 'gov close PROJ-aaaa no longer refuses for: the context of PROJ-aaaa cannot be built: the decisions could not be checked: DECISIONS_OBJECT_UNREADABLE: 086cb16ee2a4:docs/adr/DEC-000.md: git names the object and /tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-5u7_d5hc/claude-1000/td6-probe-lw7mwu9d/shallow does not hold it'
+  failure:
+  - gov close PROJ-aaaa refuses again for a finding of this ticket
+repair_of_findings: findings-f8f0a7866f052c15
+---
+# Repair PROJ-aaaa: the context of PROJ-aaaa cannot be built: the decisions coul
+
+Findings of the refused close of PROJ-aaaa (disposition: unclassed):
+- the context of PROJ-aaaa cannot be built: the decisions could not be checked: DECISIONS_OBJECT_UNREADABLE: 086cb16ee2a4:docs/adr/DEC-000.md: git names the object and /tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-5u7_d5hc/claude-1000/td6-probe-lw7mwu9d/shallow does not hold it
+
+

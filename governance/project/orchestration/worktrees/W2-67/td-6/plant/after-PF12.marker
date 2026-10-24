@@ -1,0 +1,2 @@
+PF12 pid=353 argv=close PROJ-aaaa: the regression's findings were dropped: ['FAILED tests/unit/close/test_regression_fail.py::test_regression_fail - Asser...']
+PF12 pid=354 argv=close PROJ-aaaa: the regression's findings were dropped: ['FAILED tests/unit/test_reg_0.py::test_reg_0 - AssertionError: test_reg_0 broke', 'FAILED tests/unit/test_reg_1.py::test_reg_1 - AssertionError: test_reg_1 broke', 'FAILED tests/unit/test_reg_2.py::test_reg_2 - AssertionError: test_reg_2 broke']

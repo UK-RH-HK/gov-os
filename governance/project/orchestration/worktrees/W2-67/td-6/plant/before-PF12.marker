@@ -1,0 +1,1 @@
+PF12 pid=348 argv=close PROJ-aaaa: the regression's findings were dropped: ['FAILED tests/unit/test_reg_a.py::test_reg_a - AssertionError: reg A', 'FAILED tests/unit/test_reg_b.py::test_reg_b - AssertionError: reg B']

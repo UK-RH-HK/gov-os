@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-24 21:30 BST — DEC-915/916 recorded; skip guard rebuilt and validated; P-W2-L437-A (P1) with the owner; W2-65 run 2 and W2-67 run 3 in flight; next free DEC-917)
+## RESUME HERE (2026-10-24 21:25 BST — W2-65 run 2 PACKAGES -> DEC-917 (delegated, owner's acceptance asked), run 3 launched; P-W2-L437-A (P1) with the owner; W2-67 run 3 in flight; next free DEC-918)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -49,9 +49,12 @@
   accepted `38e415e0`): W2-65's kernel template hook lines + W1-27 fixture. **DEC-911** (`6a898cbf`): 12-digit hashes,
   no keyword of row W2-L423's rule under `.gov-runtime/`; `tools/keyword_warn.py` (record_checks prints, close_queue
   stops); W2-71 = DAEO-e8f0, after the first re-pin, carried by the second with W2-68.
-- **In flight: W2-65 run 2** (task bls9benwf, `log/W2-65-A5-run2.json`; merged integrate `4183848a`, W1-27 fixture
-  `03d9aa08`; engineer + full run next). On DONE: hold; then W2-59 + W2-65 merge into integrate (dry merge-tree onto
-  `c60c9704`+ is clean), probe_impact, then the re-pin ACT package. `W2-65/pytest-of-usain/` stays (owner).
+- **In flight: W2-65 run 3** (task by90xb0ig, `log/W2-65-A5-run3.json`, from `52a52481`): merge integrate, td W1-38
+  revision (DEC-917 `07432ed0`, delegated, owner's acceptance asked; ticket `fa53ba34`: guard lines exit-mapping form,
+  lifecycle lines plain), full run. Run 2 (`52a52481`): kernel template lines `2bee46b4`, W1-27 fixture `03d9aa08`;
+  rows W2-L438 (lifecycle hooks fail open; exit 2 would loop), W2-L439 (lexical canary on its own declaration). On
+  DONE: hold; W2-59 + W2-65 merge into integrate (merge-tree, probe_impact, temp folders), then the re-pin ACT.
+  `W2-65/pytest-of-usain/` stays (owner).
 - **DEC-915** (`326bd563`): skip guard by reasons (`tools/skip_gate.py`, known list `tools/skip_known.json`, 31
   entries: 30 from W2-66's/W2-65's green JUnit + the deliberate test_inputs skip; validated 8/8 on synthetic answers;
   additions named in the digest); W2-57 first free slot after the first re-pin; **W2-66's nightly command
@@ -82,12 +85,12 @@
 - **Credentials:** only two tracked fixtures (W2-M398). **`.git/config.lock`:** leave alone.
 
 ### Next
-1. W2-65 run 2 DONE: W2-59 + W2-65 merge together (merge-tree, probe_impact, both temp folders), then the re-pin
+1. W2-65 run 3 DONE: W2-59 + W2-65 merge together (merge-tree, probe_impact, both temp folders), then the re-pin
    ACT package (see above). PACKAGES: to the owner.
-2. On the owner's P-W2-L437-A answer: record DEC-917; (a) = ticket W2-72 (containment, FULL).
+2. On the owner's P-W2-L437-A answer: record DEC-918; (a) = ticket W2-72 (containment, FULL).
 3. W2-67 run 3 DONE-UNREVIEWED: its review (DEC-916), then merge (after the re-pin). W2-57 first after the re-pin.
 4. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
-5. Next free: DEC-917; ticket W2-72; rows W2-M407, W2-L438, W2-H063.
+5. Next free: DEC-918; ticket W2-72; rows W2-M407, W2-L438, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
