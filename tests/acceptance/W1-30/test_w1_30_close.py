@@ -17,6 +17,7 @@ B6: The ticket's commits are those reachable from HEAD only; a git failure is an
 """
 
 import json
+import re
 import shutil
 
 import pytest
@@ -342,9 +343,14 @@ def test_containment_blocks_close_for_out_of_scope_commit(project, sandbox, inte
 # --------------------------------------------------------------------------
 
 def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
-    """KPI S1, CAP-38.c: Task: AB must not count as a commit of ticket A."""
-    ticket_a = "PROJ-a"
-    ticket_ab = "PROJ-ab"
+    """KPI S1, CAP-38.c: Task: AB must not count as a commit of ticket A.
+
+    Revised for W2-67 (I2 F2, PF15): ticket A has its checkpoint, so it is not refused for the missing checkpoint;
+    the refusal is the trailer gate's: no commit carries ``Task: A`` exactly, and AB's commit is not named as A's.
+    A takes an id of the kernel's ticket grammar, since ``gov checkpoint`` takes no other (``PROJ-a`` could have
+    no checkpoint); AB is A's id with one more character, a ticket no case closes."""
+    ticket_a = "PROJ-tska"
+    ticket_ab = "PROJ-tskab"
     wbs_a = "W1-tka"
     wbs_ab = "W1-tkab"
     project.add_ticket(ticket_a, wbs_a)
@@ -352,12 +358,17 @@ def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
     project.add_passing_test(wbs_a)
     project.add_passing_test(wbs_ab)
     project.write("src/example/feature_ab.py", "# feature for AB\n")
-    project.commit("implement AB only", who=IMPL,
-                   trailers=("Task: PROJ-ab", "Role: engineer", "Implements: CAP-01"))
+    ab_commit = project.commit("implement AB only", who=IMPL,
+                               trailers=(f"Task: {ticket_ab}", "Role: engineer", "Implements: CAP-01"))
+    support.checkpointed(project, ticket_a)
+    assert support.ticket_commits(project.root, ticket_a) == [], "the fixture is wrong: ticket A has a commit"
     run = support.run_close(project, sandbox, ticket_a)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "a commit with Task: PROJ-ab must not match ticket PROJ-a (substring match bug)"
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert re.search(rf"Task: {re.escape(ticket_a)}(?![A-Za-z0-9])", text), \
+        f"the refusal does not say that no commit carries Task: {ticket_a}\n{run.describe()}"
+    assert ab_commit[:7] not in text, \
+        f"a commit with Task: {ticket_ab} is named as a commit of {ticket_a} (substring match bug)\n{run.describe()}"
+    support.assert_not_closed(project, ticket_a)
 
 
 # --------------------------------------------------------------------------
