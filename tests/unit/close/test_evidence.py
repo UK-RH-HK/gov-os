@@ -26,12 +26,13 @@ def test_the_cases_skips_and_failures_are_read_as_project_node_ids(tmp_path):
 def test_a_missing_file_states_nothing_and_the_block_counts_its_skips(tmp_path):
     assert evidence.read_junit(tmp_path, tmp_path / "none.xml") == {"cases": [], "skips": [], "failures": []}
     plan = {"scope": "scoped", "why_full": [], "base": "b", "head": "h", "tree": "t", "changed": [], "selected": [],
-            "left_out": [], "per_test_timeout": 900, "distribution": "load"}
+            "left_out": [], "per_test_timeout": 900, "distribution": "load", "tmp_path_retention_policy": "failed"}
     runs = [{"skips": [{"test": "a", "reason": "r"}], "failures": []},
             {"skips": [{"test": "b", "reason": "s"}], "failures": [{"test": "c", "text": "x"}]}]
     block = evidence.block(plan, runs, ["one.xml", "two.xml"])
     assert block["skip_count"] == 2 and block["failures"] == [{"test": "c", "text": "x"}]
     assert block["junit_xml"] == ["one.xml", "two.xml"] and block["scope"] == "scoped"
+    assert block["tmp_path_retention_policy"] == "failed"
 
 
 def test_the_paths_a_class_is_judged_on_do_not_take_the_evidence_blocks_key():

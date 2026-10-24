@@ -1343,7 +1343,8 @@ def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
 
 
 def _scope_limit(root: Path, scope: dict, env: dict) -> list[str]:
-    """The per-test limit of every run (pytest-timeout, the signal method), and the check result in ``env``.
+    """The per-test limit of every run (pytest-timeout, the signal method) with its temp-folder retention
+    (DEC-905), and the check result in ``env``.
     ``TIMEOUT_PLUGIN_ABSENT`` when the runs' interpreter cannot load pytest-timeout: nothing ran, nothing is
     recorded (DEC-892 b)."""
     import os
@@ -1364,7 +1365,8 @@ def _scope_limit(root: Path, scope: dict, env: dict) -> list[str]:
                             f"pytest-timeout cannot be loaded by {sys.executable}: no test was run without its "
                             "per-test limit", {"python": sys.executable})
         scope["limit"] = (["-p", _TIMEOUT_PLUGIN] if env.get("PYTEST_DISABLE_PLUGIN_AUTOLOAD") else []) + \
-            [f"--timeout={scope['per_test_timeout']}", "--timeout_method=signal"]
+            [f"--timeout={scope['per_test_timeout']}", "--timeout_method=signal",
+             "-o", f"tmp_path_retention_policy={scope['tmp_path_retention_policy']}"]
     return list(scope["limit"])
 
 

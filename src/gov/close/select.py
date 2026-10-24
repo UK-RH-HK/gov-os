@@ -27,6 +27,7 @@ SCHEMA_NAME = "test-map.schema.json"
 SCHEMA_DIRS = ("template/governance/kernel/schemas", "governance/kernel/schemas")
 DEFAULT_PER_TEST_TIMEOUT = 900
 DEFAULT_DISTRIBUTION = "load"
+RETENTION_POLICY = "failed"  # DEC-905: every test run's tmp_path_retention_policy; a failing test's folder stays
 NIGHTLY_REL = "docs/close/nightly"
 UNIT = "tests/unit"
 ACCEPTANCE = "tests/acceptance"
@@ -283,7 +284,8 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False) -> dict:
         select(FULL_TARGET, {"reason": "FULL"})
         return {"scope": "full", "why_full": why_full, "base": since, "head": head, "tree": tree, "changed": paths,
                 "selected": _listed(selected), "left_out": [], "ignore": [own], "deselect": [],
-                "per_test_timeout": timeout, "distribution": distribution}
+                "per_test_timeout": timeout, "distribution": distribution,
+                "tmp_path_retention_policy": RETENTION_POLICY}
 
     suites = _suites(root)
     select(UNIT, {"reason": "UNIT"})
@@ -314,7 +316,8 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False) -> dict:
     ignore, deselect, left_out = _form(root, own, suites, list(selected))
     return {"scope": "scoped", "why_full": [], "base": since, "head": head, "tree": tree, "changed": paths,
             "selected": _listed(selected), "left_out": left_out, "ignore": ignore, "deselect": deselect,
-            "per_test_timeout": timeout, "distribution": distribution}
+            "per_test_timeout": timeout, "distribution": distribution,
+            "tmp_path_retention_policy": RETENTION_POLICY}
 
 
 def _listed(selected: dict) -> list[dict]:

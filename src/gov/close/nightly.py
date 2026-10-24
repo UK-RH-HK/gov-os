@@ -2,7 +2,8 @@
 
 ``python3 -m gov.close.nightly <branch> --root <project> [--coverage] --json`` runs the full uncached regression
 on the branch's head (a detached worktree of that commit, never the working tree) in the close's form: one
-parallel run, then the serial-only cases alone, with the per-test limit, the distribution mode and JUnit XML.
+parallel run, then the serial-only cases alone, with the per-test limit, the distribution mode, the temp-folder
+retention (``-o tmp_path_retention_policy=failed``, DEC-905) and JUnit XML.
 
 Every failing test is run again alone. A red that fails alone is a P1 package, bisected with ``git bisect run``
 over the commits since the last green night; a red that passes alone is a flaky candidate, never bisected. A red
@@ -283,7 +284,7 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
         test_map, _ = _select.load_map(tree)
         per_test, distribution = _select.settings(test_map)
         scope = {"ignore": [], "deselect": [], "per_test_timeout": per_test, "distribution": distribution,
-                 "check_result": None, "runs": [], "junit_xml": [], "limit": None, "folder": str(folder)}
+                 "tmp_path_retention_policy": _select.RETENTION_POLICY, "check_result": None, "runs": [], "junit_xml": [], "limit": None, "folder": str(folder)}
         if coverage:  # the shim's folder goes after the tree's own src/ in every run
             (work / "shim").mkdir()
             scope["env"] = _coverage_env(work / "shim", work / "coverage", tree)
@@ -335,7 +336,7 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
     record = {"branch": branch, "head": head, "tree": tree_id, "base": since, "scope": "full", "verdict": verdict,
               "junit_xml": junit, "failures": listed, "packages": packages, "tests_run": counts,
               "findings": findings, "per_test_timeout": per_test, "distribution": distribution,
-              "created": _close._now()}
+              "tmp_path_retention_policy": scope["tmp_path_retention_policy"], "created": _close._now()}
     if coverage:
         record["measured_map"] = measured
     rel = f"{_select.NIGHTLY_REL}/NR-{stamp}-{head[:12]}.json"

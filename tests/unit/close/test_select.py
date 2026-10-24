@@ -92,6 +92,7 @@ def test_a_one_module_change_selects_its_overlap_the_unit_tests_and_the_declared
                     "tests/acceptance/W1-zz/", "tests/acceptance/W1-rr/test_rr_more.py"}
     assert "tests/acceptance/W1-rr/test_rr.py::test_other" in plan["deselect"]
     assert "tests/acceptance/W1-rr/test_rr.py::test_reads" not in plan["deselect"]  # its prefix would take it
+    assert plan["tmp_path_retention_policy"] == "failed"
 
 
 def test_a_changed_helper_selects_the_suite_importing_it_and_a_coupling_its_suites(repo):
@@ -111,6 +112,19 @@ def test_the_shared_core_an_unplaced_path_and_full_asked_widen_to_the_full_run(r
     assert [w["reason"] for w in plan["why_full"]] == ["FULL_ASKED", "SHARED_CORE", "UNPLACED"]
     assert plan["why_full"][1]["paths"] == ["src/core/z.py"] and plan["why_full"][2]["paths"] == ["README"]
     assert _targets(plan)["tests"] == ["FULL"]
+    assert plan["tmp_path_retention_policy"] == "failed"
+
+
+def test_every_run_of_a_close_is_given_the_retention_option_with_its_per_test_limit(tmp_path):
+    import os
+    import sys
+    from gov.close.command import _scope_limit
+
+    scope = {"check_result": None, "limit": None, "per_test_timeout": 900, "tmp_path_retention_policy": "failed"}
+    env = {**os.environ, "PYTHONPATH": os.pathsep.join(p for p in sys.path if p)}
+    limit = _scope_limit(tmp_path, scope, env)
+    assert limit[-2:] == ["-o", "tmp_path_retention_policy=failed"] and "--timeout=900" in limit
+    assert scope["limit"] == limit  # the run alone of a red and the nightly's runs take the same list
 
 
 def test_a_record_only_commit_selects_nothing_by_itself(repo):

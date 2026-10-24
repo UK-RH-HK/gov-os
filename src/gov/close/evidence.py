@@ -71,5 +71,6 @@ def block(plan: dict, runs: list[dict], junit_xml: list[str]) -> dict:
         "junit_xml": list(junit_xml),
         "per_test_timeout": plan["per_test_timeout"],
         "distribution": plan["distribution"],
+        "tmp_path_retention_policy": plan["tmp_path_retention_policy"],
     })
     return evidence
