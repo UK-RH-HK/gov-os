@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.301 (the version table at the end of each section gives the history)
+**Version:** 0.302 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -6492,7 +6492,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 177. The second run on W1-15: the `PYTHONPATH` prefix (register v0.177, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-608 — The seven command lines carry no `PYTHONPATH` prefix: the kernel template's form exactly
-- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-10; the owner's acceptance is asked) · **Under:** DEC-603, DEC-605, DEC-607, DEC-584
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-10; the owner's acceptance is asked) · **Under:** DEC-603, DEC-605, DEC-607, DEC-584 · **Changed by:** DEC-917: the three guard lines (PreToolUse, PostToolUse, PostToolUseFailure) take the exit-mapping form of DEC-880 item 3 and DEC-913; the four lifecycle lines keep this entry's plain form
 - **Decision:**
   - On the lead's package P-7, option (a): the seven command lines of the template's rulesync hooks source are the kernel template's form exactly, `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"`, with no prefix. It is what DEC-603 words, it is the stricter of the two forms (a product's own package named `gov` under its `src` can no longer silence the containment check, which ends that residual of DEC-601), and where `gov` is missing it fails closed: every call is blocked.
   - **Consequence, stated in the adoption notes and the exit package:** `gov` must be installed for the user who runs a project's sessions, on every machine and runner. DEC-605 did that on this machine.
@@ -10820,3 +10820,19 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.301 | 2026-10-24 | Owner (recorded by the orchestrator, DEC-861): DEC-915 (P-SKIP-GUARD-1 (a): the skip guard reads the close's skip reasons, a versioned known list, additions named in the digest, a stopgap until W2-57, which takes the first free slot after the first re-pin; W2-66's nightly command not run until W2-M406's fix, the script stays) and DEC-916 (standing: up to two reviews per round declared in a ticket's plan before it starts; a third is the owner's exception; undeclared rounds earn nothing; W2-67's rounds 2 and 3 reviewed together). Next free id: DEC-917. |
+
+## 301. W2-65's run 2 package (register v0.302, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-917 — W1-38 holds the three guard lines to the exit-mapping form and the four lifecycle lines to the plain form; the lifecycle lines' own failure behaviour is a row
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-24; the owner's acceptance is asked, before the W2-59 + W2-65 merge) · **Under:** DEC-608, DEC-880 item 3, DEC-913, DEC-866, DEC-906, MR-3 · **Basis:** W2-65's run 2 return (`log/W2-65-A5-run2.json`, head `52a52481`), package P-W2-65-4. With the kernel template's three guard lines in the template source's exit-mapping form (DEC-913 item 1, `2bee46b4`), W1-38's six equality cases are green, but its support (`tests/acceptance/W1-38/w1_38_hooks_support.py`, `kernel_form` and `expected_command_line`) holds all seven template source lines to one form read from the kernel's three lines (DEC-608), so the eight cases of the four lifecycle lines (SessionStart, Stop, PreCompact, SubagentStop; source and generated) turn red. Ordinary work: yes; a test's rule superseded in part (DEC-866); nothing fails open.
+- **Decision:**
+  1. **P-W2-65-4 (b):** W2-65's test designer revises W1-38's support (and, where the cases need it, `tests/acceptance/W1-38/test_w1_38_hooks_command_line.py`): the three guard lines are held to the kernel template's exit-mapping form, and the four lifecycle lines to DEC-608's plain form `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"`, each line exactly. `Rewrite-Reason: DEC-917`; no other expectation is lowered. Both files are named in W2-65's ticket body (MR-3, DEC-906 item 1).
+  2. **No hook behaviour changes:** the lifecycle lines stay as they are, inside DEC-880 item 3's scope.
+  3. **Rows:** W2-L438 (a lifecycle hook program that cannot run is ignored, so SubagentStop's twelve-field check fails open; mapping it to exit 2 would loop on Stop and SubagentStop, so it needs its own design); W2-L439 (W2-59's lexical canary can pass on its own committed declaration once that is indexed).
+- **Changes:** DEC-608 (two forms, by line).
+- **Where it goes (DEC-851):** this register, with DEC-608's status line marked; W2-65's ticket body (its own commit, `Task: DAEO-e82f`); the Wave 2 list (rows W2-L438, W2-L439); W2-65's run 3 brief; RESUME HERE; the owner's digest.
+- Next free id: DEC-918.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.302 | 2026-10-24 | Delegated (orchestrator, DEC-102; the owner's acceptance asked): DEC-917 (P-W2-65-4 (b): W1-38 holds the three guard lines to the exit-mapping form and the four lifecycle lines to DEC-608's plain form, by W2-65's test designer; no hook behaviour change; rows W2-L438 and W2-L439). Next free id: DEC-918. |
