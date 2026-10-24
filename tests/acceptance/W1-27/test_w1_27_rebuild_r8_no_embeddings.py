@@ -42,6 +42,7 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_codegraph
 
 base = support.base
 
@@ -248,7 +249,7 @@ def test_the_mode_builds_everything_else_a_rebuild_builds(gov, interface, tiny, 
     """Two projects with the same commits: one rebuilt without the argument, one with it. The record store's
     digest is the same; the lexical index is recreated in both; the code index has the same outcome; and the
     store of the mode holds no vector."""
-    twin = tmp_path / "twin"
+    twin = w2_67_codegraph.note(tmp_path / "twin")   # its daemon folder goes when the case is over (batch 8)
     base.git(tmp_path, "clone", "-q", str(tiny), str(twin))
 
     full = _rebuilt(gov, interface, project=twin)
