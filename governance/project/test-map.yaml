@@ -34,9 +34,15 @@ shared_core:
   # the CLI's entry and the error module, until a planted-fault measurement narrows them (I4 F12)
   - "src/gov/cli/main.py"
   - "src/gov/cli/errors.py"
+  # the conftests above every suite folder: every pytest run under tests/, every run of an acceptance suite
+  - "tests/conftest.py"
+  - "tests/acceptance/conftest.py"
 
-# DEC-891's places, records only: no code file of those places matches (the scripts under docs/plan/ and
-# governance/project/orchestration/ stay unplaced, so a change to one runs everything).
+# DEC-891's places, records only: no code file of those places matches. A script under docs/plan/ or
+# governance/project/orchestration/ is placed only where a ticket with a suite holds it in its allowed_paths
+# (W1-42's paths hold docs/plan/wave-1-exit/apply_adapter_output.py and write_permissions_source.py); one that
+# only tickets without a suite hold is unplaced (orchestration/sync_context.py, W2-00's), so a change to it runs
+# everything.
 record_only:
   - ".tickets/**.md"
   - "docs/checkpoints/**.md"
@@ -139,6 +145,9 @@ couplings:
   - paths: ["tests/acceptance/**_support.py"]
     suites: ["tests/acceptance/W1-28/"]
     why: "W1-28's file scan reads every suite's support module and runs its whole-tree copiers (I1 §4.1)"
+  - paths: ["tests/acceptance/W1-07/conftest.py", "tests/acceptance/W1-25/conftest.py"]
+    suites: ["tests/acceptance/W1-27/test_w2_67_copies.py"]
+    why: "loaded by file path: test_w2_67_copies.py loads these suites' conftests with spec_from_file_location (W1-27's own reaches it through its suite folder)"
 
 # Moved from the path map (DEC-876 item 2, DEC-896 item 2).
 test_inputs:
