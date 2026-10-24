@@ -121,27 +121,40 @@ def test_close_runs_regression_tests_when_present(project, sandbox, interface):
 # --------------------------------------------------------------------------
 
 def test_close_requires_implements_trailer(project, sandbox, interface):
-    """KPI S1, CAP-38.c: a ticket whose commits lack Implements: cannot close."""
+    """KPI S1, CAP-38.c: a ticket whose commits lack Implements: cannot close.
+
+    Revised for W2-67 (I2 F2, PF13): the ticket has its checkpoint, as every ticket has before its close, so it is
+    not refused for the missing checkpoint; the refusal is the trailer gate's, naming the engineer's commit and the
+    ``Implements:`` trailer it lacks."""
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement", who=IMPL,
-                   trailers=("Task: PROJ-aaaa", "Role: engineer"))
+    bare = project.commit("implement", who=IMPL,
+                          trailers=("Task: PROJ-aaaa", "Role: engineer"))
+    support.checkpointed(project, TICKET)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, "close should refuse a ticket without Implements: trailers"
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert bare[:12] in text and "Implements" in text, \
+        f"the refusal does not name the commit {bare[:12]} and the Implements: trailer it lacks\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
 def test_close_requires_task_trailer(project, sandbox, interface):
-    """KPI S1, CAP-38.c: a commit for the ticket must carry Task: <ticket>."""
+    """KPI S1, CAP-38.c: a commit for the ticket must carry Task: <ticket>.
+
+    Revised for W2-67 (I2 F2, PF13): the ticket has its checkpoint, so the refusal is the trailer gate's: no commit
+    carries ``Task: PROJ-aaaa``, and the answer says so."""
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL,
                    trailers=("Role: engineer", "Implements: CAP-01"))
+    support.checkpointed(project, TICKET)
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, "close should refuse a ticket without Task: trailers"
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert f"Task: {TICKET}" in text, \
+        f"the refusal does not say that no commit carries Task: {TICKET}\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
 # --------------------------------------------------------------------------
