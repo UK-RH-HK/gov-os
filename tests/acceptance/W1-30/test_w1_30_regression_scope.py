@@ -36,13 +36,20 @@ TEST_MAP = {
 
 def _scoped_project(project, sandbox, other_paths, other_red):
     """The other ticket and its folder, and the test map, at the base; a green record naming it; then the
-    ticket's work and checkpoint."""
+    ticket's work and checkpoint.
+
+    The other ticket is closed, so its folder is committed by its test designer with its trailers: the close runs
+    ``gov check`` in the project before any test (DEC-868 item 1 (b)), and the product-traceability check is red
+    for a closed ticket that has no commit with its ``Task:`` and an ``Implements:`` that resolves."""
     project.write(support.ticket_path(OTHER), support.ticket_text(OTHER, OTHER_WBS, allowed_paths=other_paths,
                                                                   status="closed"))
+    project.commit("the other ticket", who=support.ORCHESTRATOR)
     project.write(OTHER_TEST, "def test_other():\n    assert False, 'other ticket fails'\n" if other_red else
                   "def test_other():\n    assert True\n")
+    project.commit("the other ticket's acceptance test", who=support.TEST_DESIGNER,
+                   trailers=support.trailers_of(OTHER, role="independent-test-designer", implements=support.BASE_SOURCE))
     project.write(TEST_MAP_REL, yaml.safe_dump(TEST_MAP, sort_keys=False))
-    base = project.commit("the other ticket and the test map", who=support.OWNER, trailers=())
+    base = project.commit("the test map", who=support.OWNER, trailers=())
     record = {"branch": "main", "head": base, "tree": support.git(project.root, "rev-parse", "HEAD^{tree}").strip(),
               "scope": "full", "verdict": "green", "base": None, "junit_xml": [], "failures": [], "packages": []}
     project.write(f"docs/close/nightly/NR-20261001T000000Z-{base[:12]}.json", json.dumps(record) + "\n")
