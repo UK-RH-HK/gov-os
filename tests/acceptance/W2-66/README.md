@@ -91,9 +91,11 @@ the full regression, never less.
    path (`OVERLAP` naming that ticket, whatever folder its suite is); a suite holding
    a changed file; a suite that imports a helper module of a suite whose folder holds a changed file, directly or
    through another helper (imports read from the test files: `sys.path` folders of other suites and `import x`);
-   each coupling's suites; `every_close`; `record_reading`. A changed path is **placed** when a ticket's
-   `allowed_paths`, a coupling, `record_only` or a suite folder (`tests/unit`, `tests/acceptance/<x>/`) holds it;
-   an **unplaced** path runs the full regression (`UNPLACED`). The serial-only cases (`tests/acceptance/serial-only.txt`)
+   each coupling's suites; `every_close`; `record_reading`. A changed path is **placed** when the `allowed_paths`
+   of a ticket that has a suite, a coupling, `record_only` or a suite folder (`tests/unit`, `tests/acceptance/<x>/`)
+   holds it. A path that only the `allowed_paths` of tickets without a suite hold (no declared folder with a test
+   file, no `tests/acceptance/<wbs_id>/` with one) maps to no suite: it is not placed. An **unplaced** path runs the
+   full regression (`UNPLACED`, naming it). The serial-only cases (`tests/acceptance/serial-only.txt`)
    run afterwards, alone, only those inside what the regression runs; `test_runs`' serial-afterwards run names
    them under `cases` (as today).
 4. **`gov close <ticket> --full`** runs the full regression (`FULL_ASKED`).
@@ -203,12 +205,14 @@ detection, so a moved file is in it at the path it reached only (`changed` lacks
 of the shared core runs `scoped`; the suite of the ticket whose paths the file left is `NOT_REACHED` and the close
 passes); **(j)** the overlap rule and the own suite read `tests/acceptance/<wbs_id>/` only, never the declared
 `acceptance_tests.path` (the declared folder is left out `NOT_REACHED`; `OWN` names the WBS id's folder, and the
-declared folder's files are in `left_out`).
+declared folder's files are in `left_out`); **(k)** a path that only suiteless tickets' `allowed_paths` hold is
+taken as placed (the run is `scoped` and selects nothing for it beyond the always-run set).
 
 | KPI line | Tests | Red on the built head |
 |---|---|---|
 | S1, S2 + F1 a moved file at both its paths (Interface item 2) | `test_w2_66_moved_files.py` (3): `::test_a_file_moved_out_of_the_shared_core_runs_the_full_regression`, `::test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite`, `::test_a_file_moved_into_the_shared_core_runs_the_full_regression` | (i); the last runs full today and is red only on `changed` lacking the path the file left |
 | S1, S6 a ticket's suite is its declared folder (Interface item 3) | `test_w2_66_declared_folders.py` (2): `::test_the_overlap_rule_selects_a_ticket_s_declared_folder`, `::test_the_own_suite_is_the_closing_ticket_s_declared_folder` | (j) |
+| S2 + F1 a path only suiteless tickets hold is unplaced (Interface item 3) | `test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression` (one close: one ticket declares its WBS id's folder, which does not exist; one declares a folder with a README and no test) | (k) |
 
 ### Expected green on the base
 
