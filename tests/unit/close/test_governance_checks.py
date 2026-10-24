@@ -156,27 +156,30 @@ def _counted(root):
     return json.loads(_count_path(root, TICKET).read_text(encoding="utf-8"))
 
 
-def test_a_red_hard_block_check_refuses_counted_with_a_repair_ticket_and_is_named(root):
+def test_a_red_hard_block_check_refuses_before_any_test_uncounted_with_a_repair_ticket_and_is_named(root):
+    """The pre-close gate (DEC-868 item 3): a red check refuses before any test runs and spends no attempt."""
     red = _entry("license-present", "hard-block", "RED", findings=[{"code": "CHECK_FAILED", "stderr": "no-tool"}])
-    error, _ = _close(root, entries=[red, _entry("wanted", "warning", "YELLOW")])
+    error, ran = _close(root, entries=[red, _entry("wanted", "warning", "YELLOW")])
     assert (error.code, error.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
     assert error.details["red_checks"] == [red] and error.details["check_commit"] == HEAD
     [finding] = error.details["findings"]
     assert "license-present" in finding and HEAD[:12] in finding and "no-tool" in finding and "wanted" not in finding
-    assert _counted(root)["count"] == 1 and _counted(root)["last_failures"] == [finding]
+    ran.assert_not_called()
+    assert not _count_path(root, TICKET).exists() and error.details["counted"] is False
     assert (root / ".tickets" / f"{error.details['repair_ticket']}.md").is_file()
     assert not (root / "docs" / "close").exists()
 
 
-def test_a_red_family_without_a_red_check_refuses_counted_with_a_repair_ticket_and_is_named(root):
-    error, _ = _close(root, entries=[_entry("feature-present", "hard-block", "GREEN")],
-                      families=_families(licence_hygiene="RED", graph_integrity="GREEN"))
+def test_a_red_family_without_a_red_check_refuses_before_any_test_uncounted_with_a_repair_ticket_and_is_named(root):
+    error, ran = _close(root, entries=[_entry("feature-present", "hard-block", "GREEN")],
+                        families=_families(licence_hygiene="RED", graph_integrity="GREEN"))
     assert (error.code, error.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
     assert error.details["red_checks"] == [] and error.details["red_families"] == ["licence hygiene"]
     assert error.details["check_commit"] == HEAD
     [finding] = error.details["findings"]
     assert "licence hygiene" in finding and HEAD[:12] in finding and "graph integrity" not in finding
-    assert _counted(root)["count"] == 1 and _counted(root)["last_failures"] == [finding]
+    ran.assert_not_called()
+    assert not _count_path(root, TICKET).exists() and error.details["counted"] is False
     assert (root / ".tickets" / f"{error.details['repair_ticket']}.md").is_file()
     assert not (root / "docs" / "close").exists()
 
@@ -188,13 +191,14 @@ def test_a_block_the_runner_names_nothing_for_still_refuses(root):
     assert "block" in finding and HEAD[:12] in finding
 
 
-def test_a_red_check_and_a_failing_test_are_one_refusal(root):
-    error, _ = _close(root, entries=[_entry("a", "hard-block", "RED")], test_findings=["FAILED test_a"])
-    # two test runs with the same finding and one check: each finding is named once (DEC-492)
-    assert error.details["findings"] == ["FAILED test_a", f"governance check a is RED at commit {HEAD[:12]}: []"]
-    assert [part["code"] for part in error.details["parts"]] == ["CHECK_FAILED"] * 3
-    assert error.details["parts"][2]["check_commit"] == HEAD and error.code == "CHECK_FAILED"
-    assert _counted(root)["count"] == 1 and len(list((root / ".tickets").glob("*.md"))) == 2
+def test_a_red_check_refuses_before_the_failing_test_is_run(root):
+    """DEC-868 item 3: the red check is the pre-close gate's and refuses at once; the failing test is never run."""
+    error, ran = _close(root, entries=[_entry("a", "hard-block", "RED")], test_findings=["FAILED test_a"])
+    assert error.details["findings"] == [f"governance check a is RED at commit {HEAD[:12]}: []"]
+    assert "parts" not in error.details and error.details["test_runs"] == []
+    assert error.details["check_commit"] == HEAD and error.code == "CHECK_FAILED"
+    ran.assert_not_called()
+    assert not _count_path(root, TICKET).exists() and len(list((root / ".tickets").glob("*.md"))) == 2
 
 
 @pytest.mark.parametrize("tests", [None, False], ids=["no-folder", "folder-without-a-test"])

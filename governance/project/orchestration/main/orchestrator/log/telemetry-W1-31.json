@@ -1,1 +1,0 @@
-{"ok": false, "command": "telemetry", "result": {}, "session": "", "error": {"code": "TICKET_SESSION_MISSING", "message": "no session of the ticket is named (--ticket-session): the sessions' tokens were not measured", "details": {"ticket": "DAEO-6mk8"}}}

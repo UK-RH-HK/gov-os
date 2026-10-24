@@ -1,9 +1,0 @@
-W1-35: 166 passed in 33.45s
-W1-33: 113 passed in 3.23s
-W1-34: 8 passed in 0.02s
-W1-36: 84 passed in 0.97s
-W1-38: 87 passed in 98.10s (0:01:38)
-W1-39: 67 passed in 179.49s (0:02:59)
-W1-26: 294 passed, 1 skipped in 267.48s (0:04:27)
-unit: 1608 passed in 68.04s (0:01:08)
-validator: RESULT: ALL PASS

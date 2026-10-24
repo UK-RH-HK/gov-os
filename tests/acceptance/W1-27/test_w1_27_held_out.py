@@ -19,45 +19,42 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_doctor
 
 
-def test_missing_held_out_yaml_is_reported(tmp_path, interface):
+def test_missing_held_out_yaml_is_reported(tmp_path):
     """On a throwaway project where ``governance/project/held-out.yaml`` is absent, doctor reports it.
 
-    The copy_working_tree helper already omits the held-out file (DEC-385), so the file is absent by default.
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name that doctor always emits): the case
+    reads doctor's ``held_out`` section, in ``result`` or ``error.details``: ``missing`` is true and its status is
+    not a pass. Its throwaway project is a small committed one of its own, not a copy of the whole tree.
     """
-    project = support.copy_working_tree(tmp_path / "no-held-out" / "repo")
+    project = w2_67_doctor.small_project(tmp_path / "no-held-out" / "repo")
     sandbox = support.make_sandbox(tmp_path / "sandbox")
 
     held_out_path = project / support.HELD_OUT_REL
     assert not held_out_path.exists(), "the throwaway project should not have held-out.yaml"
 
-    run = support.run_gov(project, sandbox, "doctor", "--json")
-    envelope = support.assert_envelope(run, interface, command="doctor")
-    text = json.dumps(envelope).lower()
-    assert "held" in text or "held-out" in text.replace("_", "-") or "held_out" in text, \
-        f"doctor does not mention the missing held-out.yaml\n{run.describe()}"
+    run = w2_67_doctor.doctor(project, sandbox)
+    held_out = w2_67_doctor.section(run, "held_out")
+    assert held_out.get("missing") is True, f"doctor does not report the missing held-out.yaml\n{run.describe()}"
+    assert held_out.get("status") != "pass", f"a missing held-out.yaml is reported as a pass\n{run.describe()}"
 
 
-def test_present_held_out_yaml_is_not_reported(tmp_path, interface):
+def test_present_held_out_yaml_is_not_reported(tmp_path):
     """On a throwaway project where ``governance/project/held-out.yaml`` is present (even empty), doctor does not
     report it as missing.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the case read only ``result``, which is empty whenever doctor is
+    unhealthy, so no check ran): the case reads doctor's ``held_out`` section wherever doctor put it.
     """
-    project = support.copy_working_tree(tmp_path / "has-held-out" / "repo")
+    project = w2_67_doctor.small_project(tmp_path / "has-held-out" / "repo")
     sandbox = support.make_sandbox(tmp_path / "sandbox")
 
     support.write_held_out(project, "")
 
-    run = support.run_gov(project, sandbox, "doctor", "--json")
-    envelope = support.assert_envelope(run, interface, command="doctor")
-    text = json.dumps(envelope).lower()
-
-    if "held" in text or "held_out" in text:
-        result = envelope.get("result", {})
-        if isinstance(result, dict):
-            for key, value in result.items():
-                if "held" in key.lower() or "held_out" in key.lower():
-                    if isinstance(value, dict) and value.get("missing") is True:
-                        pytest.fail(f"doctor reports held-out.yaml as missing when it is present\n{run.describe()}")
-                    if isinstance(value, str) and "missing" in value.lower():
-                        pytest.fail(f"doctor reports held-out.yaml as missing when it is present\n{run.describe()}")
+    run = w2_67_doctor.doctor(project, sandbox)
+    held_out = w2_67_doctor.section(run, "held_out")
+    assert held_out.get("missing") is False, \
+        f"doctor reports held-out.yaml as missing when it is present\n{run.describe()}"
+    assert held_out.get("status") == "pass", f"a present held-out.yaml is not a pass\n{run.describe()}"

@@ -1,8 +1,0 @@
-2026-10-20 14:27:52 quiet
-2026-10-20 14:27:53 rebuild before DAEO-7rr2
-2026-10-20 14:34:04 collect ok: 14685/14687 tests collected (2 deselected) in 5.87s
-2026-10-20 14:40:54 check ok; close DAEO-7rr2 (load 4.00)
-2026-10-20 15:53:19 close DAEO-7rr2 exit 0
-2026-10-20 15:53:20 rebuild before DAEO-0rfi
-2026-10-20 15:57:23 collect ok: 14685/14687 tests collected (2 deselected) in 5.94s
-2026-10-20 16:04:01 DAEO-0rfi STOPPED BEFORE THE CLOSE: gov check is not green (exit 3)

@@ -1,7 +1,0 @@
-You are the independent test designer for ticket `DAEO-3ef2` (`W1-38`), in the worktree `/home/usain/gov-os-worktrees/W1-38` on branch `w1/W1-38`, continuing your round 3 (commit `5f2ca9af`). Same limits as before: you write only under `tests/acceptance/W1-38/`, no source code, nothing under `~/gov-os-workbench/`, `qualification-oracle/`, this repository's own `.claude/`, never the project's held-out file; no writing rulesync command in this worktree itself; never copy or clone this tree.
-
-Your two packages are decided: read DEC-468 and DEC-469 in `docs/DECISION_REGISTER.md` of the main tree (`/home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md`, the last section; this branch does not hold it yet).
-
-Write the cases DEC-468 calls for, in the form of your OpenSpec command cases: each of the six skills OpenSpec writes is generated with what the registered OpenSpec ships (the same tolerance as for the other skills, stated in the README); no `openspec-*` skill that OpenSpec does not ship; `generate --delete` keeps all six. State DEC-469 in the README in one line (it needs no case). Change nothing else.
-
-Run `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-38 -q -p no:cacheprovider -rs` to its end. Commit once with the message `W1-38 cases round 3b: OpenSpec's skills are registered sources (DEC-468)` and the trailers `Task: DAEO-3ef2`, `Role: independent-test-designer`, `Implements: CAP-52.a`, `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Return: the commit id, the new cases with their red reasons, the counts.

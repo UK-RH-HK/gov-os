@@ -1,3 +1,0 @@
-test_w1_02_guard_hook.py exit 0: 7 passed in 9.13s
-test_w1_05_live_hooks.py exit 1: 1 failed, 85 passed in 72.90s (0:01:12)
-test_w1_19_real_models.py exit 1: 1 failed, 5 passed in 114.15s (0:01:54)

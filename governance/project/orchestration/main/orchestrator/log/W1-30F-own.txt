@@ -1,9 +1,0 @@
-W1-30 (-n auto): 355 passed in 157.86s (0:02:37)
-W1-27: 133 passed in 520.96s (0:08:40)
-W1-35: 166 passed in 32.92s
-W1-32: 81 passed in 60.61s (0:01:00)
-W1-07: 218 passed in 248.69s (0:04:08)
-W1-50 (-n auto): 666 passed, 20 warnings in 45.16s
-unit (-n auto): 1626 passed in 24.08s
-unit (serial): 1626 passed in 83.29s (0:01:23)
-validator: RESULT: ALL PASS

@@ -2,6 +2,13 @@
 
 Each test builds a temporary repository, plants a defect of one family, runs
 ``gov check --json``, and asserts that the check is RED (not GREEN or absent).
+
+Revised (W2-67, I2 §2.7 R1 and F3): the base project was red before any defect,
+so a case that judged its defect by "gov check failed" could not fail. The
+revised cases plant their defect on the green base (``green_project``,
+``test_w1_26_green_base.py``) and assert the named check's own entry RED with a
+finding that names the defect. The two path-map cases ride with the path-map
+check's fix (P-I2-4, P-IS-9) and are unchanged here.
 """
 
 from __future__ import annotations
@@ -19,77 +26,93 @@ cli_support = support.cli_support
 # 1. schema/invariants: a record whose frontmatter fails its schema
 # --------------------------------------------------------------------------
 
-def test_planted_schema_defect_ticket_missing_kpis(project, sandbox, interface):
-    """A ticket without the required ``kpis`` field fails the schema check."""
+def test_planted_schema_defect_ticket_missing_kpis(green_project, sandbox, interface):
+    """A ticket without the required ``kpis`` field fails the schema check: ``core-schema`` is RED with a finding
+    that names the ticket and the field."""
+    project = green_project
     project.write(".tickets/BAD-aaaa.md",
                   "---\nid: BAD-aaaa\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n"
                   "title: Bad ticket\nrole: engineer\nallowed_paths:\n- src/**\n---\n# BAD-aaaa\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-schema", ".tickets/BAD-aaaa.md", "kpis")
 
 
-def test_planted_schema_defect_decision_missing_status(project, sandbox, interface):
-    """A decision record without ``status`` fails the schema check."""
+def test_planted_schema_defect_decision_missing_status(green_project, sandbox, interface):
+    """A decision record without ``status`` fails the schema check: ``core-schema`` is RED with a finding that
+    names the record and the field."""
+    project = green_project
     project.write("docs/adr/BAD-0001.md",
                   "---\nid: BAD-0001\ntype: decision\nstate_class: AUTHORITATIVE\n"
                   "title: Bad decision\n---\n# BAD-0001\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-schema", "docs/adr/BAD-0001.md", "status")
 
 
 # --------------------------------------------------------------------------
 # 2. graph integrity: dangling depends_on, duplicate id, id outside grammar
 # --------------------------------------------------------------------------
 
-def test_planted_graph_defect_dangling_depends_on(project, sandbox, interface):
-    """A record with a depends_on pointing to a nonexistent id fails the graph check."""
+def test_planted_graph_defect_dangling_depends_on(green_project, sandbox, interface):
+    """A record with a depends_on pointing to a nonexistent id fails the graph check: ``core-graph`` is RED with a
+    finding that names the record and the missing target."""
+    project = green_project
     project.add_decision("DEC-001", "ACTIVE", depends_on=["NONEXISTENT-999"])
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-graph", "DEC-001", "NONEXISTENT-999")
 
 
-def test_planted_graph_defect_duplicate_id(project, sandbox, interface):
-    """Two records with the same id fail the graph check."""
+def test_planted_graph_defect_duplicate_id(green_project, sandbox, interface):
+    """Two records with the same id fail the graph check: ``core-graph`` is RED with a finding that names the id
+    and both files. (The decision checker's own finding of the same pair is
+    ``test_w1_26_decisions.py::test_duplicate_id_flagged``.)"""
+    project = green_project
     project.add_decision("DEC-001", "ACTIVE")
     project.write("docs/adr/DEC-001-copy.md",
                   support.decision("DEC-001", "PROPOSED"))
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-graph", "DEC-001", "docs/adr/DEC-001.md",
+                                    "docs/adr/DEC-001-copy.md")
 
 
-def test_planted_graph_defect_id_outside_grammar(project, sandbox, interface):
-    """A record with an id that does not match the grammar fails."""
+def test_planted_graph_defect_id_outside_grammar(green_project, sandbox, interface):
+    """A record with an id that does not match the grammar fails: ``core-graph`` is RED with a finding that names
+    the record and its id."""
+    project = green_project
     project.write("docs/adr/bad.md",
                   "---\nid: '!!!INVALID!!!'\ntype: decision\nstatus: ACTIVE\n"
                   "state_class: AUTHORITATIVE\ntitle: Bad id\n---\n# Bad\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-graph", "docs/adr/bad.md", "!!!INVALID!!!")
 
 
 # --------------------------------------------------------------------------
 # 3. authority/role limits: the decision checker's own findings
 # --------------------------------------------------------------------------
 
-def test_planted_authority_defect_active_while_superseded(project, sandbox, interface):
-    """A decision marked ACTIVE that is superseded by another fails."""
+def test_planted_authority_defect_active_while_superseded(green_project, sandbox, interface):
+    """A decision marked ACTIVE that is superseded by another fails: ``core-authority`` is RED with a finding that
+    names the superseded decision's file."""
+    project = green_project
     project.add_decision("ADR-0001", "ACTIVE", superseded_by="ADR-0002")
     project.add_decision("ADR-0002", "ACTIVE", supersedes=["ADR-0001"])
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-authority", "ADR-0001", "docs/adr/ADR-0001.md")
 
 
 # --------------------------------------------------------------------------
 # 4. mutation scope: implementer allowed_paths covers tests/acceptance/**
 # --------------------------------------------------------------------------
 
-def test_planted_mutation_defect_implementer_covers_acceptance(project, sandbox, interface):
-    """An implementer ticket whose allowed_paths includes tests/acceptance/** fails."""
+def test_planted_mutation_defect_implementer_covers_acceptance(green_project, sandbox, interface):
+    """An implementer ticket whose allowed_paths includes tests/acceptance/** fails: ``core-mutation`` is RED with
+    a finding that names the ticket and the pattern."""
+    project = green_project
     project.write(".tickets/IMPL-aaaa.md",
                   "---\nid: IMPL-aaaa\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n"
                   "title: Bad implementer\nclass: implementation\nrole: engineer\n"
@@ -98,11 +121,13 @@ def test_planted_mutation_defect_implementer_covers_acceptance(project, sandbox,
                   "---\n# IMPL-aaaa\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-mutation", ".tickets/IMPL-aaaa.md", "tests/acceptance/**")
 
 
-def test_planted_mutation_defect_implementer_covers_acceptance_subpath(project, sandbox, interface):
-    """An implementer whose allowed_paths covers a specific acceptance path also fails."""
+def test_planted_mutation_defect_implementer_covers_acceptance_subpath(green_project, sandbox, interface):
+    """An implementer whose allowed_paths covers a specific acceptance path also fails: ``core-mutation`` is RED
+    with a finding that names the ticket and the pattern."""
+    project = green_project
     project.write(".tickets/IMPL-bbbb.md",
                   "---\nid: IMPL-bbbb\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n"
                   "title: Bad implementer 2\nclass: implementation\nrole: engineer\n"
@@ -111,7 +136,8 @@ def test_planted_mutation_defect_implementer_covers_acceptance_subpath(project, 
                   "---\n# IMPL-bbbb\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-mutation", ".tickets/IMPL-bbbb.md",
+                                    "tests/acceptance/W1-99/**")
 
 
 # --------------------------------------------------------------------------
@@ -143,8 +169,11 @@ def test_planted_pathmap_defect_file_matches_two_namespaces(project, sandbox, in
 # 6. concurrency/claims: ticket DAG cycle, missing required fields
 # --------------------------------------------------------------------------
 
-def test_planted_claims_defect_ticket_dag_cycle(project, sandbox, interface):
-    """Two tickets whose depends_on form a cycle fail."""
+def test_planted_claims_defect_ticket_dag_cycle(green_project, sandbox, interface):
+    """Two tickets whose depends_on form a cycle fail: ``core-claims`` is RED with a finding that names the cycle
+    (one of its two tickets, by ticket id or WBS id); the case also holds that ``core-claims`` has no finding on the
+    two tickets once the cycle is broken."""
+    project = green_project
     project.write(".tickets/CYC-aaaa.md",
                   "---\nid: CYC-aaaa\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n"
                   "title: Cycle A\nrole: engineer\nallowed_paths:\n- src/a/**\n"
@@ -157,18 +186,31 @@ def test_planted_claims_defect_ticket_dag_cycle(project, sandbox, interface):
                   "kpis:\n  success:\n  - works\n  failure: []\n---\n# CYC-bbbb\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    cycle = ("CYC-aaaa", "CYC-bbbb", "W1-98", "W1-99")
+    support.assert_check_red_naming(run, interface, "core-claims", cycle)
+    project.write(".tickets/CYC-bbbb.md",
+                  "---\nid: CYC-bbbb\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n"
+                  "title: Cycle B\nrole: engineer\nallowed_paths:\n- src/b/**\n"
+                  "wbs_id: W1-99\n"
+                  "kpis:\n  success:\n  - works\n  failure: []\n---\n# CYC-bbbb\n")
+    project.commit("break the cycle")
+    broken = support.run_check(project, sandbox)
+    result, _ = support.result_and_envelope(broken, interface)
+    assert not support.findings_naming(support.check_entry(result, "core-claims"), cycle), \
+        f"core-claims still has a finding on the two tickets once the cycle is broken\n{broken.describe()}"
 
 
-def test_planted_claims_defect_ticket_missing_required_field(project, sandbox, interface):
-    """A ticket missing a required field (``role``) fails."""
+def test_planted_claims_defect_ticket_missing_required_field(green_project, sandbox, interface):
+    """A ticket missing a required field (``role``) fails: ``core-claims`` is RED with a finding that names the
+    ticket and the field."""
+    project = green_project
     project.write(".tickets/BAD-cccc.md",
                   "---\nid: BAD-cccc\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n"
                   "title: No role\nallowed_paths:\n- src/**\n"
                   "kpis:\n  success:\n  - works\n  failure: []\n---\n# BAD-cccc\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-claims", ".tickets/BAD-cccc.md", "role")
 
 
 # --------------------------------------------------------------------------

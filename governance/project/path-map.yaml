@@ -54,8 +54,9 @@ namespaces:
     embedding_policy: embedded
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
     deletion_rebuild: authoritative; restored from git only
-  # DEC-856 (P-W2-50 (a)): the overlay is governance memory, except the raw orchestration record below. The
-  # record's searchable parts (packages, session summaries, RESUME HERE, the PR packages) stay here.
+  # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
+  # orchestration record moved to the branch record/w2; only its searchable part (the README, the sync script,
+  # packages, session summaries and the checkpoint copy) stays in this tree, under this namespace.
   project-overlay:
     paths:
       - "governance/*"
@@ -76,50 +77,8 @@ namespaces:
     embedding_policy: not embedded
     provenance: the project overlay, written by the orchestrator or under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
-  # DEC-856 (P-W2-50 (a)): the raw orchestration record (Policy 1, DEC-819): run logs, briefs given, checkpoint
-  # series, drafts and scripts, copied from scratch. Committed and scanned by gitleaks at commit; kept out of
-  # governance memory, so no index, code graph or per-file secret gate reads it (as fixtures/**).
-  orchestration-record:
-    paths:
-      - "governance/project/orchestration/worktrees/**"
-      - "governance/project/orchestration/main/checkpoints/**"
-      - "governance/project/orchestration/main/orchestrator/log/**"
-      - "governance/project/orchestration/main/orchestrator/briefs/**"
-      - "governance/project/orchestration/main/orchestrator/drafts/**"
-      - "governance/project/orchestration/main/orchestrator/specimen/**"
-      - "governance/project/orchestration/main/orchestrator/pin/**"
-      - "governance/project/orchestration/main/orchestrator/tools/**"
-      - "governance/project/orchestration/main/orchestrator/*.py"
-      - "governance/project/orchestration/main/orchestrator/*.sh"
-      - "governance/project/orchestration/main/orchestrator/*.txt"
-      - "governance/project/orchestration/main/orchestrator/*.yaml"
-      - "governance/project/orchestration/main/orchestrator/*.json"
-      - "governance/project/orchestration/main/orchestrator/*.jsonl"
-      - "governance/project/orchestration/main/orchestrator/dec-*.md"
-      - "governance/project/orchestration/main/orchestrator/register-*.md"
-      - "governance/project/orchestration/main/orchestrator/residuals-*.md"
-      - "governance/project/orchestration/main/orchestrator/bootstrap-*.md"
-      - "governance/project/orchestration/main/orchestrator/closenote-*.md"
-      - "governance/project/orchestration/main/orchestrator/close-*.md"
-      - "governance/project/orchestration/main/orchestrator/resume-*.md"
-      - "governance/project/orchestration/main/orchestrator/verdict-*.md"
-      - "governance/project/orchestration/main/orchestrator/share-*.md"
-      - "governance/project/orchestration/main/orchestrator/policy-*.md"
-      - "governance/project/orchestration/main/orchestrator/p39-*.md"
-      - "governance/project/orchestration/main/orchestrator/adoption-*.md"
-      - "governance/project/orchestration/main/orchestrator/ADOPTION-*.md"
-      - "governance/project/orchestration/main/orchestrator/W2-*.md"
-      - "governance/project/orchestration/main/orchestrator/EXIT-*.md"
-      - "governance/project/orchestration/main/orchestrator/COMPLIANCE*.md"
-      - "governance/project/orchestration/main/orchestrator/CHECKPOINT-*.md"
-    memory_class: product
-    sensitivity: restricted
-    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
-    retention: kept in git history
-    export_policy: denied
-    embedding_policy: not embedded
-    provenance: copied from the orchestrator's and the leads' scratch by governance/project/orchestration/sync_context.py (DEC-819); scanned by gitleaks before every commit
-    deletion_rebuild: a copy; the live files stay in scratch; restored from git only
+  # DEC-887 (owner, 2026-10-21): the raw orchestration record (DEC-856's `orchestration-record` namespace) lives on
+  # the branch record/w2, outside this tree; no namespace here holds it.
   kernel-template:
     paths: ["template/**"]
     memory_class: governance
@@ -281,6 +240,14 @@ accepted_history:
     decision: DEC-871
   - commit: "7bacecd21045f56eb1d3b3da9afd9a9ccd1d5197"
     decision: DEC-871
+  - commit: "162f17ea9cafeec96687d2a83c43c060c08d3e1b"
+    decision: DEC-891
+# Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
+# role (DEC-906): each by its exact sha, with the owner's decision. Only the owner's commit adds an entry; any other
+# commit touching tests/acceptance/ without that role stays red.
+acceptance_exemptions:
+  - commit: "c9a08678644485a7528bc875164e110881b63d93"
+    decision: DEC-900
 # The data files this project's tests read, for the test-result cache (W2-48; DEC-876, P-W2-48-5 (c)): narrow on
 # purpose, fixtures, templates and schemas. The register and the ticket files are left out; a test that reads a
 # non-Python file outside these globs is always run (the cache fails safe).
@@ -294,27 +261,11 @@ close_timeout: 7200
 # gov close's owner-accepted known reds, a ratchet (DEC-757): each red by exact test id, the owner's decision
 # that accepts it, its reason and the ticket that fixes it. Only an owner's commit adds an entry; a listed test
 # that passes leaves the list in the same close.
-accepted_reds:
-  - test: "tests/acceptance/W1-42/test_w1_42_exit_report.py::test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason[RETR-X-02]"
-    decision: DEC-757
-    reason: "RETR-X-02 has no named parent expansion yet (DEC-714)"
-    fixed_by: W2-13
-  - test: "tests/acceptance/W1-42/test_w1_42_exit_report.py::test_governance_share_is_measured_and_at_most_15_percent_on_each_programme"
-    decision: DEC-757
-    reason: "The governance share is not measured per programme yet (DEC-713)"
-    fixed_by: W2-14
+accepted_reds: []
 # gov close's named load-sensitive tests (DEC-757): a listed test that fails counts only if it passes in an
 # isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry. Each entry
 # names the ticket or the Wave 3 row that fixes it (DEC-762); the list shrinks as they close.
 load_sensitive:
-  - test: "tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms"
-    decision: DEC-757
-    reason: "p95 latency under parallel load (DEC-372)"
-    fixed_by: W2-M332
-  - test: "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook"
-    decision: DEC-757
-    reason: "p95 latency under parallel load (DEC-372)"
-    fixed_by: W2-M332
   - test: "tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95"
     decision: DEC-757
     reason: "p95 latency under parallel load (DEC-372)"
@@ -427,3 +378,21 @@ load_sensitive:
     decision: DEC-871
     reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
     fixed_by: W2-57
+  - test: "tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]"
+    decision: DEC-886
+    reason: "fails in the close's parallel regression (W2-02's closes, 2026-10-21 15:36 at load about 3 and 17:26 at load 2.9) and passes alone, 3 of 3 in 5.4 to 6.0 s at load 2.8 to 3.9"
+    fixed_by: W2-57
+  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]"
+    decision: DEC-892
+    reason: "RULESYNC_FAILED in the close's parallel regression (W2-63's close, 2026-10-22 00:11): rulesync --version gave no answer within the portability check's 10-second probe under load, as DEC-871's two W1-38 cases; passes alone (2 passed in 2.9 s, 2026-10-22 00:2x)"
+    fixed_by: W2-57
+# The evaluation sets (DEC-820 (d), DEC-845, W2-58): a session a set measures (its role in `roles`, or its ticket
+# in `tickets`) is refused reads of the hidden part by the guard (no sandbox Read rule, DEC-873), and reads the visible part.
+# memory-retrieval is W2-61's: lens B's 20 questions are visible; the hidden part, which W2-61 fills, lies under
+# fixtures/, a product-memory namespace the indexer never reads. W2-61 narrows `measures` to tickets.
+evaluation_sets:
+  memory-retrieval:
+    visible: ["docs/assessment/2026-10/B-memory-retrieval.md"]
+    hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
+    measures:
+      roles: [engineer, research]

@@ -3,6 +3,11 @@
 Fails a record that changes authority class without a decision: a research or
 lesson record cited as a decision or policy, or a superseded record used to
 satisfy a current requirement.
+
+Revised (W2-67, I2 §2.7 R1): the four RED cases plant their record on the green
+base (``green_project``) and assert ``core-authority``'s own entry RED with a
+finding that names the cited record and the record that cites it, not that
+``gov check`` failed (the base was red before any defect).
 """
 
 from __future__ import annotations
@@ -14,19 +19,21 @@ import w1_26_support as support
 # A research record cited as a decision -> RED
 # --------------------------------------------------------------------------
 
-def test_research_cited_as_decision_is_red(project, sandbox, interface):
+def test_research_cited_as_decision_is_red(green_project, sandbox, interface):
     """A research record that is cited as a decision fails."""
+    project = green_project
     project.add_record("docs/research/RES-001.md", "RES-001", "research", "ACTIVE",
                         title="A research finding")
     project.add_decision("DEC-AUTH-001", "ACTIVE", depends_on=["RES-001"],
                           title="Depends on research as if it were policy")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-authority", "RES-001", "DEC-AUTH-001")
 
 
-def test_research_cited_as_policy_is_red(project, sandbox, interface):
+def test_research_cited_as_policy_is_red(green_project, sandbox, interface):
     """A research record used where a policy record is expected fails."""
+    project = green_project
     project.add_record("docs/research/RES-002.md", "RES-002", "research", "ACTIVE",
                         title="Research as policy")
     project.write(".tickets/POL-aaaa.md",
@@ -36,30 +43,32 @@ def test_research_cited_as_policy_is_red(project, sandbox, interface):
                   "kpis:\n  success:\n  - works\n  failure: []\n---\n# POL-aaaa\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-authority", "RES-002", "POL-aaaa")
 
 
 # --------------------------------------------------------------------------
 # A lesson record cited as policy -> RED
 # --------------------------------------------------------------------------
 
-def test_lesson_cited_as_policy_is_red(project, sandbox, interface):
+def test_lesson_cited_as_policy_is_red(green_project, sandbox, interface):
     """A lesson record cited as a policy fails."""
+    project = green_project
     project.add_record("docs/lessons/LES-001.md", "LES-001", "lesson", "ACTIVE",
                         title="A lesson learned")
     project.add_decision("DEC-AUTH-002", "ACTIVE", depends_on=["LES-001"],
                           title="Depends on lesson as policy")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-authority", "LES-001", "DEC-AUTH-002")
 
 
 # --------------------------------------------------------------------------
 # A superseded record used to satisfy a current requirement -> RED
 # --------------------------------------------------------------------------
 
-def test_superseded_record_satisfying_current_requirement_is_red(project, sandbox, interface):
+def test_superseded_record_satisfying_current_requirement_is_red(green_project, sandbox, interface):
     """A superseded record used to satisfy a current requirement fails."""
+    project = green_project
     project.add_decision("DEC-OLD-001", "SUPERSEDED", superseded_by="DEC-NEW-001",
                           title="Old decision")
     project.add_decision("DEC-NEW-001", "ACTIVE", supersedes=["DEC-OLD-001"],
@@ -71,7 +80,7 @@ def test_superseded_record_satisfying_current_requirement_is_red(project, sandbo
                   "kpis:\n  success:\n  - works\n  failure: []\n---\n# REQ-aaaa\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-authority", "DEC-OLD-001", "REQ-aaaa")
 
 
 # --------------------------------------------------------------------------

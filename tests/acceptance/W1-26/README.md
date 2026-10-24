@@ -648,3 +648,11 @@ fixed. The check that reads `template/governance/kernel/vendor/` for skill versi
 checks' own readings of kernel paths are not part of this piece.
 
 **Packages:** none. The three choices above are stricter readings and each is reversible by changing its case.
+
+## W2-67 (DAEO-9nys): the planted-defect cases and a base green before any defect
+
+W2-67's test designer (round 1, batch 2) gave the planted-defect cases a base project green before any defect
+(`support.green_base`, held by `test_w1_26_green_base.py`) and revised 42 weak cases so that each asserts the named
+check's own entry and finding, each shown red against a planted fault and green on the head, with a
+`Rewrite-Reason:` trailer. The base, the plants, each case's red and green, and the cases left:
+`README-W2-67.md`.

@@ -1,8 +1,0 @@
-appended 3013 chars to /home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md
-appended 877 chars to /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/bootstrap.md
-validator: RESULT: ALL PASS
-M  docs/DECISION_REGISTER.md
-M  governance/project/bootstrap.md
-rebuild exit 0
-commit exit 0
-9ee07984 Decision register v0.217: DEC-715 (owner: one stable launch command for leads and workers, on the Wave 2 list ranked high; the owner's lead launch form until then)

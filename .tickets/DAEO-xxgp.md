@@ -1,6 +1,6 @@
 ---
 id: DAEO-xxgp
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:12Z
@@ -65,6 +65,8 @@ list_rows:
 - W2-M153
 ---
 # W2-48 Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run
+
+**WITHDRAWN by the owner, 2026-10-21 (DEC-880 item 2, P-W2-48-8 (d)).** The cache is not merged; this ticket ends by that decision, not by a clean `gov close`. The lesson, as measured: per-test tracking made almost every test "always run" here, mostly through folder listings (7,076 tests) and reads of undeclared files (3,750), with dot-files (125) and only about 500 child processes the cache could not follow (lens H, finding 12; DEC-889) (run 2: 11.5 % of tests reused, a close 79 min against 81 uncached). Branch `w2/W2-48` (head `2c3c46b5`) is kept as the record, with `docs/research/W2-48-cache-choice.md`. Its purpose passes to W2-66 (`DAEO-c1uz`, path-scoped regression at close); its rows W2-H044 and W2-M153 move there. The text below is the withdrawn ticket's history.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-48), as approved (DEC-729), restated by DEC-843 and DEC-852 (owner, 2026-10-19). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

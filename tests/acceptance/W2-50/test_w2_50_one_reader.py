@@ -1,5 +1,13 @@
 """W2-50, one option reader in the guard's read rule (DEC-778), as described behaviour (DEC-136): tests added after implementation.
 
+Rewritten by W2-58's test designer (the lead's reading of P-W2-58-TD-2 (i);
+DEC-821 item 3, DEC-857 item 3, item 4): every second name below stays refused,
+for every role, now on the write side (a writable alias of a file the role may
+not write). Each case now asks only a rule's refusal (exit code 0) whose message
+names no path or folder of the file and carries nothing of it; the read rule's
+decisions in the reason (and "as the plain form's") are no longer asked. The
+paragraphs below describe the cases as first written.
+
 The guard refuses every role a call that reads the protected pair (the
 project's settings file and its held-out file), and counts as a read a command
 that gives such a file, or a folder that holds one, a second name: the sources
@@ -141,30 +149,38 @@ def _no_path_of_the_file(world, reason):
     return sorted(name for name in names if name in reason)
 
 
+def _says_nothing_of_the_file(world, result, what):
+    """No path or folder of the file in the refusal, and nothing of the file's contents (its one hook command)."""
+    said = result.reason + "\n" + result.stdout + "\n" + result.stderr
+    named = _no_path_of_the_file(world, said)
+    assert not named, f"{what}: the refusal names the file's path or folder {named}: {result.reason[:400]!r}"
+    assert support.GUARD_COMMAND not in said, f"{what}: the refusal carries the file's contents"
+
+
 def _plain(world, role, cwd):
-    """The plain second name's refusal (a premise): the read rule's, naming its decisions and no path."""
+    """The plain second name's refusal (a premise): a rule's refusal that names no path and nothing of the file.
+
+    Rewritten by W2-58 (the lead's reading of P-W2-58-TD-2 (i); DEC-548, DEC-553, DEC-778, DEC-821 item 4): a second
+    name stays refused, now on the write side; the read rule's wording (DEC-508, DEC-525) is no longer asked.
+    """
     command = _fill(world, PLAIN)
     result = _ask(world, command, role, cwd)
     what = f"premise: Bash `{command}` by the {role} (the plain second name)"
     assert result.decision == "deny" and result.returncode == 0, f"{what} was not refused: {result.describe()}"
-    assert RULE_RE.search(result.reason), f"{what} was not refused as a read: {result.describe()}"
-    assert not _no_path_of_the_file(world, result.reason), f"{what}: its reason names a path: {result.describe()}"
+    _says_nothing_of_the_file(world, result, what)
     return result
 
 
 def assert_refused_as_a_read(world, result, plain, what):
+    """Refused by a rule (exit code 0), with no path, no folder and nothing of the file in the message.
+
+    Rewritten by W2-58 (TD-2 (i)): which rule refuses it, and which decisions its reason names, is no longer asked
+    (before W2-58: the read rule's, with the plain form's decisions). ``plain`` is kept for the callers' premise.
+    """
     assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
     assert result.returncode == 0, f"{what} was refused, but not by a decision (exit {result.returncode}): " \
                                    f"{result.describe()}"
-    reason = result.reason.strip()
-    assert RULE_RE.search(reason), (
-        f"{what} was refused, but not as a read of the protected file: the reason names none of DEC-508, DEC-525, "
-        f"DEC-548, DEC-553 (the plain form's reason: {plain.reason[:200]!r}): {reason[:400]!r}")
-    assert sorted(set(DECISION_RE.findall(reason))) == sorted(set(DECISION_RE.findall(plain.reason))), (
-        f"{what}: refused, but not as the plain second name is: it names {sorted(set(DECISION_RE.findall(reason)))}, "
-        f"the plain form {sorted(set(DECISION_RE.findall(plain.reason)))}: {reason[:400]!r}")
-    named = _no_path_of_the_file(world, reason)
-    assert not named, f"{what}: the read refusal names the file's path or folder {named}: {reason[:400]!r}"
+    _says_nothing_of_the_file(world, result, what)
 
 
 # --------------------------------------------------------------------------

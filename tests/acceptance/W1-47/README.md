@@ -61,7 +61,7 @@ in the section below.
 | Success 5, failure 5 — no ask rule `[CAP-25.f]` | `test_w1_47_settings_rules.py`: one case for each of the eleven rules; no rule on a longer command that begins with one; not moved to `deny` or `allow`; `Bash(sudo:*)` and the six other deny rules in place; the kernel template carries none | `permissions.ask of .claude/settings.json still carries ['Bash(pip:*)']` and ten more; kernel template: `template/governance/kernel/settings.json does not exist` |
 | Success 6, failure 6 — four `uv` forms `[CAP-25.g]`, DEC-216 | `test_w1_47_uv_installs.py`: 41 commands ask for the orchestrator (23 of the first batch, 18 with a value option or `-w`); the four plain forms and the two forms DEC-216 words ask in all six permission modes; the 41 are denied for engineer, test designer and auditor; sixteen other `uv` commands stay unclassified, five of them with a value option in front; W1-04's three `uv` installs still ask | `` `uv --directory sub add requests` by the orchestrator did not ask: decision=allow `` and `` `…` by engineer was not denied by a rule: decision=allow `` |
 | Success 6, the research role's exception | None here: carried by W1-46's test design (DEC-219) | — |
-| Success 7 — no session role, no wide scope | `test_w1_47_session_role.py`: an orchestrator subagent has no wide scope when `GOV_ROLE` is unset, empty or blank, or names another role; the orchestrator's own session keeps it; `tests/unit/guard` passes | None: green already (reading 19) |
+| Success 7 — no session role, no wide scope | `test_w1_47_session_role.py`: an orchestrator subagent has no wide scope when `GOV_ROLE` is unset, empty or blank, or names another role; the orchestrator's own session keeps it. The builder suite `tests/unit/guard` runs as itself in every close; the nested rerun of it (`test_the_builder_tests_of_the_guard_pass`) is retired by DEC-899 (P-IS-3 (a), W2-70) | None: green already (reading 19) |
 | "The acceptance tests of W1-04 still pass" (success 5 and 6) | `tests/acceptance/W1-04`, run as it stands | Green today: 336 passed |
 
 ## Green before implementation (247 of 970)
@@ -155,8 +155,9 @@ were rewritten for the owner's answers; 22 to 27 are new.
     "The other commands on the list stay without a prompt").
 18. **Product-spec** is not named by the `uv` KPI and is not asserted there.
 19. **Success 7.** The function is internal and its one caller always passes the argument, so no public interface
-    can leave it out. The tests show the hook's behaviour around a missing session role, and that `tests/unit/guard`
-    passes. Whether a builder test calls the function without the argument is for the reviewer to read.
+    can leave it out. The tests show the hook's behaviour around a missing session role; `tests/unit/guard` runs as
+    itself in every close, and the case that re-ran it here is retired (DEC-899). Whether a builder test calls the
+    function without the argument is for the reviewer to read.
 20. **Failure 4 and failure 7 are checked by comparing text.** The committed list is read once more than for the
     deny rule itself: to check that the settings file names a path in that rule only, and that no implementation
     file and no file of this suite repeats one. Nothing is opened under a path and only file names are shown. See

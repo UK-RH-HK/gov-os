@@ -1,6 +1,0 @@
-ready load=14.57 avail=19G after 2 checks
-parallel: 2 failed, 13190 passed, 31 skipped in 1757.13s (0:29:17) [1819 s wall, load 5.94]
-declared entries: 55
-serial-afterwards: 263 passed in 1661.00s (0:27:41) [1735 s wall, load 1.31]
-validator: RESULT: ALL PASS
-PARTS: read every line above; a part is green only if its line has 'passed' and no 'failed' and no 'error'

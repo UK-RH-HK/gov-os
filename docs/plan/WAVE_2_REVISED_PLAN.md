@@ -28,7 +28,7 @@ The text below carries these answers; where an older sentence survives, this sec
 | 5 (the rest) | Opus 5.5 for every role; effort per role per launch; subagents on the parent's model; agent teams off; prompt v3 | DEC-839, DEC-840 |
 | 2 | The Contract re-baseline, (a) now, through W2-49's CIT-P | DEC-841 |
 | 4 | DEC-062 and DEC-140 withdrawn | DEC-842 |
-| 8 | W2-48 approved, testmon and coverage one package; **plus three conditions:** subprocesses seen, the leads' runs served, a nightly full uncached run | DEC-843, DEC-852 |
+| 8 | W2-48 approved, testmon and coverage one package; **plus three conditions:** subprocesses seen, the leads' runs served, a nightly full uncached run | DEC-843, DEC-852; **changed by DEC-880:** the cache withdrawn, W2-66 instead, the nightly run kept |
 | 9 | `docs/imported/` out of the schema check | DEC-844 |
 | 10 | The path map's `experiments/**` and `evaluation_sets` | DEC-845 |
 | 11 | The owner's acts as exact commands, when due | DEC-846 |
@@ -199,7 +199,7 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
     - W2-37: DEC-812 plus the code graph (keystone 4);
   - W2-26: re-scoped (DEC-827), then closed after W2-07.
 - **W2-57 (FULL; DEC-813, DEC-823):** load out of the close. One ordinary-work row rides in it: lens A's ancestry case of the commit range (W2-H023), if its test designer finds it reachable in ordinary work.
-- **W2-48 (FULL), glued (lens G R6, F6):**
+- **W2-48 (FULL), glued (lens G R6, F6). WITHDRAWN by DEC-880 (owner, 2026-10-21):** per-test tracking made almost every test "always run" here, mostly through folder listings (7,076 tests) and reads of undeclared files (3,750), with dot-files (125) and only about 500 child processes the cache could not follow (lens H, finding 12; DEC-889) (11.5 % reused, 3 % saved); a lite W2-38 comes back as W2-66, path-scoped regression at close, with the nightly full run as backstop. The text below is the history:
   - pytest-testmon and coverage, one DEC-083 install package (Q-13), raised when W2-48 starts;
   - `--testmon-env` set to a hash of the declared data globs and the test command;
   - deselected tests recorded as "reused", with the run they came from;

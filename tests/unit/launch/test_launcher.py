@@ -17,6 +17,7 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
 from gov.cli.errors import GovError  # noqa: E402
+from gov.guard import heldout  # noqa: E402
 from gov.launch import launcher  # noqa: E402
 
 STRICT = {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
@@ -124,6 +125,38 @@ def test_an_argument_that_takes_the_guard_or_the_settings_away_refuses(args):
 
 def test_a_prompt_that_names_an_argument_as_a_word_passes():
     launcher._check_cli_args(["-p", "Do not use --bare.", "--model", "haiku"])
+
+
+def _read_project(root: Path, sets: str) -> Path:
+    for rel, text in ((".tickets/DAEO-t95.md", "---\nid: DAEO-t95\nwbs_id: W2-95\nstatus: in_progress\n"
+                                               "role: engineer\n---\n"),
+                      ("governance/project/path-map.yaml", "namespaces: {}\n" + sets),
+                      ("tests/acceptance/W2-95/test_feature.py", "x\n")):
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(text, encoding="utf-8")
+    return root
+
+
+def test_the_settings_carry_the_held_out_read_rules_and_none_for_the_protected_parts(tmp_path, monkeypatch):
+    """W2-58, DEC-873: the guard refuses (c) and (d); a Read rule would deny the session's pytest the files too."""
+    monkeypatch.setattr(launcher, "_runtime_rules", lambda root: [])
+    root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    hidden: [eval/hidden/**]\n"
+                                   "    measures: {roles: [engineer]}\n")
+    (root / "eval/hidden").mkdir(parents=True)
+    (root / "eval/hidden/a.yaml").write_text("x\n", encoding="utf-8")
+    (root / heldout.CONFIG_REL).write_text(f"{heldout.CONFIG_KEY}:\n  - /held/out\n", encoding="utf-8")
+    for role in ("engineer", "independent-test-designer", "independent-auditor", "product-spec"):
+        settings = launcher.build_settings(root, role, "DAEO-t95")
+        reads = [rule for rule in settings["permissions"]["deny"] if rule.startswith("Read(")]
+        assert reads == ["Read(//held/out/**)"], role
+        assert "filesystem" not in settings["sandbox"], role
+
+
+def test_a_malformed_evaluation_set_refuses_the_launch(tmp_path):
+    root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    visible: [a]\n    measures: {roles: [research]}\n")
+    for role in ("engineer", "independent-auditor"):
+        with pytest.raises(GovError):
+            launcher.build_settings(root, role, "DAEO-t95")
 
 
 def test_a_refused_launch_leaves_no_temp_directory(tmp_path, monkeypatch):

@@ -33,8 +33,13 @@ def test_gov_check_runs_readiness(project, sandbox, interface):
 # READINESS_INVALID is a finding
 # --------------------------------------------------------------------------
 
-def test_readiness_invalid_is_a_finding(project, sandbox, interface):
-    """A specification that is READINESS_INVALID produces a finding."""
+def test_readiness_invalid_is_a_finding(green_project_with_dimensions, sandbox, interface):
+    """A specification that is READINESS_INVALID produces a finding: the ``readiness`` check is RED with a finding
+    that names the specification.
+
+    Revised (W2-67, I2 §2.7): it asserted "readiness" anywhere in the output, which every output holds (the check
+    id); the base, red before the specification (I2 R1), is now the green base that holds the dimensions."""
+    project = green_project_with_dimensions
     project.add_readiness_dimensions()
     folder = "openspec/changes/bad-spec"
     project.write(f"{folder}/.openspec.yaml", "schema: feature-readiness\n")
@@ -43,11 +48,7 @@ def test_readiness_invalid_is_a_finding(project, sandbox, interface):
                   "state_class: AUTHORITATIVE\ntitle: Bad spec\n---\n# Bad\n")
     project.commit()
     run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    output_text = run.stdout + str(result)
-    assert "readiness" in output_text.lower() or "READINESS_INVALID" in output_text, \
-        f"READINESS_INVALID is not reported\n{run.describe()}"
+    support.assert_check_red_naming(run, interface, "readiness", "SPEC-bad1")
 
 
 # --------------------------------------------------------------------------

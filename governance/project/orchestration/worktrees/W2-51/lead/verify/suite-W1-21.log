@@ -1,6 +1,0 @@
-........................................................................ [ 56%]
-.......................................................                  [100%]
-======================= W1-21 measured on the dev tiers ========================
-mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
-forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
-127 passed in 323.15s (0:05:23)

@@ -54,3 +54,5 @@ From P-W2-52 (a) (owner, 2026-10-20; DEC-865). W1-49's two cases from DEC-636 an
   - `test_w1_49_live_session.py`'s case that required a 300k window from the variable asserts DEC-838 instead: the session reports its model's own window (the default for that model), not a threshold from a setting.
   - Each change carries `Rewrite-Reason: DEC-838`; no other expectation changes; nothing is deleted or skipped; the README's table and history name the change.
 - **KPIs, failure:** with the variable set in a session's environment or in the project's settings env, the revised threshold case fails; a session that reports a threshold from a setting fails the revised live case.
+
+**DEC-892 (owner, 2026-10-22):** merged, not closed. Its close refused on NO_ACCEPTANCE_TESTS (2026-10-22 00:11): the close looks for `tests/acceptance/W2-63/`, and a test-revision ticket has none. It waits for W2-07, whose close judges a test-revision ticket on its declared `acceptance_tests.path`. No tests are written into a W2-63 folder, no exception, no decision-close.
