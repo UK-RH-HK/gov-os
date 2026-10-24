@@ -52,13 +52,19 @@ the full regression, never less.
    the template's copy `template/governance/project/test-map.yaml` (valid against the schema). Keys:
    - `version`: `1`.
    - `shared_core`: list of path patterns (required, non-empty). A changed path matching one runs the full
-     regression.
+     regression. The live map's shared core holds, beside KPI 2's list, every tracked `conftest.py` above every
+     suite folder: `tests/conftest.py` (loaded by every pytest run under `tests/`) and
+     `tests/acceptance/conftest.py` (loaded by every run of an acceptance suite).
    - `record_only`: list of path patterns. A changed path matching one is placed and selects no suite by itself.
    - `record_reading`: list of pytest targets (a folder, a file, or a node id or its beginning, relative to the
      project), run on every close whatever else is selected.
    - `every_close`: list of pytest targets run on every close.
    - `couplings`: list of `{paths: [patterns], suites: [targets], why: <text>}`; a changed path matching one of
-     `paths` selects each of `suites`.
+     `paths` selects each of `suites`. A file a test loads by file path is such a coupling: the live map takes a
+     change to `tests/acceptance/W1-07/conftest.py` or `tests/acceptance/W1-25/conftest.py` to
+     `tests/acceptance/W1-27/test_w2_67_copies.py`, which loads them (and W1-27's own) with
+     `importlib.util.spec_from_file_location`; a change to `tests/acceptance/W1-27/conftest.py` reaches it through
+     its suite folder (item 3) or a coupling.
    - `test_inputs`: the path map's `test_inputs` list, moved here (DEC-896 item 2).
    - `per_test_timeout`: seconds, a positive number; default `900` when absent.
    - `distribution`: the parallel runs' pytest-xdist `--dist` mode; default `load` when absent.
@@ -183,7 +189,7 @@ close), and the evidence block does not name it.
 | KPI line | Tests | Red on the base |
 |---|---|---|
 | S6 + F2 the evidence block | `test_w2_66_evidence.py` (8); `test_w2_66_scoped_selection.py::test_the_close_record_holds_the_same_evidence_block`, `::test_the_junit_xml_holds_every_case_run_and_no_case_left_out`, `::test_a_one_module_change_is_stated_scoped_never_full`, `::test_the_head_and_the_tree_are_stated` | (a); `test_a_refused_close_leaves_nothing_untracked_but_its_repair_ticket` is green on the base (nothing is written today) |
-| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (68 cases) | (d) |
+| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (68 cases; its five cases of Part 4 apart) | (d) |
 | S12 the lead's verification unchanged | `test_w2_66_lead_verification.py` (2) | **green on the base by design**: they hold that nothing this ticket builds changes what a plain `pytest tests` reads or collects (no configuration file, conftest outside this folder or serial-only list changed against `w2/integrate`; a fixture's test map changes nothing a plain run collects) |
 
 ### Part 3 — limits, distribution, nightly, report
@@ -206,13 +212,17 @@ of the shared core runs `scoped`; the suite of the ticket whose paths the file l
 passes); **(j)** the overlap rule and the own suite read `tests/acceptance/<wbs_id>/` only, never the declared
 `acceptance_tests.path` (the declared folder is left out `NOT_REACHED`; `OWN` names the WBS id's folder, and the
 declared folder's files are in `left_out`); **(k)** a path that only suiteless tickets' `allowed_paths` hold is
-taken as placed (the run is `scoped` and selects nothing for it beyond the always-run set).
+taken as placed (the run is `scoped` and selects nothing for it beyond the always-run set); **(l)** the live map's
+shared core holds neither `tests/conftest.py` nor `tests/acceptance/conftest.py`, and no coupling takes W1-07's or
+W1-25's `conftest.py` to `test_w2_67_copies.py` (`tests/conftest.py` is in W2-67's `allowed_paths`, so a change to
+it is placed and runs scoped).
 
 | KPI line | Tests | Red on the built head |
 |---|---|---|
 | S1, S2 + F1 a moved file at both its paths (Interface item 2) | `test_w2_66_moved_files.py` (3): `::test_a_file_moved_out_of_the_shared_core_runs_the_full_regression`, `::test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite`, `::test_a_file_moved_into_the_shared_core_runs_the_full_regression` | (i); the last runs full today and is red only on `changed` lacking the path the file left |
 | S1, S6 a ticket's suite is its declared folder (Interface item 3) | `test_w2_66_declared_folders.py` (2): `::test_the_overlap_rule_selects_a_ticket_s_declared_folder`, `::test_the_own_suite_is_the_closing_ticket_s_declared_folder` | (j) |
 | S2 + F1 a path only suiteless tickets hold is unplaced (Interface item 3) | `test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression` (one close: one ticket declares its WBS id's folder, which does not exist; one declares a folder with a README and no test) | (k) |
+| S2 + F1 the conftests above every suite are shared core; S3 conftests loaded by file path are couplings (Interface item 1) | `test_w2_66_live_test_map.py::test_a_conftest_every_run_of_the_suites_loads_is_shared_core[tests/conftest.py]`, `[tests/acceptance/conftest.py]`; `::test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it[W1-07]`, `[W1-25]`, `[W1-27]` | (l); `[W1-27]` is green on the built head (its suite folder holds the file that loads it) |
 
 ### Expected green on the base
 

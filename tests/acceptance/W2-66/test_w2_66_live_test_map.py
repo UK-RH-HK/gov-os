@@ -205,6 +205,26 @@ def test_the_shared_core_holds_every_named_member(test_map, tracked):
     assert not missing, f"the shared core does not hold: {missing}"
 
 
+ROOT_CONFTEST = "tests/conftest.py"
+# The folders above every acceptance suite: a conftest in one is loaded by every run of each suite under it.
+ABOVE_EVERY_SUITE = ("", "tests", "tests/acceptance")
+
+
+def _conftests_above_every_suite():
+    return [p for p in _tracked() if p.rsplit("/", 1)[-1] == "conftest.py"
+            and (p.rsplit("/", 1)[0] if "/" in p else "") in ABOVE_EVERY_SUITE]
+
+
+@pytest.mark.parametrize("path", _conftests_above_every_suite())
+def test_a_conftest_every_run_of_the_suites_loads_is_shared_core(test_map, path):
+    """``tests/conftest.py`` is loaded by every pytest run under ``tests/`` (and ``tests/acceptance/conftest.py``
+    by every run of an acceptance suite): a change to it can reach every suite, so it runs the full regression.
+    From the FULL review of 9174e358 (README, "Interface", item 1)."""
+    assert ROOT_CONFTEST in _conftests_above_every_suite(), f"the fixture is wrong: {ROOT_CONFTEST} is not tracked"
+    held = _placed(_patterns(test_map, "shared_core"), path)
+    assert held, f"{path}, loaded by every run of the suites below it, is not in the shared core"
+
+
 def test_the_retrieval_core_is_its_eight_modules_not_the_whole_package(test_map, tracked):
     core = _patterns(test_map, "shared_core")
     wider = [p for p in tracked if p.startswith("src/gov/retrieval/") and p not in RETRIEVAL_CORE
@@ -282,6 +302,34 @@ def test_each_coupling_imports_cannot_see_is_declared(test_map, path, suites):
     reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
     missing = [s for s in suites if not _held(reached, s, whole=False)]
     assert not missing, f"no coupling takes a change of {path} to {missing}"
+
+
+# W1-27's ``test_w2_67_copies.py`` loads these conftests by file path (``conftest_of``), which no import shows.
+W2_67_COPIES = "tests/acceptance/W1-27/test_w2_67_copies.py"
+LOADED_BY_FILE_PATH = ("W1-07", "W1-25", "W1-27")
+
+
+def _suite_folder_of(path):
+    """The suite folder that holds ``path`` (README, "Interface", item 3: a suite holding a changed file runs)."""
+    parts = path.split("/")
+    if parts[:2] == ["tests", "unit"]:
+        return "tests/unit"
+    return "/".join(parts[:3]) if parts[:2] == ["tests", "acceptance"] and len(parts) > 3 else None
+
+
+@pytest.mark.parametrize("suite", LOADED_BY_FILE_PATH)
+def test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it(test_map, suite):
+    """KPI 3: a change to W1-07's, W1-25's or W1-27's ``conftest.py`` reaches ``test_w2_67_copies.py``, through a
+    declared coupling (W1-27's own conftest also through its suite folder). From the FULL review of 9174e358."""
+    path = f"tests/acceptance/{suite}/conftest.py"
+    assert (ROOT / path).is_file() and (ROOT / W2_67_COPIES).is_file(), f"the fixture is wrong: {path}"
+    text = (ROOT / W2_67_COPIES).read_text(encoding="utf-8")
+    assert "spec_from_file_location" in text and f'"{suite}"' in text, \
+        f"the fixture is wrong: {W2_67_COPIES} no longer loads {path} by file path"
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
+    reached += [folder for folder in (_suite_folder_of(path),) if folder]
+    held = _held(reached, W2_67_COPIES)
+    assert held, f"no coupling takes a change of {path} to {W2_67_COPIES}, which loads it by file path"
 
 
 @pytest.mark.parametrize("unit", ["deploy/gov-index.service", "gov.socket", "a/b/gov-nightly.timer"])
