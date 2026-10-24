@@ -64,7 +64,17 @@ the full regression, never less.
      change to `tests/acceptance/W1-07/conftest.py` or `tests/acceptance/W1-25/conftest.py` to
      `tests/acceptance/W1-27/test_w2_67_copies.py`, which loads them (and W1-27's own) with
      `importlib.util.spec_from_file_location`; a change to `tests/acceptance/W1-27/conftest.py` reaches it through
-     its suite folder (item 3) or a coupling.
+     its suite folder (item 3) or a coupling. **A file scan is such a coupling too** (DEC-912 item 3, P2): W1-28's
+     held-out copy check (`tests/acceptance/W1-28/test_w1_28_fixture_copies.py`, DEC-385) reads every Python
+     source under `tests/acceptance/` (`w1_28_copy_check.functions`: `rglob("*.py")`, `__pycache__` aside: each
+     suite's `conftest.py`, its `test_*.py` files, its support modules and its other helper modules, in any suite
+     folder, a new one included, at any depth) and runs the copying fixtures it finds. The live map couples every
+     such file (for example the pattern `tests/acceptance/**.py`), not only the support modules, to the check's
+     cases that scan the tree: the whole file, or each of `test_the_check_finds_the_copying_fixtures_of_the_earlier_suites`,
+     `test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out`,
+     `test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs` and
+     `test_the_reading_route_does_not_flag_this_suite_or_a_named_folder`, by targets that resolve (item 3).
+     `tests/acceptance/conftest.py` reaches it as shared core; W1-28's own files also through their suite folder.
    - `test_inputs`: the path map's `test_inputs` list, moved here (DEC-896 item 2).
    - `per_test_timeout`: seconds, a positive number; default `900` when absent.
    - `distribution`: the parallel runs' pytest-xdist `--dist` mode; default `load` when absent.
@@ -206,7 +216,7 @@ close), and the evidence block does not name it.
 | KPI line | Tests | Red on the base |
 |---|---|---|
 | S6 + F2 the evidence block | `test_w2_66_evidence.py` (8); `test_w2_66_scoped_selection.py::test_the_close_record_holds_the_same_evidence_block`, `::test_the_junit_xml_holds_every_case_run_and_no_case_left_out`, `::test_a_one_module_change_is_stated_scoped_never_full`, `::test_the_head_and_the_tree_are_stated` | (a); `test_a_refused_close_leaves_nothing_untracked_but_its_repair_ticket` is green on the base (nothing is written today) |
-| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (68 cases; its five cases of Part 4 apart) | (d) |
+| S2, S3, S5, S8, S9 in the live map; DEC-891's list exactly; no hidden code; `test_inputs` moved | `test_w2_66_live_test_map.py` (68 cases; its five cases of Part 4 and its eight of Part 5 apart) | (d) |
 | S12 the lead's verification unchanged | `test_w2_66_lead_verification.py` (2) | **green on the base by design**: they hold that nothing this ticket builds changes what a plain `pytest tests` reads or collects (no configuration file, conftest outside this folder or serial-only list changed against `w2/integrate`; a fixture's test map changes nothing a plain run collects) |
 
 ### Part 3 — limits, distribution, nightly, report
@@ -250,11 +260,15 @@ and the two KPI lines DEC-912 item 3 added (S14 and S15, the ticket's last two s
 read. Expected red reason on the built head `02b62e033a10`: **(n)** a selected test-map target that does not
 resolve is still named under `selected`, runs nothing, and the close stays `scoped`: `scope` is `scoped`,
 `why_full` names no `UNRESOLVED_TARGET`, and the renamed case or file is left out, so a red it would catch passes
-the close.
+the close; **(o)** the live map's couplings take only support modules (`*_support.py`) to W1-28's check (the
+second review's finding): a change to a suite's `conftest.py`, a test file, another helper module, a file of a new
+suite folder or a file below a suite folder does not select it (642 of the 731 tracked Python sources under
+`tests/acceptance/` on the built head).
 
 | KPI line | Tests | Red on the built head |
 |---|---|---|
 | S14 + F1 a selected target (record-reading, every-close or coupling) that cannot be resolved at the head widens the run to the full regression; the record names the target and the reason (Interface items 3 and 6) | `test_w2_66_unresolved_targets.py` (8): `::test_a_renamed_record_reading_case_widens_the_run_to_the_full_regression[renamed]`, `[renamed-longer]` (the map names one case by its node id; the function is renamed, the file stays: `CASE_GONE`; `renamed-longer`'s new name begins with the old one as text, not at a node id's boundary); `::test_a_renamed_every_close_file_widens_the_run_to_the_full_regression` (`FILE_GONE`); `::test_a_renamed_coupling_target_widens_the_run_to_the_full_regression` (the change touches the coupled path: `FILE_GONE`); the effect on the outcome: `::test_a_red_the_renamed_record_reading_case_catches_refuses_the_close` (a record-only commit breaks the register), `::test_a_red_the_renamed_coupled_file_catches_refuses_the_close` (the change breaks the coupled data); only a *selected* target counts: `::test_a_gone_coupling_target_the_change_does_not_reach_widens_nothing`; a target that resolves changes nothing: `::test_selected_targets_that_resolve_change_nothing` (a class's method, one parameter set, a parametrised function, a class) | (n): the first four "the run is not stated full: scope 'scoped'"; the two outcome cases "the renamed … did not run: the close passed a red it would catch"; the last two **green on the built head by design** (they turn red only if an unselected or resolving target widens the run) |
+| S15 W1-28's held-out copy check is coupled to every file under `tests/acceptance/` that its scan reads, so a change to any of them runs it (Interface item 1) | `test_w2_66_live_test_map.py` (8), through the map's public form (a change of the path reaches the shared core, or the couplings whose `paths` match it and its suite folder), each target the map names for the check resolving: `::test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check[conftest]`, `[test-file]`, `[support-module]` (W1-05's), `[other-module]` (`w1_47_hook_time_limit.py`), `[new-suite-folder]`, `[new-suite-folder-conftest]` (`tests/acceptance/W3-99/`, which does not exist), `[below-a-suite-folder]`; `::test_every_python_source_w1_28_s_scan_reads_selects_its_check` (every tracked `*.py` under `tests/acceptance/`) | (o): "a change to … does not select … scanning cases"; `[support-module]` green on the built head |
 
 ### Expected green on the base
 
@@ -293,3 +307,11 @@ Each its own commit with its `Rewrite-Reason:`; no expectation lowered.
 - DEC-891's record places hold code: `governance/project/orchestration/sync_context.py`, and under `docs/plan/`
   `tools/validate_s1.py` and `wave-1-exit/apply_adapter_output.py`. The record-only list must be DEC-891's
   places without these (failure line 3); "the plan files" are held as `docs/plan/*.md` at least.
+- W1-28's scan (Part 5, S15) reads every `*.py` under `tests/acceptance/` (`w1_28_copy_check.functions`,
+  `rglob("*.py")`, `__pycache__` aside), and imports each copier's module with its suite folder on `sys.path`
+  (`load`). On `02b62e033a10` that is 731 tracked files: `tests/acceptance/conftest.py`; 58 suite `conftest.py`;
+  584 `test_*.py`; 77 `*_support.py`; and 11 other helper modules, which a support-only pattern misses:
+  `W1-04/w1_04_schema.py`, `W1-06/w1_06_schema.py`, `W1-27/w2_67_basetemp_probe.py`, `W1-27/w2_67_doctor.py`,
+  `W1-27/w2_67_ns_launch.py`, `W1-27/w2_67_ns_probe.py`, `W1-27/w2_67_tmp_probe.py`, `W1-28/w1_28_copy_check.py`,
+  `W1-47/w1_47_hook_time_limit.py`, `W1-50/w1_50_freeze_lift.py`, `W2-69/w2_69_stdlib_secrets_first.py`. None is
+  below a suite folder today; the scan would read one there.

@@ -332,6 +332,94 @@ def test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it(test_map,
     assert held, f"no coupling takes a change of {path} to {W2_67_COPIES}, which loads it by file path"
 
 
+# W1-28's held-out copy check (DEC-385) scans every Python source under ``tests/acceptance/``
+# (``w1_28_copy_check.functions``: ``rglob("*.py")``, ``__pycache__`` aside) and runs the copying fixtures it finds:
+# a file scan, which no import shows. Its cases that read the scan of the live tree.
+W1_28_SUITE = "tests/acceptance/W1-28"
+W1_28_CHECK = f"{W1_28_SUITE}/test_w1_28_fixture_copies.py"
+W1_28_SCAN = f"{W1_28_SUITE}/w1_28_copy_check.py"
+W1_28_SCANNING_CASES = ("test_the_check_finds_the_copying_fixtures_of_the_earlier_suites",
+                        "test_a_fixture_that_copies_from_the_repository_leaves_the_held_out_file_out",
+                        "test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs",
+                        "test_the_reading_route_does_not_flag_this_suite_or_a_named_folder")
+# Each kind of file the scan reads, of another ticket's suite, of a new suite folder, and at a depth below a suite
+# folder: (kind, path, whether the path is tracked today).
+W1_28_SCANNED = (
+    ("conftest", "tests/acceptance/W1-05/conftest.py", True),
+    ("test-file", "tests/acceptance/W1-05/test_w1_05_live_hooks.py", True),
+    ("support-module", "tests/acceptance/W1-05/w1_05_support.py", True),
+    ("other-module", "tests/acceptance/W1-47/w1_47_hook_time_limit.py", True),
+    ("new-suite-folder", "tests/acceptance/W3-99/test_w3_99_first.py", False),
+    ("new-suite-folder-conftest", "tests/acceptance/W3-99/conftest.py", False),
+    ("below-a-suite-folder", "tests/acceptance/W1-05/fixtures/w1_05_tree.py", False),
+)
+
+
+def _w1_28_fixture_holds():
+    scan = (ROOT / W1_28_SCAN).read_text(encoding="utf-8")
+    check = (ROOT / W1_28_CHECK).read_text(encoding="utf-8")
+    assert 'rglob("*.py")' in scan and '"__pycache__"' in scan, \
+        f"the fixture is wrong: {W1_28_SCAN} no longer scans every Python source under tests/acceptance/"
+    missing = [case for case in W1_28_SCANNING_CASES if f"def {case}(" not in check]
+    assert not missing, f"the fixture is wrong: {W1_28_CHECK} no longer holds {missing}"
+
+
+def _reached_by(test_map, path):
+    """What a change of ``path`` selects, read from the map's public form (README, "Interface", items 1 and 3):
+    ``None`` for the full regression (the shared core), else the targets of every coupling whose ``paths`` match
+    it and the suite folder that holds it."""
+    if _placed(_patterns(test_map, "shared_core"), path):
+        return None
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
+    return reached + [folder for folder in (_suite_folder_of(path),) if folder]
+
+
+def _runs_w1_28_s_check(reached):
+    return reached is None or all(_held(reached, f"{W1_28_CHECK}::{case}") for case in W1_28_SCANNING_CASES)
+
+
+def _resolves(target):
+    """Whether the tree holds ``target``: its file or folder and, for a node id, the function or class it names
+    after the file (a parameter set read as its function)."""
+    path, _, rest = target.partition("::")
+    if not (ROOT / path).exists():
+        return False
+    if not rest:
+        return True
+    name = rest.split("::")[0].split("[")[0]
+    text = (ROOT / path).read_text(encoding="utf-8") if (ROOT / path).is_file() else ""
+    return re.search(rf"^\s*(?:async\s+)?(?:def|class)\s+{re.escape(name)}\b", text, re.MULTILINE) is not None
+
+
+@pytest.mark.parametrize("kind,path,tracked_today", W1_28_SCANNED, ids=[kind for kind, _, _ in W1_28_SCANNED])
+def test_a_change_to_each_kind_of_file_w1_28_s_scan_reads_selects_its_check(test_map, kind, path, tracked_today):
+    """KPI 15 (DEC-912 item 3, P2): W1-28's held-out copy check is coupled to every file under tests/acceptance/
+    that its scan reads, so a change to any of them runs it; the target the live map names for it exists.
+    From the second FULL review (DEC-136). README, "Part 5"."""
+    _w1_28_fixture_holds()
+    assert (ROOT / path).is_file() == tracked_today, f"the fixture is wrong: {path} exists: {not tracked_today}"
+    # Boolean asserts: a failure names the path and the check, never the map's entries.
+    reached = _reached_by(test_map, path)
+    selects = _runs_w1_28_s_check(reached)
+    assert selects, \
+        f"a change to {path} ({kind}), which W1-28's scan reads, does not select {W1_28_CHECK}'s scanning cases"
+    named = [t for t in reached or [] if support.within(t, W1_28_SUITE) or support.covers(t, W1_28_CHECK)]
+    unresolved = sum(1 for t in named if not _resolves(t))
+    assert unresolved == 0, f"{unresolved} target(s) the live map names for {W1_28_CHECK} do not resolve in this tree"
+
+
+def test_every_python_source_w1_28_s_scan_reads_selects_its_check(test_map, tracked):
+    """KPI 15 over the whole tracked tree: every ``*.py`` under tests/acceptance/ (``__pycache__`` aside)."""
+    _w1_28_fixture_holds()
+    scanned = [p for p in tracked if p.startswith("tests/acceptance/") and p.endswith(".py")
+               and "__pycache__" not in p.split("/")]
+    assert len(scanned) > 100, f"the fixture is wrong: only {len(scanned)} Python sources under tests/acceptance/"
+    missed = [p for p in scanned if not _runs_w1_28_s_check(_reached_by(test_map, p))]
+    every = not missed
+    assert every, (f"{len(missed)} of the {len(scanned)} Python sources W1-28's scan reads do not select "
+                   f"{W1_28_CHECK}, among them {missed[:6]}")
+
+
 @pytest.mark.parametrize("unit", ["deploy/gov-index.service", "gov.socket", "a/b/gov-nightly.timer"])
 def test_w1_18_s_listing_of_the_tree_s_unit_files_is_declared(test_map, unit):
     """W1-18 lists every service, socket and timer unit of the working tree (I3 §4.1 item 6): a new one, at any
