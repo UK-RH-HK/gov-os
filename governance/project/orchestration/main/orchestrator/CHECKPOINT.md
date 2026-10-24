@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-24 20:15 BST — W2-70 round 2 merged `3ff8ba51`; W2-66 run 3 at its full run and third review (head `6eb5a93f`); W2-65 run 1 PACKAGES -> DEC-913 (delegated, owner's acceptance asked), run 2 launched; next free DEC-914)
+## RESUME HERE (2026-10-24 20:15 BST — W2-70 round 2 merged `3ff8ba51`; W2-66 run 3 at its full run and third review (head `6eb5a93f`); W2-65 run 1 PACKAGES -> DEC-913 (owner accepted), run 2 running; next free DEC-914)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -54,10 +54,10 @@
     `class_evidence` for W2-07's readers.
   - **W2-65 run 1 PACKAGES** (head `20d72c19`): P-W2-65-1 kernel template settings.json's 3 hook lines (W1-38 x6
     red), P-W2-65-2 its merge-back on W1-01 (answered by DEC-912, no exemption), P-W2-65-3 W1-27 doctor fixture
-    (W2-59 x W2-67). **DEC-913** (`3e27836d`, delegated, owner's acceptance asked; ticket `fd813dfa`): (a), none,
+    (W2-59 x W2-67). **DEC-913** (`3e27836d`, delegated; ACCEPTED by the owner `38e415e0`; ticket `fd813dfa`): (a), none,
     (a); rows W2-L427..429. **Run 2** (task bls9benwf, `log/W2-65-A5-run2.json`): merge integrate, td W1-27, engineer
-    kernel lines, full run. Stray untracked `W2-65/pytest-of-usain/` (guard refuses my rm; not merged) for the
-    owner or a later cleanup; `/tmp/gov-os-lead-W2-65/verify-v1` kept (JUnit evidence, holds fixture tokens).
+    kernel lines, full run. Stray untracked `W2-65/pytest-of-usain/`: the owner says leave it; it goes with the
+    worktree after W2-65's close; `/tmp/gov-os-lead-W2-65/verify-v1` kept (JUnit evidence, holds fixture tokens).
 - **In flight: W2-65 run 1** (DAEO-e82f, claimed `cbc7d08e`, stacked on
   W2-59 `1cad6aa0`, merged integrate `4ef3293a`; tests `ce70eb73` + W1-29 revision `d8f1af7d`; engineer next;
   estimate 3 to 4 h from 14:51; held unmerged, merges with W2-59 just before the re-pin; `log/W2-65-A5-run1.json`,
