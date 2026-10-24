@@ -89,7 +89,10 @@ def test_a_one_module_change_selects_its_overlap_the_unit_tests_and_the_declared
                               "tests/acceptance/W1-rr/test_rr.py::test_reads": ["RECORD_READING"]}
     left = {entry["target"] for entry in plan["left_out"]}
     assert left == {"tests/acceptance/W1-hh/", "tests/acceptance/W1-uu/", "tests/acceptance/W1-cc/",
-                    "tests/acceptance/W1-zz/", "tests/acceptance/W1-rr/test_rr_more.py"}
+                    "tests/acceptance/W1-zz/", "tests/acceptance/W1-rr/test_rr_more.py",
+                    "tests/acceptance/W1-rr/test_rr.py::test_other",  # each deselected case by its node id
+                    "tests/acceptance/W1-rr/test_rr.py::test_reads_too"}
+    assert all(entry["why"] == [{"reason": "NOT_REACHED"}] for entry in plan["left_out"])
     assert "tests/acceptance/W1-rr/test_rr.py::test_other" in plan["deselect"]
     assert "tests/acceptance/W1-rr/test_rr.py::test_reads" not in plan["deselect"]  # its prefix would take it
     assert plan["tmp_path_retention_policy"] == "failed"

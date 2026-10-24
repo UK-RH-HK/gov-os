@@ -393,6 +393,7 @@ def _form(root: Path, own: str, suites: list[str], targets: list[str]):
                 # pytest deselects by the id's beginning: a name that begins a target's is kept, so it runs too
                 if not any(case.startswith(name) for case in cases):
                     deselect.append(f"{file}::{name}")
+                    left_out.append({"target": f"{file}::{name}", "why": not_reached})
     return ignore, deselect, left_out
 
 
