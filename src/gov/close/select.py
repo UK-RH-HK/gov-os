@@ -182,10 +182,12 @@ def suite_folder(root: Path, front: dict, wbs: str) -> str:
 
 
 def has_suite(root: Path, folder: str) -> bool:
-    """Whether the folder, inside the project, holds a test file (``test_*.py``)."""
+    """Whether the folder holds a test file (``test_*.py``) the regression run reaches: one under ``tests/``. A
+    folder elsewhere is no suite, so the ticket's paths place nothing and a change to them runs everything."""
     from gov.close.gates import has_tests
 
-    return not folder.startswith("../") and has_tests(Path(root) / folder)
+    return folder.startswith(FULL_TARGET + "/") and ".." not in folder.split("/") \
+        and has_tests(Path(root) / folder)
 
 
 def _tickets(root: Path) -> list[tuple[str, str, list, str, bool]]:
@@ -302,7 +304,7 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False, ticket: str | None =
         if why not in selected[entry]:
             selected[entry].append(why)
 
-    if (root / own).is_dir():  # every target named exists in the tree closed
+    if ".." not in own.split("/") and (root / own).is_dir():  # every target named exists in the tree closed
         select(own, {"reason": "OWN"})
     if test_map is not None:
         core = [p for p in paths if _any(p, test_map.get("shared_core"))]

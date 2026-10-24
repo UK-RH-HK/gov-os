@@ -149,6 +149,13 @@ def test_a_path_only_suiteless_tickets_hold_is_unplaced(repo):
     repo.commit("work", files={"scripts/s.py": "s = 1\n"})
     plan = select.plan(repo.root, "W1-own")
     assert plan["scope"] == "full" and plan["why_full"] == [{"reason": "UNPLACED", "paths": ["scripts/s.py"]}]
+    # a declared folder the regression run does not reach (outside tests/) is no suite either
+    outside = "---\nid: P-W1-oo\nwbs_id: W1-oo\nacceptance_tests:\n  path: checks/\nallowed_paths:\n- tools/**\n---\n"
+    _green(repo, repo.commit("outside", files={".tickets/P-W1-oo.md": outside, "checks/test_c.py": "def test_c():\n"
+                                               "    pass\n"}))
+    repo.commit("work", files={"tools/t.py": "t = 1\n"})
+    plan = select.plan(repo.root, "W1-own")
+    assert plan["scope"] == "full" and plan["why_full"] == [{"reason": "UNPLACED", "paths": ["tools/t.py"]}]
 
 
 def test_every_run_of_a_close_is_given_the_retention_option_with_its_per_test_limit(tmp_path):
