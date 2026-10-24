@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-24 20:45 BST — W2-66 MERGED `c60c9704` (third review passed); W2-65 run 2 running; P-SKIP-GUARD-1 with the owner; W2-67 round 2 next; next free DEC-915)
+## RESUME HERE (2026-10-24 21:30 BST — DEC-915/916 recorded; skip guard rebuilt and validated; P-W2-L437-A (P1) with the owner; W2-65 run 2 and W2-67 run 3 in flight; next free DEC-917)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -52,16 +52,20 @@
 - **In flight: W2-65 run 2** (task bls9benwf, `log/W2-65-A5-run2.json`; merged integrate `4183848a`, W1-27 fixture
   `03d9aa08`; engineer + full run next). On DONE: hold; then W2-59 + W2-65 merge into integrate (dry merge-tree onto
   `c60c9704`+ is clean), probe_impact, then the re-pin ACT package. `W2-65/pytest-of-usain/` stays (owner).
-- **P-SKIP-GUARD-1** (`35f8d468`, P2) with the owner: the skip guard's fixed 31 stops every scoped close after the
-  re-pin (and `test_inputs`' removal adds one deliberate skip); recommended (a) guard on skip reasons from the
-  close's evidence block. Needed before the first close after the re-pin.
+- **DEC-915** (`326bd563`): skip guard by reasons (`tools/skip_gate.py`, known list `tools/skip_known.json`, 31
+  entries: 30 from W2-66's/W2-65's green JUnit + the deliberate test_inputs skip; validated 8/8 on synthetic answers;
+  additions named in the digest); W2-57 first free slot after the first re-pin; **W2-66's nightly command
+  (`python3 -m gov.close.nightly`) NOT run until W2-M406's fix** (repo-wide `git worktree prune`); nightly.sh stays.
+- **DEC-916** (standing): up to two reviews per round declared in the plan; W2-67 rounds 2+3 reviewed together.
+- **P-W2-L437-A** (`d44cee76`, P1) with the owner: the close's containment gate refuses W2-66 (`03f470a5`) and W2-65
+  (`4ef3293a`); all other pending tickets clean (scratchpad `judge_tickets.py`); live hook only flags. Recommended
+  (a) W2-72 in the guard, second re-pin; W2-66/W2-65 close after it.
 - **The re-pin ACT package** (after W2-59 + W2-65 merge): pin commands, pytest-timeout in the pin's env, settings
   regeneration (drop `docs/source` read-deny; lead's own-temp allow rule); ladder evidence = W2-66's fixture trial
   (3 closes) + 32/32 planted faults + its live-map cases (batching/reuse are W2-68's, DEC-890).
 - **W2-67 run 3 = rounds 2 + 3** (DEC-914 `52065681`, delegated; task b6xu384z3, `log/W2-67-A5-run3.json`, from
   `09c327d2`): W1-30 13 cases + W2-L420, 15 unit close nested-run functions, W2-50 large-store/hang cases, ride-alongs
-  (TD4-A, P1 option A, TD1C-A, F3), plant removal; returns DONE-UNREVIEWED. **P-W2-67-R23** (`6f94b16f`, P2) with the
-  owner: review budget per round (a, recommended) / one last review (b) / none (c).
+  (TD4-A, P1 option A, TD1C-A, F3), plant removal; returns DONE-UNREVIEWED; then its review under DEC-916 (one review of both rounds; one more if it fails).
 - **Standing (summary):** full runs pass `-o tmp_path_retention_policy=failed` under `flock /tmp/gov-os-verify.lock`
   (DEC-905; lock until W2-67 lands, DEC-906); changes under tests/acceptance/ only by test designers (DEC-906); owner
   Role: owner commits = ratchet, accepted_history, acceptance_exemptions entries, validated first with a full run;
@@ -80,10 +84,10 @@
 ### Next
 1. W2-65 run 2 DONE: W2-59 + W2-65 merge together (merge-tree, probe_impact, both temp folders), then the re-pin
    ACT package (see above). PACKAGES: to the owner.
-2. On the owner's P-SKIP-GUARD-1 answer: record DEC-915; build and validate the guard before the first close.
-3. W2-67 run 3 DONE-UNREVIEWED: run the review the owner chose (P-W2-67-R23), then merge (after the re-pin).
+2. On the owner's P-W2-L437-A answer: record DEC-917; (a) = ticket W2-72 (containment, FULL).
+3. W2-67 run 3 DONE-UNREVIEWED: its review (DEC-916), then merge (after the re-pin). W2-57 first after the re-pin.
 4. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
-5. Next free: DEC-915; ticket W2-72; rows W2-M407, W2-L438, W2-H063.
+5. Next free: DEC-917; ticket W2-72; rows W2-M407, W2-L438, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
