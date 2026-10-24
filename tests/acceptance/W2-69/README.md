@@ -387,7 +387,7 @@ from the behaviours the lead's brief states: the second review's finding F1′ a
 and the filter were run and their output read, and the base code was read as it stands on `w2/integrate`. No case
 of the first two batches was changed or rewritten.
 
-**103 cases in 3 files**, and a support module of their own (`w2_69_last_round_support.py`). They reuse:
+**99 cases in 3 files**, and a support module of their own (`w2_69_last_round_support.py`). They reuse:
 
 - the first two batches' support modules and fixtures;
 - their way of building a project, a store and a key block at run time (`w2_69_review_support.key_block`);
@@ -398,7 +398,7 @@ of the first two batches was changed or rewritten.
 | File | Cases | Behaviour | KPI |
 |---|---|---|---|
 | `test_w2_69_last_round_key_blocks.py` | 40 | 1 | DEC-909's first line ("Each BEGIN...END key block ... a block of 9 to 24 KB is found at every boundary position, in a long document and in every stored form"), and K1 |
-| `test_w2_69_last_round_index_filter.py` | 36 | 2 | DEC-909's second line ("The pre-index filter ... finds the same tokens and key blocks at every boundary and keeps a file that holds one out of the index"), P-3 |
+| `test_w2_69_last_round_index_filter.py` | 32 | 2 | DEC-909's second line ("The pre-index filter ... finds the same tokens and key blocks at every boundary and keeps a file that holds one out of the index"), P-3 |
 | `test_w2_69_last_round_fragments_around_key_blocks.py` | 27 | 3 | DEC-909's first line ("an embedded fragment of a longer identifier stays unflagged at every read edge"), item 6, and K2 |
 | `tests/acceptance/serial-only.txt` (two lines) | — | 4 | DEC-909 item 4 (P-4) |
 
@@ -467,7 +467,9 @@ keeping each input. A "place" is one of:
   piece's end from 110,000 bytes on, a piece's start from 140,000 bytes on). The block lies across each place so
   that the place falls at its very start, on its BEGIN line (1, 2 and 5 bytes in, its middle, its newline, the byte
   after it), at eight points spread over its body, on its END line (the newline before it, its first byte, 5 bytes
-  in, its middle, its last byte) and at its very end: 21 offsets a place (5 near the start).
+  in, its middle, its last byte) and at its very end: 21 offsets at the piece's end. At the piece's start, ten of
+  them: the very start, 2 bytes in, the BEGIN line's newline, the body at a quarter, the middle and three quarters,
+  the END line's first byte and 5 bytes in, the last byte, the very end. Near the start, five.
 - **Regular steps:** 52 steps of 307 bytes from 70,000 (15,657 bytes, more than one piece's period), one size a
   step in turn, each shape beginning at another size.
 - **The text's ends:** the very start and the very end of the text.
@@ -479,10 +481,10 @@ beside them as a control.
 | Test | Red today because |
 |---|---|
 | `last_round_key::test_premise_each_block_of_9_to_24_kb_is_a_finding_whole_and_none_once_cut` × 4 shapes. Every size: whole, a `private-key` finding by the kernel's rules; cut at a quarter, the middle or three quarters, no part a finding. The sheltered blocks of 9,300 and 24,576 bytes: no finding under `extend`; a finding by the project's rules alone where they hold the key rule | passes today (a premise) |
-| `last_round_key::test_a_key_block_of_9_to_24_kb_is_found_wherever_it_lies_in_a_long_document` × 20. Full sweeps: a plain file under `.gov-runtime/keys/` and a single SQLite text value, each in both layouts × 4 shapes (about 340 placements a case); a staged copy under `.gov-runtime/codeintel/files/docs/` in paragraph text × 4 shapes (ten boundary offsets at the two far places: about 180 placements) | **red today, 20**: "the check missed N of M key blocks: …, a block of S bytes across content offset P (a piece's end / a piece's start and a read of gitleaks): the place at [d…] bytes into the block", and blocks at regular steps past the first read. Every size from 9,300 to 24,576 is missed at some placement; 24,000 and 24,576 at every placement past the first read; none near the start |
-| `last_round_key::test_a_key_block_of_9_to_24_kb_is_found_in_every_other_form_that_holds_a_long_text_whole` × 13 forms: a plain file with zero bytes; UTF-16LE with and without a byte-order mark; UTF-16BE; a text value in an INTEGER column; a value of a table without row ids; a full-text index's document; a blob of the bytes, of UTF-16LE, of UTF-16BE; a UTF-16LE store and a UTF-16BE store; the write-ahead log (the row committed in the log only). Fewer placements (DEC-221): paragraph text, each size in one shape (the shapes in turn), ten boundary offsets at a piece's end well past the first read, and 26 regular steps of 601 bytes | **red today, 13**: as above (77 to 86 of 172 blocks missed before the trim) |
-| `last_round_key::test_a_key_block_whole_in_one_value_among_many_short_values_is_found`: a store of a text's lines, one value each (about 2,900), one of them a whole block; at 26 regular steps from 70,000 and once near the start; each size in one shape | **red today**: the 24,576-byte blocks past the first read (a value over 24,000 bytes is cut into pieces) |
-| `last_round_key::test_a_key_block_only_the_projects_own_rules_find_is_found_wherever_it_lies` × 2: a plain file in paragraph text, a SQLite value in text without blank lines. A project whose own rules hold the expression of gitleaks' `private-key` rule; sheltered PEM blocks (the run of the alphabet in their first line), found only by the scan with the project's rules alone (DEC-347, the second batch's R9) | **red today, 2**: as above, on the second rule set |
+| `last_round_key::test_a_key_block_of_9_to_24_kb_is_found_wherever_it_lies_in_a_long_document` × 20. Full sweeps: a plain file under `.gov-runtime/keys/` and a single SQLite text value, each in both layouts × 4 shapes (276 or 277 placements a case); a staged copy under `.gov-runtime/codeintel/files/docs/` in paragraph text × 4 shapes (ten boundary offsets at each far place: 184 placements) | **red today, 20**: "the check missed N of M key blocks: …, a block of S bytes across content offset P (a piece's end / a piece's start and a read of gitleaks): the place at [d…] bytes into the block", and blocks at regular steps past the first read. Missed: 121 to 124 of 276 in paragraph text, 131 to 133 of 277 without blank lines, 86 to 88 of 184 in a staged copy. Every size is missed at some placement: 9,300 bytes where a piece's end falls on its END line (9,264 to 9,287 bytes in), 24,000 and 24,576 at every placement past the first read. None is missed near the start |
+| `last_round_key::test_a_key_block_of_9_to_24_kb_is_found_in_every_other_form_that_holds_a_long_text_whole` × 13 forms. The forms:<br>• a plain file with zero bytes;<br>• UTF-16LE with and without a byte-order mark; UTF-16BE;<br>• a text value in an INTEGER column; a value of a table without row ids;<br>• a full-text index's document;<br>• a blob of the bytes, of UTF-16LE, of UTF-16BE;<br>• a UTF-16LE store and a UTF-16BE store;<br>• the write-ahead log (the row committed in the log only).<br>Fewer placements (DEC-221): paragraph text, each size in one shape (the shapes in turn), ten boundary offsets at a piece's end well past the first read, and 13 regular steps of 1,201 bytes: 73 placements a form | **red today, 13**: as above, 33 to 41 of 73 missed |
+| `last_round_key::test_a_key_block_whole_in_one_value_among_many_short_values_is_found`: a store of a paragraph text's lines, one value each (about 3,300), one of them a whole block; at 26 regular steps of 601 bytes from 70,000 and once near the start; each size in one shape | **red today**: 26 of 162, the 24,576-byte blocks past the first read (a value over 24,000 bytes is cut into pieces) |
+| `last_round_key::test_a_key_block_only_the_projects_own_rules_find_is_found_wherever_it_lies` × 2: a plain file in paragraph text, a SQLite value in text without blank lines. A project whose own rules hold the expression of gitleaks' `private-key` rule; sheltered PEM blocks (the run of the alphabet in their first line), found only by the scan with the project's rules alone (DEC-347, the second batch's R9). The two far places, 52 regular steps | **red today, 2**: as above, on the second rule set (123 and 131 of 250 missed) |
 
 **The forms (the brief: "every stored form a block can be whole in"):**
 
@@ -517,11 +519,11 @@ check's, with the stand-in gitleaks first on the child's `PATH`. It also checks 
 | `last_round_filter::test_premise_each_short_token_is_a_finding_alone_and_no_part_of_it_once_cut` × 5. The tokens: a github-pat shape (gitleaks' defaults); the project's digit token at its shortest with five dashes inside; its upper- and lower-case tokens at their shortest (19 and 20 characters); its canary. Each alone is a finding by its rule. Once cut, no part is a finding: every cut, but for the canary only cuts inside `_CANARY_`, since its head is a canary again once one character stands before it | passes today (a premise) |
 | `last_round_filter::test_premise_the_project_a_filter_is_given_is_one_whose_docs_are_a_governed_source_folder` | passes today (a premise: a clean file of `docs/` is returned, one of no namespace is not) |
 | `last_round_filter::test_the_filter_keeps_out_a_file_with_a_short_token_across_every_place_it_cuts_or_gitleaks_reads` × 3 layouts (lines, paragraphs, one line; 128 KiB) × 5 tokens. At a word boundary, at every offset of the first batch's read-edge sweep (from the token's full length plus 3 bytes before a place to 3 bytes after it), across up to three learned places | passes today: the filter's pieces overlap by far more than a token. They guard the fix |
-| `last_round_filter::test_the_filter_keeps_out_a_file_holding_a_key_block_of_9_to_24_kb_wherever_it_lies` × 2 layouts × 4 shapes. Behaviour 1's blocks and placements, at one place well past the first read (a piece's end, 21 offsets) and one near the start (5), the text's two ends, and 52 regular steps (DEC-221: one place fewer than the check's sweeps, for the filter shares the check's gitleaks call) | **red today, 8**: "the filter missed N of M key blocks … (each such file was returned: let into the index)" |
-| `last_round_filter::test_the_filter_keeps_out_a_file_holding_a_key_block_only_the_projects_own_rules_find` (DEC-347; sheltered PEM blocks, paragraph text) | **red today**: as above, on the second rule set |
+| `last_round_filter::test_the_filter_keeps_out_a_file_holding_a_key_block_of_9_to_24_kb_wherever_it_lies` × 4: paragraph text with PEM and with PGP blocks, text without blank lines with PKCS#8 and with OpenSSH blocks. Behaviour 1's six sizes and placements: a piece's end well past the first read (21 offsets), a place near the start (5), the text's two ends, and 52 regular steps. DEC-221: one place fewer and two shapes a layout, where the check's sweeps take every shape in both layouts, for the filter shares the check's gitleaks call | **red today, 4**: "the filter missed N of M key blocks … (each such file was returned: let into the index)": 97 of 216 in paragraph text, 106 and 107 of 217 without blank lines |
+| `last_round_filter::test_the_filter_keeps_out_a_file_holding_a_key_block_only_the_projects_own_rules_find` (DEC-347; sheltered PEM blocks, paragraph text) | **red today**: as above, on the second rule set (97 of 190) |
 | `last_round_filter::test_control_a_file_whose_only_token_shaped_strings_are_inside_words_is_returned_at_every_offset` × 4 layouts (one line, lines, paragraphs, words of 12,288 bytes). The first batch's K2 cells: each of the project's four rules, in 24 files shifted by 0 to 23 bytes | passes today (the control: the chance red is not brought into the filter) |
 | `last_round_filter::test_control_a_word_internal_string_at_the_filters_learned_read_edges_is_returned`: each of the project's four rules' word-internal strings, its token-shaped part beginning exactly at every learned place where a piece or a read begins, in both layouts | passes today (the control) |
-| `last_round_filter::test_a_rebuild_keeps_a_source_file_holding_a_key_block_out_of_every_index`. `gov rebuild --json`: full, the semantic index against the stand-in embedder, the code-graph tool hidden from `PATH`. The project's `docs/` holds:<br>• six documents of 200 KiB of paragraph text, each with a block (10,650 to 24,576 bytes, four shapes) beginning 1,000 bytes before a learned piece start well past the first read;<br>• a clean document of the same shape;<br>• four documents whose only token-shaped strings are the project's rules' word-internal strings, each beginning where the filter's reads begin.<br>Afterwards, a held document must be in neither the code index's staged files (`.gov-runtime/codeintel/files/`) nor the lexical index (`lexical_file.indexed` and `lexical_chunk`), no file under `.gov-runtime/` may hold a block's text, and the check must be green on the stores. The clean and fragment documents must be staged and indexed (the controls). Premises: the lexical index is recreated, and the code index stages the files the filter returns | **red today**: "after gov rebuild --json, documents holding a key block were let into the index: {…: ["the code index's staged files", "the lexical index"]}; files under .gov-runtime/ holding a block's text: [...staged copies, store.db]" |
+| `last_round_filter::test_a_rebuild_keeps_a_source_file_holding_a_key_block_out_of_every_index`. `gov rebuild --json`: full, the semantic index against the stand-in embedder, the code-graph tool hidden from `PATH`. The project's `docs/` holds:<br>• six documents of 200 KiB of paragraph text, each with a block (10,650 to 24,576 bytes, four shapes) beginning 1,000 bytes before a learned piece start well past the first read;<br>• a clean document of the same shape;<br>• four documents whose only token-shaped strings are the project's rules' word-internal strings, each beginning where the filter's reads begin.<br>Afterwards, a held document must be in neither the code index's staged files (`.gov-runtime/codeintel/files/`) nor the lexical index (`lexical_file.indexed` and `lexical_chunk`), no file under `.gov-runtime/` may hold a block's text, and the check must be green on the stores. The clean and fragment documents must be staged and indexed (the controls). Premises: the lexical index is recreated, and the code index stages the files the filter returns | **red today**: "after gov rebuild --json, documents holding a key block were let into the index: {'docs/keys/held-0.md': ["the code index's staged files", 'the lexical index'], …}". All six held documents are let in, and the files holding a block's text are the six staged copies and `store.db`. The controls hold |
 
 ### Behaviour 3 — the chance red stays away at every read edge, with key blocks cut out whole (it must hold after the fix)
 
@@ -594,15 +596,33 @@ W1-30's `test_w1_30_r11_declared_here.py`, which reads the list's form, passes w
 
 ### Run time and scratch
 
-See the red run below.
-- **Scratch:** a full-sweep case writes up to about 350 files of 200 KiB (about 70 MB) and removes them. The
-  behaviour-3 cases write 192 files of about 105 to 135 KB each.
-- **Lock files:** every heavy run takes one of the first batch's three lock files, so at most three run at once
-  across xdist workers.
+- **Run time:** measured on this machine (20 processors) while other sessions loaded it heavily.
+
+  | Run (each under `-n 8`) | Load average | Time |
+  |---|---|---|
+  | The three files together | 39 to 79 | 9.7 min |
+  | Behaviour 1 alone (before the last trim, about 15 % more placements) | about 25 | 6.1 min |
+  | Behaviour 2 alone | 39 to 52 | 1.9 min |
+  | Behaviour 3 alone | 56 | 1.6 min |
+
+  On a quiet machine, a sweep of 360 files of 256 KiB took the check 14 s.
+- **Scratch:** a full-sweep case writes up to 277 files of 200 KiB (about 55 MB) and removes them. A case of
+  behaviour 3 writes 192 files of 105 to 135 KB. The end-to-end rebuild writes a few MB.
+- **Lock files:** every heavy run takes one of the first batch's three lock files (check, filter and rebuild alike),
+  so at most three run at once across xdist workers, whatever the number of workers.
 
 ### Red run (third batch)
 
-See the designer's return for the whole run on this commit; the counts are added below once measured.
+On `w2/W2-69` at `0be248c0` plus these files, the three files in one run to the end (never `-x`), with the command
+of "Run" and `-n 8`: **42 failed, 57 passed, 0 skipped**.
+
+| Behaviour | Red | Pass (premises, controls, guards) |
+|---|---|---|
+| 1 | 36 of 40 | 4 premises |
+| 2 | 6 of 32 (4 filter sweeps, the project's own rules, end to end) | 6 premises, 15 token sweeps, 5 controls |
+| 3 | 0 of 27 | 9 premises, 9 fragment cases, 9 controls |
+
+Each red case fails for the reason its row states. The first two batches' 253 cases: see the designer's return.
 
 ### Discoveries of the third batch
 

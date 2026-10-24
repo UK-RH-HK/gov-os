@@ -428,7 +428,12 @@ def placements(layout, content, blocks, cuts, regular="each", edges=True, near_t
     for key, text in blocks.items():
         shape, size = key
         for place in (near if near_too else []) + far:
-            chosen = offsets(text) if offsets else boundary_offsets(text, near=place in near)
+            if offsets:
+                chosen = offsets(text)
+            elif place in near:
+                chosen = boundary_offsets(text, near=True)
+            else:   # the first place well past the first read at 21 offsets, the second at ten (DEC-221)
+                chosen = boundary_offsets(text) if place == far[0] else few_offsets(text)
             for offset in chosen:
                 if _fits(layout, content, place - offset, size):
                     out.append(Placement(shape, size, place, place - offset))

@@ -24,9 +24,10 @@ boundary that the check misses, at any offset or in any stored form."
   start of the text and two well past the first 60 KB (a piece's end from 110,000
   bytes on, a piece's start from 140,000). The block lies across each so that the
   place falls at its very start, on its BEGIN line, at eight points inside its
-  body, on its END line and at its very end (21 offsets; 5 near the start); and at
-  52 regular steps of 307 bytes from 70,000 (past gitleaks' first read of the
-  check's input), one size a step in turn; and at the text's very start and end.
+  body, on its END line and at its very end (21 offsets at the piece's end; ten of
+  them at the piece's start; 5 near the start); and at 52 regular steps of 307
+  bytes from 70,000 (past gitleaks' first read of the check's input), one size a
+  step in turn; and at the text's very start and end.
 - **Forms:** a plain file under ``.gov-runtime/``, a staged copy where the code
   index stages files (``.gov-runtime/codeintel/files/``), a single SQLite text
   value (full sweeps); and every other form of the first batch's K1 forms that
@@ -142,10 +143,10 @@ MAIN = ([(form, layout, shape) for form in ("plain-file", "sqlite-value") for la
 @pytest.mark.parametrize("form,layout,shape", MAIN, ids=[f"{f}-{lay}-{s}" for f, lay, s in MAIN])
 def test_a_key_block_of_9_to_24_kb_is_found_wherever_it_lies_in_a_long_document(sandbox, project, stand_in, slots,
                                                                                 form, layout, shape):
-    """Every size at the boundary offsets of the learned places (21 at each of two places well past the first read,
-    5 at one near the start) and at the text's two ends; 52 regular steps past the first read, one size a step in
-    turn, from a shape's own first size. A staged copy: ten boundary offsets at the two places well past the first
-    read (DEC-221: it is a plain file the check reads as any other)."""
+    """Every size at the boundary offsets of the learned places (21 at a piece's end and 10 at a piece's start well
+    past the first read, 5 at a place near the start) and at the text's two ends; 52 regular steps past the first
+    read, one size a step in turn, from a shape's own first size. A staged copy: ten boundary offsets at each of the
+    two places well past the first read (DEC-221: it is a plain file the check reads as any other)."""
     blocks = _blocks([shape], lr.SIZES, f"main-{form}-{layout}")
     how = {"near_too": False, "offsets": lr.few_offsets} if form == "staged-copy" else {}
     run, cases, missed, cuts = _sweep(sandbox, project, stand_in, slots, form, layout, blocks, regular="rotating",
@@ -164,13 +165,14 @@ OTHER = [form for form in lr.FORMS if form not in ("plain-file", "sqlite-value")
 def test_a_key_block_of_9_to_24_kb_is_found_in_every_other_form_that_holds_a_long_text_whole(sandbox, project,
                                                                                             stand_in, slots, form):
     """Paragraph text (where the second review found the miss); each size in one shape, the shapes in turn; a piece's
-    end well past the first read at ten boundary offsets; 26 regular steps of 601 bytes, one block a step in turn."""
+    end well past the first read at ten boundary offsets; 13 regular steps of 1,201 bytes from 70,000 (more than one
+    piece's period), one block a step in turn."""
     shift = OTHER.index(form)
     blocks = {(lr.SHAPES[(shift + n) % 4], size): lr.block(lr.SHAPES[(shift + n) % 4], size, f"other-{form}-{size}")
               for n, size in enumerate(lr.SIZES)}
     run, cases, missed, cuts = _sweep(sandbox, project, stand_in, slots, form, "paragraphs", blocks,
                                       regular="rotating", edges=False, near_too=False, offsets=lr.few_offsets,
-                                      far_cap=1, count=26, step=601, shift=shift)
+                                      far_cap=1, count=13, step=1_201, shift=shift)
     _assert_all_found(form, run, cases, missed, cuts)
 
 

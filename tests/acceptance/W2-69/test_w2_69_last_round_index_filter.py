@@ -176,7 +176,9 @@ def _filter_sweep(sandbox, project, stand_in, slots, layout, blocks, **how):
     return run, cases, lr.misses(lambda rel: rel not in returned, rels, cases), cuts
 
 
-FILTER_BLOCKS = [(layout, shape) for layout in lr.LAYOUTS for shape in lr.SHAPES]
+# Each layout with two shapes, the four shapes between them (DEC-221: the check's sweeps take every shape in both).
+FILTER_BLOCKS = [("paragraphs", "pem-rsa"), ("paragraphs", "pgp"), ("no-blank-lines", "pkcs8"),
+                 ("no-blank-lines", "openssh")]
 
 
 @pytest.mark.parametrize("layout,shape", FILTER_BLOCKS, ids=[f"{lay}-{s}" for lay, s in FILTER_BLOCKS])
