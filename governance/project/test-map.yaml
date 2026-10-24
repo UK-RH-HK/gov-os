@@ -142,9 +142,9 @@ couplings:
   - paths: ["template/governance/kernel/roles/**", "template/governance/kernel/skills/**"]
     suites: ["tests/acceptance/W1-38/"]
     why: "W1-38's fixture copies the kernel's roles and skills into every generated project (I4 §4.1 item 3)"
-  - paths: ["tests/acceptance/**_support.py"]
-    suites: ["tests/acceptance/W1-28/"]
-    why: "W1-28's file scan reads every suite's support module and runs its whole-tree copiers (I1 §4.1)"
+  - paths: ["tests/acceptance/**.py"]
+    suites: ["tests/acceptance/W1-28/test_w1_28_fixture_copies.py"]
+    why: "file scan: W1-28's held-out copy check reads every Python source under tests/acceptance/ and runs the copying fixtures it finds (I1 §4.1, DEC-385, DEC-912 item 3)"
   - paths: ["tests/acceptance/W1-07/conftest.py", "tests/acceptance/W1-25/conftest.py"]
     suites: ["tests/acceptance/W1-27/test_w2_67_copies.py"]
     why: "loaded by file path: test_w2_67_copies.py loads these suites' conftests with spec_from_file_location (W1-27's own reaches it through its suite folder)"
