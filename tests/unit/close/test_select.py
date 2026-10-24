@@ -115,6 +115,16 @@ def test_the_shared_core_an_unplaced_path_and_full_asked_widen_to_the_full_run(r
     assert plan["tmp_path_retention_policy"] == "failed"
 
 
+def test_a_moved_file_is_in_the_change_at_both_its_paths(repo):
+    _green(repo, _project(repo))
+    repo.git("config", "diff.renames", "true")  # rename detection asked for by the repository is not followed
+    repo.git("mv", "src/core/z.py", "src/a/z.py")
+    repo.commit("move")
+    plan = select.plan(repo.root, "W1-own")
+    assert {"src/core/z.py", "src/a/z.py"} <= set(plan["changed"])
+    assert plan["scope"] == "full" and plan["why_full"] == [{"reason": "SHARED_CORE", "paths": ["src/core/z.py"]}]
+
+
 def test_every_run_of_a_close_is_given_the_retention_option_with_its_per_test_limit(tmp_path):
     import os
     import sys

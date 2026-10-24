@@ -143,7 +143,11 @@ def base(root: Path) -> str | None:
 
 
 def changed(root: Path, since: str) -> list[str]:
-    return sorted(set(filter(None, _git(root, "diff", "--name-only", since, "HEAD").splitlines())))
+    """Every path changed since ``since``, read as the close's commit reader reads (``gov.close.repo``): NUL-separated,
+    unquoted and without rename detection, so a moved file is in the change at the path it left and the one it
+    reached."""
+    names = _git(root, "-c", "core.quotePath=false", "diff", "-z", "--no-renames", "--name-only", since, "HEAD")
+    return sorted(set(filter(None, names.split("\0"))))
 
 
 # ---------------------------------------------------------------------------
