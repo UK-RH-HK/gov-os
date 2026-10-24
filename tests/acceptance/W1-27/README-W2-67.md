@@ -581,6 +581,27 @@ On the head: 11 red and 8 green, in 22.7 s serially and 13.8 s with `-n 2`, the 
 `test_w2_67_copies.py`, `-n 2 --dist loadfile`): 24 passed in 56.8 s, as at the round's checkpoint. Only their static
 guard reads the new files, and it stays green.
 
+## KPI 4, batch 6: the static guard sees an f-string `--basetemp=` (P-W2-67-TD4-A)
+
+Independent test designer (MR-3), run 3, batch 6, 2026-10-24. One revision, of
+`test_w2_67_temp_folders.py::test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention`, with
+`Rewrite-Reason: P-W2-67-TD4-A (DEC-914 item 2): the guard missed an f-string --basetemp=`. It raises the
+expectation only.
+
+- **The widening.** `_passes_basetemp` also takes an f-string whose literal start is the option (`f"--basetemp={x}"`,
+  `f"--basetemp"`). The `FORMS` exemption (batch 4) also takes exactly `f"--basetemp={given}"` (or of `str(given)`)
+  of the form's own parameter (`_passes_the_given`); any other f-string there is found.
+- **Plants** (pytest plugin `td6_guard_plant.py`, with the evidence under `.gov-runtime/scratch/td-6/plant/`; nothing
+  written under `tests/`): `other` adds one source to the guard's list, an argument list passing
+  `f"--basetemp={folder}"` kept in that scratch folder: red, `["line 11: an argument list passes
+  f'--basetemp={folder}'"]`; the guard as it stood at `6d44fc80` finds nothing in the same file. `refusal-<n>` points
+  the guard at a scratch root holding only a copy of `test_w2_67_basetemp_refusal.py`: the unchanged copy, no
+  finding; red for `f"--basetemp={given.parent}"`, `f"--basetemp=/tmp/fixed-{given}"`, `f"--basetemp={given!s}"`,
+  `f"--basetemp"` in `FORMS`, and an f-string list outside `FORMS`.
+- **On the head:** green (the two static guards, 2 passed). The refusal file's three f-string forms are its table's
+  own parameter, so `test_w2_67_basetemp_refusal.py` is unchanged and keeps its result. No other source of round 1's
+  folders passes an f-string `--basetemp`.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
