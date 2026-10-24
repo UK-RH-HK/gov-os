@@ -15,6 +15,11 @@ W2-70): a commit the merge brings passes too when its full id is listed in the
 path map's ``acceptance_exemptions``; an unlisted commit without the role, an
 owner's included, keeps the merge red.
 
+DEC-912 item 1 (rewrite, W2-70 round 2): a file under ``tests/acceptance/``
+that equals neither parent passes when it equals git's own merge of the
+parents (``git merge-tree --write-tree``); a hand edit or a conflict resolution
+stays a refusal, and the brought commits are judged as before.
+
 Each test builds a small git repository in a temporary directory and asks the
 rule of ``test_only_the_test_designer_commits_to_acceptance_tests``
 (``w1_01_support.acceptance_test_offenders``) which commits offend. The last
@@ -267,6 +272,133 @@ def test_a_merge_that_brings_an_unlisted_commit_without_the_role_stays_red(repo,
     assert any(line.startswith(merge[:12]) for line in _offenders(repo)), (
         f"the merge {merge[:12]} that brings an unlisted commit is not an offender"
     )
+
+
+# --------------------------------------------------------------------------
+# DEC-912 item 1: a file equal to git's own merge of the parents (git merge-tree)
+# --------------------------------------------------------------------------
+
+SHARED_TEST_FILE = f"{ACCEPTANCE}/W1-94/test_shared.py"
+
+
+def _shared(edits):
+    """The shared test's text: nine lines, each line ``n`` in ``edits`` set to its value."""
+    return "".join(f"LINE_{n} = {edits.get(n, n)!r}\n" for n in range(9))
+
+
+def _designers_edit_one_file(repo, ticket_line=8, integrate_line=0, unlisted=False, source_conflict=False):
+    """A test designer edits line ``ticket_line`` of the shared test on ``ticket``, another line ``integrate_line``
+    on ``integrate``. ``unlisted``: an unlisted ``ticket`` commit without the role edits line 4 too (returned).
+    ``source_conflict``: engineers change the source file on both sides. HEAD is on ``integrate``."""
+    _commit(repo, {SHARED_TEST_FILE: _shared({})}, "a shared test", role=DESIGNER)
+    _git(repo, "checkout", "-q", "-b", "ticket")
+    edits = {ticket_line: "ticket"}
+    _commit(repo, {SHARED_TEST_FILE: _shared(edits)}, "the ticket's designer edits the test", role=DESIGNER)
+    bad = None
+    if unlisted:
+        edits[4] = "no role"
+        bad = _commit(repo, {SHARED_TEST_FILE: _shared(edits)}, "an engineer edits the test", role="engineer")
+    if source_conflict:
+        _commit(repo, {SOURCE_FILE: "VALUE = 'ticket'\n"}, "the ticket's engineer", role="engineer")
+    _git(repo, "checkout", "-q", "integrate")
+    _commit(repo, {SHARED_TEST_FILE: _shared({integrate_line: "integrate"})}, "another designer edits the test",
+            role=DESIGNER)
+    if source_conflict:
+        _commit(repo, {SOURCE_FILE: "VALUE = 'integrate'\n"}, "another engineer", role="engineer")
+    return bad
+
+
+def _merge_resolving(repo, branch, resolved):
+    """Merge ``branch``, which conflicts; ``resolved`` holds the texts written by hand before the merge commit."""
+    proc = subprocess.run(["git", "-C", str(repo), *_GIT, "merge", "-q", "--no-ff", "--no-commit", branch],
+                          capture_output=True, text=True, check=False)
+    assert proc.returncode != 0, "premise: the fixture merge conflicts"
+    for rel, text in resolved.items():
+        (repo / rel).write_text(text, encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", f"Merge {branch}", "--trailer", "Task: DAEO-zz90", "--trailer", "Role: orchestrator")
+    merge = _git(repo, "rev-parse", "HEAD")
+    assert len(support.commit_parents(merge, repo)) == 2, "the fixture made no merge commit"
+    return merge
+
+
+def _shared_in(repo, commit):
+    return _git(repo, "show", f"{commit}:{SHARED_TEST_FILE}") + "\n"
+
+
+def _premise_equal_to_neither_parent(repo, merge):
+    first, other = support.commit_parents(merge, repo)
+    text = _shared_in(repo, merge)
+    assert text not in (_shared_in(repo, first), _shared_in(repo, other)), (
+        "premise: the merged test equals one parent's copy, so the case does not reach DEC-912's allowance"
+    )
+    return text
+
+
+@pytest.mark.parametrize("source_conflict", [False, True], ids=["clean", "conflict-outside-the-folder"])
+def test_a_clean_merge_of_two_designers_edits_of_one_file_passes(repo, source_conflict):
+    """DEC-912 item 1. The merged test equals neither parent but is exactly git's own merge of the two
+    designers' edits. A conflict git reports only outside tests/acceptance/ (here in src/, resolved by hand)
+    does not take the allowance from the files under it."""
+    _designers_edit_one_file(repo, source_conflict=source_conflict)
+    if source_conflict:
+        merge = _merge_resolving(repo, "ticket", {SOURCE_FILE: "VALUE = 'both'\n"})
+    else:
+        merge = _merge(repo, "ticket", role="orchestrator")
+    text = _premise_equal_to_neither_parent(repo, merge)
+    assert text == _shared({0: "integrate", 8: "ticket"}), "premise: git did not merge the two edits cleanly"
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    assert offences == [], f"the merge {merge[:12]} equals git's own merge of its parents and is refused: {offences}"
+    assert _offenders(repo) == [], "a clean merge of two test designers' edits is taken for an offender"
+
+
+def test_the_same_merge_with_one_line_hand_edited_stays_red(repo):
+    _designers_edit_one_file(repo)
+    merge = _merge(repo, "ticket", own_change={SHARED_TEST_FILE: _shared({0: "integrate", 4: "by hand", 8: "ticket"})})
+    _premise_equal_to_neither_parent(repo, merge)
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    assert any(SHARED_TEST_FILE in line for line in offences), (
+        f"the merge {merge[:12]} hand-edits {SHARED_TEST_FILE} beyond git's own merge and is not refused for it: {offences}"
+    )
+    assert any(line.startswith(merge[:12]) for line in _offenders(repo))
+
+
+@pytest.mark.parametrize("resolution", ["by-hand", "as-git-writes-the-conflict"])
+def test_a_merge_that_resolves_a_conflict_in_the_file_stays_red(repo, resolution):
+    """Both designers edit line 0. Any resolution stays a refusal, even the text git itself writes for the
+    conflict (its markers), for git reports the conflict on that file."""
+    _designers_edit_one_file(repo, ticket_line=0, integrate_line=0)
+    if resolution == "by-hand":
+        text = _shared({0: "integrate and ticket"})
+    else:
+        parents = [_git(repo, "rev-parse", branch) for branch in ("integrate", "ticket")]
+        proc = subprocess.run(["git", "-C", str(repo), "merge-tree", "--write-tree", "--name-only", "-z",
+                               "--no-messages", *parents], capture_output=True, text=True, check=False)
+        tree, *conflicted = [part for part in proc.stdout.split("\0") if part]
+        assert proc.returncode == 1 and conflicted == [SHARED_TEST_FILE], f"premise: one conflict, {proc.stdout!r}"
+        text = _git(repo, "show", f"{tree}:{SHARED_TEST_FILE}") + "\n"
+        assert "<<<<<<<" in text, "premise: git's own merge holds the conflict's markers"
+    merge = _merge_resolving(repo, "ticket", {SHARED_TEST_FILE: text})
+    _premise_equal_to_neither_parent(repo, merge)
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    assert any(SHARED_TEST_FILE in line for line in offences), (
+        f"the merge {merge[:12]} resolves a conflict in {SHARED_TEST_FILE} ({resolution}) and is not refused for it: "
+        f"{offences}"
+    )
+    assert any(line.startswith(merge[:12]) for line in _offenders(repo))
+
+
+def test_a_clean_merge_that_brings_an_unlisted_commit_without_the_role_stays_red(repo):
+    """The merged test is git's own merge, so the file passes; the commit without the role still does not."""
+    bad = _designers_edit_one_file(repo, unlisted=True)
+    merge = _merge(repo, "ticket", role="orchestrator")
+    assert _premise_equal_to_neither_parent(repo, merge) == _shared({0: "integrate", 4: "no role", 8: "ticket"})
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    assert len(offences) == 1 and bad[:12] in offences[0] and SHARED_TEST_FILE not in offences[0], (
+        f"the clean merge {merge[:12]} brings the unlisted {bad[:12]} without the role; that commit alone "
+        f"must be its offence: {offences}"
+    )
+    assert any(line.startswith(merge[:12]) for line in _offenders(repo))
 
 
 # --------------------------------------------------------------------------

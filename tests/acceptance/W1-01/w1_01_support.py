@@ -236,16 +236,45 @@ def _blobs_under(commit, path, root):
     return blobs
 
 
+def _git_merge_under(first, other, path, root):
+    """(blobs under ``path``, conflicted paths) of git's own merge of two commits; None when git cannot compute it.
+
+    Git's own merge is the tree ``git merge-tree --write-tree <first> <other>``
+    writes. An error, no merge base or a git without ``--write-tree`` gives None.
+    """
+    proc = subprocess.run(
+        ["git", "-C", str(root), "-c", "core.quotePath=false", "merge-tree", "--write-tree",
+         "--name-only", "-z", "--no-messages", first, other],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode not in (0, 1):
+        return None
+    tree, *conflicted = [part for part in proc.stdout.split("\0") if part] or [""]
+    if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", tree):
+        return None
+    return _blobs_under(tree, path, root), set(conflicted)
+
+
 def merge_offences(sha, path, root=REPO_ROOT, exempt=None):
-    """Why a merge commit without the test designer's role may not pass (DEC-253); empty when it passes.
+    """Why a merge commit without the test designer's role may not pass (DEC-253, DEC-912 item 1); empty when it passes.
 
     A merge commit passes when every change it brings under ``path`` comes from
     commits on the merged side that carry ``Role: independent-test-designer``:
 
     - every file under ``path`` in which the merge differs from its first parent
       is, in the merge, exactly what one of the other parents holds (the same
-      content, or absent in both). Anything else is a change the merge commit
-      makes itself, beyond what its parents hold, whatever the merge brings;
+      mode and content, or absent in both), or exactly what git's own merge of
+      the merge's two parents holds: the tree ``git merge-tree --write-tree
+      <first parent> <other parent>`` writes (DEC-912 item 1, with DEC-750 and
+      DEC-754). Git's own merge is asked only when a file fails the first test.
+      It gives no allowance to an octopus merge, when git cannot compute it (an
+      error, no merge base, an old git), or to a file on which git reports a
+      conflict; a conflict git reports only on other files does not take the
+      allowance from this one. Anything else (a hand edit, a conflict
+      resolution) is a change the merge commit makes itself, beyond what its
+      parents hold, whatever the merge brings;
     - every non-merge commit that is reachable from another parent, is not
       reachable from the first parent, and touches ``path``, carries the role,
       or has its full id listed in the path map's ``acceptance_exemptions``
@@ -266,6 +295,11 @@ def merge_offences(sha, path, root=REPO_ROOT, exempt=None):
         if merged.get(name) != base.get(name)
         and not any(side.get(name) == merged.get(name) for side in brought)
     )
+    if own and len(others) == 1:
+        by_git = _git_merge_under(first, others[0], path, root)
+        if by_git is not None:
+            blobs, conflicted = by_git
+            own = [name for name in own if name in conflicted or blobs.get(name) != merged.get(name)]
     if own:
         offences.append("the merge commit itself changes " + ", ".join(own))
     for parent in others:
