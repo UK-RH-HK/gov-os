@@ -81,8 +81,14 @@ the full regression, never less.
    names both.
 3. **The selection.** The ticket's acceptance run stays as it is. The regression run keeps the full run's form:
    `pytest tests` with `--ignore=<path>` (and `--deselect=<node id>` where a target is finer than a file) for
-   what is left out, never a list of folders. It runs: `tests/unit`; each acceptance suite
-   `tests/acceptance/<wbs_id>/` of a ticket (any wave) whose `allowed_paths` match a changed path; a suite holding
+   what is left out, never a list of folders. **A ticket's suite** is its acceptance folder as W2-07's gate reads
+   it (`acceptance_folder` in `src/gov/close/gates.py` on the base): the folder its ticket file declares in
+   `acceptance_tests.path` (DEC-892; W2-67, W2-63 and W2-70 declare `tests/acceptance/W1-27/`, `W1-49/` and
+   `W1-05/`), else `tests/acceptance/<wbs_id>/`; a ticket **has a suite** when that folder holds a test file
+   (`test_*.py`). The closing ticket's own suite is its suite: `selected` names that folder with `OWN`, and none
+   of its files is in `left_out` (the acceptance run runs it whole). Every target `selected` names exists in the
+   tree closed. It runs: `tests/unit`; the suite of each ticket (any wave) whose `allowed_paths` match a changed
+   path (`OVERLAP` naming that ticket, whatever folder its suite is); a suite holding
    a changed file; a suite that imports a helper module of a suite whose folder holds a changed file, directly or
    through another helper (imports read from the test files: `sys.path` folders of other suites and `import x`);
    each coupling's suites; `every_close`; `record_reading`. A changed path is **placed** when a ticket's
@@ -195,11 +201,14 @@ Written by a fresh test designer after the implementation was built, from the re
 implementation read. Expected red reason on the built head `9174e358`: **(i)** the change is read with git's rename
 detection, so a moved file is in it at the path it reached only (`changed` lacks the path it left; a file moved out
 of the shared core runs `scoped`; the suite of the ticket whose paths the file left is `NOT_REACHED` and the close
-passes).
+passes); **(j)** the overlap rule and the own suite read `tests/acceptance/<wbs_id>/` only, never the declared
+`acceptance_tests.path` (the declared folder is left out `NOT_REACHED`; `OWN` names the WBS id's folder, and the
+declared folder's files are in `left_out`).
 
 | KPI line | Tests | Red on the built head |
 |---|---|---|
 | S1, S2 + F1 a moved file at both its paths (Interface item 2) | `test_w2_66_moved_files.py` (3): `::test_a_file_moved_out_of_the_shared_core_runs_the_full_regression`, `::test_a_file_moved_away_from_another_ticket_s_paths_selects_that_ticket_s_suite`, `::test_a_file_moved_into_the_shared_core_runs_the_full_regression` | (i); the last runs full today and is red only on `changed` lacking the path the file left |
+| S1, S6 a ticket's suite is its declared folder (Interface item 3) | `test_w2_66_declared_folders.py` (2): `::test_the_overlap_rule_selects_a_ticket_s_declared_folder`, `::test_the_own_suite_is_the_closing_ticket_s_declared_folder` | (j) |
 
 ### Expected green on the base
 
