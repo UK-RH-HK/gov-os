@@ -33,6 +33,7 @@ kpis:
   - A preToolUse or containment program that exits 1, or cannot start, lets the call through; a line that turns exit 0 into a refusal.
 profile: LITE
 sources:
+- DEC-917
 - DEC-913
 - DEC-880
 - DEC-822
@@ -64,4 +65,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-65), from DEC-880 item 3 (owner, 2026-10
 - **The kernel template (DEC-913 item 1):** `template/governance/kernel/settings.json`'s PreToolUse, PostToolUse and PostToolUseFailure command lines take the template source's form exactly (DEC-608), and nothing else in that file changes.
 - **KPIs, failure:** a program that exits 1 or cannot start lets the call through; a line that turns exit 0 into a refusal.
 - **Consequence to know:** a session whose guard program is broken then cannot use any tool, Edit included, so the file is fixed from another session (the orchestrator's, or the owner's terminal). No work is lost.
-- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-29/test_session_hooks.py`; and (DEC-913 item 3) `tests/acceptance/W1-27/test_w1_27_doctor.py`, with `tests/acceptance/W1-27/conftest.py` if its fixture lives there: the fixture project holds the kernel's canary declarations (`Rewrite-Reason: DEC-835`). Each change carries a `Rewrite-Reason:`; no expectation is lowered.
+- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-29/test_session_hooks.py`; and (DEC-913 item 3) `tests/acceptance/W1-27/test_w1_27_doctor.py`, with `tests/acceptance/W1-27/conftest.py` if its fixture lives there: the fixture project holds the kernel's canary declarations (`Rewrite-Reason: DEC-835`); and (DEC-917) `tests/acceptance/W1-38/w1_38_hooks_support.py` with `tests/acceptance/W1-38/test_w1_38_hooks_command_line.py` where its cases need it: the three guard lines held to the kernel template's exit-mapping form, the four lifecycle lines to DEC-608's plain form (`Rewrite-Reason: DEC-917`). Each change carries a `Rewrite-Reason:`; no expectation is lowered.

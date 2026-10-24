@@ -29,7 +29,8 @@ import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import gates as _gates, history as _history, ratchet as _ratchet, state as _state, tool as _tool
+from gov.close import (evidence as _evidence, gates as _gates, history as _history, ratchet as _ratchet,
+                       select as _select, state as _state, tool as _tool)
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
@@ -110,6 +111,11 @@ def add_arguments(parser) -> None:
     parser.add_argument("--ticket-session", metavar="<session id>[=<role>]", action="append", default=[],
                         help="a session of the ticket, as gov telemetry takes it, for the governance share "
                              "the close record states; repeatable")
+    parser.add_argument("--full", action="store_true", default=False,
+                        help="run the full regression, whatever the change (W2-66)")
+    parser.add_argument("--check-result", metavar="<file>", default=None,
+                        help="the pre-close gate's own gov check --json output, given to every test run "
+                             "of the close as GOV_CLOSE_CHECK_RESULT (W2-66)")
 
 
 def run(root: Path, args, config: dict):
@@ -213,7 +219,7 @@ def run(root: Path, args, config: dict):
     gate(_check_containment, root, commits)
     if kind == _gates.SPECIFICATION_CLASS:
         gate(_gates.check_specification, root, ticket)
-    evidence = gate(_gates.check_evidence, root, ticket, front) if kind in _gates.EVIDENCE_CLASSES else None
+    judged_on = gate(_gates.check_evidence, root, ticket, front) if kind in _gates.EVIDENCE_CLASSES else None
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end, in parallel, and the cases the project declares
     # as serial-only afterwards (DEC-527); ``test_runs`` are the runs as they were made.
@@ -222,17 +228,20 @@ def run(root: Path, args, config: dict):
     # result, and the reds of the runs are judged by the lists, after both runs.
     told = {"results": {}, "rootdirs": {}, "env": None} \
         if any(settings.get(key) for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE)) else None
+    scope = _scope(root, ticket, wbs, args)  # W2-66: what the regression run selects, and its evidence
     no_counts = dict.fromkeys(("passed", "failed", "errors", "skipped"), 0)
     if kind in _gates.EVIDENCE_CLASSES and not _gates.has_tests(folder):  # judged on its evidence (W2-H045)
         test_counts = no_counts
     else:
-        test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers, told, folder=folder)
-    counts = gate(_check_tests, root, root / "tests", timeout, folder, test_runs, workers, told)
+        test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers, told, scope,
+                           folder=folder)
+    counts = gate(_check_tests, root, root / "tests", timeout, folder, test_runs, workers, told, scope)
     reds = gate(_check_reds, root, told, timeout) if told is not None else None
     packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
+    evidence = _scope_evidence(root, scope)
     if found:
-        _refuse_for(root, ticket, found, disposition, packet, test_runs, report)
+        _refuse_for(root, ticket, found, disposition, packet, test_runs, report, evidence)
     test_counts = {key: test_counts[key] + counts[key] for key in test_counts}
 
     mandatory = packet["mandatory"]
@@ -247,13 +256,14 @@ def run(root: Path, args, config: dict):
         "tests_produced": _collect_test_paths(root, wbs, commit_files),
         "tests_run": test_counts,
         "test_runs": test_runs,
+        _evidence.KEY: evidence,
         "deviations": NOT_MEASURED,
         "skill_versions": _read_skill_versions(root),
         "commits": _commit_models(commits),
     }
     record.update(checked)
     record.update(reds or {})
-    judged = _judged_by(kind, evidence, accepted_probes, disk)  # what this close judged besides its tests
+    judged = _judged_by(kind, judged_on, accepted_probes, disk)  # what this close judged besides its tests
     record.update(judged)
     record[SHARE_KEY] = dict.fromkeys(SHARE_PARTS, NOT_MEASURED)
     record["created"] = _now()  # one time of the record, whether or not it is written again with its share
@@ -275,15 +285,16 @@ def run(root: Path, args, config: dict):
 
     return {"ticket": ticket, "close_record": close_record_path,
             "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report, **(reds or {}),
-            **judged}
+            _evidence.KEY: evidence, **judged}
 
 
-def _judged_by(kind: str, evidence: list[str] | None, accepted_probes: dict, disk: dict) -> dict:
+def _judged_by(kind: str, judged_on: list[str] | None, accepted_probes: dict, disk: dict) -> dict:
     """What the close record and the answer state of the gates of W2-07: the ticket's class, the evidence it was
-    judged on, the decisions that accepted a failed probe's findings, the disk's reading."""
+    judged on (``class_evidence``: ``evidence`` is the regression's evidence block, W2-66), the decisions that
+    accepted a failed probe's findings, the disk's reading."""
     judged = {"ticket_class": kind or "implementation", "disk": disk}
-    if evidence is not None:
-        judged["evidence"] = evidence
+    if judged_on is not None:
+        judged["class_evidence"] = judged_on
     if accepted_probes:
         judged["probe_accepted_by"] = accepted_probes
     return judged
@@ -318,7 +329,7 @@ def _workers(settings: dict):
 
 def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
                 packet: dict | None, test_runs: list[dict] | None = None, report: dict | None = None,
-                counted: bool = True) -> None:
+                evidence: dict | None = None, counted: bool = True) -> None:
     """The one refusal of a run, for every finding of its gates (DEC-492): each named once, in the gates'
     order. One gate's refusal is that gate's, with its code; several are ``CHECK_FAILED`` with each gate's
     part under ``parts``. ``test_runs`` are the runs made, stated as a passed close states them (DEC-566);
@@ -336,6 +347,8 @@ def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str
     details["disposition"] = disposition or "unclassed"
     details["test_runs"] = test_runs or []
     details.update(report or {})
+    if evidence is not None:  # W2-66: the refusal states its evidence as a passed close does
+        details[_evidence.KEY] = evidence
     if not_measured:
         details["not_measured"] = not_measured
     context_reason = None
@@ -781,19 +794,22 @@ def _full_id(root: Path, given: str) -> str | None:
 # ---------------------------------------------------------------------------
 
 def _check_tests(root: Path, test_path: Path, timeout: int, ignore: Path | None = None,
-                 stated: list | None = None, workers=AUTO_WORKERS, told: dict | None = None) -> dict:
+                 stated: list | None = None, workers=AUTO_WORKERS, told: dict | None = None,
+                 scope: dict | None = None) -> dict:
     """The counts of a test run without a finding; ``CHECK_FAILED`` with its findings. With ``ignore`` the run
     is the regression run, which may collect nothing. ``stated`` gets the runs as they were made, ``told`` each
-    test's result (``_run_tests``)."""
+    test's result, ``scope`` the selection and the evidence (``_run_tests``)."""
     findings, counts = _run_tests(root, test_path, timeout, ignore=ignore, none_collected_ok=ignore is not None,
-                                  stated=stated, workers=workers, told=told)
+                                  stated=stated, workers=workers, told=told,
+                                  **({"scope": scope} if scope is not None else {}))
     if findings:
         raise _Finding("CHECK_FAILED", "tests or checks failed", {"tests_run": counts}, findings)
     return counts
 
 
 def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int, stated: list | None = None,
-                      workers=AUTO_WORKERS, told: dict | None = None, folder: Path | None = None) -> dict:
+                      workers=AUTO_WORKERS, told: dict | None = None, scope: dict | None = None,
+                      folder: Path | None = None) -> dict:
     """The counts of the ticket's acceptance run. The acceptance tests are part of the ticket's work
     (DEC-480): without one there is no run, and the refusal says of it that it was not measured (DEC-492).
     ``folder`` is the one the ticket declares (DEC-892), else ``tests/acceptance/<wbs>/``."""
@@ -803,7 +819,7 @@ def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int, stated: l
                        f"no acceptance tests for {ticket} in {folder.relative_to(root).as_posix()}/",
                        {"ticket": ticket, "wbs": wbs},
                        not_measured=[f"the acceptance run of {ticket}: not measured, it has no acceptance tests"])
-    return _check_tests(root, folder, timeout, stated=stated, workers=workers, told=told)
+    return _check_tests(root, folder, timeout, stated=stated, workers=workers, told=told, scope=scope)
 
 
 _HAS_PARALLEL_RUNNER = "import importlib.util, sys; sys.exit(importlib.util.find_spec('xdist') is None)"
@@ -812,7 +828,8 @@ _HAS_PARALLEL_RUNNER = "import importlib.util, sys; sys.exit(importlib.util.find
 def _run_tests(root: Path, test_path: Path, timeout: int,
                ignore: Path | None = None,
                none_collected_ok: bool = False,
-               stated: list | None = None, workers=AUTO_WORKERS, told: dict | None = None) -> tuple[list[str], dict]:
+               stated: list | None = None, workers=AUTO_WORKERS, told: dict | None = None,
+               scope: dict | None = None) -> tuple[list[str], dict]:
     """Run pytest on ``test_path`` to its end: its findings and its counts, every case counted once.
 
     The run is parallel (DEC-527): the installed runner's ``-n`` with ``workers``, the project's number or
@@ -856,6 +873,11 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     pytest = [sys.executable, "-m", "pytest"]
     options = ["-q", "-p", "no:cacheprovider", "--tb=line", "--no-header"]
     whole = [str(test_path)] + (["--ignore", str(ignore)] if ignore is not None else [])
+    if scope is not None:  # W2-66: the selection, the per-test limit and the check result
+        whole += _scope_form(root, scope, ignore)
+        options += _scope_limit(root, scope, env)
+        if told is not None:  # a run alone of a load-sensitive red has the same limit
+            told["limit"] = _scope_limit(root, scope, env)
 
     # Asked of the interpreter of the run, in the run's environment: this process may have the plugin from
     # the caller's PYTHONPATH alone.
@@ -873,8 +895,11 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
                            "declares is not known, and no test was run",
                            {"list": serial_only.LIST_REL},
                            not_measured=[f"the test run of {rel}: not measured, the serial-only list cannot be read"])
-        declared = [entry for entry in listed if within(entry, test_path) and not within(entry, ignore)]
-        runs = [("parallel", pytest + whole + options + ["-n", str(workers)], env, f"the test run of {rel}")]
+        declared = [entry for entry in listed if within(entry, test_path) and not within(entry, ignore)
+                    and (scope is None or ignore is None or _select.runs(entry, scope["ignore"], scope["deselect"]))]
+        runs = [("parallel", pytest + whole + options + ["-n", str(workers)]
+                 + (["--dist", str(scope["distribution"])] if scope is not None else []),
+                 env, f"the test run of {rel}")]
         if declared:  # the plugin keeps them out of the parallel run; its folder holds nothing else
             # A file of the project found under the plugin's name before the plugin's folder would be loaded in
             # its place (DEC-555): the run's import path begins with the project's root and its src/.
@@ -908,6 +933,10 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     findings: list[str] = []
     collected = False
     for form, cmd, run_env, what in runs:
+        junit = None
+        if scope is not None:  # W2-66: every run keeps its JUnit XML
+            junit = _scope_junit(root, scope, "regression" if ignore is not None else "acceptance", form)
+            cmd = cmd + ["--junitxml", str(root / junit), "-o", "junit_family=xunit1"]
         if told is None:
             found, ran = _one_test_run(root, cmd, run_env, timeout, what, rel)
         else:
@@ -921,10 +950,14 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
         collected = collected or found is not None
         findings += found or []
         counts = {key: counts[key] + ran[key] for key in counts}
+        if junit is not None:
+            scope["runs"].append(_evidence.read_junit(root, root / junit, test_path))
         if stated is not None:
             run = {"run": "regression" if ignore is not None else "acceptance", "form": form, **ran}
             if form == "parallel":
                 run["workers"] = workers
+                if scope is not None:
+                    run["distribution"] = scope["distribution"]
             if form == "serial-afterwards":
                 run["cases"] = declared
             if form == "serial":
@@ -1068,7 +1101,7 @@ def _alone(root: Path, test: str, told: dict, timeout: int) -> str:
 
     path, sep, rest = test.partition("::")
     cmd = [sys.executable, "-m", "pytest", str(root / path) + sep + rest, "--rootdir", told["rootdirs"][test],
-           "-q", "-p", "no:cacheprovider", "--tb=line", "--no-header", "-p", results.PLUGIN]
+           "-q", "-p", "no:cacheprovider", "--tb=line", "--no-header", "-p", results.PLUGIN] + told.get("limit", [])
     found, _, alone = _told_run(root, cmd, told["env"], timeout, f"the run alone of {test}", path)
     return _ratchet.PASSED if found == [] and alone.get("results") == {test: _ratchet.PASSED} else _ratchet.FAILED
 
@@ -1261,6 +1294,100 @@ def _read_skill_versions(root: Path) -> list[dict]:
                 if listed not in versions:
                     versions.append(listed)
     return versions
+
+
+# ---------------------------------------------------------------------------
+# The scope of the regression run and its evidence (W2-66)
+# ---------------------------------------------------------------------------
+
+CHECK_RESULT_VARIABLE = "GOV_CLOSE_CHECK_RESULT"
+_TIMEOUT_PLUGIN = "pytest_timeout"
+
+
+def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
+    """What the regression run selects (``gov.close.select``), with what every run of the close needs: the
+    folder of its JUnit XML (under ``.gov-runtime/``) and the pre-close gate's ``gov check`` result, copied byte
+    for byte, where ``--check-result`` gives one. ``CHECK_RESULT_UNREADABLE`` when it cannot be read: nothing ran."""
+    from datetime import datetime, timezone
+
+    given = getattr(args, "check_result", None)
+    content = None
+    if given is not None:
+        try:
+            content = Path(given).read_bytes()
+        except OSError as e:
+            raise GovError("CHECK_RESULT_UNREADABLE", f"the check result {given} cannot be read: {e}",
+                            {"check_result": str(given)})
+    scope = _select.plan(root, wbs, full_asked=bool(getattr(args, "full", False)), ticket=ticket)
+    folder = f"{_evidence.JUNIT_DIR}/{ticket}/{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')}"
+    (root / folder).mkdir(parents=True, exist_ok=True)
+    check = None
+    if content is not None:
+        check = root / folder / "check-result.json"
+        check.write_bytes(content)
+    return {**scope, "folder": folder, "check_result": str(check) if check else None, "runs": [],
+            "junit_xml": [], "limit": None}
+
+
+def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
+    """The regression run's ``--ignore`` and ``--deselect`` options; none for the acceptance run. A node id is
+    given as the project's and as the ``tests`` folder's, the run's root folder where the project names none."""
+    if ignore is None:
+        return []
+    form = [f"--ignore={root / rel}" for rel in scope["ignore"] if (root / rel).resolve() != Path(ignore).resolve()]
+    for node in scope["deselect"]:
+        form.append(f"--deselect={node}")
+        if node.startswith("tests/"):
+            form.append(f"--deselect={node[len('tests/'):]}")
+    return form
+
+
+def _scope_limit(root: Path, scope: dict, env: dict) -> list[str]:
+    """The per-test limit of every run (pytest-timeout, the signal method) with its temp-folder retention
+    (DEC-905), and the check result in ``env``.
+    ``TIMEOUT_PLUGIN_ABSENT`` when the runs' interpreter cannot load pytest-timeout: nothing ran, nothing is
+    recorded (DEC-892 b)."""
+    import os
+
+    if scope["check_result"]:
+        env[CHECK_RESULT_VARIABLE] = scope["check_result"]
+    else:
+        env.pop(CHECK_RESULT_VARIABLE, None)
+    for key, value in (scope.get("env") or {}).items():  # the nightly's coverage shim (gov.close.nightly)
+        if key == "PYTHONPATH":
+            if value not in env["PYTHONPATH"].split(os.pathsep):
+                env[key] = os.pathsep.join([env[key], value])
+        else:
+            env[key] = value
+    if scope["limit"] is None:
+        if _started(root, [sys.executable, "-c", f"import {_TIMEOUT_PLUGIN}"], env).returncode != 0:
+            raise GovError("TIMEOUT_PLUGIN_ABSENT",
+                            f"pytest-timeout cannot be loaded by {sys.executable}: no test was run without its "
+                            "per-test limit", {"python": sys.executable})
+        scope["limit"] = (["-p", _TIMEOUT_PLUGIN] if env.get("PYTEST_DISABLE_PLUGIN_AUTOLOAD") else []) + \
+            [f"--timeout={scope['per_test_timeout']}", "--timeout_method=signal",
+             "-o", f"tmp_path_retention_policy={scope['tmp_path_retention_policy']}"]
+    return list(scope["limit"])
+
+
+def _scope_junit(root: Path, scope: dict, run: str, form: str) -> str:
+    """The JUnit XML file of the next run, relative to the project."""
+    rel = f"{scope['folder']}/{len(scope['junit_xml']) + 1:02d}-{run}-{form}.xml"
+    scope["junit_xml"].append(rel)
+    return rel
+
+
+def _scope_evidence(root: Path, scope: dict | None) -> dict | None:
+    """The evidence block (``gov.close.evidence``); a run that wrote no JUnit XML (one cut at the time limit)
+    has a file that says so, so that each file the block names exists."""
+    if scope is None:
+        return None
+    for rel in scope["junit_xml"]:
+        if not (root / rel).exists():
+            (root / rel).write_text('<?xml version="1.0" encoding="utf-8"?>\n'
+                                    "<!-- the run wrote no JUnit XML: it did not come to its end -->\n<testsuites/>\n",
+                                    encoding="utf-8")
+    return _evidence.block(scope, scope["runs"], scope["junit_xml"])
 
 
 # ---------------------------------------------------------------------------
