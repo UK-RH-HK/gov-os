@@ -110,6 +110,7 @@ the full regression, never less.
      close. A refused close leaves nothing untracked that git does not ignore but its repair ticket (DEC-490):
      its XML goes under `.gov-runtime/`.
    - `per_test_timeout` (seconds) and `distribution` (mode), as the runs used them.
+   - `tmp_path_retention_policy`: `failed`, the value every test run of the close was given (item 9).
    - Every case run is in the JUnit XML files; the record does not list 15,000 node ids itself.
 7. **The per-test limit:** every test run a close or the nightly makes runs with pytest-timeout,
    `--timeout=<per_test_timeout>` and the `signal` method; a test over it fails with pytest-timeout's text, which
@@ -117,7 +118,8 @@ the full regression, never less.
    `TIMEOUT_PLUGIN_ABSENT`, exit code 1, nothing recorded.
 8. **The nightly command:** `python3 -m gov.close.nightly <branch> --root <project> [--coverage] --json`.
    - Runs the full uncached regression on `<branch>`'s head (not the working tree) in the close's form (parallel,
-     then the serial-only cases alone; the per-test limit; the distribution mode), with JUnit XML.
+     then the serial-only cases alone; the per-test limit; the distribution mode; the retention option, item 9),
+     with JUnit XML.
    - Writes its record `docs/close/nightly/NR-<UTC stamp>-<head12>.json` in the project's working tree. Prints
      an API-0002 envelope: green: `ok: true`, exit 0, `result.record`; red: `ok: false`, exit 3,
      `error.details.record`.
@@ -132,6 +134,13 @@ the full regression, never less.
      that takes the close's changed paths to the red test's suite.
    - `--coverage` (the weekly run): coverage.py with lens H's child-process shim; `measured_map` is the path of a
      JSON object `{source path: [node ids that executed it]}`, child processes included.
+9. **The retention option** (DEC-905, DEC-904 item 1): every pytest run a close makes (the acceptance run, the
+   regression's parallel run, the serial-only cases afterwards) and every test run of the nightly is given
+   `-o tmp_path_retention_policy=failed`, so a passing test's `tmp_path` goes as the test ends and a failing
+   test's stays. The evidence block names it (item 6). *The observable:* a fixture test reads its run's
+   `config.getini("tmp_path_retention_policy")` (`failed`) and `config.option.override_ini` (holding
+   `tmp_path_retention_policy=failed`), and whether its `tmp_path` is still there after the close. pytest's own
+   count of three base folders stays: the fixture's refused close has two failing runs.
 
 ## KPI map
 
@@ -140,7 +149,10 @@ evidence); **(b)** `--full` or `--check-result` unknown (argparse: no JSON envel
 `gov.close.nightly`; **(d)** no test map, schema or template copy; **(e)** no per-test limit (a hung test runs to
 its end; a close without pytest-timeout passes); **(f)** no report. **Then (g):** once built, in this worktree
 every case that runs a close or the nightly is red until the owner installs pytest-timeout (Interface item 7:
-`TIMEOUT_PLUGIN_ABSENT`), the plugin-absent case excepted, which turns green.
+`TIMEOUT_PLUGIN_ABSENT`), the plugin-absent case excepted, which turns green. **(h)**, added with DEC-905 on the
+built head: the close's and the nightly's test runs are not given the retention option (the fixture's tests
+report `tmp_path_retention_policy` `all` and no such `-o`; a passing test's `tmp_path` is still there after the
+close), and the evidence block does not name it.
 
 ### Part 1 — the selection (fixture repositories)
 
@@ -166,6 +178,7 @@ every case that runs a close or the nightly is red until the owner installs pyte
 | KPI line | Tests | Red on the base |
 |---|---|---|
 | S8 + F4 per-test limit, failure names it; no silent pass without it | `test_w2_66_limits.py::test_a_hung_test_fails_at_the_per_test_limit_and_the_failure_names_the_limit[parallel]`, `[serial-afterwards]`, `::test_without_pytest_timeout_the_close_does_not_pass_silently`; `test_w2_66_live_test_map.py::test_the_per_test_limit_is_above_the_slowest_test_measured`; `test_w2_66_scoped_selection.py::test_a_scoped_close_states_its_settings_defaults` | (e), (a) |
+| S8b the retention option on every run, the evidence names it; the nightly's runs too [DEC-905, DEC-904 item 1] | `test_w2_66_retention.py` (8): `::test_every_test_run_of_the_close_is_given_the_retention_option[acceptance]`, `[parallel]`, `[serial-afterwards]`; `::test_a_passing_test_s_folder_goes_and_a_failing_test_s_stays[parallel]`, `[serial-afterwards]`; `::test_the_refused_close_s_evidence_names_the_option`; `::test_a_passed_close_names_the_option_in_its_result_and_its_record`; `::test_the_nightly_run_s_test_runs_are_given_the_retention_option` | (h) |
 | S9 + F4 distribution one setting, default, no worksteal | `test_w2_66_limits.py::test_the_distribution_mode_is_one_setting_and_the_runs_follow_it`; `test_w2_66_live_test_map.py::test_the_distribution_mode_stays_the_default_and_is_not_worksteal`; the settings-defaults case above | (a), (d) |
 | S10 the nightly | `test_w2_66_nightly.py` (5): the branch's head with JUnit XML; bisect P1; flaky candidate; selection miss with the map corrected; the weekly coverage map across child processes (coverage 7.16.2 is installed in the test interpreter; the case skips where it is not) | (c); the selection-miss case first fails at its scoped close (a) |
 | S11 the report | `test_w2_66_research.py` (3) | (f) |
@@ -187,6 +200,19 @@ that folder's failing test (so the refusal is that folder's, not a missing check
 are in `test_w1_30_regression_scope.py`: the folder selected by its ticket's overlap runs and blocks; left out, it
 is named with why; `--full` runs it whatever the change. No other expectation is lowered. Committed alone with
 `Rewrite-Reason: DEC-880 item 2 (a path-scoped close runs only the suites a change can reach; I2 F9)`.
+
+## Revisions after W2-07's merge (run 2)
+
+Each its own commit with its `Rewrite-Reason:`; no expectation lowered.
+
+- `test_w2_66_evidence.py::test_a_refused_close_states_its_evidence_and_says_scoped`: a refused close commits its
+  repair ticket (DEC-904 item 6, DEC-903 item 3), so the head and tree it closed are read before the close, not
+  from `HEAD` after it. No other case of the suite reads `HEAD` after a refused close.
+- `tests/acceptance/W1-30/test_w1_30_regression_scope.py`: the closed other ticket's folder is committed by its
+  test designer with its trailers, so the in-close `gov check` (DEC-868 item 1 (b)) passes and each case reaches
+  the selection it states.
+- `tests/acceptance/W1-39/test_w1_39_copy.py::test_copy_creates_the_overlay`: the overlay holds the path map and
+  the test map (DEC-903 item 1, DEC-896 item 2).
 
 ## Discoveries recorded for the lead
 
