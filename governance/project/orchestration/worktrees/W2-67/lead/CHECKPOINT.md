@@ -8,4 +8,5 @@
 - Ride-alongs: TD4-A = review F3 (KPI 4 static guard f-string, acceptance W1-27) → td-6; P1 option A (time-limit case's own TMPDIR) → engineer; TD1C-A (fixtures remove /tmp/gov-cbm-<uid>/<sha256(root)[:16]> folders they make) → an old-form test designer (td-8) since the sandbox has /tmp/gov-cbm read-only.
 - Plan: td-6 (sandboxed, xhigh): W1-30's 13 + W2-L420 + TD4-A + rm plant. td-7 (sandboxed, xhigh): W2-50's large-store and hang cases. td-8 (old form): TD1C-A. Red check. eng-4 (sandboxed, high): 15 nested-run functions + P1. Verify (verify.sh, label r3). No review (P-W2-67-R23).
 - Loop count: 0 implementer iterations in run 3.
-- Next: tripwire snapshot 12, launch td-6.
+- td-6 DONE-with-package (session 999d4d6d…, sandboxed, xhigh, 33 min): 11 commits f7867ea6..67a74333, trailers checked; 13 W1-30 cases revised (all were weak on the head; PF2 case red under PF2b since PF2's line is off-path after DEC-868), W2-L420 docstrings a0325f52, TD4-A ff4afbec; package P-W2-67-TD6-1 (packages/); rm of plant refused. Tripwire 12: only W1-27/W1-30 here; other trees: their own merges. Lines +369 −104.
+- Now: my red check red6.sh (log/red6.txt, XML /tmp/gov-os-lead-W2-67/red6). Then td-7 (copy scratchpad brief into briefs/), td-8, eng-4 (briefs drafted in session scratchpad: td-7.md, td-8.md, eng-4.md).

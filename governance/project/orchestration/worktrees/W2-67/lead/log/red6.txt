@@ -1,0 +1,15 @@
+PF13 exit=1 2 failed in 4.57s marker_lines=2
+PF5 exit=1 2 failed in 4.02s marker_lines=2
+PF11 exit=1 1 failed in 4.56s marker_lines=1
+PF12 exit=1 2 failed in 4.68s marker_lines=2
+PF16 exit=1 2 failed in 4.19s marker_lines=2
+PF4 exit=1 1 failed in 4.45s marker_lines=1
+PF15 exit=1 1 failed in 4.39s marker_lines=1
+PF9 exit=1 1 failed in 4.56s marker_lines=1
+PF10 exit=1 1 failed in 10.43s marker_lines=1
+PF1 exit=1 1 failed in 16.53s marker_lines=1
+PF2 exit=0 1 passed in 3.44s marker_lines=1
+PF2b exit=1 1 failed in 3.39s marker_lines=1
+guard-other exit=1 1 failed in 0.23s
+head exit=0 31 passed in 29.30s
+done

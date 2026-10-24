@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-24 21:25 BST — W2-65 run 2 PACKAGES -> DEC-917 (delegated, owner's acceptance asked), run 3 launched; P-W2-L437-A (P1) with the owner; W2-67 run 3 in flight; next free DEC-918)
+## RESUME HERE (2026-10-24 21:25 BST — W2-65 run 2 PACKAGES -> DEC-917 (delegated, owner's acceptance asked), run 3 launched; P-W2-L437-B (3 lines, P2) with the owner; DEC-917 accepted `92ad3a84`; W2-67 run 3 in flight; next free DEC-918)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
