@@ -99,8 +99,8 @@ the full regression, never less.
    through another helper (imports read from the test files: `sys.path` folders of other suites and `import x`);
    each coupling's suites; `every_close`; `record_reading`. A changed path is **placed** when the `allowed_paths`
    of a ticket that has a suite, a coupling, `record_only` or a suite folder (`tests/unit`, `tests/acceptance/<x>/`)
-   holds it. A path that only the `allowed_paths` of tickets without a suite hold (no declared folder with a test
-   file, no `tests/acceptance/<wbs_id>/` with one) maps to no suite: it is not placed. An **unplaced** path runs the
+   holds it. A path that only the `allowed_paths` of tickets without a suite hold (the folder each declares, or
+   else its `tests/acceptance/<wbs_id>/`, holds no test file) maps to no suite: it is not placed. An **unplaced** path runs the
    full regression (`UNPLACED`, naming it). The serial-only cases (`tests/acceptance/serial-only.txt`)
    run afterwards, alone, only those inside what the regression runs; `test_runs`' serial-afterwards run names
    them under `cases` (as today).
