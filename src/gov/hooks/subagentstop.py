@@ -48,8 +48,14 @@ def main() -> None:
     if not missing:
         sys.exit(0)
 
-    # Claude Code reads a SubagentStop block's reason from stderr on exit 2.
-    sys.stderr.write(f"Worker return contract incomplete. Missing fields: {', '.join(missing)}\n")
+    reason = f"Worker return contract incomplete. Missing fields: {', '.join(missing)}"
+    sys.stdout.write(json.dumps({"hookSpecificOutput": {
+        "hookEventName": "SubagentStop",
+        "blockReason": reason,
+        "missingFields": missing,
+    }}))
+    # Claude Code reads a SubagentStop block's reason from stderr on exit 2 (stdout is not delivered).
+    sys.stderr.write(reason + "\n")
     sys.exit(2)
 
 
