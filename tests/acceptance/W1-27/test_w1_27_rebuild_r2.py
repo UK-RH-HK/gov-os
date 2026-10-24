@@ -30,6 +30,7 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67b_support
 
 
 LEXICAL_TABLES = {"lexical_file", "lexical_parent", "lexical_chunk"}
@@ -82,7 +83,7 @@ def test_rebuild_recreates_lexical_index(rebuild_gov, rebuild_project, interface
 # Rebuild must not silently drop existing lexical tables
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_does_not_silently_drop_lexical_tables(rebuild_gov, rebuild_project, interface):
+def test_rebuild_does_not_silently_drop_lexical_tables(sandbox, tmp_path):
     """Existing lexical index tables must not be silently deleted by rebuild.
 
     The current implementation deletes ``store.db`` entirely and rebuilds
@@ -91,10 +92,16 @@ def test_rebuild_does_not_silently_drop_lexical_tables(rebuild_gov, rebuild_proj
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): it repeated the table-presence check of
+    ``test_rebuild_recreates_lexical_index`` and never read the planted
+    row's fate.  The table is kept and recreated from git: the row planted
+    for a file git does not hold is gone after the rebuild, and the
+    project's own tracked file is there.
     """
-    run1 = rebuild_gov("rebuild", "--json")
-    support.assert_envelope(run1, interface, command="rebuild")
-    assert run1.returncode == 0, f"first rebuild failed\n{run1.describe()}"
+    rebuild_project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    run1, _ = w2_67b_support.rebuild(rebuild_project, sandbox)
 
     store_path = rebuild_project / ".gov-runtime" / "store.db"
     conn = sqlite3.connect(str(store_path))
@@ -106,14 +113,21 @@ def test_rebuild_does_not_silently_drop_lexical_tables(rebuild_gov, rebuild_proj
     conn.commit()
     conn.close()
 
-    run2 = rebuild_gov("rebuild", "--json")
-    support.assert_envelope(run2, interface, command="rebuild")
-    assert run2.returncode == 0, f"second rebuild failed\n{run2.describe()}"
+    run2, _ = w2_67b_support.rebuild(rebuild_project, sandbox)
 
     tables = _tables_in_store(rebuild_project)
     assert "lexical_file" in tables, (
         f"rebuild silently dropped lexical_file; tables after rebuild: "
         f"{sorted(tables)}\n{run2.describe()}"
+    )
+    paths = {row[0] for row in w2_67b_support.store_rows(rebuild_project, "SELECT path FROM lexical_file")}
+    assert "test.py" not in paths, (
+        f"the row planted for test.py, which git does not hold, survives the rebuild: lexical_file holds "
+        f"{sorted(paths)}\n{run2.describe()}"
+    )
+    assert support.PATH_MAP_REL in paths, (
+        f"the rebuilt lexical_file does not hold the tracked {support.PATH_MAP_REL}: {sorted(paths)}\n"
+        f"{run2.describe()}"
     )
 
 
@@ -121,7 +135,7 @@ def test_rebuild_does_not_silently_drop_lexical_tables(rebuild_gov, rebuild_proj
 # Rebuild must report stores it could not recreate
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_result_names_unreconstructed_stores(rebuild_gov, rebuild_project, interface):
+def test_rebuild_result_names_unreconstructed_stores(sandbox, tmp_path):
     """If rebuild cannot recreate a derived store it must name it in the result.
 
     The semantic index requires a model (Ollama + qwen3-embedding).  If
@@ -133,18 +147,33 @@ def test_rebuild_result_names_unreconstructed_stores(rebuild_gov, rebuild_projec
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
-    """
-    run = rebuild_gov("rebuild", "--json")
-    envelope = support.assert_envelope(run, interface, command="rebuild")
-    assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    result = envelope.get("result") or {}
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): ``stores.semantic`` is always in the result.
+    The case now reads the status and reason of each store: one whose
+    tables are not in the store is ``not_recreated`` with a reason, and the
+    lexical store, whose tables are there, is ``recreated``.
+    """
+    rebuild_project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    run, result = w2_67b_support.rebuild(rebuild_project, sandbox)
     tables = _tables_in_store(rebuild_project)
-    result_text = json.dumps(result).lower()
+    stores = result.get("stores")
+    assert isinstance(stores, dict) and stores, f"the result names no store: {result}\n{run.describe()}"
 
     if not SEMANTIC_TABLES.issubset(tables):
-        assert "semantic" in result_text, (
+        semantic = stores.get("semantic") or {}
+        assert semantic.get("status") == "not_recreated" and semantic.get("reason"), (
             f"the semantic index was not recreated but rebuild does not "
-            f"name it in the result; tables: {sorted(tables)}\n"
+            f"name it not_recreated with a reason; tables: {sorted(tables)}\n"
             f"result: {result}\n{run.describe()}"
         )
+    assert LEXICAL_TABLES <= tables and (stores.get("lexical") or {}).get("status") == "recreated", (
+        f"the lexical store is not both in the store and named recreated; tables: {sorted(tables)}\n"
+        f"result: {result}\n{run.describe()}"
+    )
+    for name, entry in stores.items():
+        assert isinstance(entry, dict) and entry.get("status") in ("recreated", "not_recreated"), (
+            f"store {name} has no status recreated or not_recreated: {entry}\n{run.describe()}"
+        )
+        if entry["status"] == "not_recreated":
+            assert entry.get("reason"), f"store {name} is not recreated and gives no reason: {entry}"

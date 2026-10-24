@@ -177,6 +177,11 @@ def copy_working_tree(destination, root=REPO_ROOT):
     """Copy the repository's working tree (tracked files and untracked, unignored ones) and commit it.
 
     The settings file is copied without the held-out deny rules (DEC-399).
+
+    The copy's repository has git's automatic gc switched off (``gc.auto=0``) before its first commit, in its own
+    config, so every commit made later in it or in a per-test copy of it keeps it off too. A tree of more than
+    about 6,700 loose objects otherwise starts a background gc at the commit, whose packing races the next
+    per-test ``shutil.copytree`` of this ``.git`` (I3 F9, I4 F5; W2-67).
     """
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
@@ -198,6 +203,7 @@ def copy_working_tree(destination, root=REPO_ROOT):
             shutil.copy2(source, target)
     strip_held_out_rules(destination)
     git(destination, "init", "-q", "-b", "main")
+    git(destination, "config", "gc.auto", "0")   # no background gc to race the per-test copies (I3 F9, I4 F5)
     git(destination, "add", "-A")
     git(destination, "commit", "-q", "-m", "copy of the working tree")
     return destination

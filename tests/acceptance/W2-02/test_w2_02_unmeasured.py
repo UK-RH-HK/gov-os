@@ -6,6 +6,8 @@ finding and the check exits 0, as if it had been measured.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import w2_02_support as support
@@ -18,6 +20,15 @@ RECORDS = {
     "close": (None, "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md",
               support.shared("CL-PROJ-aaaa", "close", task="PROJ-aaaa")),
 }
+
+
+def _names_the_type(finding, record_type, rel):
+    """The finding names the type itself: its ``type`` field, or its message once the record's own path is taken
+    out (the path holds the type's folder name: ``docs/research/``, ``docs/close/``)."""
+    if finding.get("type") == record_type:
+        return True
+    message = str(finding.get("message", "")).replace(rel, "")
+    return re.search(rf"\b{re.escape(record_type)}\b", message) is not None
 
 
 def _schema_file(record_type):
@@ -34,15 +45,20 @@ def test_a_type_whose_schema_file_is_absent_is_reported_unmeasured_and_not_green
     """Every kernel schema file but the type's own, and one record of the type: a finding says the type is
     unmeasured (code or message), names the type, and the check exits non-zero.
     Red today: ``research``: no finding, exit 0; ``close``: no kernel schema of type close (the case fails at
-    finding it)."""
+    finding it).
+
+    Revised (W2-67, I4 §2.2 and F7): "names the type" was met by the record's own path in the message
+    (``docs/research/…``, ``docs/close/…``), so a finding that named no type passed. The type is now looked for in
+    the finding's ``type`` field, or in its message with the record's path taken out."""
     name = _schema_file(record_type)
     project = support.Project(tmp_path)
     project.kernel_schemas(leave_out=(name,))
     _, rel, front = RECORDS[record_type]
+    assert record_type in rel, f"the premise: the record's path {rel} holds the type's name"
     project.write(rel, support.markdown(front))
     code, findings = project.core_schema()
     found = [finding for finding in findings if support.says_unmeasured(finding)
-             and (finding.get("type") == record_type or record_type in str(finding.get("message", "")))]
+             and _names_the_type(finding, record_type, rel)]
     assert found, f"no finding says the type {record_type} is unmeasured: {findings}"
     assert code != 0, f"core-schema exits 0 although the type {record_type} is unmeasured"
 

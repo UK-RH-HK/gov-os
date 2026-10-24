@@ -424,18 +424,16 @@ class TestTicketStatus:
 
 class TestRepoInTempDir:
 
-    def test_repo_in_temp_dir_no_temp_scratch(self):
+    def test_repo_in_temp_dir_no_temp_scratch(self, tmp_path, monkeypatch):
+        # The temp folder is this test's own tmp_path, so no fixed folder is shared between runs.
+        monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
         real_tmp = os.path.realpath(tempfile.gettempdir())
         project = os.path.join(real_tmp, "test_project_w102_builder")
-        os.makedirs(project, exist_ok=True)
-        try:
-            target = os.path.join(real_tmp, "some_file.txt")
-            assert not _is_in_scratch(target, project)
-            scratch = os.path.join(project, ".gov-runtime", "scratch", "note.txt")
-            assert _is_in_scratch(scratch, project)
-        finally:
-            import shutil
-            shutil.rmtree(project, ignore_errors=True)
+        os.makedirs(project)
+        target = os.path.join(real_tmp, "some_file.txt")
+        assert not _is_in_scratch(target, project)
+        scratch = os.path.join(project, ".gov-runtime", "scratch", "note.txt")
+        assert _is_in_scratch(scratch, project)
 
 
 # ---------------------------------------------------------------------------
