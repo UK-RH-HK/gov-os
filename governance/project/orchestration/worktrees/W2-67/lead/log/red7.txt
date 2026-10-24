@@ -1,0 +1,7 @@
+fixed-limit exit=1 load=15.42 3 failed in 7.64s
+first-half-pieces exit=1 load=26.85 2 failed in 40.41s
+halves-at-middle exit=1 load=26.63 1 failed in 30.35s
+hang-green exit=1 load=20.92 1 failed in 10.40s
+hang-records-clean exit=1 load=14.02 1 failed in 7.32s
+head exit=0 load=26.15 23 passed in 52.49s
+done

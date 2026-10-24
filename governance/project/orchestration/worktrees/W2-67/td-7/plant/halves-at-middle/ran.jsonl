@@ -1,0 +1,4 @@
+{"pid": 7495, "plant": "halves-at-middle", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 7495, "plant": "halves-at-middle", "acted": "halves", "bytes": 16777216, "cut": 8388608}
+{"pid": 1884722, "plant": "halves-at-middle", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 1884722, "plant": "halves-at-middle", "acted": "halves", "bytes": 16777216, "cut": 8388608}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="5" time="24.090" timestamp="2026-10-24T23:05:23.843814+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w2_67_codegraph_folders" name="test_no_daemon_folder_of_a_project_the_case_made_is_left[w2_67b-rebuild-project]" time="10.809"><failure message="AssertionError: test_w1_27_rebuild.py::test_rebuild_is_an_act_command is over, and the daemon folder of 1 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/35db6dd99d13d3df (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw3/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_is_an_act_command0/repo)']&#10;assert not ['/tmp/gov-cbm-1000/35db6dd99d13d3df (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw3/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_is_an_act_command0/repo)']">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw3/test_no_daemon_folder_of_a_pro0')
+case = 'w2_67b-rebuild-project'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_no_daemon_folder_of_a_project_the_case_made_is_left(tmp_path, case):
+        """Red on the head: every rebuild-reaching case left the daemon folder of each project it rebuilt."""
+        rows = _nested(tmp_path, case)
+        left = sorted({f"{row['folder']} (project {row['root']})" for row in rows if Path(row["folder"]).exists()})
+&gt;       assert not left, (
+            f"{CASES[case]} is over, and the daemon folder of {len(left)} project(s) it made is left under {BASE} "
+            f"(TD1C-A, DEC-914 item 2; DEC-898): {left}"
+        )
+E       AssertionError: test_w1_27_rebuild.py::test_rebuild_is_an_act_command is over, and the daemon folder of 1 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/35db6dd99d13d3df (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw3/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_is_an_act_command0/repo)']
+E       assert not ['/tmp/gov-cbm-1000/35db6dd99d13d3df (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw3/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_is_an_act_command0/repo)']
+
+tests/acceptance/W1-27/test_w2_67_codegraph_folders.py:92: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_codegraph_folders" name="test_no_daemon_folder_of_a_project_the_case_made_is_left[origin-and-its-clone]" time="11.323"><failure message="AssertionError: test_w1_27_rebuild.py::test_fresh_clone_doctor_rebuild is over, and the daemon folder of 1 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/90defb5c22d67316 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw2/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_fresh_clone_doctor_rebuil0/clone)']&#10;assert not ['/tmp/gov-cbm-1000/90defb5c22d67316 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw2/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_fresh_clone_doctor_rebuil0/clone)']">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw2/test_no_daemon_folder_of_a_pro0')
+case = 'origin-and-its-clone'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_no_daemon_folder_of_a_project_the_case_made_is_left(tmp_path, case):
+        """Red on the head: every rebuild-reaching case left the daemon folder of each project it rebuilt."""
+        rows = _nested(tmp_path, case)
+        left = sorted({f"{row['folder']} (project {row['root']})" for row in rows if Path(row["folder"]).exists()})
+&gt;       assert not left, (
+            f"{CASES[case]} is over, and the daemon folder of {len(left)} project(s) it made is left under {BASE} "
+            f"(TD1C-A, DEC-914 item 2; DEC-898): {left}"
+        )
+E       AssertionError: test_w1_27_rebuild.py::test_fresh_clone_doctor_rebuild is over, and the daemon folder of 1 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/90defb5c22d67316 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw2/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_fresh_clone_doctor_rebuil0/clone)']
+E       assert not ['/tmp/gov-cbm-1000/90defb5c22d67316 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw2/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_fresh_clone_doctor_rebuil0/clone)']
+
+tests/acceptance/W1-27/test_w2_67_codegraph_folders.py:92: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_codegraph_folders" name="test_no_daemon_folder_of_a_project_the_case_made_is_left[make-rebuild-project-and-a-clone]" time="22.773"><failure message="AssertionError: test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_builds_everything_else_a_rebuild_builds is over, and the daemon folder of 2 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/6ce83dda2f50d239 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_the_mode_builds_everythin0/repo)', '/tmp/gov-cbm-1000/fd3c3bdbfb851891 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_the_mode_builds_everythin0/twin)']&#10;assert not ['/tmp/gov-cbm-1000/6ce83dda2f50d239 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_d...pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_the_mode_builds_everythin0/twin)']">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0')
+case = 'make-rebuild-project-and-a-clone'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_no_daemon_folder_of_a_project_the_case_made_is_left(tmp_path, case):
+        """Red on the head: every rebuild-reaching case left the daemon folder of each project it rebuilt."""
+        rows = _nested(tmp_path, case)
+        left = sorted({f"{row['folder']} (project {row['root']})" for row in rows if Path(row["folder"]).exists()})
+&gt;       assert not left, (
+            f"{CASES[case]} is over, and the daemon folder of {len(left)} project(s) it made is left under {BASE} "
+            f"(TD1C-A, DEC-914 item 2; DEC-898): {left}"
+        )
+E       AssertionError: test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_builds_everything_else_a_rebuild_builds is over, and the daemon folder of 2 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/6ce83dda2f50d239 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_the_mode_builds_everythin0/repo)', '/tmp/gov-cbm-1000/fd3c3bdbfb851891 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_the_mode_builds_everythin0/twin)']
+E       assert not ['/tmp/gov-cbm-1000/6ce83dda2f50d239 (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw1/test_no_d...pytest-0/popen-gw1/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_the_mode_builds_everythin0/twin)']
+
+tests/acceptance/W1-27/test_w2_67_codegraph_folders.py:92: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_codegraph_folders" name="test_no_daemon_folder_of_a_project_the_case_made_is_left[conftest-rebuild-project]" time="11.481"><failure message="AssertionError: test_w1_27_rebuild_r2.py::test_rebuild_recreates_lexical_index is over, and the daemon folder of 1 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/989506a3830a823d (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw0/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_recreates_lexical0/repo)']&#10;assert not ['/tmp/gov-cbm-1000/989506a3830a823d (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw0/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_recreates_lexical0/repo)']">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw0/test_no_daemon_folder_of_a_pro0')
+case = 'conftest-rebuild-project'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_no_daemon_folder_of_a_project_the_case_made_is_left(tmp_path, case):
+        """Red on the head: every rebuild-reaching case left the daemon folder of each project it rebuilt."""
+        rows = _nested(tmp_path, case)
+        left = sorted({f"{row['folder']} (project {row['root']})" for row in rows if Path(row["folder"]).exists()})
+&gt;       assert not left, (
+            f"{CASES[case]} is over, and the daemon folder of {len(left)} project(s) it made is left under {BASE} "
+            f"(TD1C-A, DEC-914 item 2; DEC-898): {left}"
+        )
+E       AssertionError: test_w1_27_rebuild_r2.py::test_rebuild_recreates_lexical_index is over, and the daemon folder of 1 project(s) it made is left under /tmp/gov-cbm-1000 (TD1C-A, DEC-914 item 2; DEC-898): ['/tmp/gov-cbm-1000/989506a3830a823d (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw0/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_recreates_lexical0/repo)']
+E       assert not ['/tmp/gov-cbm-1000/989506a3830a823d (project /tmp/gov-os-lead-W2-67/td-8/pytest-of-usain/pytest-0/popen-gw0/test_no_daemon_folder_of_a_pro0/tmp/pytest-of-usain/pytest-0/test_rebuild_recreates_lexical0/repo)']
+
+tests/acceptance/W1-27/test_w2_67_codegraph_folders.py:92: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_codegraph_folders" name="test_a_daemon_folder_the_case_did_not_make_is_never_removed" time="12.228" /></testsuite></testsuites>

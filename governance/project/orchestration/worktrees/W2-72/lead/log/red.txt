@@ -1,0 +1,547 @@
+/home/usain/gov-os-worktrees/W2-72/src/gov/__init__.py
+bringing up nodes...
+bringing up nodes...
+
+.............FF.....F....F.F......FF..F.F.FF..F.......F.F............... [  9%]
+.........................F.............................................. [ 18%]
+........................................................................ [ 28%]
+........................................................................ [ 37%]
+........................................................................ [ 47%]
+........................................................................ [ 56%]
+...................................................................F.... [ 65%]
+........................................................................ [ 75%]
+........................................................................ [ 84%]
+........................................................................ [ 94%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+_ test_judge_commits_returns_no_finding_for_the_merge_back[W2-65-s-merge-back] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+judge = <function judge.<locals>._judge at 0x7bf3275c93a0>
+name = 'W2-65-s-merge-back'
+
+    @pytest.mark.parametrize("name", sorted(MERGE_BACKS), ids=sorted(MERGE_BACKS))
+    def test_judge_commits_returns_no_finding_for_the_merge_back(judge, name):
+        merge_id = support.full_id(ROOT, MERGE_BACKS[name])
+        both = _assert_the_premise(name, merge_id)
+        findings = judge(ROOT, [merge_id])
+>       assert findings == [], (
+            f"judge_commits on {MERGE_BACKS[name]} ({name}), in this repository's objects, returns "
+            f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding; the acceptance tests both "
+            f"parents changed, {both}, are git's own clean merge (DEC-918 items 1 and 3)"
+        )
+E       AssertionError: judge_commits on 4ef3293a (W2-65-s-merge-back), in this repository's objects, returns [('4ef3293adef3', ['tests/acceptance/W1-26/README.md', 'tests/acceptance/W1-26/test_w1_26_planted_defects.py'], "a merge commit's own change to a ticket file or an acceptance test")], not no finding; the acceptance tests both parents changed, ['tests/acceptance/W1-26/README.md', 'tests/acceptance/W1-26/test_w1_26_planted_defects.py'], are git's own clean merge (DEC-918 items 1 and 3)
+E       assert [_CommitFindi...ptance test")] == []
+E         
+E         Left contains one more item: _CommitFinding(commit='4ef3293adef39ba91e335a0f98af6778f398ad84', paths=['tests/acceptance/W1-26/README.md', 'tests/ac...nce/W1-26/test_w1_26_planted_defects.py'], reason="a merge commit's own change to a ticket file or an acceptance test")
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_the_two_merge_backs.py:80: AssertionError
+_ test_judge_commits_returns_no_finding_for_the_merge_back[W2-66-s-merge-back] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+judge = <function judge.<locals>._judge at 0x7bf327615260>
+name = 'W2-66-s-merge-back'
+
+    @pytest.mark.parametrize("name", sorted(MERGE_BACKS), ids=sorted(MERGE_BACKS))
+    def test_judge_commits_returns_no_finding_for_the_merge_back(judge, name):
+        merge_id = support.full_id(ROOT, MERGE_BACKS[name])
+        both = _assert_the_premise(name, merge_id)
+        findings = judge(ROOT, [merge_id])
+>       assert findings == [], (
+            f"judge_commits on {MERGE_BACKS[name]} ({name}), in this repository's objects, returns "
+            f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding; the acceptance tests both "
+            f"parents changed, {both}, are git's own clean merge (DEC-918 items 1 and 3)"
+        )
+E       AssertionError: judge_commits on 03f470a5 (W2-66-s-merge-back), in this repository's objects, returns [('03f470a595d1', ['tests/acceptance/W1-30/test_w1_30_close.py'], "a merge commit's own change to a ticket file or an acceptance test")], not no finding; the acceptance tests both parents changed, ['tests/acceptance/W1-30/test_w1_30_close.py'], are git's own clean merge (DEC-918 items 1 and 3)
+E       assert [_CommitFindi...ptance test")] == []
+E         
+E         Left contains one more item: _CommitFinding(commit='03f470a595d1af3faca0060d46e808caf0f9e6ba', paths=['tests/acceptance/W1-30/test_w1_30_close.py'], reason="a merge commit's own change to a ticket file or an acceptance test")
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_the_two_merge_backs.py:80: AssertionError
+_ test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge[a-clean-combination-of-two-sides-edits] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x79e97df11800>
+case = 'a-clean-combination-of-two-sides-edits'
+
+    @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
+    def test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge(
+            project, sandbox, call, case):
+        """DEC-918 item 1, through the live hook: the call is silent (no report to the agent, no finding, exit 0) and
+        the check moves nothing (HEAD, index, working tree as the call left them)."""
+        shape, result, left, _ = _in_the_call(project, sandbox, call, support.SUCCESS[case])
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report="Containment: Flagged, left in place: commit 97d2db5fcdb3 (Role: orchestrator; Tas...zz90): a merge commit\'s own change to a ticket file or an acceptance test"}',), session_id='w1-03-acceptance-session')
+what = "an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; a test designer changed line 2 of tests/acceptance/...hout a conflict; the merged side also brings an engineer's pyproject.toml, in the orchestrator's own call on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; a test designer changed line 2 of tests/acceptance/W1-90/test_merged.py on the merged side and line 19 on main, and git combined the two edits without a conflict; the merged side also brings an engineer's pyproject.toml, in the orchestrator's own call on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Flagged, left in place: commit 97d2db5fcdb3 (Role: orchestrator; Task: DAEO-zz90): a merge commit\'s own change to a ticket file or an acceptance test: tests/acceptance/W1-90/test_merged.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run[a-fatal-error] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x73ee9df894e0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag0')
+case = 'a-fatal-error'
+
+    @pytest.mark.parametrize("case", sorted(support.CANNOT_RUN), ids=sorted(support.CANNOT_RUN))
+    def test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run(project, sandbox, call, tmp_path, case):
+        shape = support.clean_combination(project, sandbox)
+        shim = support.failing_merge_tree(tmp_path / "failing-git", case)
+        before = support.full_id(project, "HEAD")
+        result, left = call(project, shape.command, ORCHESTRATOR, TICKET,
+                            check_environment={"PATH": shim.path_variable()})
+        merge_id = support.full_id(project, "HEAD")
+        support.assert_shape(project, shape, before, merge_id)
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}, `git merge-tree` failing ({case})"
+>       _assert_met(shim, "the live check")
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+shim = FailingMergeTree(directory=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_st...-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag0/failing-git/refused-merge-tree-calls.log'), exit_code=128)
+who = 'the live check'
+
+    def _assert_met(shim, who):
+        refused = shim.refused()
+>       assert refused and all("merge-tree" in line for line in refused), (
+            f"{who} never ran `git merge-tree` while it could not run (exit {shim.exit_code}): the log of refused "
+            f"calls is empty, so this case shows nothing about failing closed"
+        )
+E       AssertionError: the live check never ran `git merge-tree` while it could not run (exit 128): the log of refused calls is empty, so this case shows nothing about failing closed
+E       assert ([])
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:46: AssertionError
+_ test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge[a-conflict-on-another-file-resolved-by-hand] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re1/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re1/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x79e97df38a40>
+case = 'a-conflict-on-another-file-resolved-by-hand'
+
+    @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
+    def test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge(
+            project, sandbox, call, case):
+        """DEC-918 item 1, through the live hook: the call is silent (no report to the agent, no finding, exit 0) and
+        the check moves nothing (HEAD, index, working tree as the call left them)."""
+        shape, result, left, _ = _in_the_call(project, sandbox, call, support.SUCCESS[case])
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report="Containment: Flagged, left in place: commit 73bf11a6137c (Role: orchestrator; Tas...zz90): a merge commit\'s own change to a ticket file or an acceptance test"}',), session_id='w1-03-acceptance-session')
+what = "a --no-ff merge of w1/W1-90 with orchestrator trailers in which git combines two test designers' edits of tests/accep...oth sides' engineers changed it), which the merge commit resolves by hand, in the orchestrator's own call on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a --no-ff merge of w1/W1-90 with orchestrator trailers in which git combines two test designers' edits of tests/acceptance/W1-90/test_merged.py cleanly and reports a conflict on src/gov/guard/decide.py only (both sides' engineers changed it), which the merge commit resolves by hand, in the orchestrator's own call on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Flagged, left in place: commit 73bf11a6137c (Role: orchestrator; Task: DAEO-zz90): a merge commit\'s own change to a ticket file or an acceptance test: tests/acceptance/W1-90/test_merged.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run[a-git-without-write-tree] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag1/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag1/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x73ee9e005580>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag1')
+case = 'a-git-without-write-tree'
+
+    @pytest.mark.parametrize("case", sorted(support.CANNOT_RUN), ids=sorted(support.CANNOT_RUN))
+    def test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run(project, sandbox, call, tmp_path, case):
+        shape = support.clean_combination(project, sandbox)
+        shim = support.failing_merge_tree(tmp_path / "failing-git", case)
+        before = support.full_id(project, "HEAD")
+        result, left = call(project, shape.command, ORCHESTRATOR, TICKET,
+                            check_environment={"PATH": shim.path_variable()})
+        merge_id = support.full_id(project, "HEAD")
+        support.assert_shape(project, shape, before, merge_id)
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}, `git merge-tree` failing ({case})"
+>       _assert_met(shim, "the live check")
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+shim = FailingMergeTree(directory=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_the_live_check_st...-of-usain/pytest-0/popen-gw1/test_the_live_check_still_flag1/failing-git/refused-merge-tree-calls.log'), exit_code=129)
+who = 'the live check'
+
+    def _assert_met(shim, who):
+        refused = shim.refused()
+>       assert refused and all("merge-tree" in line for line in refused), (
+            f"{who} never ran `git merge-tree` while it could not run (exit {shim.exit_code}): the log of refused "
+            f"calls is empty, so this case shows nothing about failing closed"
+        )
+E       AssertionError: the live check never ran `git merge-tree` while it could not run (exit 129): the log of refused calls is empty, so this case shows nothing about failing closed
+E       assert ([])
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:46: AssertionError
+_ test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge[the-same-edit-on-both-sides] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re2/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_neither_re2/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x79e97df39260>
+case = 'the-same-edit-on-both-sides'
+
+    @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
+    def test_the_live_check_neither_restores_refuses_nor_flags_an_acceptance_file_equal_to_git_s_own_merge(
+            project, sandbox, call, case):
+        """DEC-918 item 1, through the live hook: the call is silent (no report to the agent, no finding, exit 0) and
+        the check moves nothing (HEAD, index, working tree as the call left them)."""
+        shape, result, left, _ = _in_the_call(project, sandbox, call, support.SUCCESS[case])
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report="Containment: Flagged, left in place: commit 35b32028bd1b (Role: orchestrator; Tas...zz90): a merge commit\'s own change to a ticket file or an acceptance test"}',), session_id='w1-03-acceptance-session')
+what = "an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; a test designer made the same edit of line 2 of tes...y on both sides; the merged side also brings an engineer's pyproject.toml, in the orchestrator's own call on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; a test designer made the same edit of line 2 of tests/acceptance/W1-90/test_merged.py on both sides; the merged side also brings an engineer's pyproject.toml, in the orchestrator's own call on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Flagged, left in place: commit 35b32028bd1b (Role: orchestrator; Task: DAEO-zz90): a merge commit\'s own change to a ticket file or an acceptance test: tests/acceptance/W1-90/test_merged.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run[a-fatal-error] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds0')
+case = 'a-fatal-error'
+
+    @pytest.mark.parametrize("case", sorted(support.CANNOT_RUN), ids=sorted(support.CANNOT_RUN))
+    def test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run(project, sandbox, tmp_path, case):
+        shape = support.clean_combination(project, sandbox)
+        before = support.full_id(project, "HEAD")
+        support.support.run(project, sandbox, shape.command)
+        merge_id = support.full_id(project, "HEAD")
+        support.assert_shape(project, shape, before, merge_id)
+        shim = support.failing_merge_tree(tmp_path / "failing-git", case)
+        proc = support.judge_in_a_process(project, [merge_id], {"PATH": shim.path_variable()})
+        what = f"{shape.what}, judged with `git merge-tree` failing ({case})"
+>       _assert_met(shim, "judge_commits")
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+shim = FailingMergeTree(directory=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_sti...-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds0/failing-git/refused-merge-tree-calls.log'), exit_code=128)
+who = 'judge_commits'
+
+    def _assert_met(shim, who):
+        refused = shim.refused()
+>       assert refused and all("merge-tree" in line for line in refused), (
+            f"{who} never ran `git merge-tree` while it could not run (exit {shim.exit_code}): the log of refused "
+            f"calls is empty, so this case shows nothing about failing closed"
+        )
+E       AssertionError: judge_commits never ran `git merge-tree` while it could not run (exit 128): the log of refused calls is empty, so this case shows nothing about failing closed
+E       assert ([])
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:46: AssertionError
+_ test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge[a-clean-combination-of-two-sides-edits] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_0/sandbox/elsewhere'))
+judge = <function judge.<locals>._judge at 0x79e97df39e40>
+case = 'a-clean-combination-of-two-sides-edits'
+
+    @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
+    def test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge(project, sandbox, judge,
+                                                                                             case):
+        """DEC-918 item 1, through the close's containment gate: ``judge_commits`` on the merge commit alone returns
+        no finding."""
+        shape, merge_id = _with_no_hook(project, sandbox, support.SUCCESS[case])
+        findings = judge(project, [merge_id])
+>       assert findings == [], (
+            f"{shape.what}: judge_commits on the merge commit returns "
+            f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding (DEC-918 item 1)"
+        )
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; a test designer changed line 2 of tests/acceptance/W1-90/test_merged.py on the merged side and line 19 on main, and git combined the two edits without a conflict; the merged side also brings an engineer's pyproject.toml: judge_commits on the merge commit returns [('d1bda3838e65', ['tests/acceptance/W1-90/test_merged.py'], "a merge commit's own change to a ticket file or an acceptance test")], not no finding (DEC-918 item 1)
+E       assert [_CommitFindi...ptance test")] == []
+E         
+E         Left contains one more item: _CommitFinding(commit='d1bda3838e6573a332b56def5c8eebc30d186dff', paths=['tests/acceptance/W1-90/test_merged.py'], reason="a merge commit's own change to a ticket file or an acceptance test")
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:88: AssertionError
+_ test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run[a-git-without-write-tree] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds1/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds1/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds1')
+case = 'a-git-without-write-tree'
+
+    @pytest.mark.parametrize("case", sorted(support.CANNOT_RUN), ids=sorted(support.CANNOT_RUN))
+    def test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run(project, sandbox, tmp_path, case):
+        shape = support.clean_combination(project, sandbox)
+        before = support.full_id(project, "HEAD")
+        support.support.run(project, sandbox, shape.command)
+        merge_id = support.full_id(project, "HEAD")
+        support.assert_shape(project, shape, before, merge_id)
+        shim = support.failing_merge_tree(tmp_path / "failing-git", case)
+        proc = support.judge_in_a_process(project, [merge_id], {"PATH": shim.path_variable()})
+        what = f"{shape.what}, judged with `git merge-tree` failing ({case})"
+>       _assert_met(shim, "judge_commits")
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+shim = FailingMergeTree(directory=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw1/test_judge_commits_sti...-of-usain/pytest-0/popen-gw1/test_judge_commits_still_finds1/failing-git/refused-merge-tree-calls.log'), exit_code=129)
+who = 'judge_commits'
+
+    def _assert_met(shim, who):
+        refused = shim.refused()
+>       assert refused and all("merge-tree" in line for line in refused), (
+            f"{who} never ran `git merge-tree` while it could not run (exit {shim.exit_code}): the log of refused "
+            f"calls is empty, so this case shows nothing about failing closed"
+        )
+E       AssertionError: judge_commits never ran `git merge-tree` while it could not run (exit 129): the log of refused calls is empty, so this case shows nothing about failing closed
+E       assert ([])
+
+tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py:46: AssertionError
+_ test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge[a-conflict-on-another-file-resolved-by-hand] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_1/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_1/sandbox/elsewhere'))
+judge = <function judge.<locals>._judge at 0x79e97dfdfec0>
+case = 'a-conflict-on-another-file-resolved-by-hand'
+
+    @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
+    def test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge(project, sandbox, judge,
+                                                                                             case):
+        """DEC-918 item 1, through the close's containment gate: ``judge_commits`` on the merge commit alone returns
+        no finding."""
+        shape, merge_id = _with_no_hook(project, sandbox, support.SUCCESS[case])
+        findings = judge(project, [merge_id])
+>       assert findings == [], (
+            f"{shape.what}: judge_commits on the merge commit returns "
+            f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding (DEC-918 item 1)"
+        )
+E       AssertionError: a --no-ff merge of w1/W1-90 with orchestrator trailers in which git combines two test designers' edits of tests/acceptance/W1-90/test_merged.py cleanly and reports a conflict on src/gov/guard/decide.py only (both sides' engineers changed it), which the merge commit resolves by hand: judge_commits on the merge commit returns [('102ea39d6a35', ['tests/acceptance/W1-90/test_merged.py'], "a merge commit's own change to a ticket file or an acceptance test")], not no finding (DEC-918 item 1)
+E       assert [_CommitFindi...ptance test")] == []
+E         
+E         Left contains one more item: _CommitFinding(commit='102ea39d6a35577d9528110ca686635e40daeeab', paths=['tests/acceptance/W1-90/test_merged.py'], reason="a merge commit's own change to a ticket file or an acceptance test")
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:88: AssertionError
+_ test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge[the-same-edit-on-both-sides] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_2/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_returns_no_2/sandbox/elsewhere'))
+judge = <function judge.<locals>._judge at 0x79e97dfcc540>
+case = 'the-same-edit-on-both-sides'
+
+    @pytest.mark.parametrize("case", sorted(support.SUCCESS), ids=sorted(support.SUCCESS))
+    def test_judge_commits_returns_no_finding_for_an_acceptance_file_equal_to_git_s_own_merge(project, sandbox, judge,
+                                                                                             case):
+        """DEC-918 item 1, through the close's containment gate: ``judge_commits`` on the merge commit alone returns
+        no finding."""
+        shape, merge_id = _with_no_hook(project, sandbox, support.SUCCESS[case])
+        findings = judge(project, [merge_id])
+>       assert findings == [], (
+            f"{shape.what}: judge_commits on the merge commit returns "
+            f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding (DEC-918 item 1)"
+        )
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; a test designer made the same edit of line 2 of tests/acceptance/W1-90/test_merged.py on both sides; the merged side also brings an engineer's pyproject.toml: judge_commits on the merge commit returns [('0d79366e7e9a', ['tests/acceptance/W1-90/test_merged.py'], "a merge commit's own change to a ticket file or an acceptance test")], not no finding (DEC-918 item 1)
+E       assert [_CommitFindi...ptance test")] == []
+E         
+E         Left contains one more item: _CommitFinding(commit='0d79366e7e9a37d562d83ab1c6cac7105922fdd7', paths=['tests/acceptance/W1-90/test_merged.py'], reason="a merge commit's own change to a ticket file or an acceptance test")
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:88: AssertionError
+___ test_the_live_check_names_the_engineer_s_commit_and_not_the_merge_commit ___
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_names_the_0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_names_the_0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_the_live_check_names_the_0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x79e97dfccae0>
+
+    def test_the_live_check_names_the_engineer_s_commit_and_not_the_merge_commit(project, sandbox, call):
+        """The clean combination, where the merged side's edit of the acceptance test is an engineer's commit. The
+        merge commit holds git's own merge of the test: no finding is the merge commit's. The engineer's commit is
+        new in the move and judged by its own trailers, as before: a finding for it names the test."""
+        shape, result, left, merge_id = _in_the_call(project, sandbox, call, support.brought_by_an_engineer)
+        engineer = support.support.commit_of(project, support.MERGED_TEST, support.BRANCH)
+        assert support.trailer_values(project, engineer, "Role") == [support.support.ENGINEER], (
+            "the fixture is wrong: the merged side's commit of the test is not an engineer's"
+        )
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
+        for_the_engineer = support.findings_for(result, engineer, what)
+        assert any(support.MERGED_TEST in check_support.finding_paths(result, f) for f in for_the_engineer), (
+            f"{what}: no finding for the engineer's commit {engineer[:12]} names {support.MERGED_TEST}; findings: "
+            f"{[f['reason'] for f in check_support.new_findings(result, what)]}"
+        )
+        for_the_merge = support.findings_for(result, merge_id, what)
+>       assert for_the_merge == [], (
+            f"{what}: the merge commit {merge_id[:12]} holds git's own merge of {support.MERGED_TEST} and has the "
+            f"findings {[(f['paths'], f['reason']) for f in for_the_merge]} (DEC-918 items 1 and 2)"
+        )
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; an engineer's commit changed line 2 of tests/acceptance/W1-90/test_merged.py on the merged side, a test designer's line 19 on main, and git combined the two edits without a conflict, in the orchestrator's own call on DAEO-zz90: the merge commit e3eaa3129b93 holds git's own merge of tests/acceptance/W1-90/test_merged.py and has the findings [(['tests/acceptance/W1-90/test_merged.py'], "commit e3eaa3129b93 (Role: orchestrator; Task: DAEO-zz90): a merge commit's own change to a ticket file or an acceptance test")] (DEC-918 items 1 and 2)
+E       assert [{'action': '...ed.py'], ...}] == []
+E         
+E         Left contains one more item: {'action': 'flagged', 'agent_type': '', 'command': 'bash /tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/tes..._live_check_names_the_0/sandbox/elsewhere/calls/call-0004.sh', 'paths': ['tests/acceptance/W1-90/test_merged.py'], ...}
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:114: AssertionError
+_ test_judge_commits_finds_nothing_in_the_merge_commit_and_still_judges_the_engineer_s_commit _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_finds_nothi0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_finds_nothi0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_judge_commits_finds_nothi0/sandbox/elsewhere'))
+judge = <function judge.<locals>._judge at 0x79e97dfccc20>
+
+    def test_judge_commits_finds_nothing_in_the_merge_commit_and_still_judges_the_engineer_s_commit(project, sandbox,
+                                                                                                    judge):
+        """The same history through ``judge_commits``: the merge commit alone is no finding (no condition on the
+        bringing commits, DEC-918 item 2); the engineer's commit alone is a finding that names the test."""
+        shape, merge_id = _with_no_hook(project, sandbox, support.brought_by_an_engineer)
+        engineer = support.support.commit_of(project, support.MERGED_TEST, support.BRANCH)
+        of_the_engineer = judge(project, [engineer])
+        assert [f.commit for f in of_the_engineer] == [engineer] and support.MERGED_TEST in of_the_engineer[0].paths, (
+            f"{shape.what}: judge_commits on the engineer's commit {engineer[:12]} returns "
+            f"{[(f.commit[:12], f.paths) for f in of_the_engineer]}, not one finding that names {support.MERGED_TEST}"
+        )
+        findings = judge(project, [merge_id])
+>       assert findings == [], (
+            f"{shape.what}: judge_commits on the merge commit returns "
+            f"{[(f.commit[:12], f.paths, f.reason) for f in findings]}, not no finding (DEC-918 items 1 and 2)"
+        )
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with orchestrator trailers; an engineer's commit changed line 2 of tests/acceptance/W1-90/test_merged.py on the merged side, a test designer's line 19 on main, and git combined the two edits without a conflict: judge_commits on the merge commit returns [('e3eaa3129b93', ['tests/acceptance/W1-90/test_merged.py'], "a merge commit's own change to a ticket file or an acceptance test")], not no finding (DEC-918 items 1 and 2)
+E       assert [_CommitFindi...ptance test")] == []
+E         
+E         Left contains one more item: _CommitFinding(commit='e3eaa3129b93fb4894cfd8861415f1ea9e2ca305', paths=['tests/acceptance/W1-90/test_merged.py'], reason="a merge commit's own change to a ticket file or an acceptance test")
+E         Use -v to get more diff
+
+tests/acceptance/W2-72/test_w2_72_clean_merge_of_an_acceptance_file.py:133: AssertionError
+______ test_a_clean_combination_of_two_sides_edits_of_one_test_is_silent _______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw2/test_a_clean_combination_of_tw0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw2/test_a_clean_combination_of_tw0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw2/test_a_clean_combination_of_tw0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7bf327616b60>
+
+    def test_a_clean_combination_of_two_sides_edits_of_one_test_is_silent(project, sandbox, call):
+        """Rewritten; Rewrite-Reason: DEC-918. Until then this case was
+        ``test_a_clean_combination_of_two_sides_edits_of_one_test_is_flagged`` and expected, by DEC-410 DP-26
+        ("stays flagged, as built"), that the orchestrator's merge in its own call is a finding that names the test.
+    
+        DEC-918 item 1 changes DP-24 for acceptance tests: a path both parents changed is not the merge commit's own
+        change when the merge commit holds exactly git's own merge of it (``git merge-tree --write-tree``, no
+        conflict on that file). A test designer changed line 2 of an acceptance test on the branch and line 19 on
+        ``main``; ``git merge`` combines them without a conflict, and the merge commit holds that merge, content
+        neither parent holds. Now expected: the check is silent and moves nothing. ``read_merge``'s reading is
+        unchanged (the next case, DEC-918 item 4)."""
+        shape = own_change.changed_on_both_sides_in_different_parts(project, sandbox)
+        result, left, what = _call(project, call, shape)
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report="Containment: Flagged, left in place: commit 8b8c934257ad (Role: orchestrator; Tas...zz90): a merge commit\'s own change to a ticket file or an acceptance test"}',), session_id='w1-03-acceptance-session')
+what = "an ordinary --no-ff merge of w1/W1-90 with trailers ('orchestrator', 'DAEO-zz90'); a test designer changed line 2 of ...ch and line 19 on main, and git combined the two edits without a conflict, in the orchestrator's own call on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 with trailers ('orchestrator', 'DAEO-zz90'); a test designer changed line 2 of tests/acceptance/W1-90/test_long.py on the branch and line 19 on main, and git combined the two edits without a conflict, in the orchestrator's own call on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Flagged, left in place: commit 8b8c934257ad (Role: orchestrator; Task: DAEO-zz90): a merge commit\'s own change to a ticket file or an acceptance test: tests/acceptance/W1-90/test_long.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+___ test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent ____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_a_merge_of_two_sides_that0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_a_merge_of_two_sides_that0/sand...sixPath('/tmp/gov-os-lead-W2-72/pytest-of-usain/pytest-0/popen-gw0/test_a_merge_of_two_sides_that0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x79e97de0f4c0>
+
+    def test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent(project, sandbox, call):
+        """Rewritten; Rewrite-Reason: DEC-918. Until then this case was
+        ``test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_flagged`` and expected, by DEC-410
+        DP-24 read by its words (under ``tests/acceptance/**`` a path more than one parent changed against the
+        merge base is the merge commit's own change), that the test is named. Before DEC-410 it was ``..._is_silent``
+        and pinned silence by DEC-403 (the guard ``assert_taking`` still checks the history by those words).
+    
+        DEC-918 item 1 changes DP-24 for acceptance tests: a path both parents changed is not the merge commit's own
+        change when the merge commit holds exactly git's own merge of it (``git merge-tree --write-tree``, no
+        conflict on that file). Both parents made the same change of the test; git's own merge of it is that
+        content, which the merge commit holds. Now expected: the check is silent and moves nothing; the engineer's
+        source file the branch brings is not named either. ``read_merge`` still puts the test in ``own``
+        (``test_w1_50_acceptance_test_changed_on_both_sides.py``, DEC-918 item 4)."""
+        shape = symmetric.both_sides_made_the_same_change(project, sandbox)
+        result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
+        symmetric.assert_taking(project, shape)
+        path = support.ACCEPTANCE_FILE
+        base = support.merge_bases(project, "HEAD^1", "HEAD^2")
+        assert len(base) == 1 and (support.content_at(project, "HEAD", path) == support.content_at(
+            project, "HEAD^1", path) == support.content_at(project, "HEAD^2", path) != support.content_at(
+            project, base[0], path)), (
+            f"the fixture is wrong: the merge commit does not hold both parents' content of {path}, or it is the "
+            f"merge base's"
+        )
+        what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_merge_that_takes_each_side_s_change.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report="Containment: Flagged, left in place: commit f8c128990442 (Role: orchestrator; Tas...zz90): a merge commit\'s own change to a ticket file or an acceptance test"}',), session_id='w1-03-acceptance-session')
+what = "an ordinary --no-ff merge of w1/W1-90 into main after a test designer made the same change of tests/acceptance/W1-90/....py on both; the branch also brings an engineer's src/gov/guard/decide.py, in the orchestrator's own call on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: an ordinary --no-ff merge of w1/W1-90 into main after a test designer made the same change of tests/acceptance/W1-90/test_fixture.py on both; the branch also brings an engineer's src/gov/guard/decide.py, in the orchestrator's own call on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Flagged, left in place: commit f8c128990442 (Role: orchestrator; Task: DAEO-zz90): a merge commit\'s own change to a ticket file or an acceptance test: tests/acceptance/W1-90/test_fixture.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+  /home/usain/gov-os-worktrees/W2-72/tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200: PytestUnknownMarkWarning: Unknown pytest.mark.local_only - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.local_only
+
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+  /home/usain/gov-os-worktrees/W2-72/tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200: PytestUnknownMarkWarning: Unknown pytest.mark.local_only - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.local_only
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+16 failed, 748 passed, 16 warnings in 78.18s (0:01:18)

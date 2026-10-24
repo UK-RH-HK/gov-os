@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="44.344" timestamp="2026-10-24T21:56:09.097156+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_large_clean_store_is_decided_green" time="14.996"><failure message="AssertionError: the large store: gitleaks was not given all of .gov-runtime/store-large.bin: the word at its middle was seen under 0 of the run's 2 rule sets&#10;  exit code: 0 after 14.9 s; gitleaks runs: 4&#10;  stdout:&#10;  &#10;  stderr:&#10;  &#10;assert set() &gt;= {'cb91c830fc4...63dffbe1f3db'}&#10;  &#10;  Extra items in the right set:&#10;  'cb91c830fc414df5'&#10;  'f87f63dffbe1f3db'">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-4/...1000/pytest-of-usain/pytest-4/popen-gw0/test_a_large_clean_store_is_de0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-4/popen-gw0/test_a_large_clean_store_is_de0/w2-50/pycache'))
+
+    def test_a_large_clean_store_is_decided_green(env, sandbox):
+        """16 MiB, read by gitleaks at 2 MB/s (twice the working figure): 8.4 s a run, past the declared base of 4 s
+        (W2-67: 160 MiB against the check's 60 s before)."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+        assert_green(run, f"a clean store of {size} bytes read at {scan.SLOW_RATE} bytes a second")
+&gt;       assert_full_scan(run, LARGE, "the large store")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=14.921622365014628, calls=[{'pid': 37, 'sub': 'stdin', 'rules': 'f...art'], 'fault': None, 'began': 1792875377.5396023, 'ppid': 33, 'code': 0, 'seconds': 6.81}], fresh='zqxw5853fresh1x10')
+rel = '.gov-runtime/store-large.bin', what = 'the large store'
+
+    def assert_full_scan(run, rel, what):
+        """Every marker word of ``rel`` was given to gitleaks under every rule set this run used."""
+        scan.assert_stand_in_used(run)
+        rule_sets = run.rule_sets()
+        for word in words(rel):
+&gt;           assert run.seen_under(word) &gt;= rule_sets, (
+                f"{what}: gitleaks was not given all of {rel}: the word at its "
+                f"{['start', 'middle', 'end'][words(rel).index(word)]} was seen under {len(run.seen_under(word))} "
+                f"of the run's {len(rule_sets)} rule sets\n{run.describe()}")
+E           AssertionError: the large store: gitleaks was not given all of .gov-runtime/store-large.bin: the word at its middle was seen under 0 of the run's 2 rule sets
+E             exit code: 0 after 14.9 s; gitleaks runs: 4
+E             stdout:
+E             
+E             stderr:
+E             
+E           assert set() &gt;= {'cb91c830fc4...63dffbe1f3db'}
+E             
+E             Extra items in the right set:
+E             'cb91c830fc414df5'
+E             'f87f63dffbe1f3db'
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:101: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_large_store_among_many_small_files_is_decided_by_gov_check" time="43.588"><failure message="AssertionError: the large store in a full pool: gitleaks was not given all of .gov-runtime/store-large.bin: the word at its middle was seen under 0 of the run's 2 rule sets&#10;  exit code: 0 after 43.5 s; gitleaks runs: 604&#10;  stdout:&#10;  eason&quot;: &quot;no registered check&quot;}, &quot;fresh-agent reconstruction&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;fresh-agent reconstruction&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;product traceability&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;check_count&quot;: 2}, &quot;audit reproducibility&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;audit reproducibility&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}}, &quot;checks&quot;: [{&quot;id&quot;: &quot;secrets-indexing&quot;, &quot;family&quot;: &quot;secrets-indexing&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;cfb4b1d7133b3a5f31d08975aad961e3d2c153a4&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;b666c403ed8c1627&quot;}}, {&quot;id&quot;: &quot;openspec-validate&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;YELLOW&quot;, &quot;findings&quot;: [{&quot;code&quot;: &quot;OPENSPEC_ABSENT&quot;, &quot;message&quot;: &quot;openspec is not on PATH&quot;}], &quot;provenance&quot;: {&quot;commit&quot;: &quot;cfb4b1d7133b3a5f31d08975aad961e3d2c153a4&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;8171c830f6c796be&quot;}}, {&quot;id&quot;: &quot;skill-version&quot;, &quot;family&quot;: &quot;skill regression&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;cfb4b1d7133b3a5f31d08975aad961e3d2c153a4&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;0cbd32066513601d&quot;}}, {&quot;id&quot;: &quot;readiness&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;cfb4b1d7133b3a5f31d08975aad961e3d2c153a4&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;f4c613c426ff1c91&quot;}}]}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility&#10;    adapter/model portability: YELLOW (no registered check)&#10;    audit reproducibility: YELLOW (no registered check)&#10;    authority/role limits: YELLOW (no registered check)&#10;    command-contract consistency: YELLOW (no registered check)&#10;    concurrency/claims: YELLOW (no registered check)&#10;    context reproducibility: YELLOW (no registered check)&#10;    fresh-agent reconstruction: YELLOW (no registered check)&#10;    graph integrity: YELLOW (no registered check)&#10;    index freshness: YELLOW (no registered check)&#10;    mutation scope: YELLOW (no registered check)&#10;    path-map compliance: YELLOW (no registered check)&#10;    product traceability: YELLOW&#10;    recovery/rebuild: YELLOW (no registered check)&#10;    retrieval regression: YELLOW (no registered check)&#10;    schema/invariants: YELLOW (no registered check)&#10;    secrets indexing: GREEN&#10;    skill regression: GREEN&#10;  &#10;assert set() &gt;= {'cb91c830fc4...63dffbe1f3db'}&#10;  &#10;  Extra items in the right set:&#10;  'f87f63dffbe1f3db'&#10;  'cb91c830fc414df5'">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-4/...1000/pytest-of-usain/pytest-4/popen-gw1/test_a_large_store_among_many_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-4/popen-gw1/test_a_large_store_among_many_0/w2-50/pycache'))
+
+    def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
+        """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        small = scan.marker("smallfile")
+        block = scan.filler_block(16 * 1024, seed="small").decode()
+        for index in range(300):
+            support.write(project / scan.RUNTIME / "packets" / f"DAEO-{index:04d}" / "packet.md",
+                          f"{block[:8000]}\n{small}\n{block[8000:]}")
+        checks = project / "governance/kernel/checks"
+        checks.mkdir(parents=True, exist_ok=True)
+        (checks / "secrets-indexing.yaml").write_bytes(support.CHECK_DECLARATION.read_bytes())
+        run = scan.run_scan(sandbox, project, stand_in, markers=[*words(LARGE), small], rate=scan.SLOW_RATE,
+                            via_gov_check=True)
+        assert run.returncode is not None, f"gov check did not finish within the check's declared limit\n{run.describe()}"
+        try:
+            envelope = json.loads(run.stdout)
+        except ValueError:
+            raise AssertionError(f"gov check --json gave no JSON\n{run.describe()}") from None
+        status = [entry.get("status") for entry in _check_entries(envelope) if entry.get("id") == "secrets-indexing"]
+        assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
+&gt;       assert_full_scan(run, LARGE, "the large store in a full pool")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='{"ok": true, "command": "check", "result": {"families": {"schema/invariants": {"status":...x13'], 'fault': None, 'began': 1792875412.6655295, 'ppid': 41, 'code': 0, 'seconds': 0.33}], fresh='zqxw5853fresh1x13')
+rel = '.gov-runtime/store-large.bin', what = 'the large store in a full pool'
+
+    def assert_full_scan(run, rel, what):
+        """Every marker word of ``rel`` was given to gitleaks under every rule set this run used."""
+        scan.assert_stand_in_used(run)
+        rule_sets = run.rule_sets()
+        for word in words(rel):
+&gt;           assert run.seen_under(word) &gt;= rule_sets, (
+                f"{what}: gitleaks was not given all of {rel}: the word at its "
+                f"{['start', 'middle', 'end'][words(rel).index(word)]} was seen under {len(run.seen_under(word))} "
+                f"of the run's {len(rule_sets)} rule sets\n{run.describe()}")
+E           AssertionError: the large store in a full pool: gitleaks was not given all of .gov-runtime/store-large.bin: the word at its middle was seen under 0 of the run's 2 rule sets
+E             exit code: 0 after 43.5 s; gitleaks runs: 604
+E             stdout:
+E             eason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "cfb4b1d7133b3a5f31d08975aad961e3d2c153a4", "check_version": "1.0.0", "inputs_hash": "b666c403ed8c1627"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "cfb4b1d7133b3a5f31d08975aad961e3d2c153a4", "check_version": "1.0.0", "inputs_hash": "8171c830f6c796be"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "cfb4b1d7133b3a5f31d08975aad961e3d2c153a4", "check_version": "1.0.0", "inputs_hash": "0cbd32066513601d"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "cfb4b1d7133b3a5f31d08975aad961e3d2c153a4", "check_version": "1.0.0", "inputs_hash": "f4c613c426ff1c91"}}]}, "session": ""}
+E             
+E             stderr:
+E             families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E               adapter/model portability: YELLOW (no registered check)
+E               audit reproducibility: YELLOW (no registered check)
+E               authority/role limits: YELLOW (no registered check)
+E               command-contract consistency: YELLOW (no registered check)
+E               concurrency/claims: YELLOW (no registered check)
+E               context reproducibility: YELLOW (no registered check)
+E               fresh-agent reconstruction: YELLOW (no registered check)
+E               graph integrity: YELLOW (no registered check)
+E               index freshness: YELLOW (no registered check)
+E               mutation scope: YELLOW (no registered check)
+E               path-map compliance: YELLOW (no registered check)
+E               product traceability: YELLOW
+E               recovery/rebuild: YELLOW (no registered check)
+E               retrieval regression: YELLOW (no registered check)
+E               schema/invariants: YELLOW (no registered check)
+E               secrets indexing: GREEN
+E               skill regression: GREEN
+E             
+E           assert set() &gt;= {'cb91c830fc4...63dffbe1f3db'}
+E             
+E             Extra items in the right set:
+E             'f87f63dffbe1f3db'
+E             'cb91c830fc414df5'
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:101: AssertionError</failure></testcase></testsuite></testsuites>

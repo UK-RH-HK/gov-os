@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="28.310" timestamp="2026-10-24T21:58:54.586686+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it" time="28.255"><failure message="AssertionError: a large store with a canary: the check is green&#10;  exit code: 0 after 28.2 s; gitleaks runs: 4&#10;  stdout:&#10;  &#10;  stderr:&#10;  &#10;assert 0 != 0&#10; +  where 0 = ScanRun(returncode=0, stdout='', stderr='', seconds=28.18502327997703, calls=[{'pid': 7498, 'sub': 'stdin', 'rules': '..., 'fault': None, 'began': 1792875549.2140937, 'ppid': 7495, 'code': 0, 'seconds': 13.61}], fresh='zqxw5853fresh1x7486').returncode">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-5/...mj/claude-1000/pytest-of-usain/pytest-5/test_a_large_store_with_a_cana0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...ndependent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-5/test_a_large_store_with_a_cana0/w2-50/pycache'))
+
+    def test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it(env, sandbox):
+        """The canary stands across the store's exact middle byte, where a split into halves or powers of two falls."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        across = size // 2 - (len(scan.SECRET) + 2) // 2
+        scan.text_store(project / LARGE, size, {16: start, across: scan.SECRET, across + 4096: middle, size - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+&gt;       assert_red_naming(run, LARGE, "a large store with a canary")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=28.18502327997703, calls=[{'pid': 7498, 'sub': 'stdin', 'rules': '..., 'fault': None, 'began': 1792875549.2140937, 'ppid': 7495, 'code': 0, 'seconds': 13.61}], fresh='zqxw5853fresh1x7486')
+rel = '.gov-runtime/store-large.bin', what = 'a large store with a canary'
+
+    def assert_red_naming(run, rel, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+&gt;       assert run.returncode != 0, f"{what}: the check is green\n{run.describe()}"
+E       AssertionError: a large store with a canary: the check is green
+E         exit code: 0 after 28.2 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = ScanRun(returncode=0, stdout='', stderr='', seconds=28.18502327997703, calls=[{'pid': 7498, 'sub': 'stdin', 'rules': '..., 'fault': None, 'began': 1792875549.2140937, 'ppid': 7495, 'code': 0, 'seconds': 13.61}], fresh='zqxw5853fresh1x7486').returncode
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:91: AssertionError</failure></testcase></testsuite></testsuites>

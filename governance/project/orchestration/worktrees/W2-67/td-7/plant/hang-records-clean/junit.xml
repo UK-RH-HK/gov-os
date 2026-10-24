@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="7.837" timestamp="2026-10-24T21:59:44.254161+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_scan_that_cannot_finish_fails_closed_and_records_nothing[hang]" time="7.785"><failure message="AssertionError: after a failed run (gitleaks hang), the store was not scanned in full: a clean result was recorded from the failed run&#10;  exit code: 0 after 1.5 s; gitleaks runs: 4&#10;  stdout:&#10;  &#10;  stderr:&#10;  secrets-indexing: clean result reused, not scanned again: .gov-runtime/store.db sha256 ec285cb45a5a848be12cce12b230a9ee963c0539be93332fc72dd0a88e7a8b71&#10;  &#10;assert set() &gt;= {'cb91c830fc4...63dffbe1f3db'}&#10;  &#10;  Extra items in the right set:&#10;  'cb91c830fc414df5'&#10;  'f87f63dffbe1f3db'">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-7/...mj/claude-1000/pytest-of-usain/pytest-7/test_a_scan_that_cannot_finish0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...ndependent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-7/test_a_scan_that_cannot_finish0/w2-50/pycache'))
+fault = 'hang'
+
+    @pytest.mark.parametrize("fault", ("hang", "signal", "exit-code"))
+    def test_a_scan_that_cannot_finish_fails_closed_and_records_nothing(env, sandbox, fault):
+        """gitleaks never finishes, is killed by a signal, or exits with a code it does not give, on one store's
+        content. The store was clean, then changed by one byte (still clean), so the failed run had to scan it. A hang
+        waits out the declared short limit (W2-67: the check's 60 s before)."""
+        project, stand_in = env
+        declaration = short_limit(sandbox) if fault == "hang" else None
+        db_store(project, rows=[f"the word {FAULT} stands here"])
+        run1 = scan.run_scan(sandbox, project, stand_in, markers=words(STORE_DB))
+        assert_green(run1, "run 1, a clean store")
+        old = digest(project, STORE_DB)
+        start = words(STORE_DB)[0]
+        scan.replace_one_byte(project / STORE_DB, start, start[:-1] + ("x" if start[-1] != "x" else "y"))
+        changed = digest(project, STORE_DB)
+        failed = scan.run_scan(sandbox, project, stand_in, markers=words(STORE_DB)[1:], fault=fault, fault_marker=FAULT)
+        assert failed.returncode is not None, (
+            f"gitleaks {fault}: the check did not end within its declared limit ({scan.declared_limit_s()} s)\n"
+            f"{failed.describe()}")
+        assert failed.returncode != 0, f"gitleaks {fault} on a store, and the check is green\n{failed.describe()}"
+        assert_not_labelled(failed, STORE_DB, old, changed)
+        after = scan.run_scan(sandbox, project, stand_in, markers=words(STORE_DB)[1:])
+        assert_green(after, "the run after the failed one, real gitleaks back")
+        rule_sets = after.rule_sets()
+        for word in words(STORE_DB)[1:]:
+&gt;           assert after.seen_under(word) &gt;= rule_sets, (
+                f"after a failed run (gitleaks {fault}), the store was not scanned in full: a clean result was "
+                f"recorded from the failed run\n{after.describe()}")
+E           AssertionError: after a failed run (gitleaks hang), the store was not scanned in full: a clean result was recorded from the failed run
+E             exit code: 0 after 1.5 s; gitleaks runs: 4
+E             stdout:
+E             
+E             stderr:
+E             secrets-indexing: clean result reused, not scanned again: .gov-runtime/store.db sha256 ec285cb45a5a848be12cce12b230a9ee963c0539be93332fc72dd0a88e7a8b71
+E             
+E           assert set() &gt;= {'cb91c830fc4...63dffbe1f3db'}
+E             
+E             Extra items in the right set:
+E             'cb91c830fc414df5'
+E             'f87f63dffbe1f3db'
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:389: AssertionError</failure></testcase></testsuite></testsuites>

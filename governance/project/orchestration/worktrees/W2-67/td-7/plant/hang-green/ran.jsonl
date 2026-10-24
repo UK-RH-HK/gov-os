@@ -1,0 +1,8 @@
+{"pid": 18, "plant": "hang-green", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 82, "plant": "hang-green", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 82, "plant": "hang-green", "acted": "timeout-taken-as-clean", "timeout": 4.012}
+{"pid": 82, "plant": "hang-green", "acted": "timeout-taken-as-clean", "timeout": 4.012}
+{"pid": 1928829, "plant": "hang-green", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 1929230, "plant": "hang-green", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 1929230, "plant": "hang-green", "acted": "timeout-taken-as-clean", "timeout": 4.012}
+{"pid": 1929230, "plant": "hang-green", "acted": "timeout-taken-as-clean", "timeout": 4.012}

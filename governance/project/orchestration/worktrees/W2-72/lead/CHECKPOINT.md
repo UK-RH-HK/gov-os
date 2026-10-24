@@ -1,0 +1,26 @@
+# Lead checkpoint — DAEO-ye2a (W2-72), run 1
+
+- State: step 4 (verify). Engineer eng-1 returned DONE; verification starting (rebuild 2, gov check, collect,
+  parallel + serial-only runs under flock).
+- Commits: 704b3caf (test designer), aa3d11fc (lead checkpoint CP-DAEO-ye2a-0002), e45aecc6 (engineer: _git_merged in
+  containment.py, called at the top of _judge_commit for merges; read_merge docstring only; 10 builder tests in
+  tests/unit/guard/test_w2_72_merge_rule.py; trailers Task/Role engineer/Implements DEC-918/Co-Authored-By).
+- td-1: twelve fields OK; sandboxed; tripwire OK here; W2-67's tree changed by its own work. gov retrieve: tried,
+  STORE_MISSING. Refusals 0.
+- eng-1 (session 26fb5c7b): twelve fields OK; sandboxed; tripwire: only head move here; W2-67 tree gained untracked
+  W1-27 test files (its own work). gov retrieve: NOT used (brief said so). Refusals 2 (an ls including
+  tests/acceptance/W2-72 — counterpart rule; an inline script "can't be checked").
+- Engineer's run: 2 failed (W1-50 freeze live-session cases, network in sandbox), 2337 passed.
+- Red check (lead): 16 failed / 748 passed, the 16 as the README states.
+- Rebuild 1: ok. Reviewer brief drafted: briefs/rev-1.md (fill {HEAD}, {JUDGEMENT}, {IMPL_SESSION}=26fb5c7b-...).
+- Decided: effort xhigh for the FULL test designer (DEC-839 over this run's "high").
+- Verification so far: rebuild 2 ok; gov.__file__ in this worktree; collect-only "16489/16491 tests collected (2
+  deselected)", no error; gov check run 1 exit 3 (secrets-indexing RED, truncated traceback; transient), python3 -m
+  gov.secrets alone exit 0, gov check run 2 exit 0 (YELLOW: core-decision-citations 161 old DECISION_UNRECORDED,
+  openspec absent). keyword_warn: 3 generated files (codeintel copies of W2-69's committed files, store.db).
+- Full run v1: script in my session scratchpad (full-run.sh v1 parallel|serial); logs log/full-v1-*.
+- Lead's own note for the reviewer/residuals: a rename on one side + edit on the other of an acceptance file gives a
+  new path equal to git's merge but not "both changed" → still flagged (stricter, other) — candidate residual.
+- Next: verification; then review 1 (gov launch independent-auditor, --effort max); commit probe only if pass.
+- Loop count: 1 implementer iteration (converging).
+- Read refusals met (lead): 0.

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="7.967" timestamp="2026-10-24T21:55:46.620416+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_large_clean_store_is_decided_green" time="5.402"><failure message="AssertionError: a clean store of 16777216 bytes read at 2000000 bytes a second: the check is not green&#10;  exit code: 1 after 5.3 s; gitleaks runs: 2&#10;  stdout:&#10;  &#10;  stderr:&#10;  3.12/concurrent/futures/thread.py&quot;, line 58, in run&#10;      result = self.fn(*self.args, **self.kwargs)&#10;               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py&quot;, line 474, in judge&#10;      elif _scan(rules, chunks):&#10;           ^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py&quot;, line 170, in _scan&#10;      done = subprocess.run(&#10;             ^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-7/plant/lib/td7_plants.py&quot;, line 49, in run&#10;      return _real_subprocess.run(*args, **kwargs)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 550, in run&#10;      stdout, stderr = process.communicate(input, timeout=timeout)&#10;                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 1209, in communicate&#10;      stdout, stderr = self._communicate(input, endtime, timeout)&#10;                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 2116, in _communicate&#10;      self._check_timeout(endtime, orig_timeout, stdout, stderr)&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 1253, in _check_timeout&#10;      raise TimeoutExpired(&#10;  subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--redact', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 4 seconds&#10;  &#10;assert 1 == 0&#10; +  where 1 = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _ru...x25'], 'fault': None, 'began': 1792875348.7696536, 'ppid': 61, 'code': 0, 'seconds': 0.57}], fresh='zqxw5853fresh1x25').returncode">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-3/...1000/pytest-of-usain/pytest-3/popen-gw0/test_a_large_clean_store_is_de0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-3/popen-gw0/test_a_large_clean_store_is_de0/w2-50/pycache'))
+
+    def test_a_large_clean_store_is_decided_green(env, sandbox):
+        """16 MiB, read by gitleaks at 2 MB/s (twice the working figure): 8.4 s a run, past the declared base of 4 s
+        (W2-67: 160 MiB against the check's 60 s before)."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+&gt;       assert_green(run, f"a clean store of {size} bytes read at {scan.SLOW_RATE} bytes a second")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "&lt;frozen runpy&gt;", line 198, in _ru...x25'], 'fault': None, 'began': 1792875348.7696536, 'ppid': 61, 'code': 0, 'seconds': 0.57}], fresh='zqxw5853fresh1x25')
+what = 'a clean store of 16777216 bytes read at 2000000 bytes a second'
+
+    def assert_green(run, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+&gt;       assert run.returncode == 0, f"{what}: the check is not green\n{run.describe()}"
+E       AssertionError: a clean store of 16777216 bytes read at 2000000 bytes a second: the check is not green
+E         exit code: 1 after 5.3 s; gitleaks runs: 2
+E         stdout:
+E         
+E         stderr:
+E         3.12/concurrent/futures/thread.py", line 58, in run
+E             result = self.fn(*self.args, **self.kwargs)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py", line 474, in judge
+E             elif _scan(rules, chunks):
+E                  ^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py", line 170, in _scan
+E             done = subprocess.run(
+E                    ^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-7/plant/lib/td7_plants.py", line 49, in run
+E             return _real_subprocess.run(*args, **kwargs)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 550, in run
+E             stdout, stderr = process.communicate(input, timeout=timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+E             stdout, stderr = self._communicate(input, endtime, timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+E             self._check_timeout(endtime, orig_timeout, stdout, stderr)
+E           File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+E             raise TimeoutExpired(
+E         subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--redact', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 4 seconds
+E         
+E       assert 1 == 0
+E        +  where 1 = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "&lt;frozen runpy&gt;", line 198, in _ru...x25'], 'fault': None, 'began': 1792875348.7696536, 'ppid': 61, 'code': 0, 'seconds': 0.57}], fresh='zqxw5853fresh1x25').returncode
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_large_store_among_many_small_files_is_decided_by_gov_check" time="7.383"><failure message="AssertionError: the secrets-indexing check under gov check is ['RED'], not GREEN&#10;  exit code: 3 after 7.3 s; gitleaks runs: 78&#10;  stdout:&#10;  reproducibility&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;audit reproducibility&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}}, &quot;checks&quot;: [{&quot;id&quot;: &quot;secrets-indexing&quot;, &quot;family&quot;: &quot;secrets-indexing&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;RED&quot;, &quot;findings&quot;: [{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;secrets-indexing exited with code 1&quot;, &quot;stderr&quot;: &quot;Traceback (most recent call last):\n  File \&quot;&lt;frozen runpy&gt;\&quot;, line 198, in _run_module_as_main\n  File \&quot;&lt;frozen runpy&gt;\&quot;, line 88, in _run_code\n  File \&quot;/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/_&quot;}], &quot;provenance&quot;: {&quot;commit&quot;: &quot;e7ca34ab3e574367cbb9354cf50629771d730596&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;c7a8df9e5d326a92&quot;}}, {&quot;id&quot;: &quot;openspec-validate&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;YELLOW&quot;, &quot;findings&quot;: [{&quot;code&quot;: &quot;OPENSPEC_ABSENT&quot;, &quot;message&quot;: &quot;openspec is not on PATH&quot;}], &quot;provenance&quot;: {&quot;commit&quot;: &quot;e7ca34ab3e574367cbb9354cf50629771d730596&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;392c9d8ae538140b&quot;}}, {&quot;id&quot;: &quot;skill-version&quot;, &quot;family&quot;: &quot;skill regression&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;e7ca34ab3e574367cbb9354cf50629771d730596&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;34c74410df842467&quot;}}, {&quot;id&quot;: &quot;readiness&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;e7ca34ab3e574367cbb9354cf50629771d730596&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;961d623cdc5f248c&quot;}}]}}}&#10;  &#10;  stderr:&#10;  families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility&#10;    adapter/model portability: YELLOW (no registered check)&#10;    audit reproducibility: YELLOW (no registered check)&#10;    authority/role limits: YELLOW (no registered check)&#10;    command-contract consistency: YELLOW (no registered check)&#10;    concurrency/claims: YELLOW (no registered check)&#10;    context reproducibility: YELLOW (no registered check)&#10;    fresh-agent reconstruction: YELLOW (no registered check)&#10;    graph integrity: YELLOW (no registered check)&#10;    index freshness: YELLOW (no registered check)&#10;    mutation scope: YELLOW (no registered check)&#10;    path-map compliance: YELLOW (no registered check)&#10;    product traceability: YELLOW&#10;    recovery/rebuild: YELLOW (no registered check)&#10;    retrieval regression: YELLOW (no registered check)&#10;    schema/invariants: YELLOW (no registered check)&#10;    secrets indexing: RED&#10;    skill regression: GREEN&#10;  &#10;assert ['RED'] == ['GREEN']&#10;  &#10;  At index 0 diff: 'RED' != 'GREEN'&#10;  Use -v to get more diff">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-3/...1000/pytest-of-usain/pytest-3/popen-gw2/test_a_large_store_among_many_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-3/popen-gw2/test_a_large_store_among_many_0/w2-50/pycache'))
+
+    def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
+        """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        small = scan.marker("smallfile")
+        block = scan.filler_block(16 * 1024, seed="small").decode()
+        for index in range(300):
+            support.write(project / scan.RUNTIME / "packets" / f"DAEO-{index:04d}" / "packet.md",
+                          f"{block[:8000]}\n{small}\n{block[8000:]}")
+        checks = project / "governance/kernel/checks"
+        checks.mkdir(parents=True, exist_ok=True)
+        (checks / "secrets-indexing.yaml").write_bytes(support.CHECK_DECLARATION.read_bytes())
+        run = scan.run_scan(sandbox, project, stand_in, markers=[*words(LARGE), small], rate=scan.SLOW_RATE,
+                            via_gov_check=True)
+        assert run.returncode is not None, f"gov check did not finish within the check's declared limit\n{run.describe()}"
+        try:
+            envelope = json.loads(run.stdout)
+        except ValueError:
+            raise AssertionError(f"gov check --json gave no JSON\n{run.describe()}") from None
+        status = [entry.get("status") for entry in _check_entries(envelope) if entry.get("id") == "secrets-indexing"]
+&gt;       assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
+E       AssertionError: the secrets-indexing check under gov check is ['RED'], not GREEN
+E         exit code: 3 after 7.3 s; gitleaks runs: 78
+E         stdout:
+E         reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "Traceback (most recent call last):\n  File \"&lt;frozen runpy&gt;\", line 198, in _run_module_as_main\n  File \"&lt;frozen runpy&gt;\", line 88, in _run_code\n  File \"/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/_"}], "provenance": {"commit": "e7ca34ab3e574367cbb9354cf50629771d730596", "check_version": "1.0.0", "inputs_hash": "c7a8df9e5d326a92"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "e7ca34ab3e574367cbb9354cf50629771d730596", "check_version": "1.0.0", "inputs_hash": "392c9d8ae538140b"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "e7ca34ab3e574367cbb9354cf50629771d730596", "check_version": "1.0.0", "inputs_hash": "34c74410df842467"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "e7ca34ab3e574367cbb9354cf50629771d730596", "check_version": "1.0.0", "inputs_hash": "961d623cdc5f248c"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: RED
+E           skill regression: GREEN
+E         
+E       assert ['RED'] == ['GREEN']
+E         
+E         At index 0 diff: 'RED' != 'GREEN'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:227: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-50.test_w2_50_secrets_scan_scale" name="test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it" time="5.201"><failure message="AssertionError: a large store with a canary: the check is red but names no .gov-runtime/store-large.bin&#10;  exit code: 1 after 5.1 s; gitleaks runs: 2&#10;  stdout:&#10;  &#10;  stderr:&#10;  3.12/concurrent/futures/thread.py&quot;, line 58, in run&#10;      result = self.fn(*self.args, **self.kwargs)&#10;               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py&quot;, line 474, in judge&#10;      elif _scan(rules, chunks):&#10;           ^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py&quot;, line 170, in _scan&#10;      done = subprocess.run(&#10;             ^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-7/plant/lib/td7_plants.py&quot;, line 49, in run&#10;      return _real_subprocess.run(*args, **kwargs)&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 550, in run&#10;      stdout, stderr = process.communicate(input, timeout=timeout)&#10;                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 1209, in communicate&#10;      stdout, stderr = self._communicate(input, endtime, timeout)&#10;                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 2116, in _communicate&#10;      self._check_timeout(endtime, orig_timeout, stdout, stderr)&#10;    File &quot;/usr/lib/python3.12/subprocess.py&quot;, line 1253, in _check_timeout&#10;      raise TimeoutExpired(&#10;  subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--redact', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 4 seconds&#10;  &#10;assert []&#10; +  where [] = lines_naming('.gov-runtime/store-large.bin')&#10; +    where lines_naming = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _ru...1x28'], 'fault': None, 'began': 1792875348.973589, 'ppid': 59, 'code': 0, 'seconds': 0.63}], fresh='zqxw5853fresh1x28').lines_naming">env = (PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-3/...1000/pytest-of-usain/pytest-3/popen-gw1/test_a_large_store_with_a_cana0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-67/gov-launch-independent-test-designer-fl66j8mj/claude-1000/pytest-of-usa...-test-designer-fl66j8mj/claude-1000/pytest-of-usain/pytest-3/popen-gw1/test_a_large_store_with_a_cana0/w2-50/pycache'))
+
+    def test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it(env, sandbox):
+        """The canary stands across the store's exact middle byte, where a split into halves or powers of two falls."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        across = size // 2 - (len(scan.SECRET) + 2) // 2
+        scan.text_store(project / LARGE, size, {16: start, across: scan.SECRET, across + 4096: middle, size - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+&gt;       assert_red_naming(run, LARGE, "a large store with a canary")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "&lt;frozen runpy&gt;", line 198, in _ru...1x28'], 'fault': None, 'began': 1792875348.973589, 'ppid': 59, 'code': 0, 'seconds': 0.63}], fresh='zqxw5853fresh1x28')
+rel = '.gov-runtime/store-large.bin', what = 'a large store with a canary'
+
+    def assert_red_naming(run, rel, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+        assert run.returncode != 0, f"{what}: the check is green\n{run.describe()}"
+&gt;       assert run.lines_naming(rel), f"{what}: the check is red but names no {rel}\n{run.describe()}"
+E       AssertionError: a large store with a canary: the check is red but names no .gov-runtime/store-large.bin
+E         exit code: 1 after 5.1 s; gitleaks runs: 2
+E         stdout:
+E         
+E         stderr:
+E         3.12/concurrent/futures/thread.py", line 58, in run
+E             result = self.fn(*self.args, **self.kwargs)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py", line 474, in judge
+E             elif _scan(rules, chunks):
+E                  ^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-67/src/gov/secrets/__init__.py", line 170, in _scan
+E             done = subprocess.run(
+E                    ^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-7/plant/lib/td7_plants.py", line 49, in run
+E             return _real_subprocess.run(*args, **kwargs)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 550, in run
+E             stdout, stderr = process.communicate(input, timeout=timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+E             stdout, stderr = self._communicate(input, endtime, timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+E             self._check_timeout(endtime, orig_timeout, stdout, stderr)
+E           File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+E             raise TimeoutExpired(
+E         subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--redact', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 4 seconds
+E         
+E       assert []
+E        +  where [] = lines_naming('.gov-runtime/store-large.bin')
+E        +    where lines_naming = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "&lt;frozen runpy&gt;", line 198, in _ru...1x28'], 'fault': None, 'began': 1792875348.973589, 'ppid': 59, 'code': 0, 'seconds': 0.63}], fresh='zqxw5853fresh1x28').lines_naming
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:92: AssertionError</failure></testcase></testsuite></testsuites>

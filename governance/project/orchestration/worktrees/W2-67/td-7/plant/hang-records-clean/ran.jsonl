@@ -1,0 +1,8 @@
+{"pid": 179, "plant": "hang-records-clean", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 241, "plant": "hang-records-clean", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 241, "plant": "hang-records-clean", "acted": "recorded-clean-on-failure", "stores": 3, "error": "TimeoutExpired"}
+{"pid": 304, "plant": "hang-records-clean", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 1934512, "plant": "hang-records-clean", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 1934909, "plant": "hang-records-clean", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
+{"pid": 1934909, "plant": "hang-records-clean", "acted": "recorded-clean-on-failure", "stores": 3, "error": "TimeoutExpired"}
+{"pid": 1935051, "plant": "hang-records-clean", "installed": true, "figures": {"_TIMEOUT_S": 4, "_FLOOR": 1000000, "_LARGE": 6710886}}
