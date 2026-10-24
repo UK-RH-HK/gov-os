@@ -38,7 +38,10 @@
 - **First re-pin:** W2-58, W2-59, W2-65, W2-66, W2-07, W2-69 (W2-59 + W2-65 merge together just before; settings
   regeneration drops `docs/source` read-deny rules and adds a lead's own-temp allow rule). Second: W2-68. Until the
   first: no close unless gates (a)-(h) predict a pass; DEC-897 (b) one proven re-run; the interim skip guard (31).
-- **Merged, not closed:** W2-58, W2-63, W2-70 (`efdc4188`), W2-07 (`2a9d1a11`), W2-67 round 1 (`4da40b60`).
+- **Merged, not closed:** W2-58, W2-63, W2-70 (`efdc4188`), W2-07 (`2a9d1a11`), W2-67 round 1 (`4da40b60`),
+  **W2-69 (`2d5a829a`; DONE, third review passed; rows W2-L422..425 `cea70ea1`; R3-A, widening W2-L419 to encoded key
+  exports, for the owner's DIGEST; byte-exact review originals kept in `/tmp/gov-os-lead-W2-69/records-original/`,
+  which the sync cannot hold since they trip gitleaks)**.
 - **In flight:** W2-66 run 2 (merges integrate WITH W2-07, keeps both sides of `command.py`; W1-39 case; the
   retention KPI; report + fixture trial; fresh FULL probe; `log/W2-66-A5-run2.json`). W2-69 run 2, its LAST round
   (DEC-909: key blocks whole up to 24 KB; filter cases; two serial cases; a further fail-open finding = package, no

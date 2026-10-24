@@ -4,4 +4,93 @@ bringing up nodes...
 ...................................................................F.... [  6%]
 ...................................................FFF.................. [ 12%]
 ........................................................................ [ 18%]
-.................
+........................................................................ [ 24%]
+........................................................................ [ 30%]
+........................................................................ [ 36%]
+........................................................................ [ 43%]
+..............F...F..........F.............F............................ [ 49%]
+.................F...................................................... [ 55%]
+........................................................................ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 73%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 92%]
+........................................................................ [ 98%]
+..................                                                       [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the refused close's evidence does not state its head and tree: {'scope': 'scoped', 'why_full': [], 'base': 'fa1f723a2be392b60f5051036533af1f377fc08f', 'head': '67a8308cfc6464b5a8b8cacf0ca5e1dbafa3ea00', 'tree': '8409a4784af6f6537e28e9228ef53b1ca1bf0507', 'changed': ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T010000Z-fa1f723a2be3.json', 'src/gov/widget/thing.py', 'tests/acceptance/W1-bb/test_bb_fails.py', 'tests/acceptance/W1-bb/test_bb_skips.py'], 'selected': [{'target': 'tests/acceptance/W2-aa/', 'why': [{'reason': 'OWN'}, {'reason': 'OVERLAP', 'ticket': 'PROJ-aaaa', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/unit', 'why': [{'reason': 'UNIT'}]}, {'target': 'tests/acceptance/W1-bb/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bbbb', 'paths': ['src/gov/widget/thing.py']}, {'reason': 'TEST_CHANGED', 'paths': ['tests/acceptance/W1-bb/test_bb_fails.py', 'tests/acceptance/W1-bb/test_bb_skips.py']}]}, {'target': 'tests/acceptance/W2-bz/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bzbz', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W1-ec/test_ec_contract.py', 'why': [{'reason': 'EVERY_CLOSE'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_records.py', 'why': [{'reason': 'RECORD_READING'}]}], 'left_out': [{'target': 'tests/acceptance/W1-cp/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-dd/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-gg/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-hh/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-cc/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-ii/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-zz/', 'why': [{'reason': 'NOT_REACHED'}]}], 'skips': [{'test': 'tests/acceptance/W1-bb/test_bb_skips.py::test_bb_skips', 'reason': 'planted skip in W1-bb'}], 'skip_count': 1, 'failures': [{'test': 'tests/acceptance/W1-bb/test_bb_fails.py::test_bb_fails', 'text': 'E   AssertionError: planted failure in W1-bb\n    assert False'}], 'junit_xml': ['.gov-runtime/close/PROJ-aaaa/20261024T074006284988Z/01-acceptance-parallel.xml', '.gov-runtime/close/PROJ-aaaa/20261024T074006284988Z/02-regression-parallel.xml', '.gov-runtime/close/PROJ-aaaa/20261024T074006284988Z/03-regression-serial-afterwards.xml'], 'per_test_timeout': 900, 'distribution': 'load'}
+    assert ('67a8308cfc64...5e1dbafa3ea00' == '2abd740327f0...e5a91bdc7700d'
+      
+      - 2abd740327f00edfae23da5fcc1e5a91bdc7700d
+      + 67a8308cfc6464b5a8b8cacf0ca5e1dbafa3ea00)
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_evidence.py:40: AssertionError: the refused close's evidence does not state its head and tree: {'scope': 'scoped', 'why_full': [], 'base': 'fa1f723a2be392b60f5051036533af1f377fc08f', 'head': '67a8308cfc6464b5a8b8cacf0ca5e1dbafa3ea00', 'tree': '8409a4784af6f6537e28e9228ef53b1ca1bf0507', 'changed': ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T010000Z-fa1f723a2be3.json', 'src/gov/widget/thing.py', 'tests/acceptance/W1-bb/test_bb_fails.py', 'tests/acceptance/W1-bb/test_bb_skips.py'], 'selected': [{'target': 'tests/acceptance/W2-aa/', 'why': [{'reason': 'OWN'}, {'reason': 'OVERLAP', 'ticket': 'PROJ-aaaa', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/unit', 'why': [{'reason': 'UNIT'}]}, {'target': 'tests/acceptance/W1-bb/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bbbb', 'paths': ['src/gov/widget/thing.py']}, {'reason': 'TEST_CHANGED', 'paths': ['tests/acceptance/W1-bb/test_bb_fails.py', 'tests/acceptance/W1-bb/test_bb_skips.py']}]}, {'target': 'tests/acceptance/W2-bz/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bzbz', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W1-ec/test_ec_contract.py', 'why': [{'reason': 'EVERY_CLOSE'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_records.py', 'why': [{'reason': 'RECORD_READING'}]}], 'left_out': [{'target': 'tests/acceptance/W1-cp/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-dd/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-gg/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-hh/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-cc/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-ii/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-zz/', 'why': [{'reason': 'NOT_REACHED'}]}], 'skips': [{'test': 'tests/acceptance/W1-bb/test_bb_skips.py::test_bb_skips', 'reason': 'planted skip in W1-bb'}], 'skip_count': 1, 'failures': [{'test': 'tests/acceptance/W1-bb/test_bb_fails.py::test_bb_fails', 'text': 'E   AssertionError: planted failure in W1-bb\n    assert False'}], 'junit_xml': ['.gov-runtime/close/PROJ-aaaa/20261024T074006284988Z/01-acceptance-parallel.xml', '.gov-runtime/close/PROJ-aaaa/20261024T074006284988Z/02-regression-parallel.xml', '.gov-runtime/close/PROJ-aaaa/20261024T074006284988Z/03-regression-serial-afterwards.xml'], 'per_test_timeout': 900, 'distribution': 'load'}
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: docs/research/W2-66-scoped-close.md does not exist
+    assert None is not None
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_research.py:28: AssertionError: docs/research/W2-66-scoped-close.md does not exist
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: docs/research/W2-66-scoped-close.md does not exist
+    assert None is not None
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_research.py:28: AssertionError: docs/research/W2-66-scoped-close.md does not exist
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: docs/research/W2-66-scoped-close.md does not exist
+    assert None is not None
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_research.py:28: AssertionError: docs/research/W2-66-scoped-close.md does not exist
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the refusal does not name the other ticket's failing test
+      gov close PROJ-aaaa --json
+      exit code: 3
+      stdout:
+      {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check product-traceability-trailers is RED at commit 39f6edcc0df0: [{\"code\": \"NO_COMMITS\", \"message\": \"closed ticket PROJ-oooo has no commits with Task: trailer\"}]", "governance check family 'product traceability' is RED at commit 39f6edcc0df0"], "check_commit": "39f6edcc0df09f172e1d33441ae10dd8beac31e8", "red_checks": [{"id": "product-traceability-trailers", "family": "product traceability", "severity": "hard-block", "status": "RED", "findings": [{"code": "NO_COMMITS", "message": "closed ticket PROJ-oooo has no commits with Task: trailer"}], "provenance": {"commit": "39f6edcc0df09f172e1d33441ae10dd8beac31e8", "check_version": "1.0.0", "inputs_hash": "74d55836bf13d4d4"}}], "red_families": ["product traceability"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-lwdi"}}}
+      
+      stderr:
+      
+    assert 'tests/acceptance/W1-other/test_other.py' in '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-lwdi"}}'
+     +  where '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-lwdi"}}' = <function dumps at 0x716bb350f740>({'code': 'CHECK_FAILED', 'details': {'accepted_history': [], 'check_commit': '39f6edcc0df09f172e1d33441ae10dd8beac31e8...e, 'disposition': 'unclassed', ...}, 'message': 'tests or checks failed; findings are unclassed and await disposition'})
+     +    where <function dumps at 0x716bb350f740> = json.dumps
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W1-30/test_w1_30_regression_scope.py:68: AssertionError: the refusal does not name the other ticket's failing test
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: gov close did not succeed
+    gov close PROJ-aaaa --json
+    exit code: 3
+    stdout:
+    {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check product-traceability-trailers is RED at commit 668ebf71fb08: [{\"code\": \"NO_COMMITS\", \"message\": \"closed ticket PROJ-oooo has no commits with Task: trailer\"}]", "governance check family 'product traceability' is RED at commit 668ebf71fb08"], "check_commit": "668ebf71fb085f5a9c95003d25e62e6eef3919e7", "red_checks": [{"id": "product-traceability-trailers", "family": "product traceability", "severity": "hard-block", "status": "RED", "findings": [{"code": "NO_COMMITS", "message": "closed ticket PROJ-oooo has no commits with Task: trailer"}], "provenance": {"commit": "668ebf71fb085f5a9c95003d25e62e6eef3919e7", "check_version": "1.0.0", "inputs_hash": "a7d579d974c8222a"}}], "red_families": ["product traceability"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-hvj7"}}}
+    
+    stderr:
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W1-30/w1_30_support.py:788: AssertionError: gov close did not succeed
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the refusal does not name the other ticket's failing test
+      gov close PROJ-aaaa --json --full
+      exit code: 3
+      stdout:
+      {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check product-traceability-trailers is RED at commit bbb62b352aa7: [{\"code\": \"NO_COMMITS\", \"message\": \"closed ticket PROJ-oooo has no commits with Task: trailer\"}]", "governance check family 'product traceability' is RED at commit bbb62b352aa7"], "check_commit": "bbb62b352aa7a73523de9ebabe8d0bee7acb0ff3", "red_checks": [{"id": "product-traceability-trailers", "family": "product traceability", "severity": "hard-block", "status": "RED", "findings": [{"code": "NO_COMMITS", "message": "closed ticket PROJ-oooo has no commits with Task: trailer"}], "provenance": {"commit": "bbb62b352aa7a73523de9ebabe8d0bee7acb0ff3", "check_version": "1.0.0", "inputs_hash": "8042b2833379b6b9"}}], "red_families": ["product traceability"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-zfjj"}}}
+      
+      stderr:
+      
+    assert 'tests/acceptance/W1-other/test_other.py' in '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-zfjj"}}'
+     +  where '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-zfjj"}}' = <function dumps at 0x716bb350f740>({'code': 'CHECK_FAILED', 'details': {'accepted_history': [], 'check_commit': 'bbb62b352aa7a73523de9ebabe8d0bee7acb0ff3...e, 'disposition': 'unclassed', ...}, 'message': 'tests or checks failed; findings are unclassed and await disposition'})
+     +    where <function dumps at 0x716bb350f740> = json.dumps
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W1-30/test_w1_30_regression_scope.py:96: AssertionError: the refusal does not name the other ticket's failing test
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the refusal does not name the other ticket's failing test
+      gov close PROJ-aaaa --json --full
+      exit code: 3
+      stdout:
+      {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check product-traceability-trailers is RED at commit 4eddefc9de50: [{\"code\": \"NO_COMMITS\", \"message\": \"closed ticket PROJ-oooo has no commits with Task: trailer\"}]", "governance check family 'product traceability' is RED at commit 4eddefc9de50"], "check_commit": "4eddefc9de504df4f5d2ba510efe22a2b6880b8d", "red_checks": [{"id": "product-traceability-trailers", "family": "product traceability", "severity": "hard-block", "status": "RED", "findings": [{"code": "NO_COMMITS", "message": "closed ticket PROJ-oooo has no commits with Task: trailer"}], "provenance": {"commit": "4eddefc9de504df4f5d2ba510efe22a2b6880b8d", "check_version": "1.0.0", "inputs_hash": "88b46e90b30e25a8"}}], "red_families": ["product traceability"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-1k4z"}}}
+      
+      stderr:
+      
+    assert 'tests/acceptance/W1-other/test_other.py' in '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-1k4z"}}'
+     +  where '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-1k4z"}}' = <function dumps at 0x716bb350f740>({'code': 'CHECK_FAILED', 'details': {'accepted_history': [], 'check_commit': '4eddefc9de504df4f5d2ba510efe22a2b6880b8d...e, 'disposition': 'unclassed', ...}, 'message': 'tests or checks failed; findings are unclassed and await disposition'})
+     +    where <function dumps at 0x716bb350f740> = json.dumps
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W1-30/test_w1_30_regression_scope.py:96: AssertionError: the refusal does not name the other ticket's failing test
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: `copier copy` created more in the overlay than the path map DEC-493 names: ['governance/project/path-map.yaml', 'governance/project/test-map.yaml']
+    assert ['governance/...est-map.yaml'] == ['governance/...ath-map.yaml']
+      
+      Left contains one more item: 'governance/project/test-map.yaml'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W1-39/test_w1_39_copy.py:65: AssertionError: `copier copy` created more in the overlay than the path map DEC-493 names: ['governance/project/path-map.yaml', 'governance/project/test-map.yaml']
+9 failed, 1161 passed in 335.35s (0:05:35)

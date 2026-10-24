@@ -1,0 +1,53 @@
+bringing up nodes...
+bringing up nodes...
+
+......F...............F....................................FF........... [ 46%]
+.F.....F..........................F.....FF..........................F... [ 93%]
+........F.                                                               [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: tests/acceptance/W1-dd, the folder PROJ-qqqq declares, is not selected with OVERLAP naming the ticket and src/gov/widget/thing.py: selected [{'target': 'tests/acceptance/W2-aa/', 'why': [{'reason': 'OWN'}, {'reason': 'OVERLAP', 'ticket': 'PROJ-aaaa', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/unit', 'why': [{'reason': 'UNIT'}]}, {'target': 'tests/acceptance/W1-bb/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bbbb', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W2-bz/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bzbz', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W1-ec/test_ec_contract.py', 'why': [{'reason': 'EVERY_CLOSE'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_records.py', 'why': [{'reason': 'RECORD_READING'}]}]
+    assert False
+     +  where False = any(<generator object test_the_overlap_rule_selects_a_ticket_s_declared_folder.<locals>.<genexpr> at 0x75288a06b920>)
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_declared_folders.py:47: AssertionError: tests/acceptance/W1-dd, the folder PROJ-qqqq declares, is not selected with OVERLAP naming the ticket and src/gov/widget/thing.py: selected [{'target': 'tests/acceptance/W2-aa/', 'why': [{'reason': 'OWN'}, {'reason': 'OVERLAP', 'ticket': 'PROJ-aaaa', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/unit', 'why': [{'reason': 'UNIT'}]}, {'target': 'tests/acceptance/W1-bb/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bbbb', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W2-bz/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bzbz', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W1-ec/test_ec_contract.py', 'why': [{'reason': 'EVERY_CLOSE'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_records.py', 'why': [{'reason': 'RECORD_READING'}]}]
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the declared folder tests/acceptance/W1-dd is not named with OWN: selected [{'target': 'tests/acceptance/W2-aa/', 'why': [{'reason': 'OWN'}, {'reason': 'OVERLAP', 'ticket': 'PROJ-aaaa', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/unit', 'why': [{'reason': 'UNIT'}]}, {'target': 'tests/acceptance/W1-bb/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bbbb', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W2-bz/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bzbz', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W1-ec/test_ec_contract.py', 'why': [{'reason': 'EVERY_CLOSE'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_records.py', 'why': [{'reason': 'RECORD_READING'}]}]
+    assert 'OWN' in set()
+     +  where 'OWN' = support.OWN
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_declared_folders.py:68: AssertionError: the declared folder tests/acceptance/W1-dd is not named with OWN: selected [{'target': 'tests/acceptance/W2-aa/', 'why': [{'reason': 'OWN'}, {'reason': 'OVERLAP', 'ticket': 'PROJ-aaaa', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/unit', 'why': [{'reason': 'UNIT'}]}, {'target': 'tests/acceptance/W1-bb/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bbbb', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W2-bz/', 'why': [{'reason': 'OVERLAP', 'ticket': 'PROJ-bzbz', 'paths': ['src/gov/widget/thing.py']}]}, {'target': 'tests/acceptance/W1-ec/test_ec_contract.py', 'why': [{'reason': 'EVERY_CLOSE'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_records.py', 'why': [{'reason': 'RECORD_READING'}]}]
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: no coupling takes a change of tests/acceptance/W1-07/conftest.py to tests/acceptance/W1-27/test_w2_67_copies.py, which loads it by file path
+    assert False
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_live_test_map.py:332: AssertionError: no coupling takes a change of tests/acceptance/W1-07/conftest.py to tests/acceptance/W1-27/test_w2_67_copies.py, which loads it by file path
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: no coupling takes a change of tests/acceptance/W1-25/conftest.py to tests/acceptance/W1-27/test_w2_67_copies.py, which loads it by file path
+    assert False
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_live_test_map.py:332: AssertionError: no coupling takes a change of tests/acceptance/W1-25/conftest.py to tests/acceptance/W1-27/test_w2_67_copies.py, which loads it by file path
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: tests/conftest.py, loaded by every run of the suites below it, is not in the shared core
+    assert False
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_live_test_map.py:225: AssertionError: tests/conftest.py, loaded by every run of the suites below it, is not in the shared core
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: tests/acceptance/conftest.py, loaded by every run of the suites below it, is not in the shared core
+    assert False
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_live_test_map.py:225: AssertionError: tests/acceptance/conftest.py, loaded by every run of the suites below it, is not in the shared core
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: tests/acceptance/W1-ec/test_ec_contract.py::test_ec_contract_second, left out by deselection, is not named in left_out: [{'target': 'tests/acceptance/W1-cp/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-dd/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-gg/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-hh/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-cc/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-ii/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-zz/', 'why': [{'reason': 'NOT_REACHED'}]}]
+    assert []
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_deselected_cases.py:37: AssertionError: tests/acceptance/W1-ec/test_ec_contract.py::test_ec_contract_second, left out by deselection, is not named in left_out: [{'target': 'tests/acceptance/W1-cp/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-dd/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-ec/test_ec_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-gg/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-hh/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W1-rr/test_rr_other.py', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-cc/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-ii/', 'why': [{'reason': 'NOT_REACHED'}]}, {'target': 'tests/acceptance/W2-zz/', 'why': [{'reason': 'NOT_REACHED'}]}]
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the run is not stated full: scope 'scoped'
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/w2_66_support.py:477: AssertionError: the run is not stated full: scope 'scoped'
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the change does not name both paths of the move (src/gov/gadget/other.py, src/gov/close/other.py): ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T010000Z-7593da7260a6.json', 'src/gov/close/other.py', 'src/gov/widget/thing.py']
+    assert ('src/gov/gadget/other.py' in ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T010000Z-7593da7260a6.json', 'src/gov/close/other.py', 'src/gov/widget/thing.py'])
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_moved_files.py:76: AssertionError: the change does not name both paths of the move (src/gov/gadget/other.py, src/gov/close/other.py): ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T010000Z-7593da7260a6.json', 'src/gov/close/other.py', 'src/gov/widget/thing.py']
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the change does not name the path the file left: ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T030000Z-e1ab19cabcae.json', 'src/gov/widget/part.py', 'src/gov/widget/thing.py']
+    assert 'src/gov/gadget/part.py' in ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T030000Z-e1ab19cabcae.json', 'src/gov/widget/part.py', 'src/gov/widget/thing.py']
+     +  where ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T030000Z-e1ab19cabcae.json', 'src/gov/widget/part.py', 'src/gov/widget/thing.py'] = _changed({'base': 'e1ab19cabcaed73a598d1628e4124286c3e2eec6', 'changed': ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'd...-e1ab19cabcae.json', 'src/gov/widget/part.py', 'src/gov/widget/thing.py'], 'distribution': 'load', 'failures': [], ...})
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/test_w2_66_moved_files.py:56: AssertionError: the change does not name the path the file left: ['docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0001.md', 'docs/close/nightly/NR-20261001T030000Z-e1ab19cabcae.json', 'src/gov/widget/part.py', 'src/gov/widget/thing.py']
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: the run is not stated full: scope 'scoped'
+/home/usain/gov-os-worktrees/W2-66/tests/acceptance/W2-66/w2_66_support.py:477: AssertionError: the run is not stated full: scope 'scoped'
+11 failed, 143 passed in 34.00s

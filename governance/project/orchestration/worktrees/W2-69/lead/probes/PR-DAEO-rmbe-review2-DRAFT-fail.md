@@ -1,0 +1,69 @@
+I'm done probing and writing the return. Overall: the repair holds up, except for one fail-open that DEC-413 sends to the owner as a decision package rather than a third round.
+
+task: Second and last review probe (DEC-413) of DAEO-rmbe (W2-69) at `cfea8a26e668`, focused on the repair `8663196d`: behaviour the acceptance tests miss.
+status: DONE — verdict fail: one finding is ordinary work and fails open (private-key blocks longer than the 9,216-byte piece overlap); under DEC-413 it goes to the owner as a package, not a third round.
+work_completed: Step 0 first: (a) the trial write to `/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-rmbe` failed (OSError 30, read-only file system); (b) `git hash-object -w --stdin` wrote `1ae28402…` and `git update-index --refresh` exited 0; GOV_ROLE=independent-auditor, GOV_TICKET=DAEO-rmbe, top level `/home/usain/gov-os-worktrees/W2-69`, branch `w2/W2-69`, HEAD `cfea8a26e668`; `gov.__file__` = `/home/usain/gov-os-worktrees/W2-69/src/gov/__init__.py`; read refusals met (DEC-849): 0; `gov retrieve` not used (every source was named in the brief and read by name). Then I read the ticket, the card, P-W2-62-G1, rows W2-M404/M395/L373, DEC-853/897/413, the research note, the README and the code. I ran the reader, the check and gitleaks on copies of the four real stores, and read-only over the real `.gov-runtime/` (record write and reuse switched off). I swept long key blocks through this head's check and the base check (`w2/integrate`), reproduced three findings, and ran the suites listed under tests.
+files_changed: none (scratch only, under `$TMPDIR`, now removed)
+evidence: (1) Long key blocks, end to end: a 130 KB document staged at `.gov-runtime/codeintel/files/docs/key-notes.md` holding a 10,650-byte armoured PGP private-key block (paragraph text, offset 57,887) passes this head's check with exit 0 in 3 of 3 runs; the base check names the file in 3 of 3; this head's pre-index filter function misses it and the base's finds it. A 13,900-byte block at offset 54,448 (text without blank lines) behaves the same. (2) Sweep past both versions' first read (200 KB text, 53 offsets), misses by this head vs base: paragraphs 6 vs 0 (PEM) and 6 vs 1 (PGP) at 10,650 B; 15 vs 0 and 15 vs 1 at 13,900 B. Without blank lines: 4 vs 17 and 16 vs 24 (PEM); 4 and 16 vs 49 (PGP). At 6,700 and 9,000 B this head misses none. (3) The term decoder is exact on the real stores: 32,219 and 9,849 terms, as `fts5vocab` lists them. (4) Damaged leaf: control store named, damaged store named nothing. (5) A store holding an `fts5vocab` table: compaction returns "not compacted: table v may not be modified", and free pages go from 40 to 48. (6) Real stores: all four read by values (no raw fallback); the check is clean in 49.3 s (load ≈20, 1.4 GB peak) and 8.2 s on reuse. The whole runtime folder (2,170 files, nothing reused) is clean in 200.6 s at load 38–53, 1.5 GB peak. Both real stores are readable without waiting, and the lead's form-3 record holds both current digests. (7) Scratch: 8 inodes / 24 KB at start, peak 9,111 / 858 MB, 26 / 152 KB at end.
+tests: unit `tests/unit/secrets_check` + `tests/unit/rebuild/test_compaction.py`: 34 passed. `tests/acceptance/W2-69`: 249 passed, 1 failed (environment), 3 deselected (cases that start the real code-graph daemon). The failure is the held-store case: its premise fails because my sandbox refuses the tool's daemon folder `/tmp/gov-cbm-1000/<hash>` (confirmed directly: errno 30). By file: every-form, design-note, unit-folder, fts and raw-judgement 49 passed; still-scanned, deleted-text and held-store 26 + 1 env failure; read edges 20; word-internal 132; long key blocks 22. Earlier tests: W1-27 rebuild (digest stability included) 16 passed; W2-50 secrets-scan scale 23 passed; W2-50 never-indexed + last-review, check/link/store cases, 16 passed.
+discoveries: (1) Private-key blocks longer than 9,216 bytes are missed at layout-fixed positions by both the pre-index filter and the check, where the base found them in paragraph text (F1). (2) A damaged FTS5 leaf can hide its terms entirely (F2). (3) An `fts5vocab` table blocks compaction (F3). (4) The code-graph index's tokenizer splits at `_`, so its terms can begin where gitleaks sees no word boundary (16 forty-hex terms today). This is the same exposure as before the repair, covered by the keyword-gating row. (5) Inside my sandboxed session, the placeholder device files under `.gov-runtime/` are unreadable and the check raises there (fails closed; an environment artefact, as before this ticket).
+risks: F1's "ordinary work: yes" is a judgement. It rests on the accident class (a key export pasted into a governed document) being the one the check exists for, on real export sizes (estimated from the OpenPGP packet format; gpg could not start its agent in the sandbox), and on the first review's 8,192-byte blocks having been taken as ordinary. An orchestrator who reads it as "no" turns the verdict into pass, with F1 as a Wave 3 row.
+lessons: The repair's overlap protects matches up to 9,216 bytes only past gitleaks' first read. A key block in a short file (under about 55 KB) is still found, because gitleaks' first read spans several pieces. So any long-block probe must place the block past that read.
+proposed_decisions: P-W2-69-R2-1 (DEC-413, DEC-105). Classification: F1 ordinary work: yes, fails open; F2 no, fails open; F3 no, other. Options: (a) apply now — give gitleaks each private-key span (a BEGIN line through its END line) of a chunk whole as a chunk of its own when it fits in a piece, or widen the overlap for chunks that hold a BEGIN line; about one small engineer round plus cases for blocks of 10–24 KB. (b) Defer as a Wave 3 row and accept the residual. (c) Re-baseline KPI 1's bound to blocks up to 9,216 bytes. Recommendation: (a), riding in the re-pin with W2-69. Confidence: high on the behaviour (3 of 3 runs), medium on how often ordinary work meets it.
+unresolved: Not run in my sandbox, because the tool's daemon folder is refused: the real-tool rebuild (relative-root cases, code-graph-store case) and the held-store case. They rely on the lead's runs; the lead's real stores (no free page, values-judged digests) agree with them.
+recommended_next_action: The lead files F1 as an owner decision package under DEC-413 (P-W2-69-R2-1), and F2 and F3 as Wave 3 rows.
+
+---
+
+**Verdict: fail**
+
+**Head probed:** `cfea8a26e668` (branch `w2/W2-69`), above all the repair `8663196d`.
+
+### F1 — A private-key block longer than the piece overlap is missed, deterministically, in long files; the base check found it (severity: high, fails open)
+- **What was done:** I made documents of ordinary paragraph text (and text without blank lines) and placed in them a PEM or an armoured PGP private-key block of random base64, at many offsets. I judged each with this head's check and with the check before this ticket. I also staged one such document as the code index stages files, under `.gov-runtime/codeintel/files/`, and ran `python3 -m gov.secrets` on it.
+- **What happened:**
+  - Blocks up to 9,216 bytes are found everywhere.
+  - Longer blocks are missed whenever a piece cut falls inside them, once they lie past gitleaks' first read of the check's input (about the first 55 KB of a file's text).
+  - In paragraph text, this head misses 6 of 53 positions at 10,650 bytes and 15 of 53 at 13,900 bytes, for PEM and PGP alike. The base missed 0 of 53 (PEM) and 1 of 53 (PGP). In text without blank lines this head does better than the base.
+  - The miss does not depend on chance: the same file is green on every run (3 of 3), and the base names it (3 of 3).
+  - The pre-index filter uses the same pieces, so it lets the document into the index. The staged copy then holds the key, and the check is green.
+  - For scale, an armoured export of an RSA-4096 PGP key is about 6.7 KB with one subkey, about 10.4 KB with two and about 13.6 KB with three (the common sign/encrypt/authenticate setup). These are estimates from the packet format.
+- **What should have happened:** KPI 1 (the token found "across every boundary where the check splits … its input"), and P-W2-62-G1's "the check must not be weakened": a private-key block whole in one file is a finding wherever it lies, as the base check found it in paragraph text.
+- Ordinary work: yes, because nothing is built: a real key export pasted into a long governed document is the accident the check exists for, and whether a piece cut falls inside it depends only on where the text before it ends. The first review's 8,192-byte blocks were taken as ordinary on the same grounds.
+- Consequence: fails open
+
+### F2 — A damaged full-text leaf page passes unchecked, and its clean result is kept (severity: low, fails open)
+- **What was done:** A contentless FTS5 index held a project-rule token only as a leaf term. I set that leaf's footer offset past the end of its block.
+- **What happened:** The decoder read the page as "no terms" rather than "does not parse", so none of the page's bytes reached gitleaks. The check named nothing; the undamaged control was named. The store itself reads fine, so the clean verdict is recorded and reused.
+- **What should have happened:** A page the decoder cannot account for is read by its bytes, as other unparsable pages are.
+- Ordinary work: no, because only a damaged index page has a footer offset past its own end (every real leaf page without terms ends exactly at its footer: 868 and 643 such pages on the real stores, none otherwise).
+- Consequence: fails open
+
+### F3 — A store holding an `fts5vocab` table is never compacted (severity: low, fails closed)
+- **What was done:** I ran the rebuild's compaction step on a store holding an FTS5 index, deleted rows, and an `fts5vocab` table over that index.
+- **What happened:** The step took the vocab table for an index to optimise. The optimise was refused, so VACUUM was skipped. The store kept its free pages (40, then 48 after the real index's optimise) and was named on standard error.
+- **What should have happened:** Only FTS5 indexes are optimised, and the store is vacuumed.
+- Ordinary work: no, because no store holds an `fts5vocab` table today; it is an entry criterion of a ticket that adds one (DEC-803).
+- Consequence: other (deleted text stays in free pages, where the freed-space backstop still reads it: fails closed)
+
+### Probed and found sound
+- **Read pinning:** pieces are at most 24,002 bytes plus a two-byte blank line, so gitleaks' 25,000-byte look-ahead always reaches a separator. Every read therefore begins at a piece start however the pipe delivers the bytes. The read-edge and word-internal sweeps pass (20 and 132).
+- **The form feed in blank lines:** no default rule depends on a literal empty line in ordinary text.
+  - `curl-auth-header` and `curl-auth-user` spend one more of their five line-break slots per blank line.
+  - `jwt-base64` stops at a blank line inside base64.
+  - The private-key rule's class takes the form feed.
+  - Real tokens are never split, because the form feed goes only inside a blank line.
+- **The FTS5 index read as whole terms:** exact on both real stores (every term FTS5 lists is decoded, none extra). The b-tree index terms begin at a word start.
+- **Real stores:** all four are read by their values (no raw fallback). The freed-space reader accepts both page layouts (4 KiB and 64 KiB). After compaction, the record store has 70 freed regions with non-zero bytes (one begins right after a word byte, no project-rule match) and the code-graph store 16 (none).
+- **Locked stores:** no store a rebuild writes stays locked. Both are readable without waiting; the lead's form-3 record holds both current digests (only a values judgement records one); the code-graph store has no free page, so its compaction ran. The raw-bytes judgement of a store locked longer than the wait remains the recorded row and is not worse.
+- **Neighbouring values and keyword gating:** none today. In the record store's input, the nearest `sourcegraph`/`sgp_` keyword is 91,558 bytes from any of its 52,806 forty-hex matches; a read past the first holds about 29 KB at most. The code-graph store has 41 such matches and no keyword. The recorded row is not worse.
+- **Clean-result reuse (DEC-853):** works under form 3 (the four stores were reused on the second run). Records of the earlier form are not trusted. A raw-bytes verdict is not recorded. A finding is never recorded.
+- **Every file and rule set:** both rule sets run on every input; a gitleaks exit other than 0 or 3, and a timeout, raise (fail closed). The walk over `.gov-runtime/` is unchanged.
+- **Compaction:**
+  - The rebuild's digest is unchanged (W1-27's 16 cases pass).
+  - VACUUM renumbers rowids only in `sqlite_sequence` and the one-row `semantic_manifest`; every table whose rowids are referenced has an INTEGER PRIMARY KEY.
+  - The step writes only under `.gov-runtime/`.
+  - Compacting the query-vector cache goes slightly beyond "each store's build", harmlessly.
+- **Cost:** within DEC-853. The check took 49.3 s on the four stores and 200.6 s for the whole folder with nothing reused, at a load average of 38 to 53. The record store's input is 358.5 MB, so its per-run limit is about 418 s.
+- **Scope:** every engineer commit stays inside `allowed_paths`. No acceptance file was touched by anyone but the test designers. The unit-test edits follow the new internals and lower no expectation.
+- **Pre-index filter and path-name judgement:** they share the pieces, so short tokens are found at every offset (the first round's discovery is fixed); long key blocks are F1.

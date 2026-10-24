@@ -11,7 +11,66 @@
   `_judged_by(kind, evidence, ...)`), and both write record/answer key "evidence" (_evidence.KEY; _judged_by's
   judged["evidence"], applied after). W2-07's card: "W2-66 writes the record's evidence lines, W2-07 the gates".
   No test on integrate reads W2-07's record key "evidence".
-- Next: td-2 (W1-39 overlay case DEC-903, retention KPI DEC-905), eng-2, verify, review A3 max.
+- Merged-head check (log/merge-check.*): 9 failed / 1161 passed over W2-66, W2-07, W1-30, W1-39, tests/unit/close:
+  research x3 (expected), W1-39 overlay (DEC-903), W2-66 evidence refused-close head (repair ticket now committed, DEC-904 i6),
+  W1-30 regression_scope x4 (fixture PROJ-oooo closed without Task commit; in-close gov check, DEC-868 i1b).
+- td-2 DONE (gov launch sandboxed, xhigh, session 6aa3b670-7b91-4028-b112-a112f763e6e3, 12 fields, no gov retrieve,
+  1 read refusal (Grep over src/gov), 1 write refusal ($VAR), 1 rm refusal). Commits 21d603fa (W1-39, RR DEC-896 i2),
+  1cf451b4 (W2-66 evidence head, RR DEC-904 i6), 5c1f74ac (W1-30 regression_scope fixture, RR DEC-868 i1b),
+  85ed85b6 (retention KPI, 8 cases, README interface item 9 + evidence field tmp_path_retention_policy).
+  Tripwire 3: this tree only W1-30/W1-39/W2-66 folders + head; W2-69 tree gained 4 untracked acceptance files (W2-69's own).
+- Residual decided (no new round, §13): since W2-07's in-close gov check, a close without --check-result gives its runs no
+  GOV_CLOSE_CHECK_RESULT; no live record-reading case reads the variable yet.
+- Drafts: scratchpad eng-2-merge.md (impl: evidence clash + retention) and eng-3-report.md (report + fixture trial, old form).
+- red-2 (lead): 11 failed / 154 passed; 8 retention cases red for README reason (h) (runs report policy 'all'),
+  3 research (f). gov.__file__ in this worktree.
+- eng-2 DONE (gov launch sandboxed, high, session f8b08cd6-c6a9-4431-9faa-283b5f5c2c39, 12 fields, no gov retrieve,
+  0 read refusals, 1 Monitor refusal). 7c18f587 (W2-07's paths under record key class_evidence; local judged_on),
+  c9686606 (retention option in _scope_limit -> every close run, reds alone, nightly; evidence names it).
+  +45/-14. Its runs: W2-66 set 162p/3f (research), unit/close 412p, W2-07 40p, W1-30 515p, W2-01 88p, W2-53 57p.
+  Tripwire 4: this tree head only; W2-69 tree's own commit.
+- Loop count: 2 (eng-1 run 1; eng-2 this run) — converging.
+- eng-3 PACKAGES-with-work (old form, unsandboxed: tests/unit needs code graph; session 44081176-8046-4dcf-94db-db9d99a995b9,
+  12 fields, no gov retrieve, 1 read refusal (flock sh -c wrapped pytest), 2 other guard refusals, 2 permission prompts).
+  4f676f47 report: scoped close 687 s / 3,348 cases (W2-54 gov-check case 611 s of it); catch 32/32; fixture trial 3 closes ok.
+  165 passed. P-W2-66-a (W2-54 case should read GOV_CLOSE_CHECK_RESULT) -> classed residual (§13: no exit criterion, not fail-open).
+  /tmp/gov-os-lead-W2-66/eng-3 (2,010 inodes, 27 MB) left: rm needs permission; orchestrator removes.
+  Tripwire 5: this tree head only; W2-69's own commit.
+- 9174e358: CP-DAEO-c1uz-0007 committed (lead trailers).
+- rebuild-2 exit 0 (lexical/semantic/codeintel recreated). gov.__file__ in worktree. collect-2: "16026/16028 tests
+  collected (2 deselected) in 6.41s", no collection error. check-2 exit 0: YELLOW authority/role limits
+  (core-decision-citations), product traceability (openspec-validate: openspec not on PATH in my shell).
+- parallel-2 (head 9174e358, lock, retention): 2 failed, 15732 passed, 30 skipped in 1992.87s (33:12); load 4.4 at start.
+  Scratch peak sampled 133,262 inodes; 131,338 / 1.1G at end.
+  REDS: W1-01 test_only_the_test_designer_commits_to_acceptance_tests and test_the_integration_merges_of_this_repository_pass:
+  "03f470a595d1 (merge: the merge commit itself changes tests/acceptance/W1-30/test_w1_30_close.py)". CAUSED by the
+  run-2 merge (git's own auto-merge combined W2-07 td's and W2-66 td-1's edits). DEC-253 rule (w1_01_support.merge_offences):
+  a merge passes only if each changed acceptance file equals one parent's; exemptions apply to non-merge commits only;
+  a merge with Role: independent-test-designer is skipped. No history rewrite allowed -> PACKAGE P-W2-66-M1.
+  Blocks DONE/close/merge; not the serial run or the review (W1-01 files are not probe-judged).
+- serial (lock, retention): 262 passed in 1140 s (19:00), exit 0.
+- P-W2-66-M1 drafted: .gov-runtime/scratch/lead/P-W2-66-M1.md (recommend (a): W1-01's rule accepts git's own merge).
+- rev-1 (review 1 of 2, DEC-413): gov launch independent-auditor sandboxed, max, session f631a982-c0fb-4c27-b234-2bb0e7aed92b,
+  12 fields, tripwire 6 clean, 0 read refusals, 1 guard refusal, no gov retrieve. VERDICT FAIL at 9174e358:
+  F1 high (rename hides old path: select.py `git diff --name-only` default renames) yes/fails open;
+  F2 medium (tests/conftest.py scoped; declared acceptance folders ignored by overlap; paths placed only by suite-less tickets) yes/fails open;
+  F3 low (W1-27 test_w2_67_copies loads W1-07/W1-25/W1-27 conftests by path; no coupling) yes/fails open;
+  F4 deselected cases unnamed, F5 own suite misnamed for declared folders, F6 test-map note wrong, F7 bisect counts not-found as bad (not reproduced): yes/other;
+  feature-gated row (check-result taken as given); M1 judged yes/other.
+  Draft record: .gov-runtime/scratch/lead/probes/PR-DAEO-c1uz-review1-fail-draft.md (NOT committed).
+- Decision (lead, by JUDGEMENT + DEC-802): fix F1-F3 now, ride along F4, F5, F6; F7 and the feature-gated row residuals.
+- td-3 DONE (gov launch sandboxed xhigh, session 5540691a-3650-46e2-a87a-39f1ea642565, 12 fields, gov retrieve used once,
+  0 read refusals, 2 other refusals). Commits 39b875bc ee98e24a cc7fb17f 7dc63f67 98c4be2f 6d17109b (W2-66 folder only;
+  tripwire 7 ok). 12 new cases, no rewrites. Inadvertent exposure: pytest introspection printed opening entries of the
+  live test map (implementation) to td-3; it switched to boolean asserts. Added tests/acceptance/conftest.py to shared-core rule (accepted).
+- red-3 (lead): 11 failed / 143 passed in W2-66, for reasons (i)-(m).
+- eng-4 DONE-with-package (gov launch sandboxed high, session c4f253d9-8a81-405b-842e-7c53e8c8edcf, 12 fields, no gov
+  retrieve, 1 read refusal (grep incl. W1-30/W1-39), 1 Monitor refusal). 45763156 (--no-renames), 16e98848 (declared folders,
+  suiteless unplaced), 1ad4db0d (deselected named), b3e60cbc (live map: conftests shared core, W1-27 coupling, note),
+  d3650169 (declared folder outside tests/ = no suite). +109/-18. 177 acceptance passed; unit/close 415; W2-07 40; W1-30 515;
+  W2-01 88; W2-53 57; W1-07 223; W2-54 96p/1f (sandboxed worker case: API blocked in sandbox; lead's run decides). Tripwire 8 ok.
+- 5634d430: CP-DAEO-c1uz-0011 committed. Loop: converging (eng-4 answered review 1).
+- Next: rebuild-3 (running), collect, check, parallel-3, serial-3, rev-2 (LAST), probe record if pass, return PACKAGES (M1).
 
 ## State: STOPPED on the scratch budget (DEC-898), returned PACKAGES (run 1)
 - Branch w2/W2-66, code head a384480a (eng-1), then the lead's checkpoint commit made at this stop (see git log).

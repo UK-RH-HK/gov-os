@@ -1,0 +1,53 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "4da40b600488",
+   "after": "a00ae32d8440"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M docs/plan/WAVE_2_LIST.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-record",
+   "change": "head",
+   "before": "c9b152f352b0",
+   "after": "23b330f09ab7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66",
+   "change": "head",
+   "before": "03f470a595d1",
+   "after": "c96866061ec0"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66",
+   "change": "acceptance folder",
+   "folder": "W1-30"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66",
+   "change": "acceptance folder",
+   "folder": "W1-39"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-66",
+   "change": "acceptance folder",
+   "folder": "W2-66"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-69",
+   "change": "head",
+   "before": "0be248c078be",
+   "after": "ed2de0ebbc60"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-69",
+   "change": "acceptance folder",
+   "folder": "W2-69"
+  }
+ ]
+}
