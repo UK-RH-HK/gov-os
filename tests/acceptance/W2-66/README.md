@@ -122,7 +122,10 @@ the full regression, never less.
      `TEST_CHANGED` with `paths`; `HELPER` with `helper` (the changed helper's path) and the chain; `COUPLING`
      with `paths`; `EVERY_CLOSE`; `RECORD_READING`; a full run may name `tests` with `FULL`.
    - `left_out`: list of `{target, why: [{reason: NOT_REACHED}]}`, every acceptance suite (or each of its files,
-     where some of its files ran) the run left out; empty for a full run.
+     where some of its files ran) the run left out; empty for a full run. **Each case a target finer than a file
+     leaves out by `--deselect`** (the other cases of a file whose node id, or its beginning, is selected) is named
+     by its own entry, `{target: <its node id>, why: [{reason: NOT_REACHED}]}`: an entry that names the case left
+     out and not the case that ran (never the file's path alone).
    - `skips`: list of `{test, reason}`, every skipped case; `skip_count`: their number.
    - `failures`: list of `{test, text}`, every failing or erroring case, `text` its failure text kept.
    - `junit_xml`: list of paths, relative to the project, of each run's JUnit XML file; each exists after the
@@ -215,7 +218,8 @@ declared folder's files are in `left_out`); **(k)** a path that only suiteless t
 taken as placed (the run is `scoped` and selects nothing for it beyond the always-run set); **(l)** the live map's
 shared core holds neither `tests/conftest.py` nor `tests/acceptance/conftest.py`, and no coupling takes W1-07's or
 W1-25's `conftest.py` to `test_w2_67_copies.py` (`tests/conftest.py` is in W2-67's `allowed_paths`, so a change to
-it is placed and runs scoped).
+it is placed and runs scoped); **(m)** a case left out by `--deselect` is named nowhere in the evidence
+(`left_out` names the other files of the suite, not the deselected case).
 
 | KPI line | Tests | Red on the built head |
 |---|---|---|
@@ -223,6 +227,7 @@ it is placed and runs scoped).
 | S1, S6 a ticket's suite is its declared folder (Interface item 3) | `test_w2_66_declared_folders.py` (2): `::test_the_overlap_rule_selects_a_ticket_s_declared_folder`, `::test_the_own_suite_is_the_closing_ticket_s_declared_folder` | (j) |
 | S2 + F1 a path only suiteless tickets hold is unplaced (Interface item 3) | `test_w2_66_suiteless_tickets.py::test_a_path_only_suiteless_tickets_hold_runs_the_full_regression` (one close: one ticket declares its WBS id's folder, which does not exist; one declares a folder with a README and no test) | (k) |
 | S2 + F1 the conftests above every suite are shared core; S3 conftests loaded by file path are couplings (Interface item 1) | `test_w2_66_live_test_map.py::test_a_conftest_every_run_of_the_suites_loads_is_shared_core[tests/conftest.py]`, `[tests/acceptance/conftest.py]`; `::test_a_conftest_loaded_by_file_path_reaches_the_file_that_loads_it[W1-07]`, `[W1-25]`, `[W1-27]` | (l); `[W1-27]` is green on the built head (its suite folder holds the file that loads it) |
+| S6 + F2 every case left out by deselection named (Interface item 6) | `test_w2_66_deselected_cases.py::test_a_case_left_out_by_deselection_is_named_with_why` (the fixture's every-close target is one case of a file with two) | (m) |
 
 ### Expected green on the base
 
