@@ -13,6 +13,7 @@ B3: The repair ticket is created through the ticket tool, records findings and
 """
 
 import json
+import re
 
 import pytest
 import yaml
@@ -25,6 +26,7 @@ TICKET = "PROJ-disp"
 WBS = "W1-disp"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-disp", "Role: engineer", "Implements: CAP-01")
+SHA256 = re.compile(r"\b[0-9a-f]{64}\b")
 
 
 # --------------------------------------------------------------------------
@@ -147,6 +149,22 @@ def test_disposition_with_context_failure(project, sandbox, interface):
     full_text = json.dumps(envelope)
     assert '"context": "whole-system"' not in full_text, \
         "when context fails, 'context: whole-system' must NOT appear"
+    # Revised for W2-67 (I2 F2, PF2; DEC-868 item 3): the case asserted only the absence of a literal the close
+    # never writes. The two decisions supersede each other, so the ticket's context cannot be built; since W2-07
+    # the pre-close ``gov check`` finds that first and refuses at once, naming what fails. So the answer names both
+    # decisions and carries no hash, and the one repair ticket records the class and no context hash.
+    assert run.returncode == support.EXIT_CHECK_FAILED, f"expected exit code 3\n{run.describe()}"
+    text = support.error_text(error)
+    assert "DEC-cyc1" in text and "DEC-cyc2" in text, \
+        f"the answer does not name the decisions that fail the context\n{run.describe()}"
+    assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
+    repairs = _repair_tickets(project)
+    assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
+    front = _repair_frontmatter(repairs[0])
+    assert (front.get("disposition") or front.get("finding_disposition")) == "defer", \
+        f"the repair ticket does not record the class given: {front}"
+    assert front.get("context_hash") is None and not SHA256.search(repairs[0].read_text(encoding="utf-8")), \
+        f"the repair ticket carries a context hash although no context was built: {front}"
 
 
 # --------------------------------------------------------------------------
