@@ -818,7 +818,8 @@ def _move_commits(root: str, old: str, new: str) -> list:
     paths where it differs from a parent and no other parent brought,
     and the acceptance tests two parents both changed (DEC-410, DP-24),
     of which ``_judge_commit`` then leaves out those git's own merge of
-    the parents writes as the merge commit holds them (DEC-918).
+    the parents writes as the merge commit holds them, where it differs
+    from git's merge at no path that is not its own (DEC-918).
 
     Everything is separated by NUL, the one byte no trailer and no file
     name can hold, and nothing is unquoted.  The token after a commit's
@@ -976,49 +977,179 @@ def _lifted(root, commit, path, head, decide_fn, closes):
         return ""
 
 
+_TREE_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
+
+
+def _counted(root, closes, *args, ok=(0,)) -> str:
+    """One git process counted against ``_LIFT_PROCESSES``."""
+    closes[_LIFT_LEFT] = closes.get(_LIFT_LEFT, _LIFT_PROCESSES) - 1
+    if closes[_LIFT_LEFT] < 0:
+        raise _GitError("too many git processes for the lifts")
+    return _git(root, *args, ok=ok)
+
+
+def _acc_changed(root, closes, a, b) -> set:
+    """The acceptance tests whose content, mode or presence differs
+    between the trees *a* and *b*, without rename detection."""
+    return {p for p in _counted(
+        root, closes, "--literal-pathspecs", "diff-tree", "-r", "-z",
+        "--name-only", "--no-renames", "--ignore-submodules=none", a, b,
+        "--", ACCEPTANCE).split("\0") if p}
+
+
+def _git_merge_diff(root, commit, closes):
+    """D for the merge commit *commit* (DEC-918): the acceptance tests
+    where its tree differs from git's own merge of its two parents
+    (``git merge-tree --write-tree``) in content, mode or presence,
+    over the whole of ``tests/acceptance/``, together with every
+    acceptance test git reports as conflicted (a moved-aside
+    ``<path>~<commit>`` included).
+
+    ``None`` where git's own merge cannot be shown: an octopus merge,
+    parents with several merge bases or none, a merge-tree that fails or
+    whose output cannot be read, a spent budget.  Three git processes,
+    counted against ``_LIFT_PROCESSES``; the answer is kept in *closes*.
+    """
+    key = "git's own merge of " + commit[0]
+    if key not in closes:
+        closes[key] = None
+        parents = list(dict.fromkeys(commit[1]))
+        try:
+            if len(parents) != 2 or len(_counted(
+                    root, closes, "merge-base", "--all", *parents,
+                    ok=(0, 1)).split()) != 1:
+                return None
+            # The tree id, then the conflicted paths; exit 1 is a conflict.
+            out = _counted(root, closes, "merge-tree", "--write-tree",
+                           "--no-messages", "-z", "--name-only", *parents,
+                           ok=(0, 1)).split("\0")
+            if not _TREE_ID.fullmatch(out[0]):
+                return None
+            closes[key] = _acc_changed(root, closes, out[0], commit[0]) | {
+                p for p in out[1:] if p.startswith(ACCEPTANCE + "/")}
+        except (_GitError, _NotARepo, ValueError):
+            return None
+    return closes[key]
+
+
 def _git_merged(root, commit, closes) -> set:
     """The acceptance tests among the merge commit's own paths that are
-    not its own change by DEC-918: both parents changed the path against
-    their one merge base, and the merge commit holds exactly the entry
-    (blob and mode, or absence) that git's own merge of the two parents
-    (``git merge-tree --write-tree``) writes for it, with no conflict on
-    it.
+    not its own change by DEC-918: those outside D (``_git_merge_diff``),
+    where the merge commit holds exactly the entry (blob and mode, or
+    absence) that git's own merge of its two parents writes, with no
+    conflict on it, whether or not both parents changed the path.
 
-    Empty where it cannot be shown: an octopus merge, parents with
-    several merge bases or none, a merge-tree that fails or whose output
-    cannot be read.  At most five git processes, counted against
-    ``_LIFT_PROCESSES``, and none for a merge commit with no own
-    acceptance test.
+    Empty where it cannot be shown (D is ``None``), and empty when D
+    holds a path that ``read_merge`` does not count as the merge commit's
+    own: a drop behind a rename, or of a moved-aside copy, is then not
+    compared at all, and the merge is judged as before DEC-918.  No git
+    process for a merge commit with no own acceptance test.
     """
-    parents = list(dict.fromkeys(commit[1]))
     acc = {p for p in commit[4] if p.startswith(ACCEPTANCE + "/")}
-    if len(parents) != 2 or not acc:
+    if len(set(commit[1])) != 2 or not acc:
         return set()
+    d = _git_merge_diff(root, commit, closes)
+    if d is None or not d <= set(commit[4]):
+        return set()
+    return acc - d
 
-    def git(*args, ok=(0,)):
-        closes[_LIFT_LEFT] = closes.get(_LIFT_LEFT, _LIFT_PROCESSES) - 1
-        if closes[_LIFT_LEFT] < 0:
-            raise _GitError("too many git processes for the lifts")
-        return _git(root, *args, ok=ok)
 
-    def changed(a, b):
-        return set(git("diff-tree", "-r", "-z", "--name-only", "--no-renames",
-                       "--ignore-submodules=none", a, b).split("\0"))
+def _held_by_merges(root, paths, merges, closes) -> set:
+    """Of *paths*, acceptance tests dirty before the call and clean after
+    it, those a merge commit of the call's forward move that is no
+    finding (*merges*) holds as git's own merge of its two parents
+    writes them and its first parent does not (DEC-918): the second call
+    of a merge-back that commits what the first one left.
 
+    Only a merge commit whose D is empty counts; at most four git
+    processes for each, counted against ``_LIFT_PROCESSES``.
+    """
+    held: set = set()
+    for c in merges:
+        left = [p for p in paths if p not in held]
+        if not left:
+            break
+        if _git_merge_diff(root, c, closes) != set():
+            continue
+        try:
+            moved = _acc_changed(root, closes, c[1][0], c[0])
+        except (_GitError, _NotARepo, ValueError):
+            continue
+        held.update(p for p in left if p in moved)
+    return held
+
+
+def _merging(root, paths, head) -> set:
+    """Of *paths*, acceptance tests the call changed, those a merge in
+    progress (a ``MERGE_HEAD`` with one other commit) holds exactly as
+    git's own merge of ``HEAD`` and ``MERGE_HEAD`` writes them (DEC-918):
+    a stage-0 index entry and a regular working-tree file with that blob
+    and mode, or neither where git's merge removes the path, at a path
+    git's merge changes against ``HEAD`` and does not report conflicted.
+
+    Empty where it cannot be shown: no merge in progress, an octopus,
+    several merge bases or none, a merge-tree that fails or whose output
+    cannot be read.  At most six git processes, one merge-tree among
+    them, and none when *paths* is empty.
+    """
+    if not paths or not head:
+        return set()
+    rr = os.path.realpath(root)
     try:
-        bases = git("merge-base", "--all", *parents, ok=(0, 1)).split()
-        if len(bases) != 1:
+        with open(os.path.join(rr, _git(
+                root, "rev-parse", "--git-path", "MERGE_HEAD").strip()),
+                encoding="utf-8") as f:
+            other = f.read().split()
+        if len(other) != 1 or not _TREE_ID.fullmatch(other[0]) or len(_git(
+                root, "merge-base", "--all", head, other[0],
+                ok=(0, 1)).split()) != 1:
             return set()
-        acc &= changed(bases[0], parents[0]) & changed(bases[0], parents[1])
-        if not acc:
+        out = _git(root, "merge-tree", "--write-tree", "--no-messages", "-z",
+                   "--name-only", head, other[0], ok=(0, 1)).split("\0")
+        if not _TREE_ID.fullmatch(out[0]):
             return set()
-        # The tree id, then the conflicted paths; exit 1 is a conflict.
-        out = git("merge-tree", "--write-tree", "--no-messages", "-z",
-                  "--name-only", *parents, ok=(0, 1)).split("\0")
-        if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", out[0]):
+        conflicted = set(out[1:])
+        # Git's own merge's entry where it differs from HEAD: (mode, blob).
+        merged: dict = {}
+        tokens = iter(_git(
+            root, "--literal-pathspecs", "diff-tree", "-r", "-z",
+            "--no-renames", "--no-abbrev", "--ignore-submodules=none",
+            head, out[0], "--", ACCEPTANCE).split("\0"))
+        for tok in tokens:
+            if tok.startswith(":"):
+                meta = tok[1:].split()
+                merged[next(tokens, "")] = (
+                    None if meta[1] == "000000" else (meta[1], meta[3]))
+        index: dict = {}
+        for entry in _git(root, "--literal-pathspecs", "ls-files", "-s", "-z",
+                          "--", ACCEPTANCE).split("\0"):
+            meta, _, path = entry.partition("\t")
+            if path:
+                index.setdefault(path, []).append(tuple(meta.split()))
+        want: dict = {}
+        for p in paths:
+            full = os.path.join(rr, p)
+            if (p in conflicted or p not in merged
+                    or os.path.realpath(os.path.dirname(full))
+                    != os.path.dirname(full)):
+                continue
+            entry = merged[p]
+            if entry is None:
+                if p not in index and not os.path.lexists(full):
+                    want[p] = None
+            elif (entry[0] in ("100644", "100755")
+                  and index.get(p) == [(*entry, "0")]
+                  and os.path.isfile(full) and not os.path.islink(full)
+                  and bool(os.stat(full).st_mode & 0o100)
+                  == (entry[0] == "100755")):
+                want[p] = entry[1]
+        files = [p for p in want if want[p]]
+        blobs = _git(root, "hash-object", "--", *files).split() if files else []
+        if len(blobs) != len(files):
             return set()
-        return acc - set(out[1:]) - changed(out[0], commit[0])
-    except (_GitError, _NotARepo, ValueError):
+        return ({p for p in want if want[p] is None}
+                | {p for p, b in zip(files, blobs) if b == want[p]})
+    except (OSError, _GitError, _NotARepo, ValueError, IndexError):
         return set()
 
 
@@ -1034,8 +1165,9 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
 
     An acceptance test a merge commit holds exactly as git's own merge
     of its parents writes it (``_git_merged``) is not judged at all,
-    neither as the merge commit's own change nor against the scope
-    (DEC-918).
+    neither as the merge commit's own change nor against the scope,
+    unless the merge differs from git's own merge at a path that is not
+    its own (DEC-918).
     """
     from gov.guard.decide import (
         FREEZE_FLAG, _load_ticket, _path_allowed)
@@ -1207,6 +1339,11 @@ def check_containment(
 ) -> str:
     """Compare the current tree + HEAD with the before-snapshot.
 
+    In an orchestrator session's own call, an acceptance test that git's
+    own merge wrote is neither restored nor flagged: during a merge in
+    progress (``_merging``), and in the call that commits it
+    (``_held_by_merges``) (DEC-918).
+
     Returns report text (empty = nothing to report).
     Raises ``_GitError`` on hard git failures so the hook can record
     them as findings.
@@ -1299,6 +1436,12 @@ def check_containment(
     committed_out: set = set()
     non_fwd = False
     head_msg = ""
+    # A merge is judged commit by commit, and git's own merge of the
+    # acceptance tests is no breach, only in an orchestrator session's
+    # own call (DEC-266, DEC-918).
+    orch_own = (role or "").strip() == "orchestrator" and not subagent_type
+    closes: dict = {}
+    clean_merges: list = []  # merge commits of the move that are no finding
 
     old_head = snap.get("head_commit", "") if has_snap else None
     old_branch = snap.get("head_branch", "") if has_snap else None
@@ -1320,8 +1463,6 @@ def check_containment(
         # read => treat as non-forward (repair 8).  A merge is judged
         # commit by commit only in an orchestrator session's own call
         # (DEC-266); in any other call it stays non-forward.
-        orch_own = ((role or "").strip() == "orchestrator"
-                    and not subagent_type)
         commits: list = []
         try:
             fwd = (bool(cur_branch) and cur_branch == old_branch
@@ -1336,13 +1477,14 @@ def check_containment(
             # Commit by commit, oldest first (DEC-255, DEC-327).  The
             # record keeps the caller's role and ticket; the reason
             # names the commit and its trailers (DEC-270).
-            closes: dict = {}
             msgs: list = []
             for c in reversed(commits):
                 res = _judge_commit(
                     project_root, c, role, ticket_id, subagent_type,
                     orch_own, cur_head, decide, closes)
                 if res is None:
+                    if len(c[1]) > 1:
+                        clean_merges.append(c)
                     continue
                 bad, why = res
                 committed_out.update(bad)
@@ -1385,6 +1527,17 @@ def check_containment(
                 acc_breach.append(path)
             else:
                 oos.append(path)
+
+    # ---- git's own merge of the acceptance tests (DEC-918) ----
+    # A merge-back over two calls: what a merge in progress holds as
+    # git's own merge, and in the call that commits it what was dirty
+    # before and the merge commit, no finding, now holds.
+    if acc_breach and orch_own and not non_fwd:
+        same = _merging(project_root, acc_breach, cur_head)
+        same |= _held_by_merges(project_root, [
+            p for p in acc_breach if p in dirty_at_snap and p not in after
+            and p not in same], clean_merges, closes) if clean_merges else set()
+        acc_breach = [p for p in acc_breach if p not in same]
 
     # ---- orchestrator records (DEC-177) ----
     # When the orchestrator (in its own session) changes a path outside

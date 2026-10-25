@@ -206,10 +206,12 @@ def test_the_git_processes_are_counted_against_the_lift_budget(tmp_path):
     c = merge_commit(repo)
     closes: dict = {}
     assert _git_merged(str(repo), c, closes) == {ACC}
-    assert closes[_LIFT_LEFT] == containment._LIFT_PROCESSES - 5
-    closes = {_LIFT_LEFT: 4}
+    assert closes[_LIFT_LEFT] == containment._LIFT_PROCESSES - 3
+    assert _git_merged(str(repo), c, closes) == {ACC}  # kept, no new git
+    assert closes[_LIFT_LEFT] == containment._LIFT_PROCESSES - 3
+    closes = {_LIFT_LEFT: 2}
     assert _git_merged(str(repo), c, closes) == set()
-    assert judge(repo, c, {_LIFT_LEFT: 4}) is not None
+    assert judge(repo, c, {_LIFT_LEFT: 2}) is not None
 
 
 def test_a_merge_with_no_own_acceptance_test_starts_no_git(tmp_path):
