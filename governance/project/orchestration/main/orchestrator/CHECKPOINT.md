@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-25 01:40 BST — W2-67 DONE (review passed, probe `d0140d4d`; held to merge after the re-pin; rows W2-L447, W2-L448); W2-72 in verification; W2-65 held; next free DEC-921)
+## RESUME HERE (2026-10-25 05:15 BST — W2-72, W2-59, W2-65 MERGED; P-W2-65-M1 (P1, criss-cross at `45a6dfd5`) with the owner; pre-re-pin nightly running; next free DEC-921)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -35,23 +35,26 @@
 - **Supersession (DEC-866):** mark at once, sweep by id and value.
 
 ### Plan in force (DEC-896..DEC-919)
-- **First re-pin** carries W2-58, W2-59, W2-65, W2-66, W2-07, W2-69, **W2-72** (DEC-918). Order: W2-72 DONE -> merge;
-  then W2-59 + W2-65 merge together (`w2/W2-65` holds W2-59; dry merge-tree onto integrate clean) -> probe_impact ->
-  re-judge every pending ticket's merges with scratchpad `judge_tickets.py` (must be clean) -> the re-pin ACT package
-  (pin commands, pytest-timeout in the pin's env, settings regeneration: drop `docs/source` read-deny, add a lead's
-  own-temp allow rule; ladder evidence = W2-66's fixture trial + 32/32 planted faults; batching is W2-68's). Second
-  re-pin: W2-68 + W2-71. W2-57 takes the first free slot after the first re-pin (DEC-915).
-- **Merged, not closed (7):** W2-58, W2-63, W2-70 (`efdc4188`, r2 `3ff8ba51`), W2-07 (`2a9d1a11`), W2-67 r1
-  (`4da40b60`), W2-69 (`2d5a829a`), W2-66 (`c60c9704`; `test_inputs` removed `8f56ada1`). The close's containment gate
-  refuses W2-66 (`03f470a5`) and W2-65 (`4ef3293a`) until W2-72 is pinned.
-- **Held DONE: W2-65 at `f6881547`** (run 3: W1-38 revised per DEC-917, W1-01/W1-27/W1-38/W2-65 green; reds not its
-  own: W2-54 600 s timing (W2-L429), W1-19 load_sensitive, W2-66's lead-verification case (DEC-919, W2-L440);
-  `gov check` RED only adapter-portability until the regeneration). Evidence `/tmp/gov-os-lead-W2-65/verify-v3`.
-  `W2-65/pytest-of-usain/` stays (owner).
-- **In flight:** **W2-72** (DAEO-ye2a, task bot7jgimp, `log/W2-72-A5-run1.json`; tests `704b3caf`, engineer
-  `e45aecc6`, `c9983293`; verification and review next). **W2-67 run 4 = the review of rounds 2+3** (task b7le7f8wu,
-  `log/W2-67-A5-run4.json`, on `a74e9c67`; DEC-916: one review of both, one more if it fails; DEC-920 `418514f3`:
-  KPI 12 red = DEC-919's known red, TD6-1 (b), rows W2-L442..446). On DONE: merge after the first re-pin.
+- **First re-pin** carries W2-58, W2-59, W2-65, W2-66, W2-07, W2-69, W2-72. **All merged:** W2-72 `4a57bf6b`
+  (review 2 passed `e9c7b23a`; tree == merge-tree; probe_impact 0); W2-59 `e77ffb54`; W2-65 `45a6dfd5` (tree
+  `30442e9f`). Re-judge: all nine pending tickets' own merges clean. **But `45a6dfd5` has two merge bases
+  (`fa53ba34`, `1cad6aa0`) -> containment (criss-cross, fail closed) makes 22 paths findings -> W2-65's close refused.
+  My error: merging W2-65 alone (holds W2-59) has one base, same tree `30442e9f`.** Not pushed (origin at
+  `18ad2382`). **P-W2-65-M1** (P1, file in `packages/`, UNCOMMITTED on purpose) asks: reset local w2/integrate to
+  `4a57bf6b` and merge `w2/W2-65` once (Task: DAEO-e82f, both tickets named). On yes: do it, check tree == `30442e9f`,
+  re-judge (scratchpad `judge_new_merges.py`), commit the package + DEC-921, then the re-pin ACT. On no: W2-65
+  stays merged-not-closed until a containment change; commit the package.
+- **Pre-re-pin verification:** `tools/nightly.sh` on today's head (same tree), log `log/nightly-prerepin.txt`,
+  `log/nightly/<stamp>/`; its result goes in the ACT package.
+- **The re-pin ACT package:** pin commands, pytest-timeout in the pin's env, settings regeneration (drop
+  `docs/source` read-deny, a lead's own-temp allow rule); ladder evidence = W2-66's fixture trial + 32/32 planted
+  faults. Second re-pin: W2-68 + W2-71. W2-57 first free slot after the first re-pin (DEC-915).
+- **Merged, not closed (10 after the merges):** W2-58, W2-63, W2-70, W2-07, W2-67 r1, W2-69, W2-66, W2-72, W2-59,
+  W2-65. **Held DONE: W2-67** at `d0140d4d`; its probe is now STALE (the W2-59/W2-65 merges changed W1-26 and W1-27's
+  doctor file it judged): after the re-pin, merge integrate back + a judgement-only re-probe of those files.
+- **W2-72's packages:** P1 = DEC-919 (W2-L440); P2 = W1-03's same-second amend flake (2-4 of 22 on integrate too;
+  may refuse a close by chance): a small test-designer fix before the first closes (to decide; row or ticket W2-73).
+  Its residuals F5-F8 etc. to rows. Temp folder `/tmp/gov-os-lead-W2-72` to remove.
 - **Decisions today:** DEC-911 (12-digit hashes, no W2-L423 keyword under `.gov-runtime/`; `tools/keyword_warn.py`;
   W2-71 = DAEO-e8f0, second re-pin), DEC-912 (W1-01 merge rule = git's own merge), DEC-913/917 (W2-65's kernel lines;
   W1-38 two forms; owner accepted both), DEC-914 (W2-67 rounds 2+3), DEC-915 (skip guard by reasons:
