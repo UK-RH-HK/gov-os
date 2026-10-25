@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py\"",
+            "command": "h=\"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py\"; python3 \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
             "timeout": 60
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+            "command": "h=\"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"; python3 \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
             "timeout": 60
           }
         ]
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+            "command": "h=\"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"; python3 \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
             "timeout": 60
           }
         ]

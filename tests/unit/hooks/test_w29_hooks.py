@@ -107,6 +107,8 @@ class TestSubagentStopEmptyNull:
             input=inp, capture_output=True, text=True, timeout=30,
         )
         assert result.returncode == 2
+        # P-H-7: Claude Code reads an exit-2 block's reason from stderr
+        assert "work_completed" in result.stderr and "evidence" in result.stderr
 
 
 # --------------------------------------------------------------------------
@@ -146,10 +148,10 @@ class TestStopHook:
         })
         with mock.patch("sys.stdin", io.StringIO(stdin_data)), \
              mock.patch.dict(os.environ, {"GOV_TICKET": "T-aaaa", "CLAUDE_PROJECT_DIR": "/tmp/x"}):
-            wrote = []
-            with mock.patch("gov.checkpoint.record.write", side_effect=lambda *a: wrote.append(a)):
+            # P14a: the mock takes the hook's dest= keyword, so a write it makes is recorded, not swallowed
+            with mock.patch("gov.checkpoint.record.write") as write:
                 stop.main()
-            assert not wrote
+            write.assert_not_called()
 
     def test_no_ticket_returns_immediately(self):
         import stop
@@ -158,8 +160,10 @@ class TestStopHook:
              mock.patch.dict(os.environ, {"CLAUDE_PROJECT_DIR": "/tmp/x"}, clear=False):
             env = os.environ.copy()
             env.pop("GOV_TICKET", None)
-            with mock.patch.dict(os.environ, env, clear=True):
+            with mock.patch.dict(os.environ, env, clear=True), \
+                 mock.patch("gov.checkpoint.record.write") as write:
                 stop.main()
+            write.assert_not_called()  # PF-6: the case asserts what its name says
 
     def test_writes_checkpoint_on_normal_stop(self, tmp_path):
         script = SRC_HOOKS / "stop.py"
@@ -258,9 +262,10 @@ class TestPreCompactCombined:
         ckpt.write_text(WRITTEN)
         run = _run("precompact.py", project, role="orchestrator")
         assert run.returncode == 0
-        cp_dir = project / "docs" / "checkpoints" / "TEST-abcd"
-        assert not list(cp_dir.glob("CP-TEST-abcd-0001.md")), \
-            "no checkpoint record when ticket not set"
+        # DEC-444: automatic records go to .gov-runtime/scratch/checkpoints/, not docs/checkpoints/
+        records = list(project.glob(".gov-runtime/scratch/checkpoints/**/CP-*.md"))
+        records += list((project / "docs" / "checkpoints").glob("**/CP-*.md"))
+        assert not records, f"no checkpoint record when ticket not set: {records}"
 
     def test_checkpoint_failure_reports_systemmessage(self, monkeypatch, capsys):
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/nonexistent")
@@ -269,10 +274,10 @@ class TestPreCompactCombined:
         monkeypatch.setattr("sys.stdin", io.StringIO("{}"))
         precompact.main()
         out = capsys.readouterr().out
-        if out:
-            msg = json.loads(out)
-            assert "systemMessage" in msg
-            assert "checkpoint not written" in msg["systemMessage"]
+        assert out, "P9: a non-orchestrator whose checkpoint cannot be written must be told"
+        msg = json.loads(out)
+        assert "systemMessage" in msg
+        assert "checkpoint not written" in msg["systemMessage"]
 
 
 # --------------------------------------------------------------------------
@@ -354,18 +359,28 @@ class TestSessionStartCombined:
         assert "lines 3-5, 9,816 characters" in ctx
         assert "x" * 100 not in ctx and "truncated" not in ctx
 
-    def test_within_cap(self, tmp_path):
+    def test_within_cap(self, tmp_path, monkeypatch):
         project = _make_project(tmp_path)
         ckpt = project / ORCH
         ckpt.parent.mkdir(parents=True)
         ckpt.write_text(WRITTEN)
         os.utime(ckpt, (time.time() - 60, time.time() - 60))
+        # P10: a ready list longer than the cap, so the injection must be cut to fit
+        ready = tmp_path / "ready.txt"
+        ready.write_text("".join(f"T-{i:04d} a ready ticket\n" for i in range(1000)))
+        bin_dir = tmp_path / "bin"
+        bin_dir.mkdir()
+        (bin_dir / "tk").write_text(f"#!/bin/sh\ncat '{ready}'\n")
+        (bin_dir / "tk").chmod(0o755)
+        monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ.get('PATH', '/usr/bin:/bin')}")
         stdin = json.dumps({"source": "compact"})
         run = _run("sessionstart.py", project, role="orchestrator", ticket="TEST-abcd", stdin=stdin)
         assert run.returncode == 0
         data = json.loads(run.stdout)
         ctx = data["hookSpecificOutput"]["additionalContext"]
         assert len(ctx) <= sessionstart.CAP_CHARS
+        assert PROMPT in ctx and "SECRET-71" in ctx
+        assert "T-0000 a ready ticket" in ctx and "T-0999" not in ctx
 
 
 def _checkpoint(root, age_s, text=WRITTEN):
