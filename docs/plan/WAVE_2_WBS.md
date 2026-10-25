@@ -1217,6 +1217,17 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a file equal to it is caught;
   - another rule changes.
 
+#### W2-73 W1-03's head-move fixture: an amend that always moves HEAD (LITE, independent-test-designer; DEC-921 item 2)
+- **Why:** the fixture's `git commit --amend --no-edit` writes an identical commit in the same second, so two W1-03 cases fail by chance (6 of 10 alone), before containment is judged. Ticket `DAEO-qty6`.
+- **Starts** at once; **merges** before the first closes after the first re-pin.
+- **Allowed paths:** `tests/acceptance/W1-03/test_w1_03_head_move_and_acceptance_test.py`, its README.
+- **KPIs, success:**
+  - every amend that must move HEAD does so whatever the clock: 30 green runs in a row alone and in parallel;
+  - no expectation is lowered, each revised case still red under a planted fault, `Rewrite-Reason: DEC-921`.
+- **KPIs, failure:**
+  - a chance failure left;
+  - an expectation lowered.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
