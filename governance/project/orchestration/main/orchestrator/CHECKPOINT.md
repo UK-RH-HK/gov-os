@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-25 19:20 BST — DEC-921 done (single merge `6a4696eb`, tree `30442e9f`, clean); ACT-REPIN-1 sent; W2-73 running; next free DEC-922)
+## RESUME HERE (2026-10-25 19:20 BST — DEC-921 done (single merge `6a4696eb`, tree `30442e9f`, clean); ACT-REPIN-1 sent, NO lead running (owner may run Part A now); W2-73 MERGED `214dc9d6`; next free DEC-922)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -82,7 +82,7 @@
 ### Next
 1. The owner's ACT-REPIN-1 done -> smoke test -> report; then delete the backup ref; then W2-73's merge and the
    close queue (skip guard by reasons; keyword warning), W2-57 started.
-2. W2-73 DONE: merge (before the first closes). W2-67: after the re-pin, merge-back + judgement-only re-probe.
+2. W2-73 merged `214dc9d6` (30/30 alone; containment clean; temp removed). W2-67: after the re-pin, merge-back + judgement-only re-probe.
 3. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
 4. Next free: DEC-922; ticket W2-74; rows W2-M407, W2-L449, W2-H063.
 

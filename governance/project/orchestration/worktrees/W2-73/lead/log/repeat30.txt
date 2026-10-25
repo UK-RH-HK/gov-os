@@ -1,0 +1,9 @@
+test_while_another_actor_s_call_is_open_the_test_is_flagged_and_not_restored: 30 of 30 passed
+test_the_restore_next_to_a_head_move_takes_back_the_acceptance_tests_and_nothing_else: 30 of 30 passed
+--- whole W1-03 alone
+........................................................................ [ 59%]
+........................................................................ [ 79%]
+........................................................................ [ 98%]
+....                                                                     [100%]
+364 passed in 116.45s (0:01:56)
+whole_exit=0 repeat_fails=0
