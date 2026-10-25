@@ -48,8 +48,12 @@ PYTHONPATH=/home/usain/gov-os-worktrees/W2-72/src python3 -m pytest tests/accept
 | `test_w2_72_merge_tree_that_cannot_run.py` | KPI 2, fail closed |
 | `test_w2_72_nothing_else_changes.py` | KPI 3 |
 | `test_w2_72_the_two_merge_backs.py` | KPI 4 |
+| `test_w2_72_merge_over_two_calls.py` | review 1, F1: KPI 1 and KPI 2 over two Bash calls |
+| `test_w2_72_drop_behind_a_rename_or_a_directory.py` | review 1, F2 and F3: KPI 2 |
+| `test_w2_72_clean_merge_across_a_rename.py` | review 1, F4: KPI 1 |
 
-KPI 5 is the revision of W1-50's cases (below).
+KPI 5 is the revision of W1-50's cases (below). The last three files are review 1's batch, written after the
+implementation (section "Review 1's batch").
 
 **The merges.** Each is made as a ticket lead merges `w2/integrate` back:
 
@@ -70,7 +74,8 @@ Every history is checked by `assert_shape` from git's own answers before anythin
 
 ## KPI lines and their tests
 
-53 tests: 14 are red now and 39 pass now.
+The first batch: 53 tests, of which 14 were red before the implementation and 39 passed. Review 1's batch adds
+20 (below): 73 in all.
 
 ### KPI 1: a merge-back acceptance file equal to git's own merge is no change
 
@@ -217,6 +222,92 @@ Docstring lines only, no expectation changed:
 No other W1-50 case reads git's own clean merge of a both-changed acceptance test through the check or through
 `judge_commits`.
 
+## Review 1's batch (tests added after the implementation; Rewrite-Reason: DEC-918)
+
+The ticket's first review drove merges the first batch does not make. These tests come from its findings F1 to F4,
+written by a fresh test designer before the engineer changes anything. No part of the implementation was read;
+the tests use the hooks around each call, `judge_commits` and git's own answers only.
+
+20 tests: **13 are red now** and **7 pass now** (the "still caught" cases, which must keep passing).
+
+**The flow over several calls** (`bash_call` in `w2_72_support.py`). Each call is one Bash call of a session:
+
+- the PreToolUse hook runs, then the command for real, then the containment check;
+- the check runs as PostToolUse, or as PostToolUseFailure when the command failed (`git merge` exits 1 on a
+  conflict), as the harness sends it;
+- the call returns its exit code, what the agent was told, the findings recorded, `MERGE_HEAD` and the unmerged
+  paths, and two snapshots, one before the check and one after it. A snapshot holds HEAD, `git status` with every
+  file, the watched files and `git ls-files -s`;
+- "the check moved nothing" means the two snapshots are equal.
+
+A failure message shows every call's agent-facing text and finding records.
+
+### F1: a merge-back over two calls keeps git's own merge (KPI 1, DEC-918 item 1)
+
+`test_w2_72_merge_over_two_calls.py`. The merges are made in an orchestrator session's own calls
+(`GOV_ROLE=orchestrator`, `GOV_TICKET=DAEO-zz90`), and the merge commit carries `Task: DAEO-zz90` and
+`Role: orchestrator`.
+
+| Test | Cases | Expected | Now |
+|---|---|---|---|
+| `test_a_merge_back_over_two_calls_keeps_git_s_own_merge_of_the_acceptance_tests` | `a-conflict-on-the-source-file-resolved-in-the-second-call` (as `03f470a5`). Call 1, `git merge --no-ff --no-commit w1/W1-90`, stops on a conflict in `src/gov/guard/decide.py`, which both sides' engineers changed, while git combines `test_merged.py` (both sides' test designers changed it) and brings `test_new.py` (only the merged side added it). Call 2 resolves the source file, stages it and commits. `no-conflict-and-the-commit-in-the-second-call`: call 1 is the same merge with no conflict; call 2 is `git commit` with the trailers | neither call's check restores, flags or reports (silent, and nothing moved). The merge commit holds git's own merge of both tests: the combined test as `git merge-tree --write-tree` writes it, and the new test present. The tree and the index equal the merge commit. `judge_commits([merge])` is `[]` | **red**: after call 1 the check reports "Acceptance test restored from HEAD" for both tests (recorded `reverted`). The combined test is set back to the first parent's version and the new one is deleted, in the tree and in the index. Call 2's merge commit holds the first parent's versions: it is flagged ("a merge commit's own change to a ticket file or an acceptance test"), and `judge_commits` returns that finding |
+| `test_a_hand_write_of_an_acceptance_test_in_a_merge_over_two_calls_stays_caught` | the history of the no-conflict case, with line 10 of `test_merged.py` changed by hand: `in-the-first-call-after-the-merge` (call 1 merges, then writes); `in-a-call-of-its-own-between` (three calls); `in-the-commit-s-call-before-the-commit` | KPI 2: the check of the call that makes the hand write reports it and records a finding that names the test (restored or flagged). When the committed merge's test differs from git's own merge (it holds the hand write, or a restore that is not git's merge), the commit's check has a finding for the merge commit that names the test, and so has `judge_commits` | passes; must keep passing |
+| `test_a_conflict_in_an_acceptance_test_over_two_calls_stays_caught` | both sides changed line 2 of `test_merged.py`, and git reports the test as conflicted (call 1 exits 1). Call 2 stages the first parent's version whole, the merged side's version whole, or the blob git's own merge writes with its markers, then commits | KPI 2: call 1's check catches the conflicted test. The commit's check and `judge_commits` each have a finding for the merge commit that names it | passes; must keep passing |
+| `test_the_same_merge_over_two_calls_in_an_engineer_s_session_keeps_today_s_behaviour` | the no-conflict case in an engineer's session (`GOV_ROLE=engineer` on `DAEO-zz90`), committed with the engineer's trailers | DEC-266, today's behaviour. Call 1's check reports both tests and records them as `reverted`, and both are as `HEAD` holds them in the tree and the index. Call 2's merge is flagged with nothing reverted (W1-03's default for a merge that is not a fast-forward) | passes; must keep passing |
+
+### F2 and F3: a drop hidden behind a rename or a file replaced by a directory (KPI 2)
+
+`test_w2_72_drop_behind_a_rename_or_a_directory.py`, 8 tests, **all red now**.
+
+| Test | Expected |
+|---|---|
+| `test_the_live_check_flags_a_drop_behind_a_rename_or_a_directory` | reported, and recorded as `flagged` in a finding for the merge commit that names a path of the test (its old or new name, the directory's file, or a moved-aside name `<path>~<commit>`). Nothing moved |
+| `test_judge_commits_finds_a_drop_behind_a_rename_or_a_directory` | `judge_commits([merge])` returns one finding, for the merge commit, that names such a path |
+
+Each test runs four cases:
+
+| Case | Finding | The history |
+|---|---|---|
+| `a-clean-rename-the-first-parent-s-renamed-file-whole` | F2 (a) | a test designer renamed `test_merged.py` to `test_renamed.py` on `main` (`git mv`) and changed its line 2 on the merged side. Git's own merge is clean, with the edit at the new name. The merge commit holds `main`'s renamed file whole, so the merged side's edit is dropped |
+| `a-conflict-at-the-new-name-the-first-parent-s-version-whole` | F2 (b) | `main`'s rename also changed line 2, so git reports the conflict at the new name. It is resolved with `git checkout --ours` |
+| `a-directory-on-main-the-merged-side-s-edit-dropped` | F3 | `main` deleted the test and added a directory of the same name holding `test_inner.py`; the merged side changed line 2. Git reports the conflict only as `test_merged.py~<commit>`. The merge commit keeps the directory and drops the moved-aside copy (`git rm`) |
+| `a-directory-on-the-merged-side-the-first-parent-s-edit-dropped` | F3 | the same with the sides swapped, so `main`'s edit is dropped |
+
+`assert_moved_shape` checks each history from git's own answers:
+
+- two parents and one merge base;
+- the conflicts git's own merge reports: none, the new name, or one moved-aside name;
+- that the merge commit does not hold git's own merge of the folder `tests/acceptance/W1-90/`;
+- that it holds one side's version of that folder whole.
+
+**Red now because** both checks are silent on all four: the drop passes as git's own merge.
+
+### F4: git's own clean merge across a rename passes (KPI 1, DEC-918 item 1, DEC-912)
+
+`test_w2_72_clean_merge_across_a_rename.py`, 3 tests, **all red now**.
+
+The history: `main` changed line 2 of `test_merged.py` (a test designer's commit), and the merged side renamed it to
+`test_renamed.py` (`git mv`, a test designer's commit). Git's own merge is clean: `main`'s edit at the new name and
+the old path gone. The merge commit holds that merge exactly, and the content at the new name is held by neither
+parent.
+
+| Test | Expected | Red now because |
+|---|---|---|
+| `test_the_live_check_is_silent_on_git_s_own_merge_across_a_rename` | one call: silent, and nothing moved | `test_renamed.py` is flagged: "a merge commit's own change to a ticket file or an acceptance test" |
+| `test_judge_commits_returns_no_finding_for_git_s_own_merge_across_a_rename` | `judge_commits([merge])` is `[]` | it returns that finding |
+| `test_git_s_own_merge_across_a_rename_over_two_calls_is_kept` | F1 (b)'s form, over two calls: as F1's first test expects | after call 1 the check restores both names from `HEAD`, and call 2's merge is flagged |
+
+### Earlier cases that assert the opposite of F1
+
+None of the earlier cases leaves a merge in progress between two calls:
+
+- W1-03 and W1-50 make every merge in one call (`git merge ... && git commit`);
+- W1-45, W1-47 and W1-38 make no merge through the hooks.
+
+No earlier case expects a working-tree restore of an acceptance file that a merge in progress holds as git's own
+merge, so none is revised.
+
 ## Revisions
 
 - `conftest.py` folded into the support module: its fixtures and helpers into `w2_72_support.py`, the import path it set up into the top of each test module. Rewrite-Reason: DEC-880 (W2-66's KPI 12 case). No expectation changed.
+- Review 1's batch: 20 tests added after the implementation, from the ticket's first review (F1 to F4). These are three new modules and helpers at the end of `w2_72_support.py`'s merge section (`bash_call`, the two-call histories, the rename and directory histories, and `assert_moved_shape`). The first batch's cases, helpers and expectations are unchanged. Rewrite-Reason: DEC-918.
