@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.306 (the version table at the end of each section gives the history)
+**Version:** 0.307 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10890,3 +10890,28 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.306 | 2026-10-25 | Delegated (orchestrator, DEC-102): DEC-920 (W2-67's run 3: the KPI 12 red is DEC-919's known red; W2-L420's case keeps its counted finding with a recorded reason; rows W2-L442 to W2-L446; TD8-B is the sweep's; the review of rounds 2 and 3 runs under DEC-916). Next free id: DEC-921. |
+
+## 305. The owner's answer of 2026-10-25 on P-W2-65-M1 (register v0.307, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-921 — The two unpushed W2-59 and W2-65 merges are replaced by one merge of `w2/W2-65`, under three conditions; W2-73 for W1-03's fixture
+- **Status:** ACCEPTED (owner, 2026-10-25, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-25)`) · **Under:** DEC-884, DEC-918, DEC-410, DEC-750, DEC-754 · **Basis:** package P-W2-65-M1 (`governance/project/orchestration/packages/P-W2-65-M1.md`): merging `w2/W2-59` (`e77ffb54`) and then `w2/W2-65` (`45a6dfd5`) gave the second merge two merge bases, which containment reads fail closed, so W2-65's close would be refused; one merge of `w2/W2-65` (which holds W2-59) has one merge base and the same tree.
+- **Decision:**
+  1. **Yes to (a)**, with three conditions:
+     - before the reset, confirm that no dropped commit is on origin (never force-push; if any is pushed, stop and bring a package);
+     - keep a backup ref of the head first, not deleted until the re-pin has passed its smoke test;
+     - after the single merge, confirm the tree is `30442e9f` and that containment, the trailer gate and W1-01 all judge it clean.
+  2. **Then** create W2-73 (LITE) for W1-03's fixture, and send the re-pin ACT package.
+- **Done (2026-10-25):**
+  - **Origin:** after a fetch, `origin/w2/integrate` was at `18ad2382`, behind `4a57bf6b`; `git branch -r --contains` found neither `e77ffb54` nor `45a6dfd5`.
+  - **Backup ref:** `w2/integrate-before-reset-2026-10-24` at `45a6dfd5`.
+  - **Reset and merge:** reset to `4a57bf6b`, then one merge `6a4696eb` (Task: DAEO-e82f, both tickets named); tree `30442e9f`, equal to git's merge-tree, one merge base (`fa53ba34`).
+  - **Containment:** no finding over the 105 commits of W2-65, W2-59, W2-72 and W2-66, nor in any pending ticket's merges.
+  - **Trailer gate:** nothing lacking for those four tickets.
+  - **W1-01:** the history and integration-merges cases pass (37 passed, 3 skipped).
+- **Changes:** DEC-884 item 3 (the two tickets merge in one merge of the stacked branch).
+- **Where it goes (DEC-851):** this register; package P-W2-65-M1 (committed with this record); RESUME HERE; the re-pin ACT package.
+- Next free id: DEC-922.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.307 | 2026-10-25 | Owner (recorded by the orchestrator, DEC-861): DEC-921 (P-W2-65-M1 (a) under three conditions: nothing dropped was on origin; backup ref `w2/integrate-before-reset-2026-10-24` kept until the re-pin's smoke test; one merge `6a4696eb` of `w2/W2-65`, tree `30442e9f`, judged clean by containment, the trailer gate and W1-01; then W2-73 for W1-03's fixture and the re-pin ACT). Next free id: DEC-922. |
