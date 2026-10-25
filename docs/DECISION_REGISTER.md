@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.305 (the version table at the end of each section gives the history)
+**Version:** 0.306 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10871,3 +10871,22 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.305 | 2026-10-24 | Delegated (orchestrator, DEC-102): DEC-919 (W2-66's lead-verification case a known red on a ticket branch that changes a plain run's configuration; W2-68's test designer narrows it, row W2-L440; stale DEC-608 README text, row W2-L441; W2-65 held at `f6881547`). Next free id: DEC-920. |
+
+## 304. W2-67's run 3 return (register v0.306, delegated, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-920 — W2-67's rounds 2 and 3: the KPI 12 red is DEC-919's known red; W2-L420's case keeps its counted finding with a recorded reason; the review runs (DEC-916)
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W2 orchestrator, 2026-10-25; for the owner's digest) · **Under:** DEC-914, DEC-916, DEC-919, DEC-868 item 3, DEC-908, DEC-902, DEC-866 · **Basis:** W2-67's run 3 return (`log/W2-67-A5-run3.json`, head `a74e9c67`): every revision red under its plant and green on the head; full run 16,134 passed, 1 failed (W2-66's KPI 12 case, on `tests/acceptance/W1-27/conftest.py`, where the accepted TD1C-A fixture lives); serial-only 265 passed; `gov check` exit 0; no review run (DEC-914 item 4).
+- **Decision:**
+  1. **P-W2-67-V1:** the red is DEC-919's known red (row W2-L440); it does not stop W2-67's DONE, and the fixture stays where it is.
+  2. **P-W2-67-TD6-1 (b):** W2-L420's case (a decision checker that cannot run while `gov check` is green) keeps asserting the close's counted finding at the context step, with the reason recorded in its docstring (`Rewrite-Reason: DEC-920`, by the next test designer of W1-30 if the docstring needs it); whether DEC-868 wants it refused uncounted at the pre-close gate is row W2-L442.
+  3. **Rows:** W2-L442 (TD6-1's option (a)); W2-L443 (core-authority GREEN when W1-11's decision checker cannot run, as in a shallow clone); W2-L444 (TD7-A: a public declared time limit in the secrets check); W2-L445 (TD8-A: a W1-07 rebuild case still leaves a code-graph daemon folder); W2-L446 (the nightly re-measure of the 180 s bound under worksteal, KPI 2's second half).
+  4. **TD8-B is DEC-902's:** the weekly sweep already removes the code-graph daemon's run folders no process holds; its lists 3 and 5 run in a quiet moment.
+  5. **TD7-B and the untracked plant** (`tests/acceptance/W1-27/w2_67_td4_plant.py`, td-7's scratch JUnit) stay in W2-67's worktree and go with it after the close.
+  6. **The review (DEC-916 item 4):** one fresh FULL review of rounds 2 and 3 together on `a74e9c67`; if it fails on a finding an honest agent can hit that fails open or loses work, one test-design batch, one engineer, a full run and a second, last review.
+- **Changes:** none to earlier decisions.
+- **Where it goes (DEC-851):** this register; the Wave 2 list (rows W2-L442 to W2-L446); W2-67's run 4 brief; RESUME HERE; the owner's digest.
+- Next free id: DEC-921.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.306 | 2026-10-25 | Delegated (orchestrator, DEC-102): DEC-920 (W2-67's run 3: the KPI 12 red is DEC-919's known red; W2-L420's case keeps its counted finding with a recorded reason; rows W2-L442 to W2-L446; TD8-B is the sweep's; the review of rounds 2 and 3 runs under DEC-916). Next free id: DEC-921. |
