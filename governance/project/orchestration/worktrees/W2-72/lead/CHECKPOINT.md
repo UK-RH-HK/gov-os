@@ -28,6 +28,14 @@
 - Batch td-2 (test designer, xhigh): fold conftest into support module; Rewrite-Reason DEC-880. Brief briefs/td-2.md.
   The guard refused one inline python here-doc of mine (DEC-409 "cannot be read"); not retried.
 - After td-2: full run v2 (rebuild first), then review 1.
+- td-2 returned DONE: c9983293 (conftest folded; 53 ids identical; trailers incl. Rewrite-Reason DEC-880). Tripwire OK.
+- Rebuild 3 ok; gov check exit 0 (2 yellows); collect 16489/16491 (2 deselected), no error.
+- Full run v2 at c9983293: parallel 16193 passed, 31 skipped, 0 failed (42:05); serial-only 265 passed (17:02).
+- Keyword-bearing logs (collect*.txt, full-v1/v2-parallel.xml: test names with the rule's word) moved to
+  /tmp/gov-os-lead-W2-72/logs-kw/.
+- 6aaa404d: lead's checkpoint CP-DAEO-ye2a-0005 committed (before the probe). HEAD TO PROBE = 6aaa404d5c48.
+- Review 1 launched: briefs/rev-1.md, log/rev-1.json, tripwire-before-4.json. Nothing may be committed after
+  6aaa404d except the passing probe record.
 - Next: verification; then review 1 (gov launch independent-auditor, --effort max); commit probe only if pass.
 - Loop count: 1 implementer iteration (converging).
 - Read refusals met (lead): 0.

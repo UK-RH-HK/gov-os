@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-25 01:40 BST — W2-67 run 3 done (unreviewed) -> DEC-920, review run 4 launched; W2-72 in verification; W2-65 held; next free DEC-921)
+## RESUME HERE (2026-10-25 01:40 BST — W2-67 DONE (review passed, probe `d0140d4d`; held to merge after the re-pin; rows W2-L447, W2-L448); W2-72 in verification; W2-65 held; next free DEC-921)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -68,7 +68,7 @@
   W2-66; tickets W2-71 `e48a0f57`, W2-72 `8fe6d284`; packages P-W2-69-R2-1, P-W2-L423-A, P-W2-66-M1-R2, P-SKIP-GUARD-1,
   P-W2-67-R23, P-W2-L437-A/B.
 - **Closed:** W2-01, W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed / 7 merged-not-
-  closed / 11 built and held (W2-65 joins) / 2 in flight (W2-72, W2-67 run 4) / 36 not started, of 62; keystones
+  closed / 11 built and held (W2-65 joins) / 1 in flight (W2-72); W2-67 held DONE / 36 not started, of 62; keystones
   0 / 8 / 1.
 - **Owner's digest items:** P-W2-67-TD1B-B, P-W2-67-TD2-A; DEC-919 (delegated); skip list addition (test_inputs).
 - **Disk:** `df -i /`; the sweep's lists 3 + 5 pending. **Credentials:** two tracked fixtures (W2-M398).

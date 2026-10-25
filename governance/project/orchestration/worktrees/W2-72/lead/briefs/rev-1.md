@@ -1,5 +1,5 @@
 You are a fresh reviewer. Ticket DAEO-ye2a (W2-72), profile FULL, is implemented in the worktree
-`/home/usain/gov-os-worktrees/W2-72` on branch `w2/W2-72`, at the head `c9983293b646`, and its acceptance tests pass. You
+`/home/usain/gov-os-worktrees/W2-72` on branch `w2/W2-72`, at the head `6aaa404d5c48`, and its acceptance tests pass. You
 probe that head for behaviour the tests miss. You write nothing. Your time budget is about 90 minutes.
 
 ## Step 0, before any work: the sandbox check (report it first in your return)
@@ -64,12 +64,12 @@ the head above). If anything differs, stop and say so.
 - The decisions in `docs/DECISION_REGISTER.md`: DEC-918, DEC-912, DEC-410 (DP-21 to DP-27), DEC-421, DEC-572,
   DEC-453, DEC-266, DEC-269, DEC-403, DEC-750, DEC-754, ADR-0001 (`docs/adr/ADR-0001-threat-model.md`).
 - The ticket's acceptance tests (`tests/acceptance/W2-72/`, and the revised W1-50 cases of commit `704b3cafbb81`) and
-  the code at the head to probe: `git diff w2/integrate...c9983293b646 -- src/` shows the change. The ticket's commits:
+  the code at the head to probe: `git diff w2/integrate...6aaa404d5c48 -- src/` shows the change. The ticket's commits:
   `704b3cafbb81` (test designer: the tests, W1-50's two cases revised), `aa3d11fc142a` (lead: checkpoint record),
   `e45aecc6dde6` (engineer: the change and its builder tests `tests/unit/guard/test_w2_72_merge_rule.py`),
-  `c9983293b646` (test designer: the tests' conftest folded into their support module, for W2-66's KPI 12 case).
+  `c9983293b646` (test designer: the tests' conftest folded into their support module, for W2-66's KPI 12 case), and `6aaa404d5c48` (lead: checkpoint record before this review; no code).
 - The lead's verification at this head: a full rebuild; `gov check` exit 0; the full parallel run in the close's form
-  16,193 passed, 31 skipped, 0 failed; the serial-only cases are being run as you start.
+  16,193 passed, 31 skipped, 0 failed; the serial-only cases 265 passed; all at `c9983293b646`, which `6aaa404d5c48` changes only by a checkpoint record.
 
 ## What you probe for
 
@@ -129,7 +129,7 @@ After the twelve fields, give the **probe record's full text**, ready for the le
     commissioned_by: orchestrator
     judged_by: orchestrator
     judgement: <pass | fail>
-    probed_commit: c9983293b646
+    probed_commit: 6aaa404d5c48
     ---
 
 (`probed_commit` is given here and in your return as 12 digits; the lead writes the full id into the committed record.)
