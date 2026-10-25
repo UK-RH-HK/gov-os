@@ -7,7 +7,7 @@ W=/home/usain/gov-os-worktrees/W2-67
 LOG=$W/.gov-runtime/scratch/lead/log
 L=$1
 export TMPDIR=/tmp/gov-os-lead-W2-67
-mkdir -p "$TMPDIR"
+mkdir -p "$TMPDIR/verify-$L"  # JUnit XML under /tmp, never in the worktree
 cd "$W" || exit 99
 export PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH
 export PYTHONPATH=$W/src:$W/src/gov/close/pytest_plugin
@@ -29,13 +29,13 @@ sample() {  # $1 = pid, $2 = phase
 echo "label=$L start=$(date -Is) tmp_before_inodes=$(du -s --inodes $TMPDIR | cut -f1)" > "$LOG/verify-$L.summary"
 t0=$(date +%s)
 flock /tmp/gov-os-verify.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only \
-  -o tmp_path_retention_policy=failed -rs --junitxml="$LOG/verify-$L-parallel.xml" > "$LOG/verify-$L-parallel.out" 2>&1 &
+  -o tmp_path_retention_policy=failed -rs --junitxml="$TMPDIR/verify-$L/parallel.xml" > "$LOG/verify-$L-parallel.out" 2>&1 &
 p=$!; sample $p parallel; wait $p; e1=$?
 t1=$(date +%s)
 echo "parallel exit=$e1 seconds=$((t1-t0))" >> "$LOG/verify-$L.summary"
 export GOV_CLOSE_SERIAL_ONLY_GIVEN="$SERIAL"
 flock /tmp/gov-os-verify.lock python3 -m pytest $SERIAL -q -p no:cacheprovider -p gov_close_serial_only \
-  -o tmp_path_retention_policy=failed -rs --junitxml="$LOG/verify-$L-serial.xml" > "$LOG/verify-$L-serial.out" 2>&1 &
+  -o tmp_path_retention_policy=failed -rs --junitxml="$TMPDIR/verify-$L/serial.xml" > "$LOG/verify-$L-serial.out" 2>&1 &
 p=$!; sample $p serial; wait $p; e2=$?
 t2=$(date +%s)
 echo "serial exit=$e2 seconds=$((t2-t1))" >> "$LOG/verify-$L.summary"

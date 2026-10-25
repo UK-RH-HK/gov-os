@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-24 23:35 BST — W2-65 DONE, held at `f6881547`; DEC-919; W2-72 (first re-pin) and W2-67 run 3 in flight; next free DEC-920)
+## RESUME HERE (2026-10-25 01:40 BST — W2-67 run 3 done (unreviewed) -> DEC-920, review run 4 launched; W2-72 in verification; W2-65 held; next free DEC-921)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -48,9 +48,10 @@
   own: W2-54 600 s timing (W2-L429), W1-19 load_sensitive, W2-66's lead-verification case (DEC-919, W2-L440);
   `gov check` RED only adapter-portability until the regeneration). Evidence `/tmp/gov-os-lead-W2-65/verify-v3`.
   `W2-65/pytest-of-usain/` stays (owner).
-- **In flight:** **W2-72** (DAEO-ye2a, task bot7jgimp, `log/W2-72-A5-run1.json`, FULL ~5 h: containment = DEC-912,
-  W1-50 DP-24 revisions). **W2-67 run 3** (rounds 2+3, DEC-914; task b6xu384z3; returns DONE-UNREVIEWED, then one
-  review of both rounds under DEC-916, one more if it fails; it will show W2-66's lead-verification known red).
+- **In flight:** **W2-72** (DAEO-ye2a, task bot7jgimp, `log/W2-72-A5-run1.json`; tests `704b3caf`, engineer
+  `e45aecc6`, `c9983293`; verification and review next). **W2-67 run 4 = the review of rounds 2+3** (task b7le7f8wu,
+  `log/W2-67-A5-run4.json`, on `a74e9c67`; DEC-916: one review of both, one more if it fails; DEC-920 `418514f3`:
+  KPI 12 red = DEC-919's known red, TD6-1 (b), rows W2-L442..446). On DONE: merge after the first re-pin.
 - **Decisions today:** DEC-911 (12-digit hashes, no W2-L423 keyword under `.gov-runtime/`; `tools/keyword_warn.py`;
   W2-71 = DAEO-e8f0, second re-pin), DEC-912 (W1-01 merge rule = git's own merge), DEC-913/917 (W2-65's kernel lines;
   W1-38 two forms; owner accepted both), DEC-914 (W2-67 rounds 2+3), DEC-915 (skip guard by reasons:
@@ -67,7 +68,7 @@
   W2-66; tickets W2-71 `e48a0f57`, W2-72 `8fe6d284`; packages P-W2-69-R2-1, P-W2-L423-A, P-W2-66-M1-R2, P-SKIP-GUARD-1,
   P-W2-67-R23, P-W2-L437-A/B.
 - **Closed:** W2-01, W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed / 7 merged-not-
-  closed / 11 built and held (W2-65 joins) / 2 in flight (W2-72, W2-67 run 3) / 36 not started, of 62; keystones
+  closed / 11 built and held (W2-65 joins) / 2 in flight (W2-72, W2-67 run 4) / 36 not started, of 62; keystones
   0 / 8 / 1.
 - **Owner's digest items:** P-W2-67-TD1B-B, P-W2-67-TD2-A; DEC-919 (delegated); skip list addition (test_inputs).
 - **Disk:** `df -i /`; the sweep's lists 3 + 5 pending. **Credentials:** two tracked fixtures (W2-M398).
@@ -75,9 +76,9 @@
 
 ### Next
 1. W2-72 DONE: merge, probe_impact, temp folder; then W2-59 + W2-65 together; re-judge; the re-pin ACT (P1 ping).
-2. W2-67 run 3 DONE-UNREVIEWED: its review (DEC-916), then merge after the re-pin.
+2. W2-67 run 4 DONE (review passed): merge after the first re-pin; temp folder.
 3. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
-4. Next free: DEC-920; ticket W2-73; rows W2-M407, W2-L442, W2-H063.
+4. Next free: DEC-921; ticket W2-73; rows W2-M407, W2-L447, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2

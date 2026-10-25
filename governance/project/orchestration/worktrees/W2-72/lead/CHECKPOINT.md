@@ -21,6 +21,13 @@
 - Full run v1: script in my session scratchpad (full-run.sh v1 parallel|serial); logs log/full-v1-*.
 - Lead's own note for the reviewer/residuals: a rename on one side + edit on the other of an acceptance file gives a
   new path equal to git's merge but not "both changed" → still flagged (stricter, other) — candidate residual.
+- Full run v1 at e45aecc6: parallel 1 failed, 16192 passed, 31 skipped (46:03); serial-only 265 passed (21:17).
+  The one red: tests/acceptance/W2-66/test_w2_66_lead_verification.py::test_no_file_a_plain_run_reads_for_its_
+  configuration_or_collection_changes — our new tests/acceptance/W2-72/conftest.py (W2-66's case hard-codes
+  OWN_FOLDER=W2-66; W2-66 merged 2026-10-24 20:29; every later branch adding a conftest hits it) → row for orchestrator.
+- Batch td-2 (test designer, xhigh): fold conftest into support module; Rewrite-Reason DEC-880. Brief briefs/td-2.md.
+  The guard refused one inline python here-doc of mine (DEC-409 "cannot be read"); not retried.
+- After td-2: full run v2 (rebuild first), then review 1.
 - Next: verification; then review 1 (gov launch independent-auditor, --effort max); commit probe only if pass.
 - Loop count: 1 implementer iteration (converging).
 - Read refusals met (lead): 0.
