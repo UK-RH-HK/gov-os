@@ -1,0 +1,10 @@
+2026-10-25 05:06:27 quiet
+head 45a6dfd5
+clone rebuilt
+parallel exit 1 in 2927 s: 3 failed, 16295 passed, 31 skipped in 2680.40s (0:44:40)
+serial exit 0 in 1087 s: 265 passed, 1 warning in 995.01s (0:16:35)
+passes-alone tests/acceptance/W1-03/test_w1_03_head_move_and_acceptance_test.py::test_the_restore_next_to_a_head_move_takes_back_the_acceptance_tests_and_nothing_else
+red-alone tests/acceptance/W1-03/test_w1_03_head_move_and_acceptance_test.py::test_while_another_actor_s_call_is_open_the_test_is_flagged_and_not_restored: 1 failed in 0.42s
+passes-alone tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+verdict: red 1
+2026-10-25 06:32:56 done

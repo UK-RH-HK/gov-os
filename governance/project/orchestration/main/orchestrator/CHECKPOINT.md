@@ -44,8 +44,15 @@
   `4a57bf6b` and merge `w2/W2-65` once (Task: DAEO-e82f, both tickets named). On yes: do it, check tree == `30442e9f`,
   re-judge (scratchpad `judge_new_merges.py`), commit the package + DEC-921, then the re-pin ACT. On no: W2-65
   stays merged-not-closed until a containment change; commit the package.
-- **Pre-re-pin verification:** `tools/nightly.sh` on today's head (same tree), log `log/nightly-prerepin.txt`,
-  `log/nightly/<stamp>/`; its result goes in the ACT package.
+- **Pre-re-pin verification DONE** (`tools/nightly.sh`, clone of `45a6dfd5`, tree `30442e9f`, 05:06-06:33): parallel
+  16,295 passed / 3 failed / 31 skipped; serial 265 passed. Reds: W2-54 green-here (passes alone, W2-L429); W1-03
+  `test_the_restore_next_to_a_head_move...` (passes alone); W1-03
+  `test_while_another_actor_s_call_is_open_the_test_is_flagged_and_not_restored` (red alone): **a pre-existing flake,
+  not W2-72's**: 6/10 fail alone at `45a6dfd5`, 7/10 at `c60c97041b97` (before W2-72), `tools/w103_repeat.sh`,
+  `log/w103-repeat.txt`; cause: the fixture's same-second `git commit --amend --no-edit` leaves HEAD unchanged (fails
+  closed, before any check). **Fix before the first closes:** ticket W2-73 (LITE, test designer, W1-03's file), based
+  on `4a57bf6b` (W1-03 unchanged by the W2-59/65 merges), created AFTER the owner's P-W2-65-M1 answer (no commit on
+  top of `45a6dfd5` until then). Clones: `~/gov-os-runs/W2-00/nightly/20261025-0501`, `.../w103-before-w272`.
 - **The re-pin ACT package:** pin commands, pytest-timeout in the pin's env, settings regeneration (drop
   `docs/source` read-deny, a lead's own-temp allow rule); ladder evidence = W2-66's fixture trial + 32/32 planted
   faults. Second re-pin: W2-68 + W2-71. W2-57 first free slot after the first re-pin (DEC-915).
