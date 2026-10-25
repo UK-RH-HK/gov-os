@@ -47,6 +47,13 @@ the same change),
 ``test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_flagged_for_the_test_only``
 and
 ``test_a_conflict_in_an_acceptance_test_resolved_to_the_merged_side_s_content_is_flagged``.
+
+**Silent again, since DEC-918** (Rewrite-Reason: DEC-918). A path both parents
+changed is not the merge commit's own change when the merge commit holds
+exactly git's own merge of it. The last case of this file (both sides made the
+same change) is git's own merge and is silent again. The other two take one
+side's content whole, which is no clean merge of the test (git reports a
+conflict, or ``-X theirs`` sets it aside): still flagged.
 """
 
 from __future__ import annotations
@@ -100,16 +107,19 @@ def test_a_merge_that_takes_each_parent_s_change_of_its_own_path_is_silent(proje
         )
 
 
-def test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_flagged(project, sandbox, call):
-    """Rewritten after implementation; reason: delegated decision, DEC-410 (DP-24). Until then this case was
-    ``test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent`` and pinned silence: the merge
-    commit holds content that is each parent's, the path differs from no parent, and by DEC-403 it is not the
-    merge commit's change (the guard ``assert_taking`` still checks the history by those words).
+def test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent(project, sandbox, call):
+    """Rewritten; Rewrite-Reason: DEC-918. Until then this case was
+    ``test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_flagged`` and expected, by DEC-410
+    DP-24 read by its words (under ``tests/acceptance/**`` a path more than one parent changed against the
+    merge base is the merge commit's own change), that the test is named. Before DEC-410 it was ``..._is_silent``
+    and pinned silence by DEC-403 (the guard ``assert_taking`` still checks the history by those words).
 
-    DEC-410, DP-24, read by its words: under ``tests/acceptance/**`` a path more than one parent changed
-    against the merge base is the merge commit's own change. Both parents changed the test against the merge
-    base, in the same way. The same history: the test is named; the engineer's source file the branch
-    brings is not."""
+    DEC-918 item 1 changes DP-24 for acceptance tests: a path both parents changed is not the merge commit's own
+    change when the merge commit holds exactly git's own merge of it (``git merge-tree --write-tree``, no
+    conflict on that file). Both parents made the same change of the test; git's own merge of it is that
+    content, which the merge commit holds. Now expected: the check is silent and moves nothing; the engineer's
+    source file the branch brings is not named either. ``read_merge`` still puts the test in ``own``
+    (``test_w1_50_acceptance_test_changed_on_both_sides.py``, DEC-918 item 4)."""
     shape = symmetric.both_sides_made_the_same_change(project, sandbox)
     result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
     symmetric.assert_taking(project, shape)
@@ -122,6 +132,5 @@ def test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_flagged(pro
         f"merge base's"
     )
     what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
-    check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
-    check_support.assert_not_recorded(result, support.SOURCE, what=what)
+    check_support.assert_silent(result, what)
     check_support.assert_left_as_the_call_left_it(project, left, what)
