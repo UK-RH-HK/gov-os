@@ -5,10 +5,10 @@ DEC-889 item 5, DEC-899 items 3 and 7, DEC-813, DEC-823, DEC-871, DEC-883 item 5
 lens I's P-IS-6 (`docs/assessment/2026-10/I-SYNTHESIS.md`), I4 findings 2 and 5 and P-I4-5, I2 F12.
 
 Written by the independent test designer (MR-3) from the KPI lines and their sources, before any implementation,
-in two batches of one session. **Batch A (this commit): KPI line 1, the rulesync probe, and KPI line 2, the doctor
-probes.** Batch B adds KPI lines 3 to 7 (the serial-only list as P-IS-6's two tables, W1-30's r11 and r13, W1-50's
-`CLAUDE*` removal, a p95 case for a test designer's read, W2-M332's timing, the resource gate and the network check)
-to this folder and to the earlier files the ticket names; its sections below are marked "batch B".
+in two batches of one session. **Batch A: KPI line 1, the rulesync probe, and KPI line 2, the doctor probes.**
+**Batch B: KPI lines 3 to 7** (the serial-only list as P-IS-6's first table and the route to the nightly, W1-30's r11
+and r13, W1-50's `CLAUDE*` removal, a p95 case for a test designer's read, W2-M332, the wall-clock limits under
+load, and the network reason of the live host cases), in this folder and in the earlier files the ticket names.
 
 ## Run, and the code under test
 
@@ -79,7 +79,9 @@ marker, a skip other than the absent tool's, or a list entry.
 | `test_a_probed_tool_that_never_answers…` | doctor's own limit for the probe (5 s today) |
 | the rest | 1 to 3 s |
 
-Batch A today: 13 cases, 8 red and 5 green (the guards), in 13 s under `-n auto`.
+Batch A today: 13 cases, 8 red and 5 green (the guards), in 13 s under `-n auto`. Batch B's cases in this folder
+take 0.02 s (the list's two), 3.6 s, 2.2 s and 1.1 s (the route through the close, the broken nightly file, the
+nightly's form) and 2.4 s (the designer's p95).
 
 ## Earlier tests revised in batch A (each in a commit of its own, with its `Rewrite-Reason:`)
 
@@ -100,9 +102,117 @@ fi; exec ~/.local/bin/rulesync "$@"`, as `rulesync` in a folder put first on the
 named by `RULESYNC_BIN`. Run with `PYTHONPATH=<worktree>/src`, `-p no:cacheprovider -o
 tmp_path_retention_policy=failed`.
 
-## Batch B (to come in this folder)
+## KPI line 3: the serial-only list as P-IS-6's first table, and the route to the nightly (batch B)
 
-KPI line 3 (the serial-only list as P-IS-6's two tables; every kept entry with its reason; the moves to the parallel
-phase and to the nightly; latency cases alone), line 4 (W1-30's r11 test reads the reworked list), line 5 (W1-30's
-r13 limit, W1-50's `CLAUDE*` removal, a p95 case for a designer's read, W2-M332), line 6 (the resource gate) and line
-7 (the network check). Line 8 (the removal of `load_sensitive` entries) is the orchestrator's commit, not a test here.
+**The form** (`tests/acceptance/serial-only.txt`, the test designer's file). Today's readers read it as they are:
+one entry on a line, the beginning of a node id, the text after ` #` a comment (`gov close`'s plugin, the
+orchestrator's nightly script, W1-30's r11). Within that form every entry's comment is `<route>: <kind>: <reason>`:
+
+- route `serial`: kept in the close, alone after its parallel phase, as before;
+- route `nightly`: collected by the close and left out of both its phases (deselected, never ignored, never
+  skipped); run alone in the nightly after its parallel run less the list;
+- kinds `latency`, `daemon`, `race` take the serial route; `real-model` and `live-session` the nightly route
+  (DEC-889 item 5; `real-model-or-daemon` is split in two). The header documents all of it, and that a case is never
+  listed merely because it is slow, and that a marker routes nothing.
+
+| Success, and the failure line it guards | Tests | Today, and why |
+|---|---|---|
+| the header documents the form, the routes, the kinds and the rule on slow cases | `test_w2_57_serial_list.py::test_the_header_documents_the_form_the_routes_the_kinds_and_the_rule_on_slow_cases` | red against the list before this batch ("does not document: the comment's form `<route>: <kind>: <reason>`, the route `serial` …, the route `nightly` …, the kind `daemon` …"); green with the reworked list (the list is this designer's file) |
+| every reader takes the same entries; each is a node id's beginning (the route lives in the comment) | `test_w2_57_serial_list.py::test_every_reader_takes_the_same_entries_and_each_is_the_beginning_of_a_node_id` | green before and after (a guard: the rework keeps the list readable by today's readers) |
+| **the close**: a nightly entry (a function, and a whole file) runs in neither phase and is counted nowhere as a skip; the sibling of a routed function still runs in parallel (collected, not ignored); the serial entry runs once, alone, and is the serial run's only case; a case with route-like markers and no entry runs in parallel (failure: serialised or skipped by marker alone) | `test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` | **red until the implementation**: "cases the list routes to the nightly ran in the close: {'test_routed': [('none', …)], 'test_routed_file': [('none', …)]} (a run in no worker is the serial phase)": today's close runs every entry in its serial phase |
+| collected, never ignored: a nightly file that cannot be imported still refuses the close by name | `test_a_nightly_entry_whose_file_does_not_collect_still_refuses_the_close` | green today (a guard against `--ignore`) |
+| **the nightly's form** (the parallel run with the close's plugin, then every entry alone): every entry, nightly or serial, runs alone and passes; no entry runs in the parallel run | `test_the_nightly_form_runs_every_entry_alone_after_its_parallel_run_less_the_list` | green today (a guard: the nightly still runs the routed cases) |
+| **this repository's list** (P-IS-6's first table): every entry's route, kind and reason; the live and real-model files and cases routed to the nightly; W1-16's split; W1-50's read-merge case out; W1-09's races and the latency cases kept serial; no entry naming no case (failure: a live or real-model file left in the close; a serial entry without its reason) | W1-30's revised `test_w1_30_r11_declared_here.py` (KPI line 4, below) | red against the list before this batch (r11's 40 red cases and the header case); green with the reworked list |
+
+"The nightly's form" is taken as the lead states it: one parallel run less the list, with the close's own plugin
+(the reader `gov close` gives its parallel run), then each entry alone in a run of its own. W2-66's
+`python3 -m gov.close.nightly` is not run here (DEC-915 item 4, row W2-M406).
+
+### The list's changes, entry by entry, with what each costs or saves per close
+
+| Entries | Was | Now | Seconds per close (source) |
+|---|---|---|---|
+| W1-16's 94 cases that start no daemon (19 functions: five of `builtin_allowlist_and_daemon_secrets`, two of `code_answers`, two of `daemon_dir_and_names`, one of `paths_and_roots`, nine of `token_rule`) | serial (six whole-file entries took them in) | not listed: the parallel phase | −35.5 s serial; about +36 case-s in parallel, 8 to 16 s of wall time in I3's parallel trial (I3 F7) |
+| W1-50's read-merge latency case | serial | not listed: the parallel phase | −0.3 s serial (I1 §4.2: 10 s bound, at most 1.2 s alone) |
+| W1-46's live file; W1-50's two live freeze cases; W1-25's and W1-49's live files | serial `live-session` | `nightly: live-session` | ≈ −270 s serial, with the next row's files (I-SYNTHESIS §2.4: 208.8 s for W1-19, W1-21, W1-49 and W1-25; W1-50's two 37.9 s; W1-46's estimated) |
+| W1-19's real-model file; W1-21's dev-tier file | serial `real-model-or-daemon` | `nightly: real-model` | in the row above |
+| W2-58's four live functions (5 cases); W2-62's live resume; W2-54's sandboxed worker | on neither list: the parallel phase | **added**, `nightly: live-session` | ≈ −192 case-s from the parallel phase with the next row, and four paid sessions per close (I-SYNTHESIS §2.4; I1 F-2, I3 F6) |
+| W1-21's family check; W2-54's real-embedder case | on neither list: the parallel phase | **added**, `nightly: real-model` | in the row above |
+| W2-57's p95 case for a test designer's read | (new case) | **added**, `serial: latency` | +2.4 s serial |
+| W1-02's and W1-05's p95; W1-07's help; W1-10; W1-15; W1-17; W1-18's two | serial `latency` | `serial: latency`, each with its reason | unchanged |
+| W1-16's 67 daemon cases (34 entries); W1-20's file; W2-69's two | serial `real-model-or-daemon` | `serial: daemon` | unchanged (482 s, 116.9 s alone in the rehearsal; I3) |
+| W1-09's two race cases | serial `race` | `serial: race`, kept in this run | unchanged (≈ 14 s, I4 §4.2) |
+
+Net: about 303 s less in each close's serial phase, about 156 case-s less in its parallel phase (W1-30's revised r13
+case adds about 31 case-s back there), and no paid session in a close. No entry was removed from `load_sensitive` or `accepted_reds` (line 8 is the orchestrator's commit).
+
+**W1-09's two lines, ready for after one green nightly in parallel** (remove both from the list, and move their two
+rows of r11's `DECLARED_WITH_THEIR_ROUTE` to its `NOT_DECLARED`):
+
+    tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # serial: race: claims raced from separate processes
+    tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim  # serial: race: releases and claims raced from separate processes
+
+## KPI line 4: W1-30's r11 reads the reworked list (batch B, `Rewrite-Reason: DEC-889 item 5`)
+
+`tests/acceptance/W1-30/test_w1_30_r11_declared_here.py` (50 cases): the timed suites' cases with their parameter
+sets and routes; every other entry with its route; every live and real-model case of DEC-889 item 5, as collected,
+on the nightly route; W1-16's split (the 94 cases of 19 named functions not declared, the 67 others declared serial,
+kind `daemon`); W1-50's read-merge case and the cases of no kind not declared; every entry's `<route>: <kind>:
+<reason>` with the kind on its route and a reason in words; every entry names a file and a function that exist,
+once, and a case the test runner collects. Red against the list before this batch (40 of its 50 cases), green with
+the reworked list. It defines the kinds and routes itself (`w1_30_support.py` is not among this ticket's files).
+
+## KPI line 5 (batch B)
+
+| Item | Tests | Today |
+|---|---|---|
+| W1-30's r13 case gets a limit a loaded start meets (`Rewrite-Reason: W2-M384`) | `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py::test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project`: `--timeout 30` (was 5), the case sleeps 45 s (was 14); nothing asserted changes | green: 1 passed in 48.9 s alone (it was 18 s) |
+| W1-50's two live freeze cases remove every `CLAUDE*` variable (`Rewrite-Reason: DEC-784`) | `test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path`, `test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays`: `inherited()` as W1-46's | live: collected, not run here (the lead runs them) |
+| one p95 case for a test designer's read on a branch with changes (I1 F-10) | `test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95` (W1-02's fixture world, `w2/integrate` and a ticket branch of 120 changed files; the path shown first: the designer is refused a changed file under DEC-820 (c)) | green today (a guard of DEC-149's budget on a path no case timed: p95 55 ms on a quiet machine); 2.4 s, `serial: latency` |
+| W2-M332 times W1-19's warm queries without the memory sampler in the same process (I3 O3 (b)) | none here: the change lies in `tests/acceptance/W1-19/test_w1_19_real_models.py` (its `measured` fixture), not among this ticket's files | returned as a package (below) |
+
+## KPI line 6: the wall-clock limits that went red under load (batch B)
+
+- **W1-02's 5-second bound (168 cases in 29 functions of six files): a limit a loaded machine meets.** The bound
+  holds the hook's own time, its CPU time (the hook and the decision process it waits for), still 5 s; the test's
+  wait for the process is 18 s of wall time (was 8 s), below the guard's 20-second deadline. 0 s added to the serial
+  phase. `Rewrite-Reason: I1 F-14, DEC-823 (b)`; W1-02's README, "Revision of W2-57". The six files: 389 passed in
+  7.9 s (`-n auto`). On a quiet machine CPU and wall time agree (0.22 against 0.24 s; 0.17 against 0.16 s).
+- **The guard's 20-second deadline (DEC-580, product).** Every W1-50 and W1-03 case that sends a call through the
+  guard can meet it (137 functions); running them alone would add minutes to every close for one red seen once, at a
+  load of 52 on 20 cores. Not changed here; returned as a package (below). Such a red already names the deadline (the
+  guard's reason, "its deadline of 20 seconds was reached, so the call is refused (DEC-580)", is in the message).
+
+## KPI line 7: the live host cases name the network (batch B)
+
+Read as the lead reads it, within this ticket's files: in W1-46's own host cases, at the time a case's session runs,
+through the session's own route (the sandbox's proxy), a host that cannot be reached fails the case with a reason
+that names the network, never a skip, never a pass, so the next reader does not take it for load
+(`Rewrite-Reason: I1 F-1, DEC-892 item 3`; W1-46's README). The probe now keeps curl's exit code, the proxy's CONNECT
+answer, the HTTP status and the time. The reasons, shown on sample lines (nothing launched): a timeout through the
+proxy gives "the network: through the session's own route (the sandbox's proxy), at 2026-10-27T00:11:05Z,
+static.crates.io could not be reached: curl ended with 28 (no answer within curl's 20 s) …; this is the network at the
+time the session ran, not load and not the allowlist"; a CONNECT 403 gives "the sandbox's proxy refused … this is the
+rule, not the network". `example.com`'s case now passes only on the proxy's refusal (CONNECT 403, how this machine's
+sandbox proxy answers a domain off its list, measured 2026-10-27), no longer on a network failure. Live: collected,
+not run here. The orchestrator's pre-close network check is a tool outside this repository.
+
+## Packages returned with batch B
+
+- **The route's code is outside the implementer's paths.** The close builds its serial run from the plugin's
+  `entries()` in `src/gov/close/command.py`; neither that file nor `src/gov/close/pytest_plugin/` is in the ticket's
+  `allowed_paths` (only `src/gov/close/serial.py`, new). KPI line 3's route needs one of them.
+- **The guard's 20-second deadline** (line 6): run its 137 functions alone (minutes per close), or leave it to the
+  machine's resource gate and the close's quiet window.
+- **W2-M332** (line 5): the timing of W1-19's warm queries without the sampler needs `test_w1_19_real_models.py`.
+
+## Runs of batch B that are not mine to make
+
+Live sessions (W1-46, W1-50's two freeze cases, W1-25, W1-49, W2-58's launched sessions, W2-62's live resume, W2-54's
+sandboxed worker), real models (W1-19, W1-21's dev-tier file and family check, W2-54's real-embedder case) and the
+code-graph daemon's cases (W1-16's 67, W1-20, W2-69's two) are collected only; the lead runs them. W1-16's 94 cases
+that start no daemon could not run in this designer's sandbox: W1-16's own fixture makes its folders directly under
+`/tmp` (`tempfile.mkdtemp(prefix="w16-", dir="/tmp")`), which the launched sandbox does not let it write (92 errors,
+`Read-only file system: '/tmp/w16-…'`; the 8 cases without that fixture passed). The lead runs them in parallel.
+
+Line 8 (the removal of `load_sensitive` entries) is the orchestrator's commit, not a test here.
