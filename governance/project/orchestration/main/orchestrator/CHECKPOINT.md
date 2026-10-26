@@ -65,12 +65,6 @@
   pattern. **Before Part A: no Claude session running a gov command (W2-73's lead).** After: my smoke test (pinned
   `gov check`, adapter-portability GREEN, a guard allow + refuse, skip guard + keyword warning dry runs); then delete
   the backup ref `w2/integrate-before-reset-2026-10-24` (DEC-921); then the close queue.
-- **DEC-921** (`3cdee054`): origin at `18ad2382` (nothing dropped was pushed); backup ref at `45a6dfd5`; reset to
-  `4a57bf6b`; single merge `6a4696eb` (tree `30442e9f`, one base); containment 0 findings over 105 commits of W2-65,
-  W2-59, W2-72, W2-66 and all pending merges; trailer gate 0 lacking; W1-01 37 passed / 3 skipped.
-- **Pre-re-pin full run** on tree `30442e9f`: 16,295 passed / 3 failed (W2-54 passes alone; W1-03 x2, a pre-existing
-  fixture flake, 6/10 and 7/10 alone). JUnit moved to `/tmp/gov-os-nightly-junit/` (DEC-911); `nightly.sh` now writes
-  JUnit there.
 - **Merged, not closed (11):** W2-58, W2-63, W2-70, W2-07, W2-67 r1, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73. **Held DONE:
   W2-67** at `d0140d4d`, probe STALE (W1-26/W1-27 files changed by W2-59/65): after the re-pin, merge integrate back +
   a judgement-only re-probe of those files. W2-57 first free slot after the re-pin (DEC-915). Second re-pin: W2-68 +

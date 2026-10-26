@@ -4852,3 +4852,11 @@ P2 items go into one daily digest.
   `tools/skip_gate.py` + `tools/skip_known.json`, 31 entries, validated 8/8; W2-66's nightly command NOT run until
   W2-M406's fix, nightly.sh stays), DEC-916 (standing: two reviews per declared round), DEC-918 (containment = DEC-912;
   W2-72 first re-pin), DEC-919 (W2-66 lead-verification known red; lead brief note).
+
+## Moved from RESUME HERE on 2026-10-26 (DEC-924)
+- **DEC-921** (`3cdee054`): origin at `18ad2382` (nothing dropped was pushed); backup ref at `45a6dfd5`; reset to
+  `4a57bf6b`; single merge `6a4696eb` (tree `30442e9f`, one base); containment 0 findings over 105 commits of W2-65,
+  W2-59, W2-72, W2-66 and all pending merges; trailer gate 0 lacking; W1-01 37 passed / 3 skipped.
+- **Pre-re-pin full run** on tree `30442e9f`: 16,295 passed / 3 failed (W2-54 passes alone; W1-03 x2, a pre-existing
+  fixture flake, 6/10 and 7/10 alone). JUnit moved to `/tmp/gov-os-nightly-junit/` (DEC-911); `nightly.sh` now writes
+  JUnit there.
