@@ -129,16 +129,18 @@ def ask(world, tool_name, tool_input, who=ORCHESTRATOR, env=None, limit=support.
     project = Path(world.project)
     data = support.payload(project, tool_name, tool_input, world.sandbox, subagent)
     argv = support._argv(project / support.installed_hook_rel())
+    cpu_before = support.children_cpu_seconds()   # the hook's own time for the bound (W2-57, round support)
     started = time.perf_counter()
     try:
         proc = subprocess.run(argv, input=json.dumps(data), capture_output=True, text=True, cwd=str(project),
                               env=support.hook_environment(project, world.sandbox, role, ticket, env),
                               timeout=limit, check=False)
     except subprocess.TimeoutExpired:
-        return support.HookResult("timeout", None, "", "", time.perf_counter() - started)
+        return support.HookResult("timeout", None, "", "", time.perf_counter() - started,
+                                  support.children_cpu_seconds() - cpu_before)
     seconds = time.perf_counter() - started
     return support.HookResult(support.classify(proc.returncode, proc.stdout), proc.returncode, proc.stdout,
-                              proc.stderr, seconds)
+                              proc.stderr, seconds, support.children_cpu_seconds() - cpu_before)
 
 
 def ask_timed(world, tool_name, tool_input, who=ORCHESTRATOR, env=None):

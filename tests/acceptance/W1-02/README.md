@@ -2486,6 +2486,30 @@ is refused for another reason too.**
   is told the more useful thing by either rule. Confidence: medium-high.
 - Held under every option: every case of the tenth batch (the cases that would tighten ask for the refusal only).
 
+## Revision of W2-57 (2026-10-27): the 5-second bound is the hook's own work, the wait one a loaded machine meets
+
+`Rewrite-Reason: I1 F-14, DEC-823 (b)`. Ticket `DAEO-cy5o` (W2-57), KPI line 6: the close's resource gate covers the
+wall-clock limits that went red under load, by a limit a loaded machine meets or by running the cases alone.
+
+- **What went red.** The bound of DEC-562's "answer in bounded time" (`BOUND_S`, 5 s) was held on the hook's wall
+  time. 29 functions with 168 cases in six files ask for it (`test_w1_02_bounded_time.py`,
+  `test_w1_02_fix_round_time.py`, `test_w1_02_long_paths.py`, `test_w1_02_path_limit_time.py`,
+  `test_w1_02_path_limit_boundary.py`, `test_w1_02_multiedit.py`), all in the parallel phase. In lens I's runs one
+  went red at a load of 41: "the hook took 5.5 s (the bound is 5 s)" for a decision of 0.05 s (I1 F-14).
+- **What changed, and nothing else.** The bound is now held on the hook's **own time: its CPU time**, the work of
+  the hook process and of the decision process it forks and waits for (`support.children_cpu_seconds`, read before
+  and after the process; every `HookResult` carries `cpu_seconds` beside `seconds`). The figure stays 5 s. The
+  test's own wait for the process (`PROCESS_LIMIT_S`) is 18 s of wall time, a limit a loaded machine meets (it was
+  8 s), and below the guard's own deadline of 20 s (DEC-580), so a call answered only at the deadline is still no
+  answer. Every case, input and decision expected is unchanged; the serial phase gains nothing (0 s).
+- **What it still catches, and the trade.** An input that makes the guard work long is held as before: its work is
+  CPU, and on a quiet machine CPU and wall time agree (a first decision: 0.24 s wall, 0.22 s CPU, measured
+  2026-10-27). A guard that waits without working (a lock, a pipe) for between 5 and 18 s would pass these cases where
+  it failed them before; no case of the 168 plants such a wait, and the guard's own 20-second deadline still ends one.
+- **The guard's 20-second deadline itself** (W1-50's and W1-03's calls through the guard, 137 functions) is product
+  behaviour (DEC-580) and is not changed here; running those cases alone would cost every close minutes for one red
+  seen at 2.6 times the machine's cores. That choice is returned to the lead as a package (W2-57's README).
+
 ## Not tested
 
 Tenth batch (DEC-685), each with its reason under "The forms not held" there: the count of an allowed `MultiEdit`
