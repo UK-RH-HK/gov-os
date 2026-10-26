@@ -200,6 +200,25 @@ Readings the sources do not spell out, for this batch:
   limit of 3 s from the default of 120 s only because the suite stopped waiting at 30 s; it now states that bound
   itself (see `tests/acceptance/W1-30/README.md`).
 
+## Revision (W2-57, `Rewrite-Reason: W2-L409: the failure text is kept`)
+
+`test_every_command_returns_the_envelope[doctor]` was red in W2-02's close and green alone, and the close kept no
+failure text, so its cause is not measured (row W2-L409, DEC-886, I4 finding 5). No expectation changes; only what a
+failure says:
+
+- **The envelope case's message starts with what the command printed.** When `assert_envelope` fails, the case
+  fails with that check's first line, then the command, its exit code, and its standard output and standard error,
+  each stripped and cut to its last 2,000 characters (`OUTPUT_EXCERPT_CHARS`; the end is where a traceback's cause
+  is). The full check and `describe()` follow as the chained cause. This holds for every parameter of the function.
+- **A command that does not end within `COMMAND_TIMEOUT_S`** fails with what it printed before the wait ended, cut
+  the same way; it used to say only "did not end within 180 s". Every suite that runs `gov` through
+  `run_gov_with_code` gets this text; none asserts it.
+- Shown on 2026-10-26: green as it stands; with an ordinary cause planted only in the case's own temporary copy
+  (git's `core.quotePath` off and a Latin-1 file name, renamed), the case failed with the head
+  `standard output is not one JSON document` / `gov doctor --json, exit code 1` / `stdout (trimmed): (nothing)` /
+  `stderr (trimmed):` and the traceback's end (`_check_path_map` → `_git`). W2-57's own case for that cause is in
+  `tests/acceptance/W2-57/`.
+
 ## The four commands of DEC-542 (the follow-up after W1-41 on W1-30's ticket, DEC-569)
 
 DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list, each with one test-designer
