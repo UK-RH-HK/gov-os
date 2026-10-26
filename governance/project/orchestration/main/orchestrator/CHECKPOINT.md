@@ -1,6 +1,25 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-25 19:20 BST — DEC-921 done (single merge `6a4696eb`, tree `30442e9f`, clean); ACT-REPIN-1 sent, NO lead running (owner may run Part A now); W2-73 MERGED `214dc9d6`; next free DEC-922)
+## RESUME HERE (2026-10-26 21:30 GMT — FIRST RE-PIN DONE + SMOKE TEST PASSED (DEC-922); backup ref deleted; queue NOT started: 2 owner packages (P-W2-07-DR, P-W2-L423-Q) pinged P2; W2-57 starting in the free slot; next free DEC-923)
+
+### Now (2026-10-26)
+- **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
+  (both Role: owner, pushed). `pin-fecb870c` kept for rollback. Smoke test: pinned gov check exit 0 after one
+  rebuild (15 GREEN, 2 known YELLOW: openspec not on PATH, citation warnings); guard allow/deny/exit-2 by the exact
+  hook line; hooks and declared checks run the pin's python (-E / -P). Logs `log/repin1-smoke-*`.
+- **Tools moved to the new judge (DEC-922):** close_queue.sh gate (h) reads the interpreter from `~/.local/bin/gov`'s
+  first line, and passes `--check-result` (gate (b)'s JSON); unmeasured_gate.py subtracts `gates.decision_records`
+  as the close does; validate_entry.py / validate_exemption.sh name pin-6a4696eb.
+- **Queue (7 ready, gates (e)+(h) dry-run clean):** `bash tools/close_queue.sh DAEO-uzme DAEO-rmbe DAEO-c1uz DAEO-ye2a
+  DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73) — WAITS for P-W2-L423-Q: the
+  keyword warning now flags the index's copies of W2-69's tracked research note + acceptance test and store.db after
+  every rebuild (pinned check GREEN on them); rec (a) scope the warning to session-written files.
+- **Blocked by P-W2-07-DR:** W2-58 (5 commits), W2-63 (1), W2-07 (2) fail gate (h): decision-record commits with
+  ticket files / delegated or superseded decisions / an owner test commit. Rec (a) W2-07 round 2 (records = DEC-891's
+  list; any ACCEPTED decision; Role: owner decision-record commits), carried by the second re-pin.
+- **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
+- **Prior refusals on record:** W2-58 count 1 (WORK_WITHOUT_TASK), W2-63 count 1 (RULESYNC etc.). Commit-gate refusals
+  are not counted by the new judge.
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -35,7 +54,7 @@
 - **Supersession (DEC-866):** mark at once, sweep by id and value.
 
 ### Plan in force (DEC-896..DEC-919)
-- **First re-pin = ACT-REPIN-1** (`8455edd6`, sent): owner runs `pin/REPIN-COMMANDS-6a4696eb.sh` Part A (wheel of
+- **First re-pin = ACT-REPIN-1** (`8455edd6`; DONE 2026-10-26, smoke test passed, DEC-922; history below): owner runs `pin/REPIN-COMMANDS-6a4696eb.sh` Part A (wheel of
   `6a4696eb`, sha256 `73a281ff…c6b6c9`, dry run twice alike; pin-6a4696eb; link; `pin/repin_registry.py`; Role: owner
   commit) and Part B (by hand drop the two `docs/source` deny entries in `.rulesync/permissions.jsonc`; `rulesync
   generate --targets claudecode,agentsmd --features rules,hooks,permissions,subagents,commands,skills`; pinned
@@ -49,9 +68,7 @@
 - **Pre-re-pin full run** on tree `30442e9f`: 16,295 passed / 3 failed (W2-54 passes alone; W1-03 x2, a pre-existing
   fixture flake, 6/10 and 7/10 alone). JUnit moved to `/tmp/gov-os-nightly-junit/` (DEC-911); `nightly.sh` now writes
   JUnit there.
-- **In flight: W2-73** (DAEO-qty6, LITE test-revision, W1-03's amend fixture; claimed `533c90b1`; task bceymbw4m,
-  `log/W2-73-A5-run1.json`). On DONE: merge before the first closes.
-- **Merged, not closed (10):** W2-58, W2-63, W2-70, W2-07, W2-67 r1, W2-69, W2-66, W2-72, W2-59, W2-65. **Held DONE:
+- **Merged, not closed (11):** W2-58, W2-63, W2-70, W2-07, W2-67 r1, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73. **Held DONE:
   W2-67** at `d0140d4d`, probe STALE (W1-26/W1-27 files changed by W2-59/65): after the re-pin, merge integrate back +
   a judgement-only re-probe of those files. W2-57 first free slot after the re-pin (DEC-915). Second re-pin: W2-68 +
   W2-71.
@@ -68,23 +85,20 @@
   accepted_history, acceptance_exemptions entries; remove each returned lead's temp folder after a holder check;
   weekly sweep (lists 3 + 5 pending: `tools/sweep.py --apply --only pytest-runs,code-graph`). Older text: archive.
 
-### Where things stand (10-24 23:35)
-- **Owner pushed through `18ad2382`.** Since: DEC-907..DEC-919, merges W2-70, W2-07, W2-67 r1, W2-69, W2-70 r2,
-  W2-66; tickets W2-71 `e48a0f57`, W2-72 `8fe6d284`; packages P-W2-69-R2-1, P-W2-L423-A, P-W2-66-M1-R2, P-SKIP-GUARD-1,
-  P-W2-67-R23, P-W2-L437-A/B.
-- **Closed:** W2-01, W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed / 7 merged-not-
-  closed / 11 built and held (W2-65 joins) / 1 in flight (W2-72); W2-67 held DONE / 36 not started, of 62; keystones
-  0 / 8 / 1.
-- **Owner's digest items:** P-W2-67-TD1B-B, P-W2-67-TD2-A; DEC-919 (delegated); skip list addition (test_inputs).
-- **Disk:** `df -i /`; the sweep's lists 3 + 5 pending. **Credentials:** two tracked fixtures (W2-M398).
-  **`.git/config.lock`:** leave alone.
+### HOLD lifted (owner, 2026-10-26): ACT-REPIN-1 done; DEC-922 recorded (lead clean-up rule (a): none yet; I keep
+removing returned leads' temp folders after the holder check).
 
 ### Next
-1. The owner's ACT-REPIN-1 done -> smoke test -> report; then delete the backup ref; then W2-73's merge and the
-   close queue (skip guard by reasons; keyword warning), W2-57 started.
-2. W2-73 merged `214dc9d6` (30/30 alone; containment clean; temp removed). W2-67: after the re-pin, merge-back + judgement-only re-probe.
-3. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
-4. Next free: DEC-922; ticket W2-74; rows W2-M407, W2-L449, W2-H063.
+1. **In flight: W2-57** (DAEO-cy5o, FULL; claimed `d54546f0`; worktree `~/gov-os-worktrees/W2-57`; lead launched
+   21:28 GMT, task bykie39c7, `log/W2-57-A5-run1.json`, brief `briefs/W2-57-A5-run1.md`). On DONE: merge, probe_impact,
+   orchestrator commits its load_sensitive removals / test-map entry; W1-09 race move waits for a green nightly.
+   Records committed `3f2629dc` (DEC-922 + 2 packages); pinged P2 for both packages.
+2. On the owner's answers: P-W2-L423-Q -> adjust keyword_warn and start the 7-ticket queue (no leads start during
+   its quiet window); P-W2-07-DR -> W2-07 round 2 in a free slot.
+3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
+4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
+   then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.
+5. Next free: DEC-923; ticket W2-74; rows W2-M407, W2-L449, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2

@@ -1,0 +1,12 @@
+core-pathmap exit 0
+core-schema exit 0
+core-mutation exit 0
+core-authority exit 0
+core-graph exit 0
+context-reproducibility exit 0
+record-reading suites exit 0: 132 passed in 111.32s (0:01:51)
+placeholder scan exit 0: placeholder scan: 0 hit(s)
+keyword warning exit 1: keyword-warn: 3 file(s) hold a keyword of row W2-L423's rule; 0 not read
+keyword-warn: .gov-runtime/codeintel/files/docs/research/W2-69-secrets-scan.md
+keyword-warn: .gov-runtime/codeintel/files/tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py
+keyword-warn: .gov-runtime/store.db

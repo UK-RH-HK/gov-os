@@ -4831,3 +4831,16 @@ P2 items go into one daily digest.
 4. Daily digest; the sweep in a quiet moment; trial d redo, then remove /tmp/gov-os-tooltrial.
 5. Next free: DEC-919; ticket W2-73; rows W2-M407, W2-L438, W2-H063.
 
+
+## Moved from RESUME HERE on 2026-10-26 21:50 GMT
+### Where things stand (10-24 23:35)
+- **Owner pushed through `18ad2382`.** Since: DEC-907..DEC-919, merges W2-70, W2-07, W2-67 r1, W2-69, W2-70 r2,
+  W2-66; tickets W2-71 `e48a0f57`, W2-72 `8fe6d284`; packages P-W2-69-R2-1, P-W2-L423-A, P-W2-66-M1-R2, P-SKIP-GUARD-1,
+  P-W2-67-R23, P-W2-L437-A/B.
+- **Closed:** W2-01, W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed / 7 merged-not-
+  closed / 11 built and held (W2-65 joins) / 1 in flight (W2-72); W2-67 held DONE / 36 not started, of 62; keystones
+  0 / 8 / 1.
+- **Owner's digest items:** P-W2-67-TD1B-B, P-W2-67-TD2-A; DEC-919 (delegated); skip list addition (test_inputs).
+- **Disk:** `df -i /`; the sweep's lists 3 + 5 pending. **Credentials:** two tracked fixtures (W2-M398).
+  **`.git/config.lock`:** leave alone.
+

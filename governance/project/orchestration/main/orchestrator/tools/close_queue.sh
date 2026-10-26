@@ -72,7 +72,10 @@ for item in "$@"; do
     /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/trailer_gate.py "$ticket" 2>&1) \
     || stop "commits of $ticket lack a trailer, as the close reads them: $(echo "$missing" | tail -n +2 | tr '\n' ' ')"
   # (h) the close's work-without-a-task gate, with the pinned judge's code (W2-58's refused close of 2026-10-22).
-  unmeasured=$(/home/usain/.local/share/gov-os/pin-fecb870c/bin/python -E \
+  # The interpreter is read from the pinned gov's own first line, so the gate follows every re-pin (DEC-922).
+  pinpy=$(head -1 /home/usain/.local/bin/gov | sed 's/^#!//')
+  [ -x "$pinpy" ] || stop "the pinned gov names no interpreter that runs: $pinpy"
+  unmeasured=$("$pinpy" -E \
     /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/unmeasured_gate.py "$ticket" 2>&1) \
     || stop "work without a task in $ticket's range, as the close reads it: $(echo "$unmeasured" | head -4 | tr '\n' ' ')"
   # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
@@ -82,7 +85,8 @@ for item in "$@"; do
     /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_diff.py "$ticket" | head -5 | tr '\n' ' ')
   [ -z "$dirty" ] || stop "the working tree is not the commit, as the close reads it: $dirty"
   date '+%F %T check ok; close '"$ticket"' (load '"$(cut -d' ' -f1 /proc/loadavg)"')' >> "$LOG/queue.txt"
-  gov close "$ticket" $lift --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
+  # W2-66 (DEC-889 item 2, P-IS-2 (a)): the close's record-reading tests read gate (b)'s own gov check result.
+  gov close "$ticket" $lift --check-result "$LOG/check-$ticket.json" --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
   echo "$code" > "$LOG/close-$ticket.exit"
   date '+%F %T close '"$ticket"' exit '"$code" >> "$LOG/queue.txt"
   [ "$code" -eq 0 ] || break

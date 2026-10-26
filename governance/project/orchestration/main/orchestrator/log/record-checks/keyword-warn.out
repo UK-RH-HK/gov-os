@@ -1,1 +1,4 @@
-keyword-warn: 0 file(s) hold a keyword of row W2-L423's rule; 0 not read
+keyword-warn: .gov-runtime/codeintel/files/docs/research/W2-69-secrets-scan.md
+keyword-warn: .gov-runtime/codeintel/files/tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py
+keyword-warn: .gov-runtime/store.db
+keyword-warn: 3 file(s) hold a keyword of row W2-L423's rule; 0 not read
