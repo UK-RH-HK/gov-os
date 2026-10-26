@@ -6,6 +6,11 @@ Prints paths only, never content. Walks the folder as the check does (links foll
 reads every file in pieces, case-insensitively, as gitleaks matches keywords. The keywords are written in parts so that
 this file never holds one. Usage: keyword_warn.py [<project root>]. Exit 0 with no hit, 1 with hits, 2 if a file cannot
 be read (nothing is passed undecided).
+
+Scope (owner, DEC-923, P-W2-L423-Q (a)): the files sessions write under .gov-runtime/ (scratch, logs, records and every
+other file there), not the index stores that `gov rebuild` builds from tracked files (`codeintel/`, `store.db*`,
+`query-vector-cache.db*` at the folder's top). The pinned secrets check (W2-69) reads those stores itself and is not
+changed. Anything else under .gov-runtime/, a new or unknown file included, is still read.
 """
 import os
 import sys
@@ -31,6 +36,9 @@ def holds(path: Path) -> bool:
     return False
 
 
+STORE_FOLDERS = ("codeintel",)  # DEC-923: the index stores, at .gov-runtime/'s top only
+STORE_FILES = ("store.db", "query-vector-cache.db")  # and their -wal / -shm / -journal companions
+
 hits, unread, seen = [], [], set()
 for folder, folders, names in os.walk(runtime, followlinks=True):
     real = os.path.realpath(folder)
@@ -38,6 +46,9 @@ for folder, folders, names in os.walk(runtime, followlinks=True):
         folders[:] = []
         continue
     seen.add(real)
+    if Path(folder) == runtime:
+        folders[:] = [f for f in folders if f not in STORE_FOLDERS]
+        names = [n for n in names if not any(n == s or n.startswith(s + "-") for s in STORE_FILES)]
     for name in names:
         path = Path(folder) / name
         target = os.path.realpath(path)

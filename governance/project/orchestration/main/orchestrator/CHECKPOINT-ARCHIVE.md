@@ -4844,3 +4844,11 @@ P2 items go into one daily digest.
 - **Disk:** `df -i /`; the sweep's lists 3 + 5 pending. **Credentials:** two tracked fixtures (W2-M398).
   **`.git/config.lock`:** leave alone.
 
+
+## Moved from RESUME HERE on 2026-10-26 (DEC-923)
+- **Decisions today:** DEC-911 (12-digit hashes, no W2-L423 keyword under `.gov-runtime/`; `tools/keyword_warn.py`;
+  W2-71 = DAEO-e8f0, second re-pin), DEC-912 (W1-01 merge rule = git's own merge), DEC-913/917 (W2-65's kernel lines;
+  W1-38 two forms; owner accepted both), DEC-914 (W2-67 rounds 2+3), DEC-915 (skip guard by reasons:
+  `tools/skip_gate.py` + `tools/skip_known.json`, 31 entries, validated 8/8; W2-66's nightly command NOT run until
+  W2-M406's fix, nightly.sh stays), DEC-916 (standing: two reviews per declared round), DEC-918 (containment = DEC-912;
+  W2-72 first re-pin), DEC-919 (W2-66 lead-verification known red; lead brief note).

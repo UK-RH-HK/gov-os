@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-26 21:30 GMT — FIRST RE-PIN DONE + SMOKE TEST PASSED (DEC-922); backup ref deleted; queue NOT started: 2 owner packages (P-W2-07-DR, P-W2-L423-Q) pinged P2; W2-57 starting in the free slot; next free DEC-923)
+## RESUME HERE (2026-10-26 — FIRST RE-PIN DONE (DEC-922); owner answered both packages (DEC-923); CLOSE QUEUE RUNNING (7 tickets); W2-57 lead in flight (holds on the close lock); next free DEC-924)
 
 ### Now (2026-10-26)
 - **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
@@ -11,12 +11,15 @@
   first line, and passes `--check-result` (gate (b)'s JSON); unmeasured_gate.py subtracts `gates.decision_records`
   as the close does; validate_entry.py / validate_exemption.sh name pin-6a4696eb.
 - **Queue (7 ready, gates (e)+(h) dry-run clean):** `bash tools/close_queue.sh DAEO-uzme DAEO-rmbe DAEO-c1uz DAEO-ye2a
-  DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73) — WAITS for P-W2-L423-Q: the
-  keyword warning now flags the index's copies of W2-69's tracked research note + acceptance test and store.db after
-  every rebuild (pinned check GREEN on them); rec (a) scope the warning to session-written files.
-- **Blocked by P-W2-07-DR:** W2-58 (5 commits), W2-63 (1), W2-07 (2) fail gate (h): decision-record commits with
-  ticket files / delegated or superseded decisions / an owner test commit. Rec (a) W2-07 round 2 (records = DEC-891's
-  list; any ACCEPTED decision; Role: owner decision-record commits), carried by the second re-pin.
+  DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73) — STARTED after DEC-923 (the
+  keyword warning now leaves out the index stores; planted-hit test still caught). No main-tree commit while it runs.
+- **DEC-923 (P-W2-07-DR (a) changed):** W2-07 round 2 = DEC-891's records (ticket files) + any ACCEPTED decision
+  (delegated / later superseded) for record-only commits; gate (h) reads acceptance_exemptions + accepted_history,
+  never a Role: owner trailer (DEC-906). c9a08678 already on acceptance_exemptions. Second re-pin carries it. KPI in
+  the ticket file + card done. **Left unmeasured: `611955fa`** (also changes docs/assessment/2026-10/H-test-strategy.md,
+  not a record) -> W2-07's own close still refused: ASKED the owner (accepted_history entry as owner commit, rec).
+  **W2-07 r2 overlaps W2-57** (src/gov/close/**, tests/unit/close/** vs serial.py, test_serial*): ASKED (parallel with
+  disjoint files, rec) — starts after the queue either way.
 - **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
 - **Prior refusals on record:** W2-58 count 1 (WORK_WITHOUT_TASK), W2-63 count 1 (RULESYNC etc.). Commit-gate refusals
   are not counted by the new judge.
@@ -74,12 +77,6 @@
   W2-71.
 - **W2-72's residuals to rows** (F5-F8, the UnicodeDecodeError, the tab-in-name flag, stale facets, the transient
   secrets-indexing red): not yet filed.
-- **Decisions today:** DEC-911 (12-digit hashes, no W2-L423 keyword under `.gov-runtime/`; `tools/keyword_warn.py`;
-  W2-71 = DAEO-e8f0, second re-pin), DEC-912 (W1-01 merge rule = git's own merge), DEC-913/917 (W2-65's kernel lines;
-  W1-38 two forms; owner accepted both), DEC-914 (W2-67 rounds 2+3), DEC-915 (skip guard by reasons:
-  `tools/skip_gate.py` + `tools/skip_known.json`, 31 entries, validated 8/8; W2-66's nightly command NOT run until
-  W2-M406's fix, nightly.sh stays), DEC-916 (standing: two reviews per declared round), DEC-918 (containment = DEC-912;
-  W2-72 first re-pin), DEC-919 (W2-66 lead-verification known red; lead brief note).
 - **Standing (summary):** full runs pass `-o tmp_path_retention_policy=failed` under `flock /tmp/gov-os-verify.lock`
   (lock until W2-67 lands); tests/acceptance/ only by test designers (DEC-906); owner Role: owner commits = ratchet,
   accepted_history, acceptance_exemptions entries; remove each returned lead's temp folder after a holder check;
@@ -93,12 +90,12 @@ removing returned leads' temp folders after the holder check).
    21:28 GMT, task bykie39c7, `log/W2-57-A5-run1.json`, brief `briefs/W2-57-A5-run1.md`). On DONE: merge, probe_impact,
    orchestrator commits its load_sensitive removals / test-map entry; W1-09 race move waits for a green nightly.
    Records committed `3f2629dc` (DEC-922 + 2 packages); pinged P2 for both packages.
-2. On the owner's answers: P-W2-L423-Q -> adjust keyword_warn and start the 7-ticket queue (no leads start during
-   its quiet window); P-W2-07-DR -> W2-07 round 2 in a free slot.
+2. The queue running (log `log/close-queue-<stamp>/queue.txt`); on its end: commit nothing until it is done, then
+   W2-07 round 2 (merge integrate back into w2/W2-07 first; A1 revisions + A2; STANDARD) per the owner's answers.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
 4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
    then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.
-5. Next free: DEC-923; ticket W2-74; rows W2-M407, W2-L449, W2-H063.
+5. Next free: DEC-924; ticket W2-74; rows W2-M407, W2-L449, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
