@@ -10162,7 +10162,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 282. The owner's two rules of 2026-10-22 from W2-50's refused close (register v0.282, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-895 — Owner entries validated with the pinned judge's own readers before they are sent; a stale probe found at merge time, not at close time
-- **Status:** ACCEPTED (owner, standing, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-862 (a), DEC-891, DEC-893, DEC-754, DEC-894, DEC-861, DEC-851 · **Basis:** W2-50's refused close of 2026-10-22 (DEC-894). The DEC-892 entry reached the owner's commit, and then the close, unvalidated. W2-58's merge (`4845b9b8`, 2026-10-21) changed five files W2-50's probe judged, and only the close, a day later, found it.
+- **Status:** ACCEPTED (owner, standing, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-862 (a), DEC-891, DEC-893, DEC-754, DEC-894, DEC-861, DEC-851 · **Basis:** W2-50's refused close of 2026-10-22 (DEC-894). The DEC-892 entry reached the owner's commit, and then the close, unvalidated. W2-58's merge (`4845b9b8`, 2026-10-21) changed five files W2-50's probe judged, and only the close, a day later, found it. · **Changed by:** DEC-922: since the first re-pin, the pinned judge's readers are `pin-6a4696eb`'s (`~/.local/share/gov-os/pin-6a4696eb/bin/python -E …`).
 - **Decision:**
   1. **Validate before sending.** Before sending the owner any ratchet entry (`accepted_reds`, `load_sensitive`) or accepted-history entry to commit, the orchestrator validates it with the pinned judge's own readers: the ratchet and the close's history reader. It validates against the register text as it will stand, and says in the ACT ping that it passed. A wrong entry must never reach the owner's commit, let alone a close.
      - **How:** `~/.local/share/gov-os/pin-fecb870c/bin/python -E .gov-runtime/scratch/orchestrator/tools/validate_entry.py <patch> [<register as it will stand>]`. It runs `gov.close.ratchet._refused_because` and `gov.close.history._refused_because` from the pin, and the placeholder scan (DEC-893).
@@ -10489,7 +10489,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 289. The owner's answers of 2026-10-23 on P-W2-07-A-B (register v0.289, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-904 — A full verification run against the scratch budget: the retention trial, a lead's own clean-up rule, a bridge cap with one run at a time; W2-67 forward; W2-07's test-designer batch widened to the 196 cases
-- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-898, DEC-902, DEC-880 item 2 (b), DEC-889 items 6 and 7, DEC-868, DEC-896, DEC-899, DEC-903, DEC-866, MR-3 · **Basis:** package P-W2-07-A-B with its addendum (`governance/project/orchestration/packages/P-W2-07-A-B.md`). W2-07's and W2-66's leads stopped their full verification runs at DEC-898's lead budget: 1,062,156 inodes at about 13.6 % of W2-07's run; 5,306,782 inodes and 47 GB for W2-66's. · **Changed by:** DEC-905: the trial held; the option is the default, the bridge cap ends, the lock stays.
+- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-898, DEC-902, DEC-880 item 2 (b), DEC-889 items 6 and 7, DEC-868, DEC-896, DEC-899, DEC-903, DEC-866, MR-3 · **Basis:** package P-W2-07-A-B with its addendum (`governance/project/orchestration/packages/P-W2-07-A-B.md`). W2-07's and W2-66's leads stopped their full verification runs at DEC-898's lead budget: 1,062,156 inodes at about 13.6 % of W2-07's run; 5,306,782 inodes and 47 GB for W2-66's. · **Changed by:** DEC-905: the trial held; the option is the default, the bridge cap ends, the lock stays. · **Changed by:** DEC-922: item 2's allow rule did not come with the settings regeneration; no rule yet, and the orchestrator keeps removing a returned lead's temp folder.
 - **Decision:**
   1. **A (a), the retention trial.** pytest's `tmp_path_retention_policy=failed` is tried on one full run in the close's form, measured:
      - the peak inodes and size of the run's temp folder;
@@ -10915,3 +10915,68 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.307 | 2026-10-25 | Owner (recorded by the orchestrator, DEC-861): DEC-921 (P-W2-65-M1 (a) under three conditions: nothing dropped was on origin; backup ref `w2/integrate-before-reset-2026-10-24` kept until the re-pin's smoke test; one merge `6a4696eb` of `w2/W2-65`, tree `30442e9f`, judged clean by containment, the trailer gate and W1-01; then W2-73 for W1-03's fixture and the re-pin ACT). Next free id: DEC-922. |
+
+### DEC-922 — The first re-pin is done (ACT-REPIN-1): gov from the wheel of `6a4696eb`, the settings regenerated, the smoke test passed; no lead clean-up rule yet; the backup ref deleted; the close queue waits for two owner answers; W2-57 starts
+- **Status:** ACCEPTED (owner, 2026-10-26, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-26)`) · **Under:** DEC-884, DEC-889 item 15, DEC-896 item 3, DEC-899 item 4, DEC-904 item 2, DEC-915 item 3, DEC-917, DEC-918, DEC-921, DEC-895, DEC-861 · **Basis:** the owner's report of ACT-REPIN-1 (2026-10-26) and the orchestrator's smoke test of the same evening.
+- **Decision:**
+  1. **The re-pin (the owner's act).**
+     - **Part A:** gov is the wheel of `6a4696eb` (sha256 `73a281ff…c6b6c9`, verified), installed non-editable in `~/.local/share/gov-os/pin-6a4696eb` and linked from `~/.local/bin/gov`. The registry commit is `82f2d453` (`Role: owner`).
+     - **Part B:** the settings are regenerated in commit `8ba8b231` (`Role: owner`):
+       - the three guard hooks refuse with exit 2 when the pinned judge cannot run (W2-59, W2-65);
+       - the four lifecycle hooks stay plain (DEC-917);
+       - the two `docs/source` read-deny entries are gone (P-I1-2);
+       - the held-out deny is in place;
+       - `find-polluter.sh`'s generated copy has its source's mode (755).
+     - **Rollback:** `pin-fecb870c` stays. The rollback is one command (`ln -sfn ~/.local/share/gov-os/pin-fecb870c/bin/gov ~/.local/bin/gov`) plus reverting the two commits.
+  2. **The lead clean-up rule: (a), no rule yet.** The regeneration carries no allow rule for a lead's own temp folder. The orchestrator keeps removing a returned lead's temp folder (`/tmp/gov-os-lead-<W2 id>`) after checking that no process holds it.
+  3. **If the smoke test passes:**
+     - delete the backup ref `w2/integrate-before-reset-2026-10-24` (DEC-921);
+     - record the re-pin here;
+     - start the close queue for the merged-but-not-closed tickets, behind the full pre-close gate, now scoped by W2-66;
+     - start W2-57 (the rulesync probe fix) in the first free slot (DEC-915 item 3).
+     If it fails: stop, start nothing, and report.
+- **The smoke test (2026-10-26, between 20:45 and 21:15 GMT): passed.**
+  - **The pin:** `gov` imports from `pin-6a4696eb`'s site-packages, even with `PYTHONPATH` set to the tree's `src` (`-E`). The install is the wheel archive (its recorded sha256 is the one above), not an editable install.
+  - **`gov check` (pinned), before a rebuild:** exit 3. 12 families GREEN, 2 YELLOW, 3 RED. The three reds (index freshness, context reproducibility, recovery/rebuild) were a store older than the two re-pin commits.
+  - **After one full pinned `gov rebuild`** (exit 0, 511 s): exit 0. 15 families GREEN, 2 YELLOW, no RED; adapter/model portability GREEN. The two YELLOWs were there before the re-pin:
+    - `openspec-validate`: openspec is under the Node 22 prefix, not on the session's PATH;
+    - `core-decision-citations`: warnings for history commits that cite a decision their tree does not yet record.
+  - **A guard decision, through the exact PreToolUse line of `.claude/settings.json`:**
+    - a Read of `README.md` is allowed (exit 0);
+    - a Write under `tests/acceptance/` is denied for the orchestrator (exit 0 with a deny), and nothing is written;
+    - with no `gov` on `HOME` or `PATH`, the line refuses with exit 2.
+    The live hook also refused one of the orchestrator's own calls, which used a `$VAR` write target.
+  - **The pinned judge:**
+    - all seven hook lines run the interpreter named on the first line of `~/.local/bin/gov` (`pin-6a4696eb/bin/python`) with `-E`;
+    - the declared checks' leading `python3` or `gov` is rewritten to that interpreter with `-P` (`gov.check.runner._judged`), so the tree's `src` never runs;
+    - the orchestrator's session has no `PYTHONPATH` or `PYTHONHOME`.
+  - **The early warnings:** row W2-L423's warning lists 0 files. rulesync answers (24.0.0), so the skip guard stops on W1-38's silent skip until W2-57 lands.
+- **Done:**
+  - the backup ref deleted (it was at `45a6dfd5`; `4a57bf6b` is in `w2/integrate`'s history);
+  - the orchestrator's tools moved to the new judge:
+    - `close_queue.sh`'s gate (h) reads the interpreter from the first line of `~/.local/bin/gov`, so it follows every re-pin;
+    - the close is given gate (b)'s own result (`--check-result`, W2-66's KPI from DEC-889 item 2);
+    - `unmeasured_gate.py` subtracts decision-record commits with the judge's own `gates.decision_records`, as the close does since W2-07;
+    - `validate_entry.py` and `validate_exemption.sh` name `pin-6a4696eb`.
+- **Found before the queue:** gate (h), run with the new judge, predicts WORK_WITHOUT_TASK for three tickets:
+  - W2-58: 5 commits;
+  - W2-63: 1 commit;
+  - W2-07: 2 commits.
+  These are decision-record commits that changed a ticket file, or that name a decision that is delegated or later superseded; one is an owner commit that changed tests. W2-07, as built, measures only commits of governance records outside `.tickets/` that name an owner decision in force, which is narrower than item 1 of DEC-896 as written. Package P-W2-07-DR goes to the owner.
+  - The other seven tickets pass gates (e) and (h): W2-70, W2-69, W2-66, W2-72, W2-59, W2-65 and W2-73.
+  - Their queue does not start yet. After the rebuild, row W2-L423's early warning (DEC-911 (b)) lists the index's copies of W2-69's own tracked research note and acceptance test, and `store.db`. The pinned check passes on those same stores. So the queue would stop before every close. Package P-W2-L423-Q goes to the owner.
+  - W2-67 stays held (its probe is stale; rounds 2 and 3 are not merged).
+  - With no queue running, a slot is free, and W2-57 starts in it (DEC-915 item 3).
+- **Changes:**
+  - DEC-904 item 2: no allow rule came with the regeneration; the orchestrator keeps the clean-up;
+  - DEC-895: the pinned judge's readers are now `pin-6a4696eb`'s.
+- **Where it goes (DEC-851):**
+  - this register, with DEC-904's and DEC-895's status lines marked;
+  - the prompt §5 (DEC-895's command) and §15 (the clean-up), v3.26;
+  - `LEAD-w2-common.md` (the clean-up line);
+  - RESUME HERE.
+- Next free id: DEC-923.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.308 | 2026-10-26 | Owner (recorded by the orchestrator, DEC-861): DEC-922 (ACT-REPIN-1 done: gov from the wheel of `6a4696eb` in pin-6a4696eb, registry `82f2d453`, settings `8ba8b231`; the smoke test passed; the lead clean-up rule (a), none yet; the backup ref deleted; the queue tools on the new judge; gate (h) predicts WORK_WITHOUT_TASK for W2-58, W2-63 and W2-07, package P-W2-07-DR; row W2-L423's early warning would stop every close on W2-69's indexed files, package P-W2-L423-Q; W2-57 starts). Next free id: DEC-923. |
