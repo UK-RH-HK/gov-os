@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-26 — FIRST RE-PIN DONE (DEC-922); owner answered both packages (DEC-923); CLOSE QUEUE RUNNING (7 tickets); W2-57 lead in flight (holds on the close lock); next free DEC-924)
+## RESUME HERE (2026-10-26 22:10 GMT — CLOSE QUEUE RUNNING (7 tickets); DEC-924 answered, drafted in drafts/DEC-924, applied after the queue; W2-57 lead in flight (holds on the close lock); next free DEC-924 (taken by the draft) then DEC-925)
 
 ### Now (2026-10-26)
 - **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
@@ -90,8 +90,19 @@ removing returned leads' temp folders after the holder check).
    21:28 GMT, task bykie39c7, `log/W2-57-A5-run1.json`, brief `briefs/W2-57-A5-run1.md`). On DONE: merge, probe_impact,
    orchestrator commits its load_sensitive removals / test-map entry; W1-09 race move waits for a green nightly.
    Records committed `3f2629dc` (DEC-922 + 2 packages); pinged P2 for both packages.
-2. The queue running (log `log/close-queue-<stamp>/queue.txt`); on its end: commit nothing until it is done, then
-   W2-07 round 2 (merge integrate back into w2/W2-07 first; A1 revisions + A2; STANDARD) per the owner's answers.
+2. The queue RUNNING (`log/close-queue-20261026-2157/queue.txt`, task bwpwyj6w1). NO main-tree edit or commit until it
+   ends. Owner answered P-W2-07-DR2 = DEC-924 (Q1 (a), Q2 (a), standing: reports in commits of their own). Drafted in
+   `drafts/DEC-924/`: register with DEC-924 (copy the entry in), path-map copy, `accepted-history-611955fa.patch`
+   (validated PASS against the draft register with the pin's readers; FAILS against today's: DEC-924 first). Brief
+   part `briefs/W2-07-part-run4.md`. AFTER THE QUEUE, in order:
+   a. move `packages-pending/P-W2-07-DR2.md` to `governance/project/orchestration/packages/`;
+   b. apply DEC-924 to the register (from the draft, after re-reading for queue commits), the prompt v3.28 (§3 second
+      overlap exception; §15 Commits: reports in commits of their own), LEAD-w2-common (same practice), RESUME;
+      record_checks; commit `Task: decision-record`;
+   c. apply the patch in the working tree, run record_checks (W1-08 path map), then `git checkout --` it back; send
+      the ACT ping for the owner's Role: owner commit (exact commands; validated; DEC-924 sha);
+   d. build W2-07's A5 run 4 (`tools/build_lead_brief.py`, PROFILE=STANDARD, IMPL=engineer) and launch with gates;
+   e. queue results: merged closes -> WAVE_2_LIST rows marked; worktrees/branches of closed tickets removed.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
 4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
    then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.

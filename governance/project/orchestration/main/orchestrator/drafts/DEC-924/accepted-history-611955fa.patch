@@ -1,0 +1,11 @@
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -242,6 +242,8 @@
+     decision: DEC-871
+   - commit: "162f17ea9cafeec96687d2a83c43c060c08d3e1b"
+     decision: DEC-891
++  - commit: "611955faffaa3aad8e3b4da8579d114e79c922b3"
++    decision: DEC-924
+ # Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
+ # role (DEC-906): each by its exact sha, with the owner's decision. Only the owner's commit adds an entry; any other
+ # commit touching tests/acceptance/ without that role stays red.
