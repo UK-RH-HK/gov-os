@@ -4860,3 +4860,8 @@ P2 items go into one daily digest.
 - **Pre-re-pin full run** on tree `30442e9f`: 16,295 passed / 3 failed (W2-54 passes alone; W1-03 x2, a pre-existing
   fixture flake, 6/10 and 7/10 alone). JUnit moved to `/tmp/gov-os-nightly-junit/` (DEC-911); `nightly.sh` now writes
   JUnit there.
+
+## Moved from RESUME HERE on 2026-10-26 (tools, DEC-922)
+- **Tools moved to the new judge (DEC-922):** close_queue.sh gate (h) reads the interpreter from `~/.local/bin/gov`'s
+  first line, and passes `--check-result` (gate (b)'s JSON); unmeasured_gate.py subtracts `gates.decision_records`
+  as the close does; validate_entry.py / validate_exemption.sh name pin-6a4696eb.

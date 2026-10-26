@@ -7,9 +7,6 @@
   (both Role: owner, pushed). `pin-fecb870c` kept for rollback. Smoke test: pinned gov check exit 0 after one
   rebuild (15 GREEN, 2 known YELLOW: openspec not on PATH, citation warnings); guard allow/deny/exit-2 by the exact
   hook line; hooks and declared checks run the pin's python (-E / -P). Logs `log/repin1-smoke-*`.
-- **Tools moved to the new judge (DEC-922):** close_queue.sh gate (h) reads the interpreter from `~/.local/bin/gov`'s
-  first line, and passes `--check-result` (gate (b)'s JSON); unmeasured_gate.py subtracts `gates.decision_records`
-  as the close does; validate_entry.py / validate_exemption.sh name pin-6a4696eb.
 - **Queue (7 ready, gates (e)+(h) dry-run clean):** `bash tools/close_queue.sh DAEO-uzme DAEO-rmbe DAEO-c1uz DAEO-ye2a
   DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73) — STARTED after DEC-923 (the
   keyword warning now leaves out the index stores; planted-hit test still caught). No main-tree commit while it runs.
