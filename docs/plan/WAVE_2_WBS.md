@@ -297,6 +297,11 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - DEC-868's pre-close gate inside `gov close`.
 - **Added by DEC-896 item 3 (owner):**
   - **Decision records measured by their decision:** a decision-record commit that changes only governance records, under an ACCEPTED decision, counts as measured for the work-without-a-task gate. A decision-close would hide the gap and is not this.
+    - **Round 2 (owner, DEC-923):**
+      - the records are DEC-891's (ticket files included), beside the prompts, the briefs and the path map;
+      - the decision may be the owner's or a delegated one, also when later superseded;
+      - gate (h) also measures a commit that `acceptance_exemptions` or `accepted_history` names, never one by its `Role: owner` trailer alone (DEC-906; a trailer is text until W2-44).
+      The second re-pin carries it.
   - **Test-revision tickets** are judged on their declared `acceptance_tests.path` (DEC-892). W2-63, W2-67's revisions and W2-70 wait for this.
   - **A stale probe is named before the close spends its run** (W2-M403).
 - **Added from lens I (P-IS-4 (a), for the owner's decision):**
