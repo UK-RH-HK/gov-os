@@ -13,6 +13,7 @@ import pwd
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
 
 CLASS = "read"
@@ -20,6 +21,14 @@ HELP = "health of the installation and the project"
 EXIT_CODES = {3: "one or more health checks failed or reported drift"}
 
 CLAUDE_CODE_MINIMUM = "2.1.285"
+
+# Seconds (W2-57). Measured beside a 40-worker parallel run at loads up to 48, a version probe took at most 1.8 s and
+# the venv freeze 0.1 s; the limits leave room for the spikes a close meets. All timed probes of one run share
+# PROBE_BUDGET, so tools that never answer still leave doctor ending well inside a caller's 180 s (W1-07).
+VERSION_LIMIT = 30
+FREEZE_LIMIT = 40
+PROBE_BUDGET = 90
+_probe_deadline: float | None = None  # set by run(): when the probes' shared budget ends
 
 TOOL_BINARIES = {
     "node": "node", "uv": "uv", "rulesync": "rulesync", "openspec": "openspec",
@@ -109,6 +118,16 @@ def _git(root: Path, *args: str) -> str:
         return ""
 
 
+def _probe(argv: list[str], limit: float) -> subprocess.CompletedProcess:
+    """``argv`` run within ``limit`` seconds, or what is left of the run's probe budget; TimeoutExpired when it gives
+    no answer in time or no time is left: a tool that does not answer is read as not answering."""
+    if _probe_deadline is not None:
+        limit = min(limit, _probe_deadline - time.monotonic())
+        if limit <= 0:
+            raise subprocess.TimeoutExpired(argv, 0)
+    return subprocess.run(argv, capture_output=True, text=True, timeout=limit)
+
+
 def _find_binary(name: str) -> Path | None:
     binary_name = TOOL_BINARIES.get(name, name)
     found = shutil.which(binary_name)
@@ -133,14 +152,14 @@ def _tool_version(binary: Path, name: str) -> str | None:
     }
     if name in version_cmds:
         try:
-            result = subprocess.run(version_cmds[name], capture_output=True, text=True, timeout=5)
+            result = _probe(version_cmds[name], VERSION_LIMIT)
             out = result.stdout.strip() or result.stderr.strip()
             m = re.search(r"v?(\d+[\d.]*\S*)", out)
             return m.group(0) if m else None
         except Exception:
             return None
     try:
-        result = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=5)
+        result = _probe([str(binary), "--version"], VERSION_LIMIT)
         if result.returncode == 0:
             out = result.stdout.strip()
             if out:
@@ -199,10 +218,7 @@ def _hash_uv_freeze(venv_python: Path) -> str | None:
     if not uv:
         return None
     try:
-        result = subprocess.run(
-            [uv, "pip", "freeze", "--python", str(venv_python)],
-            capture_output=True, text=True, timeout=10,
-        )
+        result = _probe([uv, "pip", "freeze", "--python", str(venv_python)], FREEZE_LIMIT)
         if result.returncode == 0 and result.stdout:
             return hashlib.sha256(result.stdout.encode("utf-8")).hexdigest()
     except (OSError, subprocess.TimeoutExpired):
@@ -706,10 +722,7 @@ def _check_claude_code(root: Path) -> dict:
     if cli_path:
         cli_sha = _sha256_file(Path(cli_path))
         try:
-            out = subprocess.run(
-                [cli_path, "--version"],
-                capture_output=True, text=True, timeout=3,
-            ).stdout.strip()
+            out = _probe([cli_path, "--version"], VERSION_LIMIT).stdout.strip()
             m = re.search(r"(\d+\.\d+\.\d+)", out)
             cli_version = m.group(1) if m else out
         except Exception:
@@ -820,20 +833,36 @@ def _check_held_out(root: Path) -> dict:
     return {"status": "pass", "missing": False}
 
 
+def _part(name: str, check, *args) -> dict:
+    """What the part ``check`` gives. An exception it raises ends doctor as a GovError naming the part, the exception
+    and its text (I4 finding 5): an envelope with ok false, never a bare traceback, and never a pass."""
+    from gov.cli.errors import GovError
+    try:
+        return check(*args)
+    except Exception as exc:
+        raise GovError("DOCTOR_PART_FAILED", f"gov doctor's {name} part raised {type(exc).__name__}: {exc}",
+                       details={"part": name, "exception": type(exc).__name__, "text": str(exc)}) from exc
+
+
 def run(root: Path, args, config: dict) -> dict | tuple:
-    sections = {
-        "tools": _check_tools(root),
-        "hooks": _check_hooks(root),
-        "path_map": _check_path_map(root, config),
-        "path_compliance": _check_path_compliance(root),
-        "index_freshness": _check_index_freshness(root),
-        "canaries": _check_canaries(root),
-        "framework_lock": _check_framework_lock(root),
-        "isolation": _check_isolation(root),
-        "claude_code": _check_claude_code(root),
-        "held_out": _check_held_out(root),
-    }
-    sections["adoption_level"] = _check_adoption_level(root, config, sections)
+    global _probe_deadline
+    _probe_deadline = time.monotonic() + PROBE_BUDGET
+    try:
+        sections = {
+            "tools": _part("tools", _check_tools, root),
+            "hooks": _part("hooks", _check_hooks, root),
+            "path_map": _part("path_map", _check_path_map, root, config),
+            "path_compliance": _part("path_compliance", _check_path_compliance, root),
+            "index_freshness": _part("index_freshness", _check_index_freshness, root),
+            "canaries": _part("canaries", _check_canaries, root),
+            "framework_lock": _part("framework_lock", _check_framework_lock, root),
+            "isolation": _part("isolation", _check_isolation, root),
+            "claude_code": _part("claude_code", _check_claude_code, root),
+            "held_out": _part("held_out", _check_held_out, root),
+        }
+    finally:
+        _probe_deadline = None
+    sections["adoption_level"] = _part("adoption_level", _check_adoption_level, root, config, sections)
     from gov.rebuild.command import none_embedded
     semantic = sections["canaries"].get("indices", {}).get("semantic")
     note = none_embedded(config)
