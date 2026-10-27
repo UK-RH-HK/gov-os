@@ -1,3 +1,24 @@
+# Lead checkpoint — DAEO-rmbe (W2-69), RUN 3 (judgement-only re-probe, DEC-895, DEC-926)
+
+- 2026-10-27: run 3 started at 34e1c59f06e6 (clean). Cause: W2-74's merge (6ee7b4d0, DEC-925 item 1) renamed one
+  case id in tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py and changed its README; the probe of
+  e00fd14a26be is stale.
+- Step 1 DONE: merged w2/integrate (b99c75ce1700) -> 06df14f3 (--no-ff; Task DAEO-rmbe / Implements DEC-895 / Role
+  orchestrator / CAB); tree 01d3ab4054a5 == merge-tree of parents == w2/integrate's tree. Containment flagged three
+  Role: owner commits that came with the merge (82f2d4538a53, 8ba8b231a990, 048f5758e1cd): not ours, reported only.
+- Judged files changed since e00fd14a26be (ticket commits' files vs git diff e00fd14a26be HEAD): 3 --
+  tests/acceptance/W2-69/README.md, tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py (W2-74, 1ebb6f0f),
+  docs/plan/WAVE_2_WBS.md (other tickets' cards only: W2-74 new card, W2-07 round 2 note, W2-57 paths; W2-69 card
+  untouched). probe_impact.py on HEAD: 0 tickets. Context outside judged files: src/gov/check/runner.py (W2-59: the
+  declared checks run by the judge's interpreter with -P; root/src no longer prepended to PYTHONPATH).
+- Next: reviewer-4 (gov launch independent-auditor, sandboxed, max), brief briefs/reviewer-4.md, tripwire-before-11;
+  then probe record (if pass) docs/probes/DAEO-rmbe/PR-DAEO-rmbe-reprobe-1.md; verification: W2-69 suite in -k parts,
+  collect-only; gov checkpoint record; return.
+- Loop count (run 3): no implementation iterations (judgement-only).
+
+
+# ---- run 2 record below ----
+
 # Lead checkpoint — DAEO-rmbe (W2-69), RUN 2 (the last round, DEC-909)
 
 - Updated 2026-10-24: run 2 started at cfea8a26 (clean). Owner decided P-W2-69-R2-1 (a) with P-3, P-4 (DEC-909):
@@ -20,7 +41,7 @@
   12 fields. Commits 2f03393d (code + builder test), 6f2ec438 (note) (Task/Role engineer/Implements engineer/CAB).
   +64/-4. Key blocks <=24,576 B also yielded as own pieces (BEGIN dash to END dash, <=24,900 after FF); _FORM 4.
   Its runs: W2-69 352/352; W1-15+W2-50 secrets 178; W1-16 167; unit 43; collect 16,227/16,229. 0 read refusals;
-  retrieve told, not used. Packages: P-W2-69-R3-1 keyword-gated chance verdict (sourcegraph rule on 40-hex terms,
+  retrieve told, not used. Packages: P-W2-69-R3-1 keyword-gated chance verdict (code-search-vendor rule on 40-hex terms,
   known residual F8 of review 1) -> residual; P-W2-69-R3-2 rm of /tmp/gov-os-lead-W2-69/td/standin (104 MB) refused.
   Tripwire 9: W2-69 only its commits; W2-66 head moved (other lead).
 - Loop count (run 2): 1 implementation iteration (engineer-3).

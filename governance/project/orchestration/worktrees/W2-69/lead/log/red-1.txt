@@ -3650,7 +3650,7 @@ E         secret found in derived store: .gov-runtime/edges/settlemint-personal-
 E         secret found in derived store: .gov-runtime/edges/settlemint-service-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/shippo-api-token.txt
 E         secret found in derived store: .gov-runtime/edges/sidekiq-sensitive-url.txt
-E         secret found in derived store: .gov-runtime/edges/sourcegraph-access-token.txt
+E         secret found in derived store: .gov-runtime/edges/code-search-vendor-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/square-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/stripe-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/vault-batch-token.txt
@@ -3735,7 +3735,7 @@ E         secret found in derived store: .gov-runtime/edges/settlemint-applicati
 E         secret found in derived store: .gov-runtime/edges/settlemint-personal-access-token.db
 E         secret found in derived store: .gov-runtime/edges/settlemint-service-access-token.db
 E         secret found in derived store: .gov-runtime/edges/shippo-api-token.db
-E         secret found in derived store: .gov-runtime/edges/sourcegraph-access-token.db
+E         secret found in derived store: .gov-runtime/edges/code-search-vendor-access-token.db
 E         secret found in derived store: .gov-runtime/edges/square-access-token.db
 E         secret found in derived store: .gov-runtime/edges/vault-batch-token.db
 E         secret found in derived store: .gov-runtime/edges/vault-service-token.db
@@ -3818,7 +3818,7 @@ E         secret found in derived store: .gov-runtime/edges/settlemint-personal-
 E         secret found in derived store: .gov-runtime/edges/settlemint-service-access-token.db
 E         secret found in derived store: .gov-runtime/edges/shippo-api-token.db
 E         secret found in derived store: .gov-runtime/edges/sidekiq-sensitive-url.db
-E         secret found in derived store: .gov-runtime/edges/sourcegraph-access-token.db
+E         secret found in derived store: .gov-runtime/edges/code-search-vendor-access-token.db
 E         secret found in derived store: .gov-runtime/edges/square-access-token.db
 E         secret found in derived store: .gov-runtime/edges/stripe-access-token.db
 E         secret found in derived store: .gov-runtime/edges/vault-batch-token.db
@@ -3903,7 +3903,7 @@ E         secret found in derived store: .gov-runtime/edges/settlemint-applicati
 E         secret found in derived store: .gov-runtime/edges/settlemint-personal-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/settlemint-service-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/shippo-api-token.txt
-E         secret found in derived store: .gov-runtime/edges/sourcegraph-access-token.txt
+E         secret found in derived store: .gov-runtime/edges/code-search-vendor-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/square-access-token.txt
 E         secret found in derived store: .gov-runtime/edges/vault-batch-token.txt
 E         secret found in derived store: .gov-runtime/edges/vault-service-token.txt

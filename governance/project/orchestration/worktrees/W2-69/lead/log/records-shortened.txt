@@ -1,5 +1,5 @@
 Forty-hex commit hashes shortened to their first 12 digits in these lead records, because the secrets check
-(sourcegraph-gated forty-hex rule of gitleaks' defaults) flags them; byte-exact originals kept outside the scanned tree.
+(code-search-vendor-gated forty-hex rule of gitleaks' defaults) flags them; byte-exact originals kept outside the scanned tree.
 log/reviewer-2.json: original sha256 7f353962949e347be538e3ca152505da3767efd7c6fef780c7a42c8e36924024 kept at /tmp/gov-os-lead-W2-69/records-original/log__reviewer-2.json; 3 forty-hex runs shortened to 12
 log/reviewer-2.result.md: original sha256 e98900e65d3a69a6ca4485bff152c848637290e546f248c3b40c41714e9969c2 kept at /tmp/gov-os-lead-W2-69/records-original/log__reviewer-2.result.md; 3 forty-hex runs shortened to 12
 probes/PR-DAEO-rmbe-review2-DRAFT-fail.md: original sha256 e98900e65d3a69a6ca4485bff152c848637290e546f248c3b40c41714e9969c2 kept at /tmp/gov-os-lead-W2-69/records-original/probes__PR-DAEO-rmbe-review2-DRAFT-fail.md; 3 forty-hex runs shortened to 12

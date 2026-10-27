@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 17:45 GMT — W2-70 CLOSED (`23c24700`, full, base for scoping = its head `7ada0f58`); queue STOPPED before W2-66: product traceability RED (39 commits with a role in Implements) -> P1 P-TRACE-IMPL-1 + ACT file pinged; W2-69 re-probe lead in flight; W2-57 + W2-07 r2 DONE, merges held; next free DEC-927 (drafted))
+## RESUME HERE (2026-10-27 18:10 GMT — W2-70 CLOSED; DEC-927 COMMITTED `a652c48a` (owner (a) + 2 conditions: entries are corrections with should_implement; Implements checked in gate (e) and by leads); ACT-P-TRACE-IMPL-1 SENT: owner commits 39 entries, then I re-run gate (b) and restart the queue (W2-66 first, scoped); W2-69 re-probe in flight; W2-57 + W2-07 r2 merges held; next free DEC-928)
 
 ### Now (2026-10-26)
 - **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
@@ -9,10 +9,6 @@
   close queue ends** (its src/gov/close change is shared core: merged now it would make every queued close full;
   DEC-883 no code merges while closes run). Its branch lacks `048f5758` (the 611955fa entry) -> merge-back before its
   own close. Rides the second re-pin. Temp folder removed. Lead's stricter readings O1-O4 (README) noted.
-- **W2-57 returned PACKAGES** (run 1: probe fix, doctor, serial list done; review pass; branch head `d0bfeb6afd95`).
-  P-W2-57-B: B1 (widen to command.py's serial call) + B2 to the owner; B3/R1/R2/A1 delegated unless objected.
-  6 load_sensitive removals ready (at its merge). Two lead commits carry `Implements: engineer` (my IMPL error in
-  its brief): a row; run 2 brief IMPL=DEC-892. Temp folder removed.
 - **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
@@ -49,6 +45,9 @@
 - **Settings changes and ACTs (DEC-925, standing):** any settings change or regeneration -> a full run in the close's
   form on a clone with it applied + a sweep for dependent tests, BEFORE the owner's commit; every ACT's commands in
   `governance/project/orchestration/packages/ACT-<id>.md`, named in the ping.
+- **Implements: ids (DEC-927, standing):** gate (e) = `tools/trailer_gate.py` also refuses an Implements item that is
+  not a DEC the register holds or a CAP the store holds; leads run it on their worktree before returning
+  (LEAD-w2-common); build_lead_brief.py refuses a non-id IMPL. My CAP-n reading is open for the owner's overturn.
 
 ### Plan in force (DEC-896..DEC-919)
 - **First re-pin = ACT-REPIN-1** (`8455edd6`; DONE 2026-10-26, smoke test passed, DEC-922; history below): owner runs `pin/REPIN-COMMANDS-6a4696eb.sh` Part A (wheel of
@@ -90,7 +89,11 @@ removing returned leads' temp folders after the holder check).
    then commit its 30 load_sensitive removals (W1-38 x3, W1-07 [doctor], W1-30 r13, unit close follow-up, W1-46 x23,
    W1-19 warm p95; list in `log/W2-57-A5-run2.json`); (c) W2-07 r2 SECOND: lead merges integrate back + re-verifies
    (STANDARD, no probe). Temp folders of W2-57 and W2-07 removed.
-3. W2-57's proposals for the digest/owner: P-1 (entry criterion on row W2-M406's fix: gov.close.nightly must run both
+3. **Owner's request (2026-10-27), AFTER this queue:** a package P-TOOLS-REVIEW-1 proposing an independent review of
+   my tools (a short lens: what each tool does, what it could get wrong, which of this week's slips it would have
+   caught: brief builder IMPL, skip_gate id forms, keyword_warn scope, close_queue collect log, repin registry
+   approved_by, the unswept regeneration) + acceptance tests for build_lead_brief.py and the queue's gates.
+4. W2-57's proposals for the digest/owner: P-1 (entry criterion on row W2-M406's fix: gov.close.nightly must run both
    routes; DEC-803, mine to record); P-2 (DEC-549 P-4 re-baseline (c): owner, DEC-105 options); P-R2-T1 (mark DEC-373
    changed by DEC-925 + W1-19 README via a ticket); rows F3/F4/O2/O3, run 1 F3/F4/O1; W1-09 condition.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
