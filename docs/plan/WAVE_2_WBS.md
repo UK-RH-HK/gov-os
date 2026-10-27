@@ -297,6 +297,11 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - DEC-868's pre-close gate inside `gov close`.
 - **Added by DEC-896 item 3 (owner):**
   - **Decision records measured by their decision:** a decision-record commit that changes only governance records, under an ACCEPTED decision, counts as measured for the work-without-a-task gate. A decision-close would hide the gap and is not this.
+    - **Round 2 (owner, DEC-923):**
+      - the records are DEC-891's (ticket files included), beside the prompts, the briefs and the path map;
+      - the decision may be the owner's or a delegated one, also when later superseded;
+      - gate (h) also measures a commit that `acceptance_exemptions` or `accepted_history` names, never one by its `Role: owner` trailer alone (DEC-906; a trailer is text until W2-44).
+      The second re-pin carries it.
   - **Test-revision tickets** are judged on their declared `acceptance_tests.path` (DEC-892). W2-63, W2-67's revisions and W2-70 wait for this.
   - **A stale probe is named before the close spends its run** (W2-M403).
 - **Added from lens I (P-IS-4 (a), for the owner's decision):**
@@ -914,6 +919,9 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 - **Allowed paths (widened, I2 F12):**
   - `src/gov/adapters/portability.py` and `src/gov/doctor/command.py` (the probes only);
   - `src/gov/close/serial.py` (new: the serial phase and its reasons);
+  - `src/gov/close/command.py`, the serial phase's call to `serial.py` only (run 2, owner, DEC-925 item 3; gate (h)'s line is W2-07's round 2);
+  - run 2's test designer also: W1-19's `test_w1_19_real_models.py` (W2-M332) and W1-30's `test_w1_30_r15_policy_pairs.py` (a masked timeout) (DEC-925 item 3, delegated);
+  - KPI 6's guard deadline is left to the resource gate and the quiet window (owner, DEC-925 item 3, B2 (b));
   - `tests/acceptance/serial-only.txt`;
   - W1-30's r11 and r13 files;
   - `tests/acceptance/W1-38/**`, `W1-07/**`, `W1-46/**`, `W1-50/**`, `W1-02/**`;
@@ -1227,6 +1235,20 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 - **KPIs, failure:**
   - a chance failure left;
   - an expectation lowered.
+
+#### W2-74 The settings regeneration's test revisions: the docs/source cases retired, W1-49's sandbox gov, W2-69's case name (LITE, independent-test-designer; DEC-925 item 1)
+- **Why:** after the first re-pin's settings regeneration, eight base reds refuse every close (W2-70's close, 2026-10-26; package P-REPIN-R1). Six enforce the dropped `docs/source` deny rules; W1-49's `[not on PATH]` case runs the new lifecycle hook line without gov. W2-69's case name holds a keyword of row W2-L423's rule, so every run's JUnit XML does. Ticket `DAEO-2azm`.
+- **Starts** at once; **merges** before the close queue restarts, W2-70 first.
+- **Allowed paths:** W1-01's `test_w1_01_settings_deny.py`, W1-47's `test_w1_47_settings_rules.py`, W1-49's `test_w1_49_precompact.py`, W2-69's `test_w2_69_word_internal_fragments.py`, and the four READMEs.
+- **KPIs, success:**
+  - the six `docs/source` cases are retired (the folder left the tree on 2026-10-01; P-I1-2), every other deny rule still checked;
+  - W1-49's case gets a gov in its sandbox, so only tk is missing (`Rewrite-Reason: DEC-917`);
+  - W2-69's case is renamed so no test id holds the keyword, with its input and assertions unchanged (`Rewrite-Reason: DEC-911`).
+- **KPIs, failure:**
+  - another deny rule unchecked;
+  - an expectation lowered;
+  - a test id still holding the keyword.
+- **W1-06's red** (the registry entry's `approved_by`) is the orchestrator's record fix under DEC-925.
 
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.

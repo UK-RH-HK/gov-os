@@ -27,7 +27,8 @@ kpis:
   success:
   - 'gov close judges a ticket by its class [W2-H045]: an implementation ticket on its acceptance tests; a specification ticket on its closed readiness record and its acceptance tests; an audit ticket on its report and the audit validator; a research ticket on its evidence record; an integration or coordination ticket on its named evidence files'
   - 'A test-revision ticket is judged on the acceptance tests its ticket file names in acceptance_tests.path (another ticket''s folder), not on a folder of its own [DEC-892, DEC-896 item 3]'
-  - 'A decision-record commit that changes only governance records (the register, the plan files, the prompts, the briefs, governance/project/orchestration/, the path map) and names an ACCEPTED decision counts as measured for the work-without-a-task gate; a decision-record commit that names no ACCEPTED decision, or changes code, tests or the kernel, still counts as unmeasured [DEC-896 item 1]'
+  - 'A decision-record commit that changes only governance records (DEC-891''s records: .tickets/, docs/checkpoints/, docs/close/, docs/probes/, the register, the plan files, governance/project/orchestration/; and the prompts, the briefs and the path map) and names an ACCEPTED decision, the owner''s or a delegated one, also when that decision was later superseded or changed, counts as measured for the work-without-a-task gate; a decision-record commit that names no decision ever ACCEPTED, or changes any other path, still counts as unmeasured [DEC-896 item 1, DEC-923 item 2]'
+  - 'Round 2 (DEC-923 item 2): the work-without-a-task gate also counts as measured a commit that the owner-committed lists name, acceptance_exemptions or accepted_history, each under its ACCEPTED owner decision, read as the trailer gate and W1-01 read them; a Role: owner trailer alone measures nothing (DEC-906: a trailer is only text until W2-44) [DEC-923 item 2, DEC-906]'
   - 'The commit gates run first, before any test: the trailers, work without a task, accepted history, the probe gate (a stale probe named before the run, W2-M403), and the ratchet''s own reading of both lists'' entries (an entry the ratchet would not count is named); when one refuses, the close stops at once, names its cause and spends no ratchet attempt [DEC-868 item 3, DEC-896 item 3, P-IS-4 (a), I2 F13, I4 F14, F17]'
   - 'The pre-close gate inside gov close: it collects every suite it will run, in one process, as it runs them; it runs gov check with no commit since the rebuild; and it checks that the ticket''s checkpoint is fresh. Any failure refuses at once, before any test runs [DEC-868]'
   - 'Before its regression, gov close reads the shared disk''s free space and free inodes (W2-20''s reading once it lands; until then the floors 100 GiB and 10,000,000 inodes from the configuration) and refuses below either floor, naming the reading [DEC-898]'
@@ -41,6 +42,7 @@ kpis:
   - A research ticket without an evidence record closes; an audit ticket whose report fails the validator closes.
   - A collection error, a RED gov check, a stale checkpoint, a stale probe, an unmeasured commit, a ratchet entry the ratchet would not count, or a disk below the floor refused only after the regression.
   - A decision-record commit outside an ACCEPTED decision counted as measured.
+  - 'A commit counted as measured by its Role: owner trailer alone, or a code, test or kernel commit counted as measured that no owner-committed list names [DEC-923 item 2].'
 profile: STANDARD
 sources:
 - DEC-729
