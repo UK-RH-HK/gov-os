@@ -1,0 +1,87 @@
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -244,6 +244,84 @@
+     decision: DEC-891
+   - commit: "611955faffaa3aad8e3b4da8579d114e79c922b3"
+     decision: DEC-924
++  - commit: "09c327d2172662a166fa10dd593b8c74eabdca74"
++    decision: DEC-927
++  - commit: "60f71c4298bc38cb01bc37a2e6cd0406de8fdaa4"
++    decision: DEC-927
++  - commit: "915a764dd660d1ff2d08944042dd05c6fc02a6a4"
++    decision: DEC-927
++  - commit: "f1c743b3ee92b95b31a5c29cde2e756c9ace969b"
++    decision: DEC-927
++  - commit: "1475b46c9186bf2201023a4ba658b2ee3f3449a6"
++    decision: DEC-927
++  - commit: "5634d4305a7c4f9b677bed6a6cea26ea53c96c94"
++    decision: DEC-927
++  - commit: "9174e358d77bbb0829a3c6ea9694026018686e9b"
++    decision: DEC-927
++  - commit: "ba38ab8d758b3ab9147c951f30aaafbe9b80eaeb"
++    decision: DEC-927
++  - commit: "20d72c1936118e06b86b5eef16c3157e83e6aa94"
++    decision: DEC-927
++  - commit: "33401f46ad00189bbab9584138888f44f543c57e"
++    decision: DEC-927
++  - commit: "04878e23252ad3b32c6308ed2ced6db72a062ab6"
++    decision: DEC-927
++  - commit: "9e2b97758e2474d8c4b61a3ec54aad724c786965"
++    decision: DEC-927
++  - commit: "44062fecf53bdcda83cb3c4bfc668945be5c8709"
++    decision: DEC-927
++  - commit: "614817ec7d6c7a3a9fcf55849c40f414006905b2"
++    decision: DEC-927
++  - commit: "80ec31ab61b844888ddc05470aa12ce3d768e908"
++    decision: DEC-927
++  - commit: "8e9ce18db1c52f1861ce5e579ca4298d0833ea13"
++    decision: DEC-927
++  - commit: "d2eee219625e620b75b118c109c3778a2aa21a37"
++    decision: DEC-927
++  - commit: "e8ad70b51c91b274dfdbb29e57bd15ccdcd9c08c"
++    decision: DEC-927
++  - commit: "34e1c59f06e6a158bfd0cf0e00c2d83633d69647"
++    decision: DEC-927
++  - commit: "3fd2b5a1e664d7c987a2c9a3ffaafd99f4c60a01"
++    decision: DEC-927
++  - commit: "527345b7bf43b8f05d9ccb16e39d0c79c0a02563"
++    decision: DEC-927
++  - commit: "cfea8a26e668c49f60f1fa936b6295d661f47dc5"
++    decision: DEC-927
++  - commit: "e00fd14a26be19069aeb904418d2dfa7ac868dcb"
++    decision: DEC-927
++  - commit: "e4687ef4cf5631d91b8672d6e139a9a244b6e68f"
++    decision: DEC-927
++  - commit: "0808dbb6e8ffb9dab21e991689adea990323f8a6"
++    decision: DEC-927
++  - commit: "2f03393d848672981c0071ecaa18e08cb3a78977"
++    decision: DEC-927
++  - commit: "6b1d54fe6cc03ce8899912726799457157a17e01"
++    decision: DEC-927
++  - commit: "6ebc7cf7f74c1c0bbd03a763a7e1d84f7a88fc21"
++    decision: DEC-927
++  - commit: "6f2ec438a6fa9b28b703609ff2c96f7855158c5a"
++    decision: DEC-927
++  - commit: "8663196dd9445d990f68faaaa34729ec520889e9"
++    decision: DEC-927
++  - commit: "9d22d9807a440c02ee0a20d4dbf249837183bae3"
++    decision: DEC-927
++  - commit: "dc05ffe45ee2fccb9f8bf90ec4df6f9e4c033e54"
++    decision: DEC-927
++  - commit: "5baafb04661140673a70e246b61d4ab2a064e0b7"
++    decision: DEC-927
++  - commit: "8b318157db948890ede906618e6b31732e915ea6"
++    decision: DEC-927
++  - commit: "e04e6ee6effecd971eb7b3021762fd4a8d40769a"
++    decision: DEC-927
++  - commit: "e052b7b5a8539c1cd9fbd734164e9d28b28d4c1f"
++    decision: DEC-927
++  - commit: "39574e4ee5151dedc5742a89dea75a5a37c37c31"
++    decision: DEC-927
++  - commit: "78522dea7ce462aca566a7db23565a5c0dc248d9"
++    decision: DEC-927
++  - commit: "f409ad97575a32f6aab96e6ee6bcb4b7bc008691"
++    decision: DEC-927
+ # Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
+ # role (DEC-906): each by its exact sha, with the owner's decision. Only the owner's commit adds an entry; any other
+ # commit touching tests/acceptance/ without that role stays red.

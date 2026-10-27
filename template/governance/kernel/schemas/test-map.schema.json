@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "test-map",
+  "description": "governance/project/test-map.yaml: what a scoped close runs for a change (DEC-880 item 2, DEC-889 items 1 and 2, DEC-896 item 2). A changed path under the shared core, a path nothing places, and a map that is missing or invalid run the full regression.",
+  "type": "object",
+  "required": ["version", "shared_core"],
+  "properties": {
+    "version": { "const": 1 },
+    "shared_core": {
+      "description": "A changed path matching one of these runs the full regression (DEC-880 item 2 (a), DEC-892 c, P-IS-1 (a)).",
+      "$ref": "#/$defs/patterns",
+      "minItems": 1
+    },
+    "record_only": {
+      "description": "Records (DEC-891's places): a matching path is placed and selects nothing by itself. No code path matches one.",
+      "$ref": "#/$defs/patterns"
+    },
+    "record_reading": {
+      "description": "The tests that read a record-only path, directly or by scanning the tree: run on every close (DEC-889 item 2, P-IS-2 (a)).",
+      "$ref": "#/$defs/targets"
+    },
+    "every_close": {
+      "description": "Targets run on every close, whatever changed (P-IS-1 (a): W1-07's three contract files).",
+      "$ref": "#/$defs/targets"
+    },
+    "couplings": {
+      "description": "What imports and coverage cannot see: a changed path matching one of `paths` selects each of `suites`.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["paths", "suites", "why"],
+        "properties": {
+          "paths": { "$ref": "#/$defs/patterns", "minItems": 1 },
+          "suites": { "$ref": "#/$defs/targets", "minItems": 1 },
+          "why": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "test_inputs": {
+      "description": "Paths that are test inputs, not records (DEC-876 item 2): moved here from the path map.",
+      "$ref": "#/$defs/patterns"
+    },
+    "per_test_timeout": {
+      "description": "Seconds a single test may run under pytest-timeout's signal method (DEC-892 b); default 900.",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "distribution": {
+      "description": "The parallel run's pytest-xdist --dist mode; default load (worksteal waits, DEC-892 a).",
+      "type": "string",
+      "enum": ["load", "loadscope", "loadfile", "loadgroup", "worksteal", "each", "no"]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "pattern": {
+      "description": "allowed_paths' grammar: ** matches any characters including /, * any characters except /, the rest literal; the whole path must match.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^?\\[\\]{}]+$"
+    },
+    "patterns": { "type": "array", "items": { "$ref": "#/$defs/pattern" } },
+    "target": {
+      "description": "A pytest target relative to the project: a folder, a file, or a node id or its beginning.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^tests/"
+    },
+    "targets": { "type": "array", "items": { "$ref": "#/$defs/target" } }
+  }
+}

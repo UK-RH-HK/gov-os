@@ -43,6 +43,8 @@ kpis:
   - 'Measured and reported in docs/research/W2-66-scoped-close.md, on a quiet machine: the time of a typical scoped close (one module outside the shared core and its tests) against the full close, and the selection''s catch rate on lens H''s planted faults, the three widest modules included; the 15-minute target is stated as reached by W2-66 with W2-68, W2-57''s serial rework and worksteal together [DEC-889 item 11 e]'
   - 'The lead''s full verification before every return is unchanged [DEC-880 item 2 (b)]'
   - 'The valid case this ticket turns red is revised by its test designer with a Rewrite-Reason: W1-30''s test_regression_includes_other_acceptance_folders [I2 F9]; W1-01''s MR-3 whole-history test stays in the nightly and every full run'
+  - 'A selected test-map target (record-reading, every-close or coupling) that cannot be resolved at the head (its file or test function renamed or gone) widens the run to the full regression, and the record names the target and the reason [DEC-912 item 3, P1]'
+  - 'W1-28''s held-out copy check is coupled to every file under tests/acceptance/ that its scan reads, so a change to any of them runs it [DEC-912 item 3, P2]'
   failure:
   - A change under the shared core, a change no mapping places, or a missing or unreadable test map runs anything less than the full regression.
   - A scoped close whose record says full; a skip, a left-out suite or a failure the record does not name; a record without its JUnit XML or failure text.
@@ -50,6 +52,7 @@ kpis:
   - A per-test limit that lets a hung test hold the close; worksteal switched on before the nested reruns are gone.
 profile: FULL
 sources:
+- DEC-912
 - DEC-880
 - DEC-726
 - DEC-852

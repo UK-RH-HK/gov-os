@@ -297,6 +297,11 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - DEC-868's pre-close gate inside `gov close`.
 - **Added by DEC-896 item 3 (owner):**
   - **Decision records measured by their decision:** a decision-record commit that changes only governance records, under an ACCEPTED decision, counts as measured for the work-without-a-task gate. A decision-close would hide the gap and is not this.
+    - **Round 2 (owner, DEC-923):**
+      - the records are DEC-891's (ticket files included), beside the prompts, the briefs and the path map;
+      - the decision may be the owner's or a delegated one, also when later superseded;
+      - gate (h) also measures a commit that `acceptance_exemptions` or `accepted_history` names, never one by its `Role: owner` trailer alone (DEC-906; a trailer is text until W2-44).
+      The second re-pin carries it.
   - **Test-revision tickets** are judged on their declared `acceptance_tests.path` (DEC-892). W2-63, W2-67's revisions and W2-70 wait for this.
   - **A stale probe is named before the close spends its run** (W2-M403).
 - **Added from lens I (P-IS-4 (a), for the owner's decision):**
@@ -914,6 +919,9 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 - **Allowed paths (widened, I2 F12):**
   - `src/gov/adapters/portability.py` and `src/gov/doctor/command.py` (the probes only);
   - `src/gov/close/serial.py` (new: the serial phase and its reasons);
+  - `src/gov/close/command.py`, the serial phase's call to `serial.py` only (run 2, owner, DEC-925 item 3; gate (h)'s line is W2-07's round 2);
+  - run 2's test designer also: W1-19's `test_w1_19_real_models.py` (W2-M332) and W1-30's `test_w1_30_r15_policy_pairs.py` (a masked timeout) (DEC-925 item 3, delegated);
+  - KPI 6's guard deadline is left to the resource gate and the quiet window (owner, DEC-925 item 3, B2 (b));
   - `tests/acceptance/serial-only.txt`;
   - W1-30's r11 and r13 files;
   - `tests/acceptance/W1-38/**`, `W1-07/**`, `W1-46/**`, `W1-50/**`, `W1-02/**`;
@@ -1186,6 +1194,61 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a per-run base folder;
   - a test changed in a folder this card does not name.
 - About 600 to 900 lines of test code (I2's estimate for its share), and about 150 to 200 functions, most one fixture line and one assertion each.
+
+#### W2-71 The secrets check passes a real commit hash of this repository for row W2-L423's rule only (FULL, engineer; DEC-911 item 4)
+- **Why:** one gitleaks default rule takes a bare 40-hex string for a token beside its keyword, so a full commit hash in a log under `.gov-runtime/` can turn the hard-block check red (row W2-L423, P-W2-L423-A). The check strips allowlists (DEC-298, DEC-347), so the exemption is written in the check.
+- **Starts** in a free slot after the first re-pin, when no ticket in flight holds `src/gov/secrets/`; merges before the second re-pin, which carries it with W2-68.
+- **Allowed paths:** `src/gov/secrets/**`, `tests/unit/secrets_check/**`. Acceptance tests: `tests/acceptance/W2-71/`, by its test designer (MR-3).
+- **KPIs, success:**
+  - that rule's match of exactly 40 hex digits naming a commit object of this repository is no finding, in a file and in a stored value, for the check and the pre-index filter;
+  - a real token of that vendor still fails, in each of the rule's forms, built at test time;
+  - every other case stays a finding: any other rule, 39 or 41 digits, a short hash, another repository's commit, a tree or blob id, a verification that cannot run;
+  - no match printed or written; every file scanned today still scanned with every rule set;
+  - the rule's id and keywords written only in parts in tracked files.
+- **KPIs, failure:**
+  - a real token let through;
+  - a match let through that names no commit object here;
+  - a finding printed or written;
+  - a file no longer scanned.
+
+#### W2-72 Containment's merge rule matches DEC-912 (FULL, engineer; DEC-918)
+- **Why:** the close's containment gate refuses W2-66's and W2-65's closes on their DEC-912 merge-backs; DEC-410 DP-24 reads a both-changed acceptance file in git's own clean merge as the merge's own. Ticket `DAEO-ye2a`.
+- **Starts** at once; **rides the first re-pin** (DEC-918 item 3).
+- **Allowed paths:** `src/gov/guard/containment.py`, `src/gov/guard/containment_merge.py`, `tests/unit/guard/test_w2_72_*.py`. Acceptance tests: `tests/acceptance/W2-72/` and W1-50's DP-24 cases, by its test designer.
+- **KPIs, success:**
+  - a merge-back acceptance file equal to git's own merge is neither restored, refused nor flagged;
+  - any other file is still caught, failing closed when merge-tree cannot run;
+  - nothing else changes;
+  - `03f470a5` and `4ef3293a` judge clean.
+- **KPIs, failure:**
+  - a file differing from git's own merge passes;
+  - a file equal to it is caught;
+  - another rule changes.
+
+#### W2-73 W1-03's head-move fixture: an amend that always moves HEAD (LITE, independent-test-designer; DEC-921 item 2)
+- **Why:** the fixture's `git commit --amend --no-edit` writes an identical commit in the same second, so two W1-03 cases fail by chance (6 of 10 alone), before containment is judged. Ticket `DAEO-qty6`.
+- **Starts** at once; **merges** before the first closes after the first re-pin.
+- **Allowed paths:** `tests/acceptance/W1-03/test_w1_03_head_move_and_acceptance_test.py`, its README.
+- **KPIs, success:**
+  - every amend that must move HEAD does so whatever the clock: 30 green runs in a row alone and in parallel;
+  - no expectation is lowered, each revised case still red under a planted fault, `Rewrite-Reason: DEC-921`.
+- **KPIs, failure:**
+  - a chance failure left;
+  - an expectation lowered.
+
+#### W2-74 The settings regeneration's test revisions: the docs/source cases retired, W1-49's sandbox gov, W2-69's case name (LITE, independent-test-designer; DEC-925 item 1)
+- **Why:** after the first re-pin's settings regeneration, eight base reds refuse every close (W2-70's close, 2026-10-26; package P-REPIN-R1). Six enforce the dropped `docs/source` deny rules; W1-49's `[not on PATH]` case runs the new lifecycle hook line without gov. W2-69's case name holds a keyword of row W2-L423's rule, so every run's JUnit XML does. Ticket `DAEO-2azm`.
+- **Starts** at once; **merges** before the close queue restarts, W2-70 first.
+- **Allowed paths:** W1-01's `test_w1_01_settings_deny.py`, W1-47's `test_w1_47_settings_rules.py`, W1-49's `test_w1_49_precompact.py`, W2-69's `test_w2_69_word_internal_fragments.py`, and the four READMEs.
+- **KPIs, success:**
+  - the six `docs/source` cases are retired (the folder left the tree on 2026-10-01; P-I1-2), every other deny rule still checked;
+  - W1-49's case gets a gov in its sandbox, so only tk is missing (`Rewrite-Reason: DEC-917`);
+  - W2-69's case is renamed so no test id holds the keyword, with its input and assertions unchanged (`Rewrite-Reason: DEC-911`).
+- **KPIs, failure:**
+  - another deny rule unchecked;
+  - an expectation lowered;
+  - a test id still holding the keyword.
+- **W1-06's red** (the registry entry's `approved_by`) is the orchestrator's record fix under DEC-925.
 
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.

@@ -1,6 +1,6 @@
 ---
 id: DAEO-uzme
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-23T09:09:16Z
@@ -31,6 +31,7 @@ kpis:
   - 'Nothing else changes: the suites the reruns covered still run in every close as themselves'
   - 'W1-01''s history case (test_only_the_test_designer_commits_to_acceptance_tests) reads the path map''s acceptance_exemptions, a list of exact commits ({commit: full sha, decision: DEC id}) beside accepted_history, and passes a non-merge commit that touches tests/acceptance/ without the test designer''s role only when its full sha is listed there; the list''s only entry is c9a08678644485a7528bc875164e110881b63d93 citing DEC-900; any other commit, an owner''s included, stays red; Rewrite-Reason: DEC-906 [DEC-906 item 2, DEC-900]'
   - 'W1-01''s integration-merge case (test_the_integration_merges_of_this_repository_pass) reads the same list through merge_offences: a merge that brings a listed commit''s changes passes; one that brings an unlisted commit without the test designer''s role stays red; Rewrite-Reason: DEC-906 [DEC-908 item 3]'
+  - 'W1-01''s merge rule (merge_offences, read by the history and integration-merges cases) also passes a merge commit whose every changed file under tests/acceptance/ equals git''s own merge of its parents (git merge-tree --write-tree), when every brought commit that touches the folder is a test designer''s or listed in acceptance_exemptions; a file that differs from git''s own merge (a hand edit, a conflict resolution) stays a refusal. Fixtures: a clean merge of two test designers'' edits of one file passes; the same merge with one line hand-edited stays red; a merge that resolves a conflict in the file stays red; a clean merge that brings an unlisted commit without the role stays red. Rewrite-Reason: DEC-912 [DEC-912 item 1, DEC-750, DEC-754]'
   failure:
   - A retired case whose suites no longer run in the close; any other test changed; W1-01's case accepting a commit the list does not name by its full sha.
 profile: LITE
@@ -40,6 +41,7 @@ sources:
 - DEC-899
 - DEC-906
 - DEC-908
+- DEC-912
 est_loc: 20
 acceptance_tests:
   path: tests/acceptance/W1-05/
