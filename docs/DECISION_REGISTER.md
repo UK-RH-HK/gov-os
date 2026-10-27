@@ -11011,3 +11011,38 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.309 | 2026-10-26 | Owner (recorded by the orchestrator, DEC-861): DEC-923 (P-W2-L423-Q (a): the keyword warning covers only files sessions write, not the index stores; the queue starts. P-W2-07-DR (a) changed: W2-07's round 2 measures record-only decision commits (DEC-891's records) under any ACCEPTED decision, delegated or later superseded; gate (h) reads acceptance_exemptions and accepted_history, not a Role: owner trailer; the second re-pin carries it; `611955fa` still unmeasured, asked). Next free id: DEC-924. |
+
+### DEC-924 — P-W2-07-DR2: `611955fa` accepted as history by the owner's own commit; assessment and audit reports in commits of their own (standing); W2-07's round 2 beside W2-57 with the files split
+- **Status:** ACCEPTED (owner, 2026-10-26, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-26)`; item 2 standing) · **Under:** DEC-923, DEC-891, DEC-895, DEC-899, DEC-862 (a), DEC-851, DEC-861 · **Basis:** package P-W2-07-DR2 (`governance/project/orchestration/packages/P-W2-07-DR2.md`).
+- **Decision:**
+  1. **Q1 (a).** The commit `611955faffaa` (full id `611955faffaa3aad8e3b4da8579d114e79c922b3`; 2026-10-21, the decision records of DEC-889 and DEC-890) is accepted as history.
+     - **Its changed paths** (`git show --stat`, DEC-891's rule):
+       - `.tickets/DAEO-e82f.md`, `.tickets/DAEO-g23i.md`, `.tickets/DAEO-jzvg.md`, `.tickets/DAEO-k7hz.md`, `.tickets/DAEO-r9ss.md`, `.tickets/DAEO-xxgp.md`;
+       - `docs/DECISION_REGISTER.md`;
+       - `docs/assessment/2026-10/H-test-strategy.md`;
+       - `docs/plan/WAVE_2_LIST.md`, `docs/plan/WAVE_2_REVISED_PLAN.md`, `docs/plan/WAVE_2_TRIAGE.md`, `docs/plan/WAVE_2_WBS.md`;
+       - `governance/project/briefs/LEAD-w2-common.md`;
+       - `governance/project/prompts/w2-orchestrator.md`.
+     - **The entry is the owner's own `Role: owner` commit.** `docs/assessment/` is not a record (DEC-891), so the entry is the owner's to commit. The entry is `{commit: 611955faffaa3aad8e3b4da8579d114e79c922b3, decision: DEC-924}` in the path map's `accepted_history`. The orchestrator prepares it and validates it with the pinned judge's readers before the ACT (DEC-895).
+     - **Gate (h) reads it** under DEC-923 item 2 once W2-07's round 2 is pinned, so W2-07's own close is not refused on this commit.
+     - **Not (b):** one mixed commit does not justify widening the record rule.
+  2. **The standing practice (owner, standing; the rule about rules, DEC-851).** Copies of assessment or audit reports (`docs/assessment/`, `docs/audit/`, and the like) go in commits of their own. They are never mixed with ticket-file, register or plan edits.
+  3. **Q2 (a).** W2-07's round 2 runs beside W2-57, an owner exception to the overlap rule (prompt §3) for these two only, with the files split:
+     - **W2-57:** `src/gov/close/serial.py` and `tests/unit/close/test_serial*`;
+     - **W2-07's round 2:** `src/gov/close/gates.py`, gate (h)'s line in `src/gov/close/command.py`, `src/gov/close/history.py`, and `tests/unit/close/test_w2_07_*`.
+     Whichever merges second merges `w2/integrate` back, re-verifies, and gets a fresh probe if its review went stale (DEC-895).
+- **Changes:**
+  - the prompt §3's overlap rule: a second owner exception, beside DEC-899's for W2-66 and W2-07;
+  - DEC-891's application: one accepted-history entry for a commit with a path outside the records, by the owner's commit, as DEC-891 itself requires.
+- **Where it goes (DEC-851):**
+  - this register;
+  - the prompt §3 (the exception) and §15 (the commits rule), v3.28;
+  - `LEAD-w2-common.md` (reports in commits of their own, for audit and research tickets' leads);
+  - W2-07's round 2 brief, and W2-57's lead at its merge;
+  - RESUME HERE.
+  The auditor brief needs nothing: auditors commit nothing.
+- Next free id: DEC-925.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.310 | 2026-10-26 | Owner (recorded by the orchestrator, DEC-861): DEC-924 (P-W2-07-DR2: Q1 (a), `611955fa` accepted as history by the owner's own Role: owner commit, validated first; standing: assessment and audit reports in commits of their own; Q2 (a), W2-07's round 2 beside W2-57 with the files split, the second to merge merges back, re-verifies and gets a fresh probe if stale). Next free id: DEC-925. |
