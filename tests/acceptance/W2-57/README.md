@@ -9,6 +9,8 @@ in two batches of one session. **Batch A: KPI line 1, the rulesync probe, and KP
 **Batch B: KPI lines 3 to 7** (the serial-only list as P-IS-6's first table and the route to the nightly, W1-30's r11
 and r13, W1-50's `CLAUDE*` removal, a p95 case for a test designer's read, W2-M332, the wall-clock limits under
 load, and the network reason of the live host cases), in this folder and in the earlier files the ticket names.
+**Run 2** (owner, DEC-925 item 3), by a fresh test designer: R1 (an unread Claude Code version is never a pass), R2
+(W1-30's r15 rulesync case) and B3 (a) (W2-M332 in W1-19's real-model file); see "Run 2" at the end.
 
 ## Run, and the code under test
 
@@ -77,6 +79,8 @@ marker, a skip other than the absent tool's, or a list entry.
 | `test_a_generate_that_never_answers…` | the check's own limit for `generate` (10 s today), plus `gov check` |
 | `test_a_probed_tool_that_answers_well_past…` | 16 s, 16 s, 26 s, 16 s |
 | `test_a_probed_tool_that_never_answers…` | doctor's own limit for the probe (5 s today) |
+| run 2: `test_a_claude_whose_version_never_answers…` (R1 (a)) | doctor's own limit for the Claude Code probe, once: 32 s on run 1's head |
+| run 2: `test_probes_that_spend_doctor_s_time…` (R1 (b)) | the control (about 2 s), then the three silent tools' probes, once: 93 s on run 1's head |
 | the rest | 1 to 3 s |
 
 Batch A today: 13 cases, 8 red and 5 green (the guards), in 13 s under `-n auto`. Batch B's cases in this folder
@@ -145,6 +149,10 @@ orchestrator's nightly script, W1-30's r11). Within that form every entry's comm
 
 Net: about 303 s less in each close's serial phase, about 156 case-s less in its parallel phase (W1-30's revised r13
 case adds about 31 case-s back there), and no paid session in a close. No entry was removed from `load_sensitive` or `accepted_reds` (line 8 is the orchestrator's commit).
+**These savings hold once the nightly route is built in the close's serial phase** (run 2's engineer: the serial
+phase's call to `serial.py` in `src/gov/close/command.py`, DEC-925 item 3, B1 (a); reviewer O2 of run 1). Until then
+the close runs every entry of the list in its serial phase, the `nightly:` ones included, as
+`test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` shows.
 
 **W1-09's two lines, ready for after one green nightly in parallel** (remove both from the list, and move their two
 rows of r11's `DECLARED_WITH_THEIR_ROUTE` to its `NOT_DECLARED`):
@@ -169,7 +177,7 @@ the reworked list. It defines the kinds and routes itself (`w1_30_support.py` is
 | W1-30's r13 case gets a limit a loaded start meets (`Rewrite-Reason: W2-M384`) | `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py::test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project`: `--timeout 30` (was 5), the case sleeps 45 s (was 14); nothing asserted changes | green: 1 passed in 48.9 s alone (it was 18 s) |
 | W1-50's two live freeze cases remove every `CLAUDE*` variable (`Rewrite-Reason: DEC-784`) | `test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path`, `test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays`: `inherited()` as W1-46's | live: collected, not run here (the lead runs them) |
 | one p95 case for a test designer's read on a branch with changes (I1 F-10) | `test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95` (W1-02's fixture world, `w2/integrate` and a ticket branch of 120 changed files; the path shown first: the designer is refused a changed file under DEC-820 (c)) | green today (a guard of DEC-149's budget on a path no case timed: p95 55 ms on a quiet machine); 2.4 s, `serial: latency` |
-| W2-M332 times W1-19's warm queries without the memory sampler in the same process (I3 O3 (b)) | none here: the change lies in `tests/acceptance/W1-19/test_w1_19_real_models.py` (its `measured` fixture), not among this ticket's files | returned as a package (below) |
+| W2-M332 times W1-19's warm queries without the memory sampler in the same process (I3 O3 (b)) | batch B: none (the file was not this ticket's then; returned as a package). Run 2 (DEC-925 item 3, B3 (a)): `tests/acceptance/W1-19/test_w1_19_real_models.py`, its `measured` fixture; see "Run 2" | real models: collected, run by the lead on the shared GPU |
 
 ## KPI line 6: the wall-clock limits that went red under load (batch B)
 
@@ -206,6 +214,10 @@ not run here. The orchestrator's pre-close network check is a tool outside this 
   machine's resource gate and the close's quiet window.
 - **W2-M332** (line 5): the timing of W1-19's warm queries without the sampler needs `test_w1_19_real_models.py`.
 
+Answered by the owner in DEC-925 item 3: B1 (a), the serial phase's call in `command.py` is the engineer's in run 2;
+B2 (b), the guard's deadline is left to the resource gate and the quiet window; B3 (a), W1-19's real-model file is
+run 2's test designer's.
+
 ## Runs of batch B that are not mine to make
 
 Live sessions (W1-46, W1-50's two freeze cases, W1-25, W1-49, W2-58's launched sessions, W2-62's live resume, W2-54's
@@ -216,3 +228,75 @@ that start no daemon could not run in this designer's sandbox: W1-16's own fixtu
 `Read-only file system: '/tmp/w16-…'`; the 8 cases without that fixture passed). The lead runs them in parallel.
 
 Line 8 (the removal of `load_sensitive` entries) is the orchestrator's commit, not a test here.
+
+## Run 2 (owner, DEC-925 item 3)
+
+Written by a fresh independent test designer (MR-3) from DEC-925 item 3 (package P-W2-57-B: R1, R2, B3 (a)), the
+findings of run 1's reviewer as the brief gives them, and the public interfaces (`gov doctor --json`, `gov check
+--json`). No implementation of this ticket was read. Each change is in a commit of its own, with its
+`Rewrite-Reason:`.
+
+### R1: an unread Claude Code version is never a pass (DEC-802)
+
+`test_w2_57_doctor_claude_code_unread.py`. Each repository is made from scratch under `tmp_path`. `gov doctor` runs
+from this worktree's `src/` with `HOME` in the case's sandbox, which is where it looks for an editor extension
+(`.vscode-server/extensions` and `.vscode/extensions` under it; none is there). The stand-ins are first on the
+`PATH`. Out of scope: a machine with no `claude` CLI at all (today's reading of that is left as it is).
+
+| Success, and the failure line it guards | Tests | Red today, and why |
+|---|---|---|
+| (a) a `claude` first on the `PATH` whose `--version` never answers. `gov doctor` ends with its envelope, and the `claude_code` part reads "unmeasured" or "fail". It says the CLI's version was not read (a text that names the CLI and its version and says it was not read: "not read", "no answer", "timed out", "budget" and the like), and it reads no version | `test_a_claude_whose_version_never_answers_is_not_a_pass_and_doctor_says_its_version_was_not_read` | red: "claude never answered --version, but gov doctor's claude_code part reads 'pass' (after 32 s): {'status': 'pass', 'drift': False, 'cli_version': None, …, 'issues': []}" |
+| (b) the reviewer's construction (F1): three tools (`gitleaks`, `openspec`, `copier`) pinned by the sha256 of their stand-ins, each silent on `--version`, and a `claude` that answers 2.0.0 at once. The part is never "pass". If the version is read, it is 2.0.0, the part fails and names the failure on the minimum, and doctor reports `ok` false. If it is not read, the part reads "unmeasured" or "fail" and says so. The control comes first: the same `claude` beside tools that answer at once gives "fail" on 2.0.0 | `test_probes_that_spend_doctor_s_time_never_leave_an_unread_claude_code_version_as_a_pass` | red (the control held): "three tools that never answer --version took gov doctor 91 s, and its claude_code part reads 'pass' (ok True) with the CLI's version None; claude answers 2.0.0 at once, below the minimum: {…}" |
+
+Each case waits out its limit once: (a) 32 s and (b) 93 s on run 1's head. Under `-n auto` they run side by side.
+
+### R2: W1-30's r15 rulesync case does not accept a timeout as its red
+
+`tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py::test_a_registry_that_pins_another_rulesync_than_the_installed_one_turns_the_portability_check_red`
+(`Rewrite-Reason: DEC-892 item 2: a probe timeout is not the fault under test (DEC-925 item 3, R2)`).
+
+- **Before:** green before the fault, then "red or yellow" after it, whatever the reason.
+- **Now:** after the fault, one finding of the check must name both the pinned 23.0.0 and the installed version. No
+  finding may say that rulesync gave no answer in time (W1-38's `timeout_findings`). Otherwise the case fails and names
+  what was found. This is stricter; nothing else in the file changes.
+- **Green** against the installed rulesync (24.0.0): 1 passed in 12.3 s. The whole r15 file: 21 passed in 16.7 s
+  (`-n auto`).
+- **Red** against the reviewer's construction. A stand-in `rulesync` sits first on the `PATH`, in the designer's
+  temporary folder. Its first two calls go to the installed rulesync (the check's `--version` and `generate`, in the
+  run before the fault). Its third call, the `--version` of the run after the fault, never answers. The message:
+  "the registry pins rulesync 23.0.0 and 24.0.0 is installed: adapter-portability is RED, but not for the version; a
+  finding naming both versions: none; findings that say rulesync gave no answer in time: [{'code':
+  'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 25 seconds; the generated files were not
+  compared'}]; …"
+
+### B3 (a): W2-M332, W1-19's warm query times without the memory sampler
+
+`tests/acceptance/W1-19/test_w1_19_real_models.py`, its `measured` fixture (`Rewrite-Reason: W2-M332: the query
+times are taken without the memory sampler (DEC-925 item 3, B3 (a))`).
+
+- **Before:** per tier, one process built the index, asked the three warm-ups and asked each dev query once. It timed
+  every query while a thread in the same process scanned every process on the machine every 50 ms for peak memory
+  (I3 O3 (b)).
+- **Now:** per tier, the same calls run as two passes, each in a process of its own on a clone of its own:
+  - **The timed pass** runs first, with no sampler (the fixture asserts that its process reported no peaks). The p95
+    case reads its times. The hit@5 case and the fused-list case read its answers: the first asking of each question,
+    as before.
+  - **The watched pass** runs after it, on a fresh clone, so the index build is watched as before. The memory case
+    reads its peaks. It first holds that pass's answers to the work the one pass did (both routes, reranked), so the
+    peaks are those of the whole retrieval.
+- **No expectation is lowered:** the same 0.5 s p95 limit, at least 50 queries timed, the same 2.5 GB limit, the same
+  pass line of 80.
+- **Cost:** one more pass per tier (a second clone, its index build and the same questions).
+- **Run:** collected (6 cases), not run by the designer. Inside the sandbox `gov` runs a private Ollama on the CPU,
+  so times there prove nothing; the lead runs the file on the shared GPU.
+- **Still to change:** W1-19's README ("Warm p95" and "Peak RAM", DEC-373) still describes the one pass. It is not
+  this designer's file, so it is named in the return.
+
+### This folder in run 2
+
+One run, `-n auto`, on run 1's head with run 2's tests (2026-10-27): 21 cases, 17 passed and 4 failed, in 114 s.
+- **The nightly route:** red until run 2's engineer builds the route.
+- **R1's two cases:** red today, for the reasons above.
+- **The designer-read p95 case:** red here and red alone ("p95 … per round (ms): 300.5, 547.0, 296.8; the bound is
+  100 ms"). The machine's load average was 64 to 70 on 20 cores, set by other sessions. It is a `serial: latency`
+  case, which the close runs alone; run 1 measured 55 ms on a quiet machine. Run 2 does not change it.
