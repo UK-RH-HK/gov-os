@@ -1,134 +1,143 @@
 {
- "form": 1,
- "decision": "DEC-915",
- "entries": [
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_history::test_interim_rule_stays_in_force_once_introduced[acceptance-tests]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_history::test_interim_rule_stays_in_force_once_introduced[installs]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_history::test_no_install_is_recorded_before_w1_05",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_acceptance_test_deny_covers_every_depth[Edit]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_acceptance_test_deny_covers_every_depth[Write]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_guardrails_leave_ordinary_implementer_work_alone",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_implementer_write_to_acceptance_tests_is_denied[Edit]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_implementer_write_to_acceptance_tests_is_denied[Write]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[apt-get]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[apt]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[cargo]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[compound]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[npm-bare]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[npm-global]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[npm]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[pip3]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[pip]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[python-m-pip]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[python3-m-pip]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[uv-pip]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[uv-tool]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[curl-pipe-bash]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[curl-pipe-sh]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[curl-pipe-sudo-sh]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[sudo-make-install]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[sudo-package-manager]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[wget-pipe-bash]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[wget-pipe-sh]",
-   "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
-  },
-  {
-   "test": "tests.acceptance.W1-26.test_w1_26_command::test_exit_0_when_all_checks_green",
-   "reason": "the full project does not pass gov check yet"
-  },
-  {
-   "test": "tests.unit.retrieval.test_lexical::test_the_chunking_is_the_carried_one",
-   "reason": "could not import 'govbridge.core.chunking': No module named 'govbridge'"
-  },
-  {
-   "test": "tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_the_path_map_s_test_inputs_are_in_the_test_map",
-   "reason": "the path map no longer holds test_inputs (the orchestrator's edit is done)",
-   "added": "2026-10-24, the path map's test_inputs removed at W2-66's merge (8f56ada1, DEC-903 item 4)"
-  }
- ],
- "additions": [
-  "2026-10-24, the path map's test_inputs removed at W2-66's merge (8f56ada1, DEC-903 item 4)"
- ]
+  "form": 1,
+  "decision": "DEC-915",
+  "entries": [
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_history::test_interim_rule_stays_in_force_once_introduced[acceptance-tests]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_history::test_interim_rule_stays_in_force_once_introduced[installs]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_history::test_no_install_is_recorded_before_w1_05",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_acceptance_test_deny_covers_every_depth[Edit]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_acceptance_test_deny_covers_every_depth[Write]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_guardrails_leave_ordinary_implementer_work_alone",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_implementer_write_to_acceptance_tests_is_denied[Edit]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_implementer_write_to_acceptance_tests_is_denied[Write]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[apt-get]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[apt]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[cargo]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[compound]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[npm-bare]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[npm-global]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[npm]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[pip3]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[pip]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[python-m-pip]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[python3-m-pip]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[uv-pip]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_install_command_is_denied[uv-tool]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[curl-pipe-bash]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[curl-pipe-sh]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[curl-pipe-sudo-sh]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[sudo-make-install]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[sudo-package-manager]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[wget-pipe-bash]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-01.test_w1_01_settings_deny::test_pipe_to_shell_and_sudo_are_denied[wget-pipe-sh]",
+      "reason": "W1-05 is closed: the interim guardrail is retired (DEC-084)"
+    },
+    {
+      "test": "tests.acceptance.W1-26.test_w1_26_command::test_exit_0_when_all_checks_green",
+      "reason": "the full project does not pass gov check yet"
+    },
+    {
+      "test": "tests.unit.retrieval.test_lexical::test_the_chunking_is_the_carried_one",
+      "reason": "could not import 'govbridge.core.chunking': No module named 'govbridge'"
+    },
+    {
+      "test": "tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_the_path_map_s_test_inputs_are_in_the_test_map",
+      "reason": "the path map no longer holds test_inputs (the orchestrator's edit is done)",
+      "added": "2026-10-24, the path map's test_inputs removed at W2-66's merge (8f56ada1, DEC-903 item 4)"
+    },
+    {
+      "test": "tests.unit.retrieval.test_lexical::test_the_chunking_is_the_carried_one",
+      "reason": "could not import 'govbridge.core.chunking': No module named 'govbridge.core.chunking'"
+    },
+    {
+      "test": "tests.acceptance.W1-03.test_w1_03_probe_findings::test_a_check_that_cannot_run_is_reported_and_recorded_with_the_call_s_own_fields[the-gov-package-is-missing]",
+      "reason": "this interpreter finds a `gov` package without PYTHONPATH"
+    }
+  ],
+  "additions": [
+    "2026-10-24, the path map's test_inputs removed at W2-66's merge (8f56ada1, DEC-903 item 4)",
+    "2026-10-27, after the first re-pin (DEC-922): the pinned close runs its tests with the pin's interpreter, where gov is installed, so W1-03 [the-gov-package-is-missing] skips; the govbridge parity case skips with the longer module name in its message (the same cause as its known entry)"
+  ]
 }

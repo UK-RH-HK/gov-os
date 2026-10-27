@@ -1,2 +1,8 @@
 2026-10-26 22:02:51 quiet
 2026-10-26 22:02:51 rebuild before DAEO-uzme
+2026-10-26 22:08:44 collect ok: 16594/16596 tests collected (2 deselected) in 9.55s
+2026-10-26 22:10:50 records ok: 80 passed in 120.60s (0:02:00)
+2026-10-26 22:10:53 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-26 22:16:00 check ok; close DAEO-uzme (load 5.39)
+2026-10-26 23:24:29 close DAEO-uzme exit 3
+2026-10-26 23:24:29 lock removed

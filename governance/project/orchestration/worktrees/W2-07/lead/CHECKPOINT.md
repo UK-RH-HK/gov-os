@@ -1,32 +1,23 @@
-# W2-07 lead checkpoint (DAEO-r9ss, run 3): returning DONE, about 01:25, 2026-10-24
+# W2-07 lead checkpoint (DAEO-r9ss, run 4 = round 2, DEC-923, DEC-924), 2026-10-27
 
 ## State
-- Branch w2/W2-07. Run 3 commits:
-  - 6f152f80 merge of w2/integrate 488972e4 (Task: DAEO-r9ss, Implements: DEC-908, Role: orchestrator, Co-Authored-By;
-    tree f2313e4a = git merge-tree). The first attempt used `git merge --trailer` (exit 129, nothing done).
-  - 2e888299, 1a6f239a, 4ceb05ed: td-3 (Task: DAEO-r9ss, Role: independent-test-designer, Implements: DEC-908, DEC-868,
-    Rewrite-Reason: DEC-868 item 3 | DEC-868 item 1 (b), KPI 5 | KPI 10, W2-M252, Co-Authored-By). 5 W1-30 files, +199/-52.
-  - 614817ec CP-DAEO-r9ss-0010, then 80ec31ab CP-DAEO-r9ss-0011 (the closing checkpoint record; head) (lead: Task: DAEO-r9ss, Implements: engineer, Role: orchestrator).
-- Nothing running. Tree clean apart from ignored and untracked files.
+- Start head 80ec31ab61b8 (run 3's last checkpoint record), tree clean: checked.
+- b6bc7773 merge of w2/integrate ec639fbbc7bf (Task: DAEO-r9ss, Implements: DEC-923, Role: orchestrator,
+  Co-Authored-By); merge tree 4ccc1c1b4cf7 = git merge-tree of its parents. `git diff --name-only w2/integrate...HEAD`
+  is empty after it (round 1 is on integrate).
+- The containment hook flagged three owner commits brought by the merge (18ad2382f60a, 82f2d4538a53, 8ba8b231a990;
+  Role: owner, Task: decision-record), left in place: not ours, on integrate already.
+- 611955faffaa is NOT on accepted_history at the integrate head merged (ec639fbb): expected r9ss count = 1.
 
-## td-3
-- Session ab9fa908-2f6a-4cff-990b-7248beef6188, gov launch, sandboxed (check passed), --effort high. DONE, twelve fields.
-- Its runs: W1-30 512/512, W2-01 88/88, collect 15812/15814. gov retrieve: FACET_UNAVAILABLE. 1 guard read refusal.
-- Tripwire 5: this tree head + W1-30 folder (allowed); other trees moved by their own sessions (W2-00-record, W2-67, W2-69, W2-70).
+## Lead check before round 2 (log/r4-unmeasured-before.txt, unmeasured3.py, this worktree's src)
+- Main tree (w2/integrate ec639fbb) and this worktree give the same: DAEO-5j8b 5 (8f56ada1bcbe DEC-903 delegated,
+  c9a086786444 owner list acceptance_exemptions, 4166d8d9ca0b .tickets, b772b2fefeed .tickets, 65039414fb72 DEC-876
+  superseded); DAEO-pl6k 1 (8d625805c343 .tickets); DAEO-r9ss 2 (8d625805c343, 611955faffaa docs/assessment).
 
-## Verification (head 614817ec; gov.__file__ = /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py)
-- Lead check: W1-30 512 p; W2-53 57 p; W2-01 88 p; W2-07 40 p; unit close + telemetry 463 p.
-- Rebuild exit 0; collect 15812/15814 (2 deselected) exit 0, no error; gov check exit 0, ok, YELLOW only
-  core-decision-citations (warning) and openspec-validate (OPENSPEC_ABSENT).
-- Parallel (verify3.sh) stopped at 94% by the two-hour limit (waits took 95 min). Rerun parallel3.sh under flock:
-  15517 p, 2 f, 30 s, 36m37s; the 2 f are W1-01's known cases (DEC-906, DEC-908 item 3).
-- Serial-only (s3.sh, flock): 263 p, exit 0, 28m03s.
-- Scratch: /tmp/gov-os-lead-W2-07 485,867 inodes / 4.5 GB (pytest-23: killed run, 136,852 / 1.2 GB; pytest-74: serial run,
-  349,004 / 3.4 GB, 1,568 folders kept although every case passed). Worktree ignored: 3,510 inodes / 408 MB.
+## Next
+1. td-r4 (fresh test designer, gov launch, sandboxed, --effort high): tests/acceptance/W2-07/ only, Rewrite-Reason: DEC-923.
+2. Red check myself. 3. Engineer (gates.py, gate (h)'s line in command.py, history.py if needed, tests/unit/close/test_w2_07_*).
+4. unmeasured3.py again (adapt to the engineer's subtraction). 5. Rebuild, verify in full (flock, retention, disk gate).
+6. Return DONE / PACKAGES.
 
-## What a resume must do
-- Nothing but return DONE (the orchestrator merges W2-07 before W2-66). Loop: held by the lead (not disclosed).
-
-## Refusals (run 3)
-- Lead: 0 guard read refusals; 2 write refusals (a python here-document's `>=` read as a write target; a `$L` write target),
-  each taken, not retried in that form.
+## Loop: held by the lead. Workers so far: none. Refusals: 0.

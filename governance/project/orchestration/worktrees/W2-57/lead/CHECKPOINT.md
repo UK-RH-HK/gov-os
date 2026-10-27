@@ -1,7 +1,9 @@
-# Lead checkpoint — DAEO-cy5o (W2-57), run 1
+# Lead checkpoint — DAEO-cy5o (W2-57), end of run 1
 
-- **State:** start of run 1. Head `d54546f00b21` (claim commit), tree clean. Identity checked (orchestrator, DAEO-cy5o).
-- **Decided (lead):** test design in two batches in one session (td-1 = KPI 1 probe + KPI 2 doctor; resume = batch B, KPIs 3-7). Then engineer batches (probe+doctor; then serial list etc.).
-- **Found, to package at return (blocks part only):** the ticket's allowed_paths have `src/gov/close/serial.py` (new) but not `src/gov/close/command.py` (nor the serial-only plugin). The live/real-model route to the nightly needs the close's serial phase to leave nightly-kind entries out; that call is in command.py. Package P-W2-57-PATHS (widen to command.py, the serial phase's call only). Also W1-19's files are not in the designer's named files (W2-M332's sampler change, KPI 5) — the designer is told to package it if needed.
-- **Next:** launch td-1 (gov launch, sandboxed, xhigh), tripwire n=1.
-- **Loop count:** 0 implementer iterations.
+- **Status returned:** PACKAGES (P-W2-57-B1 blocks part: the nightly route's last step and the removals that wait on it). Everything else of run 1 is done, verified and reviewed (pass).
+- **Branch head:** `d0bfeb6afd95` (probe record). Probed head `6be837bbbe41` (lead checkpoint CP-DAEO-cy5o-0004). Code head `0abd2dbd1796`.
+- **Commits:** TD (session 653d4474-228f-485a-9b72-d1e0b848d82e): f590aa5b2460, afe4b16b50f6, af09123932af, 7161a1672604, 68c2ab1f23f4, 5b0d637e5dee, 4fe257d59eb0, 85087920aa72, 9103c4c5cfbb, d835cf51bbea. Engineer (898cb9f9-4684-4006-8fa3-359d08239f96): 5ec92077f8fd, 0abd2dbd1796. Lead: 6be837bbbe41 (checkpoint), d0bfeb6afd95 (probe record PR-DAEO-cy5o.md, pass). Reviewer: 666a6e88-5a6f-43a1-bbeb-20f8c77a4a11 (wrote nothing; tripwire 4 empty).
+- **Verification at 0abd2dbd:** rebuild 0; gov check 0 (15 GREEN, 2 YELLOW known); parallel 16,415 passed / 31 skipped / 10 failed (route case pending B1; W2-66 DEC-919; base reds W1-01 ×4, W1-47 ×2, W1-06, W1-49 — same as the orchestrator's DAEO-uzme close); serial 180 passed; W1-38 ×3: 201/201, 0 rulesync skips/timeouts; sampler: version max 3.54 s, check max 7.33 s at load ≤68; collect 16636/16638 (2 deselected).
+- **A resume (run 2) must:** after the orchestrator decides B1 (widen to src/gov/close/command.py) — a fresh engineer builds serial.py (the list's route reader) and command.py's serial phase taking only non-nightly entries (and, if B1 says so, nightly.py's call); R1 ride-along (doctor claude_code unread version not a pass); if R2 names W1-30 r15 for the designer, a test-design batch first; B3 if decided (W1-19 sampler, designer). Then a full verification and a fresh review on the new head (the run-1 probe will be an earlier round).
+- **Loop count:** 1 implementer iteration, converged.
+- **Temp:** /tmp/gov-os-lead-W2-57 60K, 16 inodes; .gov-runtime 372M, 2,637 inodes (store and code index from the rebuild; scratch 24M). Engineer's left uv cache under /tmp/gov-launch-engineer-xcjs8p_u (28K).

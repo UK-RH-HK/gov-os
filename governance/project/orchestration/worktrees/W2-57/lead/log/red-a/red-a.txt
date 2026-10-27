@@ -1,0 +1,91 @@
+bringing up nodes...
+bringing up nodes...
+
+...................F.................................................... [ 21%]
+......F.......................................F......F.................. [ 42%]
+................................F....................................... [ 63%]
+........................................................................ [ 84%]
+...................................F.............F.F                     [100%]
+=================================== FAILURES ===================================
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: claude answered --version after 15 s (today's limit 3 s), but gov doctor read no version: {'status': 'pass', 'drift': False, 'cli_version': None, 'cli_sha256': '9f3650acfae85c7847aaba163543bd801a4f08ee3c823e77d44b9e6e964b5b93', 'extension_version': None, 'extension_binary_sha256': None, 'pinned_version': None, 'pinned_sha256': None, 'issues': []}
+    assert None == '2.1.300'
+     +  where None = <built-in method get of dict object at 0x72d5cce84b80>('cli_version')
+     +    where <built-in method get of dict object at 0x72d5cce84b80> = {'cli_sha256': '9f3650acfae85c7847aaba163543bd801a4f08ee3c823e77d44b9e6e964b5b93', 'cli_version': None, 'drift': False, 'extension_binary_sha256': None, ...}.get
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_doctor_probes.py:73: AssertionError: claude answered --version after 15 s (today's limit 3 s), but gov doctor read no version: {'status': 'pass', 'drift': False, 'cli_version': None, 'cli_sha256': '9f3650acfae85c7847aaba163543bd801a4f08ee3c823e77d44b9e6e964b5b93', 'extension_version': None, 'extension_binary_sha256': None, 'pinned_version': None, 'pinned_sha256': None, 'issues': []}
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: node answered after 15 s (today's limit 5 s), but gov doctor read it as not answering: {'name': 'node', 'pinned_version': '22.23.3', 'found_version': None, 'sha256_match': False, 'ok': False, 'reason': 'unverified: no version read and hash does not match'}
+    assert ('' == '22.23.3'
+      
+      - 22.23.3)
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_doctor_probes.py:61: AssertionError: node answered after 15 s (today's limit 5 s), but gov doctor read it as not answering: {'name': 'node', 'pinned_version': '22.23.3', 'found_version': None, 'sha256_match': False, 'ok': False, 'reason': 'unverified: no version read and hash does not match'}
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: rulesync answered both calls after 15 s, but the check reports a timeout: [{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}]
+    assert not [{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}]
+     +  where [{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}] = <function timeout_findings at 0x7382dd0a7060>([{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}])
+     +    where <function timeout_findings at 0x7382dd0a7060> = support.timeout_findings
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_rulesync_probe.py:74: AssertionError: rulesync answered both calls after 15 s, but the check reports a timeout: [{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}]
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: gitleaks answered after 15 s (today's limit 5 s), but gov doctor read it as not answering: {'name': 'gitleaks', 'pinned_version': '8.30.0', 'found_version': None, 'sha256_match': False, 'ok': False, 'reason': 'unverified: no version read and hash does not match'}
+    assert ('' == '8.30.0'
+      
+      - 8.30.0)
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_doctor_probes.py:61: AssertionError: gitleaks answered after 15 s (today's limit 5 s), but gov doctor read it as not answering: {'name': 'gitleaks', 'pinned_version': '8.30.0', 'found_version': None, 'sha256_match': False, 'ok': False, 'reason': 'unverified: no version read and hash does not match'}
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: uv pip freeze answered after 25 s (today's limit 10 s), but gov doctor did not read its hash: {'name': 'reranker-venv', 'pinned_version': 'w2-57-stand-in 1.0', 'found_version': None, 'sha256_match': False, 'ok': False, 'reason': 'cannot find site-packages in venv'}
+    assert (False is True)
+     +  where False = <built-in method get of dict object at 0x72d5cce91440>('sha256_match')
+     +    where <built-in method get of dict object at 0x72d5cce91440> = {'found_version': None, 'name': 'reranker-venv', 'ok': False, 'pinned_version': 'w2-57-stand-in 1.0', ...}.get
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_doctor_probes.py:67: AssertionError: uv pip freeze answered after 25 s (today's limit 10 s), but gov doctor did not read its hash: {'name': 'reranker-venv', 'pinned_version': 'w2-57-stand-in 1.0', 'found_version': None, 'sha256_match': False, 'ok': False, 'reason': 'cannot find site-packages in venv'}
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: standard output is not one JSON document
+    gov doctor --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    Traceback (most recent call last):
+      File "/tmp/gov-os-lead-W2-57/pytest-of-usain/pytest-0/popen-gw0/test_a_probe_exception_ends_do0/sandbox/bin/gov", line 8, in <module>
+        sys.exit(_target())
+                 ^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-57/src/gov/cli/main.py", line 244, in main
+        outcome = command.handler(root, args, config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-57/src/gov/doctor/command.py", line 828, in run
+        "path_compliance": _check_path_compliance(root),
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-57/src/gov/doctor/command.py", line 551, in _check_path_compliance
+        renames_output = _git(root, "log", "--diff-filter=R", "--name-status", "--format=", "--all")
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/usain/gov-os-worktrees/W2-57/src/gov/doctor/command.py", line 104, in _git
+        return subprocess.run(
+               ^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/subprocess.py", line 550, in run
+        stdout, stderr = process.communicate(input, timeout=timeout)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+        stdout, stderr = self._communicate(input, endtime, timeout)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/subprocess.py", line 2153, in _communicate
+        stdout = self._translate_newlines(stdout,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.12/subprocess.py", line 1086, in _translate_newlines
+        data = data.decode(encoding, errors)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    UnicodeDecodeError: 'utf-8' codec can't decode byte 0xe9 in position 8: invalid continuation byte
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W1-07/w1_07_support.py:426: AssertionError: standard output is not one JSON document
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: rulesync answered `--version` after 15 s and the check is not green on the clean project: [{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}]
+    assert ([{'code': 'RU...ot compared'}] == []
+      
+      Left contains one more item: {'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}
+      Use -v to get more diff)
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_rulesync_probe.py:43: AssertionError: rulesync answered `--version` after 15 s and the check is not green on the clean project: [{'code': 'RULESYNC_FAILED', 'message': 'rulesync --version: no answer within 10 seconds; the generated files were not compared'}]
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: rulesync answered `generate` after 15 s and the check is not green on the clean project: [{'code': 'RULESYNC_FAILED', 'message': 'rulesync generate: no answer within 10 seconds'}]
+    assert ([{'code': 'RU... 10 seconds'}] == []
+      
+      Left contains one more item: {'code': 'RULESYNC_FAILED', 'message': 'rulesync generate: no answer within 10 seconds'}
+      Use -v to get more diff)
+/home/usain/gov-os-worktrees/W2-57/tests/acceptance/W2-57/test_w2_57_rulesync_probe.py:43: AssertionError: rulesync answered `generate` after 15 s and the check is not green on the clean project: [{'code': 'RULESYNC_FAILED', 'message': 'rulesync generate: no answer within 10 seconds'}]
+8 failed, 332 passed in 57.45s

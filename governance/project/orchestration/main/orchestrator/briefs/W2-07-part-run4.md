@@ -38,6 +38,7 @@ You are the ticket lead for ticket `DAEO-r9ss` (`W2-07`, "gov close by ticket cl
   - **Expected:** 0 for `DAEO-5j8b` and `DAEO-pl6k`.
   - **For `DAEO-r9ss`:** 1 (`611955faffaa`) until the owner commits its `accepted_history` entry (DEC-924 item 1), then 0. Say which you saw, and whether that entry was on the integrate head you merged.
 - **Verification:** in the close's form, under the lock, with the retention option and the disk gate first.
+  - **Known base reds since the settings regeneration (not yours; the orchestrator's package to the owner):** W1-01's `test_docs_source_deny_rules_survive_the_change` (4 cases), W1-47's `test_the_other_deny_rules_are_in_place[Read(./docs/source/**)]` and `[Edit(./docs/source/**)]`, W1-06's `test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool`, and W1-49's `test_without_tk_the_block_says_so_and_holds_the_rest[not on PATH]`. Name them as base reds; do not fix them.
   - **Known:** W1-19's warm-query case is on `load_sensitive`. W2-54's green-here case may time out under load (row W2-L429; re-run it alone). DEC-919's known red applies if your branch changes the serial list (it must not).
   - Any other red is named with its cause.
 - **No review (STANDARD).**

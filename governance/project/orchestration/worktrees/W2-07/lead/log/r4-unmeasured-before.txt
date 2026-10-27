@@ -1,0 +1,30 @@
+gov from: /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py
+root: /home/usain/Dynamic-Agentic-Engineering-OS
+gate (h) line: ['gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)']
+  WORK WITHOUT A TASK: 8f56ada1bcbe governance/project/path-map.yaml
+  WORK WITHOUT A TASK: c9a086786444 governance/project/path-map.yaml
+  WORK WITHOUT A TASK: 4166d8d9ca0b governance/project/path-map.yaml
+  WORK WITHOUT A TASK: b772b2fefeed .tickets/DAEO-5j8b.md
+  WORK WITHOUT A TASK: 65039414fb72 governance/project/path-map.yaml
+DAEO-5j8b (W2-58): 57 own commits, 417 others in range, 30 measured by the decision-record rule, 5 unmeasured
+  WORK WITHOUT A TASK: 8d625805c343 .tickets/DAEO-pl6k.md
+DAEO-pl6k (W2-63): 6 own commits, 466 others in range, 30 measured by the decision-record rule, 1 unmeasured
+  WORK WITHOUT A TASK: 8d625805c343 .tickets/DAEO-r9ss.md
+  WORK WITHOUT A TASK: 611955faffaa .tickets/DAEO-r9ss.md
+DAEO-r9ss (W2-07): 38 own commits, 618 others in range, 41 measured by the decision-record rule, 2 unmeasured
+exit=1
+gov from: /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py
+root: /home/usain/gov-os-worktrees/W2-07
+gate (h) line: ['gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)']
+  WORK WITHOUT A TASK: 8f56ada1bcbe governance/project/path-map.yaml
+  WORK WITHOUT A TASK: c9a086786444 governance/project/path-map.yaml
+  WORK WITHOUT A TASK: 4166d8d9ca0b governance/project/path-map.yaml
+  WORK WITHOUT A TASK: b772b2fefeed .tickets/DAEO-5j8b.md
+  WORK WITHOUT A TASK: 65039414fb72 governance/project/path-map.yaml
+DAEO-5j8b (W2-58): 57 own commits, 418 others in range, 30 measured by the decision-record rule, 5 unmeasured
+  WORK WITHOUT A TASK: 8d625805c343 .tickets/DAEO-pl6k.md
+DAEO-pl6k (W2-63): 6 own commits, 467 others in range, 30 measured by the decision-record rule, 1 unmeasured
+  WORK WITHOUT A TASK: 8d625805c343 .tickets/DAEO-r9ss.md
+  WORK WITHOUT A TASK: 611955faffaa .tickets/DAEO-r9ss.md
+DAEO-r9ss (W2-07): 39 own commits, 618 others in range, 41 measured by the decision-record rule, 2 unmeasured
+exit=1

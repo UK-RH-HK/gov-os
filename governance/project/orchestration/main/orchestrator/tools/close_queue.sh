@@ -37,9 +37,13 @@ for item in "$@"; do
   python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/keyword_warn.py \
     > "$LOG/keyword-warn-$ticket.txt" 2>&1 || stop "row W2-L423's early warning: $(head -5 "$LOG/keyword-warn-$ticket.txt" | tr '\n' ' ')"
   # (a) collection, in one process, as the close runs the regression (its environment: the tree's src).
+  # The full listing goes to a temp file and only its errors and summary are kept: test ids can hold row W2-L423's
+  # keywords (W2-69's own case names one), and the log lives under .gov-runtime/ (DEC-911, DEC-923).
   env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src \
-    python3 -m pytest tests --collect-only -q -p no:cacheprovider --no-header > "$LOG/collect-$ticket.txt" 2>&1
+    python3 -m pytest tests --collect-only -q -p no:cacheprovider --no-header > /tmp/gov-os-queue-collect.txt 2>&1
   code=$?
+  { grep -E '^ERROR|errors? during collection' /tmp/gov-os-queue-collect.txt; tail -1 /tmp/gov-os-queue-collect.txt; } > "$LOG/collect-$ticket.txt"
+  rm -f /tmp/gov-os-queue-collect.txt
   if [ "$code" -ne 0 ] || grep -q -E '^ERROR|errors? during collection' "$LOG/collect-$ticket.txt"; then
     stop "collection failed (exit $code): $(grep -E '^ERROR' "$LOG/collect-$ticket.txt" | head -3 | tr '\n' ' ')"
   fi

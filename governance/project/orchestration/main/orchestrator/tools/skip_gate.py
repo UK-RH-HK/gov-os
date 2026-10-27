@@ -41,13 +41,22 @@ if not isinstance(evidence, dict) or not isinstance(evidence.get("skips"), list)
     print(f"skip guard: the regression skipped {skipped}, as expected (no evidence block: the count rule)")
     sys.exit(0)
 
+def node_id(test: str) -> str:
+    """One form for a test id: the path form `tests/x/test_y.py::name`. The known list holds JUnit's dotted form
+    (`tests.x.test_y::name`); the pinned close's evidence block gives the path form (seen 2026-10-26)."""
+    module, sep, name = test.partition("::")
+    if sep and "/" not in module and not module.endswith(".py"):
+        module = module.replace(".", "/") + ".py"
+    return module + sep + name
+
+
 try:
-    known = {(e["test"], e["reason"]) for e in json.loads(KNOWN.read_text())["entries"]}
+    known = {(node_id(e["test"]), e["reason"]) for e in json.loads(KNOWN.read_text())["entries"]}
 except (OSError, ValueError, KeyError, TypeError) as error:
     print(f"skip guard: the known list cannot be read ({error})")
     sys.exit(2)
 
-skips = [(str(s.get("test")), str(s.get("reason"))) for s in evidence["skips"]]
+skips = [(node_id(str(s.get("test"))), str(s.get("reason"))) for s in evidence["skips"]]
 silent = [s for s in skips if SILENT in s[1]]
 installed = None
 if silent:

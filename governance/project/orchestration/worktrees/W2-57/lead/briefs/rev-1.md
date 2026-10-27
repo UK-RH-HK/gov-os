@@ -1,0 +1,108 @@
+You are a fresh reviewer. Ticket DAEO-cy5o (W2-57, "Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry"), profile FULL, is implemented for its decided part in the worktree `/home/usain/gov-os-worktrees/W2-57` on branch `w2/W2-57`, at the head `6be837bbbe41` (code head `0abd2dbd1796`; the head adds only the lead's checkpoint record), and its acceptance tests pass except the one case named below. You probe that head for behaviour the tests miss: cases that could lose work, let a role write outside its scope, change acceptance tests, or make the guard or a gate fail open. You write nothing. Return each finding as a described behaviour, with its severity. This is the first review of the ticket's one declared round (DEC-916: up to two reviews; a failed review gives one more, the last).
+
+## Step 0: the sandbox check (before any work; report it first in your return)
+
+(a) `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-cy5o','w').write('x')"` must FAIL.
+(b) `echo sandbox-trial | git hash-object -w --stdin` and `git update-index --refresh` must WORK.
+If (a) wrote the file or (b) failed, stop there and return with the twelve fields, saying which.
+
+## Standing rules (read first)
+
+- First run `printenv GOV_ROLE GOV_TICKET` (expect `independent-auditor` and `DAEO-cy5o`), `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-57` and `w2/W2-57`) and `git rev-parse --short=12 HEAD` (expect `6be837bbbe41`). If anything differs, stop and say so. Inside the sandbox `git status --short` shows about 11 `??` entries (`.bashrc`, `.gitconfig`, `.mcp.json`, `.idea` and the like): they are the sandbox's placeholder mounts, not files of the head.
+- **DEC-732, the code under test:** in this worktree, **every test run and every `gov` command used for verification runs this worktree's own `src/`**: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-57/src` set **per command** (never in a session's `--settings` env). Your verification shows it with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-57/src python3 -c "import gov; print(gov.__file__)"`, quoted in your return; it must point into this worktree. Once the bootstrap pin is on PATH (DEC-822), a bare `gov` is the pinned judge; `PYTHONPATH` chooses only the code under test.
+- Run everything in the foreground, one command after another: your session ends with your last message, and nothing started in the background is ever read. You write nothing, so no commit of yours will exist: return when your findings are complete. Your budget is about 90 minutes.
+- No `git checkout` of another commit, no `git reset`, no `git clean`, no `git stash` in this worktree. To read an older version of a file, use `git show <commit>:<path>`.
+- **Memory first (DEC-836):** use `gov retrieve` for what you need to know before reading files at random: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-57/src python3 -m gov.cli.main retrieve "<question>" --json` (the worktree's store was rebuilt for this head). **Never one giant query or context (DEC-860):** a large question is taken in batches (`--batch-size`, then `--continue <token>`), ranked and stacked within your budget. **A code question (DEC-859)** uses the code-graph tool's own traversal (`trace_path`, `search_graph`, `query_graph`), small and targeted, never a load of the whole graph; a whole-graph job reads it in pages, never one query over the tool's row cap. Say in your return whether you used `gov retrieve`, and for what.
+- **Read refusals (DEC-849):** until W2-58 lands the guard still refuses some reads (searches that start at the repository root, `governance/project/` or `.claude/`). Take the refusal, never look for another form, search named folders instead, and count the refusals you met in your return. Never read `.claude/settings.json`, in this worktree or anywhere.
+- **Policy 2 (DEC-820):** you read everything, tests and code alike, except: (a) secrets and keys, never printed; (b) the contents of the held-out qualification material: never read, print, search, diff or copy the held-out file under `governance/project/`, and never type its path; its name may be seen; (c) the counterpart's work on this ticket is closed only to the counterpart (the engineer never reads `tests/acceptance/W2-57/` or this ticket's acceptance revisions; the test designer never reads this ticket's implementation); you are no counterpart, so nothing of this ticket is closed to you; (d) the hidden half of any evaluation set, by whoever is measured by it, is never read. Never read or name the qualification oracle.
+- **Protected places:** never write in `~/gov-os-workbench`; dev-tier material is used by `GOV_DEV_TIERS` by name only and cloned into a temporary folder. No clone, copy or file of a programme under any `.gov-runtime/` folder (DEC-673).
+- Never copy the repository or a folder of it (a recursive copy, a sync, an archive, a second worktree or a clone of this repository) anywhere. A probe that needs a repository builds a temporary one from scratch in your temporary folder, or copies single named files. Inside a launched session `.gov-runtime/freeze` shows as a placeholder device file whether or not a flag exists: conclude nothing from it.
+- **Row W2-L423's rule (DEC-911):** in your return, write commit hashes as 12 digits, never the full 40, and never write the keywords of the gitleaks rule that takes a bare 40-hex string for a token: call it "row W2-L423's rule".
+- Write no file of the repository and make no commit. No subagents that write. Install nothing. No push, merge, rebase or tag. Never run `gov close`, `gov adopt`, `gov pause` or `gov rebuild` here. Your temporary folder is removed when your session ends (DEC-386): every finding is in your final message.
+- **Disk and inodes (DEC-898), your share:** the ticket's budget is 20 GB and 1,000,000 files and folders for the lead and all workers together, outside the tracked tree; **your share is at most 6 GB and 300,000 files and folders at any moment**, in your temporary folder. Keep `TMPDIR` as the sandbox sets it. Keep pytest's own retention (never `--basetemp`). **Pass `-o tmp_path_retention_policy=failed` on every pytest run you make** (DEC-905). Never run the whole of `tests/` or a whole folder of W1-07, W1-25, W1-26, W1-27 or W1-30 at once (the lead has run them); run named files or cases. Clean up as you go. Measure your temporary folder (`du -s --inodes`, `du -sh`) before and after any heavy probe and give the figures in your return's `evidence` line. If you pass your share, stop at once and return.
+- **The machine:** other sessions share it. Before any run of more than a few cases, wait while the 1-minute load is above 20 (`until awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done`). Never run with `-x`. A time-sensitive case that fails under load is re-run alone before you call it red. Node 22 commands (rulesync) carry the prefix `PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH`.
+- **Inside your sandbox** the code-graph tool's folder `/tmp/gov-cbm-<uid>` is read-only (until W2-56), `uv`'s cache is read-only, and no live session can be launched: do not run W1-16's or W1-20's daemon cases, W1-27's rebuild cases, or any live or real-model file; judge those by reading and by the lead's records; for a run you needed and could not make, describe it exactly (command and what it would show) and mark the finding as not reproduced. Never try to reach a refused place another way.
+- If the guard or the sandbox refuses something you needed for the probe, do not work around it: say so in your return. **Refused twice for the same call: stop and say so; no third try.** You never ask or notify the owner.
+
+## What you read
+
+- The ticket file `.tickets/DAEO-cy5o.md`: its KPI lines (success and failure), its body (the files named for its test designer) and its `allowed_paths`. Its card: `docs/plan/WAVE_2_WBS.md` §2, W2-57.
+- The sources: `docs/assessment/2026-10/I-SYNTHESIS.md` (§3.1 C, the W2-57 block of §4, P-IS-6 with both tables); `I4-records-plan-rest.md` (finding 2, finding 5, §4.2, P-I4-5); `I1-guard-launcher-sandbox.md` (§4.2, F-1, F-2, F-7, F-10, F-14, P-I1-8); `I3-retrieval-context-resume.md` (F7, F8, O3).
+- The decisions, in `docs/DECISION_REGISTER.md`: DEC-892 (item 2), DEC-889 (item 5), DEC-899 (items 3 and 7), DEC-915, DEC-922, DEC-813, DEC-823, DEC-871, DEC-886, DEC-784, DEC-500, DEC-527, DEC-549, DEC-562, DEC-580, DEC-595, DEC-757, DEC-762, DEC-766, DEC-866, DEC-906, DEC-919, DEC-135, DEC-136, MR-3.
+- **The change: `git log --oneline d54546f00b21..HEAD` and `git diff d54546f00b21 0abd2dbd1796`.** By part:
+  1. **The rulesync probe (KPI 1), the engineer** (`5ec92077f8fd`): `src/gov/adapters/portability.py`, each of the check's two rulesync calls 10 → 25 s, bounded so the whole check ends inside the 60 s `gov check` gives a declaration that states none (`src/gov/check/runner.py`; the declaration `template/governance/kernel/checks/adapter-portability.yaml` is outside the ticket's paths); a timeout keeps the code `RULESYNC_FAILED`, told apart by its message "no answer within 25 seconds". Builder case `tests/unit/adapters/test_portability.py`.
+  2. **The doctor probes (KPI 2), the engineer** (`5ec92077f8fd`): `src/gov/doctor/command.py`: version probes 30 s, the venv freeze 40 s, all timed probes of one run sharing a 90 s budget; each doctor part run through a wrapper that turns any exception into `GovError DOCTOR_PART_FAILED` (part, exception type and text). The change record: `docs/changes/W2-57-CIT-E.md` (`0abd2dbd1796`).
+  3. **The test designer's batch A** (`f590aa5b2460`, `afe4b16b50f6`, `af09123932af`, `7161a1672604`): `tests/acceptance/W2-57/` (rulesync and doctor cases, README); W1-38's fixture and helpers (a timeout fails, never skips; waits 60/180/180 s; the 9 masked cases and `test_timeout_handling` made stricter); W1-33's probe helper; W1-07's envelope case keeping its failure text.
+  4. **The test designer's batch B** (`68c2ab1f23f4`, `5b0d637e5dee`, `4fe257d59eb0`, `85087920aa72`, `9103c4c5cfbb`, `d835cf51bbea`): the serial-only list reworked (`<route>: <kind>: <reason>` on every entry; W1-16's 94 no-daemon cases and W1-50's read-merge case out of the list; the live and real-model files and cases routed `nightly:`, including W2-58's, W2-62's, W2-54's and W1-21's cases newly listed; W1-09's races kept serial in this run); W1-30's r11 reading it; r13's limit (5 → 30 s, its sleep 14 → 45 s); W1-50's two live freeze cases dropping every `CLAUDE*` variable; W1-02's 5-second bound now held on the hook's CPU time with an 18 s wall wait; W1-46's host cases naming the network; a designer-read p95 case.
+- **Decided or pending, not to be re-raised as findings unless you find the code or a test does something other than what is recorded:**
+  - **The route to the nightly is not built yet:** `tests/acceptance/W2-57/test_w2_57_nightly_route.py::test_a_nightly_entry_is_collected_and_left_out_of_both_phases_and_a_serial_entry_runs_alone` is red because the close's serial phase lives in `src/gov/close/command.py`, which is outside the ticket's `allowed_paths`; the lead returns that as a package (P-W2-57-B1). Until it is built, every `nightly:` entry runs in the close's serial phase (today's behaviour for the list). Judge whether listing the newly routed cases now (W2-58's, W2-62's, W2-54's, W1-21's family check) is safe in the meantime.
+  - **The guard's 20-second deadline** is left to the resource gate and the quiet window, with no list entries (package P-W2-57-B2); **W2-M332's sampler change** needs W1-19's files, outside the designer's named files (package P-W2-57-B3); the doctor exception case is strict about an exception route (package P-W2-57-A1).
+  - **Known reds not of this ticket:** W2-66's `test_w2_66_lead_verification.py::test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes` (DEC-919, row W2-L440); and, red on this branch's base since the first re-pin's settings regeneration and registry commit, W1-01's `test_docs_source_deny_rules_survive_the_change` (4 cases), W1-47's `test_the_other_deny_rules_are_in_place[Read(./docs/source/**)]` and `[Edit(./docs/source/**)]`, W1-06's `test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool`, and W1-49's `test_without_tk_the_block_says_so_and_holds_the_rest[not on PATH]`.
+- **The lead's records** (under `.gov-runtime/scratch/lead/log/`): `red-a/` and `red-b/` (the red checks before implementation); `verify/` (the rebuild, `gov check`, the full parallel run `parallel.xml`, the serial run `serial.xml`, the sampler `sampler.txt` timing `rulesync --version` and the whole portability check every 20 s beside the parallel run, and the three W1-38 runs `w138-*.xml`). The lead's figures are given below under "The lead's verification".
+
+## What you probe for
+
+Your question: **can a rulesync or doctor timeout still skip or pass a case or a check, and does any revision only look red-then-green or lower what a case caught before?** Above all, a case that could:
+
+- **fail open:**
+  - a rulesync timeout that is still read as "not installed", as green, or as anything a "not green" assertion accepts, anywhere the probe is reached: the portability check under `gov check`, W1-38's fixture and helpers, W1-33's helper, W1-30's r15 through W1-38's helper; a path where `RULESYNC_BIN` or the `PATH` makes a slow rulesync look absent;
+  - the 25 s limits: can the check be cut by `gov check`'s 60 s runner (it then reports what?), and is a check cut by the runner green or skipped anywhere;
+  - doctor: the wrapper turning a part's exception into an envelope: can it turn a real failure into `ok: true`, swallow a `GovError` a part's callee raised on purpose and change what a caller (for example `gov status`, which runs doctor behind its own catch-all) reads; the shared probe budget: can it make a tool that answers read as not answering, or a tool that does not answer read as answering, or leak between runs in one process;
+  - a revised earlier case whose expectation is lower than before (`git show d54546f00b21:<path>`): W1-02's bound moved from wall time to CPU time (a hook that blocks without using CPU for 5 to 18 s now passes; is that within "a limit a loaded machine meets", or does it let a real hang through?); r13's longer limit; W1-46's `example.com` case now requiring the proxy's CONNECT 403; W1-30's r11 against its old version;
+  - the list: a live or real-model file left in the close's parallel phase; an entry without its reason; an entry that names no case; W1-16's split (does any case that starts the daemon now run in parallel?);
+- **lose work:** a stand-in or a temporary project of the new tests that writes or removes outside its own temporary folder; a probe that leaves a process alive;
+- **let a role write outside its scope:** a commit of this ticket that touches a path its role may not write (the engineer outside `allowed_paths`; the test designer outside the files the ticket body names; any change in a folder the ticket does not name);
+- **let an implementer change the acceptance tests.**
+
+Run the code; do not judge it by reading alone. Where you can, plant a fault of your own in a temporary copy of a single named file, a stand-in tool first on the `PATH` or named by `RULESYNC_BIN` in your temporary folder, or a plugin of your own in your temporary folder, never in the worktree. A finding you could not reproduce is marked as such.
+
+## The lead's verification at `0abd2dbd1796` (the close's form, after a full rebuild)
+
+- `gov.__file__`: `/home/usain/gov-os-worktrees/W2-57/src/gov/__init__.py`.
+- Full `gov rebuild --json`: exit 0 (lexical, semantic and code-intelligence stores recreated).
+- `gov check --json`: exit 0; 17 families, 15 GREEN, 2 YELLOW (`core-decision-citations`, history commits citing a decision their tree does not record; `openspec-validate`, nothing to validate), no RED; adapter/model portability GREEN.
+- The full parallel run in the close's form (`pytest tests -n auto -p gov_close_serial_only -o tmp_path_retention_policy=failed`, under the lock, 50:08): 16,415 passed, 31 skipped (the usual 31; none names rulesync), 10 failed: the route case above (pending), W2-66's known red (DEC-919), and the eight base reds named above, which the orchestrator's own close of DAEO-uzme on `w2/integrate` (2026-10-26 23:24) refused on too.
+- The serial run (every entry of the list alone, as `gov close` runs them today, the `nightly:` entries included: W1-46's, W1-25's and W1-49's live files, W1-50's two freeze cases, W1-19's and W1-21's real-model files, W2-58's, W2-62's and W2-54's cases): 180 passed, 0 failed (17:40).
+- The rulesync sampler beside the parallel run (133 samples, 1-minute load 0.3 to 68.2): `rulesync --version` median 0.61 s, max 3.54 s; the whole portability check (both calls and the comparison) median 1.39 s, max 7.33 s; no failure.
+- W1-38's suite three times in the close's parallel form (`tests/acceptance/W1-38 tests/acceptance/W1-33 tests/unit -n auto` with the close's plugin, under the lock): 2,958 passed and 1 skipped (`govbridge`) each time; W1-38 201 of 201 each time; 0 rulesync skips and 0 timeouts in each.
+- Collection (`pytest tests --collect-only`, one process): `16636/16638 tests collected (2 deselected)`, no error.
+
+## Judgement rules: the w2 prompt's section 14, word for word (owner, DEC-801 to DEC-803, DEC-807 to DEC-809)
+
+Every reviewer, probe and auditor brief you write carries this section and the two bullets after it, word for word. You judge your own reviewers' findings by the same rules, and every finding in a probe record you commit keeps its two lines.
+
+- **The threat model is ADR-0001's** (`docs/adr/ADR-0001-threat-model.md`): the Gov OS guards against honest agent mistakes, plausible accidents and drift in ordinary work, not against a deliberate adversary with the owner's privileges. Machinery against an adversary the design cannot stop produces endless review loops.
+- **Every finding is judged by two questions, word for word:**
+  1. "Can an honest agent hit this in ordinary work?"
+  2. "Does it fail open or lose work?"
+- **Only a finding with "yes" to both justifies a round.** A finding that needs a deliberate construction (a link planted at a protected name, git environment variables set by hand such as `GIT_OBJECT_DIRECTORY` or alternates, replace refs, an opaque interpreter used to evade the guard) is a row for the Wave 3 hardening pass, never a new round (DEC-801). A finding marked "no" on the first question is a row automatically.
+- **Every finding in a probe or audit record carries two lines:** `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808).
+- **No extra round on its own:** when a ticket will resume anyway, its accepted fixes ride along in that resume (DEC-802).
+- **Feature-gated risks:** a risk that exists only when a feature is switched on is an entry criterion of the ticket that switches it on (DEC-803).
+- **Packages:** every package that proposes a round states the classification of its findings on one line, before the recommendation (DEC-809).
+- These rules go, word for word, into every reviewer, probe and auditor brief (A3, and every audit brief of W2-25, W2-28, W2-30 and W2-47).
+
+From brief A3 (reviewer), word for word:
+- Judge against ADR-0001's threat model (section 14): honest agent mistakes and plausible accidents in ordinary work, not deliberate adversaries. Ask of every finding, word for word: "Can an honest agent hit this in ordinary work?" and "Does it fail open or lose work?"
+- Every finding carries two lines: `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other`. A finding marked "no" is a row for the Wave 3 hardening pass, never a round; only "yes" with "fails open" or "loses work" fails the probe.
+
+## Return
+
+Your last message, complete in itself. **The twelve fields come first, each as a labelled line** (label at the start of a line, a colon, at least one word; "none" where there is nothing), with nothing before them. **After them, the probe record's content** for the lead to commit (you write nothing): a first line `Verdict: pass` or `Verdict: fail`; the head you probed; step 0's result; the `gov.__file__` line; the classification of your findings on one line (DEC-809); what you probed and found sound, part by part (1 to 4 above); and each finding as a described behaviour, never as code (DEC-136): what was done, what happened, what should have happened, its severity, and its two lines `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other`. The lead passes findings to a test designer; you repair nothing (MR-4). Say also your scratch figures, the read refusals met, and whether you used `gov retrieve` (and the code-graph tool), and for what.
+
+```
+task: <what you were asked to do, in one line>
+status: <DONE | PACKAGES | ESCALATION | ESCALATION_BLOCKED | LAUNCH_BLOCKED | AUTH_REQUIRED, and one line of why>
+work_completed: <what was done>
+files_changed: <each path, or "none">
+evidence: <commits with their trailers, logs, command outputs that show it>
+tests: <each suite run, with its counts, or "none run">
+discoveries: <what you found that was not known, or "none">
+risks: <what could go wrong with what was done, or "none">
+lessons: <what the next worker should know, or "none">
+proposed_decisions: <each package, with your recommendation and confidence, or "none">
+unresolved: <what is still open, or "none">
+recommended_next_action: <one line>
+```
+
+Refused twice for the same call: stop and say so; no third try.
