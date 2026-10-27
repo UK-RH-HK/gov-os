@@ -1,6 +1,6 @@
 ---
 id: DAEO-2azm
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-27T11:57:11Z
