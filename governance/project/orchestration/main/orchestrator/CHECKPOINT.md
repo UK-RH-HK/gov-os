@@ -1,33 +1,19 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 11:15 GMT — QUEUE STOPPED: W2-70's close REFUSED (count 1) on 8 base reds from the settings regeneration; P1 P-REPIN-R1 + P2 P-W2-57-B + ACT 611955fa pinged; W2-07 r2 lead in flight; W2-57 returned PACKAGES; next free DEC-925)
+## RESUME HERE (2026-10-27 17:45 GMT — W2-70 CLOSED (`23c24700`, full, base for scoping = its head `7ada0f58`); queue STOPPED before W2-66: product traceability RED (39 commits with a role in Implements) -> P1 P-TRACE-IMPL-1 + ACT file pinged; W2-69 re-probe lead in flight; W2-57 + W2-07 r2 DONE, merges held; next free DEC-927 (drafted))
 
 ### Now (2026-10-26)
-- **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
-  (both Role: owner, pushed). `pin-fecb870c` kept for rollback. Smoke test: pinned gov check exit 0 after one
-  rebuild (15 GREEN, 2 known YELLOW: openspec not on PATH, citation warnings); guard allow/deny/exit-2 by the exact
-  hook line; hooks and declared checks run the pin's python (-E / -P). Logs `log/repin1-smoke-*`.
-- **Queue run 2026-10-26 22:02 (`log/close-queue-20261026-2157/`):** W2-70 (DAEO-uzme) close REFUSED exit 3 after 68 min
-  (count 1; repair DAEO-2upp committed by the close `9fbaf969`); queue stopped; 6 others not run. 9 reds, none W2-70's:
-  W1-01 docs_source x4 + W1-47 docs/source x2 (enforce the dropped deny rules: my DEC-866 sweep miss), W1-49
-  precompact [not on PATH] (new lifecycle hook line exits 1 without gov), W1-06 (registry approved_by DEC-921 ->
-  should be DEC-922; my repin_registry.py), W2-69 unit folder (pycache leftover: REMOVED). Package P-REPIN-R1 (P1,
-  `dbfb76f0`): rec (a) LITE W2-74 test revisions + W2-69 case id rename + registry line by me; interim the warning
-  leaves out .gov-runtime/close/ (the judge's JUnit holds the keyword via W2-69's case name, no hash).
-- **Tools fixed today:** skip_gate.py reads dotted and path ids (would have stopped every passing close); known list
-  +2 (W1-03 [the-gov-package-is-missing] under the pin interpreter; govbridge longer message) -> 33, digest them;
-  queue's collect log keeps errors + summary only. Re-run queue: W2-70 first, then the other six.
-- **DEC-923/924 done:** `ef9812b1`, `ab2050b8` (W2-07 KPI), `ec639fbb` (DEC-924; prompt v3.28; reports in own
-  commits). accepted_history patch `drafts/DEC-924/accepted-history-611955fa.patch` VALIDATED (pin readers PASS;
-  record suites green applied) -> ACT sent for the owner's Role: owner commit.
-- **W2-07 round 2 in flight** (A5 run 4, task bhsrfm93v, launched 11:05, `log/W2-07-A5-run4.json`), beside W2-57.
+- **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
+- **W2-07 round 2 RETURNED DONE** (head `75048114`; gate (h) per DEC-923; W2-07 69/69; unmeasured 0/0/0 for W2-58,
+  W2-63, W2-07 on `a42e899b`; full run = the 8 base reds + W2-54 load timeout, passed alone). **MERGE HELD until the
+  close queue ends** (its src/gov/close change is shared core: merged now it would make every queued close full;
+  DEC-883 no code merges while closes run). Its branch lacks `048f5758` (the 611955fa entry) -> merge-back before its
+  own close. Rides the second re-pin. Temp folder removed. Lead's stricter readings O1-O4 (README) noted.
 - **W2-57 returned PACKAGES** (run 1: probe fix, doctor, serial list done; review pass; branch head `d0bfeb6afd95`).
   P-W2-57-B: B1 (widen to command.py's serial call) + B2 to the owner; B3/R1/R2/A1 delegated unless objected.
   6 load_sensitive removals ready (at its merge). Two lead commits carry `Implements: engineer` (my IMPL error in
   its brief): a row; run 2 brief IMPL=DEC-892. Temp folder removed.
 - **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
-- **Prior refusals on record:** W2-58 count 1 (WORK_WITHOUT_TASK), W2-63 count 1 (RULESYNC etc.). Commit-gate refusals
-  are not counted by the new judge.
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -63,6 +49,9 @@
 - **Settings changes and ACTs (DEC-925, standing):** any settings change or regeneration -> a full run in the close's
   form on a clone with it applied + a sweep for dependent tests, BEFORE the owner's commit; every ACT's commands in
   `governance/project/orchestration/packages/ACT-<id>.md`, named in the ping.
+- **Implements: ids (DEC-927, standing):** gate (e) = `tools/trailer_gate.py` also refuses an Implements item that is
+  not a DEC the register holds or a CAP the store holds; leads run it on their worktree before returning
+  (LEAD-w2-common); build_lead_brief.py refuses a non-id IMPL. My CAP-n reading is open for the owner's overturn.
 
 ### Plan in force (DEC-896..DEC-919)
 - **First re-pin = ACT-REPIN-1** (`8455edd6`; DONE 2026-10-26, smoke test passed, DEC-922; history below): owner runs `pin/REPIN-COMMANDS-6a4696eb.sh` Part A (wheel of
@@ -88,10 +77,25 @@
 removing returned leads' temp folders after the holder check).
 
 ### Next
-1. On the owner's answers: P-REPIN-R1 -> W2-74 (LITE, test revisions) + registry line + warning interim; then the
-   queue again (W2-70 first; its next refusal for the same reds would be its second). P-W2-57-B -> run 2 brief
-   (IMPL=DEC-892). The ACT (611955fa) -> owner commits after the W2-07 r2 lead is not committing in the main tree.
-2. W2-07 r2 returns -> merge (second merger merges back, DEC-924); it rides the second re-pin.
+1. **Queue run 2026-10-27 15:46:** W2-70 CLOSED exit 0 (66 min, full: BASE_UNKNOWN; record CL-DAEO-uzme.md head
+   `7ada0f58`); worktree/branch removed. STOPPED before W2-66: gate (b) RED, product-traceability IMPLEMENTS_UNRESOLVED
+   (W2-70's 7 commits). 39 commits on integrate name a role (26 record-only, 13 other; W2-70, W2-67, W2-66, W2-65,
+   W2-07, W2-69) + W2-57's 2 on its branch. P1 P-TRACE-IMPL-1 `b99c75ce`: rec (a) one owner commit of 39
+   accepted_history entries under DEC-927. Drafted `drafts/DEC-927/` (register + path map + patch; validated 39/39;
+   traceability exit 0 and record suites 80 green with it applied; tree restored). ACT file + patch in packages/.
+   ON YES: append `drafts/DEC-927/entry.md` to the register (re-run draft_dec927.py if the register moved), record
+   checks, commit; give the owner the sha; owner runs ACT-P-TRACE-IMPL-1.md; then gate (b) and restart the queue:
+   DAEO-c1uz DAEO-ye2a DAEO-kh9l DAEO-e82f DAEO-qty6 DAEO-2azm (should be SCOPED off `7ada0f58`). build_lead_brief.py
+   now refuses a non-id IMPL.
+2. **Now / after the queue:** (a) W2-69's re-probe lead IN FLIGHT (task b5z8st71x, `log/W2-69-A5-run3.json`); then
+   merge it and queue W2-69; (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
+   review 2 pass, probe `PR-DAEO-cy5o-review-2.md`; serial 104 cases 11:48 vs 180 17:40; nightly batch 76 green),
+   then commit its 30 load_sensitive removals (W1-38 x3, W1-07 [doctor], W1-30 r13, unit close follow-up, W1-46 x23,
+   W1-19 warm p95; list in `log/W2-57-A5-run2.json`); (c) W2-07 r2 SECOND: lead merges integrate back + re-verifies
+   (STANDARD, no probe). Temp folders of W2-57 and W2-07 removed.
+3. W2-57's proposals for the digest/owner: P-1 (entry criterion on row W2-M406's fix: gov.close.nightly must run both
+   routes; DEC-803, mine to record); P-2 (DEC-549 P-4 re-baseline (c): owner, DEC-105 options); P-R2-T1 (mark DEC-373
+   changed by DEC-925 + W1-19 README via a ticket); rows F3/F4/O2/O3, run 1 F3/F4/O1; W1-09 condition.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
 4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
    then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.
