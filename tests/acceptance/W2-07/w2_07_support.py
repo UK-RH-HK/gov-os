@@ -64,8 +64,21 @@ REGISTER = w201.REGISTER
 REGISTER_KEY = w201.REGISTER_KEY
 ACCEPTED_KEY = w201.ACCEPTED_KEY
 CAPABILITY = w201.CAPABILITY
+EXEMPTIONS_KEY = "acceptance_exemptions"  # DEC-906 item 2: beside accepted_history, {commit, decision}
 OWNER_ACCEPTED = "ACCEPTED (owner, 2026-10-22)"
 PROPOSED = "PROPOSED"
+# The register's own status-line forms (DEC-923 item 2: an ACCEPTED decision, the owner's or a delegated one, also
+# when later superseded or changed; a decision never ACCEPTED does not count). Copied from the register's entries:
+# DEC-903's (delegated), DEC-876's (superseded after its acceptance), a ``Changed by`` note (DEC-896's) and DEC-021's
+# (``REJECTED``).
+DELEGATED_ACCEPTED = ("ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible; "
+                      "`Task: decision-record`, `Role: orchestrator`). The owner may overturn it.")
+REJECTED = "REJECTED (for authority)"
+
+
+def superseded(by, was="ACCEPTED, owner, 2026-10-22, in the chat"):
+    """DEC-876's form: ``SUPERSEDED by DEC-n (<date>; it was <was>)``."""
+    return f"SUPERSEDED by {by} (2026-10-24; it was {was})"
 
 # --------------------------------------------------------------------------
 # The forms this suite assumes (README, "Interface assumptions")
@@ -125,8 +138,15 @@ quarantine_entry = w253.quarantine_entry
 
 
 def path_map_text(settings):
-    """W2-53's path map text: the plain keys, the accepted history and the two ratchet lists."""
-    return w253.path_map_text(settings)
+    """W2-53's path map text: the plain keys, the accepted history and the two ratchet lists; and W1-01's
+    ``acceptance_exemptions`` (DEC-906 item 2) written as a YAML list of mappings, as the others are."""
+    text = w253.path_map_text({key: value for key, value in settings.items() if key != EXEMPTIONS_KEY})
+    if EXEMPTIONS_KEY in settings:
+        entries = settings[EXEMPTIONS_KEY]
+        text += f"{EXEMPTIONS_KEY}: []\n" if not entries else f"{EXEMPTIONS_KEY}:\n" + "".join(
+            f"  {'-' if n == 0 else ' '} {field}: {json.dumps(str(value))}\n"
+            for entry in entries for n, (field, value) in enumerate(entry.items()))
+    return text
 
 
 # --------------------------------------------------------------------------

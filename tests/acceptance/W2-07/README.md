@@ -4,6 +4,14 @@ Ticket `DAEO-r9ss` (W2-07, STANDARD). Written by the independent test designer (
 from the ticket's KPI lines, its card (`docs/plan/WAVE_2_WBS.md` §2, W2-07), lens I's P-IS-4 and I2 F9/F13, and
 DEC-868, DEC-892, DEC-896, DEC-898, DEC-899 and DEC-790. No implementation was read.
 
+**Round 2 (DEC-923 item 2, DEC-924).** A fresh independent test designer revised `test_w2_07_decision_records.py`
+(and added W1-01's `acceptance_exemptions` list to the support's path-map writer) to KPI 3 as amended, the round-2
+KPI and failure lines 3 and 4, from the ticket file, the card's "Round 2 (owner, DEC-923)" note, DEC-923, DEC-924,
+DEC-896 item 1, DEC-891, DEC-906 and DEC-734, the trailer gate's public reading of `accepted_history`
+(`src/gov/close/history.py` on `w2/integrate`) and W1-01's reading of `acceptance_exemptions`
+(`tests/acceptance/W1-01/w1_01_support.py`). Each change is carried by a commit with `Rewrite-Reason: DEC-923`; no
+expectation was lowered. Round 2's own map is the section "Round 2: what the work-without-a-task gate measures".
+
 ## How the tests run
 
 - **Through public interfaces only:** `gov close <ticket> --json` (the API-0002 envelope, exit codes, findings),
@@ -40,8 +48,8 @@ DEC-868, DEC-892, DEC-896, DEC-898, DEC-899 and DEC-790. No implementation was r
 | F1 audit report fails the validator | `...[report-fails-the-validator]` | refused for `NO_ACCEPTANCE_TESTS`, not the validator's finding |
 | S1 integration missing a named file | `...::test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused[...]` | refused, not naming the missing file |
 | S2 test-revision on declared `acceptance_tests.path` [DEC-892, DEC-896 item 3] | `test_w2_07_test_revision.py::test_a_test_revision_ticket_closes_on_the_tests_its_ticket_file_names`, `...whose_named_tests_fail_is_refused_on_its_acceptance_run` | refused `NO_ACCEPTANCE_TESTS`; no `acceptance` run of the declared folder |
-| S3 decision record under an ACCEPTED decision is measured [DEC-896 item 1] | `test_w2_07_decision_records.py::test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured` | refused `WORK_WITHOUT_TASK` |
-| F3 decision record outside an ACCEPTED decision | `...::test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured`, `...naming_no_decision...`, `...that_also_changes_code_tests_or_the_kernel...[code, tests, kernel]` | **green already** (today every such commit is unmeasured); they hold the rule's limits |
+| S3 decision record under an ACCEPTED decision is measured [DEC-896 item 1] (round 1) | `test_w2_07_decision_records.py::test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured` | refused `WORK_WITHOUT_TASK` (round 1; built, green). Round 2's rows are in the section below |
+| F3 decision record outside an ACCEPTED decision (round 1) | `...::test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured`, `...naming_no_decision...`, `...that_also_changes_any_other_path...` (round 1's `...code_tests_or_the_kernel...`) | **green already** (today every such commit is unmeasured); they hold the rule's limits. Round 2 widened them (below) |
 | S4 commit gates first: trailers | `test_w2_07_commit_gates.py::test_a_commit_without_its_trailers_stops_the_close_before_any_test` | both telling tests ran (finding gathered after the runs, counted) |
 | S4: work without a task | `...::test_work_without_a_task_stops_the_close_before_any_test` | tests ran |
 | S4: accepted history | `...::test_a_refused_accepted_history_entry_stops_the_close_before_any_test` | tests ran |
@@ -69,7 +77,7 @@ DEC-868, DEC-892, DEC-896, DEC-898, DEC-899 and DEC-790. No implementation was r
 | W2-M276 (`checker.close` writes an audit ticket citing DEC-088, MR-4) | builder row in `gov readiness`'s close, outside `gov close`'s KPI lines | builder |
 | W2-M354 (repair ticket in a-dev incomplete) | the complete-ticket case (the same defect at its source) | — |
 
-Expected **green already** (8 of the suite's 40 cases; the other 32 are red): the specification ticket with a closed record (its acceptance tests already ran),
+Round 1's count: expected **green already** (8 of the suite's 40 cases; the other 32 were red): the specification ticket with a closed record (its acceptance tests already ran),
 the implementation-with-evidence guard, the five decision-record limit cases, and the not-accepted probe decision.
 They hold limits of the new rules; none shows a row already fixed except that today every task-less commit is
 unmeasured (DEC-490) and a failed probe always refuses.
@@ -100,8 +108,11 @@ unmeasured (DEC-490) and a failed probe always refuses.
   id and path), its probed commit (full id) and every finding id with its list row. A finding not so named refuses,
   and the refusal names it. A close that passes names the decision (in its result or close record).
 - **A5. A decision-record commit "names" a decision** in its message: its subject and/or an `Implements:` trailer
-  (the tests use both). The governance records are the register, `docs/plan/**`, the prompts, the briefs,
-  `governance/project/orchestration/**` and the path map.
+  (the tests use both). The governance records are, as amended by DEC-923 item 2, DEC-891's records (`.tickets/**`,
+  `docs/checkpoints/**`, `docs/close/**`, `docs/probes/**`, the register the path map names, `docs/plan/**`,
+  `governance/project/orchestration/**`) beside the prompts (`governance/project/prompts/**`), the briefs
+  (`governance/project/briefs/**`) and the path map. Round 1 read DEC-896 item 1's narrower list (without DEC-891's
+  first four folders).
 - **A6. Gate refusals.** A commit-gate or pre-close-gate refusal is a refusal (`ok: false`, non-zero exit) that
   names its cause: the gate's existing code where one exists (`TRAILER_MISSING`, `WORK_WITHOUT_TASK`,
   `ACCEPTED_HISTORY_REFUSED`, `PROBE_INVALID`, `ACCEPTED_RED_REFUSED`, `LOAD_SENSITIVE_REFUSED`,
@@ -113,6 +124,83 @@ unmeasured (DEC-490) and a failed probe always refuses.
   close of the ticket. A second refusal with the same findings reuses it and names it.
 - **A8. Interruption.** A close killed (SIGKILL) inside the ticket tool's `close` leaves nothing that makes the next
   close refuse (in particular no `TREE_NOT_COMMITTED` for its own records); the next close leaves one close record.
+
+## Round 2: what the work-without-a-task gate measures (DEC-923 item 2)
+
+All in `test_w2_07_decision_records.py`, each through `gov close --json` in a temporary project. "Red today" is
+against this worktree's code at `b6bc7773` (round 1, built): each red is refused `WORK_WITHOUT_TASK`, naming the
+record or listed commit (checked on the run of 2026-10-27).
+
+| KPI line | Case (function `[ids]`) | Red today because |
+|---|---|---|
+| S3 (amended): measured under a delegated decision | `test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured[delegated-decision]` | refused `WORK_WITHOUT_TASK`: the judge counts only an ACCEPTED owner decision |
+| S3: measured under the owner's decision, no owner trailer | `...[owner-decision]` (round 1's case, revised) | **green already** |
+| S3: measured under a decision later superseded | `test_a_decision_record_under_a_decision_later_superseded_or_changed_counts_as_measured[superseded]` | refused `WORK_WITHOUT_TASK`: a superseded decision is not counted |
+| S3: measured under a decision later changed (`· **Changed by:**`) | `...[changed]` | **green already** (kept: it holds the line against a judge that would read any later note as undone) |
+| S3: `.tickets/`, the closing ticket's own file | `test_a_decision_record_that_changes_the_closing_tickets_own_file_counts_as_measured` | refused `WORK_WITHOUT_TASK`, naming `.tickets/PROJ-dcrd.md` |
+| S3: DEC-891's other record folders | `test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[checkpoints, close, probes]` | refused `WORK_WITHOUT_TASK`: those folders are not records to the judge |
+| S3: the records round 1 already counted | `...[orchestration, prompts, briefs, plan]` | **green already** |
+| Round-2 KPI: on `accepted_history`, code or tests | `test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[accepted_history-code, accepted_history-tests, accepted_history-abbreviated-id-code, accepted_history-abbreviated-id-tests]` | refused `WORK_WITHOUT_TASK` (the trailer gate accepts the entry: its answer lists it in `accepted_history`) |
+| Round-2 KPI: on `acceptance_exemptions`, code or tests | `...[acceptance_exemptions-code, acceptance_exemptions-tests]` | refused `WORK_WITHOUT_TASK`: the judge does not read the list |
+| F3: a decision never ACCEPTED | `test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured[proposed, rejected, superseded-never-accepted]`; `test_a_decision_record_naming_no_decision_counts_as_unmeasured` | **green already** (they hold the limit) |
+| F3, F4: any other path (code, tests, kernel, `docs/assessment/`), with or without `Role: owner`, no list | `test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[code, tests, kernel, assessment × orchestrator, owner]` | **green already** (they hold the limit) |
+| Round-2 KPI, F4: the lists' own limits | `test_a_list_entry_outside_the_lists_reading_measures_nothing[accepted_history-delegated, accepted_history-proposed, acceptance_exemptions-delegated, acceptance_exemptions-proposed, acceptance_exemptions-abbreviated-id]` | **green already** (they hold the limit) |
+
+Count: 35 cases in the file, 12 red and 23 green against today's code. Round 2 is done when all 35 pass.
+
+### Revisions of round 1's cases (`Rewrite-Reason: DEC-923`)
+
+- **The measured case** (`...under_an_accepted_decision_counts_as_measured`). Before: the owner's commit with
+  `Role: owner`, under an `ACCEPTED (owner, …)` decision. After: the orchestrator's commit with
+  `Role: orchestrator` (as this repository records the owner's decisions, DEC-861), and the case asserts that no
+  `Role: owner` trailer is there, so the trailer cannot measure it (DEC-923 item 2). A delegated-decision id is
+  added. Expectation unchanged: it closes.
+- **The not-accepted case.** Before: `PROPOSED`. After: `PROPOSED`, `REJECTED` and a decision superseded without
+  ever being ACCEPTED (`SUPERSEDED by DEC-599 (…; it was PROPOSED)`), each on a `Role: owner` commit. Expectation
+  unchanged: refused `WORK_WITHOUT_TASK`, naming the commit.
+- **The no-decision case.** Unchanged (`Role: owner`, refused).
+- **The code, tests, kernel case.** Renamed `...that_also_changes_any_other_path_counts_as_unmeasured`. Before:
+  code, tests, kernel, `Role: owner`. After: code, tests, kernel and `docs/assessment/` (611955fa's shape), each with
+  `Role: orchestrator` and with `Role: owner` and no list naming it (failure line 4). Expectation unchanged: refused
+  `WORK_WITHOUT_TASK`, naming the commit.
+
+### Readings chosen (round 2)
+
+- **A9. The register's status forms of "an ACCEPTED decision".** These are copied from the register, not invented:
+  `ACCEPTED (owner, …)`, DEC-903's `ACCEPTED (delegated, orchestrator, …)`, DEC-876's
+  `SUPERSEDED by DEC-n (<date>; it was ACCEPTED, owner, …)`, and an `ACCEPTED (owner, …)` line with
+  `· **Changed by:** DEC-n: …` after its basis. Never ACCEPTED: `PROPOSED`, DEC-021's `REJECTED (for authority)`,
+  and `SUPERSEDED by DEC-n (…; it was PROPOSED)`. The later-superseded and later-changed cases make the record while
+  the decision is ACCEPTED, then restate its status in a later record of the register alone. The judge may read
+  the register at the commit or at `HEAD`, and both readings give the same answer in every case (not pinned).
+- **A10. The lists' readings.** `accepted_history` is read as the trailer gate reads it (DEC-734;
+  `src/gov/close/history.py` on `w2/integrate`): the commit by a full or an abbreviated id, and the decision an entry
+  of the register with a status line `ACCEPTED (owner…`, not superseded or revoked, whose text names the commit
+  (eight or more of its digits). `acceptance_exemptions` is read as W1-01 reads it (`w1_01_support.acceptance_exemptions`):
+  the commit by its whole id only, and the decision a `DEC-<n>`. DEC-923 item 2 adds "under its ACCEPTED owner
+  decision", so a delegated or a proposed decision on either list measures nothing. The entries are the owner's own
+  `Role: owner` commits (`Task: setup`) outside the ticket's paths. The listed commit is the owner's
+  `Task: decision-record`, `Implements: DEC-n`, `Role: owner` commit (c9a08678's shape, with `Implements:` so that
+  the trailer gate has nothing to say about it). It changes the ticket's code or its tests (`tests/unit/w207/`, in
+  the fixture ticket's allowed paths).
+- **A11. Gate order for a refused `accepted_history` entry.** The trailer gate refuses an `accepted_history` entry
+  outside DEC-734's form on its own (`ACCEPTED_HISTORY_REFUSED`), and the rule fixes no order between that gate and
+  the work-without-a-task gate. So those two limit cases accept either code, provided the refusal names the commit.
+  The `acceptance_exemptions` limits must be `WORK_WITHOUT_TASK` itself, because no other gate reads that list.
+
+### Readings left open (not pinned; any of them is a package if it matters)
+
+- **O1.** Whether an `acceptance_exemptions` entry's decision must also name the commit in its text, as DEC-734
+  requires for `accepted_history`. W1-01 does not read the register. The fixtures name it, so either reading passes.
+- **O2.** A commit that names two decisions, one ACCEPTED and one never ACCEPTED: is "names an ACCEPTED decision"
+  enough, or must every decision it names be one? 611955fa names two decisions that are both ACCEPTED. Not tested.
+- **O3.** Whether a listed commit must be a decision-record commit (`Task: decision-record`). The rule says "a
+  commit that the lists name", so a listed commit with no `Task:` at all would also be measured, but the trailer
+  gate refuses that commit without `accepted_history`. Not tested.
+- **O4.** An `accepted_history` entry under an owner decision that was ACCEPTED and later superseded. The trailer
+  gate refuses it (DEC-734's reading: not undone), while the record rule counts such a decision. DEC-923 says the
+  lists are read as the trailer gate reads them, so a test would follow the trailer gate. That is not stated
+  outright, so it is not tested.
 
 ## Revisions of W1-30 (the ticket's named batch; `Rewrite-Reason:` in the commit)
 
