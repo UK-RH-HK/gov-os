@@ -24,7 +24,8 @@ CLAUDE_CODE_MINIMUM = "2.1.285"
 
 # Seconds (W2-57). Measured beside a 40-worker parallel run at loads up to 48, a version probe took at most 1.8 s and
 # the venv freeze 0.1 s; the limits leave room for the spikes a close meets. All timed probes of one run share
-# PROBE_BUDGET, so tools that never answer still leave doctor ending well inside a caller's 180 s (W1-07).
+# PROBE_BUDGET but Claude Code's, which has VERSION_LIMIT of its own, so tools that never answer still leave doctor
+# ending well inside a caller's 180 s (W1-07): at most 90 + 30 s of probes.
 VERSION_LIMIT = 30
 FREEZE_LIMIT = 40
 PROBE_BUDGET = 90
@@ -118,10 +119,11 @@ def _git(root: Path, *args: str) -> str:
         return ""
 
 
-def _probe(argv: list[str], limit: float) -> subprocess.CompletedProcess:
+def _probe(argv: list[str], limit: float, shared: bool = True) -> subprocess.CompletedProcess:
     """``argv`` run within ``limit`` seconds, or what is left of the run's probe budget; TimeoutExpired when it gives
-    no answer in time or no time is left: a tool that does not answer is read as not answering."""
-    if _probe_deadline is not None:
+    no answer in time or no time is left: a tool that does not answer is read as not answering. A probe that is not
+    ``shared`` has its own limit alone, which the other probes cannot spend."""
+    if shared and _probe_deadline is not None:
         limit = min(limit, _probe_deadline - time.monotonic())
         if limit <= 0:
             raise subprocess.TimeoutExpired(argv, 0)
@@ -719,14 +721,18 @@ def _check_claude_code(root: Path) -> dict:
             cli_path = str(candidate)
     cli_version = None
     cli_sha = None
+    unread = "its --version gave no version"
     if cli_path:
         cli_sha = _sha256_file(Path(cli_path))
+        # Out of the shared budget (W2-57 run 2): the tools' probes before it cannot leave it no time.
         try:
-            out = _probe([cli_path, "--version"], VERSION_LIMIT).stdout.strip()
+            out = _probe([cli_path, "--version"], VERSION_LIMIT, shared=False).stdout.strip()
             m = re.search(r"(\d+\.\d+\.\d+)", out)
             cli_version = m.group(1) if m else out
-        except Exception:
-            pass
+        except subprocess.TimeoutExpired:
+            unread = f"its --version gave no answer within {VERSION_LIMIT} s"
+        except Exception as exc:
+            unread = f"its --version failed ({type(exc).__name__}: {exc})"
 
     ext_version = None
     ext_binary_sha = None
@@ -812,8 +818,14 @@ def _check_claude_code(root: Path) -> dict:
             if status != "fail":
                 status = "drift"
 
+    reason = {}
+    if cli_path and not cli_version and status == "pass":  # a CLI found whose version was not read is no pass
+        status = "unmeasured"
+        reason = {"reason": f"the Claude Code CLI's version was not read: {unread}"}
+
     return {
         "status": status,
+        **reason,
         "drift": has_drift,
         "cli_version": cli_version,
         "cli_sha256": cli_sha,
