@@ -25,6 +25,7 @@ message of these cases repeats a check's output where one is planted.
 
 from __future__ import annotations
 
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -193,9 +194,10 @@ def test_a_taxonomy_change_without_its_change_record_turns_the_claims_check_red(
 def test_a_registry_that_pins_another_rulesync_than_the_installed_one_turns_the_portability_check_red(tmp_path,
                                                                                                     sandbox):
     """Planted: the project's tool registry pins rulesync 23.0.0 and another version is installed. The project
-    is W1-38's: the template's sources, the kernel, the registry, ``rulesync generate`` run in it. Not caught by
-    this check: any other tool of the registry, an install by a role that may not install (the guard), a tool
-    used without a registry entry."""
+    is W1-38's: the template's sources, the kernel, the registry, ``rulesync generate`` run in it. The red after
+    the fault is the finding that names both versions, never a rulesync call that gave no answer in time (DEC-892
+    item 2). Not caught by this check: any other tool of the registry, an install by a role that may not install
+    (the guard), a tool used without a registry entry."""
     installed = adapters_support.rulesync_version()
     if installed is None:
         pytest.skip("rulesync is not installed")
@@ -209,13 +211,28 @@ def test_a_registry_that_pins_another_rulesync_than_the_installed_one_turns_the_
     def status():
         run = adapters_support.run_gov(root, sandbox, "check", "--json")
         entry, _family = adapters_support.portability_entries(adapters_support.check_result(run))
-        return entry["status"], run
+        return entry["status"], entry, run
 
-    before, run = status()
+    before, _, run = status()
     assert installed != "23.0.0", "the installed rulesync is the version the case plants as another one"
     adapters_support.write_tool_registry(root, rulesync_version="23.0.0")
-    after, run = status()
+    after, entry, run = status()
     _assert_turns(before, after, "tool", "adapter-portability", "the registry pins another rulesync version", run)
+    # Rewrite-Reason (DEC-892 item 2; DEC-925 item 3, R2): a check that could not compare (a rulesync call that gave
+    # no answer in time) is not green either, so the red after the fault is held to its reason: the version finding,
+    # which names the pinned 23.0.0 and the installed version, and no finding that says rulesync gave no answer.
+    findings = entry.get("findings")
+    findings = findings if isinstance(findings, list) else []
+    number = re.search(r"\d+(?:\.\d+)+", installed)
+    number = number.group(0) if number else installed
+    named = [finding for finding in findings if isinstance(finding, dict)
+             and "23.0.0" in str(finding.get("message", "")) and number in str(finding.get("message", ""))]
+    timed_out = adapters_support.timeout_findings(findings)
+    assert named and not timed_out, (
+        f"the registry pins rulesync 23.0.0 and {number} is installed: adapter-portability is {after}, but not for "
+        f"the version; a finding naming both versions: {'yes' if named else 'none'}; findings that say rulesync "
+        f"gave no answer in time: {timed_out or 'none'}; every finding: {entry.get('findings')!r}\n{run.describe()}"
+    )
 
 
 # --------------------------------------------------------------------------
