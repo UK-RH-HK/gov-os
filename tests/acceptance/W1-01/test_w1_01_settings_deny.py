@@ -111,19 +111,5 @@ def test_guardrails_leave_ordinary_implementer_work_alone(interim, deny_rules):
         assert not hits, f"{tool} `{target}` is denied by {hits}; implementers need it"
 
 
-@pytest.mark.parametrize(
-    ("tool", "path"),
-    [
-        ("Read", "docs/source/framework-v4.1.2.md"),
-        ("Read", "docs/source/protocol/distribution-v1.2.md"),
-        ("Edit", "docs/source/framework-v4.1.2.md"),
-        ("Edit", "docs/source/protocol/distribution-v1.2.md"),
-    ],
-)
-def test_docs_source_deny_rules_survive_the_change(deny_rules, tool, path):
-    """KPI failure 2: W1-01 adds rules and loses none of the docs/source ones."""
-    assert support.denying_rules(deny_rules, "Edit", SECRET_PROBE), (
-        f"W1-01 rules are not in place: Edit on {SECRET_PROBE} is not denied"
-    )
-    hits = support.denying_rules(deny_rules, tool, path)
-    assert hits, f"{tool} on {path} is no longer denied: a docs/source deny rule was lost"
+# KPI failure 2 (a docs/source deny rule lost) is retired by DEC-925 item 1: docs/source left the tree on
+# 2026-10-01 and DEC-922's settings regeneration dropped its two deny rules (P-I1-2, DEC-899). README, "Failure 2".
