@@ -4873,3 +4873,9 @@ P2 items go into one daily digest.
 - **DEC-923/924 done:** `ef9812b1`, `ab2050b8` (W2-07 KPI), `ec639fbb` (DEC-924; prompt v3.28; reports in own
   commits). accepted_history patch `drafts/DEC-924/accepted-history-611955fa.patch` VALIDATED (pin readers PASS;
   record suites green applied) -> ACT sent for the owner's Role: owner commit.
+
+## Moved from RESUME HERE on 2026-10-27 (pin bullet, DEC-922)
+- **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
+  (both Role: owner, pushed). `pin-fecb870c` kept for rollback. Smoke test: pinned gov check exit 0 after one
+  rebuild (15 GREEN, 2 known YELLOW: openspec not on PATH, citation warnings); guard allow/deny/exit-2 by the exact
+  hook line; hooks and declared checks run the pin's python (-E / -P). Logs `log/repin1-smoke-*`.

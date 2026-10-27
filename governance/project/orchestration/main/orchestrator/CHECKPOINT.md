@@ -3,10 +3,7 @@
 ## RESUME HERE (2026-10-27 12:15 GMT — DEC-925 recorded (`ecc49cc4`): W2-74 + W2-57 run 2 + W2-07 r2 leads IN FLIGHT (3); queue waits for W2-74's merge, then W2-70 first (full: no base yet, then scoped); owner committed 611955fa entry `048f5758` and pushed; next free DEC-926)
 
 ### Now (2026-10-26)
-- **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
-  (both Role: owner, pushed). `pin-fecb870c` kept for rollback. Smoke test: pinned gov check exit 0 after one
-  rebuild (15 GREEN, 2 known YELLOW: openspec not on PATH, citation warnings); guard allow/deny/exit-2 by the exact
-  hook line; hooks and declared checks run the pin's python (-E / -P). Logs `log/repin1-smoke-*`.
+- **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
 - **Queue run 2026-10-26 22:02 (`log/close-queue-20261026-2157/`):** W2-70 (DAEO-uzme) close REFUSED exit 3 after 68 min
   (count 1; repair DAEO-2upp committed by the close `9fbaf969`); queue stopped; 6 others not run. 9 reds, none W2-70's:
   W1-01 docs_source x4 + W1-47 docs/source x2 (enforce the dropped deny rules: my DEC-866 sweep miss), W1-49
