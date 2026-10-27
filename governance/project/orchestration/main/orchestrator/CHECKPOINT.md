@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 18:25 GMT — owner committed DEC-927's 39 entries `e95d3520` and pushed; traceability green; DEC-928 `93f5d3bd`; W2-69 re-probe passed and MERGED; CLOSE QUEUE RUNNING (7, W2-66 first, should be scoped off W2-70's head); W2-57 + W2-07 r2 merges held until it ends; next free DEC-929)
+## RESUME HERE (2026-10-27 20:00 GMT — W2-66's close REFUSED 19:52 (count 1, repair DAEO-s1wp) on my ACT .patch file under orchestration/ (W2-66's record-only case); patch removed `508571d3`; QUEUE RESTARTED (task b6vdk8upi, 7, W2-66 first: full again, path map changed since base; then scoped off W2-66's head); W2-66's next refusal for the same cause = its second; merges of W2-57/W2-07 held; next free DEC-929)
 
 ### Now (2026-10-26)
 - **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
@@ -79,7 +79,11 @@
 3. **Owner's request (2026-10-27), AFTER this queue:** a package P-TOOLS-REVIEW-1 proposing an independent review of
    my tools (a short lens: what each tool does, what it could get wrong, which of this week's slips it would have
    caught: brief builder IMPL, skip_gate id forms, keyword_warn scope, close_queue collect log, repin registry
-   approved_by, the unswept regeneration) + acceptance tests for build_lead_brief.py and the queue's gates.
+   approved_by, the unswept regeneration, the ACT .patch under orchestration/ (W2-66's refusal), close_queue.sh
+   exiting 0 after a refused close) + acceptance tests for build_lead_brief.py and the queue's gates. Also for the
+   owner: W2-66's scope widens to FULL whenever the path map (SHARED_CORE) or the prompt/briefs (UNPLACED) change
+   between closes: decision commits to those between queued closes cost scoping (W2-68 / test map question).
+   Open repair tickets DAEO-2upp (W2-70, closed) and DAEO-s1wp (W2-66): leave for the owner's decision.
 4. W2-57's proposals for the digest/owner: P-1 (entry criterion on row W2-M406's fix: gov.close.nightly must run both
    routes; DEC-803, mine to record); P-2 (DEC-549 P-4 re-baseline (c): owner, DEC-105 options); P-R2-T1 (mark DEC-373
    changed by DEC-925 + W1-19 README via a ticket); rows F3/F4/O2/O3, run 1 F3/F4/O1; W1-09 condition.
