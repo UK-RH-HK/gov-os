@@ -4,3 +4,11 @@
 2026-10-27 16:00:41 records ok: 80 passed in 91.54s (0:01:31)
 2026-10-27 16:00:43 network ok: allowlisted hosts checked: 17; unreachable: 0
 2026-10-27 16:05:40 check ok; close DAEO-uzme (load 5.27)
+2026-10-27 17:12:10 close DAEO-uzme exit 0
+2026-10-27 17:12:10 skip guard: 32 skip(s), each on the known list; no silent rulesync skip
+2026-10-27 17:12:10 outputs of DAEO-uzme committed: 23c24700
+2026-10-27 17:12:10 rebuild before DAEO-c1uz
+2026-10-27 17:16:21 collect ok: 16588/16590 tests collected (2 deselected) in 6.31s
+2026-10-27 17:18:04 records ok: 80 passed in 91.59s (0:01:31)
+2026-10-27 17:18:06 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-27 17:22:57 DAEO-c1uz STOPPED BEFORE THE CLOSE: gov check is not green (exit 3)

@@ -20,6 +20,11 @@ def main() -> None:
     missing = [key for key in KEYS if key not in values]
     if missing:
         sys.exit(f"missing: {', '.join(missing)}")
+    # IMPL fills every worker's and the lead's `Implements:` trailer: it must be ids the store resolves, never a role
+    # (P-TRACE-IMPL-1: 41 commits carried `Implements: engineer` or a like role and turned product traceability red).
+    impl = [part.strip() for part in values["IMPL"].split(",")]
+    if not impl or not all(re.fullmatch(r"(DEC|CAP|AR|MR|ADR)-[0-9A-Za-z.]+", part) for part in impl):
+        sys.exit(f"IMPL must be decision or Contract ids (e.g. DEC-925), not {values['IMPL']!r}")
     common = COMMON.read_text()
     # The common brief's first three paragraphs are its heading, its note to the orchestrator and the opening
     # "You are the ticket lead" paragraph, which the ticket's own part gives with the ticket's facts.
