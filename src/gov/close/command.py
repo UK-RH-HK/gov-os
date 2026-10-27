@@ -198,7 +198,7 @@ def run(root: Path, args, config: dict):
                        accepted=accepted_probes) or frozenset()
     gate(_check_trailers, root, commits, ticket, history)
     gate(_check_accepted_history, history["refused"])
-    recorded = _gates.decision_records(root, others, settings)  # measured by their decision (DEC-896 item 1)
+    recorded = _gates.decision_records(root, others, settings)  # measured by a decision (DEC-896 1, DEC-923 2)
     gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)
     for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE):
         gate(_gates.check_ratchet_lists, root, key)
