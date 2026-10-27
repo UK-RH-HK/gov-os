@@ -6,9 +6,9 @@ date: 2026-10-27
 branch: w2/W2-57
 base: d835cf51bbea
 ticket: DAEO-cy5o (W2-57)
-author: engineer (W2-57, run 1, batch 1)
+author: engineer (W2-57, run 1, batch 1; run 2)
 decisions_recorded: []
-decisions_carried: [DEC-892, DEC-871, DEC-886, DEC-915, DEC-500, DEC-186, DEC-595, DEC-135]
+decisions_carried: [DEC-892, DEC-871, DEC-886, DEC-915, DEC-500, DEC-186, DEC-595, DEC-135, DEC-925, DEC-924, DEC-889, DEC-527, DEC-549, DEC-555, DEC-802]
 state_class: EVIDENCE
 ---
 
@@ -93,3 +93,37 @@ Node 22 on the PATH, after commit `5ec92077f8fd`:
 | `tests/acceptance/W1-26` (`-n auto`) | 415 passed, 1 skipped (`test_w1_26_command.py:44`, the full project does not pass gov check yet) |
 | `tests/unit/adapters`, `tests/unit/doctor` | 139 passed |
 | `tests/unit` (`-n auto`) | 2644 passed, 1 skipped (`tests/unit/retrieval/test_lexical.py:54`, no `govbridge`) |
+
+# Run 2: the close's route to the nightly (B1) and the doctor budget (R1)
+
+Run 2 (owner, DEC-925 item 3) does two things. The first is P-W2-57-B B1 (a), KPI line "Run 2": W2-57 is widened to the
+serial-phase call in `src/gov/close/command.py`, and gate (h)'s line stays W2-07's round 2's (DEC-924 item 3). The
+second is R1, a ride-along (DEC-802): reviewer F1 of run 1, an unread Claude Code version read as a pass. The
+acceptance cases are the test designer's run 2 files, `tests/acceptance/W2-57/test_w2_57_nightly_route.py` and
+`test_w2_57_doctor_claude_code_unread.py`. Before this change 3 of their 5 cases failed: the route case, because the
+nightly entries ran in the serial phase, and both doctor cases, which read `claude_code` as `pass` with
+`cli_version: None`.
+
+## 6. The changes
+
+| # | File | Change | Evidence |
+|---|---|---|---|
+| 5 | `src/gov/close/serial.py` (new) | `nightly(root)` reads the list (`gov_close_serial_only.LIST_REL`, its entry as the plugin takes it: the text before ` #`). An entry's route is its comment's first word, before the first `:`. It gives the entries that every line naming them routes to `nightly`. `phase(root, declared)` gives the entries of `declared` that are not routed there, in their order. Fail closed: an entry with no comment, an unknown first word (`weekly`, `Nightly`, `nightly` without its colon) or a second line that keeps it serial stays in the serial phase. A list that is not UTF-8 text raises `UnicodeDecodeError`, never "no list". | `tests/unit/close/test_serial.py` (new, 11 passed) |
+| 6 | `src/gov/close/command.py`, `_run_tests`, the serial phase's call only | Unchanged: `declared` is still the list's entries in scope, and while one is in scope the parallel run carries the plugin. The plugin deselects every listed entry from the parallel run, either route, so a nightly entry is collected and left out there even when every entry in scope is a nightly one. Then `declared = serial.phase(root, declared)`, and the run afterwards is made only when an entry is left. It is given exactly those entries (the plugin's DEC-549 check holds for them), and the close's evidence names them as its `cases`. The list is still read first by `serial_only.entries`, inside the existing `SERIAL_ONLY_LIST_UNREADABLE` refusal, so an unreadable list refuses the close as before. Nothing else in the file changes (7 lines added, 4 removed: one import and the call). | `test_w2_57_nightly_route.py` (passes; red before) |
+| 7 | `src/gov/doctor/command.py`, `_probe` and `_check_claude_code` | Both routes. (a) `_probe(..., shared=False)` keeps a probe out of the shared `PROBE_BUDGET`: Claude Code's version probe has its own `VERSION_LIMIT` (30 s), so the tools' probes that run before it can no longer leave it no time. (b) A CLI that is found but whose version is not read (no answer within the limit, a failed call, or `--version` gave no version) makes the part `unmeasured` where it would be `pass`. Its `reason` reads "the Claude Code CLI's version was not read: …" with the cause. A `fail` or `drift` found otherwise stays. No CLI at all keeps today's reading. Why both: (a) alone leaves a timeout or a missing version a pass, and (b) alone would leave a machine whose other tools hang unable to read a CLI that answers at once. The bound: the shared probes stop at 90 s and Claude Code's probe at 30 s, so with doctor's other parts (4.6 s and 0.6 s at load 19) `gov doctor` ends near 125 s at worst, inside W1-07's 180 s. | `test_w2_57_doctor_claude_code_unread.py` (2 passed; red before: a CLI that never answers, and three hanging tools before a CLI that answers 2.0.0 at once, now read `fail` below the minimum) |
+
+## 7. The runs of run 2
+
+All with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-57/src` (`gov.__file__` is
+`/home/usain/gov-os-worktrees/W2-57/src/gov/__init__.py`), `-p no:cacheprovider -o tmp_path_retention_policy=failed`,
+Node 22 on the PATH, after commit `8d34ea94ba5a`:
+
+| Suite | Result |
+|---|---|
+| `tests/acceptance/W2-57` (`-n auto`) | 21 passed |
+| `tests/acceptance/W1-30` (`-n auto`) | 537 passed |
+| `tests/acceptance/W2-66` (`-n auto`) | 168 passed, 1 skipped (`test_w2_66_live_test_map.py:466`, the path map no longer holds `test_inputs`), 1 failed: `test_w2_66_lead_verification.py::test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes`. This is the known red of DEC-919: the branch changes `serial-only.txt` and two `conftest.py` files. |
+| `tests/acceptance/W1-27` (`-n auto`) | 174 passed, 2 failed: `test_w1_27_rebuild_r4.py::test_rebuild_codeintel_reason_is_measured` and `::test_rebuild_codeintel_is_recreated_when_tool_answers`. Both are `gov rebuild`'s, the same two as run 1 (`Read-only file system: '/tmp/gov-cbm-1000/…'`, the sandbox), not doctor's. |
+| `tests/acceptance/W1-07` (`-n auto`) | 223 passed |
+| `tests/unit/close` (`-n auto`) | 428 passed |
+| `tests/unit` (`-n auto`) | 2655 passed, 1 skipped (`tests/unit/retrieval/test_lexical.py:54`, no `govbridge`) |
