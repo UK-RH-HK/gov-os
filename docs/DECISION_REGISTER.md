@@ -11091,3 +11091,25 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.311 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-925 (P-REPIN-R1 (a): W2-74 retires the six docs/source cases, gives W1-49's sandbox a gov and renames W2-69's case; the registry line cites DEC-922; the warning leaves out the close's JUnit until W2-74 merges; the queue restarts, W2-70 first. Standing: a settings change runs in full on a clone with a sweep before the owner's commit; every ACT's commands in a file under packages/. P-W2-57-B: B1 (a), B2 (b), B3, R1, R2, A1 delegated). Next free id: DEC-926. |
+
+### DEC-926 — After W2-74's merge, the keyword warning leaves out only the four JUnit files of W2-70's refused close, by exact path
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-27, under the prompt §7: P3, reversible, confidence high; it changes nothing in the Charter, the master rules or the Contract's scope, and does not weaken the guard: gate (b) is unchanged; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it. · **Under:** DEC-925 item 1, DEC-923, DEC-911, DEC-895 · **Basis:** W2-74 merged as `6ee7b4d0` (its full run green), so DEC-925's interim ended and the whole `.gov-runtime/close/` folder is read again.
+- **What happened:**
+  - The warning then listed one file: `.gov-runtime/close/DAEO-uzme/20261026T222046368356Z/03-regression-parallel.xml`. It is the JUnit evidence of W2-70's refused close (2026-10-26), written before W2-74 renamed W2-69's case.
+  - Evidence is never edited (prompt §5).
+  - The pinned secrets-indexing check passes on the main tree with it in place (`python -P -m gov.secrets`, exit 0, 2026-10-27).
+- **Decision:**
+  - The warning leaves out the four JUnit files of that refused close's run folder, by exact path.
+  - Every other file under `.gov-runtime/close/` is read, including every new close's JUnit.
+  - The close queue's stop on the warning stands.
+- **Also (operational):**
+  - W2-74's merge made W2-69's FULL probe stale: it renamed one case id in W2-69's acceptance file (`probe_impact.py`).
+  - W2-69 leaves this queue run, and a judgement-only re-probe in its worktree is scheduled at once (DEC-895).
+  - The queue runs W2-70, W2-66, W2-72, W2-59, W2-65, W2-73 and W2-74. Each passes gates (e) and (h).
+  - W2-07's round 2 (DONE) merges after the queue: its `src/gov/close` change is shared core and would widen every queued close to the full suite (DEC-883).
+- **Where it goes:** this register; `tools/keyword_warn.py`; RESUME HERE; the daily digest.
+- Next free id: DEC-927.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.312 | 2026-10-27 | Delegated (orchestrator): DEC-926 (after W2-74's merge, the keyword warning leaves out only the four JUnit files of W2-70's refused close, by exact path; W2-69 out of the queue for a re-probe; W2-07's round 2 merges after the queue). Next free id: DEC-927. |
