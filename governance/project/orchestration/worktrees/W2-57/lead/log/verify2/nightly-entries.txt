@@ -1,0 +1,15 @@
+tests/acceptance/W1-46/test_w1_46_live_sessions.py
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path
+tests/acceptance/W1-25/test_w1_25_live_session.py
+tests/acceptance/W1-49/test_w1_49_live_session.py
+tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_collects_its_own_acceptance_tests
+tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_engineer_runs_its_tests_and_sees_their_results
+tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_test_designer_imports_the_branch_s_changed_code
+tests/acceptance/W2-58/test_w2_58_launched_sessions.py::test_a_launched_session_shows_no_phantom_deletion
+tests/acceptance/W2-62/test_w2_62_live_resume.py
+tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+tests/acceptance/W1-19/test_w1_19_real_models.py
+tests/acceptance/W1-21/test_w1_21_dev_tier.py
+tests/acceptance/W1-21/test_w1_21_family_check.py::test_the_check_is_green_when_the_dev_tiers_meet_the_baselines
+tests/acceptance/W2-54/test_w2_54_query_vector.py::test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before

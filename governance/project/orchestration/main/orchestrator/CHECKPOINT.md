@@ -14,7 +14,11 @@
   should be DEC-922; my repin_registry.py), W2-69 unit folder (pycache leftover: REMOVED). Package P-REPIN-R1 (P1,
   `dbfb76f0`): rec (a) LITE W2-74 test revisions + W2-69 case id rename + registry line by me; interim the warning
   leaves out .gov-runtime/close/ (the judge's JUnit holds the keyword via W2-69's case name, no hash).
-- **W2-07 round 2 in flight** (A5 run 4, task bhsrfm93v, launched 11:05, `log/W2-07-A5-run4.json`), beside W2-57.
+- **W2-07 round 2 RETURNED DONE** (head `75048114`; gate (h) per DEC-923; W2-07 69/69; unmeasured 0/0/0 for W2-58,
+  W2-63, W2-07 on `a42e899b`; full run = the 8 base reds + W2-54 load timeout, passed alone). **MERGE HELD until the
+  close queue ends** (its src/gov/close change is shared core: merged now it would make every queued close full;
+  DEC-883 no code merges while closes run). Its branch lacks `048f5758` (the 611955fa entry) -> merge-back before its
+  own close. Rides the second re-pin. Temp folder removed. Lead's stricter readings O1-O4 (README) noted.
 - **W2-57 returned PACKAGES** (run 1: probe fix, doctor, serial list done; review pass; branch head `d0bfeb6afd95`).
   P-W2-57-B: B1 (widen to command.py's serial call) + B2 to the owner; B3/R1/R2/A1 delegated unless objected.
   6 load_sensitive removals ready (at its merge). Two lead commits carry `Implements: engineer` (my IMPL error in
@@ -84,7 +88,7 @@ removing returned leads' temp folders after the holder check).
 ### Next
 1. **In flight (3 leads):** W2-74 (DAEO-2azm, claimed `a42e899b`, task b3rzj4fta, `log/W2-74-A5-run1.json`);
    W2-57 run 2 (task bmlp2i9u5, `log/W2-57-A5-run2.json`; B1 route in command.py's serial call, R1, B3, R2; review 2
-   = last); W2-07 r2 (task bhsrfm93v). Registry line fixed `1c3d4dff`; keyword_warn leaves out .gov-runtime/close/
+   = last); W2-07 r2 RETURNED (merge held). Registry line fixed `1c3d4dff`; keyword_warn leaves out .gov-runtime/close/
    UNTIL W2-74 MERGES (then delete that line in tools/keyword_warn.py).
 2. W2-74 DONE -> merge, probe_impact, remove the warning's interim line, then `tools/close_queue.sh DAEO-uzme
    DAEO-rmbe DAEO-c1uz DAEO-ye2a DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70 runs full: base unknown; the six after it

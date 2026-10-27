@@ -1,0 +1,13 @@
+tests/acceptance/W1-01/test_w1_01_settings_deny.py exit=0
+16 passed, 25 skipped in 0.04s
+tests/acceptance/W1-47/test_w1_47_settings_rules.py exit=0
+23 passed in 0.03s
+tests/acceptance/W1-49/test_w1_49_precompact.py exit=0
+30 passed in 1.98s
+tests/acceptance/W2-69/test_w2_69_word_internal_fragments.py exit=0
+132 passed in 449.79s (0:07:29)
+collect exit=0
+16588/16590 tests collected (2 deselected) in 6.52s
+16588
+keyword-warn: 0 file(s) hold a keyword of row W2-L423's rule; 0 not read
+keyword_warn exit=0

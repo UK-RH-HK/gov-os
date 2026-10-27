@@ -155,4 +155,322 @@ ss.....................sssssssssssssssssssss..FFF.F..................... [ 10%]
 ........................................................................ [ 66%]
 ........................................................................ [ 67%]
 ........................................................................ [ 67%]
-...........................................................
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+.........................s.............................................. [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+..............................................F......................... [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+.........................................................s.............. [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+................................                                         [100%]
+=================================== FAILURES ===================================
+_ test_docs_source_deny_rules_survive_the_change[Read-docs/source/framework-v4.1.2.md] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+deny_rules = ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+tool = 'Read', path = 'docs/source/framework-v4.1.2.md'
+
+    @pytest.mark.parametrize(
+        ("tool", "path"),
+        [
+            ("Read", "docs/source/framework-v4.1.2.md"),
+            ("Read", "docs/source/protocol/distribution-v1.2.md"),
+            ("Edit", "docs/source/framework-v4.1.2.md"),
+            ("Edit", "docs/source/protocol/distribution-v1.2.md"),
+        ],
+    )
+    def test_docs_source_deny_rules_survive_the_change(deny_rules, tool, path):
+        """KPI failure 2: W1-01 adds rules and loses none of the docs/source ones."""
+        assert support.denying_rules(deny_rules, "Edit", SECRET_PROBE), (
+            f"W1-01 rules are not in place: Edit on {SECRET_PROBE} is not denied"
+        )
+        hits = support.denying_rules(deny_rules, tool, path)
+>       assert hits, f"{tool} on {path} is no longer denied: a docs/source deny rule was lost"
+E       AssertionError: Read on docs/source/framework-v4.1.2.md is no longer denied: a docs/source deny rule was lost
+E       assert []
+
+tests/acceptance/W1-01/test_w1_01_settings_deny.py:129: AssertionError
+_ test_docs_source_deny_rules_survive_the_change[Read-docs/source/protocol/distribution-v1.2.md] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+deny_rules = ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+tool = 'Read', path = 'docs/source/protocol/distribution-v1.2.md'
+
+    @pytest.mark.parametrize(
+        ("tool", "path"),
+        [
+            ("Read", "docs/source/framework-v4.1.2.md"),
+            ("Read", "docs/source/protocol/distribution-v1.2.md"),
+            ("Edit", "docs/source/framework-v4.1.2.md"),
+            ("Edit", "docs/source/protocol/distribution-v1.2.md"),
+        ],
+    )
+    def test_docs_source_deny_rules_survive_the_change(deny_rules, tool, path):
+        """KPI failure 2: W1-01 adds rules and loses none of the docs/source ones."""
+        assert support.denying_rules(deny_rules, "Edit", SECRET_PROBE), (
+            f"W1-01 rules are not in place: Edit on {SECRET_PROBE} is not denied"
+        )
+        hits = support.denying_rules(deny_rules, tool, path)
+>       assert hits, f"{tool} on {path} is no longer denied: a docs/source deny rule was lost"
+E       AssertionError: Read on docs/source/protocol/distribution-v1.2.md is no longer denied: a docs/source deny rule was lost
+E       assert []
+
+tests/acceptance/W1-01/test_w1_01_settings_deny.py:129: AssertionError
+_ test_docs_source_deny_rules_survive_the_change[Edit-docs/source/framework-v4.1.2.md] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+deny_rules = ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+tool = 'Edit', path = 'docs/source/framework-v4.1.2.md'
+
+    @pytest.mark.parametrize(
+        ("tool", "path"),
+        [
+            ("Read", "docs/source/framework-v4.1.2.md"),
+            ("Read", "docs/source/protocol/distribution-v1.2.md"),
+            ("Edit", "docs/source/framework-v4.1.2.md"),
+            ("Edit", "docs/source/protocol/distribution-v1.2.md"),
+        ],
+    )
+    def test_docs_source_deny_rules_survive_the_change(deny_rules, tool, path):
+        """KPI failure 2: W1-01 adds rules and loses none of the docs/source ones."""
+        assert support.denying_rules(deny_rules, "Edit", SECRET_PROBE), (
+            f"W1-01 rules are not in place: Edit on {SECRET_PROBE} is not denied"
+        )
+        hits = support.denying_rules(deny_rules, tool, path)
+>       assert hits, f"{tool} on {path} is no longer denied: a docs/source deny rule was lost"
+E       AssertionError: Edit on docs/source/framework-v4.1.2.md is no longer denied: a docs/source deny rule was lost
+E       assert []
+
+tests/acceptance/W1-01/test_w1_01_settings_deny.py:129: AssertionError
+_ test_docs_source_deny_rules_survive_the_change[Edit-docs/source/protocol/distribution-v1.2.md] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+deny_rules = ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+tool = 'Edit', path = 'docs/source/protocol/distribution-v1.2.md'
+
+    @pytest.mark.parametrize(
+        ("tool", "path"),
+        [
+            ("Read", "docs/source/framework-v4.1.2.md"),
+            ("Read", "docs/source/protocol/distribution-v1.2.md"),
+            ("Edit", "docs/source/framework-v4.1.2.md"),
+            ("Edit", "docs/source/protocol/distribution-v1.2.md"),
+        ],
+    )
+    def test_docs_source_deny_rules_survive_the_change(deny_rules, tool, path):
+        """KPI failure 2: W1-01 adds rules and loses none of the docs/source ones."""
+        assert support.denying_rules(deny_rules, "Edit", SECRET_PROBE), (
+            f"W1-01 rules are not in place: Edit on {SECRET_PROBE} is not denied"
+        )
+        hits = support.denying_rules(deny_rules, tool, path)
+>       assert hits, f"{tool} on {path} is no longer denied: a docs/source deny rule was lost"
+E       AssertionError: Edit on docs/source/protocol/distribution-v1.2.md is no longer denied: a docs/source deny rule was lost
+E       assert []
+
+tests/acceptance/W1-01/test_w1_01_settings_deny.py:129: AssertionError
+___ test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool ____
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+registry = {'tools': [{'approved_by': 'DEC-074', 'date': '2026-09-30', 'install': "bash -c '. ~/.nvm/nvm.sh && nvm install 22.23....proved_by': 'DEC-074', 'date': '2026-09-30', 'install': 'uv tool install copier==9.18.2', 'name': 'copier', ...}, ...]}
+decisions = {'DEC-001': Decision(id='DEC-001', title='Assemble first; Rust kernel becomes the later replacement', status='PROPOSED...is a health finding (Gate U), not a silent cost.\n- **Measurement:** telemetry (DEC-026) tagged by task ID.\n\n'), ...}
+
+    def test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool(registry, decisions):
+        """Every entry but the ten stack pins: the cited decision's own text holds the entry's name.
+    
+        This covers gitleaks, PyYAML, ccusage, Superpowers and anything else the
+        registry records (bubblewrap and socat cite DEC-141 when they are recorded).
+        """
+        checked, wrong = 0, []
+        for entry in support.entries(registry):
+            name = support.norm_name(entry.get("name", ""))
+            if name in STACK_NAMES:
+                continue
+            checked += 1
+            decision = decisions.get(support.approved_by(entry))
+            if decision is None:
+                wrong.append(f"{name}: {support.approved_by(entry)!r} is not in the register")
+            elif not support.names_tool(support.own_text(decision), name):
+                wrong.append(f"{name}: {decision.id} ({decision.title!r}) does not name it")
+        assert checked, f"{support.REGISTRY_REL} records no tool outside the ten stack pins"
+>       assert wrong == [], f"entries of {support.REGISTRY_REL} approved by a decision that does not name the tool: {wrong}"
+E       AssertionError: entries of governance/project/tool-registry.yaml approved by a decision that does not name the tool: ['gov: DEC-921 ("The two unpushed W2-59 and W2-65 merges are replaced by one merge of `w2/W2-65`, under three conditions; W2-73 for W1-03\'s fixture") does not name it']
+E       assert ['gov: DEC-92... not name it'] == []
+E         
+E         Left contains one more item: 'gov: DEC-921 ("The two unpushed W2-59 and W2-65 merges are replaced by one merge of `w2/W2-65`, under three conditions; W2-73 for W1-03\'s fixture") does not name it'
+E         Use -v to get more diff
+
+tests/acceptance/W1-06/test_w1_06_install_approvals.py:176: AssertionError
+________ test_the_other_deny_rules_are_in_place[Read(./docs/source/**)] ________
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']}}
+rule = 'Read(./docs/source/**)'
+
+    @pytest.mark.parametrize("rule", support.KEPT_DENY_RULES)
+    def test_the_other_deny_rules_are_in_place(settings, rule):
+        """KPI success 5: "leaves the Bash(sudo:*) deny rule and the other deny rules in place"."""
+>       assert rule in support.permission_rules(settings, "deny"), (
+            f"permissions.deny of {support.SETTINGS_REL} no longer carries {rule}"
+        )
+E       AssertionError: permissions.deny of .claude/settings.json no longer carries Read(./docs/source/**)
+E       assert 'Read(./docs/source/**)' in ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+E        +  where ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)'] = <function permission_rules at 0x73852a93ade0>({'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']}}, 'deny')
+E        +    where <function permission_rules at 0x73852a93ade0> = support.permission_rules
+
+tests/acceptance/W1-47/test_w1_47_settings_rules.py:59: AssertionError
+________ test_the_other_deny_rules_are_in_place[Edit(./docs/source/**)] ________
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']}}
+rule = 'Edit(./docs/source/**)'
+
+    @pytest.mark.parametrize("rule", support.KEPT_DENY_RULES)
+    def test_the_other_deny_rules_are_in_place(settings, rule):
+        """KPI success 5: "leaves the Bash(sudo:*) deny rule and the other deny rules in place"."""
+>       assert rule in support.permission_rules(settings, "deny"), (
+            f"permissions.deny of {support.SETTINGS_REL} no longer carries {rule}"
+        )
+E       AssertionError: permissions.deny of .claude/settings.json no longer carries Edit(./docs/source/**)
+E       assert 'Edit(./docs/source/**)' in ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+E        +  where ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)'] = <function permission_rules at 0x73852a93ade0>({'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']}}, 'deny')
+E        +    where <function permission_rules at 0x73852a93ade0> = support.permission_rules
+
+tests/acceptance/W1-47/test_w1_47_settings_rules.py:59: AssertionError
+______ test_without_tk_the_block_says_so_and_holds_the_rest[not on PATH] _______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+run = Hooks(precompact_commands={'manual': 'g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov ho...in=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-1/popen-gw2/test_without_tk_the_block_says0/sandbox/bin')))
+project = PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-1/popen-gw2/test_without_tk_the_block_says0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-1/popen-gw2/test_without_tk_the_block_says0/sand...bin=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-1/popen-gw2/test_without_tk_the_block_says0/sandbox/bin'))
+how = 'not on PATH'
+
+    @pytest.mark.parametrize("how", ("not on PATH", "fails"))
+    def test_without_tk_the_block_says_so_and_holds_the_rest(run, project, sandbox, how):
+        """The block is still appended: the git head is there, and the tickets line says `unavailable`."""
+        path, text = _checkpoint(project, ORCH, "ZQ")
+        if how == "fails":
+            sandbox.tk_fails()
+        result = run.precompact(project, "auto", path=sandbox.path_without_tk if how == "not on PATH" else None)
+>       support.assert_not_blocked(result, f"a compaction while tk is {how}")
+
+tests/acceptance/W1-49/test_w1_49_precompact.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = HookRun(command='g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at ...ead-W2-07/pytest-of-usain/pytest-1/popen-gw2/test_without_tk_the_block_says0/sandbox/home/.local/bin/gov or on PATH\n')
+what = 'a compaction while tk is not on PATH'
+
+    def assert_not_blocked(run, what):
+        """DEC-264: exit code 0, and no JSON answer that blocks (``decision: block``, ``continue: false``)."""
+>       assert run.returncode == 0, f"{what}: the hook ended with {run.returncode}, not 0: {run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a compaction while tk is not on PATH: the hook ended with 1, not 0: exit=1 stdout='' stderr='gov hook: no pinned gov at /tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-1/popen-gw2/test_without_tk_the_block_says0/sandbox/home/.local/bin/gov or on PATH'
+
+tests/acceptance/W1-49/w1_49_support.py:525: AssertionError
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+>       done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+argv = ['sh', '-c', 'python3 -m gov.context.context_check']
+
+    def run(argv, *, cwd, env, timeout):
+        started = time.monotonic()
+        try:
+            done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"{' '.join(map(str, argv))} did not end within {timeout:.0f} s") from None
+E           AssertionError: sh -c python3 -m gov.context.context_check did not end within 630 s
+
+tests/acceptance/W2-54/w2_54_support.py:245: AssertionError
+=========================== short test summary info ============================
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_history.py:17: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_history.py:223: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:62: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:68: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [13] tests/acceptance/W1-01/test_w1_01_settings_deny.py:82: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [7] tests/acceptance/W1-01/test_w1_01_settings_deny.py:88: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_settings_deny.py:94: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+9 failed, 16336 passed, 31 skipped in 2925.85s (0:48:45)

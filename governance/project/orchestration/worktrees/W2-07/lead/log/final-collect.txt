@@ -1,0 +1,2 @@
+(summary of the full listing, row W2-L423's rule)
+16641/16643 tests collected (2 deselected) in 8.74s
