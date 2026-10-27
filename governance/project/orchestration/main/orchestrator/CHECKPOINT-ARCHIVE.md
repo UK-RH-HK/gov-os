@@ -4898,3 +4898,16 @@ P2 items go into one daily digest.
   P-W2-57-B: B1 (widen to command.py's serial call) + B2 to the owner; B3/R1/R2/A1 delegated unless objected.
   6 load_sensitive removals ready (at its merge). Two lead commits carry `Implements: engineer` (my IMPL error in
   its brief): a row; run 2 brief IMPL=DEC-892. Temp folder removed.
+
+## Moved from RESUME HERE on 2026-10-27 (re-pin bullet, hold note)
+- **First re-pin = ACT-REPIN-1** (`8455edd6`; DONE 2026-10-26, smoke test passed, DEC-922; history below): owner runs `pin/REPIN-COMMANDS-6a4696eb.sh` Part A (wheel of
+  `6a4696eb`, sha256 `73a281ff…c6b6c9`, dry run twice alike; pin-6a4696eb; link; `pin/repin_registry.py`; Role: owner
+  commit) and Part B (by hand drop the two `docs/source` deny entries in `.rulesync/permissions.jsonc`; `rulesync
+  generate --targets claudecode,agentsmd --features rules,hooks,permissions,subagents,commands,skills`; pinned
+  `gov.guard.heldout`; commit). Lead clean-up rule: options (a) none yet [recommended] / (b) literal per lead / (c)
+  pattern. **Before Part A: no Claude session running a gov command (W2-73's lead).** After: my smoke test (pinned
+  `gov check`, adapter-portability GREEN, a guard allow + refuse, skip guard + keyword warning dry runs); then delete
+  the backup ref `w2/integrate-before-reset-2026-10-24` (DEC-921); then the close queue.
+### HOLD lifted (owner, 2026-10-26): ACT-REPIN-1 done; DEC-922 recorded (lead clean-up rule (a): none yet; I keep
+removing returned leads' temp folders after the holder check).
+
