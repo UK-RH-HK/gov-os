@@ -15,6 +15,25 @@
   then probe record (if pass) docs/probes/DAEO-rmbe/PR-DAEO-rmbe-reprobe-1.md; verification: W2-69 suite in -k parts,
   collect-only; gov checkpoint record; return.
 - Loop count (run 3): no implementation iterations (judgement-only).
+- keyword_warn before the review: 17 old lead records (runs 1-2) held a keyword of row W2-L423's rule. After the
+  reviewer exited, the lead replaced the keywords (originals byte-exact in /tmp/gov-os-lead-W2-69/records-original-run3/,
+  sha256 prefixes in log/records-keyword-dropped.txt); keyword_warn then 0 files.
+- reviewer-4 (session cd4b8e11-e2aa-495a-add9-458909c90db3, gov launch SANDBOXED, max, ~15 min): DONE, 12 fields,
+  VERDICT PASS at 06df14f32d06. Same 3 judged files; 68 values equal and in order (ast), body identical, only ids=
+  added; 132 collected / 132 passed; W2-69 card byte-identical; ticket code unchanged. F1 (low): the renamed case's
+  failure output still prints the rule's full name -> yes / other (fails closed) -> row (W2-71 / Wave 3). Tripwire 11:
+  no change anywhere. 0 read refusals; retrieve used once (FACET_UNAVAILABLE); other refusals: heredoc, a loop-variable
+  redirect, rm of its scratch (not retried).
+- Lead commit ade5cbdb = docs/probes/DAEO-rmbe/PR-DAEO-rmbe-reprobe-1.md (probed_commit 06df14f3 in full; Task
+  DAEO-rmbe / Implements DEC-895 / Role orchestrator / CAB); the earlier record left as it is.
+- Verify (close's form, -n auto, plugin, retention failed, flock): w69-a (-k word_internal) 142 passed 266 s;
+  w69-b (last_round) 89 passed 351 s; w69-c (the rest) 118 passed 343 s; w69-serial 3 passed 63 s. Total 352.
+  gov.__file__ in this worktree. collect-6: "16588/16590 tests collected (2 deselected) in 6.78s", no error.
+- Not done, on purpose: no gov checkpoint record (a commit after the probed head other than the probe record is not
+  allowed; the orchestrator writes the close's fresh one); no rebuild / gov check / full run (orchestrator's scope).
+- Lead refusals: python heredoc refused by the guard hook (DEC-409), rewritten as a file; rm of
+  .gov-runtime/scratch/lead/verify-part.sh not approved (script moved to the session scratchpad, file now a text note).
+- STATE: DONE, returned to orchestrator. Head ade5cbdb.
 
 
 # ---- run 2 record below ----

@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 18:10 GMT — W2-70 CLOSED; DEC-927 COMMITTED `a652c48a` (owner (a) + 2 conditions: entries are corrections with should_implement; Implements checked in gate (e) and by leads); ACT-P-TRACE-IMPL-1 SENT: owner commits 39 entries, then I re-run gate (b) and restart the queue (W2-66 first, scoped); W2-69 re-probe in flight; W2-57 + W2-07 r2 merges held; next free DEC-928)
+## RESUME HERE (2026-10-27 18:25 GMT — owner committed DEC-927's 39 entries `e95d3520` and pushed; traceability green; DEC-928 `93f5d3bd`; W2-69 re-probe passed and MERGED; CLOSE QUEUE RUNNING (7, W2-66 first, should be scoped off W2-70's head); W2-57 + W2-07 r2 merges held until it ends; next free DEC-929)
 
 ### Now (2026-10-26)
 - **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
@@ -47,7 +47,9 @@
   `governance/project/orchestration/packages/ACT-<id>.md`, named in the ping.
 - **Implements: ids (DEC-927, standing):** gate (e) = `tools/trailer_gate.py` also refuses an Implements item that is
   not a DEC the register holds or a CAP the store holds; leads run it on their worktree before returning
-  (LEAD-w2-common); build_lead_brief.py refuses a non-id IMPL. My CAP-n reading is open for the owner's overturn.
+  (LEAD-w2-common); build_lead_brief.py refuses a non-id IMPL. CAP-n reading ACCEPTED by the owner (DEC-928).
+- **ACT wording (DEC-928, standing):** "a plain terminal, not a Claude session" only when an ACT replaces or
+  reinstalls gov (a re-pin); an owner commit of a patch is run by the owner's operator.
 
 ### Plan in force (DEC-896..DEC-919)
 - **Merged, not closed (11):** W2-58, W2-63, W2-70, W2-07, W2-67 r1, W2-69, W2-66, W2-72, W2-59, W2-65, W2-73. **Held DONE:
@@ -63,17 +65,13 @@
 
 ### Next
 1. **Queue run 2026-10-27 15:46:** W2-70 CLOSED exit 0 (66 min, full: BASE_UNKNOWN; record CL-DAEO-uzme.md head
-   `7ada0f58`); worktree/branch removed. STOPPED before W2-66: gate (b) RED, product-traceability IMPLEMENTS_UNRESOLVED
-   (W2-70's 7 commits). 39 commits on integrate name a role (26 record-only, 13 other; W2-70, W2-67, W2-66, W2-65,
-   W2-07, W2-69) + W2-57's 2 on its branch. P1 P-TRACE-IMPL-1 `b99c75ce`: rec (a) one owner commit of 39
-   accepted_history entries under DEC-927. Drafted `drafts/DEC-927/` (register + path map + patch; validated 39/39;
-   traceability exit 0 and record suites 80 green with it applied; tree restored). ACT file + patch in packages/.
-   ON YES: append `drafts/DEC-927/entry.md` to the register (re-run draft_dec927.py if the register moved), record
-   checks, commit; give the owner the sha; owner runs ACT-P-TRACE-IMPL-1.md; then gate (b) and restart the queue:
-   DAEO-c1uz DAEO-ye2a DAEO-kh9l DAEO-e82f DAEO-qty6 DAEO-2azm (should be SCOPED off `7ada0f58`). build_lead_brief.py
-   now refuses a non-id IMPL.
-2. **Now / after the queue:** (a) W2-69's re-probe lead IN FLIGHT (task b5z8st71x, `log/W2-69-A5-run3.json`); then
-   merge it and queue W2-69; (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
+   `7ada0f58`); worktree/branch removed. Stopped before W2-66 on product traceability (P-TRACE-IMPL-1) -> DEC-927,
+   owner's 39 entries `e95d3520`, DEC-928. **Queue RESTARTED 18:25** (task bz7x8sg6h): DAEO-c1uz DAEO-ye2a DAEO-kh9l
+   DAEO-e82f DAEO-qty6 DAEO-2azm DAEO-rmbe; all passed gates (e)+(h) dry. Report each close's evidence scope /
+   why_full / selected (should be scoped off `7ada0f58`). NO main-tree commit while it runs. W2-69's re-probe merged
+   (`PR-DAEO-rmbe-reprobe-1.md`); its lead temp folder (54M, holds the originals of 17 lead records it re-worded) kept
+   until W2-69 closes.
+2. **After the queue:** (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
    review 2 pass, probe `PR-DAEO-cy5o-review-2.md`; serial 104 cases 11:48 vs 180 17:40; nightly batch 76 green),
    then commit its 30 load_sensitive removals (W1-38 x3, W1-07 [doctor], W1-30 r13, unit close follow-up, W1-46 x23,
    W1-19 warm p95; list in `log/W2-57-A5-run2.json`); (c) W2-07 r2 SECOND: lead merges integrate back + re-verifies
