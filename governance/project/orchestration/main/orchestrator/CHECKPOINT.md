@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 11:15 GMT — QUEUE STOPPED: W2-70's close REFUSED (count 1) on 8 base reds from the settings regeneration; P1 P-REPIN-R1 + P2 P-W2-57-B + ACT 611955fa pinged; W2-07 r2 lead in flight; W2-57 returned PACKAGES; next free DEC-925)
+## RESUME HERE (2026-10-27 12:15 GMT — DEC-925 recorded (`ecc49cc4`): W2-74 + W2-57 run 2 + W2-07 r2 leads IN FLIGHT (3); queue waits for W2-74's merge, then W2-70 first (full: no base yet, then scoped); owner committed 611955fa entry `048f5758` and pushed; next free DEC-926)
 
 ### Now (2026-10-26)
 - **Pin:** `~/.local/bin/gov` -> `pin-6a4696eb` (wheel sha256 `73a281ff…c6b6c9`); registry `82f2d453`, settings `8ba8b231`
@@ -14,12 +14,6 @@
   should be DEC-922; my repin_registry.py), W2-69 unit folder (pycache leftover: REMOVED). Package P-REPIN-R1 (P1,
   `dbfb76f0`): rec (a) LITE W2-74 test revisions + W2-69 case id rename + registry line by me; interim the warning
   leaves out .gov-runtime/close/ (the judge's JUnit holds the keyword via W2-69's case name, no hash).
-- **Tools fixed today:** skip_gate.py reads dotted and path ids (would have stopped every passing close); known list
-  +2 (W1-03 [the-gov-package-is-missing] under the pin interpreter; govbridge longer message) -> 33, digest them;
-  queue's collect log keeps errors + summary only. Re-run queue: W2-70 first, then the other six.
-- **DEC-923/924 done:** `ef9812b1`, `ab2050b8` (W2-07 KPI), `ec639fbb` (DEC-924; prompt v3.28; reports in own
-  commits). accepted_history patch `drafts/DEC-924/accepted-history-611955fa.patch` VALIDATED (pin readers PASS;
-  record suites green applied) -> ACT sent for the owner's Role: owner commit.
 - **W2-07 round 2 in flight** (A5 run 4, task bhsrfm93v, launched 11:05, `log/W2-07-A5-run4.json`), beside W2-57.
 - **W2-57 returned PACKAGES** (run 1: probe fix, doctor, serial list done; review pass; branch head `d0bfeb6afd95`).
   P-W2-57-B: B1 (widen to command.py's serial call) + B2 to the owner; B3/R1/R2/A1 delegated unless objected.
@@ -60,6 +54,9 @@
   safe during closes); `--main` only with a head-moving decision commit, never during a close. Owner's daily push:
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`.
 - **Supersession (DEC-866):** mark at once, sweep by id and value.
+- **Settings changes and ACTs (DEC-925, standing):** any settings change or regeneration -> a full run in the close's
+  form on a clone with it applied + a sweep for dependent tests, BEFORE the owner's commit; every ACT's commands in
+  `governance/project/orchestration/packages/ACT-<id>.md`, named in the ping.
 
 ### Plan in force (DEC-896..DEC-919)
 - **First re-pin = ACT-REPIN-1** (`8455edd6`; DONE 2026-10-26, smoke test passed, DEC-922; history below): owner runs `pin/REPIN-COMMANDS-6a4696eb.sh` Part A (wheel of
@@ -85,10 +82,16 @@
 removing returned leads' temp folders after the holder check).
 
 ### Next
-1. On the owner's answers: P-REPIN-R1 -> W2-74 (LITE, test revisions) + registry line + warning interim; then the
-   queue again (W2-70 first; its next refusal for the same reds would be its second). P-W2-57-B -> run 2 brief
-   (IMPL=DEC-892). The ACT (611955fa) -> owner commits after the W2-07 r2 lead is not committing in the main tree.
-2. W2-07 r2 returns -> merge (second merger merges back, DEC-924); it rides the second re-pin.
+1. **In flight (3 leads):** W2-74 (DAEO-2azm, claimed `a42e899b`, task b3rzj4fta, `log/W2-74-A5-run1.json`);
+   W2-57 run 2 (task bmlp2i9u5, `log/W2-57-A5-run2.json`; B1 route in command.py's serial call, R1, B3, R2; review 2
+   = last); W2-07 r2 (task bhsrfm93v). Registry line fixed `1c3d4dff`; keyword_warn leaves out .gov-runtime/close/
+   UNTIL W2-74 MERGES (then delete that line in tools/keyword_warn.py).
+2. W2-74 DONE -> merge, probe_impact, remove the warning's interim line, then `tools/close_queue.sh DAEO-uzme
+   DAEO-rmbe DAEO-c1uz DAEO-ye2a DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70 runs full: base unknown; the six after it
+   should be SCOPED off W2-70's close record: show the owner each close's evidence scope/why_full/selected).
+   W2-70's next refusal on the same reds = its second -> package. Then close W2-74 itself.
+3. W2-57 / W2-07 r2 merges: second merger merges back + re-verifies + fresh probe if stale (DEC-924/925). On W2-57's
+   merge, commit its load_sensitive removals (6 ready + any the route frees). W2-07 r2 rides the second re-pin.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
 4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
    then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.

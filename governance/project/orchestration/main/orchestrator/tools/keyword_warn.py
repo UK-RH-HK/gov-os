@@ -37,6 +37,9 @@ def holds(path: Path) -> bool:
 
 
 STORE_FOLDERS = ("codeintel",)  # DEC-923: the index stores, at .gov-runtime/'s top only
+# DEC-925 item 1, INTERIM until W2-74 merges: the close's own JUnit evidence (.gov-runtime/close/), which the judge
+# writes and which holds a keyword only through W2-69's case name. Remove this line when W2-74 merges.
+STORE_FOLDERS += ("close",)
 STORE_FILES = ("store.db", "query-vector-cache.db")  # and their -wal / -shm / -journal companions
 
 hits, unread, seen = [], [], set()

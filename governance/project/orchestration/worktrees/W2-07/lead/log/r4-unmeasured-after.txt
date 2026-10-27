@@ -1,0 +1,16 @@
+gov from: /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py
+root: /home/usain/Dynamic-Agentic-Engineering-OS
+gate (h) line: ['gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)']
+DAEO-5j8b (W2-58): 57 own commits, 418 others in range, 53 measured by the decision-record rule, 0 unmeasured
+DAEO-pl6k (W2-63): 6 own commits, 467 others in range, 53 measured by the decision-record rule, 0 unmeasured
+  WORK WITHOUT A TASK: 611955faffaa .tickets/DAEO-r9ss.md
+DAEO-r9ss (W2-07): 38 own commits, 619 others in range, 69 measured by the decision-record rule, 1 unmeasured
+exit=1
+gov from: /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py
+root: /home/usain/gov-os-worktrees/W2-07
+gate (h) line: ['gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)']
+DAEO-5j8b (W2-58): 57 own commits, 420 others in range, 53 measured by the decision-record rule, 0 unmeasured
+DAEO-pl6k (W2-63): 6 own commits, 469 others in range, 53 measured by the decision-record rule, 0 unmeasured
+  WORK WITHOUT A TASK: 611955faffaa .tickets/DAEO-r9ss.md
+DAEO-r9ss (W2-07): 41 own commits, 618 others in range, 69 measured by the decision-record rule, 1 unmeasured
+exit=1

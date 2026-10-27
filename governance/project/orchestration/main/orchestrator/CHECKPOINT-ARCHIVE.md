@@ -4865,3 +4865,11 @@ P2 items go into one daily digest.
 - **Tools moved to the new judge (DEC-922):** close_queue.sh gate (h) reads the interpreter from `~/.local/bin/gov`'s
   first line, and passes `--check-result` (gate (b)'s JSON); unmeasured_gate.py subtracts `gates.decision_records`
   as the close does; validate_entry.py / validate_exemption.sh name pin-6a4696eb.
+
+## Moved from RESUME HERE on 2026-10-27 (DEC-925)
+- **Tools fixed today:** skip_gate.py reads dotted and path ids (would have stopped every passing close); known list
+  +2 (W1-03 [the-gov-package-is-missing] under the pin interpreter; govbridge longer message) -> 33, digest them;
+  queue's collect log keeps errors + summary only. Re-run queue: W2-70 first, then the other six.
+- **DEC-923/924 done:** `ef9812b1`, `ab2050b8` (W2-07 KPI), `ec639fbb` (DEC-924; prompt v3.28; reports in own
+  commits). accepted_history patch `drafts/DEC-924/accepted-history-611955fa.patch` VALIDATED (pin readers PASS;
+  record suites green applied) -> ACT sent for the owner's Role: owner commit.

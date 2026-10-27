@@ -14,7 +14,28 @@
   c9a086786444 owner list acceptance_exemptions, 4166d8d9ca0b .tickets, b772b2fefeed .tickets, 65039414fb72 DEC-876
   superseded); DAEO-pl6k 1 (8d625805c343 .tickets); DAEO-r9ss 2 (8d625805c343, 611955faffaa docs/assessment).
 
-## Next
+## td-r4 returned DONE (session 8c1aa722-cb7d-4e2f-ad08-3d6aaafc116c, gov launch, sandboxed: check passed)
+- fe7b9ffe0d64 (Task: DAEO-r9ss, Role: independent-test-designer, Implements: DEC-923, DEC-924, Rewrite-Reason:
+  DEC-923, Co-Authored-By): README, test_w2_07_decision_records.py (6 -> 35 cases), w2_07_support.py. +339/-49.
+- Tripwire r4-1: this tree's head + W2-07 acceptance folder only (allowed). gov retrieve: FACET_UNAVAILABLE. 0 refusals.
+- Open readings O1-O4 in the README (not pinned).
+- Lead red check (log/red4.*): 12 failed, 57 passed; all 12 WORK_WITHOUT_TASK, the README's expected reds.
+  gov.__file__ = /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py.
+
+## eng-r4 returned DONE (session 8dd399ca-d94b-41a9-8f13-269ed78c585d, gov launch, sandboxed: check passed)
+- 549227b6f11a (Task: DAEO-r9ss, Role: engineer, Implements: DEC-923, DEC-924, Co-Authored-By): gates.py +48/-17,
+  command.py 1 line (comment of gate (h)'s recorded line), new tests/unit/close/test_w2_07_decision_records.py +100.
+- decision_records() returns owner_listed() + record commits whose named decisions are ALL ever ACCEPTED (stricter
+  than round 1's "any"); acceptance_exemptions: exact full id, owner ACCEPTED decision naming the commit.
+- Tripwire r4-2: this tree's head only. 0 read refusals; 1 write refusal (.gov-runtime/scratch/eng-r4/, taken).
+  gov retrieve not used (brief named the files).
+- Its runs: W2-07 69 p; unit close 435 p; W2-01+W2-53 145 p; W1-30 all 55 files p.
+- Lead check (log/r4-unmeasured-after.txt): 5j8b 0, pl6k 0, r9ss 1 (611955faffaa), main tree and this worktree.
+- f2ac21e8 CP-DAEO-r9ss-0014 committed (lead trailers).
+- v4a: rebuild 0, collect 16641/16643 no error, gov check ok (YELLOW core-decision-citations, openspec-validate).
+- p4.sh (parallel, flock) started; then s4.sh (serial).
+
+## Next (was: eng-r4)
 1. td-r4 (fresh test designer, gov launch, sandboxed, --effort high): tests/acceptance/W2-07/ only, Rewrite-Reason: DEC-923.
 2. Red check myself. 3. Engineer (gates.py, gate (h)'s line in command.py, history.py if needed, tests/unit/close/test_w2_07_*).
 4. unmeasured3.py again (adapt to the engineer's subtraction). 5. Rebuild, verify in full (flock, retention, disk gate).

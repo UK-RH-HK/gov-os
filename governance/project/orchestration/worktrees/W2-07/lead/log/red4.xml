@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="69" time="21.756" timestamp="2026-10-27T11:19:15.215396+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_closes_on_its_named_evidence_files[integration]" time="0.947" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_specification_ticket_is_judged_on_its_readiness_record_and_its_tests[readiness-closed]" time="3.423" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_audit_ticket_is_judged_on_its_report_and_the_audit_validator[report-passes-the-validator]" time="1.002" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_implementation_ticket_naming_evidence_but_without_acceptance_tests_is_refused" time="0.973" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_research_ticket_closes_on_its_evidence_record" time="0.947" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused[integration]" time="0.971" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_closes_on_its_named_evidence_files[coordination]" time="0.942" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_research_ticket_without_its_evidence_record_is_refused" time="0.976" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_integration_or_coordination_ticket_missing_a_named_evidence_file_is_refused[coordination]" time="0.973" /><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_commit_without_its_trailers_stops_the_close_before_any_test" time="0.765" /><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_an_audit_ticket_is_judged_on_its_report_and_the_audit_validator[report-fails-the-validator]" time="1.037" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_changes_the_closing_tickets_own_file_counts_as_measured" time="0.762"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 79413bef8eac names no task and changes .tickets/PROJ-dcrd.md: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 79413bef8eac names no task and changes .tickets/PROJ-dcrd.md: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;79413bef8eac&quot;, &quot;paths&quot;: [&quot;.tickets/PROJ-dcrd.md&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;79413bef8eac&quot;, &quot;paths&quot;: [&quot;.tickets/PROJ-dcrd.md&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-a0gl&quot;}}}&#10;&#10;stderr:">project = &lt;w2_07_support.Project object at 0x780e72018590&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_decision_record_that_ch0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_decision_record_that_ch0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_decision_record_that_changes_the_closing_tickets_own_file_counts_as_measured(project, sandbox, interface):
+        """``.tickets/`` is a record (DEC-891): the register and the closing ticket's own file (its work), under an
+        ACCEPTED owner decision (8d625805's shape)."""
+        _ticket(project)
+        rel = support.base.ticket_path(TICKET)
+        text = (project.root / rel).read_text(encoding="utf-8")
+        record = _decision_record(project, "DEC-505", path_map=False,
+                                  also={rel: text + "\nAmended under DEC-505: the close's time limit.\n"})
+        assert _changed(project, record) == sorted([rel, support.REGISTER]), "the fixture is wrong"
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...-disposition to classify", "counted": false, "repair_ticket": "pro-a0gl"}}}\n', stderr='', seconds=0.22234495996963233)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 79413bef8eac names no task and changes .tickets/PROJ-dcrd.md: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 79413bef8eac names no task and changes .tickets/PROJ-dcrd.md: work on PROJ-dcrd that no ticket measured"], "commit": "79413bef8eac", "paths": [".tickets/PROJ-dcrd.md"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "79413bef8eac", "paths": [".tickets/PROJ-dcrd.md"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-a0gl"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_ratchet_entry_the_ratchet_would_not_count_stops_the_close_before_any_test[accepted_reds-ACCEPTED_RED_REFUSED]" time="0.811" /><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_work_without_a_task_stops_the_close_before_any_test" time="0.849" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured[delegated-decision]" time="0.785"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit a5693e9641bf names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit a5693e9641bf names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;a5693e9641bf&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;a5693e9641bf&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-456f&quot;}}}&#10;&#10;stderr:">status = 'ACCEPTED (delegated, orchestrator, 2026-10-23, under the prompt §7: P2, reversible; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it.'
+project = &lt;w2_07_support.Project object at 0x7afdb5bc7020&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_decision_record_of_gove0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_decision_record_of_gove0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("status", [support.OWNER_ACCEPTED, support.DELEGATED_ACCEPTED],
+                             ids=["owner-decision", "delegated-decision"])
+    def test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured(status, project,
+                                                                                                  sandbox, interface):
+        """The orchestrator's record (``Role: orchestrator``: no trailer of the owner's) of the path map and the
+        register, under an ACCEPTED decision: the owner's, or a delegated one (DEC-903's form, 8f56ada1's shape)."""
+        _ticket(project)
+        record = _decision_record(project, "DEC-501", status=status)
+        assert _changed(project, record) == sorted([support.PATH_MAP_REL, support.REGISTER]), "the fixture is wrong"
+        assert "Role: owner" not in support.git(project, "show", "-s", "--format=%B", record), "the fixture is wrong"
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...-disposition to classify", "counted": false, "repair_ticket": "pro-456f"}}}\n', stderr='', seconds=0.24183212500065565)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit a5693e9641bf names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit a5693e9641bf names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured"], "commit": "a5693e9641bf", "paths": ["governance/project/path-map.yaml"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "a5693e9641bf", "paths": ["governance/project/path-map.yaml"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-456f"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[probes]" time="0.765"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 5def6eb64276 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 5def6eb64276 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;5def6eb64276&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;5def6eb64276&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-u29h&quot;}}}&#10;&#10;stderr:">rel = 'docs/probes/PROJ-othr/README.md'
+project = &lt;w2_07_support.Project object at 0x76e17e27bec0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw1/test_a_decision_record_that_al0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw1/test_a_decision_record_that_al0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("rel", [
+        "docs/checkpoints/PROJ-othr/README.md",
+        "docs/close/PROJ-othr/README.md",
+        "docs/probes/PROJ-othr/README.md",
+        "governance/project/orchestration/packages/P-W9-dcrd.md",
+        "governance/project/prompts/w9-orchestrator.md",
+        "governance/project/briefs/LEAD-w9-common.md",
+        "docs/plan/WAVE_9_WBS.md",
+    ], ids=["checkpoints", "close", "probes", "orchestration", "prompts", "briefs", "plan"])
+    def test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured(rel, project, sandbox,
+                                                                                             interface):
+        """Each of the other governance records of KPI 3, beside the path map and the register."""
+        _ticket(project)
+        record = _decision_record(project, "DEC-506", also={rel: "# A record of the fixture\n"})
+        assert _changed(project, record) == sorted([support.PATH_MAP_REL, support.REGISTER, rel]), "the fixture is wrong"
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...-disposition to classify", "counted": false, "repair_ticket": "pro-u29h"}}}\n', stderr='', seconds=0.22813511395361274)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 5def6eb64276 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 5def6eb64276 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured"], "commit": "5def6eb64276", "paths": ["governance/project/path-map.yaml"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "5def6eb64276", "paths": ["governance/project/path-map.yaml"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-u29h"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[checkpoints]" time="0.778"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 8e8a6e25612d names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 8e8a6e25612d names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;8e8a6e25612d&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;8e8a6e25612d&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-h8vy&quot;}}}&#10;&#10;stderr:">rel = 'docs/checkpoints/PROJ-othr/README.md'
+project = &lt;w2_07_support.Project object at 0x780e71326360&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_decision_record_that_al0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_decision_record_that_al0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("rel", [
+        "docs/checkpoints/PROJ-othr/README.md",
+        "docs/close/PROJ-othr/README.md",
+        "docs/probes/PROJ-othr/README.md",
+        "governance/project/orchestration/packages/P-W9-dcrd.md",
+        "governance/project/prompts/w9-orchestrator.md",
+        "governance/project/briefs/LEAD-w9-common.md",
+        "docs/plan/WAVE_9_WBS.md",
+    ], ids=["checkpoints", "close", "probes", "orchestration", "prompts", "briefs", "plan"])
+    def test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured(rel, project, sandbox,
+                                                                                             interface):
+        """Each of the other governance records of KPI 3, beside the path map and the register."""
+        _ticket(project)
+        record = _decision_record(project, "DEC-506", also={rel: "# A record of the fixture\n"})
+        assert _changed(project, record) == sorted([support.PATH_MAP_REL, support.REGISTER, rel]), "the fixture is wrong"
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-h8vy"}}}\n', stderr='', seconds=0.2327798999613151)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 8e8a6e25612d names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 8e8a6e25612d names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured"], "commit": "8e8a6e25612d", "paths": ["governance/project/path-map.yaml"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "8e8a6e25612d", "paths": ["governance/project/path-map.yaml"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-h8vy"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_ratchet_entry_the_ratchet_would_not_count_stops_the_close_before_any_test[load_sensitive-LOAD_SENSITIVE_REFUSED]" time="0.797" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_under_a_decision_later_superseded_or_changed_counts_as_measured[superseded]" time="0.792"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit e8114b87e7be names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit e8114b87e7be names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;e8114b87e7be&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;e8114b87e7be&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-rcad&quot;}}}&#10;&#10;stderr:">later = 'superseded', project = &lt;w2_07_support.Project object at 0x7afdb53ea900&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_decision_record_under_a0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_decision_record_under_a0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("later", ["superseded", "changed"])
+    def test_a_decision_record_under_a_decision_later_superseded_or_changed_counts_as_measured(later, project, sandbox,
+                                                                                              interface):
+        """The record was made under an ACCEPTED owner decision; a later decision superseded it (DEC-876's status form,
+        65039414's shape) or changed it (a ``Changed by`` note on its status line)."""
+        _ticket(project)
+        record = _decision_record(project, "DEC-504")
+        if later == "superseded":
+            _restated(project, "DEC-504", support.superseded("DEC-599"), "DEC-599")
+        else:
+            _restated(project, "DEC-504", support.OWNER_ACCEPTED, "DEC-598",
+                      note=" · **Changed by:** DEC-598: the close's time limit is 600 seconds")
+        assert _changed(project, record) == sorted([support.PATH_MAP_REL, support.REGISTER]), "the fixture is wrong"
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-rcad"}}}\n', stderr='', seconds=0.2360245119780302)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit e8114b87e7be names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit e8114b87e7be names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured"], "commit": "e8114b87e7be", "paths": ["governance/project/path-map.yaml"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "e8114b87e7be", "paths": ["governance/project/path-map.yaml"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-rcad"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_refused_accepted_history_entry_stops_the_close_before_any_test" time="0.799" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[orchestration]" time="3.426" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[close]" time="0.757"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 0903c365d710 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 0903c365d710 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;0903c365d710&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;0903c365d710&quot;, &quot;paths&quot;: [&quot;governance/project/path-map.yaml&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-1fcl&quot;}}}&#10;&#10;stderr:">rel = 'docs/close/PROJ-othr/README.md'
+project = &lt;w2_07_support.Project object at 0x780e71325400&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_decision_record_that_al1/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_decision_record_that_al1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("rel", [
+        "docs/checkpoints/PROJ-othr/README.md",
+        "docs/close/PROJ-othr/README.md",
+        "docs/probes/PROJ-othr/README.md",
+        "governance/project/orchestration/packages/P-W9-dcrd.md",
+        "governance/project/prompts/w9-orchestrator.md",
+        "governance/project/briefs/LEAD-w9-common.md",
+        "docs/plan/WAVE_9_WBS.md",
+    ], ids=["checkpoints", "close", "probes", "orchestration", "prompts", "briefs", "plan"])
+    def test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured(rel, project, sandbox,
+                                                                                             interface):
+        """Each of the other governance records of KPI 3, beside the path map and the register."""
+        _ticket(project)
+        record = _decision_record(project, "DEC-506", also={rel: "# A record of the fixture\n"})
+        assert _changed(project, record) == sorted([support.PATH_MAP_REL, support.REGISTER, rel]), "the fixture is wrong"
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-1fcl"}}}\n', stderr='', seconds=0.2221207800321281)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 0903c365d710 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 0903c365d710 names no task and changes governance/project/path-map.yaml: work on PROJ-dcrd that no ticket measured"], "commit": "0903c365d710", "paths": ["governance/project/path-map.yaml"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "0903c365d710", "paths": ["governance/project/path-map.yaml"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-1fcl"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_by_class" name="test_a_specification_ticket_is_judged_on_its_readiness_record_and_its_tests[a-required-row-open]" time="2.076" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_of_governance_records_under_an_accepted_decision_counts_as_measured[owner-decision]" time="3.541" /><testcase classname="tests.acceptance.W2-07.test_w2_07_commit_gates" name="test_a_stale_probe_is_named_before_any_test_runs" time="0.806" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_under_a_decision_later_superseded_or_changed_counts_as_measured[changed]" time="3.468" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[plan]" time="3.492" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[tests-orchestrator]" time="0.766" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[tests-owner]" time="0.813" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured[rejected]" time="0.827" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[kernel-orchestrator]" time="0.850" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[prompts]" time="3.431" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured[superseded-never-accepted]" time="0.820" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[kernel-owner]" time="0.787" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_naming_no_decision_counts_as_unmeasured" time="0.808" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[code-owner]" time="0.798" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[assessment-orchestrator]" time="0.796" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[assessment-owner]" time="0.778" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_naming_a_decision_that_is_not_accepted_counts_as_unmeasured[proposed]" time="0.783" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[accepted_history-code]" time="0.767"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 9160839a7e01 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 9160839a7e01 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;9160839a7e01&quot;, &quot;paths&quot;: [&quot;src/example/feature.py&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;9160839a7e01&quot;, &quot;paths&quot;: [&quot;src/example/feature.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [{&quot;commit&quot;: &quot;9160839a7e0184c89eedc40202fc9071eedc269a&quot;, &quot;decision&quot;: &quot;DEC-510&quot;}], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-447h&quot;}}}&#10;&#10;stderr:">key = 'accepted_history', given = 'full', which = 'code'
+project = &lt;w2_07_support.Project object at 0x7afdb53eaf90&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_commit_an_owner_committ0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_commit_an_owner_committ0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("which", sorted(LISTED_PATHS))
+    @pytest.mark.parametrize("key, given", [
+        (support.ACCEPTED_KEY, "full"),
+        (support.ACCEPTED_KEY, "abbreviated"),
+        (support.EXEMPTIONS_KEY, "full"),
+    ], ids=["accepted_history", "accepted_history-abbreviated-id", "acceptance_exemptions"])
+    def test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured(
+            key, given, which, project, sandbox, interface):
+        """The round-2 KPI: a listed commit is measured whatever paths it changes. ``accepted_history`` is read as the
+        trailer gate reads it (DEC-734: a full or an abbreviated id), ``acceptance_exemptions`` as W1-01 reads it (the
+        whole id)."""
+        _ticket(project, allowed=LISTED_ALLOWED)
+        owners = _owners_commit(project, "DEC-510", which)
+        _listed(project, key, owners, "DEC-510", given=owners[:12] if given == "abbreviated" else None)
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-447h"}}}\n', stderr='', seconds=0.2178604140644893)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 9160839a7e01 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 9160839a7e01 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured"], "commit": "9160839a7e01", "paths": ["src/example/feature.py"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "9160839a7e01", "paths": ["src/example/feature.py"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [{"commit": "9160839a7e0184c89eedc40202fc9071eedc269a", "decision": "DEC-510"}], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-447h"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_any_other_path_counts_as_unmeasured[code-orchestrator]" time="0.767" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[accepted_history-tests]" time="0.802"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit ead8dca78bb3 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit ead8dca78bb3 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;ead8dca78bb3&quot;, &quot;paths&quot;: [&quot;tests/unit/w207/test_w207_by_the_owner.py&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;ead8dca78bb3&quot;, &quot;paths&quot;: [&quot;tests/unit/w207/test_w207_by_the_owner.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [{&quot;commit&quot;: &quot;ead8dca78bb302a70fed548e71202959e2ddb213&quot;, &quot;decision&quot;: &quot;DEC-510&quot;}], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-4vbv&quot;}}}&#10;&#10;stderr:">key = 'accepted_history', given = 'full', which = 'tests'
+project = &lt;w2_07_support.Project object at 0x7e6237d727b0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_commit_an_owner_committ0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_commit_an_owner_committ0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("which", sorted(LISTED_PATHS))
+    @pytest.mark.parametrize("key, given", [
+        (support.ACCEPTED_KEY, "full"),
+        (support.ACCEPTED_KEY, "abbreviated"),
+        (support.EXEMPTIONS_KEY, "full"),
+    ], ids=["accepted_history", "accepted_history-abbreviated-id", "acceptance_exemptions"])
+    def test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured(
+            key, given, which, project, sandbox, interface):
+        """The round-2 KPI: a listed commit is measured whatever paths it changes. ``accepted_history`` is read as the
+        trailer gate reads it (DEC-734: a full or an abbreviated id), ``acceptance_exemptions`` as W1-01 reads it (the
+        whole id)."""
+        _ticket(project, allowed=LISTED_ALLOWED)
+        owners = _owners_commit(project, "DEC-510", which)
+        _listed(project, key, owners, "DEC-510", given=owners[:12] if given == "abbreviated" else None)
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-4vbv"}}}\n', stderr='', seconds=0.2512779050739482)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit ead8dca78bb3 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit ead8dca78bb3 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured"], "commit": "ead8dca78bb3", "paths": ["tests/unit/w207/test_w207_by_the_owner.py"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "ead8dca78bb3", "paths": ["tests/unit/w207/test_w207_by_the_owner.py"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [{"commit": "ead8dca78bb302a70fed548e71202959e2ddb213", "decision": "DEC-510"}], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-4vbv"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[accepted_history-abbreviated-id-code]" time="0.781"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit f03ed2bd5a00 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit f03ed2bd5a00 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;f03ed2bd5a00&quot;, &quot;paths&quot;: [&quot;src/example/feature.py&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;f03ed2bd5a00&quot;, &quot;paths&quot;: [&quot;src/example/feature.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [{&quot;commit&quot;: &quot;f03ed2bd5a00e3df0d8a6924c4e1bfeabb678ae2&quot;, &quot;decision&quot;: &quot;DEC-510&quot;}], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-frss&quot;}}}&#10;&#10;stderr:">key = 'accepted_history', given = 'abbreviated', which = 'code'
+project = &lt;w2_07_support.Project object at 0x75fe256ebb60&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw0/test_a_commit_an_owner_committ0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw0/test_a_commit_an_owner_committ0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("which", sorted(LISTED_PATHS))
+    @pytest.mark.parametrize("key, given", [
+        (support.ACCEPTED_KEY, "full"),
+        (support.ACCEPTED_KEY, "abbreviated"),
+        (support.EXEMPTIONS_KEY, "full"),
+    ], ids=["accepted_history", "accepted_history-abbreviated-id", "acceptance_exemptions"])
+    def test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured(
+            key, given, which, project, sandbox, interface):
+        """The round-2 KPI: a listed commit is measured whatever paths it changes. ``accepted_history`` is read as the
+        trailer gate reads it (DEC-734: a full or an abbreviated id), ``acceptance_exemptions`` as W1-01 reads it (the
+        whole id)."""
+        _ticket(project, allowed=LISTED_ALLOWED)
+        owners = _owners_commit(project, "DEC-510", which)
+        _listed(project, key, owners, "DEC-510", given=owners[:12] if given == "abbreviated" else None)
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-frss"}}}\n', stderr='', seconds=0.2195495319319889)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit f03ed2bd5a00 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit f03ed2bd5a00 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured"], "commit": "f03ed2bd5a00", "paths": ["src/example/feature.py"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "f03ed2bd5a00", "paths": ["src/example/feature.py"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [{"commit": "f03ed2bd5a00e3df0d8a6924c4e1bfeabb678ae2", "decision": "DEC-510"}], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-frss"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[accepted_history-abbreviated-id-tests]" time="0.770"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 4d761c867685 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 4d761c867685 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;4d761c867685&quot;, &quot;paths&quot;: [&quot;tests/unit/w207/test_w207_by_the_owner.py&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;4d761c867685&quot;, &quot;paths&quot;: [&quot;tests/unit/w207/test_w207_by_the_owner.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [{&quot;commit&quot;: &quot;4d761c86768571480e9b1dc9e8a6f7dc376b0079&quot;, &quot;decision&quot;: &quot;DEC-510&quot;}], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-yq8s&quot;}}}&#10;&#10;stderr:">key = 'accepted_history', given = 'abbreviated', which = 'tests'
+project = &lt;w2_07_support.Project object at 0x780e7137cf80&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_commit_an_owner_committ0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_a_commit_an_owner_committ0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("which", sorted(LISTED_PATHS))
+    @pytest.mark.parametrize("key, given", [
+        (support.ACCEPTED_KEY, "full"),
+        (support.ACCEPTED_KEY, "abbreviated"),
+        (support.EXEMPTIONS_KEY, "full"),
+    ], ids=["accepted_history", "accepted_history-abbreviated-id", "acceptance_exemptions"])
+    def test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured(
+            key, given, which, project, sandbox, interface):
+        """The round-2 KPI: a listed commit is measured whatever paths it changes. ``accepted_history`` is read as the
+        trailer gate reads it (DEC-734: a full or an abbreviated id), ``acceptance_exemptions`` as W1-01 reads it (the
+        whole id)."""
+        _ticket(project, allowed=LISTED_ALLOWED)
+        owners = _owners_commit(project, "DEC-510", which)
+        _listed(project, key, owners, "DEC-510", given=owners[:12] if given == "abbreviated" else None)
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...-disposition to classify", "counted": false, "repair_ticket": "pro-yq8s"}}}\n', stderr='', seconds=0.21317594894208014)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 4d761c867685 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 4d761c867685 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured"], "commit": "4d761c867685", "paths": ["tests/unit/w207/test_w207_by_the_owner.py"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "4d761c867685", "paths": ["tests/unit/w207/test_w207_by_the_owner.py"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [{"commit": "4d761c86768571480e9b1dc9e8a6f7dc376b0079", "decision": "DEC-510"}], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-yq8s"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[acceptance_exemptions-tests]" time="0.808"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit 268269970496 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit 268269970496 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;268269970496&quot;, &quot;paths&quot;: [&quot;tests/unit/w207/test_w207_by_the_owner.py&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;268269970496&quot;, &quot;paths&quot;: [&quot;tests/unit/w207/test_w207_by_the_owner.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-jqob&quot;}}}&#10;&#10;stderr:">key = 'acceptance_exemptions', given = 'full', which = 'tests'
+project = &lt;w2_07_support.Project object at 0x7cc688d8f9b0&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw2/test_a_commit_an_owner_committ0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw2/test_a_commit_an_owner_committ0/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("which", sorted(LISTED_PATHS))
+    @pytest.mark.parametrize("key, given", [
+        (support.ACCEPTED_KEY, "full"),
+        (support.ACCEPTED_KEY, "abbreviated"),
+        (support.EXEMPTIONS_KEY, "full"),
+    ], ids=["accepted_history", "accepted_history-abbreviated-id", "acceptance_exemptions"])
+    def test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured(
+            key, given, which, project, sandbox, interface):
+        """The round-2 KPI: a listed commit is measured whatever paths it changes. ``accepted_history`` is read as the
+        trailer gate reads it (DEC-734: a full or an abbreviated id), ``acceptance_exemptions`` as W1-01 reads it (the
+        whole id)."""
+        _ticket(project, allowed=LISTED_ALLOWED)
+        owners = _owners_commit(project, "DEC-510", which)
+        _listed(project, key, owners, "DEC-510", given=owners[:12] if given == "abbreviated" else None)
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-jqob"}}}\n', stderr='', seconds=0.2364438889781013)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit 268269970496 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit 268269970496 names no task and changes tests/unit/w207/test_w207_by_the_owner.py: work on PROJ-dcrd that no ticket measured"], "commit": "268269970496", "paths": ["tests/unit/w207/test_w207_by_the_owner.py"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "268269970496", "paths": ["tests/unit/w207/test_w207_by_the_owner.py"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-jqob"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured[acceptance_exemptions-code]" time="0.812"><failure message="AssertionError: gov close did not succeed&#10;gov close PROJ-dcrd --json&#10;exit code: 3&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;close&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;WORK_WITHOUT_TASK&quot;, &quot;message&quot;: &quot;commit d211ccfe3ea2 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition&quot;, &quot;details&quot;: {&quot;findings&quot;: [&quot;commit d211ccfe3ea2 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured&quot;], &quot;commit&quot;: &quot;d211ccfe3ea2&quot;, &quot;paths&quot;: [&quot;src/example/feature.py&quot;], &quot;ticket&quot;: &quot;PROJ-dcrd&quot;, &quot;work_without_task&quot;: [{&quot;commit&quot;: &quot;d211ccfe3ea2&quot;, &quot;paths&quot;: [&quot;src/example/feature.py&quot;]}], &quot;disposition&quot;: &quot;unclassed&quot;, &quot;test_runs&quot;: [], &quot;trailers_base&quot;: null, &quot;accepted_history&quot;: [], &quot;note&quot;: &quot;findings await their class; use --disposition to classify&quot;, &quot;counted&quot;: false, &quot;repair_ticket&quot;: &quot;pro-ycrm&quot;}}}&#10;&#10;stderr:">key = 'acceptance_exemptions', given = 'full', which = 'code'
+project = &lt;w2_07_support.Project object at 0x7afdb543e870&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_commit_an_owner_committ1/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_a_commit_an_owner_committ1/sandbox/elsewhere'))
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("which", sorted(LISTED_PATHS))
+    @pytest.mark.parametrize("key, given", [
+        (support.ACCEPTED_KEY, "full"),
+        (support.ACCEPTED_KEY, "abbreviated"),
+        (support.EXEMPTIONS_KEY, "full"),
+    ], ids=["accepted_history", "accepted_history-abbreviated-id", "acceptance_exemptions"])
+    def test_a_commit_an_owner_committed_list_names_under_its_accepted_owner_decision_counts_as_measured(
+            key, given, which, project, sandbox, interface):
+        """The round-2 KPI: a listed commit is measured whatever paths it changes. ``accepted_history`` is read as the
+        trailer gate reads it (DEC-734: a full or an abbreviated id), ``acceptance_exemptions`` as W1-01 reads it (the
+        whole id)."""
+        _ticket(project, allowed=LISTED_ALLOWED)
+        owners = _owners_commit(project, "DEC-510", which)
+        _listed(project, key, owners, "DEC-510", given=owners[:12] if given == "abbreviated" else None)
+        support.checkpointed(project, TICKET)
+&gt;       _closes(project, sandbox, interface)
+
+tests/acceptance/W2-07/test_w2_07_decision_records.py:260: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-07/test_w2_07_decision_records.py:95: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-07/w2_07_support.py:363: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-dcrd', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...-disposition to classify", "counted": false, "repair_ticket": "pro-ycrm"}}}\n', stderr='', seconds=0.24086620204616338)
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+&gt;       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-dcrd --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "WORK_WITHOUT_TASK", "message": "commit d211ccfe3ea2 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured; findings are unclassed and await disposition", "details": {"findings": ["commit d211ccfe3ea2 names no task and changes src/example/feature.py: work on PROJ-dcrd that no ticket measured"], "commit": "d211ccfe3ea2", "paths": ["src/example/feature.py"], "ticket": "PROJ-dcrd", "work_without_task": [{"commit": "d211ccfe3ea2", "paths": ["src/example/feature.py"]}], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-ycrm"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_list_entry_outside_the_lists_reading_measures_nothing[accepted_history-delegated]" time="0.823" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_list_entry_outside_the_lists_reading_measures_nothing[acceptance_exemptions-delegated]" time="0.800" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_list_entry_outside_the_lists_reading_measures_nothing[accepted_history-proposed]" time="0.805" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_list_entry_outside_the_lists_reading_measures_nothing[acceptance_exemptions-proposed]" time="0.781" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_list_entry_outside_the_lists_reading_measures_nothing[acceptance_exemptions-abbreviated-id]" time="0.762" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_collection_error_in_any_suite_refuses_before_any_test[regression]" time="2.044" /><testcase classname="tests.acceptance.W2-07.test_w2_07_decision_records" name="test_a_decision_record_that_also_changes_another_governance_record_counts_as_measured[briefs]" time="3.380" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_collection_error_in_any_suite_refuses_before_any_test[acceptance]" time="2.161" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_red_gov_check_refuses_before_any_test" time="2.140" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_stale_checkpoint_refuses_before_any_test" time="1.709" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_disk_below_a_floor_refuses_before_the_regression_naming_the_reading[space]" time="1.964" /><testcase classname="tests.acceptance.W2-07.test_w2_07_pre_close_gate" name="test_a_disk_below_a_floor_refuses_before_the_regression_naming_the_reading[inodes]" time="1.972" /><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_a_refused_close_writes_a_complete_schema_valid_repair_ticket" time="3.599" /><testcase classname="tests.acceptance.W2-07.test_w2_07_probe_findings" name="test_a_decision_that_is_not_accepted_does_not_accept_the_findings" time="0.809" /><testcase classname="tests.acceptance.W2-07.test_w2_07_probe_findings" name="test_a_finding_the_decision_does_not_name_still_refuses" time="0.848" /><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_the_repair_ticket_stays_tracked_and_blocks_no_later_close" time="5.517" /><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_an_interrupted_close_leaves_nothing_that_blocks_the_next_close" time="5.315" /><testcase classname="tests.acceptance.W2-07.test_w2_07_share" name="test_a_close_by_class_carries_the_measured_governance_share" time="1.560" /><testcase classname="tests.acceptance.W2-07.test_w2_07_probe_findings" name="test_a_failed_probe_whose_every_finding_an_accepted_owner_decision_names_lets_the_ticket_close" time="3.367" /><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_adoption_gap_refusals_do_not_count_toward_escalation" time="1.300" /><testcase classname="tests.acceptance.W2-07.test_w2_07_repair_and_escalation" name="test_a_repeated_identical_refusal_reuses_its_repair_ticket" time="5.091" /><testcase classname="tests.acceptance.W2-07.test_w2_07_test_revision" name="test_a_test_revision_ticket_closes_on_the_tests_its_ticket_file_names" time="3.074" /><testcase classname="tests.acceptance.W2-07.test_w2_07_test_revision" name="test_a_test_revision_ticket_whose_named_tests_fail_is_refused_on_its_acceptance_run" time="3.054" /></testsuite></testsuites>
