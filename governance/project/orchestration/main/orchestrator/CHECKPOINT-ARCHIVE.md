@@ -4888,3 +4888,7 @@ P2 items go into one daily digest.
   should be DEC-922; my repin_registry.py), W2-69 unit folder (pycache leftover: REMOVED). Package P-REPIN-R1 (P1,
   `dbfb76f0`): rec (a) LITE W2-74 test revisions + W2-69 case id rename + registry line by me; interim the warning
   leaves out .gov-runtime/close/ (the judge's JUnit holds the keyword via W2-69's case name, no hash).
+
+## Moved from RESUME HERE on 2026-10-27 (prior refusals)
+- **Prior refusals on record:** W2-58 count 1 (WORK_WITHOUT_TASK), W2-63 count 1 (RULESYNC etc.). Commit-gate refusals
+  are not counted by the new judge.

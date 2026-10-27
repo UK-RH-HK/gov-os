@@ -1,10 +1,9 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 15:50 GMT — W2-74 MERGED `6ee7b4d0` (full run green); CLOSE QUEUE RUNNING (7: W2-70 first, full; then scoped); W2-69 out (stale probe) -> re-probe brief ready, launch AFTER the queue; W2-07 r2 DONE, merge after the queue; W2-57 run 2 in flight; DEC-926 delegated `429cac2e`; next free DEC-927)
+## RESUME HERE (2026-10-27 17:45 GMT — W2-70 CLOSED (`23c24700`, full, base for scoping = its head `7ada0f58`); queue STOPPED before W2-66: product traceability RED (39 commits with a role in Implements) -> P1 P-TRACE-IMPL-1 + ACT file pinged; W2-69 re-probe lead in flight; W2-57 + W2-07 r2 DONE, merges held; next free DEC-927 (drafted))
 
 ### Now (2026-10-26)
 - **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
-- **First queue run (2026-10-26):** W2-70 refused, count 1, on 8 base reds (P-REPIN-R1; details in the archive).
 - **W2-07 round 2 RETURNED DONE** (head `75048114`; gate (h) per DEC-923; W2-07 69/69; unmeasured 0/0/0 for W2-58,
   W2-63, W2-07 on `a42e899b`; full run = the 8 base reds + W2-54 load timeout, passed alone). **MERGE HELD until the
   close queue ends** (its src/gov/close change is shared core: merged now it would make every queued close full;
@@ -15,8 +14,6 @@
   6 load_sensitive removals ready (at its merge). Two lead commits carry `Implements: engineer` (my IMPL error in
   its brief): a row; run 2 brief IMPL=DEC-892. Temp folder removed.
 - **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
-- **Prior refusals on record:** W2-58 count 1 (WORK_WITHOUT_TASK), W2-63 count 1 (RULESYNC etc.). Commit-gate refusals
-  are not counted by the new judge.
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -77,13 +74,18 @@
 removing returned leads' temp folders after the holder check).
 
 ### Next
-1. **Queue RUNNING** (task bsbmwu264, `log/close-queue-20261027-1546/`): DAEO-uzme DAEO-c1uz DAEO-ye2a DAEO-kh9l
-   DAEO-e82f DAEO-qty6 DAEO-2azm. W2-70 runs full (no base); the six after it should be SCOPED off W2-70's close
-   record: report each close's evidence scope / why_full / selected to the owner. W2-70's next refusal on the same
-   reds = its second -> package. NO main-tree commit while it runs. keyword_warn: interim line removed; DEC-926 leaves
-   out only the refused close's 4 JUnit files (exact paths).
-2. **After the queue:** (a) launch W2-69's judgement-only re-probe (`briefs/W2-69-A5-run3.md`, built; worktree
-   `34e1c59f06e6`), then merge it and close W2-69; (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
+1. **Queue run 2026-10-27 15:46:** W2-70 CLOSED exit 0 (66 min, full: BASE_UNKNOWN; record CL-DAEO-uzme.md head
+   `7ada0f58`); worktree/branch removed. STOPPED before W2-66: gate (b) RED, product-traceability IMPLEMENTS_UNRESOLVED
+   (W2-70's 7 commits). 39 commits on integrate name a role (26 record-only, 13 other; W2-70, W2-67, W2-66, W2-65,
+   W2-07, W2-69) + W2-57's 2 on its branch. P1 P-TRACE-IMPL-1 `b99c75ce`: rec (a) one owner commit of 39
+   accepted_history entries under DEC-927. Drafted `drafts/DEC-927/` (register + path map + patch; validated 39/39;
+   traceability exit 0 and record suites 80 green with it applied; tree restored). ACT file + patch in packages/.
+   ON YES: append `drafts/DEC-927/entry.md` to the register (re-run draft_dec927.py if the register moved), record
+   checks, commit; give the owner the sha; owner runs ACT-P-TRACE-IMPL-1.md; then gate (b) and restart the queue:
+   DAEO-c1uz DAEO-ye2a DAEO-kh9l DAEO-e82f DAEO-qty6 DAEO-2azm (should be SCOPED off `7ada0f58`). build_lead_brief.py
+   now refuses a non-id IMPL.
+2. **Now / after the queue:** (a) W2-69's re-probe lead IN FLIGHT (task b5z8st71x, `log/W2-69-A5-run3.json`); then
+   merge it and queue W2-69; (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
    review 2 pass, probe `PR-DAEO-cy5o-review-2.md`; serial 104 cases 11:48 vs 180 17:40; nightly batch 76 green),
    then commit its 30 load_sensitive removals (W1-38 x3, W1-07 [doctor], W1-30 r13, unit close follow-up, W1-46 x23,
    W1-19 warm p95; list in `log/W2-57-A5-run2.json`); (c) W2-07 r2 SECOND: lead merges integrate back + re-verifies
