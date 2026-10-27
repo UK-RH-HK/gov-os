@@ -1,6 +1,6 @@
 ---
 id: DAEO-cy5o
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-23T09:08:45Z

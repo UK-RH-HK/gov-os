@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import stat
+from pathlib import Path
 
 import w1_26_support as support
 
@@ -30,30 +31,49 @@ def _make_fake_openspec(sandbox, exit_code=0, output=""):
 # openspec absent: reported by name, never green, never exception
 # --------------------------------------------------------------------------
 
-def test_openspec_absent_reported_by_name(project, sandbox, interface):
-    """When openspec is not on PATH, the check reports it by name."""
-    project.commit()
-    env_path = sandbox.bin.as_posix()
-    run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    output_text = run.stdout + run.stderr
-    assert "openspec" in output_text.lower() or "openspec" in str(result).lower(), \
-        f"openspec is absent but its name is nowhere in the output\n{run.describe()}"
+OPENSPEC_CHECK = "openspec-validate"
+OPENSPEC_FAMILY = "product traceability"
 
 
-def test_openspec_absent_never_green(project, sandbox, interface):
-    """When openspec is absent, no check whose family is openspec-related is GREEN."""
-    project.commit()
+def _without_openspec(monkeypatch):
+    """``gov check`` runs with a PATH whose folders hold no ``openspec``: absent on any machine."""
+    folders = [folder for folder in os.environ.get("PATH", "").split(os.pathsep)
+               if folder and not (Path(folder) / "openspec").exists()]
+    monkeypatch.setenv("PATH", os.pathsep.join(folders))
+
+
+def _with_fake_openspec(monkeypatch, sandbox):
+    """``gov check`` runs with the sandbox's ``bin`` first on PATH, where the case puts its fake ``openspec``."""
+    monkeypatch.setenv("PATH", os.pathsep.join((str(sandbox.bin), os.environ.get("PATH", ""))))
+
+
+def test_openspec_absent_reported_by_name(green_project, sandbox, interface, monkeypatch):
+    """When openspec is not on PATH, the check reports it by name: a finding of ``openspec-validate`` names it.
+
+    Revised (W2-67, I2 §2.7): it asserted "openspec" anywhere in the output, which every output holds (the check
+    id)."""
+    project = green_project
+    _without_openspec(monkeypatch)
     run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    families = support.families_of(result)
-    for family_name, entry in families.items():
-        if "openspec" in family_name.lower():
-            status = entry.get("status") if isinstance(entry, dict) else entry
-            assert status != support.GREEN, \
-                f"openspec is absent but {family_name} is GREEN\n{run.describe()}"
+    result, _ = support.result_and_envelope(run, interface)
+    entry = support.check_entry(result, OPENSPEC_CHECK)
+    assert support.findings_naming(entry, "openspec"), \
+        f"openspec is absent but no finding of {OPENSPEC_CHECK} names it: {entry}\n{run.describe()}"
+
+
+def test_openspec_absent_never_green(green_project, sandbox, interface, monkeypatch):
+    """When openspec is absent, the openspec check is not GREEN, nor is its family.
+
+    Revised (W2-67, I2 §2.7): it looped over families whose name holds "openspec", and there is none."""
+    project = green_project
+    _without_openspec(monkeypatch)
+    run = support.run_check(project, sandbox)
+    result, _ = support.result_and_envelope(run, interface)
+    entry = support.check_entry(result, OPENSPEC_CHECK)
+    assert entry.get("status") in (support.RED, support.YELLOW), \
+        f"openspec is absent but {OPENSPEC_CHECK} is {entry.get('status')!r}: {entry}\n{run.describe()}"
+    assert entry.get("family") == OPENSPEC_FAMILY and support.family_status(result, OPENSPEC_FAMILY) != support.GREEN, \
+        f"openspec is absent but its family {entry.get('family')!r} is GREEN\n{run.describe()}"
 
 
 def test_openspec_absent_no_exception(project, sandbox, interface):
@@ -81,13 +101,19 @@ def test_openspec_present_and_passing(project, sandbox, interface):
 # openspec present and failing -> RED
 # --------------------------------------------------------------------------
 
-def test_openspec_present_and_failing_is_red(project, sandbox, interface):
-    """When openspec validate --strict fails, the check is RED."""
+def test_openspec_present_and_failing_is_red(green_project, sandbox, interface, monkeypatch):
+    """When openspec validate --strict fails, the check is RED: ``openspec-validate`` is RED and ``gov check``
+    exits non-zero.
+
+    Revised (W2-67, I2 §2.7): its fake ``openspec`` was never on the PATH ``gov check`` runs with, and the
+    assertion ("openspec" in the output, or a non-zero exit) held on a base red before any defect (I2 R1)."""
+    project = green_project
     _make_fake_openspec(sandbox, exit_code=1, output="validation error")
-    project.commit()
+    _with_fake_openspec(monkeypatch, sandbox)
     run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    output_text = run.stdout + str(result)
-    assert "openspec" in output_text.lower() or run.returncode != 0, \
-        f"openspec failed but the check does not reflect it\n{run.describe()}"
+    result, envelope = support.result_and_envelope(run, interface)
+    entry = support.check_entry(result, OPENSPEC_CHECK)
+    assert entry.get("status") == support.RED, \
+        f"openspec validate --strict failed but {OPENSPEC_CHECK} is {entry.get('status')!r}: {entry}\n{run.describe()}"
+    assert envelope["ok"] is False and run.returncode == support.EXIT_CHECK_FAILED, \
+        f"a planted defect did not cause exit {support.EXIT_CHECK_FAILED}\n{run.describe()}"

@@ -242,13 +242,12 @@ accepted_history:
     decision: DEC-871
   - commit: "162f17ea9cafeec96687d2a83c43c060c08d3e1b"
     decision: DEC-891
-# The data files this project's tests read, for the test-result cache (W2-48; DEC-876, P-W2-48-5 (c)): narrow on
-# purpose, fixtures, templates and schemas. The register and the ticket files are left out; a test that reads a
-# non-Python file outside these globs is always run (the cache fails safe).
-test_inputs:
-  - "fixtures/**"
-  - "template/**"
-  - "schemas/**"
+# Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
+# role (DEC-906): each by its exact sha, with the owner's decision. Only the owner's commit adds an entry; any other
+# commit touching tests/acceptance/ without that role stays red.
+acceptance_exemptions:
+  - commit: "c9a08678644485a7528bc875164e110881b63d93"
+    decision: DEC-900
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200

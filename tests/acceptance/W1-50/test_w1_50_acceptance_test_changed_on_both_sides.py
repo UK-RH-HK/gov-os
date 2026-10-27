@@ -29,9 +29,17 @@ in its own call is a finding that names it:
 - both sides made the identical change: the merge commit differs from neither
   parent, and by the words of DP-24 the path is "a path that more than one
   parent changed against the merge base" all the same. Through the check this
-  is the rewritten ``test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_flagged``
+  is ``test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent``
   (``test_w1_50_merge_that_takes_each_side_s_change.py``); through the helper
   it is here.
+
+**Since DEC-918** (Rewrite-Reason: DEC-918): the last two shapes are git's own
+merge of the test, so through the check they are no change of the merge
+commit's and the merge is silent
+(``test_a_clean_combination_of_two_sides_edits_of_one_test_is_silent``, here,
+was ``..._is_flagged``). Through the helper they stay in ``own``: the reading
+is unchanged. The other shapes take one side whole after a conflict, which is
+no clean merge of the test: still flagged.
 
 The merge commit carries the orchestrator's trailers; one case carries a test
 designer's (a finding by DP-27 as well).
@@ -174,12 +182,21 @@ def test_the_same_merge_with_a_test_designer_s_trailers_on_the_merge_commit_is_f
 # DP-26: git's own clean combination of two edits
 # --------------------------------------------------------------------------
 
-def test_a_clean_combination_of_two_sides_edits_of_one_test_is_flagged(project, sandbox, call):
-    """DEC-410, DP-26: "stays flagged, as built". A test designer changed line 2 of an acceptance test on the
-    branch and line 19 on ``main``; ``git merge`` combines them without a conflict, and the merge commit holds
-    content of the test neither parent holds. The test is named."""
+def test_a_clean_combination_of_two_sides_edits_of_one_test_is_silent(project, sandbox, call):
+    """Rewritten; Rewrite-Reason: DEC-918. Until then this case was
+    ``test_a_clean_combination_of_two_sides_edits_of_one_test_is_flagged`` and expected, by DEC-410 DP-26
+    ("stays flagged, as built"), that the orchestrator's merge in its own call is a finding that names the test.
+
+    DEC-918 item 1 changes DP-24 for acceptance tests: a path both parents changed is not the merge commit's own
+    change when the merge commit holds exactly git's own merge of it (``git merge-tree --write-tree``, no
+    conflict on that file). A test designer changed line 2 of an acceptance test on the branch and line 19 on
+    ``main``; ``git merge`` combines them without a conflict, and the merge commit holds that merge, content
+    neither parent holds. Now expected: the check is silent and moves nothing. ``read_merge``'s reading is
+    unchanged (the next case, DEC-918 item 4)."""
     shape = own_change.changed_on_both_sides_in_different_parts(project, sandbox)
-    _assert_the_test_is_named(project, shape, _call(project, call, shape))
+    result, left, what = _call(project, call, shape)
+    check_support.assert_silent(result, what)
+    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 def test_read_merge_puts_a_clean_combination_of_two_sides_edits_of_one_test_in_own(project, sandbox, helper):
