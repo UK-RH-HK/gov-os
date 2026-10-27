@@ -1,3 +1,6 @@
 parallel start 2026-10-27 13:18:11 load 10.41 25.27 29.27
 parallel exit 1 end 2026-10-27 14:12:11 load 0.68 10.10 25.34 | 8 failed, 16430 passed, 31 skipped in 2836.80s (0:47:16)
 serial start 2026-10-27 14:12:43 load 5.69 10.38 24.95
+serial exit 0 end 2026-10-27 15:13:51 load 1.27 4.70 17.32 | 104 passed in 708.90s (0:11:48)
+nightly start 2026-10-27 15:14:21 load 1.31 4.37 16.81
+nightly exit 0 end 2026-10-27 15:39:21 load 12.52 9.32 9.63 | 76 passed, 1 warning in 412.27s (0:06:52)

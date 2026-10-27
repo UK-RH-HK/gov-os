@@ -37,10 +37,14 @@ def holds(path: Path) -> bool:
 
 
 STORE_FOLDERS = ("codeintel",)  # DEC-923: the index stores, at .gov-runtime/'s top only
-# DEC-925 item 1, INTERIM until W2-74 merges: the close's own JUnit evidence (.gov-runtime/close/), which the judge
-# writes and which holds a keyword only through W2-69's case name. Remove this line when W2-74 merges.
-STORE_FOLDERS += ("close",)
 STORE_FILES = ("store.db", "query-vector-cache.db")  # and their -wal / -shm / -journal companions
+# DEC-926 (delegated, after DEC-925's interim ended with W2-74's merge 6ee7b4d0): the JUnit evidence of W2-70's refused
+# close, written before W2-69's case was renamed; evidence is never edited, and the pinned secrets check passes on it.
+# Exact paths only: every other file under .gov-runtime/close/ is read.
+EVIDENCE_BEFORE_W2_74 = {".gov-runtime/close/DAEO-uzme/20261026T222046368356Z/03-regression-parallel.xml",
+                         ".gov-runtime/close/DAEO-uzme/20261026T222046368356Z/04-regression-serial-afterwards.xml",
+                         ".gov-runtime/close/DAEO-uzme/20261026T222046368356Z/01-acceptance-parallel.xml",
+                         ".gov-runtime/close/DAEO-uzme/20261026T222046368356Z/02-acceptance-serial-afterwards.xml"}
 
 hits, unread, seen = [], [], set()
 for folder, folders, names in os.walk(runtime, followlinks=True):
@@ -56,6 +60,8 @@ for folder, folders, names in os.walk(runtime, followlinks=True):
         path = Path(folder) / name
         target = os.path.realpath(path)
         if target == runs or target.startswith(runs + os.sep) or not os.path.isfile(path):
+            continue
+        if path.relative_to(root).as_posix() in EVIDENCE_BEFORE_W2_74:
             continue
         try:
             if holds(path):

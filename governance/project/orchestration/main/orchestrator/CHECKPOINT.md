@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 12:15 GMT — DEC-925 recorded (`ecc49cc4`): W2-74 + W2-57 run 2 + W2-07 r2 leads IN FLIGHT (3); queue waits for W2-74's merge, then W2-70 first (full: no base yet, then scoped); owner committed 611955fa entry `048f5758` and pushed; next free DEC-926)
+## RESUME HERE (2026-10-27 15:50 GMT — W2-74 MERGED `6ee7b4d0` (full run green); CLOSE QUEUE RUNNING (7: W2-70 first, full; then scoped); W2-69 out (stale probe) -> re-probe brief ready, launch AFTER the queue; W2-07 r2 DONE, merge after the queue; W2-57 run 2 in flight; DEC-926 delegated `429cac2e`; next free DEC-927)
 
 ### Now (2026-10-26)
 - **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
@@ -83,14 +83,14 @@
 removing returned leads' temp folders after the holder check).
 
 ### Next
-1. **In flight (3 leads):** W2-74 (DAEO-2azm, claimed `a42e899b`, task b3rzj4fta, `log/W2-74-A5-run1.json`);
-   W2-57 run 2 (task bmlp2i9u5, `log/W2-57-A5-run2.json`; B1 route in command.py's serial call, R1, B3, R2; review 2
-   = last); W2-07 r2 RETURNED (merge held). Registry line fixed `1c3d4dff`; keyword_warn leaves out .gov-runtime/close/
-   UNTIL W2-74 MERGES (then delete that line in tools/keyword_warn.py).
-2. W2-74 DONE -> merge, probe_impact, remove the warning's interim line, then `tools/close_queue.sh DAEO-uzme
-   DAEO-rmbe DAEO-c1uz DAEO-ye2a DAEO-kh9l DAEO-e82f DAEO-qty6` (W2-70 runs full: base unknown; the six after it
-   should be SCOPED off W2-70's close record: show the owner each close's evidence scope/why_full/selected).
-   W2-70's next refusal on the same reds = its second -> package. Then close W2-74 itself.
+1. **Queue RUNNING** (task bsbmwu264, `log/close-queue-20261027-1546/`): DAEO-uzme DAEO-c1uz DAEO-ye2a DAEO-kh9l
+   DAEO-e82f DAEO-qty6 DAEO-2azm. W2-70 runs full (no base); the six after it should be SCOPED off W2-70's close
+   record: report each close's evidence scope / why_full / selected to the owner. W2-70's next refusal on the same
+   reds = its second -> package. NO main-tree commit while it runs. keyword_warn: interim line removed; DEC-926 leaves
+   out only the refused close's 4 JUnit files (exact paths).
+2. **After the queue:** (a) launch W2-69's judgement-only re-probe (`briefs/W2-69-A5-run3.md`, built; worktree
+   `34e1c59f06e6`), then merge it and close W2-69; (b) merge W2-07 r2 (`75048114`; shared core, so not during the
+   queue); W2-57 run 2 (task bmlp2i9u5) is in flight: the second of W2-57/W2-07 to merge merges back.
 3. W2-57 / W2-07 r2 merges: second merger merges back + re-verifies + fresh probe if stale (DEC-924/925). On W2-57's
    merge, commit its load_sensitive removals (6 ready + any the route frees). W2-07 r2 rides the second re-pin.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
