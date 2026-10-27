@@ -4,13 +4,7 @@
 
 ### Now (2026-10-26)
 - **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
-- **Queue run 2026-10-26 22:02 (`log/close-queue-20261026-2157/`):** W2-70 (DAEO-uzme) close REFUSED exit 3 after 68 min
-  (count 1; repair DAEO-2upp committed by the close `9fbaf969`); queue stopped; 6 others not run. 9 reds, none W2-70's:
-  W1-01 docs_source x4 + W1-47 docs/source x2 (enforce the dropped deny rules: my DEC-866 sweep miss), W1-49
-  precompact [not on PATH] (new lifecycle hook line exits 1 without gov), W1-06 (registry approved_by DEC-921 ->
-  should be DEC-922; my repin_registry.py), W2-69 unit folder (pycache leftover: REMOVED). Package P-REPIN-R1 (P1,
-  `dbfb76f0`): rec (a) LITE W2-74 test revisions + W2-69 case id rename + registry line by me; interim the warning
-  leaves out .gov-runtime/close/ (the judge's JUnit holds the keyword via W2-69's case name, no hash).
+- **First queue run (2026-10-26):** W2-70 refused, count 1, on 8 base reds (P-REPIN-R1; details in the archive).
 - **W2-07 round 2 RETURNED DONE** (head `75048114`; gate (h) per DEC-923; W2-07 69/69; unmeasured 0/0/0 for W2-58,
   W2-63, W2-07 on `a42e899b`; full run = the 8 base reds + W2-54 load timeout, passed alone). **MERGE HELD until the
   close queue ends** (its src/gov/close change is shared core: merged now it would make every queued close full;

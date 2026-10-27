@@ -4879,3 +4879,12 @@ P2 items go into one daily digest.
   (both Role: owner, pushed). `pin-fecb870c` kept for rollback. Smoke test: pinned gov check exit 0 after one
   rebuild (15 GREEN, 2 known YELLOW: openspec not on PATH, citation warnings); guard allow/deny/exit-2 by the exact
   hook line; hooks and declared checks run the pin's python (-E / -P). Logs `log/repin1-smoke-*`.
+
+## Moved from RESUME HERE on 2026-10-27 (first queue run, P-REPIN-R1)
+- **Queue run 2026-10-26 22:02 (`log/close-queue-20261026-2157/`):** W2-70 (DAEO-uzme) close REFUSED exit 3 after 68 min
+  (count 1; repair DAEO-2upp committed by the close `9fbaf969`); queue stopped; 6 others not run. 9 reds, none W2-70's:
+  W1-01 docs_source x4 + W1-47 docs/source x2 (enforce the dropped deny rules: my DEC-866 sweep miss), W1-49
+  precompact [not on PATH] (new lifecycle hook line exits 1 without gov), W1-06 (registry approved_by DEC-921 ->
+  should be DEC-922; my repin_registry.py), W2-69 unit folder (pycache leftover: REMOVED). Package P-REPIN-R1 (P1,
+  `dbfb76f0`): rec (a) LITE W2-74 test revisions + W2-69 case id rename + registry line by me; interim the warning
+  leaves out .gov-runtime/close/ (the judge's JUnit holds the keyword via W2-69's case name, no hash).
