@@ -11115,7 +11115,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.312 | 2026-10-27 | Delegated (orchestrator): DEC-926 (after W2-74's merge, the keyword warning leaves out only the four JUnit files of W2-70's refused close, by exact path; W2-69 out of the queue for a re-probe; W2-07's round 2 merges after the queue). Next free id: DEC-927. |
 
 ### DEC-927 — P-TRACE-IMPL-1 (a) with two conditions: the 39 commits whose `Implements:` names a role are accepted as history as corrections, by the owner's own commit; a wrong `Implements:` is caught within the ticket (standing)
-- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-734, DEC-891, DEC-895, DEC-862 (a), DEC-925 item 2, DEC-851, DEC-861 · **Basis:** package P-TRACE-IMPL-1 (`governance/project/orchestration/packages/P-TRACE-IMPL-1.md`). After W2-70's close (2026-10-27, exit 0), gate (b) went red on product traceability: a closed ticket's commits must name ids the store resolves, and seven of W2-70's carry `Implements: independent-test-designer`. The lead briefs' `IMPL` slot had been filled with a role, so leads and their workers wrote a role there in 39 commits of six tickets on `w2/integrate` (and two on W2-57's branch).
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-734, DEC-891, DEC-895, DEC-862 (a), DEC-925 item 2, DEC-851, DEC-861 · **Basis:** package P-TRACE-IMPL-1 (`governance/project/orchestration/packages/P-TRACE-IMPL-1.md`). After W2-70's close (2026-10-27, exit 0), gate (b) went red on product traceability: a closed ticket's commits must name ids the store resolves, and seven of W2-70's carry `Implements: independent-test-designer`. The lead briefs' `IMPL` slot had been filled with a role, so leads and their workers wrote a role there in 39 commits of six tickets on `w2/integrate` (and two on W2-57's branch). · **Changed by:** DEC-928: the CAP-n reading of item 2 is accepted by the owner; the entries are committed (`e95d3520`).
 - **Decision:**
   1. **(a), one `Role: owner` commit of all 39 entries, each a correction, not a bare exemption.** Each entry in the path map's `accepted_history` is `{commit: <full id>, decision: DEC-927, should_implement: [<ids>]}`. `should_implement` holds the decision ids the commit should have named in `Implements:`, taken from its Task ticket's `sources` that the register holds.
      - 26 of the commits change only records, and 13 change code, tests or notes (DEC-891).
@@ -11179,3 +11179,17 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.313 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-927 (P-TRACE-IMPL-1 (a): 39 commits whose Implements names a role accepted as history by the owner's commit, each entry a correction naming the decision ids it should have implemented; standing: each lead checks its commits' Implements before it returns and gate (e) checks the same; briefs fill Implements with ids only). Next free id: DEC-928. |
+
+### DEC-928 — DEC-927's reading accepted (Contract ids the store holds are valid `Implements:` targets); DEC-926 stands; an ACT names a plain terminal only when it replaces or reinstalls gov (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 3 standing) · **Under:** DEC-927, DEC-926, DEC-925 item 2, DEC-851, DEC-861 · **Basis:** the owner's commit `e95d3520` (DEC-927's 39 accepted-history entries, `Role: owner`) and push of both branches (`w2/integrate` at `e95d3520`, `record/w2` at `2a056c80`). After it, the pinned `gov.close.traceability` exits 0 with no findings.
+- **Decision:**
+  1. **DEC-927's reading is accepted.** Contract ids that the store holds (`CAP-n`) are valid `Implements:` targets, as the judge reads them. Roles and other words stay refused. Gate (e) and the leads' check stand as recorded in DEC-927 item 2.
+  2. **DEC-926 stands.**
+  3. **ACT wording (owner, standing).** An ACT says "a plain terminal, not a Claude session" only when it replaces or reinstalls gov itself, as a re-pin does. For an owner commit of a patch, the owner's operator runs it.
+- **Done:** W2-69's judgement-only re-probe passed and merged (`PR-DAEO-rmbe-reprobe-1.md`); the queue restarts with W2-66, W2-69 included.
+- **Where it goes (DEC-851):** this register, with DEC-927's status line noting the acceptance; the prompt §7 (ACT files), v3.31; RESUME HERE.
+- Next free id: DEC-929.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.314 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-928 (DEC-927's CAP-n reading accepted; DEC-926 stands; standing: an ACT names a plain terminal only when it replaces or reinstalls gov, otherwise the owner's operator runs it). Next free id: DEC-929. |
