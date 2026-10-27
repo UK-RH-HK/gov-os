@@ -89,10 +89,14 @@ removing returned leads' temp folders after the holder check).
    reds = its second -> package. NO main-tree commit while it runs. keyword_warn: interim line removed; DEC-926 leaves
    out only the refused close's 4 JUnit files (exact paths).
 2. **After the queue:** (a) launch W2-69's judgement-only re-probe (`briefs/W2-69-A5-run3.md`, built; worktree
-   `34e1c59f06e6`), then merge it and close W2-69; (b) merge W2-07 r2 (`75048114`; shared core, so not during the
-   queue); W2-57 run 2 (task bmlp2i9u5) is in flight: the second of W2-57/W2-07 to merge merges back.
-3. W2-57 / W2-07 r2 merges: second merger merges back + re-verifies + fresh probe if stale (DEC-924/925). On W2-57's
-   merge, commit its load_sensitive removals (6 ready + any the route frees). W2-07 r2 rides the second re-pin.
+   `34e1c59f06e6`), then merge it and close W2-69; (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
+   review 2 pass, probe `PR-DAEO-cy5o-review-2.md`; serial 104 cases 11:48 vs 180 17:40; nightly batch 76 green),
+   then commit its 30 load_sensitive removals (W1-38 x3, W1-07 [doctor], W1-30 r13, unit close follow-up, W1-46 x23,
+   W1-19 warm p95; list in `log/W2-57-A5-run2.json`); (c) W2-07 r2 SECOND: lead merges integrate back + re-verifies
+   (STANDARD, no probe). Temp folders of W2-57 and W2-07 removed.
+3. W2-57's proposals for the digest/owner: P-1 (entry criterion on row W2-M406's fix: gov.close.nightly must run both
+   routes; DEC-803, mine to record); P-2 (DEC-549 P-4 re-baseline (c): owner, DEC-105 options); P-R2-T1 (mark DEC-373
+   changed by DEC-925 + W1-19 README via a ticket); rows F3/F4/O2/O3, run 1 F3/F4/O1; W1-09 condition.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
 4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
    then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.
