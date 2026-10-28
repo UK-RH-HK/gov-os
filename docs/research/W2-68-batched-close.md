@@ -56,10 +56,9 @@ The `fingerprints` row is kept out of the store's digest and out of the graph's 
 
 1. **Read and refuse (exit 1, nothing run).** The batch refuses unless all of these hold:
    - the working tree is HEAD (`repo.tree_differences`, as the close reads it);
-   - every ticket named is a ticket of the project and is not closed;
-   - HEAD's code fingerprint can be computed. Otherwise the batch refuses with `FINGERPRINT_UNKNOWN`, and the caller closes the tickets one by one, each on a fresh run.
+   - every ticket named is a ticket of the project and is not closed.
 
-   The batch's head H and its code fingerprint F are fixed here.
+   The batch's head H and its code fingerprint F are fixed here. Where HEAD's fingerprints cannot be computed (no test map, an invalid one), the batch still runs steps 2 to 7, its record stating the fingerprints as null, and each close of step 9 then runs fresh (section 11, point E).
 2. **One full rebuild** at H, with `gov rebuild`'s own code and never `--no-embeddings`. The store records H, F and the records fingerprint.
 3. **One `gov check`** at H (`gov.check.runner.run_checks`). Its result is written to `.gov-runtime/close/batch/<stamp>/check.json`. A blocking result ends the batch red (exit 3): no regression runs and nothing closes.
 4. **One full regression** at H in the close's form. This is `nightly.night` on H: a detached worktree, one parallel run, then the serial-only cases, the per-test limit, retention `failed` and JUnit XML.
@@ -72,17 +71,18 @@ The `fingerprints` row is kept out of the store's digest and out of the graph's 
    - Each attribution keeps its evidence: the test, its failure text, its run alone, and either the bisect range and first bad commit or the folder.
    - The run's verdict is red if any test failed in it, flaky candidates included. **Nothing closes on a red run.**
 6. **No code merge during a batch.** At the end the batch reads HEAD again. If HEAD's code fingerprint is not F, the batch ends with `BATCH_CODE_CHANGED` (exit 1). Its run is still valid for H, but it serves no close at another code.
-7. **The record** is `docs/close/nightly/NR-<stamp>-<H12>.json`: the nightly's record plus `kind: batch`, `tickets`, `code_fingerprint`, `records_fingerprint`, `skip_count`, `skips`, `check_result` (path, commit, blocks) and `attribution`. The batch exits 0 on green and 3 on red, with the API-0002 envelope. The batch commits nothing: the caller commits the record before the first close. That commit is record-only, because `docs/close/nightly/*.json` is on the record-only list.
+7. **The record** is `docs/close/nightly/NR-<stamp>-<H12>.json`: the nightly's record plus `kind: batch`, `tickets`, `code_fingerprint`, `records_fingerprint`, `skip_count`, `skips`, `check_result` (path, commit, blocks) and `attribution`.
+8. **The batch commits the run record** (a record-only path, since `docs/close/nightly/*.json` is on the record-only list) in a commit that names no task: trailers `Role: <the caller's GOV_ROLE, else orchestrator>`, `Implements: DEC-883`, and a `Co-Authored-By` only where the caller's environment gives one. A red run's record is committed too, and the batch ends there (exit 3): **nothing closes on a red run.**
+9. **The batch closes each ticket, one after another, in the order given** (section 11, point E):
+   - before each close, it makes the store fresh at HEAD: the incremental record load (section 5) where the store's code fingerprint equals HEAD's; else (a fingerprint that cannot be computed) a full rebuild at HEAD;
+   - it runs `gov close <ticket>` in-process (the close's own code path, with `--check-result` set to the batch's `check.json`), which finds the batch's run by reuse (section 4) and runs only its own checks: its acceptance suite, the record-reading set, its trailers, paths, probe record and checkpoint;
+   - it commits the close's outputs as the orchestrator's queue does today (the ticket file, `docs/close/<ticket>/`, `docs/checkpoints/<ticket>/`; trailers `Task: <ticket>`, `Implements: DEC-883`, `Role: <as in step 8>`), so the next close finds a clean tree;
+   - **a refused close ends the batch** (the owner's queue rule of 2026-10-27: a refusal ends the queue with a non-zero status). The closes before it stand, the tickets after it are not closed, the envelope names the refusal (its code and its findings), exit 3. What the refused close left (its repair ticket) is left in the tree, uncommitted.
 
-`python3 -m gov.close.batch refresh --root <project> --json` runs the incremental record load (section 5) at HEAD, between closes.
+   Each close record cites the batch's run (record, commit, fingerprint, JUnit XML) and states `scope: reused`. Where HEAD's fingerprints cannot be computed, each close runs fresh: no reuse, its own `gov check`, a full rebuild before it.
+10. **The envelope** (API-0002) gives the run record, each ticket's close (its record path, or its refusal) and the store loads made. The batch exits 0 when the run is green and every ticket closed, 3 on a red run or a refused close, 1 on a refusal of step 1 or step 6.
 
-Then the caller (the orchestrator's queue) closes each ticket **one after another**:
-
-1. `refresh`;
-2. `gov close <ticket> --check-result <the batch's check.json>`;
-3. commit the close's outputs.
-
-Each close finds the batch's run by reuse (section 4) and runs only its own checks: its acceptance suite, the record-reading set, its trailers, paths, probe record and checkpoint. Each close record cites the batch's run (record, commit, fingerprint, JUnit XML) and states `scope: reused`.
+`python3 -m gov.close.batch refresh --root <project> --json` runs the incremental record load (section 5) at HEAD on its own. It exits 0 when the store is fresh at HEAD after the load, and 1 with the error's code otherwise.
 
 ## 4. Reuse: "the last fully passing run" (in `batch.py`, called from the close)
 
@@ -95,7 +95,7 @@ A candidate is reused only if **all** of the following hold. Each failure means 
 1. Its head is a full commit id of the repository, and is HEAD or an ancestor of HEAD.
 2. It is a full run: `scope: full`. A scoped or reused close is never a candidate, so reuse never chains.
 3. It passed, with no failure stated: `evidence.failures` is empty, or for a night both `failures` and `findings` are empty. A run whose close needed a load-sensitive re-run or an accepted red is not reused.
-4. Every JUnit XML file it names exists, parses, holds at least one test case and holds no `failure` or `error`. A run cut short is never reused, whether its file is a placeholder with no case or is missing.
+4. It names at least one JUnit XML file, and every JUnit XML file it names exists, parses, holds at least one test case and holds no `failure` or `error`. A run cut short is never reused, whether its file is a placeholder with no case or is missing. A record that names none (an empty `junit_xml`, as W2-66's planted green nights) is never reused.
 5. The skip count read from its JUnit XML equals the count the record states: a close's or a batch's `skip_count`, or a night's `tests_run.skipped`. A record that states neither is not reused (section 11, point D).
 6. The code fingerprint of its head, computed now, equals HEAD's, and also equals the fingerprint the record states, where it states one. If HEAD's code fingerprint cannot be computed, nothing is reused.
 7. The close was not asked `--full`, and W2-66's plan gives no `TEST_MAP_*` or `UNRESOLVED_TARGET` reason.
@@ -146,7 +146,7 @@ Otherwise the close runs its own check, as today. Today the pre-close gate runs 
 | Step | Reads |
 |---|---|
 | fingerprints | the git objects of one commit (`ls-tree`, `show` of the test map), the test-map schema |
-| batch `run` | the working tree's status, the ticket files, HEAD; then the reads of the rebuild, `gov check` and the nightly |
+| batch `run` | the working tree's status, the ticket files, HEAD; then the reads of the rebuild, `gov check` and the nightly; then, for each close, the reads of the store load before it and of `gov close` itself, and the status of the close's outputs it commits |
 | reuse | the committed close records' frontmatter and the nightly folder's JSON (as `select._green_heads` reads them), the JUnit XML files they name, git ancestry, the fingerprints |
 | batch `refresh` | the store's fingerprints row, HEAD's tree and log, the tracked files' blobs |
 | store check | the store's `commits` table and fingerprints row, HEAD's fingerprints |
@@ -175,7 +175,7 @@ The design needs no change to `select.py`, `evidence.py`, `nightly.py`, `src/gov
 
 ## 9. Known limits (residuals, not this ticket)
 
-- The orchestrator's `close_queue.sh` and its skip guard (DEC-899 item 7) must call the batch and read the `reused` block's skip count. That is the orchestrator's tooling.
+- The orchestrator's `close_queue.sh` must call the batch, and keeps its own gates around it: the keyword warning, the collection, the network check, the gitleaks scan of the staged outputs, and the skip guard (DEC-899 item 7) reading the `reused` block's skip count. That is the orchestrator's tooling. The batch does not run gitleaks on what it commits (the run record of step 8, each close's outputs of step 9).
 - The nightly's selection-miss rule (`nightly._scoped_closes`) reads only `scoped` closes. A red outside the record-reading set after a `reused` close is therefore not named as that close's miss. `nightly.py` is not in this ticket's paths, so this goes to a row.
 - Equal fingerprints say the tree is the same, not the machine: installed packages, the interpreter and the pinned judge are all outside the tree.
 - Reuse needs the reused run's JUnit XML, which lives under `.gov-runtime/` and is not committed. On another clone or after a clean-up, condition 4 fails and the close runs fresh. That is safe, but it saves nothing there.
@@ -195,7 +195,7 @@ Figures: to be added after implementation.
 
 ## 11. Settled points
 
-The engineer returned four points from the check against the code; the lead settled each.
+The engineer returned four points from the check against the code (A to D); the lead settled each, and added point E after the acceptance tests were written.
 
 - **A. The batch's `gov check` serves closes whose records differ from H.**
   - *The point:* after the first close, HEAD is H plus record-only commits (close records, ticket status, checkpoints). `gov check`'s declared checks read records, and `_check_governance` today stands only on a result of the commit being closed.
@@ -213,6 +213,10 @@ The engineer returned four points from the check against the code; the lead sett
   - *The point:* a night's record states no `skip_count` or `skips`, only `tests_run.skipped`.
   - *Answer:* a night's stated skip count is its `tests_run.skipped`; a batch's record states `skip_count` and `skips` itself. Condition 5 compares the count read from the JUnit XML with whichever the record states; a record that states neither is not reused.
   - *Why:* every candidate then has one stated count to check, and a record with none cannot show that it hides no skip.
+- **E. The batch drives the whole batch, its closes included** (the lead's amendment).
+  - *The point:* the acceptance tests read DEC-883 item 1 ("queued closes on one integrated head ... then each ticket's own checks, one after another") as one command that closes the tickets; the draft left the closes to the caller.
+  - *Answer:* `python3 -m gov.close.batch run` does, after steps 1 to 7 of section 3, step 8 (it commits the run record, in a commit that names no task; a red run's record is committed too and the batch ends there, exit 3), step 9 (it closes each ticket one after another in the order given: the store made fresh at HEAD before each close, by the incremental record load where the code fingerprint equals HEAD's, else a full rebuild; `gov close` in-process with the batch's check result; the close's outputs committed as the orchestrator's queue does today; a refused close ends the batch, exit 3, the closes before it standing, its repair ticket left uncommitted) and step 10 (the envelope: the run record, each close, the store loads). A fingerprint that cannot be computed no longer refuses the batch (`FINGERPRINT_UNKNOWN` is gone): the batch runs, its record states the fingerprints as null, and each close runs fresh. A record that names no JUnit XML file is never reused (condition 4). The queue keeps its own gates around a batch, and the batch runs no gitleaks scan on what it commits (section 9).
+  - *Why:* that is the better reading of a merge queue: one command takes the queued tickets from one head to closed, or stops at the first refusal as the owner's queue rule of 2026-10-27 does.
 
 ## 12. Corrections to the lead's draft
 
