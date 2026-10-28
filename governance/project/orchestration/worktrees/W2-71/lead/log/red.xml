@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="23" skipped="0" tests="213" time="38.974" timestamp="2026-10-28T22:49:02.503774+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_premise_every_quoted_id_names_a_commit_of_the_project" time="1.440" /><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_premise_the_line_is_a_finding_of_row_w2_l423s_rule_and_of_no_other[vendor-keyword]" time="0.616" /><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_premise_the_line_is_a_finding_of_row_w2_l423s_rule_and_of_no_other[prefix-keyword]" time="0.607" /><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_premise_the_every_commit_log_is_a_finding_of_row_w2_l423s_rule_only" time="0.632" /><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check[file-vendor-keyword]" time="0.001"><failure message="AssertionError: the check reports .gov-runtime/scratch/review-vendor-keyword/review.log (a commit hash of this repository after the rule's keyword, file) as a finding&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/every-commit/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log&#10;  secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db&#10;  secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('file', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        named = scene.check.names(rel)
+&gt;       assert not named, (f"the check reports {rel} (a commit hash of this repository after the rule's keyword, "
+                           f"{place[0]}) as a finding\n{scene.check.describe()}")
+E       AssertionError: the check reports .gov-runtime/scratch/review-vendor-keyword/review.log (a commit hash of this repository after the rule's keyword, file) as a finding
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/every-commit/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log
+E         secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db
+E         secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:95: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check[file-prefix-keyword]" time="0.001"><failure message="AssertionError: the check reports .gov-runtime/scratch/review-prefix-keyword/review.log (a commit hash of this repository after the rule's keyword, file) as a finding&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/every-commit/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log&#10;  secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db&#10;  secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('file', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        named = scene.check.names(rel)
+&gt;       assert not named, (f"the check reports {rel} (a commit hash of this repository after the rule's keyword, "
+                           f"{place[0]}) as a finding\n{scene.check.describe()}")
+E       AssertionError: the check reports .gov-runtime/scratch/review-prefix-keyword/review.log (a commit hash of this repository after the rule's keyword, file) as a finding
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/every-commit/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log
+E         secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db
+E         secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:95: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check[store-vendor-keyword]" time="0.001"><failure message="AssertionError: the check reports .gov-runtime/stores/review-vendor-keyword.db (a commit hash of this repository after the rule's keyword, store) as a finding&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/every-commit/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log&#10;  secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db&#10;  secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('store', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        named = scene.check.names(rel)
+&gt;       assert not named, (f"the check reports {rel} (a commit hash of this repository after the rule's keyword, "
+                           f"{place[0]}) as a finding\n{scene.check.describe()}")
+E       AssertionError: the check reports .gov-runtime/stores/review-vendor-keyword.db (a commit hash of this repository after the rule's keyword, store) as a finding
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/every-commit/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log
+E         secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db
+E         secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:95: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check[store-prefix-keyword]" time="0.001"><failure message="AssertionError: the check reports .gov-runtime/stores/review-prefix-keyword.db (a commit hash of this repository after the rule's keyword, store) as a finding&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/every-commit/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log&#10;  secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db&#10;  secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('store', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        named = scene.check.names(rel)
+&gt;       assert not named, (f"the check reports {rel} (a commit hash of this repository after the rule's keyword, "
+                           f"{place[0]}) as a finding\n{scene.check.describe()}")
+E       AssertionError: the check reports .gov-runtime/stores/review-prefix-keyword.db (a commit hash of this repository after the rule's keyword, store) as a finding
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/every-commit/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log
+E         secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db
+E         secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:95: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check[file-every-commit]" time="0.000"><failure message="AssertionError: the check reports .gov-runtime/scratch/every-commit/review.log (a commit hash of this repository after the rule's keyword, file) as a finding&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/every-commit/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log&#10;  secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db&#10;  secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('file', 'every-commit')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_is_no_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        named = scene.check.names(rel)
+&gt;       assert not named, (f"the check reports {rel} (a commit hash of this repository after the rule's keyword, "
+                           f"{place[0]}) as a finding\n{scene.check.describe()}")
+E       AssertionError: the check reports .gov-runtime/scratch/every-commit/review.log (a commit hash of this repository after the rule's keyword, file) as a finding
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/every-commit/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log
+E         secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db
+E         secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:95: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_the_check_is_clean_on_a_runtime_folder_that_holds_only_commit_hashes_of_this_repository" time="0.000"><failure message="AssertionError: the check is not clean on a runtime folder whose only matches are commit hashes of this repository&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/every-commit/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log&#10;  secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log&#10;  secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db&#10;  secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert 1 == 0&#10; +  where 1 = CheckRun(exit code 1, 0.7 s).returncode&#10; +    where CheckRun(exit code 1, 0.7 s) = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;.check">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+
+    def test_the_check_is_clean_on_a_runtime_folder_that_holds_only_commit_hashes_of_this_repository(scene):
+&gt;       assert scene.check.returncode == 0, ("the check is not clean on a runtime folder whose only matches are commit "
+                                             f"hashes of this repository\n{scene.check.describe()}")
+E       AssertionError: the check is not clean on a runtime folder whose only matches are commit hashes of this repository
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/every-commit/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-prefix-keyword/review.log
+E         secret found in derived store: .gov-runtime/scratch/review-vendor-keyword/review.log
+E         secret found in derived store: .gov-runtime/stores/review-prefix-keyword.db
+E         secret found in derived store: .gov-runtime/stores/review-vendor-keyword.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert 1 == 0
+E        +  where 1 = CheckRun(exit code 1, 0.7 s).returncode
+E        +    where CheckRun(exit code 1, 0.7 s) = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;.check
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:100: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter[file-vendor-keyword]" time="0.000"><failure message="AssertionError: the filter leaves out docs/review-vendor-keyword.md (a commit hash of this repository after the rule's keyword, file)&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('file', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        passes = scene.filter.passes(rel)
+&gt;       assert passes, (f"the filter leaves out {rel} (a commit hash of this repository after the rule's keyword, "
+                        f"{place[0]})\n{scene.filter.describe()}")
+E       AssertionError: the filter leaves out docs/review-vendor-keyword.md (a commit hash of this repository after the rule's keyword, file)
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:110: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter[file-prefix-keyword]" time="0.000"><failure message="AssertionError: the filter leaves out docs/review-prefix-keyword.md (a commit hash of this repository after the rule's keyword, file)&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('file', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        passes = scene.filter.passes(rel)
+&gt;       assert passes, (f"the filter leaves out {rel} (a commit hash of this repository after the rule's keyword, "
+                        f"{place[0]})\n{scene.filter.describe()}")
+E       AssertionError: the filter leaves out docs/review-prefix-keyword.md (a commit hash of this repository after the rule's keyword, file)
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:110: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter[store-vendor-keyword]" time="0.000"><failure message="AssertionError: the filter leaves out docs/review-vendor-keyword.db (a commit hash of this repository after the rule's keyword, store)&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('store', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        passes = scene.filter.passes(rel)
+&gt;       assert passes, (f"the filter leaves out {rel} (a commit hash of this repository after the rule's keyword, "
+                        f"{place[0]})\n{scene.filter.describe()}")
+E       AssertionError: the filter leaves out docs/review-vendor-keyword.db (a commit hash of this repository after the rule's keyword, store)
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:110: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter[store-prefix-keyword]" time="0.000"><failure message="AssertionError: the filter leaves out docs/review-prefix-keyword.db (a commit hash of this repository after the rule's keyword, store)&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('store', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        passes = scene.filter.passes(rel)
+&gt;       assert passes, (f"the filter leaves out {rel} (a commit hash of this repository after the rule's keyword, "
+                        f"{place[0]})\n{scene.filter.describe()}")
+E       AssertionError: the filter leaves out docs/review-prefix-keyword.db (a commit hash of this repository after the rule's keyword, store)
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:110: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter[file-every-commit]" time="0.000"><failure message="AssertionError: the filter leaves out docs/every-commit.md (a commit hash of this repository after the rule's keyword, file)&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">scene = &lt;test_w2_71_exemption.Scene object at 0x7999507bbef0&gt;
+place = ('file', 'every-commit')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_a_commit_hash_of_this_repository_beside_the_keyword_passes_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        passes = scene.filter.passes(rel)
+&gt;       assert passes, (f"the filter leaves out {rel} (a commit hash of this repository after the rule's keyword, "
+                        f"{place[0]})\n{scene.filter.describe()}")
+E       AssertionError: the filter leaves out docs/every-commit.md (a commit hash of this repository after the rule's keyword, file)
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:110: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_beside_a_real_token_the_check_names_the_token_and_not_the_commit_hash[file]" time="1.380"><failure message="AssertionError: the check names the file that holds only a commit hash of this repository, beside a real finding elsewhere&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/exempt.log&#10;  secret found in derived store: .gov-runtime/scratch/token.log&#10;  secret found in derived store: .gov-runtime/stores/exempt.db&#10;  secret found in derived store: .gov-runtime/stores/token.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">mixed = &lt;test_w2_71_exemption.Mixed object at 0x79995063b890&gt;, form = 'file'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_beside_a_real_token_the_check_names_the_token_and_not_the_commit_hash(mixed, form):
+        assert mixed.check.ended, f"the check did not end\n{mixed.check.describe()}"
+        token_named = mixed.check.names(mixed.token[form])
+        exempt_named = mixed.check.names(mixed.exempt[form])
+        assert token_named, f"the check does not name the token's {form}\n{mixed.check.describe()}"
+&gt;       assert not exempt_named, (f"the check names the {form} that holds only a commit hash of this repository, beside "
+                                  f"a real finding elsewhere\n{mixed.check.describe()}")
+E       AssertionError: the check names the file that holds only a commit hash of this repository, beside a real finding elsewhere
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/exempt.log
+E         secret found in derived store: .gov-runtime/scratch/token.log
+E         secret found in derived store: .gov-runtime/stores/exempt.db
+E         secret found in derived store: .gov-runtime/stores/token.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:149: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_beside_a_real_token_the_check_names_the_token_and_not_the_commit_hash[store]" time="0.001"><failure message="AssertionError: the check names the store that holds only a commit hash of this repository, beside a real finding elsewhere&#10;  exit code: 1 after 0.7 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/exempt.log&#10;  secret found in derived store: .gov-runtime/scratch/token.log&#10;  secret found in derived store: .gov-runtime/stores/exempt.db&#10;  secret found in derived store: .gov-runtime/stores/token.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">mixed = &lt;test_w2_71_exemption.Mixed object at 0x79995063b890&gt;, form = 'store'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_beside_a_real_token_the_check_names_the_token_and_not_the_commit_hash(mixed, form):
+        assert mixed.check.ended, f"the check did not end\n{mixed.check.describe()}"
+        token_named = mixed.check.names(mixed.token[form])
+        exempt_named = mixed.check.names(mixed.exempt[form])
+        assert token_named, f"the check does not name the token's {form}\n{mixed.check.describe()}"
+&gt;       assert not exempt_named, (f"the check names the {form} that holds only a commit hash of this repository, beside "
+                                  f"a real finding elsewhere\n{mixed.check.describe()}")
+E       AssertionError: the check names the store that holds only a commit hash of this repository, beside a real finding elsewhere
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/exempt.log
+E         secret found in derived store: .gov-runtime/scratch/token.log
+E         secret found in derived store: .gov-runtime/stores/exempt.db
+E         secret found in derived store: .gov-runtime/stores/token.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:149: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_beside_a_real_token_the_filter_passes_the_commit_hash_and_not_the_token[file]" time="0.000"><failure message="AssertionError: the filter leaves out the file that holds only a commit hash of this repository&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">mixed = &lt;test_w2_71_exemption.Mixed object at 0x79995063b890&gt;, form = 'file'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_beside_a_real_token_the_filter_passes_the_commit_hash_and_not_the_token(mixed, form):
+        token_passes = mixed.filter.passes(mixed.token_docs[form])
+        exempt_passes = mixed.filter.passes(mixed.exempt_docs[form])
+        assert not token_passes, f"the filter passes the token's {form}\n{mixed.filter.describe()}"
+&gt;       assert exempt_passes, (f"the filter leaves out the {form} that holds only a commit hash of this repository\n"
+                               f"{mixed.filter.describe()}")
+E       AssertionError: the filter leaves out the file that holds only a commit hash of this repository
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_beside_a_real_token_the_filter_passes_the_commit_hash_and_not_the_token[store]" time="0.000"><failure message="AssertionError: the filter leaves out the store that holds only a commit hash of this repository&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">mixed = &lt;test_w2_71_exemption.Mixed object at 0x79995063b890&gt;, form = 'store'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_beside_a_real_token_the_filter_passes_the_commit_hash_and_not_the_token(mixed, form):
+        token_passes = mixed.filter.passes(mixed.token_docs[form])
+        exempt_passes = mixed.filter.passes(mixed.exempt_docs[form])
+        assert not token_passes, f"the filter passes the token's {form}\n{mixed.filter.describe()}"
+&gt;       assert exempt_passes, (f"the filter leaves out the {form} that holds only a commit hash of this repository\n"
+                               f"{mixed.filter.describe()}")
+E       AssertionError: the filter leaves out the store that holds only a commit hash of this repository
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_premise_the_worktree_quotes_commits_its_repository_holds" time="1.337" /><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_in_a_linked_worktree_a_commit_of_its_repository_is_no_finding_of_the_check[file]" time="0.001"><failure message="AssertionError: in a linked worktree the check reports the file that quotes commits of its repository&#10;  exit code: 1 after 0.6 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/lead.log&#10;  secret found in derived store: .gov-runtime/stores/lead.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">worktree = &lt;test_w2_71_exemption.Worktree object at 0x79995063aa50&gt;
+form = 'file'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_in_a_linked_worktree_a_commit_of_its_repository_is_no_finding_of_the_check(worktree, form):
+        assert worktree.check.ended, f"the check did not end\n{worktree.check.describe()}"
+        named = worktree.check.names(worktree.check_rels[form])
+&gt;       assert not named, (f"in a linked worktree the check reports the {form} that quotes commits of its repository\n"
+                           f"{worktree.check.describe()}")
+E       AssertionError: in a linked worktree the check reports the file that quotes commits of its repository
+E         exit code: 1 after 0.6 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/lead.log
+E         secret found in derived store: .gov-runtime/stores/lead.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_in_a_linked_worktree_a_commit_of_its_repository_is_no_finding_of_the_check[store]" time="0.000"><failure message="AssertionError: in a linked worktree the check reports the store that quotes commits of its repository&#10;  exit code: 1 after 0.6 s&#10;  stdout (tail, masked):&#10;  secret found in derived store: .gov-runtime/scratch/lead.log&#10;  secret found in derived store: .gov-runtime/stores/lead.db&#10;  &#10;  stderr (tail, masked):&#10;  &#10;assert not True">worktree = &lt;test_w2_71_exemption.Worktree object at 0x79995063aa50&gt;
+form = 'store'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_in_a_linked_worktree_a_commit_of_its_repository_is_no_finding_of_the_check(worktree, form):
+        assert worktree.check.ended, f"the check did not end\n{worktree.check.describe()}"
+        named = worktree.check.names(worktree.check_rels[form])
+&gt;       assert not named, (f"in a linked worktree the check reports the {form} that quotes commits of its repository\n"
+                           f"{worktree.check.describe()}")
+E       AssertionError: in a linked worktree the check reports the store that quotes commits of its repository
+E         exit code: 1 after 0.6 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/lead.log
+E         secret found in derived store: .gov-runtime/stores/lead.db
+E         
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:197: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_in_a_linked_worktree_a_commit_of_its_repository_passes_the_filter[file]" time="0.000"><failure message="AssertionError: in a linked worktree the filter leaves out the file that quotes commits of its repository&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">worktree = &lt;test_w2_71_exemption.Worktree object at 0x79995063aa50&gt;
+form = 'file'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_in_a_linked_worktree_a_commit_of_its_repository_passes_the_filter(worktree, form):
+        passes = worktree.filter.passes(worktree.filter_rels[form])
+&gt;       assert passes, (f"in a linked worktree the filter leaves out the {form} that quotes commits of its repository\n"
+                        f"{worktree.filter.describe()}")
+E       AssertionError: in a linked worktree the filter leaves out the file that quotes commits of its repository
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:204: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_exemption" name="test_in_a_linked_worktree_a_commit_of_its_repository_passes_the_filter[store]" time="0.003"><failure message="AssertionError: in a linked worktree the filter leaves out the store that quotes commits of its repository&#10;  the filter's exit code: 0 after 0.7 s; paths returned: 0&#10;  stderr (tail, masked):&#10;  &#10;assert False">worktree = &lt;test_w2_71_exemption.Worktree object at 0x79995063aa50&gt;
+form = 'store'
+
+    @pytest.mark.parametrize("form", ["file", "store"])
+    def test_in_a_linked_worktree_a_commit_of_its_repository_passes_the_filter(worktree, form):
+        passes = worktree.filter.passes(worktree.filter_rels[form])
+&gt;       assert passes, (f"in a linked worktree the filter leaves out the {form} that quotes commits of its repository\n"
+                        f"{worktree.filter.describe()}")
+E       AssertionError: in a linked worktree the filter leaves out the store that quotes commits of its repository
+E         the filter's exit code: 0 after 0.7 s; paths returned: 0
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_exemption.py:204: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_keywords_in_parts" name="test_premise_the_list_holds_this_suites_own_files" time="0.008" /><testcase classname="tests.acceptance.W2-71.test_w2_71_keywords_in_parts" name="test_no_file_the_branch_writes_holds_a_keyword_of_row_w2_l423s_rule_whole" time="0.007" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_premise_every_run_went_through_the_logging_gitleaks_and_ended" time="3.723" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_premise_the_check_found_the_findings_and_the_filter_left_them_out" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_gitleaks_call_is_given_a_report_file[check-1]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_gitleaks_call_is_given_a_report_file[check-2]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_gitleaks_call_is_given_a_report_file[filter]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_temp_folder_given_to_the_check_holds_no_file_after_the_run[check-1]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_temp_folder_given_to_the_check_holds_no_file_after_the_run[check-2]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_temp_folder_given_to_the_check_holds_no_file_after_the_run[filter]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_project_holds_no_new_or_changed_file_but_the_clean_record[check-1]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_project_holds_no_new_or_changed_file_but_the_clean_record[check-2]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_project_holds_no_new_or_changed_file_but_the_clean_record[filter]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_match_and_no_keyword_is_printed[check-1-stdout]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_match_and_no_keyword_is_printed[check-1-stderr]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_match_and_no_keyword_is_printed[check-2-stdout]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_match_and_no_keyword_is_printed[check-2-stderr]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_match_and_no_keyword_is_printed[filter-stdout]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_match_and_no_keyword_is_printed[filter-stderr]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_clean_record_holds_no_file_or_store_with_a_finding_and_no_match[check-1]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_clean_record_holds_no_file_or_store_with_a_finding_and_no_match[check-2]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_a_finding_is_found_again_on_the_next_run" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_a_commit_hash_that_cannot_be_verified_is_not_recorded_clean" time="0.641" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets[.gov-runtime/top.log]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets[.gov-runtime/scratch/lead.log]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets[.gov-runtime/scratch/a/b/c/deep.log]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets[.gov-runtime/stores/plain.db]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets[.gov-runtime/scratch/exempt.log]" time="0.000"><failure message="AssertionError: the check gave .gov-runtime/scratch/exempt.log (exempt) to gitleaks with the rule sets ['extended'], not both&#10;assert {'alone', 'extended'} &lt;= {'extended'}&#10;  &#10;  Extra items in the left set:&#10;  'alone'">scene = &lt;test_w2_71_nothing_printed_or_written.Scene object at 0x799950709940&gt;
+rel = '.gov-runtime/scratch/exempt.log'
+
+    @pytest.mark.parametrize("rel", CHECK_MARKED)
+    def test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets(scene, rel):
+        marker, _, kind = scene.check_files[rel]
+        seen = _sets_seen(scene.calls["check-1"], _mark(marker))
+&gt;       assert {"extended", "alone"} &lt;= seen, (f"the check gave {rel} ({kind}) to gitleaks with the rule sets "
+                                               f"{sorted(seen)}, not both")
+E       AssertionError: the check gave .gov-runtime/scratch/exempt.log (exempt) to gitleaks with the rule sets ['extended'], not both
+E       assert {'alone', 'extended'} &lt;= {'extended'}
+E         
+E         Extra items in the left set:
+E         'alone'
+
+tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py:216: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets[.gov-runtime/stores/exempt.db]" time="0.000"><failure message="AssertionError: the check gave .gov-runtime/stores/exempt.db (exempt) to gitleaks with the rule sets ['extended'], not both&#10;assert {'alone', 'extended'} &lt;= {'extended'}&#10;  &#10;  Extra items in the left set:&#10;  'alone'">scene = &lt;test_w2_71_nothing_printed_or_written.Scene object at 0x799950709940&gt;
+rel = '.gov-runtime/stores/exempt.db'
+
+    @pytest.mark.parametrize("rel", CHECK_MARKED)
+    def test_the_check_gives_every_clean_or_exempt_file_to_both_rule_sets(scene, rel):
+        marker, _, kind = scene.check_files[rel]
+        seen = _sets_seen(scene.calls["check-1"], _mark(marker))
+&gt;       assert {"extended", "alone"} &lt;= seen, (f"the check gave {rel} ({kind}) to gitleaks with the rule sets "
+                                               f"{sorted(seen)}, not both")
+E       AssertionError: the check gave .gov-runtime/stores/exempt.db (exempt) to gitleaks with the rule sets ['extended'], not both
+E       assert {'alone', 'extended'} &lt;= {'extended'}
+E         
+E         Extra items in the left set:
+E         'alone'
+
+tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py:216: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets[docs/top.md]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets[docs/deep/x/y.md]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets[docs/plain.db]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets[docs/exempt.md]" time="0.000"><failure message="AssertionError: the filter gave docs/exempt.md (exempt) to gitleaks with the rule sets ['extended'], not both&#10;assert {'alone', 'extended'} &lt;= {'extended'}&#10;  &#10;  Extra items in the left set:&#10;  'alone'">scene = &lt;test_w2_71_nothing_printed_or_written.Scene object at 0x799950709940&gt;
+rel = 'docs/exempt.md'
+
+    @pytest.mark.parametrize("rel", FILTER_MARKED)
+    def test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets(scene, rel):
+        marker, _, kind = scene.filter_files[rel]
+        seen = _sets_seen(scene.calls["filter"], _mark(marker))
+&gt;       assert {"extended", "alone"} &lt;= seen, (f"the filter gave {rel} ({kind}) to gitleaks with the rule sets "
+                                               f"{sorted(seen)}, not both")
+E       AssertionError: the filter gave docs/exempt.md (exempt) to gitleaks with the rule sets ['extended'], not both
+E       assert {'alone', 'extended'} &lt;= {'extended'}
+E         
+E         Extra items in the left set:
+E         'alone'
+
+tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py:224: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets[docs/exempt.db]" time="0.001"><failure message="AssertionError: the filter gave docs/exempt.db (exempt) to gitleaks with the rule sets ['extended'], not both&#10;assert {'alone', 'extended'} &lt;= {'extended'}&#10;  &#10;  Extra items in the left set:&#10;  'alone'">scene = &lt;test_w2_71_nothing_printed_or_written.Scene object at 0x799950709940&gt;
+rel = 'docs/exempt.db'
+
+    @pytest.mark.parametrize("rel", FILTER_MARKED)
+    def test_the_filter_gives_every_clean_or_exempt_file_to_both_rule_sets(scene, rel):
+        marker, _, kind = scene.filter_files[rel]
+        seen = _sets_seen(scene.calls["filter"], _mark(marker))
+&gt;       assert {"extended", "alone"} &lt;= seen, (f"the filter gave {rel} ({kind}) to gitleaks with the rule sets "
+                                               f"{sorted(seen)}, not both")
+E       AssertionError: the filter gave docs/exempt.db (exempt) to gitleaks with the rule sets ['extended'], not both
+E       assert {'alone', 'extended'} &lt;= {'extended'}
+E         
+E         Extra items in the left set:
+E         'alone'
+
+tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py:224: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_the_branch_changes_neither_gitleaks_file" time="0.004" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_gitleaks_file_shelters_a_match_by_content[.gitleaks.toml]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_nothing_printed_or_written" name="test_no_gitleaks_file_shelters_a_match_by_content[template/.gitleaks.toml]" time="0.003" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[default-rule-whose-secret-is-the-commit-hash]" time="3.478" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[project-rule-whose-match-is-the-commit-hash]" time="0.630" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[project-token-rule-whose-match-holds-the-commit-hash]" time="0.612" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[same-hash-found-by-row-w2-l423s-rule-and-another]" time="0.623" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[exempt-hash-and-another-rules-finding-in-one-text]" time="0.581" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[prefixed-form-holding-the-commit-hash]" time="0.638" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[prefixed-16-form-holding-the-commit-hash]" time="0.618" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[prefixed-local-form-holding-the-commit-hash]" time="0.637" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[commit-of-another-repository-after-vendor-keyword]" time="0.617" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[commit-of-another-repository-after-prefix-keyword]" time="0.627" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[tree-id-of-this-repository]" time="0.609" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_text_is_a_finding_of_the_rules_the_case_names[blob-id-of-this-repository]" time="0.596" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_quoted_ids_are_what_the_cases_say" time="0.006" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_secret_of_the_default_rules_finding_is_the_commit_hash" time="0.393" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[default-rule-whose-secret-is-the-commit-hash-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[default-rule-whose-secret-is-the-commit-hash-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[project-rule-whose-match-is-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[project-rule-whose-match-is-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[project-token-rule-whose-match-holds-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[project-token-rule-whose-match-holds-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[same-hash-found-by-row-w2-l423s-rule-and-another-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[same-hash-found-by-row-w2-l423s-rule-and-another-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[exempt-hash-and-another-rules-finding-in-one-text-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[exempt-hash-and-another-rules-finding-in-one-text-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[prefixed-form-holding-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[prefixed-form-holding-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[prefixed-16-form-holding-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[prefixed-16-form-holding-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[prefixed-local-form-holding-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[prefixed-local-form-holding-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[commit-of-another-repository-after-vendor-keyword-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[commit-of-another-repository-after-vendor-keyword-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[commit-of-another-repository-after-prefix-keyword-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[commit-of-another-repository-after-prefix-keyword-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[tree-id-of-this-repository-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[tree-id-of-this-repository-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[blob-id-of-this-repository-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_still_finds_it[blob-id-of-this-repository-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[default-rule-whose-secret-is-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[default-rule-whose-secret-is-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[project-rule-whose-match-is-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[project-rule-whose-match-is-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[project-token-rule-whose-match-holds-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[project-token-rule-whose-match-holds-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[same-hash-found-by-row-w2-l423s-rule-and-another-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[same-hash-found-by-row-w2-l423s-rule-and-another-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[exempt-hash-and-another-rules-finding-in-one-text-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[exempt-hash-and-another-rules-finding-in-one-text-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[prefixed-form-holding-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[prefixed-form-holding-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[prefixed-16-form-holding-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[prefixed-16-form-holding-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[prefixed-local-form-holding-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[prefixed-local-form-holding-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[commit-of-another-repository-after-vendor-keyword-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[commit-of-another-repository-after-vendor-keyword-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[commit-of-another-repository-after-prefix-keyword-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[commit-of-another-repository-after-prefix-keyword-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[tree-id-of-this-repository-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[tree-id-of-this-repository-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[blob-id-of-this-repository-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_still_leaves_it_out[blob-id-of-this-repository-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_row_w2_l423s_rule_as_gitleaks_ships_it_never_matches_the_text[39-digits-a-prefix-of-the-commit-hash]" time="2.202" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_row_w2_l423s_rule_as_gitleaks_ships_it_never_matches_the_text[41-digits-the-commit-hash-and-one-more]" time="0.614" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_row_w2_l423s_rule_as_gitleaks_ships_it_never_matches_the_text[41-digits-one-more-and-the-commit-hash]" time="0.594" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_row_w2_l423s_rule_as_gitleaks_ships_it_never_matches_the_text[12-digit-shortened-hash]" time="0.610" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_rewritten_rule_finds_the_text[39-digits-a-prefix-of-the-commit-hash]" time="0.606" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_rewritten_rule_finds_the_text[41-digits-the-commit-hash-and-one-more]" time="0.613" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_rewritten_rule_finds_the_text[41-digits-one-more-and-the-commit-hash]" time="0.589" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_the_rewritten_rule_finds_the_text[12-digit-shortened-hash]" time="0.615" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_premise_git_resolves_the_39_and_the_12_digit_prefixes_to_the_commit" time="0.005" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[39-digits-a-prefix-of-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[39-digits-a-prefix-of-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[41-digits-the-commit-hash-and-one-more-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[41-digits-the-commit-hash-and-one-more-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[41-digits-one-more-and-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[41-digits-one-more-and-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[12-digit-shortened-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_check_does_not_widen_the_exemption_to_it[12-digit-shortened-hash-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[39-digits-a-prefix-of-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[39-digits-a-prefix-of-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[41-digits-the-commit-hash-and-one-more-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[41-digits-the-commit-hash-and-one-more-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[41-digits-one-more-and-the-commit-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[41-digits-one-more-and-the-commit-hash-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[12-digit-shortened-hash-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_only_that_rule_and_match" name="test_the_filter_does_not_widen_the_exemption_to_it[12-digit-shortened-hash-store]" time="0.005" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_premise_the_token_is_a_finding_of_row_w2_l423s_rule_and_names_no_object_here[prefixed-40]" time="2.429" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_premise_the_token_is_a_finding_of_row_w2_l423s_rule_and_names_no_object_here[prefixed-16-and-40]" time="0.635" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_premise_the_token_is_a_finding_of_row_w2_l423s_rule_and_names_no_object_here[prefixed-local-and-40]" time="0.624" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_premise_the_token_is_a_finding_of_row_w2_l423s_rule_and_names_no_object_here[bare-40-after-vendor-keyword]" time="0.622" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_premise_the_token_is_a_finding_of_row_w2_l423s_rule_and_names_no_object_here[bare-40-after-prefix-keyword]" time="0.610" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_premise_the_token_is_a_finding_of_row_w2_l423s_rule_and_names_no_object_here[bare-40-upper-case]" time="0.612" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[prefixed-40-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[prefixed-40-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[prefixed-16-and-40-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[prefixed-16-and-40-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[prefixed-local-and-40-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[prefixed-local-and-40-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[bare-40-after-vendor-keyword-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[bare-40-after-vendor-keyword-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[bare-40-after-prefix-keyword-file]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[bare-40-after-prefix-keyword-store]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[bare-40-upper-case-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_a_finding_of_the_check[bare-40-upper-case-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[prefixed-40-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[prefixed-40-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[prefixed-16-and-40-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[prefixed-16-and-40-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[prefixed-local-and-40-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[prefixed-local-and-40-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[bare-40-after-vendor-keyword-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[bare-40-after-vendor-keyword-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[bare-40-after-prefix-keyword-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[bare-40-after-prefix-keyword-store]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[bare-40-upper-case-file]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_real_tokens_still_fail" name="test_a_real_token_of_the_vendor_is_left_out_by_the_filter[bare-40-upper-case-store]" time="0.002" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_premise_no_git_is_on_the_path_of_the_no_git_case" time="0.003" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_premise_the_project_without_its_git_folder_is_no_repository_even_unbounded" time="1.386" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_premise_the_failing_git_answers_with_an_error" time="0.015" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[no-git-file-vendor-keyword]" time="1.387" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[no-git-file-prefix-keyword]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[no-git-store-vendor-keyword]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[no-git-store-prefix-keyword]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[not-a-repository-file-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[not-a-repository-file-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[not-a-repository-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[not-a-repository-store-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-fails-file-vendor-keyword]" time="1.408" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-fails-file-prefix-keyword]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-fails-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-fails-store-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-hangs-file-vendor-keyword]" time="1.440" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-hangs-file-prefix-keyword]" time="0.001" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-hangs-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_check_fails_closed_when_the_verification_cannot_run[git-hangs-store-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[no-git-file-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[no-git-file-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[no-git-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[no-git-store-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[not-a-repository-file-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[not-a-repository-file-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[not-a-repository-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[not-a-repository-store-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-fails-file-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-fails-file-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-fails-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-fails-store-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-hangs-file-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-hangs-file-prefix-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-hangs-store-vendor-keyword]" time="0.000" /><testcase classname="tests.acceptance.W2-71.test_w2_71_verification_cannot_run" name="test_the_filter_fails_closed_when_the_verification_cannot_run[git-hangs-store-prefix-keyword]" time="0.006" /></testsuite></testsuites>
