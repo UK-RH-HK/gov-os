@@ -6,8 +6,7 @@
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept for rollback.
 - **Queue 2026-10-27c done** (log `log/close-queue-20261027-1957/`): W2-66 `f8d1f60a` (full), W2-72 `6c439d8a`, W2-59
   `f0f933e1`, W2-65 `be18d1c7`, W2-73 `74c08ed8`, W2-74 `182823e4`, W2-69 `07a8d624` (each scoped, base `00b371a0`,
-  30 targets: OWN 1, UNIT 1, EVERY_CLOSE 3, RECORD_READING 26). Gates before each close ~12 min (rebuild 4, collect,
-  records 2, check 5): longer than the scoped close itself -> re-plan item (batched closes).
+  30 targets). Gates before each close ~12 min (rebuild 4, records 2, check 5) > the scoped close -> re-plan item.
 - **Done after it:** close_queue.sh exits 4 on a refused close (DEC-929 item 3; `tools/test_close_queue_refusal.sh`
   PASS). Worktrees+branches removed: W2-59, W2-66, W2-69, W2-72, W2-73, W2-74. **W2-65's worktree kept** (guard
   refused my rm of its stray `pytest-of-usain/`, 5.8M; branch merged): for the owner/digest. Lead temp folders of
