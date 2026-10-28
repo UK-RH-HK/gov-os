@@ -1,6 +1,6 @@
 ---
 id: DAEO-e82f
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-21T07:33:34Z

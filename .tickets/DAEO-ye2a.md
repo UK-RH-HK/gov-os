@@ -1,6 +1,6 @@
 ---
 id: DAEO-ye2a
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-24T20:37:07Z
