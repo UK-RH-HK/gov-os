@@ -3,32 +3,23 @@
 ## RESUME HERE (2026-10-28 22:25 GMT — RE-PIN 2 DONE (gov = pin-5c401220); ACT-NIGHTLY-1 installed + checked. QUEUE STOPPED 21:31 (exit 4): W2-58's close REFUSED, count 1, repair DAEO-pr0y (committed by the close, `b252fd7d`): W2-54's green-here fixture timed out (>900 s) under the full close's load (row W2-L429). DEC-936 (owner) + DEC-937 (delegated) committed `6a195eca` (ping gate in the nightly folder: tonight's nightly has it; prompt v3.36). W2-75 (DAEO-ebmh, LITE TD: fixture reads GOV_CLOSE_CHECK_RESULT) claimed `3eef001d`, lead run 1 RUNNING (task bbagsmpkm, brief W2-75-A5-run1). When DONE: merge, rebuild, restart the queue W2-58, W2-63, W2-07, W2-57 (W2-58's second close; a second refusal for the same cause -> owner package). Nightly 02:00 tonight (first). Cron pings only reach the log: relay P1s from pings.log/status.txt each morning (prompt §7). Then ACT-W2-57-LS-2, leads in parallel (W2-68, W2-71, W2-67, K4, K3); next DEC-938)
 
 ### Now
-- **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
-- **Queue 2026-10-27c done:** 7 closed (W2-66 full; six scoped off `00b371a0`). Gates ~12 min per close > the scoped
-  close -> re-plan item. Closed tickets' worktrees removed except **W2-65's** (guard refused my rm of its stray
-  `pytest-of-usain/`, 5.8M) -> digest. Rows moved to §4 (`4f2fc3d6`).
-- **Merged today:** W2-57 `57e363c5`; W2-07 r2 `8555aafc` (run 5: full 16479 passed, serial 180; probe_impact made
-  W2-57's probe stale on command.py); W2-57 re-probe `4904a60f` (PR-DAEO-cy5o-reprobe-1.md pass). Rebuilds ok. Temp
-  folders of W2-07, W2-57 removed. Merged-not-closed now: W2-58, W2-63, W2-07, W2-67 (r1), W2-57.
-- **ACT-W2-57-LS-1 done** (owner `6367e965`). ACT-W2-57-LS-2 (W1-46 x23, W1-19) right after re-pin 2, validated
-  with the new pin (`tools/act_clone_run.sh`, reads the pin from ~/.local/bin/gov).
-- **Re-pin 2 (DEC-933):** ACT-REPIN-2 sent (`packages/ACT-REPIN-2.md`; `pin/REPIN-COMMANDS-5c401220.sh`, plain
-  terminal). Ladder: full run on 5c401220 16478 passed, 1 flaky (W2-54 time limit, passed alone), serial 180; wheel
-  e4f35131…905d0 twice. When owner says done: smoke test, prompt pin line (DEC-895's command), ACT-W2-57-LS-2, queue
-  W2-58, W2-63, W2-07, W2-57. Confirm no lead/close/nightly before the owner runs it.
-- **Nightly (DEC-934):** committed `governance/project/orchestration/nightly/` (cron entry refuses changed code;
-  logs + rotate; morning check -> status.txt; test_nightly.sh 20/20). ACT-NIGHTLY-1 revised: Part A crontab (3
-  lines), Part B Windows wake task 01:50 + wake timers. cron measured: 4/4 hourly runs every night 10-20..10-28.
-  Digest: report status.txt per night; no line = MISSED P1. Scratch copies removed.
-- **Lesson today:** record checks on untracked files prove nothing about tracked ones (a999f97b's 9 paths in no
-  namespace, W1-08 red, fixed 95a810a6); and never chain a commit after `;` (1916501d went in on a red check).
-  W2-58's review cases fail when run from inside a Claude session (its env leaks into the guard sandbox): row.
-- **Rows added:** W2-L449 (bare run loads the pin), W2-M407 (product nightly rule), W2-L450 (W2-57 designer p95
-  under load, not on load_sensitive).
-- **Run clones** under ~/gov-os-runs/W2-00 (2.6G+, plus 560M ACT clone) never removed -> P-TOOLS-REVIEW-1.
+- **Pin:** gov = pin-5c401220 (DEC-935, registry `bc37c419`); pin-6a4696eb kept. Tools read the pin from
+  ~/.local/bin/gov's first line. The nightly route takes 15 entries out of the close (nightly only now).
+- **Merged-not-closed:** W2-58, W2-63, W2-07, W2-67 (r1), W2-57. W2-65's worktree kept (guard refused my rm of its
+  stray `pytest-of-usain/`) -> digest.
+- **ACT-W2-57-LS-1 done** (owner `6367e965`). ACT-W2-57-LS-2 (W1-46 x23, W1-19) next: validate with the new pin
+  (`tools/act_clone_run.sh`), then send.
+- **Nightly:** committed `governance/project/orchestration/nightly/` (DEC-934; ping gate DEC-936, 28/28 tests);
+  crontab 3 lines + Windows wake task (owner, checked). Morning: read status.txt + pings.log, relay P1s (prompt §7);
+  digest reports each night's line, estimate vs actual.
+- **Lessons 2026-10-28:** checks on untracked files prove nothing about tracked ones (`a999f97b`, W1-08); no commit
+  chained after `;` (`1916501d`); a ticket citing a new DEC: commit the register first. W2-58's review cases fail
+  from inside a Claude session (env leak): row.
+- **Rows added:** W2-L449, W2-M407, W2-L450. Run clones under ~/gov-os-runs/W2-00 (3G+) never removed ->
+  P-TOOLS-REVIEW-1.
 - **W2-67** held (probe stale: W1-26/W1-27 + w1_07_support.py; `d0140d4d`).
-- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1), DEC-930 (re-plan after re-pin 2; four weekly
-  numbers), DEC-931/932 (ACTs), DEC-933 (re-pin cadence; nightly rule).
+- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1), DEC-930 + DEC-936 item 3 (the re-plan package with
+  its 5 + 6 points), DEC-936 item 2 (carry on, leads in parallel, P2 delegated, only P1/ACT ping).
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this

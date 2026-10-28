@@ -2,6 +2,36 @@
 
 Not the resume point: the current one is the RESUME HERE block of `CHECKPOINT.md` beside this file.
 
+## Moved from RESUME HERE 2026-10-28 22:30 (replaced by the new state)
+### Now
+- **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
+- **Queue 2026-10-27c done:** 7 closed (W2-66 full; six scoped off `00b371a0`). Gates ~12 min per close > the scoped
+  close -> re-plan item. Closed tickets' worktrees removed except **W2-65's** (guard refused my rm of its stray
+  `pytest-of-usain/`, 5.8M) -> digest. Rows moved to §4 (`4f2fc3d6`).
+- **Merged today:** W2-57 `57e363c5`; W2-07 r2 `8555aafc` (run 5: full 16479 passed, serial 180; probe_impact made
+  W2-57's probe stale on command.py); W2-57 re-probe `4904a60f` (PR-DAEO-cy5o-reprobe-1.md pass). Rebuilds ok. Temp
+  folders of W2-07, W2-57 removed. Merged-not-closed now: W2-58, W2-63, W2-07, W2-67 (r1), W2-57.
+- **ACT-W2-57-LS-1 done** (owner `6367e965`). ACT-W2-57-LS-2 (W1-46 x23, W1-19) right after re-pin 2, validated
+  with the new pin (`tools/act_clone_run.sh`, reads the pin from ~/.local/bin/gov).
+- **Re-pin 2 (DEC-933):** ACT-REPIN-2 sent (`packages/ACT-REPIN-2.md`; `pin/REPIN-COMMANDS-5c401220.sh`, plain
+  terminal). Ladder: full run on 5c401220 16478 passed, 1 flaky (W2-54 time limit, passed alone), serial 180; wheel
+  e4f35131…905d0 twice. When owner says done: smoke test, prompt pin line (DEC-895's command), ACT-W2-57-LS-2, queue
+  W2-58, W2-63, W2-07, W2-57. Confirm no lead/close/nightly before the owner runs it.
+- **Nightly (DEC-934):** committed `governance/project/orchestration/nightly/` (cron entry refuses changed code;
+  logs + rotate; morning check -> status.txt; test_nightly.sh 20/20). ACT-NIGHTLY-1 revised: Part A crontab (3
+  lines), Part B Windows wake task 01:50 + wake timers. cron measured: 4/4 hourly runs every night 10-20..10-28.
+  Digest: report status.txt per night; no line = MISSED P1. Scratch copies removed.
+- **Lesson today:** record checks on untracked files prove nothing about tracked ones (a999f97b's 9 paths in no
+  namespace, W1-08 red, fixed 95a810a6); and never chain a commit after `;` (1916501d went in on a red check).
+  W2-58's review cases fail when run from inside a Claude session (its env leaks into the guard sandbox): row.
+- **Rows added:** W2-L449 (bare run loads the pin), W2-M407 (product nightly rule), W2-L450 (W2-57 designer p95
+  under load, not on load_sensitive).
+- **Run clones** under ~/gov-os-runs/W2-00 (2.6G+, plus 560M ACT clone) never removed -> P-TOOLS-REVIEW-1.
+- **W2-67** held (probe stale: W1-26/W1-27 + w1_07_support.py; `d0140d4d`).
+- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1), DEC-930 (re-plan after re-pin 2; four weekly
+  numbers), DEC-931/932 (ACTs), DEC-933 (re-pin cadence; nightly rule).
+
+
 ## Moved from RESUME HERE 2026-10-28 10:30 (replaced by the new state)
 ## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RESTARTED 00:55 (task bwjd5xd0y; first run stopped: `-E` dropped PYTHONPATH, 0 serial entries read; fixed + guard); DEC-932 `4f2fc3d6`; DEC-933 `70c7924d` (P-REPIN-2 (a); nightly 02:00-05:00 by measured estimate; ACT-NIGHTLY-1 crontab sent); clone run waits on the lock behind W2-07's run (~03:30); next DEC-934)
 
