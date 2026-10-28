@@ -1,15 +1,35 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-27 20:00 GMT — W2-66's close REFUSED 19:52 (count 1, repair DAEO-s1wp) on my ACT .patch file under orchestration/ (W2-66's record-only case); patch removed `508571d3`; QUEUE RESTARTED (task b6vdk8upi, 7, W2-66 first: full again, path map changed since base; then scoped off W2-66's head); W2-66's next refusal for the same cause = its second; merges of W2-57/W2-07 held; next free DEC-929)
+## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RUNNING (task b28ua0o6h); next free DEC-932)
 
-### Now (2026-10-26)
-- **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
-- **W2-07 round 2 RETURNED DONE** (head `75048114`; gate (h) per DEC-923; W2-07 69/69; unmeasured 0/0/0 for W2-58,
-  W2-63, W2-07 on `a42e899b`; full run = the 8 base reds + W2-54 load timeout, passed alone). **MERGE HELD until the
-  close queue ends** (its src/gov/close change is shared core: merged now it would make every queued close full;
-  DEC-883 no code merges while closes run). Its branch lacks `048f5758` (the 611955fa entry) -> merge-back before its
-  own close. Rides the second re-pin. Temp folder removed. Lead's stricter readings O1-O4 (README) noted.
-- **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
+### Now
+- **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept for rollback.
+- **Queue 2026-10-27c done** (log `log/close-queue-20261027-1957/`): W2-66 `f8d1f60a` (full), W2-72 `6c439d8a`, W2-59
+  `f0f933e1`, W2-65 `be18d1c7`, W2-73 `74c08ed8`, W2-74 `182823e4`, W2-69 `07a8d624` (each scoped, base `00b371a0`,
+  30 targets: OWN 1, UNIT 1, EVERY_CLOSE 3, RECORD_READING 26). Gates before each close ~12 min (rebuild 4, collect,
+  records 2, check 5): longer than the scoped close itself -> re-plan item (batched closes).
+- **Done after it:** close_queue.sh exits 4 on a refused close (DEC-929 item 3; `tools/test_close_queue_refusal.sh`
+  PASS). Worktrees+branches removed: W2-59, W2-66, W2-69, W2-72, W2-73, W2-74. **W2-65's worktree kept** (guard
+  refused my rm of its stray `pytest-of-usain/`, 5.8M; branch merged): for the owner/digest. Lead temp folders of
+  W2-69 and W2-65 removed. Rows marked `76fb5f18` (W2-H044, W2-M153, W2-L437, W2-M404, W2-M395, W2-L373, part W2-L419).
+- **W2-57 merged `57e363c5`** (review current: integrate changed no src since a42e899b); probe_impact: W2-67 + 1 file
+  (`tests/acceptance/W1-07/w1_07_support.py`), already stale. Rebuild ok.
+- **ACT-W2-57-LS-1 (DEC-931):** patch `drafts/ACT-W2-57-LS-1.patch`: removes 6 load_sensitive (W1-38 x3, W1-07
+  [doctor], W1-30 r13, unit follow-up) + W2-57's 2 DEC-927 corrections (named in register `f06ccf4b`). Validated:
+  pinned readers PASS 2/2, ratchet counts 24 kept / 0 refused, record checks green, 69 dependent tests pass. Clone run
+  in the close's form WITH THE PIN: `tools/act_clone_run.sh` -> `log/act-runs/ACT-W2-57-LS-1-*/run.txt`. If the unit
+  follow-up case fails there, drop it from the patch (5 entries). Then write `packages/ACT-W2-57-LS-1.md` (operator
+  commits Role: owner; Implements: DEC-931, DEC-927), commit it, ping ACT.
+  ACT-W2-57-LS-2 (W1-46 x23, W1-19 warm p95) right after the second re-pin.
+- **Finding for rows:** a lone `pytest tests/unit/close/test_serial.py` under the pin fails to import gov.close.serial
+  (the pin's gov loads first); the full run collects because some unit conftests put src/ first. The close itself sets
+  PYTHONPATH=src. Fragile for a narrow scoped selection -> row.
+- **validate_entry.py** now scans only added lines for placeholders (an old entry's unfilled time, on a removed line, failed it).
+- **W2-07 r2 run 5:** brief `briefs/W2-07-A5-run5.md`; expects merge clean, unmeasured 0/0/0, full run; DONE ->
+  merge W2-07 (second), then probe_impact.
+- **W2-67** held (probe stale on W1-26/W1-27 files + w1_07_support.py; r2+r3 unmerged at `d0140d4d`).
+- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1 package; record commits between queues), DEC-930
+  (re-plan package after the second re-pin; four weekly numbers from now), DEC-931 (the two ACTs).
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -64,33 +84,19 @@
   weekly sweep (lists 3 + 5 pending: `tools/sweep.py --apply --only pytest-runs,code-graph`). Older text: archive.
 
 ### Next
-1. **Queue run 2026-10-27 15:46:** W2-70 CLOSED exit 0 (66 min, full: BASE_UNKNOWN; record CL-DAEO-uzme.md head
-   `7ada0f58`); worktree/branch removed. Stopped before W2-66 on product traceability (P-TRACE-IMPL-1) -> DEC-927,
-   owner's 39 entries `e95d3520`, DEC-928. **Queue RESTARTED 18:25** (task bz7x8sg6h): DAEO-c1uz DAEO-ye2a DAEO-kh9l
-   DAEO-e82f DAEO-qty6 DAEO-2azm DAEO-rmbe; all passed gates (e)+(h) dry. Report each close's evidence scope /
-   why_full / selected (should be scoped off `7ada0f58`). NO main-tree commit while it runs. W2-69's re-probe merged
-   (`PR-DAEO-rmbe-reprobe-1.md`); its lead temp folder (54M, holds the originals of 17 lead records it re-worded) kept
-   until W2-69 closes.
-2. **After the queue:** (b) merge W2-57 FIRST (DONE run 2, head `da0240e0563e`,
-   review 2 pass, probe `PR-DAEO-cy5o-review-2.md`; serial 104 cases 11:48 vs 180 17:40; nightly batch 76 green),
-   then commit its 30 load_sensitive removals (W1-38 x3, W1-07 [doctor], W1-30 r13, unit close follow-up, W1-46 x23,
-   W1-19 warm p95; list in `log/W2-57-A5-run2.json`); (c) W2-07 r2 SECOND: lead merges integrate back + re-verifies
-   (STANDARD, no probe). Temp folders of W2-57 and W2-07 removed.
-3. **Owner's request (2026-10-27), AFTER this queue:** a package P-TOOLS-REVIEW-1 proposing an independent review of
-   my tools (a short lens: what each tool does, what it could get wrong, which of this week's slips it would have
-   caught: brief builder IMPL, skip_gate id forms, keyword_warn scope, close_queue collect log, repin registry
-   approved_by, the unswept regeneration, the ACT .patch under orchestration/ (W2-66's refusal), close_queue.sh
-   exiting 0 after a refused close) + acceptance tests for build_lead_brief.py and the queue's gates. Also for the
-   owner: W2-66's scope widens to FULL whenever the path map (SHARED_CORE) or the prompt/briefs (UNPLACED) change
-   between closes: decision commits to those between queued closes cost scoping (W2-68 / test map question).
-   Open repair tickets DAEO-2upp (W2-70, closed) and DAEO-s1wp (W2-66): leave for the owner's decision.
+1. **When the clone run ends:** ACT-W2-57-LS-1 file + ping. **When W2-07 run 5 returns DONE:** merge it, probe_impact,
+   rebuild; remove its temp folder (holder check). Then packages P-SCOPE-RECORDS-1 (DEC-929) and P-TOOLS-REVIEW-1.
+2. **Second re-pin** (W2-57, W2-07 r2, W2-68, W2-71 code), then ACT-W2-57-LS-2, closes W2-58, W2-63, W2-07, W2-57,
+   then the re-plan package (DEC-930).
+3. **P-TOOLS-REVIEW-1 (independent review of my tools: lens + this week's slips, list in the
+   archive; acceptance tests for build_lead_brief.py and the queue's gates). Repair tickets DAEO-2upp (W2-70) and
+   DAEO-s1wp (W2-66, now closed): owner's decision.
 4. W2-57's proposals for the digest/owner: P-1 (entry criterion on row W2-M406's fix: gov.close.nightly must run both
    routes; DEC-803, mine to record); P-2 (DEC-549 P-4 re-baseline (c): owner, DEC-105 options); P-R2-T1 (mark DEC-373
    changed by DEC-925 + W1-19 README via a ticket); rows F3/F4/O2/O3, run 1 F3/F4/O1; W1-09 condition.
 3. W2-67: merge-back + judgement-only re-probe of the W1-26/W1-27 files.
-4. Daily digest (decisions since the owner's push of 8ba8b231: DEC-922); the sweep in a quiet moment; trial d redo,
-   then remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.
-5. Next free: DEC-928; ticket W2-75; rows W2-M407, W2-L449, W2-H063.
+4. Daily digest (DEC-922..); sweep; trial d redo + remove /tmp/gov-os-tooltrial; W2-72's residuals to rows.
+5. Next free: DEC-932; ticket W2-75; rows W2-M407, W2-L449, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
@@ -102,33 +108,36 @@ oracle; ~/gov-os-workbench; grow accepted_reds/load_sensitive; weaken a hard-blo
 The long history moved to `CHECKPOINT-ARCHIVE.md` beside this file (DEC-792, 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-10-24T13:52:07Z f2c5712158e10c392f25707b4f4db1ce65b35fedc6383db08728d98244ac557e
-git head: cbc7d08ec61f8e6bfd2ad229d449aac037eff77b
+generated: 2026-10-27T20:51:25Z c04801fc00fd86097d5b1e79af2d4f9a63255abe226a2ee31f4aee18f669a161
+git head: 00b371a09163e86f20a086c1e6664073902c4173
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
+  DAEO-2azm [in_progress] - W2-74 The settings regeneration's test revisions: the docs/source cases retired, W1-49's sandbox gov, W2-69's case name
   DAEO-2ds6 [in_progress] - W2-26 EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg)
   DAEO-49o5 [in_progress] - W2-16 Immutable, hash-pinned releases (CAP-43.b lite) <- [DAEO-g0ip, DAEO-ha8z]
   DAEO-5j8b [in_progress] - W2-58 Policy 2 in the guard and the launcher: reads open, four refusals
   DAEO-6n5k [in_progress] - W2-37 gov impact <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-9nys [in_progress] - W2-67 Test hygiene: per-test copies, nested runs, temp folders, and the weak tests' revisions
   DAEO-c1uz [in_progress] - W2-66 Path-scoped regression at close: selection and evidence (the lite W2-38)
+  DAEO-cy5o [in_progress] - W2-57 Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry
   DAEO-e82f [in_progress] - W2-65 The guard's hook lines refuse a call when the guard program cannot run
   DAEO-egsy [in_progress] - W2-51 The Wave 2 plan validator <- [DAEO-g0ip]
   DAEO-ha8z [in_progress] - W2-49 Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P) <- [DAEO-g0ip, DAEO-egsy]
   DAEO-kh9l [in_progress] - W2-59 The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps
   DAEO-pl6k [in_progress] - W2-63 W1-49's two window tests follow DEC-838: no compaction threshold, the model's own window
+  DAEO-qty6 [in_progress] - W2-73 W1-03's head-move fixture: an amend that always moves HEAD
   DAEO-r30l [in_progress] - W2-20 Machine-wide resource gate <- [DAEO-g0ip]
   DAEO-r9ss [in_progress] - W2-07 gov close by ticket class; the commit gates before any test; complete, tracked repair tickets; a share for every close <- [DAEO-g0ip, DAEO-zflj, DAEO-7rr2]
   DAEO-rmbe [in_progress] - W2-69 The secrets check reads what the stores hold: no chance red from where a scan begins
   DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
-  DAEO-uzme [in_progress] - W2-70 Retire the two nested reruns
+  DAEO-ye2a [in_progress] - W2-72 Containment's merge rule matches DEC-912: a merge-back file equal to git's own merge is no change
   DAEO-ym8a [in_progress] - W2-03 Decisions as records, each with its own hash <- [DAEO-g0ip, DAEO-zflj]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS  cbc7d08e [w2/integrate]
-  /home/usain/gov-os-worktrees/W2-00-record   f6752ecf [record/w2]
+  /home/usain/Dynamic-Agentic-Engineering-OS  00b371a0 [w2/integrate]
+  /home/usain/gov-os-worktrees/W2-00-record   a6efab00 [record/w2]
   /home/usain/gov-os-worktrees/W2-03          9a3e3456 [w2/W2-03]
   /home/usain/gov-os-worktrees/W2-05          f19f156e [w2/W2-05]
-  /home/usain/gov-os-worktrees/W2-07          80ec31ab [w2/W2-07]
+  /home/usain/gov-os-worktrees/W2-07          75048114 [w2/W2-07]
   /home/usain/gov-os-worktrees/W2-16          1908149d [w2/W2-16]
   /home/usain/gov-os-worktrees/W2-20          1a54976c [w2/W2-20]
   /home/usain/gov-os-worktrees/W2-26          62c4e477 [w2/W2-26]
@@ -136,13 +145,16 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-49          19d45246 [w2/W2-49]
   /home/usain/gov-os-worktrees/W2-51          c2c80e6c [w2/W2-51]
   /home/usain/gov-os-worktrees/W2-52          a21f06a7 [w2/W2-52]
+  /home/usain/gov-os-worktrees/W2-57          da0240e0 [w2/W2-57]
   /home/usain/gov-os-worktrees/W2-58          09f5ebfa [w2/W2-58]
   /home/usain/gov-os-worktrees/W2-59          1cad6aa0 [w2/W2-59]
   /home/usain/gov-os-worktrees/W2-63          ad38ed68 [w2/W2-63]
-  /home/usain/gov-os-worktrees/W2-65          4ef3293a [w2/W2-65]
-  /home/usain/gov-os-worktrees/W2-66          5634d430 [w2/W2-66]
-  /home/usain/gov-os-worktrees/W2-67          09c327d2 [w2/W2-67]
-  /home/usain/gov-os-worktrees/W2-69          34e1c59f [w2/W2-69]
-  /home/usain/gov-os-worktrees/W2-70          e052b7b5 [w2/W2-70]
+  /home/usain/gov-os-worktrees/W2-65          f6881547 [w2/W2-65]
+  /home/usain/gov-os-worktrees/W2-66          d738898f [w2/W2-66]
+  /home/usain/gov-os-worktrees/W2-67          d0140d4d [w2/W2-67]
+  /home/usain/gov-os-worktrees/W2-69          ade5cbdb [w2/W2-69]
+  /home/usain/gov-os-worktrees/W2-72          2bd574f3 [w2/W2-72]
+  /home/usain/gov-os-worktrees/W2-73          42daa2ab [w2/W2-73]
+  /home/usain/gov-os-worktrees/W2-74          260aa087 [w2/W2-74]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

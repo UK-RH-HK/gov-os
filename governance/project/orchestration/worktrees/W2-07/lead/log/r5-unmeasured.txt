@@ -1,0 +1,7 @@
+gov from: /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py
+root: /home/usain/gov-os-worktrees/W2-07
+gate (h) line: ['gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)']
+DAEO-5j8b (W2-58): 57 own commits, 489 others in range, 102 measured by the decision-record rule, 0 unmeasured
+DAEO-pl6k (W2-63): 6 own commits, 538 others in range, 102 measured by the decision-record rule, 0 unmeasured
+DAEO-r9ss (W2-07): 44 own commits, 684 others in range, 112 measured by the decision-record rule, 0 unmeasured
+exit 0

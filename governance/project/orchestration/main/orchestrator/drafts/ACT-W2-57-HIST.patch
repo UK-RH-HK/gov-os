@@ -1,0 +1,17 @@
+diff --git a/governance/project/path-map.yaml b/governance/project/path-map.yaml
+index c50e359a..f35919a7 100644
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -361,6 +361,12 @@ accepted_history:
+   - commit: "f409ad97575a32f6aab96e6ee6bcb4b7bc008691"
+     decision: DEC-927
+     should_implement: [DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912]
++  - commit: "6be837bbbe4158768ca88ae47972308386e008cf"
++    decision: DEC-927
++    should_implement: [DEC-813, DEC-823, DEC-871, DEC-883, DEC-889, DEC-890, DEC-892, DEC-784]
++  - commit: "d0bfeb6afd9523b4ee6a4e6e2da5333f54b283bf"
++    decision: DEC-927
++    should_implement: [DEC-813, DEC-823, DEC-871, DEC-883, DEC-889, DEC-890, DEC-892, DEC-784]
+ # Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
+ # role (DEC-906): each by its exact sha, with the owner's decision. Only the owner's commit adds an entry; any other
+ # commit touching tests/acceptance/ without that role stays red.

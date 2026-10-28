@@ -59,8 +59,15 @@ for e in entries:
     else:
         failed += 1
         print(f"FAIL ({key}): {label}: {why}")
-scan = subprocess.run([sys.executable, "-E", str(Path(__file__).with_name("placeholder_scan.py")), str(patch)],
+# Only the lines the patch adds are scanned: a line it removes leaves the tree, so its text adds no placeholder
+# (2026-10-28: an old entry's "00:2x" on a removed line failed ACT-W2-57-LS-1).
+import tempfile
+with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as added_text:
+    added_text.write("\n".join(line[1:] for line in patch.read_text().splitlines()
+                               if line.startswith("+") and not line.startswith("+++")) + "\n")
+scan = subprocess.run([sys.executable, "-E", str(Path(__file__).with_name("placeholder_scan.py")), added_text.name],
                       capture_output=True, text=True)
+Path(added_text.name).unlink()
 print(scan.stdout.strip().splitlines()[-1] if scan.stdout.strip() else "placeholder scan: no output")
 failed += scan.returncode != 0
 print(f"entries judged: {len(entries)}; failed: {failed}")

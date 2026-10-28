@@ -93,7 +93,8 @@ for item in "$@"; do
   gov close "$ticket" $lift --check-result "$LOG/check-$ticket.json" --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
   echo "$code" > "$LOG/close-$ticket.exit"
   date '+%F %T close '"$ticket"' exit '"$code" >> "$LOG/queue.txt"
-  [ "$code" -eq 0 ] || break
+  # Owner 2026-10-27: a refused close must end the queue with a non-zero status (it was `break`, then exit 0).
+  [ "$code" -eq 0 ] || { date '+%F %T '"$ticket"' CLOSE REFUSED (exit '"$code"'); queue stopped' >> "$LOG/queue.txt"; rm -f "$LOCK"; exit 4; }
   # The interim skip guard (owner, DEC-899 item 7), until W2-57 lands: the full regression's skip count must be the
   # expected 31, or the queue stops here, before the close's outputs are committed (a silent rulesync skip, I4 F2).
   skips=$(python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/skip_gate.py "$LOG/close-$ticket.json" 2>&1) \

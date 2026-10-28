@@ -2,6 +2,53 @@
 
 Not the resume point: the current one is the RESUME HERE block of `CHECKPOINT.md` beside this file.
 
+## Moved from RESUME HERE 2026-10-28 00:45 (replaced by the new state)
+## RESUME HERE (2026-10-27 21:35 GMT — W2-66 CLOSED 21:29 (`f8d1f60a`), queue on W2-72; owner asks: P-SCOPE-RECORDS-1, queue exit fix, re-plan package (below); queue task b6vdk8upi; merges of W2-57/W2-07 held; next free DEC-929)
+
+### Owner 2026-10-27 21:00 (no answer needed; ACT AFTER THIS QUEUE; record as DEC-929 between queues)
+1. Package P-SCOPE-RECORDS-1 (for W2-68 or a small ticket): move path map's load_sensitive, accepted_reds,
+   accepted_history, acceptance_exemptions into record files of their own read by the record-reading set (editing
+   them no longer widens a close); path map's configuration stays shared core; prompts + briefs onto the record-only
+   list, any test reading them into the record-reading set. Say what each change could let through.
+2. Interim (until 1 lands): hold non-urgent record commits while a queue runs; commit them between queues.
+3. FIRST THING when this queue ends (before the tooling review): close_queue.sh must exit non-zero after a refused
+   close. Never edit it while it runs. STAGED: tools/close_queue.sh.next (refusal -> log, unlock, exit 4;
+   bash -n ok): when the queue ends, `mv` it over close_queue.sh, then test the refusal path with a stub close.
+
+### Queue run 2026-10-27c progress
+- W2-66 CLOSED 21:29 exit 0 (76 min; full: SHARED_CORE path map, UNPLACED brief+prompt; base 7ada0f58); `f8d1f60a`.
+
+### Owner 2026-10-27 21:35: RE-PLAN package (after this queue AND the second re-pin), six-part
+1. Minimum to start EXAMIN's copy: fast closes, memory proven (K4 incl. W2-61's measure), agents loading role/skills/
+   model at launch (K3), leads' sandbox. Everything else proposed for Wave 3, with each deferral's cost.
+2. Estimate per remaining keystone + target date for the copy's start.
+3. Operating change (proposal): one daily digest with every non-urgent item; only P1s and ACTs ping; P2s become
+   delegated decisions the owner can overturn in the digest.
+4. FROM NOW, weekly: closes/day, refusals from my own tooling, cost/week (a measured source only), owner
+   decisions/week. 2026-10-27: closes W2-70, W2-66; tooling refusals W2-70 (regen), W2-66 (.patch) + archive's.
+5. Parallelism once closes are short: which tickets run side by side (memory vs K3), leads at once under the resource
+   gate, quiet-window length with scoped/batched closes, whether the verification lock can relax after W2-67.
+   Plan remaining keystones so leads wait least for the machine.
+
+### Now (2026-10-26)
+- **Pin:** gov = pin-6a4696eb (DEC-922; smoke test in the archive); pin-fecb870c kept for rollback.
+- **W2-07 round 2 DONE** (head `75048114`; W2-07 69/69; unmeasured 0/0/0 for W2-58, W2-63, W2-07). MERGE HELD until
+  the queue ends (shared core; DEC-883); lacks `048f5758` -> merge-back first. Rides the second re-pin.
+- **W2-67** stays held (probe stale on W1-26/W1-27 files; r2+r3 unmerged at `d0140d4d`).
+
+
+## Moved from RESUME HERE 2026-10-27 21:40 (size limit)
+- Header 20:00: W2-66's close REFUSED 19:52 (count 1, repair DAEO-s1wp) on my ACT .patch file under orchestration/
+  (W2-66's record-only case); patch removed `508571d3`; QUEUE RESTARTED (task b6vdk8upi, 7, W2-66 first: full again,
+  path map changed since base). W2-66 then CLOSED 21:29.
+- Next 1 (old): Queue run 2026-10-27 15:46: W2-70 CLOSED exit 0 (66 min, full: BASE_UNKNOWN; record CL-DAEO-uzme.md
+  head `7ada0f58`); worktree/branch removed. Stopped before W2-66 on product traceability (P-TRACE-IMPL-1) -> DEC-927,
+  owner's 39 entries `e95d3520`, DEC-928. Queue restarted 18:25 (task bz7x8sg6h), refused at W2-66 19:52.
+- Next 3 (old, full text): P-TOOLS-REVIEW-1 lens: brief builder IMPL, skip_gate id forms, keyword_warn scope,
+  close_queue collect log, repin registry approved_by, the unswept regeneration, the ACT .patch under orchestration/
+  (W2-66's refusal), close_queue.sh exiting 0 after a refused close; + acceptance tests for build_lead_brief.py and the
+  queue's gates. Scope widening (path map SHARED_CORE, prompt/briefs UNPLACED) -> now the owner's P-SCOPE-RECORDS-1.
+
 # CHECKPOINT — W1 orchestrator (Wave 1 under the live guard)
 
 - **Updated:** 2026-10-16 (update 70: W2 layer 1 running). Header below is from 2026-10-05.
