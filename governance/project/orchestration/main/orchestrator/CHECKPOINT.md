@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RESTARTED 00:55 (task bwjd5xd0y; first run stopped: `-E` dropped PYTHONPATH, 0 serial entries read; fixed + guard); DEC-932 `4f2fc3d6`; DEC-933 `70c7924d` (P-REPIN-2 (a); nightly 02:00-05:00 by measured estimate; ACT-NIGHTLY-1 crontab sent); clone run waits on the lock behind W2-07's full run (~03:30); next free DEC-934)
+## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RESTARTED 00:55 (task bwjd5xd0y; first run stopped: `-E` dropped PYTHONPATH, 0 serial entries read; fixed + guard); DEC-932 `4f2fc3d6`; DEC-933 `70c7924d` (P-REPIN-2 (a); nightly 02:00-05:00 by measured estimate; ACT-NIGHTLY-1 crontab sent); clone run waits on the lock behind W2-07's run (~03:30); next DEC-934)
 
 ### Now
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept for rollback.
