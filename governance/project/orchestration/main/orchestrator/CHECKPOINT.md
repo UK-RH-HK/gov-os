@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 20:40 GMT — RE-PIN 2 DONE: gov = pin-5c401220 (owner `bc37c419`), smoke passed, DEC-935 `eb0015a4`; ACT-NIGHTLY-1 INSTALLED and checked (crontab 3 lines; Windows task Ready, WakeToRun); QUEUE STARTED 20:07 (task btt0w8kww; log close-queue-20261028-2007) W2-58 (closing since 20:25), W2-63, W2-07, W2-57, all full, ends ~02:10; tonight's nightly waits for it (latest start ~03:25). NO main-tree commits while it runs. AFTER THE QUEUE: commit DEC-936 (drafts/DEC-936.md) + the ping gate (drafts/nightly-next/ -> governance/project/orchestration/nightly/, 28/28 tests) + prompt v3.36 (P2 delegated; only P1/ACT ping; carry-on order); then ACT-W2-57-LS-2 run; then leads in parallel (W2-68, W2-71, W2-67, K4, K3 first); next DEC-936)
+## RESUME HERE (2026-10-28 22:25 GMT — RE-PIN 2 DONE (gov = pin-5c401220); ACT-NIGHTLY-1 installed + checked. QUEUE STOPPED 21:31 (exit 4): W2-58's close REFUSED, count 1, repair DAEO-pr0y (committed by the close, `b252fd7d`): W2-54's green-here fixture timed out (>900 s) under the full close's load (row W2-L429). DEC-936 (owner) + DEC-937 (delegated) committed `6a195eca` (ping gate in the nightly folder: tonight's nightly has it; prompt v3.36). W2-75 (DAEO-ebmh, LITE TD: fixture reads GOV_CLOSE_CHECK_RESULT) claimed `3eef001d`, lead run 1 RUNNING (task bbagsmpkm, brief W2-75-A5-run1). When DONE: merge, rebuild, restart the queue W2-58, W2-63, W2-07, W2-57 (W2-58's second close; a second refusal for the same cause -> owner package). Nightly 02:00 tonight (first). Cron pings only reach the log: relay P1s from pings.log/status.txt each morning (prompt §7). Then ACT-W2-57-LS-2, leads in parallel (W2-68, W2-71, W2-67, K4, K3); next DEC-938)
 
 ### Now
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
@@ -106,36 +106,29 @@ oracle; ~/gov-os-workbench; grow accepted_reds/load_sensitive; weaken a hard-blo
 The long history moved to `CHECKPOINT-ARCHIVE.md` beside this file (DEC-792, 2026-10-18).
 
 <!-- GENERATED STATE BLOCK BEGIN -->
-generated: 2026-10-27T20:51:25Z c04801fc00fd86097d5b1e79af2d4f9a63255abe226a2ee31f4aee18f669a161
-git head: 00b371a09163e86f20a086c1e6664073902c4173
+generated: 2026-10-28T21:30:38Z ce5dfa42e7d2bf708b1c8ef0e11da719105665e0d82989a6ab961cd8657e7b2c
+git head: 0ab1a3a131c9fd06b767fbb9ea7a1bf4b2c02b84
 tickets in progress (`tk ls --status=in_progress`):
   DAEO-0z8c [in_progress] - W2-05 The git environment of every check, hook and helper; the settings re-sort <- [DAEO-g0ip]
-  DAEO-2azm [in_progress] - W2-74 The settings regeneration's test revisions: the docs/source cases retired, W1-49's sandbox gov, W2-69's case name
   DAEO-2ds6 [in_progress] - W2-26 EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg)
   DAEO-49o5 [in_progress] - W2-16 Immutable, hash-pinned releases (CAP-43.b lite) <- [DAEO-g0ip, DAEO-ha8z]
   DAEO-5j8b [in_progress] - W2-58 Policy 2 in the guard and the launcher: reads open, four refusals
   DAEO-6n5k [in_progress] - W2-37 gov impact <- [DAEO-g0ip, DAEO-ym8a]
   DAEO-9nys [in_progress] - W2-67 Test hygiene: per-test copies, nested runs, temp folders, and the weak tests' revisions
-  DAEO-c1uz [in_progress] - W2-66 Path-scoped regression at close: selection and evidence (the lite W2-38)
   DAEO-cy5o [in_progress] - W2-57 Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry
-  DAEO-e82f [in_progress] - W2-65 The guard's hook lines refuse a call when the guard program cannot run
   DAEO-egsy [in_progress] - W2-51 The Wave 2 plan validator <- [DAEO-g0ip]
   DAEO-ha8z [in_progress] - W2-49 Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P) <- [DAEO-g0ip, DAEO-egsy]
-  DAEO-kh9l [in_progress] - W2-59 The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps
   DAEO-pl6k [in_progress] - W2-63 W1-49's two window tests follow DEC-838: no compaction threshold, the model's own window
-  DAEO-qty6 [in_progress] - W2-73 W1-03's head-move fixture: an amend that always moves HEAD
   DAEO-r30l [in_progress] - W2-20 Machine-wide resource gate <- [DAEO-g0ip]
   DAEO-r9ss [in_progress] - W2-07 gov close by ticket class; the commit gates before any test; complete, tracked repair tickets; a share for every close <- [DAEO-g0ip, DAEO-zflj, DAEO-7rr2]
-  DAEO-rmbe [in_progress] - W2-69 The secrets check reads what the stores hold: no chance red from where a scan begins
   DAEO-siiz [in_progress] - W2-52 The lite A7 and A10 stage records <- [DAEO-g0ip, DAEO-ha8z]
-  DAEO-ye2a [in_progress] - W2-72 Containment's merge rule matches DEC-912: a merge-back file equal to git's own merge is no change
   DAEO-ym8a [in_progress] - W2-03 Decisions as records, each with its own hash <- [DAEO-g0ip, DAEO-zflj]
 worktrees (`git worktree list`):
-  /home/usain/Dynamic-Agentic-Engineering-OS  00b371a0 [w2/integrate]
-  /home/usain/gov-os-worktrees/W2-00-record   a6efab00 [record/w2]
+  /home/usain/Dynamic-Agentic-Engineering-OS  0ab1a3a1 [w2/integrate]
+  /home/usain/gov-os-worktrees/W2-00-record   05a82194 [record/w2]
   /home/usain/gov-os-worktrees/W2-03          9a3e3456 [w2/W2-03]
   /home/usain/gov-os-worktrees/W2-05          f19f156e [w2/W2-05]
-  /home/usain/gov-os-worktrees/W2-07          75048114 [w2/W2-07]
+  /home/usain/gov-os-worktrees/W2-07          31ddf173 [w2/W2-07]
   /home/usain/gov-os-worktrees/W2-16          1908149d [w2/W2-16]
   /home/usain/gov-os-worktrees/W2-20          1a54976c [w2/W2-20]
   /home/usain/gov-os-worktrees/W2-26          62c4e477 [w2/W2-26]
@@ -143,16 +136,10 @@ worktrees (`git worktree list`):
   /home/usain/gov-os-worktrees/W2-49          19d45246 [w2/W2-49]
   /home/usain/gov-os-worktrees/W2-51          c2c80e6c [w2/W2-51]
   /home/usain/gov-os-worktrees/W2-52          a21f06a7 [w2/W2-52]
-  /home/usain/gov-os-worktrees/W2-57          da0240e0 [w2/W2-57]
+  /home/usain/gov-os-worktrees/W2-57          d0cb9629 [w2/W2-57]
   /home/usain/gov-os-worktrees/W2-58          09f5ebfa [w2/W2-58]
-  /home/usain/gov-os-worktrees/W2-59          1cad6aa0 [w2/W2-59]
   /home/usain/gov-os-worktrees/W2-63          ad38ed68 [w2/W2-63]
   /home/usain/gov-os-worktrees/W2-65          f6881547 [w2/W2-65]
-  /home/usain/gov-os-worktrees/W2-66          d738898f [w2/W2-66]
   /home/usain/gov-os-worktrees/W2-67          d0140d4d [w2/W2-67]
-  /home/usain/gov-os-worktrees/W2-69          ade5cbdb [w2/W2-69]
-  /home/usain/gov-os-worktrees/W2-72          2bd574f3 [w2/W2-72]
-  /home/usain/gov-os-worktrees/W2-73          42daa2ab [w2/W2-73]
-  /home/usain/gov-os-worktrees/W2-74          260aa087 [w2/W2-74]
 pending owner decisions: not known to the hook; see the written part of this checkpoint
 <!-- GENERATED STATE BLOCK END -->

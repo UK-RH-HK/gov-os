@@ -1,0 +1,27 @@
+{
+  "digest": "6f0db5a3aab7666104a1084da7b39e993289d30521c6f8659b748e6e9a3c8624",
+  "store": {
+    "digest": "6f0db5a3aab7666104a1084da7b39e993289d30521c6f8659b748e6e9a3c8624",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated"
+    },
+    "semantic": {
+      "status": "recreated"
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "compaction": {
+    ".gov-runtime/store.db": "compacted",
+    ".gov-runtime/query-vector-cache.db": "compacted",
+    ".gov-runtime/codeintel/home/_config.db": "compacted",
+    ".gov-runtime/codeintel/home/code.db": "compacted"
+  },
+  "timing": {
+    "lexical_s": 1.3
+  }
+}
