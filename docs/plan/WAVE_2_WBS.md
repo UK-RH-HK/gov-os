@@ -1250,6 +1250,20 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a test id still holding the keyword.
 - **W1-06's red** (the registry entry's `approved_by`) is the orchestrator's record fix under DEC-925.
 
+#### W2-75 W2-54's green-here fixture reads the close's own check result (LITE, independent-test-designer; DEC-937, delegated; row W2-L429)
+- **Why:** W2-58's full close (2026-10-28, refused, count 1, repair DAEO-pr0y) ran 15,672 regression cases with 0 failed and 3 errors: W2-54's three green-here cases. Their fixture `gov_check_here` runs `gov check` on this repository, about six minutes alone and over the close's 900 s per-test limit under a full close's load. Row W2-L429 names the fix: read the close's check result (`GOV_CLOSE_CHECK_RESULT`, gate (b)'s run on the same commit; P-IS-2 (a)). Ticket file `DAEO-ebmh`.
+- **Starts** at once; **merges** before the close queue restarts, W2-58 first.
+- **Allowed paths:** W2-54's `conftest.py`, `test_w2_54_green_here.py`, `w2_54_support.py` and `README.md`.
+- **KPIs, success:**
+  - in a close, the fixture reads the close's check result instead of running `gov check`;
+  - outside a close, it runs `gov check` as now;
+  - a missing, unreadable or malformed result is never read as green;
+  - each case keeps its meaning (`Rewrite-Reason: W2-L429`).
+- **KPIs, failure:**
+  - a green-here case passing on a missing or red result;
+  - an expectation lowered;
+  - the fixture still running `gov check` inside a close.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
