@@ -1,34 +1,32 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RESTARTED 00:55 (task bwjd5xd0y; first run stopped: `-E` dropped PYTHONPATH, 0 serial entries read; fixed + guard); DEC-932 `4f2fc3d6`; DEC-933 `70c7924d` (P-REPIN-2 (a); nightly 02:00-05:00 by measured estimate; ACT-NIGHTLY-1 crontab sent); clone run waits on the lock behind W2-07's run (~03:30); next DEC-934)
+## RESUME HERE (2026-10-28 10:30 GMT — W2-07 r2 MERGED `8555aafc`, W2-57 re-probe MERGED `4904a60f`; ACT-W2-57-LS-1 READY (`5c401220`, clone run green); ACT-NIGHTLY-1 sent; RE-PIN 2 LADDER RUNNING: full run on head `5c401220` (task bfxlzqklt, nightly.sh day), wheel dry run OK (e4f35131…905d0 twice); next DEC-934)
 
 ### Now
-- **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept for rollback.
-- **Queue 2026-10-27c done** (log `log/close-queue-20261027-1957/`): W2-66 `f8d1f60a` (full), W2-72 `6c439d8a`, W2-59
-  `f0f933e1`, W2-65 `be18d1c7`, W2-73 `74c08ed8`, W2-74 `182823e4`, W2-69 `07a8d624` (each scoped, base `00b371a0`,
-  30 targets). Gates before each close ~12 min (rebuild 4, records 2, check 5) > the scoped close -> re-plan item.
-- **Done after it:** close_queue.sh exits 4 on a refused close (DEC-929 item 3; `tools/test_close_queue_refusal.sh`
-  PASS). Worktrees+branches removed: W2-59, W2-66, W2-69, W2-72, W2-73, W2-74. **W2-65's worktree kept** (guard
-  refused my rm of its stray `pytest-of-usain/`, 5.8M; branch merged): for the owner/digest. Lead temp folders of
-  W2-69 and W2-65 removed. Rows marked `76fb5f18` (W2-H044, W2-M153, W2-L437, W2-M404, W2-M395, W2-L373, part W2-L419).
-- **W2-57 merged `57e363c5`** (review current: integrate changed no src since a42e899b); probe_impact: W2-67 + 1 file
-  (`tests/acceptance/W1-07/w1_07_support.py`), already stale. Rebuild ok.
-- **ACT-W2-57-LS-1 (DEC-931):** patch `drafts/ACT-W2-57-LS-1.patch`: removes 6 load_sensitive (W1-38 x3, W1-07
-  [doctor], W1-30 r13, unit follow-up) + W2-57's 2 DEC-927 corrections (named in register `f06ccf4b`). Validated:
-  pinned readers PASS 2/2, ratchet counts 24 kept / 0 refused, record checks green, 69 dependent tests pass. Clone run
-  in the close's form WITH THE PIN: `tools/act_clone_run.sh` -> `log/act-runs/ACT-W2-57-LS-1-*/run.txt`. If the unit
-  follow-up case fails there, drop it from the patch (5 entries). Then write `packages/ACT-W2-57-LS-1.md` (operator
-  commits Role: owner; Implements: DEC-931, DEC-927), commit it, ping ACT.
-  ACT-W2-57-LS-2 (W1-46 x23, W1-19 warm p95) right after the second re-pin.
-- **DEC-932:** narrow scoped close passes under the pin (close sets PYTHONPATH=src for every run, alone runs too):
-  no fix, row W2-L449. Rows of the queue moved to §4, counts fixed. P-REPIN-2: re-pin 2 = W2-57 + W2-07 r2 as soon
-  as W2-07 merges; W2-68 + W2-71 a third; ladder in the package. Run clones under ~/gov-os-runs/W2-00 (2.6G) are
-  never removed (guard refuses my rm; sweep only protects them; a stopped clone of 558M left) -> tools review/digest.
-- **W2-07 r2 run 5:** brief `briefs/W2-07-A5-run5.md`; expects merge clean, unmeasured 0/0/0, full run; DONE ->
-  merge W2-07 (second), then probe_impact.
+- **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
+- **Queue 2026-10-27c done:** 7 closed (W2-66 full; six scoped off `00b371a0`). Gates ~12 min per close > the scoped
+  close -> re-plan item. Closed tickets' worktrees removed except **W2-65's** (guard refused my rm of its stray
+  `pytest-of-usain/`, 5.8M) -> digest. Rows moved to §4 (`4f2fc3d6`).
+- **Merged today:** W2-57 `57e363c5`; W2-07 r2 `8555aafc` (run 5: full 16479 passed, serial 180; probe_impact made
+  W2-57's probe stale on command.py); W2-57 re-probe `4904a60f` (PR-DAEO-cy5o-reprobe-1.md pass). Rebuilds ok. Temp
+  folders of W2-07, W2-57 removed. Merged-not-closed now: W2-58, W2-63, W2-07, W2-67 (r1), W2-57.
+- **ACT-W2-57-LS-1** (`packages/ACT-W2-57-LS-1.md`, `5c401220`): 6 removals + 2 DEC-927 corrections; the clone run
+  with the pin (`log/act-runs/ACT-W2-57-LS-1-20261028-0052/`): parallel 16431 passed 0 failed, serial 180, green.
+  Owner's operator commits it. ACT-W2-57-LS-2 (W1-46 x23, W1-19) right after re-pin 2, validated with the new pin.
+- **Re-pin 2 (DEC-933, P-REPIN-2):** pins `5c401220`. Done: `pin/repin_dry2.sh` (two builds e4f35131…905d0; wheel
+  holds serial.py, gates.py), `pin/repin2_registry.py` (refuses before install: checked), `pin/REPIN-COMMANDS-
+  5c401220.sh`. Running: the full regression on a fresh clone with the head's code (`tools/nightly.sh` day; first
+  run of the rewritten script; its record step writes `log/nightly/history.jsonl`). Then write
+  `packages/ACT-REPIN-2.md` (plain terminal), ping ACT. After it: smoke test, update the prompt's pin line (DEC-895's
+  command), ACT-W2-57-LS-2, queue W2-58, W2-63, W2-07, W2-57.
+- **Nightly (DEC-933):** `tools/nightly.sh night` + `tools/nightly_estimate.py` (estimate 84 min; effective
+  parallelism 7.4) tested 8/8 (`tools/test_nightly_night_mode.sh`); ACT-NIGHTLY-1 (crontab 02:00) with the owner.
+- **Rows added:** W2-L449 (bare run loads the pin), W2-M407 (product nightly rule), W2-L450 (W2-57 designer p95
+  under load, not on load_sensitive).
+- **Run clones** under ~/gov-os-runs/W2-00 (2.6G+, plus 560M ACT clone) never removed -> P-TOOLS-REVIEW-1.
 - **W2-67** held (probe stale: W1-26/W1-27 + w1_07_support.py; `d0140d4d`).
-- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1 package; record commits between queues), DEC-930
-  (re-plan package after the second re-pin; four weekly numbers from now), DEC-931 (the two ACTs).
+- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1), DEC-930 (re-plan after re-pin 2; four weekly
+  numbers), DEC-931/932 (ACTs), DEC-933 (re-pin cadence; nightly rule).
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -83,10 +81,9 @@
   weekly sweep (lists 3 + 5 pending: `tools/sweep.py --apply --only pytest-runs,code-graph`). Older text: archive.
 
 ### Next
-1. **When the clone run ends:** ACT-W2-57-LS-1 file + ping. **When W2-07 run 5 returns DONE:** merge it, probe_impact,
-   rebuild; remove its temp folder (holder check). Then packages P-SCOPE-RECORDS-1 (DEC-929) and P-TOOLS-REVIEW-1.
-2. **Second re-pin** (W2-57, W2-07 r2, W2-68, W2-71 code), then ACT-W2-57-LS-2, closes W2-58, W2-63, W2-07, W2-57,
-   then the re-plan package (DEC-930).
+1. **Re-pin 2:** full run -> ACT-REPIN-2 -> smoke -> ACT-W2-57-LS-2 -> queue W2-58, W2-63, W2-07, W2-57.
+2. Packages P-SCOPE-RECORDS-1 (DEC-929) and P-TOOLS-REVIEW-1; then the re-plan package (DEC-930). Re-pin 3 =
+   W2-68 + W2-71 when they land.
 3. **P-TOOLS-REVIEW-1 (independent review of my tools: lens + this week's slips, list in the
    archive; acceptance tests for build_lead_brief.py and the queue's gates). Repair tickets DAEO-2upp (W2-70) and
    DAEO-s1wp (W2-66, now closed): owner's decision.

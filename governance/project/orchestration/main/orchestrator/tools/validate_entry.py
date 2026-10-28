@@ -2,7 +2,7 @@
 as it will stand, before the entry reaches the owner's commit (owner, standing, DEC-895 item 1).
 
 Run with the pin's interpreter, so the judge's own code reads it:
-    ~/.local/share/gov-os/pin-6a4696eb/bin/python -E validate_entry.py <patch of the path map> [<register file>]
+    <the current pin's interpreter, the first line of ~/.local/bin/gov> -E validate_entry.py <patch of the path map> [<register file>]
 
 It applies nothing. It reads the entries the patch adds to `load_sensitive`, `accepted_reds` or `accepted_history`,
 and judges each:

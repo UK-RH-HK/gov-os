@@ -1,26 +1,15 @@
-# Lead checkpoint — DAEO-cy5o (W2-57), end of run 2 (DONE)
+# Lead checkpoint — DAEO-cy5o (W2-57), end of run 3 (judgement-only re-probe, DEC-895): DONE
 
-- **Status returned:** DONE. Review 2, the last of the round (DEC-916), passed, and its probe record is committed.
-- **Branch head:** `da0240e0563e` (the probe record, `docs/probes/DAEO-cy5o/PR-DAEO-cy5o-review-2.md`). Probed head: `8f61bda0eb5c` (checkpoint CP-DAEO-cy5o-0009). Code head: `9f8b06408511`.
-- **Run 2 commits:**
-  - `101285866733`: the merge of `w2/integrate` at `a42e899b56fb` (lead).
-  - Test designer (session 6e0470a5-0894-4c9c-957c-ca46d78108d0): `2074ac440fdb` (W1-19, B3), `8b62efcf2cc2` (W1-30 r15, R2), `7d16971e1a82` (W2-57's R1 file and README).
-  - Engineer (session 310f4f41-0e50-4ddd-9c2d-bb6c998cc96f): `8d34ea94ba5a` (`serial.py`, the serial call in `command.py`, doctor R1, unit `test_serial`), `9f8b06408511` (CIT-E).
-  - Lead: `8f61bda0eb5c` (checkpoint), `da0240e0563e` (probe record).
-  - Reviewer (session 65b2eade-aedd-45f6-b014-4ff8f5d64a91): wrote nothing.
-- **Verification at `9f8b06408511`** (`log/verify2`):
-  - rebuild: exit 0;
-  - `gov check`: ok, 15 GREEN, 2 YELLOW (both known);
-  - parallel run: 16,430 passed, 31 skipped, 8 failed. The 8 are W2-66's DEC-919 case and seven base reds (W1-01 ×4, W1-47 ×2, W1-49). W2-74 fixes the seven; it merged into `w2/integrate` at 15:33, after this run started at 13:18;
-  - serial run (48 entries): 104 passed;
-  - nightly batch (15 entries): 76 passed;
-  - collection: 16649/16651 (2 deselected), no error.
-- **Packages and residuals returned:**
-  - P-1 (review 2's F1): an entry criterion of W2-M406's fix: `gov.close.nightly` must run both routes.
-  - P-2 (F2): the scope of DEC-549 P-4.
-  - P-W2-57-R2-T1: W1-19's README and DEC-373's mark.
-  - Rows: review 2's F3 and F4, and O2 (W2-58's launched cases leave its close).
-  - Run 1's residuals: its F3 (W1-02's bound on CPU time) and O1 (`Implements: engineer` on two of run 1's lead commits).
-- **What a resume must do:** nothing in this worktree. The orchestrator merges. Whichever of W2-57 and W2-07's round 2 merges second merges `w2/integrate` back, re-verifies, and gets a fresh probe if its review went stale (DEC-924, DEC-895).
-- **Loop count:** run 2 took 1 implementer iteration, converged.
-- **Temp:** `/tmp/gov-os-lead-W2-57` 36K, 9 inodes. `.gov-runtime` 411M, 2,698 inodes (the store and index 373M; scratch 38M).
+- **Status returned:** DONE. The re-probe passed and its record is committed. Ready to merge.
+- **Branch head:** `d0cb962998b5` (the probe record `docs/probes/DAEO-cy5o/PR-DAEO-cy5o-reprobe-1.md`). Probed head: `8d9d78d93529`.
+- **Run 3 commits (all lead, trailers Task: DAEO-cy5o, Implements: DEC-895, Role: orchestrator, Co-Authored-By):**
+  - `91f5b19af1af`: merge of `w2/integrate` at `8555aafc0ba6` (no conflict).
+  - `8d9d78d93529`: gov checkpoint CP-DAEO-cy5o-0012.
+  - `d0cb962998b5`: probe record (pass).
+- **Judged x changed:** one file, `src/gov/close/command.py`: comment-only change of gate (h)'s `recorded` line; behaviour in W2-07's `gates.py`. probe_impact on the merge: STALE PROBE, 1 file.
+- **Verification (log/run3/):** rebuild exit 0; keyword warn 0; gov check ok 15 GREEN 2 YELLOW (known); W2-57 + tests/unit/close close-form parallel 466 passed 0 failed (3:52); serial entry p95 1 passed; collect `16690/16692 tests collected (2 deselected)`, no error.
+- **Reviewer rev-3:** session 5c605c2d-28ee-473e-a639-f42f87ccc3a8, gov launch sandboxed, effort max, 14.9 min, 63 turns; twelve fields complete; tripwire 8: no change; verdict pass, no finding, O1 (yes / other); F1-F4 of review 2 stand. Read refusals 0; gov retrieve used once (facets stale); code-graph CLI could not start in the sandbox.
+- **trailer_gate:** `DAEO-cy5o: 31 commits, 31 judged, 0 lacking, 2 Implements item(s) not a decision or Contract id that resolves`: `d0bfeb6afd95` and `6be837bbbe41` (run 1 lead commits, `Implements: engineer`; P-TRACE-IMPL-1 already names them for a later accepted-history entry). Should have named DEC-733 and DEC-511 respectively.
+- **What a resume must do:** nothing in this worktree. The orchestrator merges and closes.
+- **Loop count:** run 3 added no code; no implementer.
+- **Temp:** `/tmp/gov-os-lead-W2-57` 28K, 7 inodes. `.gov-runtime` 428M, 2,768 inodes.

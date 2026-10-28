@@ -1,7 +1,7 @@
 """Gate (h) of the close queue: the close's work-without-a-task gate (`_check_unmeasured`, DEC-490, DEC-500), run with
 the pinned judge's own code before a close spends its full run (W2-58's refused close of 2026-10-22).
 
-    ~/.local/share/gov-os/pin-6a4696eb/bin/python -E unmeasured_gate.py <ticket id>
+    <the current pin's interpreter, the first line of ~/.local/bin/gov> -E unmeasured_gate.py <ticket id>
 
 Prints each commit of the ticket's range that names no task and changes the ticket's work, with the paths; exits 1
 if any. (Merges that are git's own merge on a FULL ticket's probed paths, which the probe gate exempts, are not

@@ -16,7 +16,7 @@ log "clone at $(git log -1 --format=%h)"
 python3 "$ORCH/tools/add_exemption.py" governance/project/path-map.yaml >> "$OUT/run.txt" 2>&1 || { log "the entry could not be added"; exit 2; }
 git diff > "$PATCH"
 log "patch written: $(git diff --stat | tail -1)"
-/home/usain/.local/share/gov-os/pin-6a4696eb/bin/python -E "$ORCH/tools/check_exemption_pin.py" "$T/clone" >> "$OUT/run.txt" 2>&1 \
+"$(head -1 /home/usain/.local/bin/gov | sed 's/^#!//')" -E "$ORCH/tools/check_exemption_pin.py" "$T/clone" >> "$OUT/run.txt" 2>&1 \
   || { log "PIN CHECK FAILED"; exit 1; }
 python3 "$ORCH/tools/placeholder_scan.py" "$PATCH" >> "$OUT/run.txt" 2>&1
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$T/clone/src" python3 -m gov.check.pathmap >> "$OUT/run.txt" 2>&1; log "core-pathmap exit $?"

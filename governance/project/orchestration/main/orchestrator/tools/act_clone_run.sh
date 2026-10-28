@@ -2,7 +2,7 @@
 # A full run in the close's form, WITH THE CURRENT PIN, on a fresh clone of w2/integrate's head with a path-map patch
 # applied to its tree (owner, standing, DEC-925 item 2; asked for ACT-W2-57-LS-1 on 2026-10-28).
 # Usage: act_clone_run.sh <name> <patch>
-# The close's form, as the pinned `gov close` builds it (gov/close/command.py of pin-6a4696eb):
+# The close's form, as the pinned `gov close` builds it (gov/close/command.py of the current pin):
 #   the pin's interpreter; PYTHONPATH = the clone's src/ (the close sets it so); the parallel run of tests/ with the
 #   pin's serial-only plugin, -n auto, --dist load, --timeout=900 --timeout_method=signal (the test map's
 #   per_test_timeout and distribution), tmp_path retention "failed"; then the declared cases alone and serially;
@@ -13,8 +13,11 @@ NAME=$1
 PATCH=$2
 ORCH=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator
 REPO=/home/usain/Dynamic-Agentic-Engineering-OS
-PIN=/home/usain/.local/share/gov-os/pin-6a4696eb
-PY=$PIN/bin/python
+# The current pin, whichever it is: the interpreter on the first line of ~/.local/bin/gov (as close_queue.sh reads it),
+# so this script follows every re-pin (DEC-933 item 1).
+PY=$(head -1 /home/usain/.local/bin/gov | sed 's/^#!//')
+PIN=$(dirname "$(dirname "$PY")")
+[ -x "$PY" ] || { echo "the pinned gov names no interpreter that runs: $PY"; exit 2; }
 PLUG=$PIN/lib/python3.12/site-packages/gov/close/pytest_plugin
 STAMP=$(date +%Y%m%d-%H%M)
 OUT=$ORCH/log/act-runs/$NAME-$STAMP

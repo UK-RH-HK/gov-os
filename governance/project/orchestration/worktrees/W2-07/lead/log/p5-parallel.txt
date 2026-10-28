@@ -227,4 +227,19 @@ ssss................sssssssss.ssssssss.ssss............................. [ 11%]
 ........................................................................ [ 97%]
 ........................................................................ [ 98%]
 ........................................................................ [ 98%]
-.................................................................
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+......................                                                   [100%]
+=========================== short test summary info ============================
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_history.py:17: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_history.py:223: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:62: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:68: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [13] tests/acceptance/W1-01/test_w1_01_settings_deny.py:82: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [7] tests/acceptance/W1-01/test_w1_01_settings_deny.py:88: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_settings_deny.py:94: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+16479 passed, 31 skipped in 3252.02s (0:54:12)
