@@ -33,8 +33,13 @@ cd "$CLONE" || exit 2
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" "$PY" -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
-ENTRIES=$(PYTHONPATH="$PLUG" "$PY" -E -c "import pathlib, gov_close_serial_only as s; print('\n'.join(s.entries(pathlib.Path('.'))))")
-echo "serial-only entries (pin's reading): $(echo "$ENTRIES" | grep -c .)" >> "$OUT/run.txt"
+# No -E here: -E drops PYTHONPATH, and the plugin then never loads (2026-10-28: 0 entries read, run stopped).
+ENTRIES=$(env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$PLUG" "$PY" -c "import pathlib, gov_close_serial_only as s; print('\n'.join(s.entries(pathlib.Path('.'))))" 2>> "$OUT/run.txt")
+count=$(echo "$ENTRIES" | grep -c .)
+echo "serial-only entries (pin's reading): $count" >> "$OUT/run.txt"
+# The list holds well over a hundred entries; none read means the reading failed, and the serial run would be the
+# whole suite.
+[ "$count" -gt 0 ] || { echo "STOPPED: no serial-only entry read" >> "$OUT/run.txt"; exit 2; }
 OPTS="-q -p no:cacheprovider --tb=line --no-header --timeout=900 --timeout_method=signal -o tmp_path_retention_policy=failed"
 start=$(date +%s)
 # shellcheck disable=SC2086

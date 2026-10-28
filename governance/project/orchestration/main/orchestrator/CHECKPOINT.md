@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RUNNING (task b28ua0o6h); next free DEC-932)
+## RESUME HERE (2026-10-28 00:45 GMT — QUEUE DONE: all 7 closed exit 0 (W2-66 full 76 min; six scoped 10-28 min); W2-57 MERGED `57e363c5`; W2-07 r2 lead run 5 (merge-back + re-verify) RUNNING (task b8gq2vln2); ACT-W2-57-LS-1 clone run RESTARTED 00:55 (task bwjd5xd0y; first run stopped: `-E` dropped PYTHONPATH, 0 serial entries read; fixed + guard); DEC-932 `4f2fc3d6`; P-REPIN-2 sent (owner's choice pending); next free DEC-933)
 
 ### Now
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept for rollback.
@@ -21,9 +21,10 @@
   follow-up case fails there, drop it from the patch (5 entries). Then write `packages/ACT-W2-57-LS-1.md` (operator
   commits Role: owner; Implements: DEC-931, DEC-927), commit it, ping ACT.
   ACT-W2-57-LS-2 (W1-46 x23, W1-19 warm p95) right after the second re-pin.
-- **Finding for rows:** a lone `pytest tests/unit/close/test_serial.py` under the pin fails to import gov.close.serial
-  (the pin's gov loads first); the full run collects because some unit conftests put src/ first. The close itself sets
-  PYTHONPATH=src. Fragile for a narrow scoped selection -> row.
+- **DEC-932:** narrow scoped close passes under the pin (close sets PYTHONPATH=src for every run, alone runs too):
+  no fix, row W2-L449. Rows of the queue moved to §4, counts fixed. P-REPIN-2: re-pin 2 = W2-57 + W2-07 r2 as soon
+  as W2-07 merges; W2-68 + W2-71 a third; ladder in the package. Run clones under ~/gov-os-runs/W2-00 (2.6G) are
+  never removed (guard refuses my rm; sweep only protects them; a stopped clone of 558M left) -> tools review/digest.
 - **validate_entry.py** now scans only added lines for placeholders (an old entry's unfilled time, on a removed line, failed it).
 - **W2-07 r2 run 5:** brief `briefs/W2-07-A5-run5.md`; expects merge clean, unmeasured 0/0/0, full run; DONE ->
   merge W2-07 (second), then probe_impact.
