@@ -2,7 +2,7 @@
 
 - **Ticket:** DAEO-2gc7 (W2-68), profile FULL.
 - **Sources:** DEC-883 items 1 to 4; DEC-889 items 2 (2 b: a failing test is re-run alone before any bisect) and 4; DEC-890; DEC-880 (the path map is shared core); DEC-884 item 4 (the trial); DEC-899; DEC-936 item 2. The card is in `docs/plan/WAVE_2_WBS.md` §2 (W2-68) and the ticket file is `.tickets/DAEO-2gc7.md`. The design builds on W2-66's `gov.close.select`, `gov.close.evidence`, `gov.close.nightly` and `governance/project/test-map.yaml`.
-- **Status:** design, before implementation. It is the lead's design, checked by the engineer against the code on `w2/integrate` at `966b9f6b`. Section 12 lists what was corrected. Section 11 lists the open points, each returned as a decision package.
+- **Status:** design, before implementation. It is the lead's design, checked by the engineer against the code on `w2/integrate` at `966b9f6b`. Section 12 lists what was corrected. Section 11 lists the points the engineer returned, each settled by the lead with its answer and why.
 - **Readers:** the test designer and the reviewer, before any code is written.
 
 ## 0. What exists (W2-66, as it stands on w2/integrate)
@@ -33,7 +33,7 @@ No second store of runs is built. Reuse and the batch read and write only (a) an
 
 ## 1. The two fingerprints (new module `src/gov/close/fingerprint.py`)
 
-- **Read, never written:** the test map's `record_only` list, as the commit being fingerprinted holds it (`git show <commit>:governance/project/test-map.yaml`). The list is judged by the same steps as `select.load_map`: YAML that parses to a mapping, then validation against the test-map schema (Draft 2020-12). Section 11, package B, settles which schema is used. Patterns are read with the `allowed_paths` grammar (`select.match`).
+- **Read, never written:** the test map's `record_only` list, as the commit being fingerprinted holds it (`git show <commit>:governance/project/test-map.yaml`). The list is judged by the same steps as `select.load_map`: YAML that parses to a mapping, then validation against the test-map schema (Draft 2020-12). The schema is the commit's own `template/governance/kernel/schemas/test-map.schema.json`, then its `governance/kernel/schemas/test-map.schema.json`, else the running package's own; a map that none of them validates is "cannot be computed" (section 11, point B). Patterns are read with the `allowed_paths` grammar (`select.match`).
 - **The code fingerprint of a commit** is `sha256:` followed by the sha256 of the sorted lines of `git ls-tree -r -z --full-tree <commit>`. Each line has the form `<mode> <type> <object>`, a tab, then the path. Every path that the commit's `record_only` list matches is left out. Submodule entries are kept. Nothing is read from the working tree.
 - **The records fingerprint of a commit** is computed the same way over exactly the left-out (record-only) entries.
 - **The path map and the test map are always code** (DEC-880, DEC-899). `governance/project/path-map.yaml`, `governance/project/test-map.yaml` and the test-map schema stay in the code fingerprint even if a `record_only` pattern matches them. A change to the path map, or to the record-only list itself, therefore changes the code fingerprint and forces a fresh run.
@@ -48,7 +48,7 @@ No second store of runs is built. Reuse and the batch read and write only (a) an
 | every close record's `evidence` | `code_fingerprint` and `records_fingerprint` of the head closed (or null) | the close (`command.py`'s record lines) |
 | a batch's run record (`docs/close/nightly/NR-*.json`, `kind: batch`) | `code_fingerprint` and `records_fingerprint` of the batch's head | the batch |
 
-Whether the `fingerprints` table counts toward the store's digest is open: see section 11, package C.
+The `fingerprints` row is kept out of the store's digest and out of the graph's tables (section 5; section 11, point C).
 
 ## 3. The batch (new module `src/gov/close/batch.py`; `python3 -m gov.close.batch`, no new `gov` command)
 
@@ -96,7 +96,7 @@ A candidate is reused only if **all** of the following hold. Each failure means 
 2. It is a full run: `scope: full`. A scoped or reused close is never a candidate, so reuse never chains.
 3. It passed, with no failure stated: `evidence.failures` is empty, or for a night both `failures` and `findings` are empty. A run whose close needed a load-sensitive re-run or an accepted red is not reused.
 4. Every JUnit XML file it names exists, parses, holds at least one test case and holds no `failure` or `error`. A run cut short is never reused, whether its file is a placeholder with no case or is missing.
-5. The skip count read from its JUnit XML equals the count it states, where it states one (see section 11, package D, for nights).
+5. The skip count read from its JUnit XML equals the count the record states: a close's or a batch's `skip_count`, or a night's `tests_run.skipped`. A record that states neither is not reused (section 11, point D).
 6. The code fingerprint of its head, computed now, equals HEAD's, and also equals the fingerprint the record states, where it states one. If HEAD's code fingerprint cannot be computed, nothing is reused.
 7. The close was not asked `--full`, and W2-66's plan gives no `TEST_MAP_*` or `UNRESOLVED_TARGET` reason.
 
@@ -109,7 +109,7 @@ A candidate is reused only if **all** of the following hold. Each failure means 
   - the skips of the close's own runs.
 
   **A reused run's skips are stated, never inherited unseen.**
-- W2-66's `select._form` leaves out only acceptance suites. The reused form must therefore also ignore `tests/unit` and every other entry under `tests/` that no record-reading target reaches. W2-66's scoped plan never needed this, because it always selects `tests/unit`.
+- The reused run's regression also leaves out `tests/unit` and every other folder under `tests/` that is not a record-reading target, each by `--ignore`. W2-66's `select._form` leaves out only acceptance suites, which its scoped plan never needed to widen, because that plan always selects `tests/unit`.
 
 **The governance check of a reusing close.** The close states the reused record's check result (`governance_checks_reused`: record, commit, code fingerprint) in place of running `gov check` again, when all of these hold:
 - the reused record names a check result (a batch does);
@@ -117,11 +117,12 @@ A candidate is reused only if **all** of the following hold. Each failure means 
 - every check in it was run at the record's head;
 - it does not block.
 
-Otherwise the close runs its own check, as today. Today the pre-close gate runs `gov check` before `_scope` asks for the selection, so the reuse decision has to be taken before the pre-close gate. That is a change to the order of the calls in `command.py`. Section 11, package A, covers the records that change between H and the head closed.
+Otherwise the close runs its own check, as today. Today the pre-close gate runs `gov check` before `_scope` asks for the selection, so the reuse decision has to be taken before the pre-close gate. That is a change to the order of the calls in `command.py`. The records committed after H are judged by the record-reading set, which every reusing close runs (section 11, point A).
 
 ## 5. The store (`src/gov/store/**`, `src/gov/close/repo.py`)
 
 - **The fingerprints row.** `gov.store.load` records the row: head, code, records, kind `rebuild`.
+- **The row and the store's digest.** The row is kept out of the store's digest (`_digest`) and out of the graph's tables (`_TABLES`), so the recovery-rebuild check (CAP-38.b, `gov.rebuild.check`) is unchanged. An incremental record load of a commit must leave the same store digest as a full load of that commit.
 - **The incremental record load** (in `gov.store`, called by `batch refresh`):
   - It runs only when the store's row holds a code fingerprint equal to HEAD's. Otherwise it refuses with `STORE_CODE_CHANGED` (exit 1): a full rebuild is needed.
   - It reloads the record graph from HEAD: records, edges, commits, trailers, commit paths and register entries. This takes seconds.
@@ -179,6 +180,7 @@ The design needs no change to `select.py`, `evidence.py`, `nightly.py`, `src/gov
 - Equal fingerprints say the tree is the same, not the machine: installed packages, the interpreter and the pinned judge are all outside the tree.
 - Reuse needs the reused run's JUnit XML, which lives under `.gov-runtime/` and is not committed. On another clone or after a clean-up, condition 4 fails and the close runs fresh. That is safe, but it saves nothing there.
 - The bisect needs a green nightly-folder record before H. Without one, the attribution falls to the test's own ticket or to `outside`.
+- The governance checks are not run again over the records committed after H (close records, ticket status, checkpoints): a reusing close states the batch's check result, made at H. The reason is the owner's own text, DEC-883 item 1 a (one `gov check` for the whole batch, on that head) and item 1 b (each ticket's own checks, which do not include `gov check`). Those records are judged by the record-reading set, which every reusing close runs; the next batch's or night's check sees them in full.
 
 ## 10. The trial (DEC-884 item 4), to be measured and added here
 
@@ -191,32 +193,35 @@ The trial runs on a fixture programme built from scratch in a temporary folder, 
 
 Figures: to be added after implementation.
 
-## 11. Open points, returned as decision packages
+## 11. Settled points
 
-These points are kept as the lead designed them, or are left open where the draft is silent. Each is returned to the lead with a recommendation.
+The engineer returned four points from the check against the code; the lead settled each.
 
-- **A. The batch's `gov check` serves closes whose records differ from H.** After the first close, HEAD is H plus record-only commits: close records, ticket status, checkpoints. `gov check`'s declared checks read records, and `_check_governance` today stands only on a result of the commit being closed. Options:
-  - (a) keep the draft: one check per batch, as DEC-883 item 1 a says, with this named as a residual;
-  - (b) reuse the check only where HEAD's records fingerprint equals the record's;
-  - (c) every close runs its own `gov check` (about 7 min a ticket).
-
-  Recommended: (a), confidence medium.
-- **B. Which schema judges a past commit's test map.** `select._schema` reads the working tree's kernel schema, else the running package's. A fingerprint of a commit that is not HEAD needs one answer. Recommended: the commit's own `template/governance/kernel/schemas/test-map.schema.json` (then `governance/kernel/schemas/`), else the running package's. This makes the fingerprint a function of the commit and the judge alone. Confidence medium-high.
-- **C. The `fingerprints` table and the store's digest.** The recovery-rebuild check (CAP-38.b, `gov.rebuild.check`) compares the store's digest with a clean load of HEAD. If the row, and in particular its kind, counts toward `_digest`, every `refresh` would turn that check red. Recommended:
-  - keep the table out of `_digest` and out of `_TABLES`;
-  - require that an incremental load of a commit gives the same digest as a full load of it.
-
-  Confidence high.
-- **D. A night's stated skip count.** A night's record states no `skip_count` or `skips`, only `tests_run.skipped`. Recommended: condition 5 reads `tests_run.skipped` as a night's stated count. A batch's record states `skip_count` itself. Confidence high.
+- **A. The batch's `gov check` serves closes whose records differ from H.**
+  - *The point:* after the first close, HEAD is H plus record-only commits (close records, ticket status, checkpoints). `gov check`'s declared checks read records, and `_check_governance` today stands only on a result of the commit being closed.
+  - *Answer:* one check per batch. A reusing close states the batch's check result in place of its own, under the conditions of section 4. The record-only commits after H are judged by the record-reading set, which every reusing close runs. The gap is named in section 9 as a residual.
+  - *Why:* the owner's own text settles it. DEC-883 item 1 a: "one rebuild, one `gov check` and one full regression for the whole batch, on that head"; item 1 b: each ticket's own checks are its acceptance suite, the record-reading tests, trailers, paths, probe record and checkpoint.
+- **B. Which schema judges a past commit's test map.**
+  - *The point:* `select._schema` reads the working tree's kernel schema, else the running package's; a fingerprint of a commit that is not HEAD needs one answer.
+  - *Answer:* the commit's own `template/governance/kernel/schemas/test-map.schema.json`, then its `governance/kernel/schemas/test-map.schema.json`, else the running package's own. A map that none of them validates is "cannot be computed".
+  - *Why:* the fingerprint is then a function of the commit and the judge alone, never of the working tree.
+- **C. The `fingerprints` row and the store's digest.**
+  - *The point:* the recovery-rebuild check (CAP-38.b, `gov.rebuild.check`) compares the store's digest with a clean load of HEAD. A row that counted toward `_digest`, its kind in particular, would turn that check red after every `refresh`.
+  - *Answer:* the row is kept out of the store's digest and out of the graph's tables, and an incremental record load of a commit must leave the same store digest as a full load of that commit (both stated in section 5).
+  - *Why:* the recovery-rebuild check stays unchanged, and an incremental load is checkable against a full one.
+- **D. A night's stated skip count.**
+  - *The point:* a night's record states no `skip_count` or `skips`, only `tests_run.skipped`.
+  - *Answer:* a night's stated skip count is its `tests_run.skipped`; a batch's record states `skip_count` and `skips` itself. Condition 5 compares the count read from the JUnit XML with whichever the record states; a record that states neither is not reused.
+  - *Why:* every candidate then has one stated count to check, and a record with none cannot show that it hides no skip.
 
 ## 12. Corrections to the lead's draft
 
 - **Section 0, the nightly's bisect.** The range starts at the newest green record of the nightly folder (`nightly._last_green`). Full close records are not read for it. When there is no such record, nothing is bisected (`range` and `first_bad` are null). `git bisect run` walks every commit in the range, not only the merges, so the first bad commit can be a ticket's own commit.
 - **Section 0, `--check-result`.** It gives the copied result to the close's test runs as `GOV_CLOSE_CHECK_RESULT`. It does not skip the pre-close gate's `gov check`. The reused check of section 4 is a new call.
 - **Section 0, `STORE_STALE`.** `repo.store_is_of_head` answers true, false or None (no store), and raises only `STORE_UNREADABLE`. `STORE_STALE` is raised by `command._check_store`.
-- **Section 1, the map's reading.** `select.load_map` reads the working tree's file, so it cannot be called on a commit's blob. The fingerprint repeats its steps on the blob (package B).
+- **Section 1, the map's reading.** `select.load_map` reads the working tree's file, so it cannot be called on a commit's blob. The fingerprint repeats its steps on the blob (point B).
 - **Section 4, the reused form.** `select._form` ignores only acceptance suites. The reused run must also ignore `tests/unit` and the other folders under `tests/` (added in section 4).
 - **Section 4, ordering.** The pre-close gate's `gov check` runs before the selection today. Reuse has to be decided first (added in section 4).
 - **Section 5, the record graph.** The loader's tables also include `commit_paths`, which the incremental load reloads too.
 - **Section 5, the lexical and semantic refresh.** These are the existing `lexical.refresh` and `semantic.refresh`, already incremental: by blob for the lexical index, by missing chunk id for the vectors. The lexical index reads the working tree (DEC-344), not HEAD. That is the same thing only because the close and the batch first require the tree to be HEAD.
-- **Section 4, condition 5.** Nights state no `skip_count`; see package D.
+- **Section 4, condition 5.** Nights state no `skip_count`; see point D.
