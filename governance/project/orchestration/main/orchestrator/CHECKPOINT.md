@@ -27,7 +27,7 @@
   never removed (guard refuses my rm; sweep only protects them; a stopped clone of 558M left) -> tools review/digest.
 - **W2-07 r2 run 5:** brief `briefs/W2-07-A5-run5.md`; expects merge clean, unmeasured 0/0/0, full run; DONE ->
   merge W2-07 (second), then probe_impact.
-- **W2-67** held (probe stale on W1-26/W1-27 files + w1_07_support.py; r2+r3 unmerged at `d0140d4d`).
+- **W2-67** held (probe stale: W1-26/W1-27 + w1_07_support.py; `d0140d4d`).
 - **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1 package; record commits between queues), DEC-930
   (re-plan package after the second re-pin; four weekly numbers from now), DEC-931 (the two ACTs).
 
