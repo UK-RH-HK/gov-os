@@ -849,6 +849,7 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     import importlib.machinery
     import importlib.util
     import os
+    from gov.close import serial
     from gov.close.pytest_plugin import gov_close_results as results, gov_close_serial_only as serial_only
 
     counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}  # a skip is counted, not refused (DEC-500)
@@ -912,10 +913,12 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
                 [env["PYTHONPATH"], str(Path(serial_only.__file__).resolve().parent)])}
             plugin_env.pop(serial_only.GIVEN_VARIABLE, None)  # a close inside a run afterwards is given its own
             # In the run afterwards the plugin holds that every entry given names a case (DEC-549).
-            runs = [("parallel", runs[0][1] + ["-p", serial_only.PLUGIN], plugin_env, runs[0][3]),
-                    ("serial-afterwards", pytest + declared + options + ["-p", serial_only.PLUGIN],
-                     {**plugin_env, serial_only.GIVEN_VARIABLE: "\n".join(declared)},
-                     f"the serial run afterwards of the declared cases of {rel}")]
+            runs = [("parallel", runs[0][1] + ["-p", serial_only.PLUGIN], plugin_env, runs[0][3])]
+            declared = serial.phase(root, declared)  # W2-57: an entry routed to the nightly is in neither phase
+            if declared:
+                runs.append(("serial-afterwards", pytest + declared + options + ["-p", serial_only.PLUGIN],
+                             {**plugin_env, serial_only.GIVEN_VARIABLE: "\n".join(declared)},
+                             f"the serial run afterwards of the declared cases of {rel}"))
     else:
         declared = []
         runs = [("serial", pytest + whole + options, env, f"the test run of {rel}")]

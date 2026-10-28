@@ -118,6 +118,8 @@ NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
 CONFIG_INVALID = "CONFIG_INVALID"
 
 COMMAND_TIMEOUT_S = 180.0  # a wait under parallel load, not a time the ticket promises (DEC-554, point 2)
+# How much of each stream a failure message keeps at its head: the end, where a traceback's cause is (row W2-L409).
+OUTPUT_EXCERPT_CHARS = 2000
 
 # Revised after implementation: W1-27's rebuild recreates the lexical index
 # through its owner and its secrets filter (DEC-440); the size of the copied
@@ -135,6 +137,21 @@ class CliMissing(AssertionError):
 def label(args):
     """``("check", "--list")`` -> ``"check --list"`` (test ids and messages)."""
     return " ".join(args)
+
+
+def excerpt(text, limit=OUTPUT_EXCERPT_CHARS):
+    """``text`` (str or bytes) stripped, and cut to its last ``limit`` characters; what was cut is counted."""
+    if isinstance(text, bytes):
+        text = text.decode("utf-8", errors="replace")
+    text = (text or "").strip()
+    if len(text) <= limit:
+        return text or "(nothing)"
+    return f"[{len(text) - limit} characters before this cut]\n{text[-limit:]}"
+
+
+def output_excerpt(stdout, stderr):
+    """What a command printed, trimmed, for the head of a failure message (row W2-L409)."""
+    return f"stdout (trimmed):\n{excerpt(stdout)}\nstderr (trimmed):\n{excerpt(stderr)}"
 
 
 # --------------------------------------------------------------------------
@@ -397,6 +414,10 @@ class Run:
         return (f"gov {' '.join(self.args)}\nexit code: {self.returncode}\nstdout:\n{self.stdout}\n"
                 f"stderr:\n{self.stderr}")
 
+    def excerpt(self):
+        """The command, its exit code and what it printed, trimmed (row W2-L409)."""
+        return f"gov {' '.join(self.args)}, exit code {self.returncode}\n{output_excerpt(self.stdout, self.stderr)}"
+
     def envelope(self):
         """Standard output as one JSON object."""
         try:
@@ -430,8 +451,10 @@ def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
     try:
         done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
                               capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
-    except subprocess.TimeoutExpired:
-        raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+    except subprocess.TimeoutExpired as exc:
+        # Row W2-L409: what the command printed before the wait ended is kept, so its cause shows.
+        raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s; "
+                             f"what it printed before then:\n{output_excerpt(exc.stdout, exc.stderr)}") from None
     return Run(tuple(args), done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
 
 
