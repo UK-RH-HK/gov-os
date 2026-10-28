@@ -25,7 +25,6 @@
   no fix, row W2-L449. Rows of the queue moved to §4, counts fixed. P-REPIN-2: re-pin 2 = W2-57 + W2-07 r2 as soon
   as W2-07 merges; W2-68 + W2-71 a third; ladder in the package. Run clones under ~/gov-os-runs/W2-00 (2.6G) are
   never removed (guard refuses my rm; sweep only protects them; a stopped clone of 558M left) -> tools review/digest.
-- **validate_entry.py** now scans only added lines for placeholders (an old entry's unfilled time, on a removed line, failed it).
 - **W2-07 r2 run 5:** brief `briefs/W2-07-A5-run5.md`; expects merge clean, unmeasured 0/0/0, full run; DONE ->
   merge W2-07 (second), then probe_impact.
 - **W2-67** held (probe stale on W1-26/W1-27 files + w1_07_support.py; r2+r3 unmerged at `d0140d4d`).
