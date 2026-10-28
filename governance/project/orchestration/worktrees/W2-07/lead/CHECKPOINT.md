@@ -10,5 +10,14 @@
   full verification (parallel p5.sh then serial s5.sh, flock, retention) -> trailer_gate -> collect-only -> return.
 - No workers in this run (STANDARD, no code changes). Loop count: n/a.
 
+## Results so far
+- Rebuild (r5rebuild.sh) exit 0, 00:33-00:45; gov.__file__ = /home/usain/gov-os-worktrees/W2-07/src/gov/__init__.py.
+- Lead check (unmeasured3.py): 5j8b 0, pl6k 0, r9ss 0 (log/r5-unmeasured.txt).
+- gov check exit 0: YELLOW core-decision-citations (warning), openspec-validate (not on PATH); rest GREEN.
+- Touched suites (t5.sh: W2-07, W2-57, unit/close): 535 p, 1 f = W2-57 designer-read p95 (246/256/253 ms, load
+  20-32 at start); passed alone at load 6 (2.95 s). Not on load_sensitive.
+- keyword_warn: 0 files. Guard refusals: lead 1 write (variable path in a Bash redirect; done via script file).
+- Next: p5.sh (parallel, flock) then s5.sh (serial, flock).
+
 ## What a resume must do
 - Continue from the first step above that has no result in log/ (r5-*).

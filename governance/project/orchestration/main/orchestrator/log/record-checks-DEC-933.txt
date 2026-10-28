@@ -1,0 +1,9 @@
+core-pathmap exit 0
+core-schema exit 0
+core-mutation exit 0
+core-authority exit 0
+core-graph exit 0
+context-reproducibility exit 0
+record-reading suites exit 0: 132 passed in 362.73s (0:06:02)
+placeholder scan exit 0: placeholder scan: 0 hit(s)
+keyword warning exit 0: keyword-warn: 0 file(s) hold a keyword of row W2-L423's rule; 0 not read
