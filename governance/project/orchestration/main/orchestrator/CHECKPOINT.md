@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 13:10 GMT — ACT-W2-57-LS-1 COMMITTED by owner `6367e965`; gate (b) green after it; ACT-REPIN-2 SENT (`a47f1b3c`, ladder passed); ACT-NIGHTLY-1 REVISED (DEC-934 `a999f97b`, namespace fix `95a810a6`): committed nightly in governance/project/orchestration/nightly/; final gov check on a47f1b3c running (task bcb2lmcv2); next DEC-935)
+## RESUME HERE (2026-10-28 14:30 GMT — RE-PIN 2 DONE: gov = pin-5c401220 (owner `bc37c419`), smoke passed, DEC-935 `eb0015a4`; the nightly route takes 15 entries out of the close (nightly only now); owner installing ACT-NIGHTLY-1; QUEUE STARTED W2-58, W2-63, W2-07, W2-57 (all full; gates e+h dry pass); NO main-tree commits while it runs; next DEC-936)
 
 ### Now
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
