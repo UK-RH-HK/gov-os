@@ -1,0 +1,6 @@
+2026-10-28 20:12:39 quiet
+2026-10-28 20:12:39 rebuild before DAEO-5j8b
+2026-10-28 20:18:08 collect ok: 16690/16692 tests collected (2 deselected) in 8.26s
+2026-10-28 20:20:19 records ok: 80 passed in 126.04s (0:02:06)
+2026-10-28 20:20:21 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-28 20:25:56 check ok; close DAEO-5j8b (load 4.01)

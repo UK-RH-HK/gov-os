@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 14:30 GMT — RE-PIN 2 DONE: gov = pin-5c401220 (owner `bc37c419`), smoke passed, DEC-935 `eb0015a4`; the nightly route takes 15 entries out of the close (nightly only now); owner installing ACT-NIGHTLY-1; QUEUE STARTED W2-58, W2-63, W2-07, W2-57 (all full; gates e+h dry pass); NO main-tree commits while it runs; next DEC-936)
+## RESUME HERE (2026-10-28 20:40 GMT — RE-PIN 2 DONE: gov = pin-5c401220 (owner `bc37c419`), smoke passed, DEC-935 `eb0015a4`; ACT-NIGHTLY-1 INSTALLED and checked (crontab 3 lines; Windows task Ready, WakeToRun); QUEUE STARTED 20:07 (task btt0w8kww; log close-queue-20261028-2007) W2-58 (closing since 20:25), W2-63, W2-07, W2-57, all full, ends ~02:10; tonight's nightly waits for it (latest start ~03:25). NO main-tree commits while it runs. AFTER THE QUEUE: commit DEC-936 (drafts/DEC-936.md) + the ping gate (drafts/nightly-next/ -> governance/project/orchestration/nightly/, 28/28 tests) + prompt v3.36 (P2 delegated; only P1/ACT ping; carry-on order); then ACT-W2-57-LS-2 run; then leads in parallel (W2-68, W2-71, W2-67, K4, K3 first); next DEC-936)
 
 ### Now
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
