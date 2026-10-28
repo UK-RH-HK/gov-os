@@ -11196,3 +11196,41 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.314 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-928 (DEC-927's CAP-n reading accepted; DEC-926 stands; standing: an ACT names a plain terminal only when it replaces or reinstalls gov, otherwise the owner's operator runs it). Next free id: DEC-929. |
+
+### DEC-929 — Governance commits stop widening closes: a package for record files of their own; meanwhile non-urgent record commits wait for the gap between queues; the close queue exits non-zero after a refused close (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; items 2 and 3 standing) · **Under:** DEC-880, DEC-889, DEC-851, DEC-861 · **Basis:** W2-66's close record (`docs/close/DAEO-c1uz/CL-DAEO-c1uz.md`): scope full, `SHARED_CORE` (the path map) and `UNPLACED` (the lead brief, the prompt), base `7ada0f58`. The six closes after it were scoped off its head (`00b371a0`) and took 10 to 28 minutes each.
+- **Decision:**
+  1. **A package, after the queue (for W2-68 or a small ticket):**
+     - move the path map's frequently edited lists (`load_sensitive`, `accepted_reds`, `accepted_history`, `acceptance_exemptions`) into record files of their own, read by the record-reading set, so that editing them does not widen a close;
+     - the path map's configuration stays shared core;
+     - prompts and briefs go on the record-only list, and any test that reads them joins the record-reading set;
+     - the package says what each change could let through.
+  2. **Until then (owner, standing):** non-urgent record commits wait while a queue runs; the orchestrator commits them between queues.
+  3. **The close queue's exit status (owner, standing):** `tools/close_queue.sh` exits non-zero after a refused close, fixed as soon as the queue of 2026-10-27 ended, before the tooling review.
+- **Done:** item 3 on 2026-10-28. A refused close now logs `CLOSE REFUSED (exit <n>)`, removes the lock and exits 4 (it was `break`, then exit 0). `tools/test_close_queue_refusal.sh` runs the script's own lines with a stub close: a refused close gives exit 4, the log line and no lock, and a passing close goes on.
+- **Where it goes (DEC-851):** this register; the prompt §15 (the pre-close gate), v3.32; RESUME HERE; the daily digest.
+
+### DEC-930 — A re-plan package for the rest of Wave 2 after this queue and the second re-pin; four numbers reported weekly from now (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-855, DEC-878, DEC-851, DEC-861
+- **Decision:**
+  1. **The re-plan package**, in the six-part form, once this queue and the second re-pin are done:
+     - the minimum needed to start EXAMIN's copy: fast closes, memory proven (K4, W2-61's measure included), agents loading role, skills and model at launch (K3), and the leads' sandbox; everything else proposed for Wave 3, with what each deferral costs;
+     - an estimate per remaining keystone, and a target date for the copy's start;
+     - an operating change, proposed: one daily digest with every non-urgent item; only P1s and ACTs ping; P2s become delegated decisions the owner can overturn in the digest;
+     - parallelism once closes are short: which remaining tickets run side by side (for example the memory tickets and the K3 tickets), how many leads at once the resource gate allows on this machine, how short quiet windows become with scoped and batched closes, and whether the one-verification-run-at-a-time lock can be relaxed once W2-67 lands; the remaining keystones planned so that leads wait as little as possible for the machine.
+  2. **Four numbers, reported weekly from now (owner, standing):** closes per day, refusals caused by the orchestrator's own tooling, cost per week (from a measured source only; where none exists, the report says so), and the number of the owner's decisions per week.
+- **Where it goes (DEC-851):** this register; the prompt §15 (reports), v3.32; RESUME HERE.
+
+### DEC-931 — W2-57's `load_sensitive` removals timed to where each fix lives: two ACTs; the first validated by a full run in the close's form with the current pin; W2-57's two `Implements:` corrections ride the first
+- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`) · **Under:** DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-925 item 2, DEC-927, DEC-851, DEC-861 · **Basis:** W2-57 merged as `57e363c5` (2026-10-28), its return's 30 removals (`log/W2-57-A5-run2.json`), its change record `docs/changes/W2-57-CIT-E.md`.
+- **Decision:**
+  1. **Each removal is timed to where its fix lives.** An entry whose fix is in force in a close now is removed now (ACT-W2-57-LS-1). An entry whose fix is in the judge's code (the live and real-model tests leaving the close for the nightly; the serial phase's changes in `command.py`) stays until the second re-pin pins W2-57's code, and leaves in a second ACT right after it (ACT-W2-57-LS-2).
+  2. **The first ACT is validated** with a full run in the close's form, with the current pin, on a clone with the removal applied (the owner's standing rule for changes that alter how closes behave, DEC-925 item 2), and the ACT says so.
+  3. **W2-57's two `Implements:` corrections** ride the first ACT, in DEC-927's form (`6be837bbbe41`, `d0bfeb6afd95`; named under DEC-927 item 1 in `f06ccf4b`).
+- **The orchestrator's reading, for the owner to overturn:** in a close the pinned `gov close` sets `PYTHONPATH` to the project's `src/`, and W1-07's and W1-38's cases run `gov` from `src/` too. So the fixes of W1-38's three cases and W1-07's `[doctor]` are product code (`src/gov/adapters/portability.py`, `src/gov/doctor/command.py`), yet in force in a close since the merge: they go in the first ACT. W1-30 r13's fix is in the test (its limit, 5 to 30 s). The unit close follow-up case has no fix (not reproduced in 6 runs); it goes in the first ACT only if the clone run passes it. W1-46's 23 and W1-19's warm p95 leave the close only by the nightly route (`src/gov/close/serial.py`, the judge's): the second ACT.
+- **Where it goes (DEC-851):** this register; `governance/project/orchestration/packages/ACT-W2-57-LS-1.md`; RESUME HERE; the daily digest.
+- Next free id: DEC-932.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.315 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-929 (a package moving the path map's lists into record files and prompts and briefs onto the record-only list; standing: non-urgent record commits wait for the gap between queues; the queue exits non-zero after a refused close, done), DEC-930 (the re-plan package after the second re-pin; standing: four numbers weekly), DEC-931 (W2-57's removals in two ACTs by where each fix lives; the first validated by a full close-form run with the current pin; the two corrections ride it). Next free id: DEC-932. |
