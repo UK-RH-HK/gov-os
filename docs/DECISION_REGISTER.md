@@ -10982,7 +10982,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.308 | 2026-10-26 | Owner (recorded by the orchestrator, DEC-861): DEC-922 (ACT-REPIN-1 done: gov from the wheel of `6a4696eb` in pin-6a4696eb, registry `82f2d453`, settings `8ba8b231`; the smoke test passed; the lead clean-up rule (a), none yet; the backup ref deleted; the queue tools on the new judge; gate (h) predicts WORK_WITHOUT_TASK for W2-58, W2-63 and W2-07, package P-W2-07-DR; row W2-L423's early warning would stop every close on W2-69's indexed files, package P-W2-L423-Q; W2-57 starts). Next free id: DEC-923. |
 
 ### DEC-923 — P-W2-L423-Q (a): the keyword warning covers only files sessions write; P-W2-07-DR (a) changed: W2-07's round 2 measures record-only decision commits under any ACCEPTED decision, and gate (h) reads the owner-committed lists, not a `Role: owner` trailer
-- **Status:** ACCEPTED (owner, 2026-10-26, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-26)`) · **Under:** DEC-911, DEC-896 item 1, DEC-891, DEC-906, DEC-922, DEC-866, DEC-861 · **Basis:** packages P-W2-L423-Q and P-W2-07-DR (`governance/project/orchestration/packages/`).
+- **Status:** ACCEPTED (owner, 2026-10-26, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-26)`) · **Under:** DEC-911, DEC-896 item 1, DEC-891, DEC-906, DEC-922, DEC-866, DEC-861 · **Basis:** packages P-W2-L423-Q and P-W2-07-DR (`governance/project/orchestration/packages/`). · **Changed by:** DEC-925 item 1: until W2-74 merges, the early warning also leaves out the close's own JUnit evidence (`.gov-runtime/close/`).
 - **Decision:**
   1. **P-W2-L423-Q (a).** Row W2-L423's early warning (`tools/keyword_warn.py`) covers only the files sessions write under `.gov-runtime/` (scratch, logs, records, and every other file there). It leaves out the index stores that `gov rebuild` builds from tracked files: `codeintel/`, `store.db*` and `query-vector-cache.db*` at the folder's top. The pinned secrets check on the stores stays as it is: gate (b) still runs before every close and fails closed. **Start the close queue.**
   2. **P-W2-07-DR (a), with one change.**
@@ -11013,7 +11013,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.309 | 2026-10-26 | Owner (recorded by the orchestrator, DEC-861): DEC-923 (P-W2-L423-Q (a): the keyword warning covers only files sessions write, not the index stores; the queue starts. P-W2-07-DR (a) changed: W2-07's round 2 measures record-only decision commits (DEC-891's records) under any ACCEPTED decision, delegated or later superseded; gate (h) reads acceptance_exemptions and accepted_history, not a Role: owner trailer; the second re-pin carries it; `611955fa` still unmeasured, asked). Next free id: DEC-924. |
 
 ### DEC-924 — P-W2-07-DR2: `611955fa` accepted as history by the owner's own commit; assessment and audit reports in commits of their own (standing); W2-07's round 2 beside W2-57 with the files split
-- **Status:** ACCEPTED (owner, 2026-10-26, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-26)`; item 2 standing) · **Under:** DEC-923, DEC-891, DEC-895, DEC-899, DEC-862 (a), DEC-851, DEC-861 · **Basis:** package P-W2-07-DR2 (`governance/project/orchestration/packages/P-W2-07-DR2.md`).
+- **Status:** ACCEPTED (owner, 2026-10-26, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-26)`; item 2 standing) · **Under:** DEC-923, DEC-891, DEC-895, DEC-899, DEC-862 (a), DEC-851, DEC-861 · **Basis:** package P-W2-07-DR2 (`governance/project/orchestration/packages/P-W2-07-DR2.md`). · **Changed by:** DEC-925 item 3: W2-57 also holds `command.py`'s serial-phase call (B1 (a)); round 2 keeps gate (h)'s line; the second to merge merges back.
 - **Decision:**
   1. **Q1 (a).** The commit `611955faffaa` (full id `611955faffaa3aad8e3b4da8579d114e79c922b3`; 2026-10-21, the decision records of DEC-889 and DEC-890) is accepted as history.
      - **Its changed paths** (`git show --stat`, DEC-891's rule):
@@ -11046,3 +11046,191 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.310 | 2026-10-26 | Owner (recorded by the orchestrator, DEC-861): DEC-924 (P-W2-07-DR2: Q1 (a), `611955fa` accepted as history by the owner's own Role: owner commit, validated first; standing: assessment and audit reports in commits of their own; Q2 (a), W2-07's round 2 beside W2-57 with the files split, the second to merge merges back, re-verifies and gets a fresh probe if stale). Next free id: DEC-925. |
+
+### DEC-925 — P-REPIN-R1 (a): W2-74 for the regeneration's test revisions, the registry line, the warning's interim, the queue restarted; settings changes run in full on a clone first and ACT commands in a file (standing); P-W2-57-B: B1 (a), B2 (b), the rest delegated
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-922, DEC-923, DEC-924, DEC-911, DEC-917, DEC-899, DEC-906, DEC-866, DEC-851, DEC-861 · **Basis:** packages P-REPIN-R1 and P-W2-57-B (`governance/project/orchestration/packages/P-REPIN-R1.md`). On 2026-10-26, W2-70's close (DAEO-uzme) ran 68 minutes on the full suite and was refused (exit 3, count 1; repair ticket DAEO-2upp). Its eight remaining reds came from the first re-pin's settings regeneration, not from W2-70. The owner committed the accepted-history entry for `611955fa` (`048f5758`, DEC-924) and pushed both branches.
+- **Decision:**
+  1. **P-REPIN-R1 (a).**
+     - **W2-74** (LITE, test designer; ticket `DAEO-2azm`). Each change carries a `Rewrite-Reason:`. It:
+       - retires the six `docs/source` cases (W1-01 ×4, W1-47 ×2), with the folder's removal on 2026-10-01 and P-I1-2 as the reason;
+       - revises W1-49's `[not on PATH]` case so its sandbox has a gov;
+       - renames W2-69's case so its name does not hold row W2-L423's keyword.
+     - **The registry line:** the orchestrator fixes it to cite DEC-922. It is done: the gov entry's `approved_by` is `DEC-922`, and W1-06's approvals suite passes, 25 of 25.
+     - **Until W2-74 merges,** the keyword warning also leaves out the close's own JUnit files (`.gov-runtime/close/`).
+     - **Then the queue restarts, W2-70 first.**
+  2. **A standing rule (owner, standing; the rule about rules, DEC-851).**
+     - **Settings changes:** before the orchestrator sends the owner any settings change or regeneration to commit, it runs a full run in the close's form on a clone with the new settings applied, and sweeps for every test that depends on what changes. The re-pin's regeneration reached the owner's commit without that.
+     - **ACT commands in a file:** every ACT's exact commands go in a file under `governance/project/orchestration/packages/`, not only in the message. The commands of the last ACT did not reach the owner.
+  3. **P-W2-57-B.**
+     - **B1 (a):** W2-57 is widened to the serial-phase call in `src/gov/close/command.py`. W2-07's round 2 keeps gate (h)'s line. Whichever of W2-57 and W2-07's round 2 merges second merges `w2/integrate` back, re-verifies, and gets a fresh probe if its review went stale (DEC-895).
+     - **B2 (b):** the guard's 20-second deadline under load is left to the resource gate and the quiet window.
+     - **Delegated, as the orchestrator proposed:**
+       - B3 (a): W1-19's real-model file is named for W2-57's test designer (W2-M332);
+       - R1: the doctor-budget fix rides along in run 2 (DEC-802);
+       - R2: W1-30's r15 file is named for the test designer (its masked timeout);
+       - A1 (a): the doctor exception case stays strict.
+- **Answered in the chat (the owner's question on W2-70's 68 minutes):** the close ran the full suite (`scope: full`, `why_full: BASE_UNKNOWN`, `base: null`, `changed: []`). W2-66's selection takes as its base the newest head that a committed full, passing close record (`docs/close/*/CL-*.md`, evidence `scope: full`) or a green record of W2-66's own nightly names. None exists yet:
+  - earlier close records predate W2-66's evidence block;
+  - W2-66's nightly is not run (DEC-915 item 4).
+  The first passing close after the restart runs full and sets the base; the closes after it are scoped.
+- **Changes:**
+  - DEC-923 item 1 (the warning's interim);
+  - DEC-924 item 3 (W2-57 also holds `command.py`'s serial-phase call);
+  - W2-57's KPI 6 (the guard deadline, B2 (b)) and paths;
+  - DEC-899 item 4's settings regeneration practice (the full run on a clone before the owner's commit).
+- **Where it goes (DEC-851):**
+  - this register, with DEC-923's and DEC-924's status lines marked;
+  - the prompt §5 (settings changes) and §7 (ACT commands in a file), v3.29;
+  - RESUME HERE;
+  - W2-57's ticket file and card;
+  - W2-74's ticket file and card;
+  - `tools/keyword_warn.py`.
+  The lead and auditor briefs need nothing: leads and auditors send no settings change and no ACT.
+- Next free id: DEC-926.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.311 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-925 (P-REPIN-R1 (a): W2-74 retires the six docs/source cases, gives W1-49's sandbox a gov and renames W2-69's case; the registry line cites DEC-922; the warning leaves out the close's JUnit until W2-74 merges; the queue restarts, W2-70 first. Standing: a settings change runs in full on a clone with a sweep before the owner's commit; every ACT's commands in a file under packages/. P-W2-57-B: B1 (a), B2 (b), B3, R1, R2, A1 delegated). Next free id: DEC-926. |
+
+### DEC-926 — After W2-74's merge, the keyword warning leaves out only the four JUnit files of W2-70's refused close, by exact path
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-27, under the prompt §7: P3, reversible, confidence high; it changes nothing in the Charter, the master rules or the Contract's scope, and does not weaken the guard: gate (b) is unchanged; `Task: decision-record`, `Role: orchestrator`). The owner may overturn it. · **Under:** DEC-925 item 1, DEC-923, DEC-911, DEC-895 · **Basis:** W2-74 merged as `6ee7b4d0` (its full run green), so DEC-925's interim ended and the whole `.gov-runtime/close/` folder is read again.
+- **What happened:**
+  - The warning then listed one file: `.gov-runtime/close/DAEO-uzme/20261026T222046368356Z/03-regression-parallel.xml`. It is the JUnit evidence of W2-70's refused close (2026-10-26), written before W2-74 renamed W2-69's case.
+  - Evidence is never edited (prompt §5).
+  - The pinned secrets-indexing check passes on the main tree with it in place (`python -P -m gov.secrets`, exit 0, 2026-10-27).
+- **Decision:**
+  - The warning leaves out the four JUnit files of that refused close's run folder, by exact path.
+  - Every other file under `.gov-runtime/close/` is read, including every new close's JUnit.
+  - The close queue's stop on the warning stands.
+- **Also (operational):**
+  - W2-74's merge made W2-69's FULL probe stale: it renamed one case id in W2-69's acceptance file (`probe_impact.py`).
+  - W2-69 leaves this queue run, and a judgement-only re-probe in its worktree is scheduled at once (DEC-895).
+  - The queue runs W2-70, W2-66, W2-72, W2-59, W2-65, W2-73 and W2-74. Each passes gates (e) and (h).
+  - W2-07's round 2 (DONE) merges after the queue: its `src/gov/close` change is shared core and would widen every queued close to the full suite (DEC-883).
+- **Where it goes:** this register; `tools/keyword_warn.py`; RESUME HERE; the daily digest.
+- Next free id: DEC-927.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.312 | 2026-10-27 | Delegated (orchestrator): DEC-926 (after W2-74's merge, the keyword warning leaves out only the four JUnit files of W2-70's refused close, by exact path; W2-69 out of the queue for a re-probe; W2-07's round 2 merges after the queue). Next free id: DEC-927. |
+
+### DEC-927 — P-TRACE-IMPL-1 (a) with two conditions: the 39 commits whose `Implements:` names a role are accepted as history as corrections, by the owner's own commit; a wrong `Implements:` is caught within the ticket (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-734, DEC-891, DEC-895, DEC-862 (a), DEC-925 item 2, DEC-851, DEC-861 · **Basis:** package P-TRACE-IMPL-1 (`governance/project/orchestration/packages/P-TRACE-IMPL-1.md`). After W2-70's close (2026-10-27, exit 0), gate (b) went red on product traceability: a closed ticket's commits must name ids the store resolves, and seven of W2-70's carry `Implements: independent-test-designer`. The lead briefs' `IMPL` slot had been filled with a role, so leads and their workers wrote a role there in 39 commits of six tickets on `w2/integrate` (and two on W2-57's branch). · **Changed by:** DEC-928: the CAP-n reading of item 2 is accepted by the owner; the entries are committed (`e95d3520`).
+- **Decision:**
+  1. **(a), one `Role: owner` commit of all 39 entries, each a correction, not a bare exemption.** Each entry in the path map's `accepted_history` is `{commit: <full id>, decision: DEC-927, should_implement: [<ids>]}`. `should_implement` holds the decision ids the commit should have named in `Implements:`, taken from its Task ticket's `sources` that the register holds.
+     - 26 of the commits change only records, and 13 change code, tests or notes (DEC-891).
+     - The entries are validated with the pinned judge's readers and the record suites, and the ACT file is updated (DEC-895, DEC-925 item 2).
+     - The commits, each with its correction and its changed paths (`git show --name-only`):
+       - `09c327d2172662a166fa10dd593b8c74eabdca74` (DAEO-9nys, Role: orchestrator, `Implements: engineer`; should have named DEC-889, DEC-892, DEC-898, DEC-899, DEC-904, DEC-907; record-only): `docs/probes/DAEO-9nys/PR-DAEO-9nys.md`
+       - `60f71c4298bc38cb01bc37a2e6cd0406de8fdaa4` (DAEO-9nys, Role: orchestrator, `Implements: engineer`; should have named DEC-889, DEC-892, DEC-898, DEC-899, DEC-904, DEC-907; record-only): `docs/checkpoints/DAEO-9nys/CP-DAEO-9nys-0004.md`
+       - `915a764dd660d1ff2d08944042dd05c6fc02a6a4` (DAEO-9nys, Role: orchestrator, `Implements: engineer`; should have named DEC-889, DEC-892, DEC-898, DEC-899, DEC-904, DEC-907; record-only): `docs/checkpoints/DAEO-9nys/CP-DAEO-9nys-0012.md`
+       - `f1c743b3ee92b95b31a5c29cde2e756c9ace969b` (DAEO-9nys, Role: orchestrator, `Implements: engineer`; should have named DEC-889, DEC-892, DEC-898, DEC-899, DEC-904, DEC-907; record-only): `docs/checkpoints/DAEO-9nys/CP-DAEO-9nys-0008.md`
+       - `1475b46c9186bf2201023a4ba658b2ee3f3449a6` (DAEO-c1uz, Role: orchestrator, `Implements: engineer`; should have named DEC-912, DEC-880, DEC-726, DEC-852, DEC-841, DEC-881, DEC-883, DEC-884, DEC-889, DEC-890, DEC-892, DEC-896, DEC-891, DEC-899, DEC-903, DEC-905; record-only): `docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0002.md`
+       - `5634d4305a7c4f9b677bed6a6cea26ea53c96c94` (DAEO-c1uz, Role: orchestrator, `Implements: engineer`; should have named DEC-912, DEC-880, DEC-726, DEC-852, DEC-841, DEC-881, DEC-883, DEC-884, DEC-889, DEC-890, DEC-892, DEC-896, DEC-891, DEC-899, DEC-903, DEC-905; record-only): `docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0011.md`
+       - `9174e358d77bbb0829a3c6ea9694026018686e9b` (DAEO-c1uz, Role: orchestrator, `Implements: engineer`; should have named DEC-912, DEC-880, DEC-726, DEC-852, DEC-841, DEC-881, DEC-883, DEC-884, DEC-889, DEC-890, DEC-892, DEC-896, DEC-891, DEC-899, DEC-903, DEC-905; record-only): `docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0007.md`
+       - `ba38ab8d758b3ab9147c951f30aaafbe9b80eaeb` (DAEO-c1uz, Role: orchestrator, `Implements: engineer`; should have named DEC-912, DEC-880, DEC-726, DEC-852, DEC-841, DEC-881, DEC-883, DEC-884, DEC-889, DEC-890, DEC-892, DEC-896, DEC-891, DEC-899, DEC-903, DEC-905; record-only): `docs/checkpoints/DAEO-c1uz/CP-DAEO-c1uz-0004.md`
+       - `20d72c1936118e06b86b5eef16c3157e83e6aa94` (DAEO-e82f, Role: orchestrator, `Implements: engineer`; should have named DEC-917, DEC-913, DEC-880, DEC-822, DEC-835, DEC-884, DEC-889, DEC-899; record-only): `docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0004.md`
+       - `33401f46ad00189bbab9584138888f44f543c57e` (DAEO-e82f, Role: orchestrator, `Implements: engineer`; should have named DEC-917, DEC-913, DEC-880, DEC-822, DEC-835, DEC-884, DEC-889, DEC-899; record-only): `docs/checkpoints/DAEO-e82f/CP-DAEO-e82f-0002.md`
+       - `04878e23252ad3b32c6308ed2ced6db72a062ab6` (DAEO-e82f, Role: engineer, `Implements: engineer`; should have named DEC-917, DEC-913, DEC-880, DEC-822, DEC-835, DEC-884, DEC-889, DEC-899; code, tests or notes): `src/gov/hooks/subagentstop.py`, `template/governance/kernel/hooks/subagentstop.py`
+       - `9e2b97758e2474d8c4b61a3ec54aad724c786965` (DAEO-e82f, Role: engineer, `Implements: engineer`; should have named DEC-917, DEC-913, DEC-880, DEC-822, DEC-835, DEC-884, DEC-889, DEC-899; code, tests or notes): `.rulesync/hooks.jsonc`, `src/gov/hooks/subagentstop.py`, `template/.rulesync/hooks.jsonc`, `template/governance/kernel/hooks/subagentstop.py`, `tests/unit/hooks/test_w29_hooks.py`
+       - `44062fecf53bdcda83cb3c4bfc668945be5c8709` (DAEO-r9ss, Role: orchestrator, `Implements: engineer`; should have named DEC-729, DEC-738, DEC-790, DEC-868, DEC-892, DEC-896, DEC-898, DEC-899, DEC-903, DEC-904, DEC-908; record-only): `docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0005.md`
+       - `614817ec7d6c7a3a9fcf55849c40f414006905b2` (DAEO-r9ss, Role: orchestrator, `Implements: engineer`; should have named DEC-729, DEC-738, DEC-790, DEC-868, DEC-892, DEC-896, DEC-898, DEC-899, DEC-903, DEC-904, DEC-908; record-only): `docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0010.md`
+       - `80ec31ab61b844888ddc05470aa12ce3d768e908` (DAEO-r9ss, Role: orchestrator, `Implements: engineer`; should have named DEC-729, DEC-738, DEC-790, DEC-868, DEC-892, DEC-896, DEC-898, DEC-899, DEC-903, DEC-904, DEC-908; record-only): `docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0011.md`
+       - `8e9ce18db1c52f1861ce5e579ca4298d0833ea13` (DAEO-r9ss, Role: orchestrator, `Implements: engineer`; should have named DEC-729, DEC-738, DEC-790, DEC-868, DEC-892, DEC-896, DEC-898, DEC-899, DEC-903, DEC-904, DEC-908; record-only): `docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0007.md`
+       - `d2eee219625e620b75b118c109c3778a2aa21a37` (DAEO-r9ss, Role: orchestrator, `Implements: engineer`; should have named DEC-729, DEC-738, DEC-790, DEC-868, DEC-892, DEC-896, DEC-898, DEC-899, DEC-903, DEC-904, DEC-908; record-only): `docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0008.md`
+       - `e8ad70b51c91b274dfdbb29e57bd15ccdcd9c08c` (DAEO-r9ss, Role: orchestrator, `Implements: engineer`; should have named DEC-729, DEC-738, DEC-790, DEC-868, DEC-892, DEC-896, DEC-898, DEC-899, DEC-903, DEC-904, DEC-908; record-only): `docs/checkpoints/DAEO-r9ss/CP-DAEO-r9ss-0002.md`
+       - `34e1c59f06e6a158bfd0cf0e00c2d83633d69647` (DAEO-rmbe, Role: orchestrator, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; record-only): `docs/probes/DAEO-rmbe/PR-DAEO-rmbe.md`
+       - `3fd2b5a1e664d7c987a2c9a3ffaafd99f4c60a01` (DAEO-rmbe, Role: orchestrator, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; record-only): `docs/checkpoints/DAEO-rmbe/CP-DAEO-rmbe-0004.md`
+       - `527345b7bf43b8f05d9ccb16e39d0c79c0a02563` (DAEO-rmbe, Role: orchestrator, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; record-only): `docs/checkpoints/DAEO-rmbe/CP-DAEO-rmbe-0003.md`
+       - `cfea8a26e668c49f60f1fa936b6295d661f47dc5` (DAEO-rmbe, Role: orchestrator, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; record-only): `docs/checkpoints/DAEO-rmbe/CP-DAEO-rmbe-0006.md`
+       - `e00fd14a26be19069aeb904418d2dfa7ac868dcb` (DAEO-rmbe, Role: orchestrator, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; record-only): `docs/checkpoints/DAEO-rmbe/CP-DAEO-rmbe-0008.md`
+       - `e4687ef4cf5631d91b8672d6e139a9a244b6e68f` (DAEO-rmbe, Role: orchestrator, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; record-only): `docs/checkpoints/DAEO-rmbe/CP-DAEO-rmbe-0002.md`
+       - `0808dbb6e8ffb9dab21e991689adea990323f8a6` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `src/gov/secrets/__init__.py`
+       - `2f03393d848672981c0071ecaa18e08cb3a78977` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `src/gov/secrets/__init__.py`, `tests/unit/secrets_check/test_stored_forms.py`
+       - `6b1d54fe6cc03ce8899912726799457157a17e01` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `src/gov/rebuild/command.py`, `src/gov/secrets/__init__.py`, `tests/unit/secrets_check/__init__.py`, `tests/unit/secrets_check/test_scan_scale.py`, `tests/unit/secrets_check/test_secrets.py`, `tests/unit/secrets_check/test_token_rule.py`
+       - `6ebc7cf7f74c1c0bbd03a763a7e1d84f7a88fc21` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `docs/research/W2-69-secrets-scan.md`
+       - `6f2ec438a6fa9b28b703609ff2c96f7855158c5a` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `docs/research/W2-69-secrets-scan.md`
+       - `8663196dd9445d990f68faaaa34729ec520889e9` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `docs/research/W2-69-secrets-scan.md`, `src/gov/rebuild/command.py`, `src/gov/secrets/__init__.py`, `tests/unit/rebuild/test_compaction.py`, `tests/unit/secrets_check/test_stored_forms.py`
+       - `9d22d9807a440c02ee0a20d4dbf249837183bae3` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `tests/unit/rebuild/test_compaction.py`
+       - `dc05ffe45ee2fccb9f8bf90ec4df6f9e4c033e54` (DAEO-rmbe, Role: engineer, `Implements: engineer`; should have named DEC-897, DEC-853, DEC-290, DEC-899, DEC-909, DEC-868, DEC-896; code, tests or notes): `docs/research/W2-69-secrets-scan.md`
+       - `5baafb04661140673a70e246b61d4ab2a064e0b7` (DAEO-uzme, Role: orchestrator, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; record-only): 
+       - `8b318157db948890ede906618e6b31732e915ea6` (DAEO-uzme, Role: orchestrator, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; record-only): `docs/checkpoints/DAEO-uzme/CP-DAEO-uzme-0002.md`
+       - `e04e6ee6effecd971eb7b3021762fd4a8d40769a` (DAEO-uzme, Role: orchestrator, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; record-only): `docs/checkpoints/DAEO-uzme/CP-DAEO-uzme-0003.md`
+       - `e052b7b5a8539c1cd9fbd734164e9d28b28d4c1f` (DAEO-uzme, Role: orchestrator, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; record-only): `docs/checkpoints/DAEO-uzme/CP-DAEO-uzme-0005.md`
+       - `39574e4ee5151dedc5742a89dea75a5a37c37c31` (DAEO-uzme, Role: independent-test-designer, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; code, tests or notes): `tests/acceptance/W1-01/test_w1_01_integration_merges.py`, `tests/acceptance/W1-01/w1_01_support.py`
+       - `78522dea7ce462aca566a7db23565a5c0dc248d9` (DAEO-uzme, Role: independent-test-designer, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; code, tests or notes): `tests/acceptance/W1-01/test_w1_01_history.py`, `tests/acceptance/W1-01/w1_01_support.py`
+       - `f409ad97575a32f6aab96e6ee6bcb4b7bc008691` (DAEO-uzme, Role: independent-test-designer, `Implements: independent-test-designer`; should have named DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912; code, tests or notes): `tests/acceptance/W1-05/README.md`, `tests/acceptance/W1-05/test_w1_05_switch_over_record.py`, `tests/acceptance/W1-05/w1_05_support.py`, `tests/acceptance/W1-30/test_w1_30_r11_declared_here.py`, `tests/acceptance/W1-47/README.md`, `tests/acceptance/W1-47/test_w1_47_session_role.py` and 1 more
+     - W2-57's two lead commits (`Implements: engineer`) are handled the same way when W2-57 is ready to close.
+       - **Named at W2-57's merge** (`57e363c5`, 2026-10-28; recorded by the orchestrator under this item, for the owner's commit of the two entries):
+         - `6be837bbbe4158768ca88ae47972308386e008cf` (DAEO-cy5o, Role: orchestrator, `Implements: engineer`; should have named DEC-813, DEC-823, DEC-871, DEC-883, DEC-889, DEC-890, DEC-892, DEC-784; record-only): the lead's checkpoint before review 1
+         - `d0bfeb6afd9523b4ee6a4e6e2da5333f54b283bf` (DAEO-cy5o, Role: orchestrator, `Implements: engineer`; should have named DEC-813, DEC-823, DEC-871, DEC-883, DEC-889, DEC-890, DEC-892, DEC-784; record-only): the probe record of review 1
+  2. **Caught at the source (owner, standing; the rule about rules, DEC-851).**
+     - **Each lead** checks its own commits' trailers before it returns: every `Implements:` item must be a decision id that the register holds.
+     - **Gate (e)** (`tools/trailer_gate.py`) checks the same, so a wrong `Implements:` is caught within the ticket, not at close time. A lead runs it on its own worktree: `trailer_gate.py <ticket id> <worktree>`.
+     - **The orchestrator's reading, for the owner to overturn:** a Contract id that the record store holds (`CAP-n`) is also accepted, as the judge resolves it. W2-59's four commits name `CAP-33`. A role, a row or any other word is refused.
+     - **`tools/build_lead_brief.py`** refuses an `IMPL` that is not a decision or Contract id.
+- **Where it goes (DEC-851):**
+  - this register;
+  - the path map (the owner's commit);
+  - the prompt §15 (gate (e)), v3.30;
+  - `LEAD-w2-common.md` (the check before a return);
+  - `tools/trailer_gate.py` and `tools/build_lead_brief.py`;
+  - RESUME HERE;
+  - the daily digest.
+- Next free id: DEC-928.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.313 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-927 (P-TRACE-IMPL-1 (a): 39 commits whose Implements names a role accepted as history by the owner's commit, each entry a correction naming the decision ids it should have implemented; standing: each lead checks its commits' Implements before it returns and gate (e) checks the same; briefs fill Implements with ids only). Next free id: DEC-928. |
+
+### DEC-928 — DEC-927's reading accepted (Contract ids the store holds are valid `Implements:` targets); DEC-926 stands; an ACT names a plain terminal only when it replaces or reinstalls gov (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 3 standing) · **Under:** DEC-927, DEC-926, DEC-925 item 2, DEC-851, DEC-861 · **Basis:** the owner's commit `e95d3520` (DEC-927's 39 accepted-history entries, `Role: owner`) and push of both branches (`w2/integrate` at `e95d3520`, `record/w2` at `2a056c80`). After it, the pinned `gov.close.traceability` exits 0 with no findings.
+- **Decision:**
+  1. **DEC-927's reading is accepted.** Contract ids that the store holds (`CAP-n`) are valid `Implements:` targets, as the judge reads them. Roles and other words stay refused. Gate (e) and the leads' check stand as recorded in DEC-927 item 2.
+  2. **DEC-926 stands.**
+  3. **ACT wording (owner, standing).** An ACT says "a plain terminal, not a Claude session" only when it replaces or reinstalls gov itself, as a re-pin does. For an owner commit of a patch, the owner's operator runs it.
+- **Done:** W2-69's judgement-only re-probe passed and merged (`PR-DAEO-rmbe-reprobe-1.md`); the queue restarts with W2-66, W2-69 included.
+- **Where it goes (DEC-851):** this register, with DEC-927's status line noting the acceptance; the prompt §7 (ACT files), v3.31; RESUME HERE.
+- Next free id: DEC-929.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.314 | 2026-10-27 | Owner (recorded by the orchestrator, DEC-861): DEC-928 (DEC-927's CAP-n reading accepted; DEC-926 stands; standing: an ACT names a plain terminal only when it replaces or reinstalls gov, otherwise the owner's operator runs it). Next free id: DEC-929. |
+
+### DEC-929 — Governance commits stop widening closes: a package for record files of their own; meanwhile non-urgent record commits wait for the gap between queues; the close queue exits non-zero after a refused close (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; items 2 and 3 standing) · **Under:** DEC-880, DEC-889, DEC-851, DEC-861 · **Basis:** W2-66's close record (`docs/close/DAEO-c1uz/CL-DAEO-c1uz.md`): scope full, `SHARED_CORE` (the path map) and `UNPLACED` (the lead brief, the prompt), base `7ada0f58`. The six closes after it were scoped off its head (`00b371a0`) and took 10 to 28 minutes each.
+- **Decision:**
+  1. **A package, after the queue (for W2-68 or a small ticket):**
+     - move the path map's frequently edited lists (`load_sensitive`, `accepted_reds`, `accepted_history`, `acceptance_exemptions`) into record files of their own, read by the record-reading set, so that editing them does not widen a close;
+     - the path map's configuration stays shared core;
+     - prompts and briefs go on the record-only list, and any test that reads them joins the record-reading set;
+     - the package says what each change could let through.
+  2. **Until then (owner, standing):** non-urgent record commits wait while a queue runs; the orchestrator commits them between queues.
+  3. **The close queue's exit status (owner, standing):** `tools/close_queue.sh` exits non-zero after a refused close, fixed as soon as the queue of 2026-10-27 ended, before the tooling review.
+- **Done:** item 3 on 2026-10-28. A refused close now logs `CLOSE REFUSED (exit <n>)`, removes the lock and exits 4 (it was `break`, then exit 0). `tools/test_close_queue_refusal.sh` runs the script's own lines with a stub close: a refused close gives exit 4, the log line and no lock, and a passing close goes on.
+- **Where it goes (DEC-851):** this register; the prompt §15 (the pre-close gate), v3.32; RESUME HERE; the daily digest.
+
+### DEC-930 — A re-plan package for the rest of Wave 2 after this queue and the second re-pin; four numbers reported weekly from now (standing)
+- **Status:** ACCEPTED (owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-855, DEC-878, DEC-851, DEC-861
+- **Decision:**
+  1. **The re-plan package**, in the six-part form, once this queue and the second re-pin are done:
+     - the minimum needed to start EXAMIN's copy: fast closes, memory proven (K4, W2-61's measure included), agents loading role, skills and model at launch (K3), and the leads' sandbox; everything else proposed for Wave 3, with what each deferral costs;
+     - an estimate per remaining keystone, and a target date for the copy's start;
+     - an operating change, proposed: one daily digest with every non-urgent item; only P1s and ACTs ping; P2s become delegated decisions the owner can overturn in the digest;
+     - parallelism once closes are short: which remaining tickets run side by side (for example the memory tickets and the K3 tickets), how many leads at once the resource gate allows on this machine, how short quiet windows become with scoped and batched closes, and whether the one-verification-run-at-a-time lock can be relaxed once W2-67 lands; the remaining keystones planned so that leads wait as little as possible for the machine.
+  2. **Four numbers, reported weekly from now (owner, standing):** closes per day, refusals caused by the orchestrator's own tooling, cost per week (from a measured source only; where none exists, the report says so), and the number of the owner's decisions per week.
+- **Where it goes (DEC-851):** this register; the prompt §15 (reports), v3.32; RESUME HERE.
+
+### DEC-931 — W2-57's `load_sensitive` removals timed to where each fix lives: two ACTs; the first validated by a full run in the close's form with the current pin; W2-57's two `Implements:` corrections ride the first
+- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`) · **Under:** DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-925 item 2, DEC-927, DEC-851, DEC-861 · **Basis:** W2-57 merged as `57e363c5` (2026-10-28), its return's 30 removals (`log/W2-57-A5-run2.json`), its change record `docs/changes/W2-57-CIT-E.md`.
+- **Decision:**
+  1. **Each removal is timed to where its fix lives.** An entry whose fix is in force in a close now is removed now (ACT-W2-57-LS-1). An entry whose fix is in the judge's code (the live and real-model tests leaving the close for the nightly; the serial phase's changes in `command.py`) stays until the second re-pin pins W2-57's code, and leaves in a second ACT right after it (ACT-W2-57-LS-2).
+  2. **The first ACT is validated** with a full run in the close's form, with the current pin, on a clone with the removal applied (the owner's standing rule for changes that alter how closes behave, DEC-925 item 2), and the ACT says so.
+  3. **W2-57's two `Implements:` corrections** ride the first ACT, in DEC-927's form (`6be837bbbe41`, `d0bfeb6afd95`; named under DEC-927 item 1 in `f06ccf4b`).
+- **The orchestrator's reading, for the owner to overturn:** in a close the pinned `gov close` sets `PYTHONPATH` to the project's `src/`, and W1-07's and W1-38's cases run `gov` from `src/` too. So the fixes of W1-38's three cases and W1-07's `[doctor]` are product code (`src/gov/adapters/portability.py`, `src/gov/doctor/command.py`), yet in force in a close since the merge: they go in the first ACT. W1-30 r13's fix is in the test (its limit, 5 to 30 s). The unit close follow-up case has no fix (not reproduced in 6 runs); it goes in the first ACT only if the clone run passes it. W1-46's 23 and W1-19's warm p95 leave the close only by the nightly route (`src/gov/close/serial.py`, the judge's): the second ACT.
+- **Where it goes (DEC-851):** this register; `governance/project/orchestration/packages/ACT-W2-57-LS-1.md`; RESUME HERE; the daily digest.
+- Next free id: DEC-932.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.315 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-929 (a package moving the path map's lists into record files and prompts and briefs onto the record-only list; standing: non-urgent record commits wait for the gap between queues; the queue exits non-zero after a refused close, done), DEC-930 (the re-plan package after the second re-pin; standing: four numbers weekly), DEC-931 (W2-57's removals in two ACTs by where each fix lives; the first validated by a full close-form run with the current pin; the two corrections ride it). Next free id: DEC-932. |

@@ -35,7 +35,11 @@ GENERATE = ("generate", "--targets", "claudecode,agentsmd",
 GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")  # rulesync alone writes here (DEC-471)
 TOOLS = frozenset("Agent Bash Edit Glob Grep NotebookEdit Read Skill Task TodoWrite WebFetch WebSearch Write".split())
 TOOLS_FIELD = re.compile(r"^[-*]\s+\*\*Tools:?\*\*:?(.*(?:\n[ \t]+\S.*)*)", re.MULTILINE)
-TIME_LIMIT = 10  # seconds, for each of the two rulesync calls
+# Seconds, for each of the two rulesync calls (W2-57). Measured beside a 40-worker parallel run at loads up to 48:
+# --version took at most 2.3 s and generate 4.2 s, yet closes saw a call pass 10 s. Both calls at their limits,
+# with the check's own work, still end inside the 60 s gov check gives a declaration that states none (runner.py),
+# so a call that never answers ends the check red with its own finding, not cut off by the runner.
+TIME_LIMIT = 25
 
 
 def _finding(code: str, message: str, file: str | None = None) -> dict:

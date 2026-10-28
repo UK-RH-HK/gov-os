@@ -1215,6 +1215,29 @@ all declared and none of its others; seven controls of the same files are not de
 entry names a file and a function that exist, once, and says its kind. They read the list and ask
 the test runner only to collect; none runs a declared case.
 
+**Revised by W2-57 (2026-10-27, `Rewrite-Reason: DEC-889 item 5`; P-IS-6's first table).** The list now says
+where each entry runs. Every entry's comment is `<route>: <kind>: <reason>`: `serial` keeps it in the close (alone,
+after the parallel phase), `nightly` routes it to the nightly (collected by the close and left out of both its
+phases; run alone in the nightly). Five kinds, each on its route: `latency`, `daemon` and `race` stay serial;
+`real-model` and `live-session` go to the nightly (`real-model-or-daemon` is split in two). The list's header
+documents the form; W2-57's README gives every entry's change. The file now holds (all read as text and collected,
+nothing run):
+
+- the timed suites' cases with their parameter sets and routes (W1-02's and W1-05's p95 serial; W1-50's two live
+  freeze cases nightly); W1-50's read-merge latency case is no longer declared (it runs in parallel, I1 §4.2);
+- every other entry with its route (the latency cases of W1-07, W1-10, W1-15, W1-17 and W1-18 and W2-57's new p95
+  case for a test designer's read serial; W1-20's file and W2-69's two daemon cases serial; W1-09's two races
+  serial in this run; W1-19's and W1-21's real-model files, W1-25's, W1-46's and W1-49's live files nightly);
+- every live and real-model case of DEC-889 item 5, as collected, on the nightly route: also W1-21's family check,
+  W2-58's four live functions, W2-62's live resume, W2-54's sandboxed worker and its real-embedder case;
+- W1-16's split (I3 F7): of its 161 marked cases, the 94 in 19 named functions that start no daemon are not
+  declared, and the 67 that reach the daemon are declared serial, kind `daemon`;
+- every entry says its route, its kind (on its kind's route) and a reason in words; names a file and a function
+  that exist, once; and names at least one case the test runner collects.
+
+W1-09's two race cases move to the parallel phase only after one green nightly in parallel; their two lines and
+their two rows in `DECLARED_WITH_THEIR_ROUTE` are then removed together (the rows move to `NOT_DECLARED`).
+
 ### 3. A store rebuilt without embeddings (`test_w1_30_r11_rebuild_mode.py`, 2 cases)
 
 DEC-530. What the mode builds is held in `tests/acceptance/W1-27/` (its README, round 8). Here:
@@ -1545,6 +1568,14 @@ The projects declare their serial-only cases as round 11's do.
 | 5. A byte in the list that is not UTF-8 is a finding of its own | `test_a_byte_in_the_list_that_is_not_utf8_is_a_finding_that_names_the_list` (2: in a comment, in an entry) | no traceback; exit code 3, `SERIAL_ONLY_LIST_UNREADABLE` and the list's path in the answer, counted once, nothing closed | red, both: a traceback (`UnicodeDecodeError`), exit code 1, no JSON |
 
 9 red.
+
+**Behaviour 3's timing, revised by W2-57 (2026-10-27, `Rewrite-Reason: W2-M384`; I2 §2.2).** The close is given
+`--timeout 30` (`LIMIT_S`, it was 5) and the case sleeps `LIMIT_S + 15` = 45 s (it was 14). Under a load of 19 to
+29 the parallel run's workers took longer than 5 s to reach the case, so the run was cut before it began and the
+case's own premise failed ("the fixture is wrong: the case had not begun when the run was cut"; W2-53's re-close,
+and lens I's run alone 1 of 3). Thirty seconds is a start a loaded machine meets, and the sleep still outlasts the
+limit wherever within it the case began, so the run is still cut while its case runs. What is asserted is
+unchanged; the case takes about 50 s instead of 18 s, in the parallel phase.
 
 **Settlement 28 (proposed).** A serial-only list that cannot be read as UTF-8 text is the finding
 `SERIAL_ONLY_LIST_UNREADABLE`: exit code 3, counted, with a repair ticket, as every finding about

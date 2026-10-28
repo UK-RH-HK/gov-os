@@ -35,6 +35,30 @@ in `test_w1_38_test_folder_rule.py` and changed, rewrote and removed no other ca
 197 green, 4 red, 0 skipped** as run before the engineer's work (the 182 older cases all green). See the section
 "The round of DEC-664" below.
 
+**The revision of W2-57 (2026-10-26, ticket `DAEO-cy5o`, DEC-892 item 2; `Rewrite-Reason: DEC-892 item 2: a probe
+timeout is not an absent tool and not the fault under test`)** adds no case and removes none; it makes 10 cases
+stricter and gives the suite's own rulesync waits limits a loaded machine meets (I4 finding 2, P-I4-5 (a)):
+
+- **The session fixture fails, never skips, on a timeout.** `rulesync_bin` skips ("rulesync is not installed",
+  the text unchanged) only when `RULESYNC_BIN` names no file. A rulesync that is there and gives no answer to
+  `--version` within `RULESYNC_PROBE_TIMEOUT_S` (60 s; it was 10 s), cannot be started, or fails `--version` fails
+  every case that needs it, naming what happened. Under a close's load the old probe's timeout skipped up to 181
+  cases silently.
+- **The suite's other rulesync calls:** `run_rulesync_generate` (and `--check`, `--delete` through it) waits
+  `RULESYNC_GENERATE_TIMEOUT_S` (180 s; it was 30 s, passed in W2-50's run 9, row W2-L415), and the declared check's
+  whole run `CHECK_TIMEOUT_S` (180 s; it was 60 s). A timeout in any of them fails the case and names the wait.
+- **The 9 cases a timeout satisfied now assert their reason.** Found by running the cause: a stand-in rulesync
+  first on the `PATH` whose `--version` (RS-ver) or `generate` (RS-gen) answered after 11 s turned 29 and 28 cases
+  red; among the cases that run the check, these 9 stayed green under both without the check comparing anything:
+  `TestBrokenHeldOutFile::test_broken_file_is_not_green_and_no_path_is_printed` (7: a finding of the held-out
+  step, `HELD_OUT_STEP_FAILED`, is now required), `TestFindings::test_one_hand_edit_is_one_finding` (the one
+  finding must name AGENTS.md) and `TestRegisteredFamilyCheck::test_gov_check_is_red_after_a_hand_edit` (the
+  findings of the declared command and of `gov check` must name CLAUDE.md). Each is green against a prompt
+  rulesync and red, 9 of 9, under RS-ver and under RS-gen.
+- **`TestToolAbsentOrHanging::test_timeout_handling`** (I-SYNTHESIS P38-1) now requires a printed finding that
+  names rulesync and says it gave no answer in time, and no finding that reads it as absent; it waits the
+  suite's check wait, not the old limit plus 5 s, and its stand-in `exec`s its sleep so nothing outlives it.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
@@ -733,8 +757,9 @@ its family, its command; the module exists).
 ## Tools the cases need
 
 - **rulesync.** Cases marked `@pytest.mark.needs_rulesync` need the binary at `/home/usain/.local/bin/rulesync`
-  (override with `RULESYNC_BIN`, which the check reads too). They are skipped when rulesync is not installed. This
-  is the suite's only skip.
+  (override with `RULESYNC_BIN`, which the check reads too). They are skipped when rulesync is not installed
+  (`RULESYNC_BIN` names no file). This is the suite's only skip. A rulesync that is there and gives no answer in
+  time fails them, naming the timeout (W2-57, DEC-892 item 2).
 - **openspec.** The fifteen OpenSpec cases (`TestOpenSpecCommands`, `TestOpenSpecSkills`,
   `test_delete_preserves_openspec_commands`, `test_delete_preserves_openspec_skills`) read what one
   `openspec init --tools claude` wrote in a temporary folder with a temporary home. `openspec` is taken from

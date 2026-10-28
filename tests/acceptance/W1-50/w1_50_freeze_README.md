@@ -782,3 +782,12 @@ subprocess with `HOME` set to a throwaway sandbox directory. No acceptance test 
 | W1-50 | via `w1_02_support.hook_environment` (guard) and `w1_28_support.pause()` (pause); lift via `w1_50_freeze_lift.py`: `"HOME": str(sandbox.home)` | None (test helpers like `_put_mirror` and `_find_mirror_files` write to `sandbox.home`, not the real home) |
 
 No case in another ticket's suite was revised for this batch.
+
+## Revision of W2-57 (2026-10-27, `Rewrite-Reason: DEC-784`)
+
+The two live cases (`test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path`
+and `test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays`) launch their
+session with the caller's environment less `GOV_ROLE`, `GOV_TICKET` and **every variable whose name begins
+`CLAUDE`** (`inherited()`, as W1-46's live sessions do since DEC-784), where they removed a fixed list of six names
+before (I1 F-7). Nothing else of the cases changes: no expectation, no limit. Both now run in the nightly, not in the
+close (the serial-only list's `nightly: live-session` entries, DEC-889 item 5).

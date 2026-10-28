@@ -28,6 +28,7 @@ One test stands on a recommendation: the last of the block's four items
 from __future__ import annotations
 
 import os
+import shutil
 
 import pytest
 
@@ -268,9 +269,21 @@ def test_a_directory_in_place_of_the_checkpoint_is_left_alone_and_said_so(run, p
 def test_without_tk_the_block_says_so_and_holds_the_rest(run, project, sandbox, how):
     """The block is still appended: the git head is there, and the tickets line says `unavailable`."""
     path, text = _checkpoint(project, ORCH, "ZQ")
+    hook_path = None
     if how == "fails":
         sandbox.tk_fails()
-    result = run.precompact(project, "auto", path=sandbox.path_without_tk if how == "not on PATH" else None)
+    else:
+        # DEC-917: the lifecycle line looks for the pinned gov at $HOME/.local/bin/gov, then on PATH. Leaving out the
+        # PATH entries that hold tk can leave out gov too, so the sandbox's HOME gets a link to the gov the caller's
+        # PATH gives, and only tk is missing.
+        hook_path = sandbox.path_without_tk
+        assert shutil.which("tk", path=hook_path) is None, f"tk is still on the hook's PATH: {hook_path}"
+        pinned = shutil.which("gov")
+        assert pinned, "no gov on the caller's PATH: the lifecycle line has no pinned gov to run the hook with"
+        link = sandbox.home / ".local" / "bin" / "gov"
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(os.path.realpath(pinned))
+    result = run.precompact(project, "auto", path=hook_path)
     support.assert_not_blocked(result, f"a compaction while tk is {how}")
     block = support.read_block(path, text)
     assert support.git(project, "rev-parse", "HEAD").strip() in block, f"the block lost the git head: {block[:500]!r}"

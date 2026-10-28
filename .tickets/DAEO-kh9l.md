@@ -1,6 +1,6 @@
 ---
 id: DAEO-kh9l
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-19T21:53:43Z

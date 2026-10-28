@@ -120,7 +120,7 @@ word it is a finding by no rule, with each rule set.
 |---|---|
 | `word_internal::test_premise_a_project_rules_string_is_a_token_alone_and_none_inside_its_word` × 4 rules | passes today (a premise) |
 | `word_internal::test_the_default_rules_with_a_leading_boundary_are_the_ones_covered` | passes today: the 68 default rules and the project's 4 are the ones this suite names |
-| `word_internal::test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word` × 68 rules (65 strings built from the rules' own expressions, 3 rules without a case, below) | passes today (a premise) |
+| `word_internal::test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word` × 68 rules (65 strings built from the rules' own expressions, 3 rules without a case, below); each case is named by its rule, except `[code-search-access-token]` (see "Renamed case" below) | passes today (a premise) |
 | `word_internal::test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset` × 12 forms × 4 rules: the string in cells of 24 bytes, in 24 files shifted by 0 to 23 bytes, so that **every byte offset** is where a token-shaped string begins inside a word in one of them; forms: plain one line, lines, blank lines, words of 12,288 bytes, UTF-16LE; a long SQLite value, many small values, a full-text index, a blob, a UTF-16LE blob, a UTF-16 store, deleted rows in freed space | **red today, 40**: "the check flagged N of 24 files that hold token-shaped strings only inside words": in the plain forms, the files whose string begins at gitleaks' read at 90,535 or 119,207; in the SQLite forms also where today's raw-byte scan cuts a value at an overflow page (its 4-byte page number puts a non-word byte before the string) and, for a blob, where the rows-as-text form renders it as `b'…\n…'` (the `n` after the backslash begins a word). **Not red today, 8**: blank lines (reads end at blank lines) and freed rows (a small store, each freed region begins with a cell's header) |
 | `word_internal::test_premise_the_w2_62_identifier_is_no_finding_whole_and_a_finding_cut` | passes today: P-W2-62-G1's cut test, on its shape (84 characters, the first 22 lower-case letters and underscores, a 62-byte `gov-token-lower` shape after them) |
 | `word_internal::test_the_identifier_of_the_w2_62_stop_is_no_finding_at_any_offset` × 4 forms (plain lines, plain one line, a long value, many values; cells of 88 bytes in 88 files) | **red today, 4**: "flagged 2 of 88 files" (plain), 6 and 15 (SQLite): W2-62's stop, reproduced |
@@ -141,6 +141,14 @@ becomes possible:
 characters is still a finding, so a read that ends inside the word makes no new match. Two rules,
 `airtable-personnal-access-token` and `facebook-access-token`, need their keyword in the same read: the keyword
 follows the token, a space apart.
+
+**Renamed case (DEC-911, DEC-925 item 1, 2026-10-27).** One default rule's name, the code-search vendor's access-token
+rule, holds a keyword of row W2-L423's rule, and its case's id was that name, so every run's JUnit XML under
+`.gov-runtime/` held the keyword. A fresh Independent Test Designer on ticket `DAEO-2azm` (W2-74) gave the case the
+explicit id `[code-search-access-token]` (`RULE_IDS` in the test file) and wrote the rule's name in parts
+(`CODE_SEARCH_ACCESS_TOKEN_RULE`), so that the name never stands whole in the file. The rule list's value and order,
+the case's input and its assertions are unchanged; `Rewrite-Reason: DEC-911`. No other test id of this suite holds a
+keyword.
 
 ### K3 — success: "Deleted text does not survive a rebuild …"; failure: "Deleted text left in a store's free pages after a rebuild."
 

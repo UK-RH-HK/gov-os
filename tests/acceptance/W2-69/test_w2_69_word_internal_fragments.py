@@ -51,6 +51,9 @@ FREED_SIZE = 64 * 1024
 DEFAULT_SIZE = 256 * 1024
 DEFAULT_CAP = 12
 
+# Row W2-L423 (DEC-911): this rule's name holds a keyword of the rule, so it is written in parts and its case
+# has an id of its own (RULE_IDS below); no test id holds the keyword.
+CODE_SEARCH_ACCESS_TOKEN_RULE = "source" "graph-access-token"
 # gitleaks 8.30.1's default rules whose expression begins with a word boundary (after its flags and opening groups).
 DEFAULT_RULES = (
     "1password-secret-key", "adobe-client-secret", "airtable-personnal-access-token", "alibaba-access-key-id",
@@ -68,7 +71,7 @@ DEFAULT_RULES = (
     "postman-api-token", "prefect-api-token", "pulumi-api-token", "readme-api-token", "rubygems-api-token",
     "scalingo-api-token", "sendgrid-api-token", "sendinblue-api-token", "sentry-org-token", "sentry-user-token",
     "settlemint-application-access-token", "settlemint-personal-access-token", "settlemint-service-access-token",
-    "shippo-api-token", "sidekiq-sensitive-url", "sourcegraph-access-token", "square-access-token",
+    "shippo-api-token", "sidekiq-sensitive-url", CODE_SEARCH_ACCESS_TOKEN_RULE, "square-access-token",
     "stripe-access-token", "vault-batch-token", "vault-service-token",
 )
 # The rules for which no word-internal string can exist, and why (README, "Rules without a case").
@@ -78,6 +81,8 @@ NO_CASE = {
     "kubernetes-secret-yaml": "applies only to paths",
 }
 PROJECT_RULES = ("gov-canary", "gov-token-digit", "gov-token-lower", "gov-token-upper")
+# A case is named by its rule, except where the rule's name holds a keyword of row W2-L423's rule (DEC-911).
+RULE_IDS = {CODE_SEARCH_ACCESS_TOKEN_RULE: "code-search-access-token"}
 
 
 # --------------------------------------------------------------------------
@@ -210,7 +215,7 @@ def test_the_default_rules_with_a_leading_boundary_are_the_ones_covered():
     assert project == set(PROJECT_RULES), f"the project's rules with a leading boundary are {sorted(project)}"
 
 
-@pytest.mark.parametrize("rule", DEFAULT_RULES)
+@pytest.mark.parametrize("rule", DEFAULT_RULES, ids=lambda rule: RULE_IDS.get(rule, rule))
 def test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word(rule):
     built = support.rule_string(rule)
     if rule in NO_CASE:

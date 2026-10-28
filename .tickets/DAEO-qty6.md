@@ -1,6 +1,6 @@
 ---
 id: DAEO-qty6
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-25T18:56:59Z
