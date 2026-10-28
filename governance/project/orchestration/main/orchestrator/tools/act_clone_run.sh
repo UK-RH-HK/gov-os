@@ -60,7 +60,7 @@ s_exit=$?
 end=$(date +%s)
 echo "parallel exit $p_exit in $((mid - start)) s: $(tail -1 "$OUT/parallel.txt")" >> "$OUT/run.txt"
 echo "serial exit $s_exit in $((end - mid)) s: $(tail -1 "$OUT/serial.txt")" >> "$OUT/run.txt"
-"$PY" "$ORCH/tools/nightly_alone.py" "$CLONE" "$JUNIT" >> "$OUT/run.txt" 2>&1
+"$PY" /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/nightly/nightly_alone.py "$CLONE" "$JUNIT" >> "$OUT/run.txt" 2>&1
 du -sh "$CLONE" >> "$OUT/run.txt" 2>&1
 date '+%F %T done' >> "$OUT/run.txt"
 cat "$OUT/run.txt"

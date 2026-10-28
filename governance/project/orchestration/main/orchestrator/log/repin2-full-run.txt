@@ -1,0 +1,9 @@
+2026-10-28 10:17:15 nightly day: quiet
+head 5c40122014da
+clone rebuilt
+parallel exit 1 in 3077 s: 1 failed, 16478 passed, 31 skipped in 2793.16s (0:46:33)
+serial exit 0 in 1378 s: 180 passed, 1 warning in 1262.92s (0:21:02)
+passes-alone tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+verdict: flaky-candidates 1
+duration: estimate none s, actual 5707 s (setup 942 s)
+2026-10-28 11:52:22 done

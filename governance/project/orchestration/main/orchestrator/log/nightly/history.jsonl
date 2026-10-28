@@ -1,0 +1,1 @@
+{"when": 1793186653.0702734, "parallel": {"cases": 16510, "sum": 19748.629, "longest": 630.1, "wall": 2793.062}, "serial": {"cases": 180, "sum": 1261.644, "longest": 176.546, "wall": 1261.912}, "setup_s": 942.0, "actual_s": 5707.0, "estimate_s": null, "source": "history"}

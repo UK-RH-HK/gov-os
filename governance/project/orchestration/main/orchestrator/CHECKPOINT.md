@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-28 10:30 GMT — W2-07 r2 MERGED `8555aafc`, W2-57 re-probe MERGED `4904a60f`; ACT-W2-57-LS-1 READY (`5c401220`, clone run green); ACT-NIGHTLY-1 sent; RE-PIN 2 LADDER RUNNING: full run on head `5c401220` (task bfxlzqklt, nightly.sh day), wheel dry run OK (e4f35131…905d0 twice); next DEC-934)
+## RESUME HERE (2026-10-28 13:10 GMT — ACT-W2-57-LS-1 COMMITTED by owner `6367e965`; gate (b) green after it; ACT-REPIN-2 SENT (`a47f1b3c`, ladder passed); ACT-NIGHTLY-1 REVISED (DEC-934 `a999f97b`, namespace fix `95a810a6`): committed nightly in governance/project/orchestration/nightly/; final gov check on a47f1b3c running (task bcb2lmcv2); next DEC-935)
 
 ### Now
 - **Pin:** gov = pin-6a4696eb (DEC-922); pin-fecb870c kept. Tools now read the pin from ~/.local/bin/gov's first line.
@@ -10,17 +10,19 @@
 - **Merged today:** W2-57 `57e363c5`; W2-07 r2 `8555aafc` (run 5: full 16479 passed, serial 180; probe_impact made
   W2-57's probe stale on command.py); W2-57 re-probe `4904a60f` (PR-DAEO-cy5o-reprobe-1.md pass). Rebuilds ok. Temp
   folders of W2-07, W2-57 removed. Merged-not-closed now: W2-58, W2-63, W2-07, W2-67 (r1), W2-57.
-- **ACT-W2-57-LS-1** (`packages/ACT-W2-57-LS-1.md`, `5c401220`): 6 removals + 2 DEC-927 corrections; the clone run
-  with the pin (`log/act-runs/ACT-W2-57-LS-1-20261028-0052/`): parallel 16431 passed 0 failed, serial 180, green.
-  Owner's operator commits it. ACT-W2-57-LS-2 (W1-46 x23, W1-19) right after re-pin 2, validated with the new pin.
-- **Re-pin 2 (DEC-933, P-REPIN-2):** pins `5c401220`. Done: `pin/repin_dry2.sh` (two builds e4f35131…905d0; wheel
-  holds serial.py, gates.py), `pin/repin2_registry.py` (refuses before install: checked), `pin/REPIN-COMMANDS-
-  5c401220.sh`. Running: the full regression on a fresh clone with the head's code (`tools/nightly.sh` day; first
-  run of the rewritten script; its record step writes `log/nightly/history.jsonl`). Then write
-  `packages/ACT-REPIN-2.md` (plain terminal), ping ACT. After it: smoke test, update the prompt's pin line (DEC-895's
-  command), ACT-W2-57-LS-2, queue W2-58, W2-63, W2-07, W2-57.
-- **Nightly (DEC-933):** `tools/nightly.sh night` + `tools/nightly_estimate.py` (estimate 84 min; effective
-  parallelism 7.4) tested 8/8 (`tools/test_nightly_night_mode.sh`); ACT-NIGHTLY-1 (crontab 02:00) with the owner.
+- **ACT-W2-57-LS-1 done** (owner `6367e965`). ACT-W2-57-LS-2 (W1-46 x23, W1-19) right after re-pin 2, validated
+  with the new pin (`tools/act_clone_run.sh`, reads the pin from ~/.local/bin/gov).
+- **Re-pin 2 (DEC-933):** ACT-REPIN-2 sent (`packages/ACT-REPIN-2.md`; `pin/REPIN-COMMANDS-5c401220.sh`, plain
+  terminal). Ladder: full run on 5c401220 16478 passed, 1 flaky (W2-54 time limit, passed alone), serial 180; wheel
+  e4f35131…905d0 twice. When owner says done: smoke test, prompt pin line (DEC-895's command), ACT-W2-57-LS-2, queue
+  W2-58, W2-63, W2-07, W2-57. Confirm no lead/close/nightly before the owner runs it.
+- **Nightly (DEC-934):** committed `governance/project/orchestration/nightly/` (cron entry refuses changed code;
+  logs + rotate; morning check -> status.txt; test_nightly.sh 20/20). ACT-NIGHTLY-1 revised: Part A crontab (3
+  lines), Part B Windows wake task 01:50 + wake timers. cron measured: 4/4 hourly runs every night 10-20..10-28.
+  Digest: report status.txt per night; no line = MISSED P1. Scratch copies removed.
+- **Lesson today:** record checks on untracked files prove nothing about tracked ones (a999f97b's 9 paths in no
+  namespace, W1-08 red, fixed 95a810a6); and never chain a commit after `;` (1916501d went in on a red check).
+  W2-58's review cases fail when run from inside a Claude session (its env leaks into the guard sandbox): row.
 - **Rows added:** W2-L449 (bare run loads the pin), W2-M407 (product nightly rule), W2-L450 (W2-57 designer p95
   under load, not on load_sensitive).
 - **Run clones** under ~/gov-os-runs/W2-00 (2.6G+, plus 560M ACT clone) never removed -> P-TOOLS-REVIEW-1.
