@@ -9286,7 +9286,7 @@ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two package
 - **Decision:** W2-59 starts now on `w2/integrate`, although W2-05's unmerged branch changes two of its files (`src/gov/check/runner.py`'s `_run_command` environment and git calls; `src/gov/retrieval/retrieve_check.py`). W2-59's engineer is told W2-05's changes and keeps its own edit of those lines small and composable; W2-05's resume merges `w2/integrate` first and resolves the conflict keeping both sides (DEC-750, DEC-754). An exception to the prompt's §3 for this pair only.
 
 ### DEC-855 — How the owner is notified: `owner-ping`, a permission request (standing)
-- **Status:** ACCEPTED (changed by DEC-936 item 2.5: only P1s and ACTs ping; P2s delegated; owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
+- **Status:** ACCEPTED (night-time notification changed by DEC-938: the morning package and one 07:30 ping; changed by DEC-936 item 2.5: only P1s and ACTs ping; P2s delegated; owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
 - **Decision:**
   1. **Whenever anything needs the owner** (any decision that gates any ticket, even if other work continues; any COMMIT-NEEDED; any owner act, such as an install, a pin, a release or a go; any LAUNCH_BLOCKED, ESCALATION or AUTH_REQUIRED), the orchestrator:
      - (a) writes the full six-part package (DEC-818) in its message, and saves it under `governance/project/orchestration/packages/<id>.md`;
@@ -11345,7 +11345,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-936 — ACT-NIGHTLY-1 installed; a night's P1s wait until 07:30 unless the owner is active; carry on without waiting, as many leads as the machine allows; P2s delegated; six additions for the re-plan package (standing)
-- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 2 to 4 standing) · **Under:** DEC-930, DEC-933, DEC-934, DEC-935, DEC-855, DEC-847, DEC-898, DEC-851, DEC-861 · **Changes:** DEC-855 (pings: only P1s and ACTs; P2s decided as delegated, listed in the digest for the owner to overturn), DEC-934 item 2 (the morning check's P1 pings wait until 07:30 unless the owner is active).
+- **Status:** ACCEPTED (item 1's night-time pings replaced by DEC-938's morning package; owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 2 to 4 standing) · **Under:** DEC-930, DEC-933, DEC-934, DEC-935, DEC-855, DEC-847, DEC-898, DEC-851, DEC-861 · **Changes:** DEC-855 (pings: only P1s and ACTs; P2s decided as delegated, listed in the digest for the owner to overturn), DEC-934 item 2 (the morning check's P1 pings wait until 07:30 unless the owner is active).
 - **Status reported by the owner, checked by the orchestrator (2026-10-28):**
   - **ACT-NIGHTLY-1 Part A:** the three crontab lines, cron active (the backup was empty). Checked: `crontab -l` shows them; `systemctl is-active cron` gives `active`.
   - **Part B:** the task "GovOS nightly wake" is Ready (next run 2026-10-29 01:50, `WakeToRun` true, start when available, a 4-hour limit, not on battery). Wake timers are allowed. Windows Update's active hours are 12:00 to 06:00, which cover 01:30 to 05:30.
@@ -11417,3 +11417,41 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.321 | 2026-10-28 | Orchestrator, delegated (DEC-936 item 2.5): DEC-937 (W2-58's close refused on W2-54's green-here fixture timing out under load, repair DAEO-pr0y; ticket W2-75 makes the fixture read the close's check result; the queue holds until it merges). Next free id: DEC-938. |
+
+
+### DEC-938 — The morning package: investigate after the nightly, one P1-MORNING file, one ping at 07:30 from the orchestrator's session; hold only what an item blocks (standing)
+- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
+- **Decision (the owner's six points):**
+  1. **Investigate before reporting.** After the nightly ends, for every finding (a red test, a refused close, a missed or failed night, any alert):
+     - re-run failing tests alone and in the close's form;
+     - bisect a real red to the commit that caused it (`git bisect run`, as decided);
+     - separate a flaky candidate (passes alone) from a real failure;
+     - identify the root cause, with the measurements that show it.
+     
+     If a cause cannot be found by 07:30, say so, with what has been ruled out and what would be tried next.
+  2. **One package:** everything since the last package goes into one file, `governance/project/orchestration/packages/P1-MORNING-<date>.md`. Each item in the six-part format: what happened, the evidence and root cause, why it matters, the options, the recommendation, and what it blocks. The delegated P2s decided overnight are listed at the end, for the owner to overturn.
+  3. **One ping, at 07:30, from the orchestrator's own session,** so that it reaches the owner's phone. In the chat, a short summary: the nightly's verdict (the estimate against the actual), each item in one line with its recommendation, and the file's Windows path. No pings between the end of the owner's day and 07:30.
+  4. **Hold only what an item blocks:**
+     - if the nightly is red, no closes until the owner has answered;
+     - a ticket whose close was refused waits;
+     - everything independent of the open items keeps running, so the machine is not idle while the owner is away.
+  5. **The owner answers the whole package in one message;** the orchestrator applies the answers, then resumes the held work.
+  6. **Emergencies** (a secret exposed, a risk of losing data or history, the disk below its floor, the guard failing open): stop the affected work at once, and put the item first in the package. Still ping only at 07:30, unless the owner is already active.
+  
+  Until a push notifier is in, this morning package replaces the nightly's own pings.
+- **How it is applied (the orchestrator's reading, for the owner to overturn):**
+  - **The schedule:** two one-shot prompts in this Claude session (`CronCreate`), each morning's run scheduling the next day's:
+    - about 05:37: read `log/nightly/status.txt`, the night's `run.txt`, the cron log and `pings.log`, then investigate;
+    - 07:30: write and commit the package file, then the one ping and the chat summary.
+    
+    They live only while this session runs. If the session has ended, the next session reads status.txt and pings.log at its start (prompt §7), and the package goes out then.
+  - **"The owner is already active":** Windows' last input under 15 minutes old (the nightly's `ping_gate.sh` reading), or a message from the owner in the chat since the end of their day.
+  - **The nightly's own cron pings** stay as lines in `pings.log` (they never reached the phone; DEC-936's finding). The orchestrator reads them; they are not the notification.
+  - **The Windows path** of the package file: `\\wsl.localhost\Ubuntu-24.04\home\usain\Dynamic-Agentic-Engineering-OS\governance\project\orchestration\packages\P1-MORNING-<date>.md`.
+  - **A morning with nothing to report:** the 07:30 ping still goes, with the nightly's verdict and "no items", so a silent morning is never mistaken for a missing one.
+- **Where it goes (DEC-851):** this register, with DEC-855's and DEC-936's status lines; the prompt §7 (how the owner is notified), v3.37; RESUME HERE.
+- Next free id: DEC-939.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.322 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-938 (standing: after the nightly, investigate every finding to its root cause; one P1-MORNING-<date>.md package in the six-part form with the overnight delegated P2s at its end; one ping at 07:30 from the orchestrator's session, none overnight; hold only what an item blocks; one answer, then resume; emergencies stop the affected work at once and come first). Next free id: DEC-939. |
