@@ -66,6 +66,8 @@ namespaces:
       - "governance/project/prompts/**"
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
+      # DEC-934: the nightly's committed, reviewed scripts and their tests
+      - "governance/project/orchestration/nightly/**"
       - "governance/project/orchestration/sessions/**"
       - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
       - "governance/project/orchestration/main/orchestrator/PR-*.md"
