@@ -7,18 +7,23 @@
 #   <date> ran | <verdict> head <head> duration ...      the night ran to a verdict;
 #   <date> FAILED | <its last line>                         a night run started but ended without a verdict;
 #   <date> MISSED | no night run started 01:55-05:00        nothing started (cron down, WSL down, the PC asleep).
-# FAILED and MISSED ping P1 at once (a miss is never silent). Before 05:00 it does nothing (the window is open);
+# FAILED and MISSED ping P1 (a miss is never silent): at once if the owner is active, otherwise at 07:30 (the
+# gate, DEC-936); the line itself is written at once. Before 05:00 it does nothing (the window is open);
 # a night already in status.txt is not checked again. The orchestrator's digest also reads status.txt and treats a
 # night with no line as MISSED, the backstop when neither cron line could run.
 ORCH=${NIGHTLY_ORCH:-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator}
-PING=${NIGHTLY_PING:-/home/usain/.local/bin/owner-ping}
+# Its pings go through the gate (DEC-936): the line is written at 05:30, but a FAILED or MISSED night's P1 waits
+# until 07:30 unless the owner is already active. The gate's final ping is owner-ping (NIGHTLY_PING in the tests).
+GATE=$(cd "$(dirname "$0")" && pwd)/ping_gate.sh
+PING=$GATE
 NOW_HM=${NIGHTLY_NOW_HM:-$(date +%H%M)}
 DAY=${NIGHTLY_DAY:-$(date +%Y%m%d)}
 STATUS=$ORCH/log/nightly/status.txt
 mkdir -p "$ORCH/log/nightly"
 [ "$((10#$NOW_HM))" -ge 500 ] || exit 0
 label=$(date -d "$DAY" +%F)
-grep -q "^$label " "$STATUS" 2>/dev/null && exit 0
+# A night already checked is not checked again; its held pings (if any) still go out.
+if grep -q "^$label " "$STATUS" 2>/dev/null; then bash "$GATE" --wait-flush; exit 0; fi
 run=""
 for dir in "$ORCH/log/nightly/$DAY"-0[1-4][0-9][0-9]; do
   [ -f "$dir/run.txt" ] || continue
@@ -38,3 +43,6 @@ else
 fi
 echo "$line" >> "$STATUS"
 echo "$line"
+# The night's held pings (this check's, and any nightly.sh held at night) go at 07:30, or as soon as the owner is
+# active: this cron job waits for that, checking every 5 minutes.
+bash "$GATE" --wait-flush

@@ -78,7 +78,8 @@ env -i bash "$work/cron.sh"; code=$?
 rm -f "$work/repo/governance/project/orchestration/nightly/extra.sh" "$work/pings.txt"
 
 # ---- nightly_check.sh: ran, failed, missed, before 05:00, once a night ------------------------------------------
-check() { NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=$1 bash "$HERE/nightly_check.sh" > /dev/null; }
+# The owner is taken as active here (idle 0 s), so the check's pings go at once; K7 and K8 test the hold.
+check() { NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=0 NIGHTLY_WAIT_STEP=1 NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=$1 bash "$HERE/nightly_check.sh" > /dev/null; }
 S=$work/orch/log/nightly/status.txt
 check 0430; [ ! -e "$S" ] || fail "K1: checked before 05:00"
 check 0530; grep -q "^2026-10-29 MISSED" "$S" || fail "K2: no MISSED line"
@@ -94,6 +95,38 @@ check 0530; grep -q "^2026-10-29 ran | verdict: green duration: estimate 5000 s,
 [ ! -e "$work/pings.txt" ] || fail "K5: a green night pinged"
 rm -f "$S"; printf 'x nightly day: quiet\nverdict: green\n' > "$work/orch/log/nightly/20261029-0200/run.txt"
 check 0530; grep -q "^2026-10-29 MISSED" "$S" || fail "K6: a day run counted as the night's"
+# K7, K8: the owner inactive at 05:30: the line is written at once, the P1 waits; at 08:00 it goes, marked held
+rm -f "$S" "$work/pings.txt" "$work/orch/log/nightly/pending-pings.txt"; rm -rf "$work/orch/log/nightly/20261029-0200"
+NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=99999 NIGHTLY_WAIT_STEP=1 NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=0530 \
+  timeout 4 bash "$HERE/nightly_check.sh" > /dev/null; code=$?
+[ "$code" -eq 124 ] || fail "K7: the check did not wait for 07:30 or the owner (exit $code)"
+grep -q "^2026-10-29 MISSED" "$S" || fail "K7: the line was not written at once"
+[ ! -e "$work/pings.txt" ] || fail "K7: pinged an inactive owner at 05:30"
+grep -q "P1 NIGHTLY-MISSED 2026-10-29" "$work/orch/log/nightly/pending-pings.txt" || fail "K7: the P1 was not held"
+NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=99999 NIGHTLY_WAIT_STEP=1 NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=0800 \
+  timeout 10 bash "$HERE/nightly_check.sh" > /dev/null
+grep -q "P1 NIGHTLY-MISSED 2026-10-29 .*(held from " "$work/pings.txt" 2>/dev/null || fail "K8: the held P1 did not go at 08:00"
+[ ! -s "$work/orch/log/nightly/pending-pings.txt" ] || fail "K8: the held file was not emptied"
+[ "$(grep -c '^2026-10-29' "$S")" -eq 1 ] || fail "K8: the night was checked twice"
+
+# ---- ping_gate.sh: at once by day or when active; held at night; flushed, marked held ----------------------------
+gate() { NIGHTLY_ORCH=$work/g NIGHTLY_PING=$work/ping NIGHTLY_WAIT_STEP=1 "$@"; }
+P=$work/g/log/nightly/pending-pings.txt
+rm -f "$work/pings.txt"
+gate env NIGHTLY_NOW_HM=0900 NIGHTLY_IDLE_S=99999 bash "$HERE/ping_gate.sh" "G1 day"
+grep -q "^G1 day$" "$work/pings.txt" || fail "G1: a daytime ping was held"
+gate env NIGHTLY_NOW_HM=0300 NIGHTLY_IDLE_S=10 bash "$HERE/ping_gate.sh" "G2 active"
+grep -q "^G2 active$" "$work/pings.txt" || fail "G2: an active owner's ping was held"
+gate env NIGHTLY_NOW_HM=0300 NIGHTLY_IDLE_S=99999 bash "$HERE/ping_gate.sh" "G3 asleep"
+grep -q "G3 asleep" "$work/pings.txt" && fail "G3: pinged at 03:00 with the owner inactive"
+grep -q "G3 asleep" "$P" || fail "G3: not held"
+gate env NIGHTLY_NOW_HM=0300 NIGHTLY_IDLE_S= bash "$HERE/ping_gate.sh" "G4 unreadable"
+grep -q "G4 unreadable" "$P" || fail "G4: an unreadable idle time did not hold the ping"
+gate env NIGHTLY_NOW_HM=0400 NIGHTLY_IDLE_S=99999 timeout 3 bash "$HERE/ping_gate.sh" --wait-flush; code=$?
+[ "$code" -eq 124 ] && ! grep -q "G3 asleep" "$work/pings.txt" || fail "G5: --wait-flush did not wait at 04:00 ($code)"
+gate env NIGHTLY_NOW_HM=0730 NIGHTLY_IDLE_S=99999 timeout 5 bash "$HERE/ping_gate.sh" --wait-flush
+grep -q "^G3 asleep (held from " "$work/pings.txt" && grep -q "^G4 unreadable (held from " "$work/pings.txt" || fail "G6: not flushed at 07:30"
+[ ! -s "$P" ] || fail "G6: the held file was not emptied"
 
 # ---- rotate.sh: the newest kept, the budget held -----------------------------------------------------------------
 rm -rf "$work/orch/log/nightly"; mkdir -p "$work/orch/log/nightly/cron" "$work/junit"
@@ -109,5 +142,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K6, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, rotate.sh R1-R3"
 exit "$fails"

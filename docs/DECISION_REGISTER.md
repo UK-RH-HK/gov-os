@@ -9286,7 +9286,7 @@ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two package
 - **Decision:** W2-59 starts now on `w2/integrate`, although W2-05's unmerged branch changes two of its files (`src/gov/check/runner.py`'s `_run_command` environment and git calls; `src/gov/retrieval/retrieve_check.py`). W2-59's engineer is told W2-05's changes and keeps its own edit of those lines small and composable; W2-05's resume merges `w2/integrate` first and resolves the conflict keeping both sides (DEC-750, DEC-754). An exception to the prompt's §3 for this pair only.
 
 ### DEC-855 — How the owner is notified: `owner-ping`, a permission request (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
+- **Status:** ACCEPTED (changed by DEC-936 item 2.5: only P1s and ACTs ping; P2s delegated; owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
 - **Decision:**
   1. **Whenever anything needs the owner** (any decision that gates any ticket, even if other work continues; any COMMIT-NEEDED; any owner act, such as an install, a pin, a release or a go; any LAUNCH_BLOCKED, ESCALATION or AUTH_REQUIRED), the orchestrator:
      - (a) writes the full six-part package (DEC-818) in its message, and saves it under `governance/project/orchestration/packages/<id>.md`;
@@ -11285,7 +11285,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-934 — ACT-NIGHTLY-1 revised: cron runs committed, reviewed code; logs kept under a budget; a missed night is a P1; cron checked in this WSL, with a Windows task for restarts and sleep (standing)
-- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 1 and 2 standing) · **Under:** DEC-933 item 2, DEC-852 item 3, DEC-898, DEC-928 item 3, DEC-851, DEC-861 · **Basis:** ACT-NIGHTLY-1 as first sent (`70c7924d`), not installed. The same message confirmed ACT-W2-57-LS-1, committed as `6367e965` (`Role: owner`); after it gate (b) is green (`gov check` exit 0: 15 GREEN, 2 known YELLOW) and the record checks pass.
+- **Status:** ACCEPTED (item 2 changed by DEC-936 item 1: a night's P1s wait until 07:30 unless the owner is active; owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 1 and 2 standing) · **Under:** DEC-933 item 2, DEC-852 item 3, DEC-898, DEC-928 item 3, DEC-851, DEC-861 · **Basis:** ACT-NIGHTLY-1 as first sent (`70c7924d`), not installed. The same message confirmed ACT-W2-57-LS-1, committed as `6367e965` (`Role: owner`); after it gate (b) is green (`gov check` exit 0: 15 GREEN, 2 known YELLOW) and the record checks pass.
 - **Decision (the owner's four points):**
   1. **The cron line runs committed, reviewed code,** not a script in scratch: the nightly is committed with its tests and reviewed by the orchestrator, and cron calls the committed path (or checks a committed sha256).
   2. **Log, don't discard:** the run's output goes to a dated log file, rotated under a budget, and the morning digest reports whether the nightly ran. A missed or failed-to-start nightly is a P1 in the digest, so a silent miss can't happen.
@@ -11342,3 +11342,78 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.319 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-935 (the second re-pin done, gov = wheel of 5c401220, registry `bc37c419`; smoke test passed: pin, guard allow/deny/no-judge, declared checks, gov check 15 GREEN 2 known YELLOW, the nightly route takes 15 entries out of the close). Next free id: DEC-936. |
+
+
+### DEC-936 — ACT-NIGHTLY-1 installed; a night's P1s wait until 07:30 unless the owner is active; carry on without waiting, as many leads as the machine allows; P2s delegated; six additions for the re-plan package (standing)
+- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 2 to 4 standing) · **Under:** DEC-930, DEC-933, DEC-934, DEC-935, DEC-855, DEC-847, DEC-898, DEC-851, DEC-861 · **Changes:** DEC-855 (pings: only P1s and ACTs; P2s decided as delegated, listed in the digest for the owner to overturn), DEC-934 item 2 (the morning check's P1 pings wait until 07:30 unless the owner is active).
+- **Status reported by the owner, checked by the orchestrator (2026-10-28):**
+  - **ACT-NIGHTLY-1 Part A:** the three crontab lines, cron active (the backup was empty). Checked: `crontab -l` shows them; `systemctl is-active cron` gives `active`.
+  - **Part B:** the task "GovOS nightly wake" is Ready (next run 2026-10-29 01:50, `WakeToRun` true, start when available, a 4-hour limit, not on battery). Wake timers are allowed. Windows Update's active hours are 12:00 to 06:00, which cover 01:30 to 05:30.
+  - **Both branches pushed:** `w2/integrate` at `0ab1a3a1`, `record/w2` at `5076472e`.
+  - **The tooling review's count, two slips today:** the nightly folder outside any namespace (`a999f97b`, fixed `95a810a6`), and a commit chained after a red check (`1916501d`). Commits are now conditional on green checks.
+- **Decision:**
+  1. **The morning check's P1 pings** (`FAILED`, `MISSED`) wait until 07:30 unless the owner is already active. The check still runs at 05:30 and writes its line.
+  2. **Carry on without waiting for the owner, within the standing rules** (the resource gate, the close and verification locks, the nightly window, the scratch budgets, conditional commits):
+     1. finish the queue (W2-58, W2-63, W2-07, W2-57), then ACT-W2-57-LS-2 validated on the new pin, to empty `load_sensitive`;
+     2. then run as much in parallel as the machine allows: between closes keep leads running on every ticket whose dependencies are met and whose paths do not overlap a running ticket's, up to the resource gate; never leave the machine idle while tickets are ready. Priority to what the re-plan needs first: W2-68 and W2-71 (the third re-pin), W2-67's re-probe and remaining rounds, and the K4 (memory) and K3 (agents know what to do) tickets whose entry criteria are met;
+     3. re-pin each judge improvement as soon as it merges and passes its checks, each ACT with its commands in a file;
+     4. bring P-SCOPE-RECORDS-1, P-TOOLS-REVIEW-1 and the re-plan package as soon as they are ready, holding no other work for them;
+     5. one daily digest with every non-urgent item; ping the owner only for P1s and ACTs; P2s are decided as delegated decisions, listed in the digest for the owner to overturn.
+  3. **Additions to the re-plan package** (on top of DEC-930's five points; no work on them now):
+     1. **Mutation testing as a standing practice:**
+        - red-first evidence for every test designer's work, as now;
+        - for FULL tickets that change core code (the judge, the guard, the secrets check, selection), a mutation check scoped to the changed lines at review time (cosmic-ray, as lens H rated it), with a minimum kill rate and the survivors named for the test designer;
+        - for adopted products, the same on their critical modules with each language's tool (cosmic-ray or mutmut, cargo-mutants, StrykerJS), run in the nightly window.
+        
+        A time cap per ticket (about 60 minutes, sampling beyond it); a pass mark of about 85 to 90 % with the survivors named; never inside a close; never for record-only, test-only or documentation tickets. The package says what it costs per ticket and per night, and where it starts.
+     2. **Carried through the kernel, not the prompt:** the test-design skill and the reviewer's role text in `template/governance/kernel/` describe it; `gov launch` loads them at each session's start (W2-60); the pinned `gov close` checks the mutation report for FULL core tickets; each adopted repository declares its critical modules and mutation tool at adoption (W2-19's declared commands); it ships through the release and pin ladder (K7).
+     3. **Every standing practice settled:** where it lives today (the prompt, the orchestrator's tools, the kernel, the judge) and where it must live for an adopted product to inherit it (a kernel skill, a role text, a template or a check in the judge), with the ticket that carries it there. For example: the nightly window and its measured length, the queue's gates, the ACT format, the scratch budgets, the merge-time stale-probe rule, the re-pin cadence. What stays only in the orchestrator's tooling is this repository's habit, not part of the Gov OS.
+     4. **Capacity-aware scheduling:**
+        - a machine profile read at start (CPU cores, memory, disk, GPUs and their memory);
+        - a resource profile per ticket or job (CPU, memory, GPU and GPU memory, expected duration, exclusive or shared), declared and corrected from measured runs;
+        - a planner: from the dependency graph (depends_on, overlapping paths), which tickets can run in parallel and how many fit on this machine at once, dispatching them as slots free up, GPU jobs exclusive, respecting the close lock, the verification lock and the nightly window;
+        - a report of utilisation and waiting time.
+        
+        A minimal version for Wave 2 (the machine profile, the GPU in the resource gate, a computed maximum of concurrent leads); the full planner for Wave 3, later across several machines.
+     5. **A Wave 3 row:** a reproducible Gov OS environment, a container image built from the tool registry (Python and its packages, Node and rulesync, gitleaks, Ollama and the pinned models, the code-graph tool, the pin, the scheduler), so the Gov OS runs identically on the owner's PC, a rented cloud pod (RunPod), CI (W2-43) and adopters' machines. Then a measured trial on a RunPod pod (close times, build times, GPU jobs, cost per day) against the owner's PC, on Secure Cloud only, with held-out material kept off the pod unless its protections come with it.
+     6. **Adoption readiness, before EXAMIN's copy:**
+        - what exists today, and what is missing, for adopting an existing repository end to end: every file classified into namespaces; current told from historical documents (drift); the indexes built and refreshed; questions answered correctly from them; any restructuring proposed as governed tickets, never files moved on its own;
+        - a proving ground: several synthetic repositories of different shapes (a Python app with drifted specs and plans, a Rust workspace, a TypeScript monorepo, a repository with legacy documents, large files and a secret in its history). Each holds planted problems whose correct handling is known in advance (a stale spec that looks current, a superseded plan, a misleading file name, a secret, an orphaned test). Adoption must find and handle each one, and a held-out question set per repository checks the indexes' answers;
+        - mutation testing for adoption itself: a planted problem that passes unnoticed means adoption is not ready. Passing the proving ground becomes an entry criterion for EXAMIN's copy, beside the memory measure.
+  4. **The run clones under `~/gov-os-runs`** stay in the tooling review (DEC-933 item 3).
+- **How item 1 is applied (`governance/project/orchestration/nightly/ping_gate.sh`; the orchestrator's reading, for the owner to overturn):**
+  - Every ping of the nightly goes through the gate, the run's own included (a red at 03:00 is held too): from 07:30 to midnight it pings at once; from midnight to 07:30 at once only if the owner is active.
+  - **"Active":** Windows' last input under 15 minutes old, read through PowerShell (`GetLastInputInfo`) from WSL. Checked live on 2026-10-28: 37 s.
+  - An unreadable idle time counts as inactive: the ping is held, never lost.
+  - The 05:30 check writes its line at once, then waits, checking every 5 minutes, until 07:30 or the owner is active, and sends the held pings marked "held from <time>". No new crontab line.
+  - **A finding, the orchestrator's (2026-10-28):** `owner-ping` only writes a line to `~/.config/gov-os-notify/pings.log`. The owner's phone is notified by Claude Code's permission request on the command, so only when a Claude session runs it (prompt §7, DEC-855). A ping from cron (the nightly, the morning check) only writes the log: it never reaches the phone, held or not. ACT-NIGHTLY-1 assumed otherwise.
+    - **Until the owner chooses:** the orchestrator reads `pings.log` and `status.txt` at each session's start and each morning, and relays any nightly P1 with its own `owner-ping` (prompt §7).
+    - **Options for the owner** (in the next digest): (a) that relay only; (b) a notifier the cron job can call directly (for example ntfy or Pushover: an install and an account, the owner's act); (c) a Windows toast from WSL through PowerShell (no install; only seen at the PC).
+  - Tests: `test_nightly.sh` 28 of 28. A mutation check (the gate made to ping always) fails 9 checks across K7, K8 and G3 to G6. No `.ps1` file: the PowerShell is inside the shell script, so W2-66's record-only case stays green.
+- **Where it goes (DEC-851):** this register, with DEC-855's and DEC-934's status lines; the prompt §7 and §15 (pings and P2s; the carry-on order), v3.36; `governance/project/orchestration/nightly/`; RESUME HERE; the daily digest.
+- Next free id: DEC-937.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.320 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-936 (ACT-NIGHTLY-1 installed and checked; a night's P1s wait until 07:30 unless the owner is active, ping_gate.sh; carry on without waiting, leads in parallel up to the resource gate with W2-68, W2-71, W2-67 and K4/K3 first; re-pin as each lands; only P1s and ACTs ping, P2s delegated in the digest; six additions to the re-plan package: mutation testing, through the kernel, every standing practice's home, capacity-aware scheduling, a reproducible environment and a RunPod trial, adoption readiness and its proving ground). Next free id: DEC-937. |
+
+
+### DEC-937 (delegated) — W2-58's close refused on W2-54's green-here fixture timing out under load: ticket W2-75 makes it read the close's own check result; the queue holds until it merges
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and prompt §7: P2, reversible, stricter-or-equal, no guard, containment, held-out, install, main or release involved; for the owner to overturn in the digest) · **Under:** DEC-936, DEC-889 item 2 (P-IS-2 (a)), DEC-906, DEC-866, DEC-855 · **Basis:** the queue of 2026-10-28 (log `close-queue-20261028-2007`), stopped with exit 4 (DEC-929 item 3 working).
+- **What happened:**
+  - W2-58's close (`DAEO-5j8b`, full: shared core changed since its base) ran 20:25 to 21:31: acceptance 803 passed; regression parallel 15,672 passed, 0 failed, 3 errors, 32 skipped; serial afterwards 104 passed.
+  - The 3 errors are W2-54's green-here cases, `test_gov_check_gives_context_reproducibility_green_here`, `test_gov_check_gives_core_schema_green_here` and `test_the_w1_43_audit_report_is_untouched`: "failed on setup with Timeout (>900.0s) from pytest-timeout".
+  - Their shared fixture `gov_check_here` runs `gov check` on this repository, about six minutes alone and over the close's 900 s per-test limit under a full close's load.
+  - Refused, count 1; the pinned close committed its repair ticket `DAEO-pr0y` itself (`b252fd7d`).
+  - Row W2-L429 recorded the same timeout (600 s, W2-65's run, 2026-10-24) and named the fix: the case reads the close's check result instead of running `gov check` itself (P-W2-66-a).
+- **Decision:**
+  1. **Ticket W2-75** (`DAEO-ebmh`, LITE, independent-test-designer, class test-revision, takes row W2-L429): W2-54's `gov_check_here` reads the result the pinned close hands its runs (`GOV_CLOSE_CHECK_RESULT`, gate (b)'s `gov check` on the same commit after the rebuild) inside a close. It runs `gov check` as now outside one. A missing, unreadable or malformed result is never read as green, and each case keeps its meaning.
+  2. **The queue holds** (W2-58, W2-63, W2-07, W2-57: each would meet the same timeout) until W2-75 merges. Then it restarts, W2-58 first.
+  3. **No re-run of W2-58's close before then:** that would be a retry of the ratchet (prompt §15), and nothing would have changed.
+- **What it could let through:** nothing that the close's own gate (b) does not already judge. The cases then rest on the `gov check` that gate (b) ran on the same commit, and the queue refuses the close before it starts if that check is not green. The fallback keeps the cases running `gov check` wherever the close does not hand a result.
+- **Where it goes (DEC-851):** this register; `.tickets/DAEO-ebmh.md`; `docs/plan/WAVE_2_WBS.md` §2 (W2-75); RESUME HERE; the daily digest.
+- Next free id: DEC-938.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.321 | 2026-10-28 | Orchestrator, delegated (DEC-936 item 2.5): DEC-937 (W2-58's close refused on W2-54's green-here fixture timing out under load, repair DAEO-pr0y; ticket W2-75 makes the fixture read the close's check result; the queue holds until it merges). Next free id: DEC-938. |

@@ -13,7 +13,8 @@ REPO=/home/usain/Dynamic-Agentic-Engineering-OS
 HERE=$REPO/governance/project/orchestration/nightly
 ORCH=$REPO/.gov-runtime/scratch/orchestrator
 LOGDIR=$ORCH/log/nightly/cron
-PING=/home/usain/.local/bin/owner-ping
+# Every ping through the gate: at night a ping waits until 07:30 unless the owner is active (DEC-936).
+PING=$HERE/ping_gate.sh
 export HOME=/home/usain
 export LANG=C.UTF-8
 export PATH=/home/usain/.local/bin:/home/usain/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib

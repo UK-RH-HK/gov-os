@@ -30,7 +30,8 @@ RUNS=/home/usain/gov-os-runs/W2-00/nightly
 # where the secrets-indexing check reads.
 JUNIT=/tmp/gov-os-nightly-junit/$STAMP
 LOCKFILE=/tmp/gov-os-verify.lock
-PING=/home/usain/.local/bin/owner-ping
+# Every ping through the gate: at night a ping waits until 07:30 unless the owner is active (DEC-936).
+PING=$HERE/ping_gate.sh
 mkdir -p "$OUT" "$RUNS" "$JUNIT"
 MODE=${1:-day}
 OWN_FLAG=0
