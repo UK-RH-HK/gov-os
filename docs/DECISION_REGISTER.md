@@ -11222,7 +11222,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - **Where it goes (DEC-851):** this register; the prompt §15 (reports), v3.32; RESUME HERE.
 
 ### DEC-931 — W2-57's `load_sensitive` removals timed to where each fix lives: two ACTs; the first validated by a full run in the close's form with the current pin; W2-57's two `Implements:` corrections ride the first
-- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`) · **Under:** DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-925 item 2, DEC-927, DEC-851, DEC-861 · **Basis:** W2-57 merged as `57e363c5` (2026-10-28), its return's 30 removals (`log/W2-57-A5-run2.json`), its change record `docs/changes/W2-57-CIT-E.md`.
+- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; its reading accepted by the owner, DEC-932 item 1) · **Under:** DEC-762, DEC-766, DEC-862 (a), DEC-895, DEC-925 item 2, DEC-927, DEC-851, DEC-861 · **Basis:** W2-57 merged as `57e363c5` (2026-10-28), its return's 30 removals (`log/W2-57-A5-run2.json`), its change record `docs/changes/W2-57-CIT-E.md`.
 - **Decision:**
   1. **Each removal is timed to where its fix lives.** An entry whose fix is in force in a close now is removed now (ACT-W2-57-LS-1). An entry whose fix is in the judge's code (the live and real-model tests leaving the close for the nightly; the serial phase's changes in `command.py`) stays until the second re-pin pins W2-57's code, and leaves in a second ACT right after it (ACT-W2-57-LS-2).
   2. **The first ACT is validated** with a full run in the close's form, with the current pin, on a clone with the removal applied (the owner's standing rule for changes that alter how closes behave, DEC-925 item 2), and the ACT says so.
@@ -11234,3 +11234,19 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.315 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-929 (a package moving the path map's lists into record files and prompts and briefs onto the record-only list; standing: non-urgent record commits wait for the gap between queues; the queue exits non-zero after a refused close, done), DEC-930 (the re-plan package after the second re-pin; standing: four numbers weekly), DEC-931 (W2-57's removals in two ACTs by where each fix lives; the first validated by a full close-form run with the current pin; the two corrections ride it). Next free id: DEC-932. |
+
+### DEC-932 — DEC-931's reading accepted; a narrowly scoped close collects and passes under the pin (no fix needed, row W2-L449); re-pins as judge improvements land: P-REPIN-2 proposed
+- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; item 3's choice pending in P-REPIN-2) · **Under:** DEC-931, DEC-922, DEC-924, DEC-851, DEC-861
+- **Decision:**
+  1. **DEC-931's reading is accepted.** The rulesync and doctor fixes are product code, but closes run the tests against `src/`, so W1-38's three cases and W1-07's `[doctor]` belong in ACT-W2-57-LS-1.
+  2. **The fragile spot, checked (owner's question):** does a narrowly scoped close collect and pass under the pin? If not, fix it now.
+     - **Measured (2026-10-28):** with the pin's interpreter and `PYTHONPATH` set to `src/`, as the pinned `gov close` sets it for every run it starts (the parallel run, the serial run afterwards and each run alone, `told["env"]`): `tests/unit/close/test_serial.py` alone, 11 passed; `tests/unit/close` alone, 428 passed; `gov` loads from `src/gov/__init__.py`.
+     - **So no fix is needed in the close.** Only a run without `PYTHONPATH` loads the pinned wheel's `gov`: that is row W2-L449 (low). Leads already set it (DEC-732), and the queue's gate (a) collects with it.
+  3. **Re-pin cadence (the owner's preference: "re-pins are cheap; pin each judge improvement as it lands").** The orchestrator proposes, in package `P-REPIN-2`, a second re-pin carrying W2-57 and W2-07 round 2 as soon as W2-07 merges, with W2-68 and W2-71 in a third, and the cadence as a standing rule.
+- **Where it goes (DEC-851):** this register, with DEC-931's status line; row W2-L449 in `docs/plan/WAVE_2_LIST.md`; `packages/P-REPIN-2.md`; RESUME HERE.
+- **Also in this commit's list change:** the six rows the queue of 2026-10-27 closed move to section 4 and the counts are corrected (`76fb5f18` had marked them in place, against the list's own practice since W2-02's close).
+- Next free id: DEC-933.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.316 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-932 (DEC-931's reading accepted; a narrow scoped close passes under the pin, no fix, row W2-L449; package P-REPIN-2 proposes a re-pin per judge improvement). Next free id: DEC-933. |
