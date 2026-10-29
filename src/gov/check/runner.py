@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.checks import CHECKS_DIRS, ENFORCES_FIELD, TIMEOUT_FIELD, load_declarations
-from gov.util.gitenv import git_env
+from gov.util.gitenv import git_env, program_env
 
 VERSION = "1.0.0"
 
@@ -92,7 +92,7 @@ def _judged(command: str) -> str:
 def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[int | None, str, str]:
     """The exit code, output and error output of ``command``. The exit code is None when it passed ``timeout`` seconds."""
     command = _judged(command)
-    env = git_env(root)  # a declared check starts git in the root: no GIT_* variable of a hook names another repository
+    env = program_env()  # a declared check may start git anywhere: no inherited GIT_* variable, no index (P-1)
     xdg_tmp = tempfile.mkdtemp(prefix="gov-check-")
     env.setdefault("XDG_CONFIG_HOME", xdg_tmp)
     env.setdefault("XDG_DATA_HOME", xdg_tmp)

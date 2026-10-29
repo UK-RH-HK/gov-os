@@ -6,13 +6,16 @@ worktree's git directory and ``GIT_INDEX_FILE`` its index. A git call the hook's
 (DEC-710). ``git_env`` is the one place that clears them, with the trace and configuration variables
 (``GIT_TRACE*``, ``GIT_CONFIG_*``) among them, and turns lazy fetching off (``GIT_NO_LAZY_FETCH``).
 
-The one value kept is git's own for the call's repository: a ``GIT_INDEX_FILE`` that names a file directly in
-the git directory of ``root``. ``git commit -a`` and ``git commit -- <path>`` give the hook such an index
-(``index.lock``, ``next-index-*.lock``) and what is to be committed is only there. Any other value is cleared,
-a linked worktree's index under the main tree's ``.git/worktrees/`` among them. A
-``GIT_DIR`` that names the git directory of ``root`` is the one git finds from ``root`` by itself, so clearing
-it changes nothing. ``foreign_index`` names an inherited ``GIT_INDEX_FILE`` that is not kept, for a caller that
-must refuse rather than act on the default index in its place (the staged-secrets gate).
+P-1 (DEC-804 item 3): an inherited ``GIT_INDEX_FILE`` is honoured only for git calls in the project root; a
+program that may start git elsewhere gets no index. The one value ``git_env`` keeps is git's own for the call's
+repository: a ``GIT_INDEX_FILE`` that names a file directly in the git directory of ``root``. ``git commit -a``
+and ``git commit -- <path>`` give the hook such an index (``index.lock``, ``next-index-*.lock``) and what is to
+be committed is only there. Any other value is cleared, a linked worktree's index under the main tree's
+``.git/worktrees/`` among them. A ``GIT_DIR`` that names the git directory of ``root`` is the one git finds from
+``root`` by itself, so clearing it changes nothing. ``program_env`` keeps no index at all: a declared check runs
+git where it likes (a temporary repository of its own), and an index kept as an absolute path would be the
+project's there (F-A, DEC-807 item 2). ``foreign_index`` names an inherited ``GIT_INDEX_FILE`` that is not kept,
+for a caller that must refuse rather than act on the default index in its place (the staged-secrets gate).
 
 ``pinned`` also leaves the system and the person's own configuration unread (``~/.gitconfig``, the XDG file):
 for the calls that only read, where a setting there (``trace2.eventTarget``) could write or change an answer.
@@ -36,7 +39,8 @@ _PINNED = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
 
 
 def git_env(root: str | Path | None = None, *, pinned: bool = False, base: dict | None = None) -> dict[str, str]:
-    """The environment for a git call (or a program that starts git) acting on the repository at ``root``.
+    """The environment for a git call in the repository at ``root`` (``git -C <root> …``); a program that may
+    start git elsewhere takes ``program_env`` instead (P-1).
 
     ``base`` (default ``os.environ``) without any ``GIT_*`` variable but the person's identity and push transport
     (``GIT_AUTHOR_*``, ``GIT_COMMITTER_*``, ``GIT_SSH*``, ``GIT_ASKPASS``, ``GIT_TERMINAL_PROMPT``), with
@@ -52,6 +56,15 @@ def git_env(root: str | Path | None = None, *, pinned: bool = False, base: dict 
     if own is not None:
         env[_OWN] = own
     return env
+
+
+def program_env(*, pinned: bool = False, base: dict | None = None) -> dict[str, str]:
+    """The environment for a program that may start git outside the project root (a declared check, P-1).
+
+    ``git_env``'s, with no ``GIT_INDEX_FILE`` kept whatever ``base`` holds: no inherited ``GIT_DIR``,
+    ``GIT_WORK_TREE``, ``GIT_COMMON_DIR`` or index reaches it, so its git in a folder of its own acts on that
+    folder's repository only, and its git in the root finds the root's own index by itself."""
+    return git_env(None, pinned=pinned, base=base)
 
 
 def foreign_index(root: str | Path, *, base: dict | None = None) -> str | None:
