@@ -11,24 +11,21 @@ stays (DEC-248, DEC-208)".
 reads as 300 and clamps to the minimum. No residual goes to ``bootstrap.md``
 for this line.
 
-**Where it is set (DEC-636, DEC-665).** Until the owner's apply block of
-2026-10-11 the variable stood in the ``env`` key of ``.claude/settings.json``,
-and two cases here read it there. That file is now rulesync's output, and
-rulesync writes no env block; the variable is set in the env block of the
-owner's user-level settings, so every repository on this machine gets it. No
-case reads the user-level settings. The two cases were rewritten to the decided
-state through what a case may read:
+**No threshold is set (DEC-838, DEC-865).** The 300k entry of DEC-636 and
+DEC-665 (in the owner's user-level settings from 2026-10-11) is retired: since
+2026-10-19 every session uses its model's full window, and no launch and no
+settings file passes a compaction threshold. The two cases read what a case may
+read:
 
 - the project's settings set no window of their own (the ``env`` key, through
   the suite's loader, which gives the ``hooks`` and ``env`` keys and nothing
   else);
 - the environment a Claude Code session on this machine gives its commands
-  carries the variable, a plain integer of about 300k. Claude Code exports the
-  env block of its settings to every command a session runs, so this is what
-  the user-level entry does, seen from outside it. The case is ``local_only``
-  (the entry is this machine's) and is skipped, never passed, when the suite is
-  not run from a session. It shows the value a session gets and that the
-  project does not supply it; it does not show which file supplies it.
+  carries no ``CLAUDE_CODE_AUTO_COMPACT_WINDOW``. Claude Code exports the env
+  block of its settings to every command a session runs, and a launch's own
+  environment reaches them too, so a threshold from either would show here. The
+  case is ``local_only`` (the environment is this machine's) and is skipped,
+  never passed, when the suite is not run from a session.
 """
 
 from __future__ import annotations
@@ -58,29 +55,26 @@ def test_the_project_settings_set_no_auto_compact_window_of_their_own(settings_e
 
 
 @pytest.mark.local_only
-def test_a_session_on_this_machine_gets_an_auto_compact_window_of_about_300k_tokens(settings_env):
-    """Success 3, rewritten after implementation (DEC-665). "About 300k tokens (30 % of the window)" is 270,000 to
-    330,000, as a plain integer: the value a session's commands are given, with no project entry behind it.
+def test_a_session_on_this_machine_is_given_no_compaction_threshold(settings_env):
+    """Success 3, rewritten after implementation (DEC-838, DEC-865). No launch and no settings file passes a
+    compaction threshold: the variable is in neither the project's ``env`` key nor the environment a session gives
+    its commands, so the session uses its model's full window.
 
-    Before: ``test_the_auto_compact_window_is_about_300k_tokens``.
+    Before: ``test_a_session_on_this_machine_gets_an_auto_compact_window_of_about_300k_tokens`` (DEC-636, DEC-665:
+    the variable a plain integer of about 300k in a session's environment).
     """
     if os.environ.get(SESSION_MARKER) != "1":
-        pytest.skip(f"not run from a Claude Code session ({SESSION_MARKER} is not 1): the env block of the "
-                    "user-level settings reaches a session's commands only; the window is not measured")
+        pytest.skip(f"not run from a Claude Code session ({SESSION_MARKER} is not 1): the env block of a settings "
+                    "file reaches a session's commands only; the window is not measured")
     assert support.WINDOW_KEY not in settings_env, (
-        f"the env key of {support.SETTINGS_REL} sets {support.WINDOW_KEY}: the session's value is the project's, "
-        "not the user-level one (DEC-636)"
+        f"the env key of {support.SETTINGS_REL} sets {support.WINDOW_KEY}: a settings file passes a compaction "
+        "threshold, and no settings file may (DEC-838)"
     )
-    value = os.environ.get(support.WINDOW_KEY)
-    assert value is not None, (
-        f"this session's commands are given no {support.WINDOW_KEY}: no auto-compact window is set for a session "
-        "on this machine (DEC-636)"
+    given = os.environ.get(support.WINDOW_KEY)   # one value, so that a failure prints nothing else of the environment
+    assert given is None, (
+        f"this session's commands are given {support.WINDOW_KEY}={given!r}: a launch or a settings file passes a "
+        "compaction threshold, and the session does not use its model's full window (DEC-838)"
     )
-    assert value.isdigit(), (
-        f"{support.WINDOW_KEY} is {value!r}; the CLI reads a plain integer only (a value like 300k reads as 300)"
-    )
-    low, high = support.WINDOW_TOKENS - support.WINDOW_TOLERANCE, support.WINDOW_TOKENS + support.WINDOW_TOLERANCE
-    assert low <= int(value) <= high, f"{support.WINDOW_KEY} is {value}, not about {support.WINDOW_TOKENS}"
 
 
 @pytest.mark.local_only

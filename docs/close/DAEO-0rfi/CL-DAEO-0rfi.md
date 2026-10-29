@@ -1,0 +1,8119 @@
+---
+id: CL-DAEO-0rfi
+type: close
+status: ACTIVE
+state_class: AUTHORITATIVE
+task: DAEO-0rfi
+created: '2026-10-21T21:28:54Z'
+outputs:
+- .claude/skills/checkpoint/SKILL.md
+- .rulesync/rules/governance.md
+- .rulesync/skills/checkpoint/SKILL.md
+- .tickets/DAEO-0rfi.md
+- .tickets/DAEO-0z8c.md
+- .tickets/DAEO-5j8b.md
+- .tickets/DAEO-6n5k.md
+- .tickets/DAEO-7rr2.md
+- .tickets/DAEO-j8gn.md
+- .tickets/DAEO-juee.md
+- .tickets/DAEO-k7hz.md
+- .tickets/DAEO-kh9l.md
+- .tickets/DAEO-kl5e.md
+- .tickets/DAEO-pl6k.md
+- .tickets/DAEO-r9ss.md
+- .tickets/DAEO-sdxk.md
+- .tickets/DAEO-siiz.md
+- .tickets/DAEO-swdu.md
+- .tickets/DAEO-u4oz.md
+- .tickets/DAEO-xxgp.md
+- AGENTS.md
+- CLAUDE.md
+- docs/DECISION_REGISTER.md
+- docs/adr/ADR-0001-threat-model.md
+- docs/assessment/2026-10/A-purpose-roadmap.md
+- docs/assessment/2026-10/B-memory-retrieval.md
+- docs/assessment/2026-10/C-decisions-to-spec.md
+- docs/assessment/2026-10/D-tool-staging.md
+- docs/assessment/2026-10/E-roles-context.md
+- docs/assessment/2026-10/F-models-context.md
+- docs/assessment/2026-10/G-tools-glue.md
+- docs/assessment/2026-10/SYNTHESIS.md
+- docs/changes/W2-50-CIT-E.md
+- docs/changes/W2-50-CIT-P.md
+- docs/changes/W2-54-CIT-E.md
+- docs/changes/W2-62-CIT-P.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0002.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0004.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0007.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0009.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0014.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0022.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0026.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0027.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0028.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0031.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0034.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0035.md
+- docs/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0008.md
+- docs/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0009.md
+- docs/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0010.md
+- docs/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0011.md
+- docs/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0012.md
+- docs/checkpoints/DAEO-juee/CP-DAEO-juee-0004.md
+- docs/checkpoints/DAEO-juee/CP-DAEO-juee-0006.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0004.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0008.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0010.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0013.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0016.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0019.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0022.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0024.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0027.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0032.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0037.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0043.md
+- docs/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0049.md
+- docs/checkpoints/DAEO-pl6k/CP-DAEO-pl6k-0002.md
+- docs/checkpoints/DAEO-zflj/CP-DAEO-zflj-0021.md
+- docs/close/DAEO-7rr2/CL-DAEO-7rr2.md
+- docs/plan/WAVE_2_LIST.md
+- docs/plan/WAVE_2_REVISED_PLAN.md
+- docs/plan/WAVE_2_WBS.md
+- docs/probes/DAEO-0rfi/PR-DAEO-0rfi-run5.md
+- docs/probes/DAEO-0rfi/PR-DAEO-0rfi.md
+- docs/probes/DAEO-juee/PR-DAEO-juee.md
+- docs/probes/DAEO-kl5e/PR-DAEO-kl5e-last-round-3.md
+- docs/probes/DAEO-kl5e/PR-DAEO-kl5e-run-8.md
+- governance/project/briefs/AUDITOR-common.md
+- governance/project/briefs/JUDGEMENT.md
+- governance/project/briefs/LEAD-w2-common.md
+- governance/project/orchestration/README.md
+- governance/project/orchestration/main/checkpoints/DAEO-03pw/CP-DAEO-03pw-0001.md
+- governance/project/orchestration/main/checkpoints/DAEO-03pw/CP-DAEO-03pw-0002.md
+- governance/project/orchestration/main/checkpoints/DAEO-03pw/CP-DAEO-03pw-0003.md
+- governance/project/orchestration/main/checkpoints/DAEO-03pw/CP-DAEO-03pw-0004.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0002.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0003.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0004.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0005.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0006.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0007.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0008.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0009.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0010.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0011.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0012.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0013.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0014.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0015.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0016.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0017.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0018.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0019.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0020.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0021.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0022.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0023.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0024.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0025.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0026.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0027.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0028.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0029.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0030.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0031.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0032.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0033.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0034.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0035.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0036.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0037.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0038.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0039.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0040.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0041.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0042.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0043.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0044.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0045.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0046.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0047.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0048.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0049.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0050.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0051.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0052.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0053.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0054.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0055.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0056.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0057.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0058.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0059.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0060.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0061.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0062.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0063.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0064.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0065.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0066.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0067.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0068.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0069.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0070.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0071.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0072.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0073.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0074.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0075.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0076.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0077.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0078.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0079.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0080.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0081.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0082.md
+- governance/project/orchestration/main/checkpoints/DAEO-6cc2/CP-DAEO-6cc2-0083.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0001.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0002.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0003.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0004.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0005.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0006.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0007.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0008.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0009.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0010.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0011.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0012.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0013.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0014.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0015.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0016.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0017.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0018.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0019.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0020.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0021.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0022.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0023.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0024.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0025.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0026.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0027.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0028.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0029.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0030.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0031.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0032.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0033.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0034.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0035.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0036.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0037.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0038.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0039.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0040.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0041.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0042.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0043.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0044.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0045.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0046.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0047.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0048.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0049.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0050.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0051.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0052.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0053.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0054.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0055.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0056.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0057.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0058.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0059.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0060.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0061.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0062.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0063.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0064.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0065.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0066.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0067.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0068.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0069.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0070.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0071.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0072.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0073.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0074.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0075.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0076.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0077.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0078.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0079.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0080.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0081.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0082.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0083.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0084.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0085.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0086.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0087.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0088.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0089.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0090.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0091.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0092.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0093.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0094.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0095.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0096.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0097.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0098.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0099.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0100.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0101.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0102.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0103.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0104.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0105.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0106.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0107.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0108.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0109.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0110.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0111.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0112.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0113.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0114.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0115.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0116.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0117.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0118.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0119.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0120.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0121.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0122.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0123.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0124.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0125.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0126.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0127.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0128.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0129.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0130.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0131.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0132.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0133.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0134.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0135.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0136.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0137.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0138.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0139.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0140.md
+- governance/project/orchestration/main/checkpoints/DAEO-sdxk/CP-DAEO-sdxk-0141.md
+- governance/project/orchestration/main/orchestrator/ADOPTION-outside-sources.md
+- governance/project/orchestration/main/orchestrator/CHECKPOINT-ARCHIVE.md
+- governance/project/orchestration/main/orchestrator/CHECKPOINT.md
+- governance/project/orchestration/main/orchestrator/COMPLIANCE-orchestrator-notes.md
+- governance/project/orchestration/main/orchestrator/COMPLIANCE.md
+- governance/project/orchestration/main/orchestrator/EXIT-PACKAGE-CI.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-2lwj-after-W1-41.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-2lwj-followup.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-2lwj.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-3ef2-round-DEC-635.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-6mk8-round-DEC-655.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-cdoi.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-emkd-deadline.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-emkd-root-search.md
+- governance/project/orchestration/main/orchestrator/PR-DAEO-emkd.md
+- governance/project/orchestration/main/orchestrator/W2-50-CIT-P.draft.md
+- governance/project/orchestration/main/orchestrator/adopt-A0-A4.sh
+- governance/project/orchestration/main/orchestrator/adopt-A5-A8.sh
+- governance/project/orchestration/main/orchestrator/adopt-proposal.py
+- governance/project/orchestration/main/orchestrator/adoption-note.md
+- governance/project/orchestration/main/orchestrator/append.py
+- governance/project/orchestration/main/orchestrator/apply_adapter_output.py
+- governance/project/orchestration/main/orchestrator/bootstrap-merges.md
+- governance/project/orchestration/main/orchestrator/bootstrap-ollama.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-08.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-09.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-10.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-12.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-13.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-14.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-15.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-17.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-18.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-25.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-31b.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-34.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-37.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-46.md
+- governance/project/orchestration/main/orchestrator/bootstrap-w1-49.md
+- governance/project/orchestration/main/orchestrator/briefs/A5-early-template.md
+- governance/project/orchestration/main/orchestrator/briefs/AUDITOR-common.md
+- governance/project/orchestration/main/orchestrator/briefs/JUDGEMENT.md
+- governance/project/orchestration/main/orchestrator/briefs/LEAD-steps.md
+- governance/project/orchestration/main/orchestrator/briefs/PERF-measure.md
+- governance/project/orchestration/main/orchestrator/briefs/TWELVE-FIELDS.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note6.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note7.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-note8.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run6.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run7.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run8.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-A5-run9.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-probe.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-probe4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-probe8.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-02-probe9.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-06-A1-batch2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-06-A1-batch3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-06-A1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-07-A1-batch2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-07-A1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-07-A2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-08-A1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-08-A4-gap.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-08-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-08-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-08-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-08-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-09-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-09-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-09-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-09-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-09-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-10-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-10-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A4-gap.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-head4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-note4b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5-run4b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-11-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-12-A4-gap.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-12-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-12-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-12-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-12-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-13-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-13-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-13-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-13-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-14-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-14-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-H-intro.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-H-pieces.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-H2-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-H3-top.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-runH1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-runH2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-A5-runH3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-probeH.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-15-probeH2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-head4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-16-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-17-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-17-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-17-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-17-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-18-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-18-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-18-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-18-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-head4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-head5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-19-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-head4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-20-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-head2b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-head4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-note3b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-run2b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-run3b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-21-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-22-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-22-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-22-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-22-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-22-dup-removal.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-23-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-23-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-24-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-24-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-24-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-24-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-24-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-24-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-25-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-25-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-25-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-25-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-note4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-align.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26-dec438-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-audit-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-audit-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-na-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26b-na-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26d-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26d-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26e-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26e-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-26e-fix2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r10-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r11-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r4-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r4-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r5-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r5-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r6-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r6-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r7-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r7-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r8-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r9-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27-r9-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-27b-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-28-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-28-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-28-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-28-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-28-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-28-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29b-fix-hooks.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-29b-fix-record.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-G-intro.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-G-pieces.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-G2-note.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-G3-note.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-J-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-J2-top.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-noteF2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runF1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runF2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runG1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runG2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runG3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runJ.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runJ2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-A5-runK.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-align2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probe.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probe2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probe3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probeG.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probeJ-final.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probeJ.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-probeK.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r10-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r10-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r4-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r4-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r4b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r4c-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r5-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r5-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r5b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r6-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r6-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r6b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r7-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r7-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r8-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r8-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r8b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r9-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-30-r9-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-note4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31b-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31b-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-31b-probe.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-32-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-32-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-33-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-33-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-33-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-33-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-34-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-34-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-34-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-34-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-A5-headF.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-A5-runF1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-align.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-35-w26-fixture.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-align.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-na-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-na-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-36-w26-lifecycle.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-37-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-37-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-37-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-37-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-headM2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-runL.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-runM.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-A5-runM2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-probeL.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-probeM.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-r3-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-r3-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-r3b-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-r4-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-38-r4-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-r3-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-r3-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-39-r4-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-40-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-40-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-40-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-40-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-40-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-40-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-note4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-round.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-41-probe.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-final-b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-final-c.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-final.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run4b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-42-A5-run7.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-43-compliance-part.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-44-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-44-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-46-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-47-A1-batch2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-47-A1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-47-A2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-48-A1-batch2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-48-A1-batch3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-48-A1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-49-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-49-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-49-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-49-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-49-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-49-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head6.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-head7.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-run6.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5-run7.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50-A5.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-head2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-head3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-note3b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50F-A5-run3b.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50M-A5-head.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50M-A5-note2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50M-A5-note3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50M-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50M-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50M-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50c-cases.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-50c-fix.md
+- governance/project/orchestration/main/orchestrator/briefs/W1-midwave-audit.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-01-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-01-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-01-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-01-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-01-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-02-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-02-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-02-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-02-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-02-part-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-03-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-03-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-05-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-05-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-05-A5-run2b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-16-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-16-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-20-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-20-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-26-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-26-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-37-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-37-A5-run1b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-48-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-48-part-run1.filled.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-48-part-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-49-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-49-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-record.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run6.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run7.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run7b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-A5-run8.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-50-part-run8.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-51-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-52-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-52-A5-run1b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-52-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-52-A5-run2b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-53-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run3.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run3b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run4.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run4b.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run4c.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-A5-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-54-part-run5.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-58-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-58-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-58-part-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-58-part-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-59-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-59-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-59-part-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-59-part-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-62-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-62-A5-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-62-part-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-62-part-run2.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-63-A5-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/W2-63-part-run1.md
+- governance/project/orchestration/main/orchestrator/briefs/adoption-auditor.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-A.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-B.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-C.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-D.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-E.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-F.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-F2.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-G.md
+- governance/project/orchestration/main/orchestrator/briefs/assessment-S.md
+- governance/project/orchestration/main/orchestrator/briefs/superseded/LEAD-common.md
+- governance/project/orchestration/main/orchestrator/build-adoption-note.py
+- governance/project/orchestration/main/orchestrator/build-brief-J.py
+- governance/project/orchestration/main/orchestrator/build-brief-J2.py
+- governance/project/orchestration/main/orchestrator/build-brief-K.py
+- governance/project/orchestration/main/orchestrator/build-brief-L.py
+- governance/project/orchestration/main/orchestrator/build-brief-M.py
+- governance/project/orchestration/main/orchestrator/build-brief-M2.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-02R9.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-41R.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-final-b.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-final-c.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-final.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-run3.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-run4.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-run4b.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-run5.py
+- governance/project/orchestration/main/orchestrator/build-brief-W1-42-run7.py
+- governance/project/orchestration/main/orchestrator/build-probe-M.py
+- governance/project/orchestration/main/orchestrator/build-register-201.py
+- governance/project/orchestration/main/orchestrator/build-share-table.py
+- governance/project/orchestration/main/orchestrator/check-W1-41-close.sh
+- governance/project/orchestration/main/orchestrator/check-after-adoption.sh
+- governance/project/orchestration/main/orchestrator/check-at-head.sh
+- governance/project/orchestration/main/orchestrator/close-W1-02R8.sh
+- governance/project/orchestration/main/orchestrator/close-W1-02R9.sh
+- governance/project/orchestration/main/orchestrator/close-W1-15H.sh
+- governance/project/orchestration/main/orchestrator/close-W1-15H2.sh
+- governance/project/orchestration/main/orchestrator/close-W1-30-final.sh
+- governance/project/orchestration/main/orchestrator/close-W1-30G.sh
+- governance/project/orchestration/main/orchestrator/close-W1-30G2.sh
+- governance/project/orchestration/main/orchestrator/close-W1-30J.sh
+- governance/project/orchestration/main/orchestrator/close-W1-30K.sh
+- governance/project/orchestration/main/orchestrator/close-W1-31b-second.sh
+- governance/project/orchestration/main/orchestrator/close-W1-31b.sh
+- governance/project/orchestration/main/orchestrator/close-W1-38-final.sh
+- governance/project/orchestration/main/orchestrator/close-W1-38L.sh
+- governance/project/orchestration/main/orchestrator/close-W1-41R.sh
+- governance/project/orchestration/main/orchestrator/close-W1-42-tk.sh
+- governance/project/orchestration/main/orchestrator/close-W1-42.sh
+- governance/project/orchestration/main/orchestrator/close-note-W1-30J.md
+- governance/project/orchestration/main/orchestrator/close-two.sh
+- governance/project/orchestration/main/orchestrator/closenote-W1-02R8.md
+- governance/project/orchestration/main/orchestrator/closenote-W1-15H.md
+- governance/project/orchestration/main/orchestrator/closenote-W1-15H2.md
+- governance/project/orchestration/main/orchestrator/closenote-W1-30G.md
+- governance/project/orchestration/main/orchestrator/closenote-W1-41.md
+- governance/project/orchestration/main/orchestrator/cmp-check.py
+- governance/project/orchestration/main/orchestrator/commit-W1-42-wtlist.sh
+- governance/project/orchestration/main/orchestrator/commit-context-data.sh
+- governance/project/orchestration/main/orchestrator/commit-v0215.sh
+- governance/project/orchestration/main/orchestrator/commit-v0216.sh
+- governance/project/orchestration/main/orchestrator/commit-v0217.sh
+- governance/project/orchestration/main/orchestrator/commit-v0218.sh
+- governance/project/orchestration/main/orchestrator/compare-adapter-second.py
+- governance/project/orchestration/main/orchestrator/compare-adapter.py
+- governance/project/orchestration/main/orchestrator/context-check-2.sh
+- governance/project/orchestration/main/orchestrator/dec-439.md
+- governance/project/orchestration/main/orchestrator/dec-440.md
+- governance/project/orchestration/main/orchestrator/dec-442.md
+- governance/project/orchestration/main/orchestrator/dec-452.md
+- governance/project/orchestration/main/orchestrator/dec-455.md
+- governance/project/orchestration/main/orchestrator/dec-456.md
+- governance/project/orchestration/main/orchestrator/dec-460.md
+- governance/project/orchestration/main/orchestrator/dec-467.md
+- governance/project/orchestration/main/orchestrator/dec-468.md
+- governance/project/orchestration/main/orchestrator/dec-470.md
+- governance/project/orchestration/main/orchestrator/dec-471.md
+- governance/project/orchestration/main/orchestrator/dec-472.md
+- governance/project/orchestration/main/orchestrator/dec-479.md
+- governance/project/orchestration/main/orchestrator/dec-480.md
+- governance/project/orchestration/main/orchestrator/dec-481.md
+- governance/project/orchestration/main/orchestrator/dec-487.md
+- governance/project/orchestration/main/orchestrator/dec-488.md
+- governance/project/orchestration/main/orchestrator/dec-489.md
+- governance/project/orchestration/main/orchestrator/dec-490.md
+- governance/project/orchestration/main/orchestrator/dec-491.md
+- governance/project/orchestration/main/orchestrator/dec-492.md
+- governance/project/orchestration/main/orchestrator/dec-497.md
+- governance/project/orchestration/main/orchestrator/dec-498.md
+- governance/project/orchestration/main/orchestrator/dec-499.md
+- governance/project/orchestration/main/orchestrator/dec-500.md
+- governance/project/orchestration/main/orchestrator/dec-501.md
+- governance/project/orchestration/main/orchestrator/dec-502.md
+- governance/project/orchestration/main/orchestrator/dec-503.md
+- governance/project/orchestration/main/orchestrator/dec-511.md
+- governance/project/orchestration/main/orchestrator/dec-512.md
+- governance/project/orchestration/main/orchestrator/dec-513.md
+- governance/project/orchestration/main/orchestrator/dec-516.md
+- governance/project/orchestration/main/orchestrator/dec-517.md
+- governance/project/orchestration/main/orchestrator/dec-518.md
+- governance/project/orchestration/main/orchestrator/dec-526.md
+- governance/project/orchestration/main/orchestrator/dec-527.md
+- governance/project/orchestration/main/orchestrator/dec-533.md
+- governance/project/orchestration/main/orchestrator/dec-535.md
+- governance/project/orchestration/main/orchestrator/dec-536.md
+- governance/project/orchestration/main/orchestrator/dec-540.md
+- governance/project/orchestration/main/orchestrator/dec-547.md
+- governance/project/orchestration/main/orchestrator/dec-548.md
+- governance/project/orchestration/main/orchestrator/dec-549.md
+- governance/project/orchestration/main/orchestrator/dec-550.md
+- governance/project/orchestration/main/orchestrator/dec-551.md
+- governance/project/orchestration/main/orchestrator/dec-553.md
+- governance/project/orchestration/main/orchestrator/dec-554.md
+- governance/project/orchestration/main/orchestrator/dec-555.md
+- governance/project/orchestration/main/orchestrator/dec-556.md
+- governance/project/orchestration/main/orchestrator/dec-562.md
+- governance/project/orchestration/main/orchestrator/dec-563.md
+- governance/project/orchestration/main/orchestrator/dec-568.md
+- governance/project/orchestration/main/orchestrator/dec-569.md
+- governance/project/orchestration/main/orchestrator/dec-570.md
+- governance/project/orchestration/main/orchestrator/dec-571.md
+- governance/project/orchestration/main/orchestrator/dec-572.md
+- governance/project/orchestration/main/orchestrator/dec-579.md
+- governance/project/orchestration/main/orchestrator/dec-580.md
+- governance/project/orchestration/main/orchestrator/dec-585.md
+- governance/project/orchestration/main/orchestrator/dec-586.md
+- governance/project/orchestration/main/orchestrator/dec-587.md
+- governance/project/orchestration/main/orchestrator/dec-588.md
+- governance/project/orchestration/main/orchestrator/dec-592.md
+- governance/project/orchestration/main/orchestrator/dec-594.md
+- governance/project/orchestration/main/orchestrator/dec-601.md
+- governance/project/orchestration/main/orchestrator/dec-602.md
+- governance/project/orchestration/main/orchestrator/dec-603.md
+- governance/project/orchestration/main/orchestrator/dec-608.md
+- governance/project/orchestration/main/orchestrator/dec-609.md
+- governance/project/orchestration/main/orchestrator/dec-610.md
+- governance/project/orchestration/main/orchestrator/dec-611.md
+- governance/project/orchestration/main/orchestrator/dec-620.md
+- governance/project/orchestration/main/orchestrator/dec-621.md
+- governance/project/orchestration/main/orchestrator/dec-622.md
+- governance/project/orchestration/main/orchestrator/dec-623.md
+- governance/project/orchestration/main/orchestrator/dec-624.md
+- governance/project/orchestration/main/orchestrator/dec-625.md
+- governance/project/orchestration/main/orchestrator/dec-626.md
+- governance/project/orchestration/main/orchestrator/dec-627.md
+- governance/project/orchestration/main/orchestrator/dec-634.md
+- governance/project/orchestration/main/orchestrator/dec-635.md
+- governance/project/orchestration/main/orchestrator/dec-641.md
+- governance/project/orchestration/main/orchestrator/dec-642.md
+- governance/project/orchestration/main/orchestrator/dec-643.md
+- governance/project/orchestration/main/orchestrator/dec-644.md
+- governance/project/orchestration/main/orchestrator/dec-647.md
+- governance/project/orchestration/main/orchestrator/drafts/DEC-662-draft.md
+- governance/project/orchestration/main/orchestrator/drafts/a-dev-tkclose.json
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-B3-hook.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W1-02-round9.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W1-38-closeM.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W1-38-roundM.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W1-41-close.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W1-41R.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W1-42-close.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W2-accept-edits.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W2-first.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-W2-launch.md
+- governance/project/orchestration/main/orchestrator/drafts/bootstrap-two-closes.md
+- governance/project/orchestration/main/orchestrator/drafts/product-spec.agent.md
+- governance/project/orchestration/main/orchestrator/drafts/product-spec.role.md
+- governance/project/orchestration/main/orchestrator/drafts/register-201.md
+- governance/project/orchestration/main/orchestrator/drafts/register-202.md
+- governance/project/orchestration/main/orchestrator/drafts/register-203.md
+- governance/project/orchestration/main/orchestrator/drafts/register-204.md
+- governance/project/orchestration/main/orchestrator/drafts/register-205.md
+- governance/project/orchestration/main/orchestrator/drafts/register-206.md
+- governance/project/orchestration/main/orchestrator/drafts/register-207.md
+- governance/project/orchestration/main/orchestrator/drafts/register-208.md
+- governance/project/orchestration/main/orchestrator/drafts/register-209.md
+- governance/project/orchestration/main/orchestrator/drafts/register-210.md
+- governance/project/orchestration/main/orchestrator/drafts/register-211.md
+- governance/project/orchestration/main/orchestrator/drafts/register-212.md
+- governance/project/orchestration/main/orchestrator/drafts/register-213.md
+- governance/project/orchestration/main/orchestrator/drafts/register-214.md
+- governance/project/orchestration/main/orchestrator/drafts/register-215.md
+- governance/project/orchestration/main/orchestrator/drafts/register-216.md
+- governance/project/orchestration/main/orchestrator/drafts/register-217.md
+- governance/project/orchestration/main/orchestrator/drafts/register-218.md
+- governance/project/orchestration/main/orchestrator/drafts/register-219.md
+- governance/project/orchestration/main/orchestrator/exp-clone-1.py
+- governance/project/orchestration/main/orchestrator/exp-clone-2.py
+- governance/project/orchestration/main/orchestrator/exp-clone-3.py
+- governance/project/orchestration/main/orchestrator/exp-clone-4.py
+- governance/project/orchestration/main/orchestrator/exp-hook-cwd.py
+- governance/project/orchestration/main/orchestrator/exp-hook-timeout.py
+- governance/project/orchestration/main/orchestrator/find-owner.py
+- governance/project/orchestration/main/orchestrator/fix-capabilities.py
+- governance/project/orchestration/main/orchestrator/fix-clause-lines.py
+- governance/project/orchestration/main/orchestrator/fix-context-sources.py
+- governance/project/orchestration/main/orchestrator/fix-depends-on.py
+- governance/project/orchestration/main/orchestrator/fix-frontmatter.py
+- governance/project/orchestration/main/orchestrator/import-outside.py
+- governance/project/orchestration/main/orchestrator/live-case-3x.sh
+- governance/project/orchestration/main/orchestrator/log/MIDWAVE-AUDIT.md
+- governance/project/orchestration/main/orchestrator/log/PERF-REPORT.md
+- governance/project/orchestration/main/orchestrator/log/PERF-measure.err
+- governance/project/orchestration/main/orchestrator/log/PERF-measure.json
+- governance/project/orchestration/main/orchestrator/log/PERF-times.tsv
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run3b.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run3b.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run5.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run5.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run6.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run6.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run7.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run7.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run8.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run8.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run9.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-lead-run9.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe4.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe4.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe8.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe8.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe9.err
+- governance/project/orchestration/main/orchestrator/log/W1-02-probe9.json
+- governance/project/orchestration/main/orchestrator/log/W1-02-run6-engineer-partial.diff
+- governance/project/orchestration/main/orchestrator/log/W1-02F-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-02R-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-02R8-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-06-A1-batch2.err
+- governance/project/orchestration/main/orchestrator/log/W1-06-A1-batch2.json
+- governance/project/orchestration/main/orchestrator/log/W1-06-A1-batch3.err
+- governance/project/orchestration/main/orchestrator/log/W1-06-A1-batch3.json
+- governance/project/orchestration/main/orchestrator/log/W1-06-A1-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-06-A1-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-07-A1-batch2.err
+- governance/project/orchestration/main/orchestrator/log/W1-07-A1-batch2.json
+- governance/project/orchestration/main/orchestrator/log/W1-07-A1-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-07-A1-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-07-A1-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-07-A1-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-07-A2-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-07-A2-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-08-A1-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-08-A1-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-08-A4-gap-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-08-A4-gap-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-08-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-08-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-08-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-08-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-08-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-09-findings-run1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-09-findings-run3.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-09-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-09-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-09-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-09-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-09-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-09-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-09-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-10-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-10-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-10-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-11-A4-gap-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-11-A4-gap-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-11-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run4b.err
+- governance/project/orchestration/main/orchestrator/log/W1-11-lead-run4b.json
+- governance/project/orchestration/main/orchestrator/log/W1-12-A4-gap-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-12-A4-gap-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-12-findings-run1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-12-findings-run2.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-12-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-12-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-12-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-12-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-12-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-13-findings-run1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-13-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-13-lead-checkpoint-run1.md
+- governance/project/orchestration/main/orchestrator/log/W1-13-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-13-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-13-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-13-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-14-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-14-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-14-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-findings-run1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-15-findings-run2.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-15-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-runH1.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-runH1.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-runH2.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-runH2.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-runH3.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-lead-runH3.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-probeH.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-probeH.json
+- governance/project/orchestration/main/orchestrator/log/W1-15-probeH2.err
+- governance/project/orchestration/main/orchestrator/log/W1-15-probeH2.json
+- governance/project/orchestration/main/orchestrator/log/W1-16-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-16-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-17-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-17-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-17-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-17-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-17-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-18-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-18-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-18-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-18-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-18-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-19-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run5.err
+- governance/project/orchestration/main/orchestrator/log/W1-19-lead-run5.json
+- governance/project/orchestration/main/orchestrator/log/W1-20-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-20-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-21-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run2b.err
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run2b.json
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run3b.err
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run3b.json
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-21-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-22-dup-removal.err
+- governance/project/orchestration/main/orchestrator/log/W1-22-dup-removal.json
+- governance/project/orchestration/main/orchestrator/log/W1-22-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-22-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-22-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-22-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-23-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-23-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-24-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-24-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-24-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-24-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-24-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-24-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-25-findings-run1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-25-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-25-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-25-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-25-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-25-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-26-align.err
+- governance/project/orchestration/main/orchestrator/log/W1-26-align.json
+- governance/project/orchestration/main/orchestrator/log/W1-26-dec438-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-26-dec438-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-26-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-26b-audit-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-26b-audit-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-26b-audit-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-26b-audit-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-26b-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-26b-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-26b-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-26b-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-26b-na-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-26b-na-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-26b-na-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-26b-na-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-26d-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-26d-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-26d-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-26d-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-26d-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-26e-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-26e-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-26e-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-26e-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-26e-fix2.err
+- governance/project/orchestration/main/orchestrator/log/W1-26e-fix2.json
+- governance/project/orchestration/main/orchestrator/log/W1-26e-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-27-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r10-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r10-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r11-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r11-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r4-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r4-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r4-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r4-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r5-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r5-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r5-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r5-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r6-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r6-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r6-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r6-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r7-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r7-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r7-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r7-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r8-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r8-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r9-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r9-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27-r9-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-27-r9-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-27b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-27b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-27b-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-27b-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-28-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-28-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-28-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-28-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-28-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-28-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-28-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-29-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-29-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-29-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-29-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-29-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-29-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-29b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-29b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-29b-fix-hooks.err
+- governance/project/orchestration/main/orchestrator/log/W1-29b-fix-hooks.json
+- governance/project/orchestration/main/orchestrator/log/W1-29b-fix-record.err
+- governance/project/orchestration/main/orchestrator/log/W1-29b-fix-record.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-align2.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-align2.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runF1.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runF1.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runF2.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runF2.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runG1.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runG1.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runG2.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runG2.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runG3.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runG3.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runJ.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runJ.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runJ2.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runJ2.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runK.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-lead-runK.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-probe.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-probe.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-probe2.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-probe2.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-probe3.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-probe3.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-probeG.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-probeG.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-probeJ.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-probeJ.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-probeK.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-probeK.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r10-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r10-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r10-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r10-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r10-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4c-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r4c-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r5b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r6-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r6-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r6-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r6-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r6b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r6b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r7-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r7-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r7-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r7-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r7-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-30-r8-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r8-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r8-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r8-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r8b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r8b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r9-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r9-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r9-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-30-r9-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-30-r9-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-30-worktree-checkpoints/CP-DAEO-2lwj-0001.md
+- governance/project/orchestration/main/orchestrator/log/W1-30-worktree-checkpoints/CP-DAEO-2lwj-0002.md
+- governance/project/orchestration/main/orchestrator/log/W1-30-worktree-checkpoints/CP-DAEO-2lwj-0003.md
+- governance/project/orchestration/main/orchestrator/log/W1-30-worktree-checkpoints/CP-DAEO-2lwj-0004.md
+- governance/project/orchestration/main/orchestrator/log/W1-30-worktree-checkpoints/CP-DAEO-2lwj-0005.md
+- governance/project/orchestration/main/orchestrator/log/W1-30F-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-30G-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run3-return.err
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run3-return.json
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run4-settings-question.json
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-31-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-31-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-31-r4-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-31b-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-31b-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-31b-probe.err
+- governance/project/orchestration/main/orchestrator/log/W1-31b-probe.json
+- governance/project/orchestration/main/orchestrator/log/W1-32-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-32-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-32-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-33-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-33-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-33-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-33-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-33-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-34-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-34-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-34-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-34-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-34-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-35-align.err
+- governance/project/orchestration/main/orchestrator/log/W1-35-align.json
+- governance/project/orchestration/main/orchestrator/log/W1-35-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-35-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-35-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-35-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-35-lead-runF1.err
+- governance/project/orchestration/main/orchestrator/log/W1-35-lead-runF1.json
+- governance/project/orchestration/main/orchestrator/log/W1-35-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-35-w26-fixture.err
+- governance/project/orchestration/main/orchestrator/log/W1-35-w26-fixture.json
+- governance/project/orchestration/main/orchestrator/log/W1-36-align.err
+- governance/project/orchestration/main/orchestrator/log/W1-36-align.json
+- governance/project/orchestration/main/orchestrator/log/W1-36-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-36-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-36-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-36-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-36-na-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-36-na-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-36-na-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-36-na-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-36-w26-lifecycle.err
+- governance/project/orchestration/main/orchestrator/log/W1-36-w26-lifecycle.json
+- governance/project/orchestration/main/orchestrator/log/W1-37-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-37-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-37-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-37-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-37-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-runL.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-runL.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-runM.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-runM.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-runM2.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-lead-runM2.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-38-probeL.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-probeL.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-probeM.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-probeM.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-r3-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-r3-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-r3-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-r3-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-r3b-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-r3b-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-r4-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-r4-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-38-r4-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-38-r4-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-39-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-39-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-39-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-39-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-39-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-39-r3-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-39-r3-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-39-r3-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-39-r3-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-39-r4-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-39-r4-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-39-r4-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-40-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-40-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-40-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-40-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-40-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-40-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-40-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-41-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-round.err
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-round.json
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-41-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-41-own.txt
+- governance/project/orchestration/main/orchestrator/log/W1-41-probe.err
+- governance/project/orchestration/main/orchestrator/log/W1-41-probe.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-CHECKPOINT.md
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-final-b.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-final-b.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-final.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-final.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run4b.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run4b.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run5.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run5.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run7.err
+- governance/project/orchestration/main/orchestrator/log/W1-42-lead-run7.json
+- governance/project/orchestration/main/orchestrator/log/W1-42-r8-state.txt
+- governance/project/orchestration/main/orchestrator/log/W1-42-records.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-44-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-44-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-46-A1-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-46-A1-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-46-findings-run1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-46-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-46-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-46-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-46-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-46-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-46-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-46-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-47-A1-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-47-A1-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-47-A1-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-47-A1-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-47-A2-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-47-A2-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-48-A1-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-48-A1-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-48-A1-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-48-A1-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-48-A1-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-48-A1-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-49-findings-run2.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-49-findings-run3.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-49-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-49-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-49-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-49-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-49-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-49-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-49-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-findings-batch1.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-50-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run4.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run4.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run5.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run5.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run6.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run6.json
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run7.err
+- governance/project/orchestration/main/orchestrator/log/W1-50-lead-run7.json
+- governance/project/orchestration/main/orchestrator/log/W1-50F-findings.jsonl
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run3b.err
+- governance/project/orchestration/main/orchestrator/log/W1-50F-lead-run3b.json
+- governance/project/orchestration/main/orchestrator/log/W1-50M-lead-run1.err
+- governance/project/orchestration/main/orchestrator/log/W1-50M-lead-run1.json
+- governance/project/orchestration/main/orchestrator/log/W1-50M-lead-run2.err
+- governance/project/orchestration/main/orchestrator/log/W1-50M-lead-run2.json
+- governance/project/orchestration/main/orchestrator/log/W1-50M-lead-run3.err
+- governance/project/orchestration/main/orchestrator/log/W1-50M-lead-run3.json
+- governance/project/orchestration/main/orchestrator/log/W1-50c-cases.err
+- governance/project/orchestration/main/orchestrator/log/W1-50c-cases.json
+- governance/project/orchestration/main/orchestrator/log/W1-50c-fix.err
+- governance/project/orchestration/main/orchestrator/log/W1-50c-fix.json
+- governance/project/orchestration/main/orchestrator/log/W1-midwave-audit.err
+- governance/project/orchestration/main/orchestrator/log/W1-midwave-audit.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-A5-run3.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-A5-run4.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-A5-run5.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-close-rebuild.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-close.json
+- governance/project/orchestration/main/orchestrator/log/W2-01-transition-cp.json
+- governance/project/orchestration/main/orchestrator/log/W2-02-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-02-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-02-A5-run3.json
+- governance/project/orchestration/main/orchestrator/log/W2-02-A5-run4.json
+- governance/project/orchestration/main/orchestrator/log/W2-03-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-03-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-05-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-05-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-05-A5-run2b.json
+- governance/project/orchestration/main/orchestrator/log/W2-16-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-16-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-20-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-20-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-26-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-26-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-37-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-37-A5-run1b.json
+- governance/project/orchestration/main/orchestrator/log/W2-48-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-49-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-49-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-record.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run3.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run4.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run5.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run6.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run7.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run7b.json
+- governance/project/orchestration/main/orchestrator/log/W2-50-A5-run8.json
+- governance/project/orchestration/main/orchestrator/log/W2-51-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-52-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-52-A5-run1b.json
+- governance/project/orchestration/main/orchestrator/log/W2-52-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-52-A5-run2b.json
+- governance/project/orchestration/main/orchestrator/log/W2-53-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run3.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run3b.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run4.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run4b.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run4c.json
+- governance/project/orchestration/main/orchestrator/log/W2-54-A5-run5.json
+- governance/project/orchestration/main/orchestrator/log/W2-58-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-58-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-59-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-59-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-62-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/W2-62-A5-run2.json
+- governance/project/orchestration/main/orchestrator/log/W2-63-A5-run1.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A0.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A0.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A1.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A1.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A2.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A2.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A3.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A3.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A4.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A4.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A5.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A5.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A6.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A6.json
+- governance/project/orchestration/main/orchestrator/log/adopt-A8.err
+- governance/project/orchestration/main/orchestrator/log/adopt-A8.json
+- governance/project/orchestration/main/orchestrator/log/adoption-auditor.err
+- governance/project/orchestration/main/orchestrator/log/adoption-auditor.json
+- governance/project/orchestration/main/orchestrator/log/assessment-A.json
+- governance/project/orchestration/main/orchestrator/log/assessment-B.json
+- governance/project/orchestration/main/orchestrator/log/assessment-C.json
+- governance/project/orchestration/main/orchestrator/log/assessment-D.json
+- governance/project/orchestration/main/orchestrator/log/assessment-E.json
+- governance/project/orchestration/main/orchestrator/log/assessment-F.json
+- governance/project/orchestration/main/orchestrator/log/assessment-G.json
+- governance/project/orchestration/main/orchestrator/log/assessment-S.json
+- governance/project/orchestration/main/orchestrator/log/check-W1-41-close.err
+- governance/project/orchestration/main/orchestrator/log/check-W1-41-close.json
+- governance/project/orchestration/main/orchestrator/log/check-adopted.err
+- governance/project/orchestration/main/orchestrator/log/check-adopted.json
+- governance/project/orchestration/main/orchestrator/log/check-after-ctx-data.err
+- governance/project/orchestration/main/orchestrator/log/check-after-ctx-data.json
+- governance/project/orchestration/main/orchestrator/log/check-at-46ec8da3.err
+- governance/project/orchestration/main/orchestrator/log/check-at-46ec8da3.json
+- governance/project/orchestration/main/orchestrator/log/check-at-71ae763f-b.err
+- governance/project/orchestration/main/orchestrator/log/check-at-71ae763f-b.json
+- governance/project/orchestration/main/orchestrator/log/check-at-71ae763f.err
+- governance/project/orchestration/main/orchestrator/log/check-at-71ae763f.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-02F-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-02R-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-02R8-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-15H-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-15H2-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-26e-premerge.err
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-26e-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-27b-premerge.err
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-27b-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-30-premerge.err
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-30-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-30F-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-30G-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-30J-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-30b-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-31-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-31b-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-32-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-35-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-38-premerge.err
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-38-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-39-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-39b-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-40-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-at-W1-41-premerge.json
+- governance/project/orchestration/main/orchestrator/log/check-before-cdoi-close.err
+- governance/project/orchestration/main/orchestrator/log/check-before-cdoi-close.json
+- governance/project/orchestration/main/orchestrator/log/check-c9537e39.json
+- governance/project/orchestration/main/orchestrator/log/check-with-evidence-record.json
+- governance/project/orchestration/main/orchestrator/log/close-DAEO-7rr2-2.err
+- governance/project/orchestration/main/orchestrator/log/close-DAEO-7rr2-2.json
+- governance/project/orchestration/main/orchestrator/log/close-DAEO-7rr2-3.err
+- governance/project/orchestration/main/orchestrator/log/close-DAEO-7rr2-3.json
+- governance/project/orchestration/main/orchestrator/log/close-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-02F.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-02F.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-02R8.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-02R8.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-02R9.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-02R9.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-02R9.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-15H.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-15H.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-15H.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-15H2.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-15H2.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-15H2.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-30-final.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30-final.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30F.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30F.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30G.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30G.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30G2.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30G2.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30J.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30J.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30J.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-30K.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30K.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-30b-repair-ticket-DAEO-g6tp.md
+- governance/project/orchestration/main/orchestrator/log/close-W1-30b.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-30b.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-31.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-31.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-31b-second.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-31b-second.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-31b-second.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-31b.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-31b.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-32.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-32.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-35F.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-35F.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-38-final.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-38-final.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-38.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-38.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-38L.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-38L.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-38M.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-38M.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-38b.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-38b.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-39.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-39.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-40.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-40.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-41.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-41.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-41R.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-41R.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-41R.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-42-tk.txt
+- governance/project/orchestration/main/orchestrator/log/close-W1-42.err
+- governance/project/orchestration/main/orchestrator/log/close-W1-42.json
+- governance/project/orchestration/main/orchestrator/log/close-W1-42.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/close-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/close-DAEO-7rr2.exit
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/close-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/queue.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/rebuild-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/rebuild-DAEO-7rr2.exit
+- governance/project/orchestration/main/orchestrator/log/close-queue-2026-10-20/rebuild-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/check-DAEO-0rfi.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/check-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/checkpoint-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/checkpoint-commit-DAEO-0rfi.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/close-DAEO-0rfi.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/close-DAEO-0rfi.exit
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/close-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/queue.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/rebuild-DAEO-0rfi.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1108/rebuild-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/check-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/check-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/checkpoint-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/checkpoint-commit-DAEO-7rr2.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/close-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/close-DAEO-7rr2.exit
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/close-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/queue.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/rebuild-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1212/rebuild-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/check-DAEO-0rfi.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/check-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/check-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/check-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/checkpoint-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/checkpoint-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/checkpoint-commit-DAEO-0rfi.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/checkpoint-commit-DAEO-7rr2.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/close-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/close-DAEO-7rr2.exit
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/close-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/queue.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/rebuild-DAEO-0rfi.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/rebuild-DAEO-0rfi.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/rebuild-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-20261020-1422/rebuild-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/check-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/check-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/checkpoint-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/checkpoint-commit-DAEO-7rr2.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/close-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/close-DAEO-7rr2.exit
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/close-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/queue.txt
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/rebuild-DAEO-7rr2.err
+- governance/project/orchestration/main/orchestrator/log/close-queue-run2/rebuild-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/close-two-1.txt
+- governance/project/orchestration/main/orchestrator/log/commit-W1-42-wtlist.txt
+- governance/project/orchestration/main/orchestrator/log/commit-v0215.txt
+- governance/project/orchestration/main/orchestrator/log/commit-v0215b.txt
+- governance/project/orchestration/main/orchestrator/log/commit-v0217.txt
+- governance/project/orchestration/main/orchestrator/log/commit-v0218.txt
+- governance/project/orchestration/main/orchestrator/log/compare-adapter-1.txt
+- governance/project/orchestration/main/orchestrator/log/compare-adapter-2.txt
+- governance/project/orchestration/main/orchestrator/log/compare-adapter-3-before-operator-script.txt
+- governance/project/orchestration/main/orchestrator/log/compare-adapter-4-second.txt
+- governance/project/orchestration/main/orchestrator/log/context-check-1.txt
+- governance/project/orchestration/main/orchestrator/log/context-check-2.txt
+- governance/project/orchestration/main/orchestrator/log/doctor-2026-10-12.err
+- governance/project/orchestration/main/orchestrator/log/doctor-2026-10-12.json
+- governance/project/orchestration/main/orchestrator/log/doctor-718a.json
+- governance/project/orchestration/main/orchestrator/log/doctor-718c.json
+- governance/project/orchestration/main/orchestrator/log/doctor-adopted.err
+- governance/project/orchestration/main/orchestrator/log/doctor-adopted.json
+- governance/project/orchestration/main/orchestrator/log/doctor-after-rebuild.err
+- governance/project/orchestration/main/orchestrator/log/doctor-after-rebuild.json
+- governance/project/orchestration/main/orchestrator/log/doctor-at-6db36969.err
+- governance/project/orchestration/main/orchestrator/log/doctor-at-6db36969.json
+- governance/project/orchestration/main/orchestrator/log/doctor-before-rebuild.err
+- governance/project/orchestration/main/orchestrator/log/doctor-before-rebuild.json
+- governance/project/orchestration/main/orchestrator/log/exp-clone-3.txt
+- governance/project/orchestration/main/orchestrator/log/exp-clone-4.txt
+- governance/project/orchestration/main/orchestrator/log/exp-hook-cwd.txt
+- governance/project/orchestration/main/orchestrator/log/exp-hook-timeout.txt
+- governance/project/orchestration/main/orchestrator/log/lead-usage.jsonl
+- governance/project/orchestration/main/orchestrator/log/live-case-dec671-1.txt
+- governance/project/orchestration/main/orchestrator/log/live-case-dec671-2.txt
+- governance/project/orchestration/main/orchestrator/log/live-case-dec671-3.txt
+- governance/project/orchestration/main/orchestrator/log/merge-W1-42.txt
+- governance/project/orchestration/main/orchestrator/log/own-W1-15H.txt
+- governance/project/orchestration/main/orchestrator/log/own-W1-15H2.txt
+- governance/project/orchestration/main/orchestrator/log/own-W1-30J.txt
+- governance/project/orchestration/main/orchestrator/log/pin-check-2026-10-19.err
+- governance/project/orchestration/main/orchestrator/log/pin-check-2026-10-19.json
+- governance/project/orchestration/main/orchestrator/log/pin-rebuild-2026-10-19.txt
+- governance/project/orchestration/main/orchestrator/log/pin-secrets-rerun.err
+- governance/project/orchestration/main/orchestrator/log/pin-secrets-rerun.out
+- governance/project/orchestration/main/orchestrator/log/rebuild-078d9553.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-5653a941.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-7d689987.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-02F.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-02R8.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-02R8.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-02R9-close.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-02R9-close.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-15H.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-15H.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-15H2.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-15H2.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30-final.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30-final.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30F.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30G.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30G.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30G2.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30G2.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30J.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30J.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30K.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-30K.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-31b-close.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-31b-close.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-32.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-35F.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-38L.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-38L.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-41-check.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-41-check.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-41.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-41R-close.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-41R-close.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-bootstrap.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-bootstrap.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-close.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-close.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-tkclose.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-tkclose.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-wtlist.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-W1-42-wtlist.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-adopted.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-adopted.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-after-2026-10-19.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-after-2026-10-19.start
+- governance/project/orchestration/main/orchestrator/log/rebuild-after-2026-10-19.txt
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-2f31bef2.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-2f31bef2.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-71ae763f-b.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-71ae763f-b.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-71ae763f.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-71ae763f.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-W1-30b-close.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-W1-30b-close.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-fbfdc602.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-at-fbfdc602.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-c9537e39.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-close-two.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-close-two.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-ctx2.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-ctx2.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-d2f054b5.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-dec448.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-dec448.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-718a.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-718a.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-718b.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-718b.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-718c.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-718c.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-w2-tickets.txt
+- governance/project/orchestration/main/orchestrator/log/rebuild-full-w2plan.txt
+- governance/project/orchestration/main/orchestrator/log/rebuild-merge-W1-42.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-merge-W1-42.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0215.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0215.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0216.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0216.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0217.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0217.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0218.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0218.json
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0219.err
+- governance/project/orchestration/main/orchestrator/log/rebuild-v0219.json
+- governance/project/orchestration/main/orchestrator/log/record-checks/context-reproducibility.out
+- governance/project/orchestration/main/orchestrator/log/record-checks/core-authority.out
+- governance/project/orchestration/main/orchestrator/log/record-checks/core-graph.out
+- governance/project/orchestration/main/orchestrator/log/record-checks/core-mutation.out
+- governance/project/orchestration/main/orchestrator/log/record-checks/core-pathmap.out
+- governance/project/orchestration/main/orchestrator/log/record-checks/core-schema.out
+- governance/project/orchestration/main/orchestrator/log/reg-W1-41/summary.txt
+- governance/project/orchestration/main/orchestrator/log/reg-W1-42/parallel.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg-W1-42/summary.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-02.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-05-after-close-W1-32.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-05.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-06.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-08.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-16.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-19.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-28.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-39.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-46.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/W1-50.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-00af199c.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-00e3d539.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-0aea779f.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-0cb06c64.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-0e962584.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-11d5be9a.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-168397f6.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-2c29ed82.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-30185589.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-303a6b71.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-37023ee8.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-46449b17.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-5203ab3c.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-6a978dbc.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-797ea347.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-7f83d65d.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-840f1e37.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-85e9b580.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-9032db2d.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-9100626e.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-991dd9ac.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-23-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-24-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-26-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-26b-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-26c-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-26e-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-27-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-27b-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-29-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-29b-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-30-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-30G-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-30b-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-31-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-31b-merge/parallel.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-31b-merge/serial-afterwards.full.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-32-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-35-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-36-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-38-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-38M-merge/summary.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-39-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-39b-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-40-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-50M-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-W1-50c-merge.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-a098842e.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-ad392210.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-b60b8f62.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-b81c4d43.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-c39f361a.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-d060e400.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-d92f28ad.txt
+- governance/project/orchestration/main/orchestrator/log/reg/at-e827ffc7.txt
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-2ah0.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-3vt4.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-52q7.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-5rtz.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-5zs6.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-6qt1.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-8em0.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-9kkl.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-ax5o-W2-01-close.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-c6ir.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-fknh.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-hv7l.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-ij1w.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-l5l4.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-lbrx.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-ldvk.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-odzv.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-ogl4.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-pr9k.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-wj2g.md
+- governance/project/orchestration/main/orchestrator/log/repair-tickets/DAEO-wyvs.md
+- governance/project/orchestration/main/orchestrator/log/retrieval-check.out
+- governance/project/orchestration/main/orchestrator/log/retrieval-check.time
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W1-30.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W1-30.txt
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W1-38.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W1-38.txt
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W1-49.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W1-49.txt
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W2-54.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W2-54.txt
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W2-62.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/W2-62.txt
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/check.err
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/check.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/check.json
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/done
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/rebuild.end
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/rebuild.err
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/rebuild.exit
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/rebuild.json
+- governance/project/orchestration/main/orchestrator/log/reverify-W2-62/rebuild.start
+- governance/project/orchestration/main/orchestrator/log/secrets-at-71ae763f.err
+- governance/project/orchestration/main/orchestrator/log/secrets-at-71ae763f.out
+- governance/project/orchestration/main/orchestrator/log/secrets-at-71ae763f.time
+- governance/project/orchestration/main/orchestrator/log/secrets-check-K.err
+- governance/project/orchestration/main/orchestrator/log/secrets-check-K.out
+- governance/project/orchestration/main/orchestrator/log/secrets-real-store-2.out
+- governance/project/orchestration/main/orchestrator/log/secrets-real-store-2.time
+- governance/project/orchestration/main/orchestrator/log/secrets-real-store.out
+- governance/project/orchestration/main/orchestrator/log/secrets-real-store.time
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-ad01.err
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-ad01.json
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-gp13.err
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-gp13.json
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-im01.err
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-im01.json
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-sp01.err
+- governance/project/orchestration/main/orchestrator/log/share-ARGUS-sp01.json
+- governance/project/orchestration/main/orchestrator/log/share-DAEO-gjjf.err
+- governance/project/orchestration/main/orchestrator/log/share-DAEO-gjjf.json
+- governance/project/orchestration/main/orchestrator/log/share-ORION-ad01.err
+- governance/project/orchestration/main/orchestrator/log/share-ORION-ad01.json
+- governance/project/orchestration/main/orchestrator/log/share-ORION-ad02.err
+- governance/project/orchestration/main/orchestrator/log/share-ORION-ad02.json
+- governance/project/orchestration/main/orchestrator/log/share-ORION-gp09-r3.err
+- governance/project/orchestration/main/orchestrator/log/share-ORION-gp09-r3.json
+- governance/project/orchestration/main/orchestrator/log/share-ORION-gp09.err
+- governance/project/orchestration/main/orchestrator/log/share-ORION-gp09.json
+- governance/project/orchestration/main/orchestrator/log/share-ORION-im01.err
+- governance/project/orchestration/main/orchestrator/log/share-ORION-im01.json
+- governance/project/orchestration/main/orchestrator/log/share-ORION-sp01.err
+- governance/project/orchestration/main/orchestrator/log/share-ORION-sp01.json
+- governance/project/orchestration/main/orchestrator/log/sweep-check.json
+- governance/project/orchestration/main/orchestrator/log/sweep-close-DAEO-7rr2.json
+- governance/project/orchestration/main/orchestrator/log/sweep-rebuild.json
+- governance/project/orchestration/main/orchestrator/log/sweep-times.txt
+- governance/project/orchestration/main/orchestrator/log/sweep-w146-net.txt
+- governance/project/orchestration/main/orchestrator/log/telemetry-W1-30.err
+- governance/project/orchestration/main/orchestrator/log/telemetry-W1-30.json
+- governance/project/orchestration/main/orchestrator/log/telemetry-W1-31.err
+- governance/project/orchestration/main/orchestrator/log/telemetry-W1-31.json
+- governance/project/orchestration/main/orchestrator/log/unit-adopted.txt
+- governance/project/orchestration/main/orchestrator/merge-W1-42.sh
+- governance/project/orchestration/main/orchestrator/metrics.py
+- governance/project/orchestration/main/orchestrator/own-W1-02R.sh
+- governance/project/orchestration/main/orchestrator/own-W1-02R8.sh
+- governance/project/orchestration/main/orchestrator/own-W1-02R9.sh
+- governance/project/orchestration/main/orchestrator/own-W1-15H.sh
+- governance/project/orchestration/main/orchestrator/own-W1-15H2.sh
+- governance/project/orchestration/main/orchestrator/own-W1-30G.sh
+- governance/project/orchestration/main/orchestrator/own-W1-30J.sh
+- governance/project/orchestration/main/orchestrator/own-W1-38M.sh
+- governance/project/orchestration/main/orchestrator/own-two-closes.sh
+- governance/project/orchestration/main/orchestrator/p39-note.md
+- governance/project/orchestration/main/orchestrator/pin/DEC-870-entry.md
+- governance/project/orchestration/main/orchestrator/pin/P-W2-54-install.md
+- governance/project/orchestration/main/orchestrator/pin/PIN-COMMANDS.sh
+- governance/project/orchestration/main/orchestrator/pin/apply_dec871.py
+- governance/project/orchestration/main/orchestrator/pin/pin_registry.py
+- governance/project/orchestration/main/orchestrator/policy-piece.md
+- governance/project/orchestration/main/orchestrator/redact-scratch.py
+- governance/project/orchestration/main/orchestrator/reg-old-form.sh
+- governance/project/orchestration/main/orchestrator/reg.sh
+- governance/project/orchestration/main/orchestrator/register-046.md
+- governance/project/orchestration/main/orchestrator/register-047.md
+- governance/project/orchestration/main/orchestrator/register-048.md
+- governance/project/orchestration/main/orchestrator/register-049.md
+- governance/project/orchestration/main/orchestrator/register-050.md
+- governance/project/orchestration/main/orchestrator/register-051.md
+- governance/project/orchestration/main/orchestrator/register-052.md
+- governance/project/orchestration/main/orchestrator/register-053.md
+- governance/project/orchestration/main/orchestrator/register-054.md
+- governance/project/orchestration/main/orchestrator/register-055.md
+- governance/project/orchestration/main/orchestrator/register-056.md
+- governance/project/orchestration/main/orchestrator/register-057.md
+- governance/project/orchestration/main/orchestrator/register-058.md
+- governance/project/orchestration/main/orchestrator/register-059.md
+- governance/project/orchestration/main/orchestrator/register-060.md
+- governance/project/orchestration/main/orchestrator/register-061.md
+- governance/project/orchestration/main/orchestrator/register-062.md
+- governance/project/orchestration/main/orchestrator/register-063.md
+- governance/project/orchestration/main/orchestrator/register-064.md
+- governance/project/orchestration/main/orchestrator/register-065.md
+- governance/project/orchestration/main/orchestrator/register-066.md
+- governance/project/orchestration/main/orchestrator/register-067.md
+- governance/project/orchestration/main/orchestrator/register-068.md
+- governance/project/orchestration/main/orchestrator/register-069.md
+- governance/project/orchestration/main/orchestrator/register-070.md
+- governance/project/orchestration/main/orchestrator/register-071.md
+- governance/project/orchestration/main/orchestrator/register-072.md
+- governance/project/orchestration/main/orchestrator/register-073.md
+- governance/project/orchestration/main/orchestrator/register-074.md
+- governance/project/orchestration/main/orchestrator/register-075.md
+- governance/project/orchestration/main/orchestrator/register-076.md
+- governance/project/orchestration/main/orchestrator/register-077.md
+- governance/project/orchestration/main/orchestrator/register-078.md
+- governance/project/orchestration/main/orchestrator/register-079.md
+- governance/project/orchestration/main/orchestrator/register-080.md
+- governance/project/orchestration/main/orchestrator/register-081.md
+- governance/project/orchestration/main/orchestrator/register-082.md
+- governance/project/orchestration/main/orchestrator/registry-gov.yaml
+- governance/project/orchestration/main/orchestrator/registry-xdist.txt
+- governance/project/orchestration/main/orchestrator/report-after-merge.py
+- governance/project/orchestration/main/orchestrator/residuals-W1-02F.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-02R.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-02R8.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-15H.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-15H2.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-23.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-26.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-26b.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-26e.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-27.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-27b.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-29.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-29b.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-30.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-30F.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-30G.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-30J.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-30K.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-30b.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-31.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-32.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-35.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-35F.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-36.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-38.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-38L.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-39.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-40.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-41.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-50M.md
+- governance/project/orchestration/main/orchestrator/residuals-W1-50c.md
+- governance/project/orchestration/main/orchestrator/residuals-check-baseline.md
+- governance/project/orchestration/main/orchestrator/residuals-rebuild.md
+- governance/project/orchestration/main/orchestrator/resume-block-history-2026-10-04.md
+- governance/project/orchestration/main/orchestrator/resume-block.md
+- governance/project/orchestration/main/orchestrator/secrets-scan.sh
+- governance/project/orchestration/main/orchestrator/share-run2.sh
+- governance/project/orchestration/main/orchestrator/share-run3.sh
+- governance/project/orchestration/main/orchestrator/share-table.md
+- governance/project/orchestration/main/orchestrator/show-check-one.py
+- governance/project/orchestration/main/orchestrator/show-check.py
+- governance/project/orchestration/main/orchestrator/show-close.py
+- governance/project/orchestration/main/orchestrator/show-result.py
+- governance/project/orchestration/main/orchestrator/show-share.py
+- governance/project/orchestration/main/orchestrator/specimen/reduce.py
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-2-subagent.jsonl
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-2-subagent.meta.json
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-2.jsonl
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-3-subagent.jsonl
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-3-subagent.meta.json
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-3-tool-result-b5u4ggtf0.head.txt
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-3.jsonl
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen-4.jsonl
+- governance/project/orchestration/main/orchestrator/specimen/session-specimen.jsonl
+- governance/project/orchestration/main/orchestrator/specimen/specimen-2-hook.py
+- governance/project/orchestration/main/orchestrator/specimen/specimen-2-prompt.txt
+- governance/project/orchestration/main/orchestrator/specimen/specimen-2-settings.json
+- governance/project/orchestration/main/orchestrator/specimen/specimen-3-hook.py
+- governance/project/orchestration/main/orchestrator/specimen/specimen-3-prompt.txt
+- governance/project/orchestration/main/orchestrator/specimen/specimen-3-settings.json
+- governance/project/orchestration/main/orchestrator/specimen/specimen-prompt.txt
+- governance/project/orchestration/main/orchestrator/specimen/specimen-settings.json
+- governance/project/orchestration/main/orchestrator/tools/build_lead_brief.py
+- governance/project/orchestration/main/orchestrator/tools/close_queue.sh
+- governance/project/orchestration/main/orchestrator/tools/lead_usage.py
+- governance/project/orchestration/main/orchestrator/tools/record_checks.sh
+- governance/project/orchestration/main/orchestrator/tools/reverify_w2_62.sh
+- governance/project/orchestration/main/orchestrator/tools/tripwire.py
+- governance/project/orchestration/main/orchestrator/trace-restores.py
+- governance/project/orchestration/main/orchestrator/try-regenerate-over-existing.py
+- governance/project/orchestration/main/orchestrator/try-rulesync-source.py
+- governance/project/orchestration/main/orchestrator/update-checklist.py
+- governance/project/orchestration/main/orchestrator/verdict-move-note.md
+- governance/project/orchestration/main/orchestrator/wait-load.sh
+- governance/project/orchestration/packages/P-W2-48.md
+- governance/project/orchestration/packages/P-W2-49.md
+- governance/project/orchestration/packages/P-W2-50.md
+- governance/project/orchestration/packages/P-W2-51.md
+- governance/project/orchestration/packages/P-W2-52.md
+- governance/project/orchestration/packages/P-W2-53.md
+- governance/project/orchestration/packages/P-W2-54.md
+- governance/project/orchestration/packages/P-W2-55.md
+- governance/project/orchestration/packages/P-W2-58-1.md
+- governance/project/orchestration/packages/SWEEP-2026-10-20.md
+- governance/project/orchestration/sessions/2026-10-19-orchestrator-DAEO-sdxk.md
+- governance/project/orchestration/sync_context.py
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0001.md
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0003.md
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0006.md
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0008.md
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0010.md
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0011.md
+- governance/project/orchestration/worktrees/W2-02/checkpoints/DAEO-zflj/CP-DAEO-zflj-0013.md
+- governance/project/orchestration/worktrees/W2-02/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/probe-4.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/ps-1.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/ps-2.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/ps-3.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/ps-4.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-02/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-02/lead/log/chunk0
+- governance/project/orchestration/worktrees/W2-02/lead/log/chunk1
+- governance/project/orchestration/worktrees/W2-02/lead/log/chunk2
+- governance/project/orchestration/worktrees/W2-02/lead/log/chunk3
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/all.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/test_w1_02_guard_hook.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/test_w1_02_guard_hook.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/test_w1_05_live_hooks.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/test_w1_05_live_hooks.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/test_w1_19_real_models.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/test_w1_19_real_models.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency/uptime-start.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/all.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/test_w1_05_live_hooks.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/test_w1_05_live_hooks.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/test_w1_05_switch_over_record.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/test_w1_05_switch_over_record.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/test_w1_19_real_models.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/test_w1_19_real_models.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency3/uptime-start.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency4/W1-19-real-models.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency4/W1-19-real-models.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/latency4/load-start.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/ps-1.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/ps-2.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/ps-3.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/ps-4.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/rebuild-3.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/rebuild-3.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-1.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-1.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-2-W1-26.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-2-W1-26.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-2-W2-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-2-W2-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-2-import.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/red-2.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-01.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-01.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-03.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-03.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-04.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-04.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-05.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-05.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-06.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-06.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-07.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-07.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-08.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-08.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-09.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-09.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-10.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-10.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-11.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-11.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-12.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-12.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-13.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-13.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-14.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-14.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-15.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-15.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-16.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-16.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-17.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-17.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-18.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-18.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-19.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-19.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-20.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-20.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-21.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-21.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-22.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-22.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-23.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-23.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-24.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-24.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-25.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-25.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-26.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-26.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-27.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-27.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-28.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-28.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-29.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-29.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-30.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-30.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-31.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-31.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-32.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-32.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-33.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-33.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-34.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-34.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-35.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-35.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-36.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-36.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-37.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-37.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-38.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-38.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-39.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-39.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-40.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-40.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-41.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-41.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-42.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-42.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-44.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-44.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-45.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-45.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-46.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-46.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-47.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-47.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-48.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-48.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-49.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-49.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-50.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W1-50.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W2-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/W2-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/chunk-c0.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/chunk-c1.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/chunk-c2.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/chunk-c3.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/unit.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites/unit.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/A.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/B.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/C.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/D.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/E.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/F.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-01.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-01.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-03.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-03.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-04.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-04.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-05.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-05.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-06.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-06.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-07.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-07.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-08.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-08.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-09.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-09.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-10.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-10.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-11.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-11.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-12.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-12.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-13.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-13.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-14.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-14.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-15.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-15.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-16.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-16.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-17.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-17.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-18.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-18.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-19.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-19.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-20.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-20.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-21.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-21.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-22.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-22.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-23.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-23.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-24.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-24.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-25.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-25.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-26.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-26.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-27.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-27.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-28.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-28.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-29.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-29.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-30.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-30.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-31.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-31.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-32.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-32.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-33.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-33.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-34.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-34.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-35.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-35.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-36.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-36.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-37.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-37.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-38.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-38.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-39.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-39.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-40.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-40.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-41.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-41.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-42.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-42.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-44.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-44.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-45.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-45.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-46.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-46.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-47.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-47.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-48.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-48.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-49.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-49.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-50.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W1-50.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W2-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/W2-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/unit.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites3/unit.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-01.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-01.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-03.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-03.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-04.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-04.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-05.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-05.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-06.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-06.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-07.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-07.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-08.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-08.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-09.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-09.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-10.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-10.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-11.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-11.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-12.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-12.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-13.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-13.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-14.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-14.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-15.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-15.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-16.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-16.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-17.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-17.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-18.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-18.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-19.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-19.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-20.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-20.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-21.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-21.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-22.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-22.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-23.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-23.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-24.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-24.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-25.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-25.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-26.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-26.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-27.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-27.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-28.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-28.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-29.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-29.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-30.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-30.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-31.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-31.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-32.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-32.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-33.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-33.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-34.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-34.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-35.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-35.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-36.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-36.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-37.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-37.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-38.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-38.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-39.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-39.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-40.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-40.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-41.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-41.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-42.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-42.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-44.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-44.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-45.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-45.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-46.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-46.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-47.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-47.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-48.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-48.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-49.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-49.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-50.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W1-50.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-01.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-01.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-02.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-02.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-50.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-50.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-53.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-53.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-54.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-54.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-62.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/W2-62.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/all.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-A.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-A.start
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-B.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-B.start
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-C.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-C.start
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-D.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-D.start
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-E.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-E.start
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-F.done
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/chunk-F.start
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/collect.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/gov-check-node.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/gov-check-node.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/gov-check.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/gov-check.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/rebuild.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/rebuild.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/unit.exit
+- governance/project/orchestration/worktrees/W2-02/lead/log/suites4/unit.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-02/lead/log/v3-import.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/validate-skip2.txt
+- governance/project/orchestration/worktrees/W2-02/lead/log/validate.txt
+- governance/project/orchestration/worktrees/W2-02/lead/resolve_schema_conflict.py
+- governance/project/orchestration/worktrees/W2-02/lead/run_latency.sh
+- governance/project/orchestration/worktrees/W2-02/lead/run_red2.sh
+- governance/project/orchestration/worktrees/W2-02/lead/run_suites.sh
+- governance/project/orchestration/worktrees/W2-02/lead/run_suites4.sh
+- governance/project/orchestration/worktrees/W2-02/lead/validate_s1_skip2.py
+- governance/project/orchestration/worktrees/W2-03/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0001.md
+- governance/project/orchestration/worktrees/W2-03/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0003.md
+- governance/project/orchestration/worktrees/W2-03/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0005.md
+- governance/project/orchestration/worktrees/W2-03/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0006.md
+- governance/project/orchestration/worktrees/W2-03/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0007.md
+- governance/project/orchestration/worktrees/W2-03/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0009.md
+- governance/project/orchestration/worktrees/W2-03/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-03/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-03/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-03/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-03/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-03/lead/log/batch-E.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/batch-E.progress
+- governance/project/orchestration/worktrees/W2-03/lead/log/batch-LAT.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/batch-LAT.progress
+- governance/project/orchestration/worktrees/W2-03/lead/log/cit-after.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/cit-before.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/cit-r2.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-alone-W1-46-live.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-alone-W1-46-live.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-A.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-A.progress
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-B.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-B.progress
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-C.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-C.progress
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-D.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-batch-D.progress
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-01.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-02.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-03.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-04.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-05.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-06.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-07.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-08.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-09.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-10.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-11.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-12.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-13.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-14.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-15.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-16.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-17.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-18.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-19.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-20.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-21.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-22.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-23.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-24.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-25.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-26.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-27.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-28.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-29.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-30.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-31.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-32.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-33.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-34.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-35.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-36.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-37.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-38.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-39.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-40.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-41.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-42.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-44.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-45.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-46.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-47.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-48.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-49.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W1-50.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W2-01.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W2-02.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-W2-03.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/r2-suite-unit.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/rebuild-2.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/rebuild-2.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-C.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-C.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-D.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-D.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-E.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-E.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-30.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-30.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-31.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-32.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-33.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-34.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-35.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-36.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-37.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-38.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-39.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-40.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-41.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-41.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-42.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-44.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-45.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-46.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-47.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-48.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-49.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W1-50.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W2.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-W2.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-test_w1_02_guard_hook.py.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-test_w1_05_live_hooks.py.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-test_w1_19_real_models.py.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-unit.exit
+- governance/project/orchestration/worktrees/W2-03/lead/log/suite-unit.txt
+- governance/project/orchestration/worktrees/W2-03/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-03/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-03/lead/realreg.py
+- governance/project/orchestration/worktrees/W2-03/lead/run-batch.sh
+- governance/project/orchestration/worktrees/W2-03/lead/run_suites.py
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0001.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0002.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0004.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0006.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0008.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0009.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0011.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0012.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0013.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0015.md
+- governance/project/orchestration/worktrees/W2-05/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0016.md
+- governance/project/orchestration/worktrees/W2-05/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/eng1.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/eng2.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/eng3.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/rev1.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/rev2.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/td1.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/td2.md
+- governance/project/orchestration/worktrees/W2-05/lead/briefs/td3.md
+- governance/project/orchestration/worktrees/W2-05/lead/log/check1.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/check1.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/check3.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/check3.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/check4.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/check4.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/eng1.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/eng2.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/eng3.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild1.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild1.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild2.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild3.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild3.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild4.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/rebuild4.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/red-W2-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/red-W2-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/red-import.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/red2-W2-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/red2-W2-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/red2-import.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/red3-W2-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/red3-W2-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/red3-import.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/rev1.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/rev2.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-01.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-01.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-02.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-02.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-03.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-03.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-04.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-04.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-06.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-06.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-07.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-07.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-08.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-08.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-09.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-09.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-10.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-10.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-11.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-11.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-12.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-12.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-13.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-13.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-14.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-14.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-15.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-15.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-16.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-16.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-17.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-17.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-18.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-18.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-19.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-19.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-20.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-20.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-21.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-21.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-22.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-22.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-23.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-23.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-24.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-24.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-25.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-25.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-26.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-26.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-27.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-27.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-28.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-28.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-29.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-29.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-30.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-30.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-31.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-31.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-32.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-32.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-33.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-33.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-34.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-34.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-35.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-35.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-36.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-36.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-37.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-37.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-38.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-38.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-39.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-39.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-40.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-40.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-41.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-41.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-42.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-42.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-44.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-44.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-45.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-45.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-46.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-46.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-47.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-47.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-48.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-48.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-49.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-49.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-50.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W1-50.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W2-01.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W2-01.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W2-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W2-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W2-53.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/W2-53.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/batch-A.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/batch-B.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/batch-C1.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/batch-C2.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun-W1-02.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun-W1-02.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun-W1-46.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun-W1-46.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun2-W1-46.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun2-W1-46.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun3-W1-46-noclaude.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/rerun3-W1-46-noclaude.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/unit.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites/unit.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-01.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-01.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-02.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-02.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-03.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-03.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-04.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-04.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-06.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-06.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-07.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-07.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-08.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-08.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-09.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-09.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-10.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-10.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-11.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-11.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-12.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-12.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-13.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-13.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-14.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-14.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-15.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-15.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-16.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-16.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-17.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-17.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-18.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-18.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-19.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-19.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-20.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-20.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-21.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-21.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-22.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-22.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-23.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-23.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-24.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-24.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-25.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-25.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-26.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-26.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-27.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-27.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-28.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-28.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-29.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-29.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-30.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-30.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-31.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-31.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-32.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-32.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-33.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-33.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-34.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-34.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-35.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-35.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-36.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-36.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-37.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-37.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-38.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-38.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-39.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-39.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-40.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-40.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-41.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-41.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-42.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-42.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-44.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-44.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-45.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-45.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-46.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-46.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-47.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-47.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-48.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-48.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-49.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-49.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-50.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W1-50.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W2-01.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W2-01.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W2-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W2-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W2-53.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/W2-53.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/batch-A.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/batch-B.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/batch-C.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/batch-red4.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun-W1-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun-W1-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun-W1-19.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun-W1-19.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun-W1-46-noclaude.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun-W1-46-noclaude.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun2-W1-46-noclaude.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/rerun2-W1-46-noclaude.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/reruns.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/unit.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites2/unit.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-01.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-01.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-02.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-02.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-03.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-03.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-04.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-04.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-06.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-06.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-07.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-07.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-08.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-08.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-09.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-09.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-10.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-10.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-11.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-11.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-12.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-12.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-13.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-13.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-14.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-14.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-15.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-15.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-16.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-16.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-17.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-17.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-18.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-18.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-19.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-19.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-20.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-20.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-21.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-21.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-22.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-22.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-23.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-23.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-24.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-24.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-25.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-25.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-26.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-26.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-27.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-27.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-28.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-28.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-29.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-29.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-30.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-30.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-31.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-31.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-32.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-32.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-33.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-33.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-34.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-34.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-35.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-35.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-36.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-36.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-37.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-37.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-38.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-38.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-39.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-39.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-40.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-40.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-41.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-41.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-42.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-42.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-44.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-44.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-45.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-45.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-46.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-46.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-47.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-47.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-48.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-48.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-49.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-49.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-50.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W1-50.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W2-01.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W2-01.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W2-05.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W2-05.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W2-53.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/W2-53.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/batch-A.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/batch-B.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/batch-C.done
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/unit.exit
+- governance/project/orchestration/worktrees/W2-05/lead/log/suites3/unit.txt
+- governance/project/orchestration/worktrees/W2-05/lead/log/td1.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/td2.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/td3.json
+- governance/project/orchestration/worktrees/W2-05/lead/log/v4-import.txt
+- governance/project/orchestration/worktrees/W2-05/lead/probes/PR-DAEO-0z8c-round-1.md
+- governance/project/orchestration/worktrees/W2-05/lead/probes/PR-DAEO-0z8c-round-2.md
+- governance/project/orchestration/worktrees/W2-05/lead/rerun3.sh
+- governance/project/orchestration/worktrees/W2-05/lead/rerun4.sh
+- governance/project/orchestration/worktrees/W2-05/lead/run_suites.sh
+- governance/project/orchestration/worktrees/W2-05/lead/run_suites2.sh
+- governance/project/orchestration/worktrees/W2-05/lead/run_suites3.sh
+- governance/project/orchestration/worktrees/W2-05/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-05/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-05/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-05/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0001.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0002.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0004.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0006.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0007.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0009.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0011.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0012.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0014.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0015.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0017.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0019.md
+- governance/project/orchestration/worktrees/W2-16/checkpoints/DAEO-49o5/CP-DAEO-49o5-0021.md
+- governance/project/orchestration/worktrees/W2-16/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/eng-3.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/rev-2.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/rev-3.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-16/lead/briefs/td-3.md
+- governance/project/orchestration/worktrees/W2-16/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/eng-3.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/failing-1.txt
+- governance/project/orchestration/worktrees/W2-16/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/rebuild-2.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/rebuild-2.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/rebuild-3.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/rebuild-3.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/red-3/W2-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/red-3/W2-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/red-3/rewrites.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/red-3/rewrites.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/rev-2.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/rev-3.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/td-3.json
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-01.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-01.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-02.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-02.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-03.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-03.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-04.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-04.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-05-latency-alone.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-05-latency-alone.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-05.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-05.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-06.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-06.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-07.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-07.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-08.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-08.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-09.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-09.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-10.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-10.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-11.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-11.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-12.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-12.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-13.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-13.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-14.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-14.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-15.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-15.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-17.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-17.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-18.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-18.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-19.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-19.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-20.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-20.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-21.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-21.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-22.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-22.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-23.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-23.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-24.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-24.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-25.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-25.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-26.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-26.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-27.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-27.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-28.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-28.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-29.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-29.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-30.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-30.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-31.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-31.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-32.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-32.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-33.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-33.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-34.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-34.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-35.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-35.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-36.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-36.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-37.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-37.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-38.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-38.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-39.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-39.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-40.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-40.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-41.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-41.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-42.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-42.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-44.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-44.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-45.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-45.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-46.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-46.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-47.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-47.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-48.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-48.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-49.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-49.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-50.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W1-50.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W2-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W2-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W2-49.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/W2-49.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/batch-A.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/batch-B.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/batch-C.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/batch-D.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/batch-E1.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/batch-E2.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/unit.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-1/unit.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-01.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-01.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-02.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-02.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-03.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-03.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-04.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-04.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-05-rerun.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-05-rerun.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-05.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-05.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-06.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-06.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-07.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-07.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-08.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-08.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-09.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-09.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-10.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-10.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-11.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-11.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-12.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-12.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-13.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-13.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-14.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-14.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-15.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-15.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-17.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-17.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-18.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-18.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-19.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-19.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-20.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-20.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-21.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-21.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-22.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-22.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-23.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-23.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-24.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-24.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-25.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-25.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-26.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-26.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-27.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-27.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-28.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-28.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-29.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-29.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-30.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-30.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-31.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-31.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-32.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-32.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-33.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-33.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-34.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-34.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-35.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-35.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-36.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-36.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-37.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-37.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-38.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-38.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-39.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-39.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-40.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-40.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-41.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-41.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-42.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-42.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-44.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-44.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-45.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-45.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-46.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-46.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-47.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-47.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-48.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-48.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-49.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-49.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-50.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W1-50.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W2-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W2-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W2-49.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/W2-49.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/batch-A.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/batch-B.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/batch-C.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/batch-D.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/batch-E.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/unit.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify-3/unit.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-01.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-01.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-02.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-02.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-03.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-03.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-04.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-04.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-05.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-05.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-06.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-06.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-07.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-07.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-08.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-08.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-09.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-09.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-10.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-10.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-11.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-11.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-12.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-12.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-13.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-13.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-14.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-14.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-15.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-15.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-17.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-17.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-18.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-18.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-19.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-19.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-20.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-20.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-21.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-21.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-22.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-22.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-23.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-23.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-24.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-24.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-25.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-25.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-26.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-26.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-27.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-27.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-28.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-28.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-29.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-29.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-30.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-30.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-31.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-31.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-32.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-32.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-33.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-33.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-34.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-34.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-35.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-35.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-36.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-36.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-37.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-37.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-38.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-38.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-39.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-39.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-40.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-40.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-41.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-41.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-42.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-42.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-44.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-44.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-45.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-45.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-46.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-46.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-47.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-47.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-48.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-48.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-49.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-49.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-50.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W1-50.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W2-16.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W2-16.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W2-49.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/W2-49.log
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/batch-A.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/batch-B.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/batch-C.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/batch-D.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/batch-E2.done
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/unit.exit
+- governance/project/orchestration/worktrees/W2-16/lead/log/verify/unit.log
+- governance/project/orchestration/worktrees/W2-16/lead/probes/review-1-draft.md
+- governance/project/orchestration/worktrees/W2-16/lead/probes/review-2-draft.md
+- governance/project/orchestration/worktrees/W2-16/lead/run-batch-3.sh
+- governance/project/orchestration/worktrees/W2-16/lead/run-batch.sh
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0001.md
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0003.md
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0004.md
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0006.md
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0007.md
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0009.md
+- governance/project/orchestration/worktrees/W2-20/checkpoints/DAEO-r30l/CP-DAEO-r30l-0011.md
+- governance/project/orchestration/worktrees/W2-20/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-20/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-20/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-20/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-20/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-20/lead/briefs/td-3.md
+- governance/project/orchestration/worktrees/W2-20/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-20/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-20/lead/log/rebuild.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/rebuild.out
+- governance/project/orchestration/worktrees/W2-20/lead/log/red2/W2-20.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/red2/W2-20.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/red2/cmds.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/red2/cmds.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/red2/import.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-20/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-20/lead/log/td-3.json
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-01.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-02.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-02_test_w1_02_guard_hook.py.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-03.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-04.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-05.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-05_test_w1_05_latency.py.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-05_test_w1_05_live_hooks.py.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-05_test_w1_05_switch_over.py.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-05_test_w1_05_switch_over_record.py.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-06.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-07.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-08.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-09.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-10.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-11.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-12.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-13.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-14.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-15.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-16.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-17.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-18.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-19.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-20.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-21.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-22.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-23.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-24.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-25.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-26.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-27.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-28.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-29.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-30.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-31.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-32.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-33.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-34.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-35.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-36.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-37.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-38.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-39.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-40.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-41.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-42.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-44.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-45.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-46.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-47.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-48.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-49.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W1-50.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/W2-20.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/b1.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/b2.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/b3.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/import.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/summary-b1.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/summary-b2.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/summary-b3.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/summary.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/unit.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify/validate.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/L1.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/L2.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/L3.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/L4.done
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-01.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-02.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-03.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-04.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05-alone.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05-alone.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05-alone2.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05-alone2.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05-alone3.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05-alone3.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-05.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-06.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-07.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-08.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-09.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-10.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-11.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-12.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-13.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-14.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-15.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-16.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-17.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-18.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-19-alone.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-19-alone.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-19.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-20.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-21.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-22.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-23.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-24.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-25.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-26.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-27.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-28.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-29.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-30.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-31.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-32.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-33.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-34.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-35.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-36.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-37.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-38.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-39.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-40.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-41.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-42.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-44.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-45.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-46.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-47.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-48.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-49.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W1-50.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/W2-20.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/alone-uptime.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/alone2-load.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/alone3-load.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/import.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/rebuild.exit
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/rebuild.out
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/summary-L1.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/summary-L2.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/summary-L3.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/summary-L4.txt
+- governance/project/orchestration/worktrees/W2-20/lead/log/verify2/unit.txt
+- governance/project/orchestration/worktrees/W2-20/lead/run_suites.sh
+- governance/project/orchestration/worktrees/W2-20/lead/verify.sh
+- governance/project/orchestration/worktrees/W2-20/lead/verify2.sh
+- governance/project/orchestration/worktrees/W2-26/checkpoints/DAEO-2ds6/CP-DAEO-2ds6-0001.md
+- governance/project/orchestration/worktrees/W2-26/checkpoints/DAEO-2ds6/CP-DAEO-2ds6-0002.md
+- governance/project/orchestration/worktrees/W2-26/checkpoints/DAEO-2ds6/CP-DAEO-2ds6-0004.md
+- governance/project/orchestration/worktrees/W2-26/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-26/lead/briefs/research-1.md
+- governance/project/orchestration/worktrees/W2-26/lead/log/research-1.json
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0001.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0003.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0005.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0006.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0008.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0009.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0011.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0012.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0013.md
+- governance/project/orchestration/worktrees/W2-37/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0014.md
+- governance/project/orchestration/worktrees/W2-37/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/rev-1-resume.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/rev-2-resume.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/rev-2.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-37/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-37/lead/extract.py
+- governance/project/orchestration/worktrees/W2-37/lead/log/check-1.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/check-1.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/eng-1.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/eng-2.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/import-2.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2-W1-02.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2-W1-02.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2-W1-19.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2-W1-19.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2-W1-46.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2-W1-46.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/r2.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/r3-W1-05.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/r3-W1-05.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/r3-W1-46.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/r3-W1-46.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/r3.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/rebuild-1.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/rebuild-1.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/rebuild-2.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/rebuild-2.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/red-1.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/red-1.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/red2-W2-37.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/red2-W2-37.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/red2.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-1-resume.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-1-resume.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-1.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-2-resume.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-2-resume.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-2.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/rev-2.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/secrets-1.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/secrets-1.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/td-1.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-37/lead/log/td-2.result.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1-unit.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1-unit.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1-w2-37.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1-w2-37.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-31.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-31.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-32.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-32.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-33.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-33.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-34.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-34.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-35.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-35.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-36.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-36.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-37.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-37.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-38.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-38.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-39.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-39.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-40.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-40.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-41.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-41.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-42.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-42.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-44.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-44.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-45.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a-W1-45.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1a.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-01.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-01.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-02.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-02.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-03.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-03.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-04.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-04.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-05.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-05.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-06.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-06.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-07.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-07.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-08.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-08.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-09.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-09.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-10.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-10.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-11.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-11.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-12.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-12.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-13.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-13.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-14.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-14.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-15.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-15.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-16.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-16.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-17.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-17.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-18.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-18.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-19.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-19.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-20.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b-W1-20.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1b.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1c-W1-30.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1c-W1-30.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1c.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-46.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-46.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-47.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-47.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-48.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-48.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-49.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-49.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-50.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W1-50.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-01.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-01.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-02.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-02.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-03.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-03.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-53.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d-W2-53.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1d.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-21.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-21.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-22.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-22.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-23.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-23.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-24.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-24.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-25.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-25.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-26.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-26.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-27.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-27.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-28.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-28.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-29.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e-W1-29.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v1e.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-W2-37.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-W2-37.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-check.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-check.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-uc.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-unit.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2-unit.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-31.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-31.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-32.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-32.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-33.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-33.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-34.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-34.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-35.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-35.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-36.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-36.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-37.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-37.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-38.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-38.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-39.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-39.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-40.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-40.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-41.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-41.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-42.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-42.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-44.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-44.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-45.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a-W1-45.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2a.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-01.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-01.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-02.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-02.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-03.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-03.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-04.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-04.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-05.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-05.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-06.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-06.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-07.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-07.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-08.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-08.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-09.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-09.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-10.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-10.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-11.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-11.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-12.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-12.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-13.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-13.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-14.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-14.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-15.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-15.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-16.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-16.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-17.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-17.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-18.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-18.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-19.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-19.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-20.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b-W1-20.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2b.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2c-W1-30.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2c-W1-30.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2c.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-46.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-46.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-47.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-47.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-48.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-48.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-49.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-49.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-50.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W1-50.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-01.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-01.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-02.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-02.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-03.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-03.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-53.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d-W2-53.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2d.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-21.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-21.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-22.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-22.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-23.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-23.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-24.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-24.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-25.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-25.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-26.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-26.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-27.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-27.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-28.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-28.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-29.rc
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e-W1-29.txt
+- governance/project/orchestration/worktrees/W2-37/lead/log/v2e.done
+- governance/project/orchestration/worktrees/W2-37/lead/log/w1-46-errors.txt
+- governance/project/orchestration/worktrees/W2-37/lead/probes/PR-DAEO-6n5k-round-1.md
+- governance/project/orchestration/worktrees/W2-37/lead/probes/PR-DAEO-6n5k-round-2.md
+- governance/project/orchestration/worktrees/W2-37/lead/rerun_load.sh
+- governance/project/orchestration/worktrees/W2-37/lead/rerun_load3.sh
+- governance/project/orchestration/worktrees/W2-37/lead/run_suites.sh
+- governance/project/orchestration/worktrees/W2-37/lead/run_unit_check.sh
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-5.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-6.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-7.json
+- governance/project/orchestration/worktrees/W2-37/lead/tripwire-before-8.json
+- governance/project/orchestration/worktrees/W2-48/checkpoints/DAEO-xxgp/CP-DAEO-xxgp-0001.md
+- governance/project/orchestration/worktrees/W2-48/checkpoints/DAEO-xxgp/CP-DAEO-xxgp-0002.md
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W1-07.exit
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W1-07.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W1-32.exit
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W1-32.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W2-01.exit
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W2-01.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W2-53.exit
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-W2-53.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc-final.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc0.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc1.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc2.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc3.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc4.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/acc5.txt
+- governance/project/orchestration/worktrees/W2-48/engineer/suites.done
+- governance/project/orchestration/worktrees/W2-48/engineer/unit.exit
+- governance/project/orchestration/worktrees/W2-48/engineer/unit.txt
+- governance/project/orchestration/worktrees/W2-48/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-48/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-48/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-48/lead/log/eng-1.exit
+- governance/project/orchestration/worktrees/W2-48/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-48/lead/log/rebuild-1.start
+- governance/project/orchestration/worktrees/W2-48/lead/log/rebuild-1.txt
+- governance/project/orchestration/worktrees/W2-48/lead/log/red-1.exit
+- governance/project/orchestration/worktrees/W2-48/lead/log/red-1.txt
+- governance/project/orchestration/worktrees/W2-48/lead/log/td-1.exit
+- governance/project/orchestration/worktrees/W2-48/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-48/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-48/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0001.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0003.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0004.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0005.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0007.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0008.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0010.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0011.md
+- governance/project/orchestration/worktrees/W2-49/checkpoints/DAEO-ha8z/CP-DAEO-ha8z-0013.md
+- governance/project/orchestration/worktrees/W2-49/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/ps-1.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/ps-2.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/run2-ps-1.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/run2-ps-2.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/run2-td-1.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/rv-1.md
+- governance/project/orchestration/worktrees/W2-49/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-49/lead/log/after.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/after.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/ps-1.json
+- governance/project/orchestration/worktrees/W2-49/lead/log/ps-2.json
+- governance/project/orchestration/worktrees/W2-49/lead/log/red.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/red.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-W1-46-alone.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-W1-46-alone.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-ps-1.json
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-ps-2.json
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-rebuild.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-rebuild.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-red.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-red.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/ALL.done
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-01.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-01.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-02.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-02.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-03.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-03.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-04.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-04.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-05.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-05.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-06.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-06.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-07.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-07.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-08.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-08.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-09.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-09.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-10.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-10.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-11.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-11.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-12.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-12.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-13.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-13.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-14.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-14.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-15.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-15.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-16.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-16.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-17.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-17.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-18.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-18.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-19.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-19.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-20.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-20.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-21.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-21.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-22.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-22.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-23.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-23.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-24.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-24.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-25.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-25.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-26.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-26.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-27.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-27.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-28.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-28.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-29.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-29.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-30.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-30.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-31.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-31.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-32.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-32.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-33.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-33.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-34.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-34.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-35.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-35.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-36.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-36.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-37.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-37.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-38.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-38.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-39.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-39.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-40.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-40.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-41.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-41.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-42.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-42.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-44.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-44.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-45.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-45.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-46.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-46.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-47.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-47.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-48.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-48.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-49.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-49.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-50.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W1-50.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W2-49.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/W2-49.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/unit.exit
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-suites/unit.txt
+- governance/project/orchestration/worktrees/W2-49/lead/log/run2-td-1.json
+- governance/project/orchestration/worktrees/W2-49/lead/log/rv-1.json
+- governance/project/orchestration/worktrees/W2-49/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-49/lead/run2-suites.sh
+- governance/project/orchestration/worktrees/W2-49/ps-run2/split_records.py
+- governance/project/orchestration/worktrees/W2-49/ps-run2/version_line.py
+- governance/project/orchestration/worktrees/W2-50/W2-50-CIT-P.draft.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0001.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0002.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0003.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0005.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0006.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0007.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0009.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0011.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0012.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0014.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0015.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0017.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0018.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0020.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0021.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0023.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0025.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0026.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0028.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0029.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0030.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0031.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0033.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0034.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0035.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0036.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0038.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0039.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0040.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0041.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0042.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0044.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0045.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0046.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0047.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0048.md
+- governance/project/orchestration/worktrees/W2-50/checkpoints/DAEO-kl5e/CP-DAEO-kl5e-0050.md
+- governance/project/orchestration/worktrees/W2-50/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-50/lead/W2-50-CIT-P.draft.md
+- governance/project/orchestration/worktrees/W2-50/lead/alone7.sh
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-3.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-4.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-5.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-6.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-7.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-cite-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-cite-2.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-cite-3.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/eng-citp-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/ps-citp-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-2.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-3.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-4.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-5.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-6.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/rev-7.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-3.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-4.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-5.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-6.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-7.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-8.md
+- governance/project/orchestration/worktrees/W2-50/lead/briefs/td-9.md
+- governance/project/orchestration/worktrees/W2-50/lead/check7.sh
+- governance/project/orchestration/worktrees/W2-50/lead/lanes7.sh
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7.pre
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7a.code
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7a.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7a.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7a.load
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7a.time
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7b.code
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7b.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7b.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7b.load
+- governance/project/orchestration/worktrees/W2-50/lead/log/check-7b.time
+- governance/project/orchestration/worktrees/W2-50/lead/log/checkpoint-8.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-3.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-4.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-5.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-6.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-7.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-cite-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-cite-2.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-cite-3.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/eng-citp-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/gov-file-7.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/pre-8-unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/pre-8-unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/pre-8.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/pre-8.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/ps-citp-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-1.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-2.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-2.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-2.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-3.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-3.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-3.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-4.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-4.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-4.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-5.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-5.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-5.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-6.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-6.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-6.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-7.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-7.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-7.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rebuild-7.start
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-1.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-1.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-2.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-2.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-3.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-3.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-4.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-4.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-5.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-5.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-6.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-6.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-7.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-7.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-8.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-8.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-9.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/red-9.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-2.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-3.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-4.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-5.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-6.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-7.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-7.result.md
+- governance/project/orchestration/worktrees/W2-50/lead/log/rev-7.status-before
+- governance/project/orchestration/worktrees/W2-50/lead/log/secrets-7-warm.err
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-3.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-4.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-5.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-6.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-7.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-8.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/td-9.json
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/ALL.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v1/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2-summary.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-01.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W2-50.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v2/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3-summary.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02-latency-2.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02-latency-2.load
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02-latency-2.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02-latency-alone.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02-latency-alone.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-47.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W2-50.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v3/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4-summary.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-05-latency-alone.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-05-latency-alone.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-19-latency-alone.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-19-latency-alone.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v4/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-alone.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-alone/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-alone/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-alone/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-alone/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-lane1.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-lane2.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-lane3.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5-summary.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v5/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6-summary.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-30.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-41.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/unit.chain-done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v6/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-all.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/all.done
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/test_decision_p95_is_under_100_ms.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/test_decision_p95_is_under_100_ms.load
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/test_decision_p95_is_under_100_ms.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over.load
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-alone/test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-lane1.out
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-lane2.out
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-lane3.out
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-start.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7-summary.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/RUNS-CHANGED
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-02.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-02.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-03.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-03.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-04.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-04.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-05.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-05.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-06.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-06.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-07.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-07.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-08.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-08.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-09.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-09.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-10.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-10.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-11.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-11.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-12.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-12.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-13.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-13.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-14.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-14.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-15.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-15.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-16.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-16.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-17.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-17.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-18.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-18.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-19.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-19.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-20.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-20.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-21.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-21.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-22.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-22.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-23.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-23.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-24.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-24.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-25.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-25.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-26.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-26.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-27.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-27.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-28.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-28.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-29.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-29.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-30.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-30.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-31.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-31.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-32.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-32.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-33.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-33.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-34.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-34.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-35.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-35.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-36.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-36.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-37.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-37.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-38.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-38.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-39.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-39.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-40.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-40.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-41.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-41.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-42.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-42.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-44.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-44.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-45.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-45.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-46.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-46.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-47.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-47.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-48.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-48.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-49.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-49.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W1-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-01.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-01.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-50.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-50.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-53.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-53.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-54.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/W2-54.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/unit.exit
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/unit.txt
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/v7.chain-done-W1-01
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/v7.chain-done-W1-30
+- governance/project/orchestration/worktrees/W2-50/lead/log/v7/v7.chain-done-W2-50
+- governance/project/orchestration/worktrees/W2-50/lead/measure7.py
+- governance/project/orchestration/worktrees/W2-50/lead/msg-merge-8.txt
+- governance/project/orchestration/worktrees/W2-50/lead/probegate8.py
+- governance/project/orchestration/worktrees/W2-50/lead/probes/PR-DAEO-kl5e-extra-review.md
+- governance/project/orchestration/worktrees/W2-50/lead/probes/PR-DAEO-kl5e-last-round-2.md
+- governance/project/orchestration/worktrees/W2-50/lead/probes/PR-DAEO-kl5e-last-round-3.md
+- governance/project/orchestration/worktrees/W2-50/lead/probes/PR-DAEO-kl5e-last-round.md
+- governance/project/orchestration/worktrees/W2-50/lead/probes/PR-DAEO-kl5e-round-1.md
+- governance/project/orchestration/worktrees/W2-50/lead/probes/PR-DAEO-kl5e-round-2.md
+- governance/project/orchestration/worktrees/W2-50/lead/tripwire-before-10.json
+- governance/project/orchestration/worktrees/W2-50/lead/tripwire-before-11.json
+- governance/project/orchestration/worktrees/W2-50/lead/tripwire-before-9.json
+- governance/project/orchestration/worktrees/W2-50/lead/verify.sh
+- governance/project/orchestration/worktrees/W2-50/lead/verify2.sh
+- governance/project/orchestration/worktrees/W2-50/lead/verify3.sh
+- governance/project/orchestration/worktrees/W2-51/checkpoints/DAEO-egsy/CP-DAEO-egsy-0001.md
+- governance/project/orchestration/worktrees/W2-51/checkpoints/DAEO-egsy/CP-DAEO-egsy-0003.md
+- governance/project/orchestration/worktrees/W2-51/checkpoints/DAEO-egsy/CP-DAEO-egsy-0005.md
+- governance/project/orchestration/worktrees/W2-51/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-51/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-51/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-51/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-51/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-51/lead/verify/part2.done
+- governance/project/orchestration/worktrees/W2-51/lead/verify/part3.done
+- governance/project/orchestration/worktrees/W2-51/lead/verify/part4.done
+- governance/project/orchestration/worktrees/W2-51/lead/verify/rebuild.exit
+- governance/project/orchestration/worktrees/W2-51/lead/verify/rebuild.json
+- governance/project/orchestration/worktrees/W2-51/lead/verify/rerun-W1-19.exit
+- governance/project/orchestration/worktrees/W2-51/lead/verify/rerun-W1-19.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/rerun-W1-46.exit
+- governance/project/orchestration/worktrees/W2-51/lead/verify/rerun-W1-46.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/run_some.sh
+- governance/project/orchestration/worktrees/W2-51/lead/verify/run_suites.sh
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-01.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-02.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-03.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-04.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-05.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-06.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-07.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-08.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-09.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-10.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-11.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-12.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-13.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-14.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-15.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-16.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-17.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-18.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-19.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-20.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-21.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-22.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-23.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-24.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-25.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-26.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-27.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-28.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-29.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-30.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-31.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-32.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-33.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-34.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-35.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-36.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-37.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-38.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-39.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-40.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-41.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-42.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-44.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-45.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-46.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-47.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-48.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-49.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W1-50.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suite-W2-51.log
+- governance/project/orchestration/worktrees/W2-51/lead/verify/suites.exit
+- governance/project/orchestration/worktrees/W2-51/lead/verify/unit.log
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0001.md
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0003.md
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0004.md
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0006.md
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0007.md
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0009.md
+- governance/project/orchestration/worktrees/W2-52/checkpoints/DAEO-siiz/CP-DAEO-siiz-0010.md
+- governance/project/orchestration/worktrees/W2-52/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-52/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-52/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-52/lead/briefs/eng-3.md
+- governance/project/orchestration/worktrees/W2-52/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-52/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-52/lead/log/eng-1.exit
+- governance/project/orchestration/worktrees/W2-52/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-52/lead/log/eng-2.exit
+- governance/project/orchestration/worktrees/W2-52/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-52/lead/log/eng-3.exit
+- governance/project/orchestration/worktrees/W2-52/lead/log/eng-3.json
+- governance/project/orchestration/worktrees/W2-52/lead/log/rev-1.exit
+- governance/project/orchestration/worktrees/W2-52/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-52/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-52/lead/runs/W1-41.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs/W1-41.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs/check.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs/check.json
+- governance/project/orchestration/worktrees/W2-52/lead/runs/govfile.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs/rebuild.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs/rebuild.json
+- governance/project/orchestration/worktrees/W2-52/lead/runs/red.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs/red.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs/unit.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs/unit.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-01.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-01.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-02.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-02.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-03.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-03.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-04.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-04.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-05.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-05.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-06.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-06.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-07.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-07.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-08.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-08.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-09.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-09.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-10.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-10.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-11.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-11.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-12.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-12.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-13.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-13.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-14.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-14.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-15.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-15.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-16.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-16.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-17.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-17.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-18.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-18.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-19.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-19.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-20.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-20.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-21.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-21.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-22.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-22.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-23.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-23.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-24.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-24.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-25.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-25.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-26.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-26.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-27.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-27.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-28.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-28.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-29.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-29.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-30.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-30.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-31.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-31.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-32.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-32.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-33.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-33.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-34.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-34.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-35.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-35.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-36.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-36.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-37.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-37.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-38.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-38.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-39.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-39.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-40.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-40.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-41.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-41.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-42.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-42.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-44.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-44.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-45.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-45.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-46.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-46.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-47.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-47.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-48.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-48.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-49.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-49.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-50.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W1-50.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-01.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-01.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-49.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-49.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-52.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-52.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-53.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/W2-53.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/check.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/check.json
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/govfile.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/rebuild.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/rebuild.json
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/unit.exit
+- governance/project/orchestration/worktrees/W2-52/lead/runs2/unit.txt
+- governance/project/orchestration/worktrees/W2-52/lead/runsuites.py
+- governance/project/orchestration/worktrees/W2-52/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-52/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-52/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-52/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-52/lead/tripwire-compare-3.txt
+- governance/project/orchestration/worktrees/W2-52/lead/tripwire-compare-4.txt
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0001.md
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0002.md
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0003.md
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0005.md
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0006.md
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0008.md
+- governance/project/orchestration/worktrees/W2-53/checkpoints/DAEO-7rr2/CP-DAEO-7rr2-0009.md
+- governance/project/orchestration/worktrees/W2-53/engineer/unit-run1.log
+- governance/project/orchestration/worktrees/W2-53/engineer/unit-run1.rc
+- governance/project/orchestration/worktrees/W2-53/engineer/unit-run2.log
+- governance/project/orchestration/worktrees/W2-53/engineer/unit-run2.rc
+- governance/project/orchestration/worktrees/W2-53/engineer/w130-run1.log
+- governance/project/orchestration/worktrees/W2-53/engineer/w130-run1.rc
+- governance/project/orchestration/worktrees/W2-53/engineer/w201-run1.log
+- governance/project/orchestration/worktrees/W2-53/engineer/w201-run1.rc
+- governance/project/orchestration/worktrees/W2-53/engineer/w253-base.log
+- governance/project/orchestration/worktrees/W2-53/engineer/w253-base.rc
+- governance/project/orchestration/worktrees/W2-53/engineer/w253-base.time
+- governance/project/orchestration/worktrees/W2-53/engineer/w253-run1.log
+- governance/project/orchestration/worktrees/W2-53/engineer/w253-run1.rc
+- governance/project/orchestration/worktrees/W2-53/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-53/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-53/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-53/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-53/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-53/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-53/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-53/lead/log/rebuild-1.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/red-1.exit
+- governance/project/orchestration/worktrees/W2-53/lead/log/red-1.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-53/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-53/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/A.codes
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/A.exit
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/B.codes
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/B.exit
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/C.codes
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/C.exit
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-01.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-02.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-03.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-04.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-05.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-06.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-07.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-08.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-09.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-10.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-11.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-12.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-13.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-14.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-15.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-16.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-17.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-18.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-19.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-20.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-21.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-22.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-23.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-24.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-25.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-26.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-27.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-28.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-29.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-30.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-31.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-32.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-33.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-34.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-35.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-36.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-37.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-38.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-39.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-40.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-41.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-42.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-44.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-45.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-46.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-47.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-48.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-49.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W1-50.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W2-01.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/W2-53.txt
+- governance/project/orchestration/worktrees/W2-53/lead/log/verify/unit.txt
+- governance/project/orchestration/worktrees/W2-53/lead/verify.sh
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0001.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0003.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0005.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0006.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0008.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0010.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0011.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0012.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0013.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0015.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0016.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0017.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0018.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0019.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0020.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0021.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0023.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0024.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0025.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0027.md
+- governance/project/orchestration/worktrees/W2-54/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0028.md
+- governance/project/orchestration/worktrees/W2-54/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng1.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng2.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng3.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng4.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng5-resume.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng5.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng6.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/eng7.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/rv1.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/td1.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/td2.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/td3.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/td4-resume.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/td4.md
+- governance/project/orchestration/worktrees/W2-54/lead/briefs/td5.md
+- governance/project/orchestration/worktrees/W2-54/lead/eng3-measure.py
+- governance/project/orchestration/worktrees/W2-54/lead/eng4-measure.py
+- governance/project/orchestration/worktrees/W2-54/lead/eng5-measure.py
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone-W1-02.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone-W1-02.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone-W1-05.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone-W1-05.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone-W1-46.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone-W1-46.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone4-W1-05.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone4-W1-05.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone4-W1-19.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone4-W1-19.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone4.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone4.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5-W1-19.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5-W1-19.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5-W1-46.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5-W1-46.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5-place-after.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/alone5.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/batchA.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/batchB.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/batchC.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/check-red.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/check-red.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/check-red.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/check2.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/check2.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/check2.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/check2.time
+- governance/project/orchestration/worktrees/W2-54/lead/log/cp4.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/cp5.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/ctx-before.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/ctx-before.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/ctx4.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/ctx4.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/ctx4.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng1.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng2.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng3.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng4.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng5-resume.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng5.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng6.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng7.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/eng7.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-measure.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-measure.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-place-after.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-place-before.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-place-mid.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-shared-gpu.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-shared-gpu.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-w1-21-hit5.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4-w1-21-hit5.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-place-after.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-place-before.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-place-mid.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-shared-gpu.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-shared-gpu.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-w1-21-hit5.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b-w1-21-hit5.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu4b.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-head.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-place-after.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-place-before.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-place-mid.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-shared-gpu.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-shared-gpu.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-w1-21-hit5.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5-w1-21-hit5.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/gpu5.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/import.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/import2.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/import3.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/m3-ctx.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/m3-measure-copy.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/m3-measure.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/m3-measure.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/m3.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/r3-local.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/r3-local.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild1.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild1.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild10.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild10.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild10.import
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild10.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild10.time
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild11.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild11.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild11.import
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild11.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild11.time
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild12.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild12.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild12.import
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild12.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild12.time
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild2.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild2.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild3.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild3.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild4.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild4.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild5.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild5.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild6.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild6.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild7.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild7.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild8.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild8.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild8.import
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild8.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild8.time
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild9.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild9.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild9.import
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild9.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/rebuild9.time
+- governance/project/orchestration/worktrees/W2-54/lead/log/red.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red2.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red2.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-19.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-19.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-19.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-21.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-21.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-21.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-46.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-46.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W1-46.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W2-54.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W2-54.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r-W2-54.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red3r.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/red4-W2-54.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/red4-W2-54.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/red4-W2-54.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/red4.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/rest.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rv1-result.md
+- governance/project/orchestration/worktrees/W2-54/lead/log/rv1.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/rv1.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/td1.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/td2.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/td3.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/td4-resume.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/td4.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/td5.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/td5.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/tripwire-compare-3.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W1-24.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W1-24.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W1-26.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W1-26.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W1-30.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W1-30.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W2-54.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-W2-54.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-unit.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v-unit.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-01.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-01.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-01.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-02.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-02.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-02.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-03.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-03.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-03.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-04.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-04.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-04.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-05.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-05.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-05.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-06.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-06.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-06.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-07.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-07.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-07.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-08.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-08.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-08.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-09.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-09.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-09.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-10.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-10.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-10.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-11.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-11.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-11.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-12.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-12.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-12.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-13.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-13.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-13.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-14.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-14.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-14.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-15.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-15.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-15.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-16.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-16.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-16.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-17.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-17.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-17.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-18.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-18.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-18.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-19.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-19.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-19.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-20.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-20.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-20.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-21.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-21.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-21.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-22.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-22.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-22.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-23.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-23.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-23.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-24.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-24.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-24.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-25.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-25.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-25.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-26.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-26.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-26.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-27.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-27.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-27.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-28.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-28.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-28.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-29.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-29.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-29.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-30.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-30.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-30.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-31.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-31.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-31.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-32.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-32.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-32.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-33.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-33.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-33.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-34.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-34.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-34.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-35.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-35.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-35.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-36.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-36.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-36.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-37.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-37.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-37.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-38.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-38.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-38.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-39.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-39.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-39.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-40.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-40.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-40.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-41.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-41.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-41.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-42.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-42.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-42.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-44.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-44.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-44.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-45.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-45.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-45.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-46.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-46.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-46.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-47.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-47.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-47.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-48.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-48.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-48.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-49.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-49.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-49.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-50.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-50.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W1-50.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-01.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-01.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-01.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-53.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-53.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-53.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-54.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-54.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-W2-54.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-unit.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-unit.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v2-unit.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-01.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-01.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-01.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-02.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-02.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-02.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-03.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-03.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-03.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-04.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-04.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-04.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-05.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-05.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-05.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-06.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-06.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-06.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-07.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-07.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-07.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-08.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-08.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-08.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-09.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-09.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-09.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-10.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-10.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-10.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-11.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-11.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-11.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-12.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-12.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-12.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-13.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-13.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-13.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-14.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-14.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-14.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-15.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-15.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-15.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-16.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-16.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-16.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-17.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-17.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-17.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-18.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-18.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-18.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-19.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-19.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-19.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-20.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-20.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-20.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-21.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-21.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-21.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-22.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-22.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-22.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-23.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-23.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-23.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-24.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-24.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-24.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-25.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-25.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-25.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-26.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-26.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-26.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-27.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-27.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-27.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-28.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-28.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-28.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-29.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-29.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-29.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-30.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-30.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-30.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-31.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-31.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-31.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-32.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-32.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-32.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-33.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-33.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-33.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-34.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-34.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-34.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-35.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-35.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-35.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-36.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-36.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-36.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-37.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-37.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-37.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-38.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-38.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-38.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-39.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-39.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-39.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-40.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-40.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-40.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-41.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-41.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-41.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-42.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-42.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-42.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-44.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-44.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-44.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-45.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-45.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-45.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-46.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-46.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-46.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-47.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-47.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-47.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-48.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-48.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-48.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-49.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-49.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-49.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-50.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-50.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W1-50.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-01.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-01.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-01.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-53.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-53.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-53.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-54.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-54.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-W2-54.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-all.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-check.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-check.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-check.head
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-check.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-check.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-unit.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-unit.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4-unit.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v4.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-W2-54.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-W2-54.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-W2-54.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-check.err
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-check.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-check.head
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-check.json
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-check.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-unit.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-unit.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5-unit.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5a-place-after.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5a-place-before.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5a.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5a.out
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5b-place-after.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5b.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5b.out
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-01.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-01.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-01.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-02.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-02.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-02.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-03.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-03.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-03.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-04.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-04.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-04.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-05.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-05.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-05.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-06.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-06.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-06.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-07.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-07.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-07.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-08.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-08.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-08.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-09.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-09.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-09.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-10.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-10.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-10.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-11.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-11.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-11.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-12.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-12.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-12.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-13.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-13.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-13.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-14.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-14.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-14.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-15.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-15.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-15.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-16.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-16.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1-W1-16.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g1.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-17.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-17.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-17.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-18.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-18.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-18.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-19.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-19.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-19.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-20.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-20.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-20.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-22.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-22.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-22.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-23.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-23.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-23.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-24.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-24.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-24.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-25.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-25.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-25.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-26.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-26.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-26.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-27.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-27.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-27.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-28.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-28.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-28.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-29.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-29.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-29.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-31.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-31.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-31.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-46.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-46.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2-W1-46.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g2.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-21.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-21.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-21.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-32.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-32.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-32.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-33.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-33.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-33.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-34.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-34.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-34.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-35.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-35.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-35.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-36.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-36.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-36.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-37.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-37.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-37.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-38.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-38.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-38.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-39.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-39.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-39.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-40.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-40.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-40.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-42.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-42.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-42.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-44.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-44.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-44.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-45.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-45.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-45.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-47.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-47.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-47.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-48.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-48.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-48.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-49.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-49.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-49.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-50.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-50.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W1-50.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W2-01.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W2-01.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W2-01.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W2-53.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W2-53.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3-W2-53.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5g3.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w30-W1-30.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w30-W1-30.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w30-W1-30.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w30.done
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w41-W1-41.exit
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w41-W1-41.load
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w41-W1-41.txt
+- governance/project/orchestration/worktrees/W2-54/lead/log/v5w41.done
+- governance/project/orchestration/worktrees/W2-54/lead/run_alone4.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_alone5.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_ctx.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_gpu.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_gpu2.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_gpu5.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_measure.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_place.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_r3.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_rebuild.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_rest.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_suites.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_v5a.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_v5b.sh
+- governance/project/orchestration/worktrees/W2-54/lead/run_verify4.sh
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-10.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-5.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-6.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-7.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-8.json
+- governance/project/orchestration/worktrees/W2-54/lead/tripwire-before-9.json
+- governance/project/orchestration/worktrees/W2-54/w2_54_embed_variation.py
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0001.md
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0002.md
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0003.md
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0005.md
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0006.md
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0007.md
+- governance/project/orchestration/worktrees/W2-58/checkpoints/DAEO-5j8b/CP-DAEO-5j8b-0009.md
+- governance/project/orchestration/worktrees/W2-58/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/eng-1-resume-1.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/probe-eng-1.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/td-1-resume-1.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/td-1-resume-2.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/td-1-resume-3.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-58/lead/briefs/td-2b.md
+- governance/project/orchestration/worktrees/W2-58/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/eng-1.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/eng-2.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/eng-2.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/probe-eng-1.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/probe-eng-1.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/probe-eng-1.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/rebuild-1.t0
+- governance/project/orchestration/worktrees/W2-58/lead/log/rebuild-1.t1
+- governance/project/orchestration/worktrees/W2-58/lead/log/red-W2-58.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/red-W2-58.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/red-gov-file.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-1.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-1.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-2.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-2.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-3.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-3b.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-3c.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-3c.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-3c.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-4.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-4.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-4.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-5.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-5.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-5.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-6.json
+- governance/project/orchestration/worktrees/W2-58/lead/log/td-6.start
+- governance/project/orchestration/worktrees/W2-58/lead/log/v1-W1-02-disputed.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/v1-W1-02-disputed.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v1-W2-58.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/v1-W2-58.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-02_test_w1_02_copies.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-02_test_w1_02_name_filters.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-02_test_w1_02_protected_reads_open.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-02_test_w1_02_root_searches.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-02_test_w1_02_search_on_a_pipe.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-02_test_w1_02_wildcard_globs.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W1-05_test_w1_05_switch_over_record.py.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/W2-58.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/summary.txt
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/unit.exit
+- governance/project/orchestration/worktrees/W2-58/lead/log/v2/unit_guard_launch.txt
+- governance/project/orchestration/worktrees/W2-58/lead/packages/P-W2-58-1.md
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-5.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-6.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-7.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-8.json
+- governance/project/orchestration/worktrees/W2-58/lead/tripwire-before-9.json
+- governance/project/orchestration/worktrees/W2-59/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0001.md
+- governance/project/orchestration/worktrees/W2-59/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0003.md
+- governance/project/orchestration/worktrees/W2-59/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0006.md
+- governance/project/orchestration/worktrees/W2-59/checkpoints/DAEO-kh9l/CP-DAEO-kh9l-0008.md
+- governance/project/orchestration/worktrees/W2-59/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-59/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-59/lead/briefs/eng-2.md
+- governance/project/orchestration/worktrees/W2-59/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-59/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-59/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-unit.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-w1-02-p95.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-w1-05-p95-b.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-w1-05-p95.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-w1-05-switch-over.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after-w1-25.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/after2.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-1.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-1.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-2.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-2.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-2.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-3.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/check-4.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/close-wait.done
+- governance/project/orchestration/worktrees/W2-59/lead/log/cp-run2-merge.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/cp-run2-tests.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/cp-run2-verified.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/eng-1.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/eng-1.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/eng-2.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/eng-2.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/eng-2.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/import-check-2.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/import-check.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/lone.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/lone.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/merge-tree.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-1.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-2.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-2.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-2.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-3.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-3.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-3.load
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-3.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/rebuild-3.time
+- governance/project/orchestration/worktrees/W2-59/lead/log/red-1.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/rev-1.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/secrets-2.err
+- governance/project/orchestration/worktrees/W2-59/lead/log/secrets-2.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/secrets-2.out
+- governance/project/orchestration/worktrees/W2-59/lead/log/secrets-pin.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/secrets-tree.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/secrets.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-01.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-02.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-03.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-04.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-05.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-26.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W1-38.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W2-01.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W2-53.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W2-54.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/W2-59.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/A/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-06.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-07.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-08.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-09.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-10.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-11.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-12.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-13.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-14.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-15.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-16.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/W1-17.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/B/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-18.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-19.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-20.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-21.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-22.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-23.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-24.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-25.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-27.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-28.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/W1-29.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/C/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-30.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-31.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-32.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-33.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-34.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-35.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-36.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-37.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-39.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/W1-40.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/D/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-41.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-42.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-44.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-45.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-46.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-47.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-48.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-49.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/W1-50.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/E/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W1-22.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W1-26.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W1-38.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W2-50.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W2-53.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W2-59.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/W2-62.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2A/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W1-01.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W1-02.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W1-03.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W1-04.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W1-05.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W2-01.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/W2-54.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2B/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-06.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-07.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-08.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-09.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-10.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-11.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-12.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-13.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-14.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-15.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-16.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/W1-17.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2C/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-18.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-19.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-20.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-21.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-23.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-24.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-25.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-27.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-28.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/W1-29.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2D/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-30.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-31.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-32.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-33.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-34.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-35.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-36.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-37.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-39.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/W1-40.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2E/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-41.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-42.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-44.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-45.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-46.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-47.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-48.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-49.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/W1-50.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/end.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/start.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/suites/R2F/summary.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/td-1.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/td-1.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/td-2.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-59/lead/log/td-2.start
+- governance/project/orchestration/worktrees/W2-59/lead/log/tripwire-3.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/tripwire-4.txt
+- governance/project/orchestration/worktrees/W2-59/lead/log/unit-1.exit
+- governance/project/orchestration/worktrees/W2-59/lead/log/unit-1.txt
+- governance/project/orchestration/worktrees/W2-59/lead/packages.md
+- governance/project/orchestration/worktrees/W2-59/lead/run_after.sh
+- governance/project/orchestration/worktrees/W2-59/lead/run_after2.sh
+- governance/project/orchestration/worktrees/W2-59/lead/run_suites.sh
+- governance/project/orchestration/worktrees/W2-59/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-59/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-59/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-59/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-59/lead/tripwire-before-5.json
+- governance/project/orchestration/worktrees/W2-62/checkpoints/DAEO-juee/CP-DAEO-juee-0001.md
+- governance/project/orchestration/worktrees/W2-62/checkpoints/DAEO-juee/CP-DAEO-juee-0002.md
+- governance/project/orchestration/worktrees/W2-62/checkpoints/DAEO-juee/CP-DAEO-juee-0003.md
+- governance/project/orchestration/worktrees/W2-62/checkpoints/DAEO-juee/CP-DAEO-juee-0005.md
+- governance/project/orchestration/worktrees/W2-62/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-62/lead/briefs/eng-1.md
+- governance/project/orchestration/worktrees/W2-62/lead/briefs/rev-1.md
+- governance/project/orchestration/worktrees/W2-62/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-62/lead/briefs/td-2.md
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-02-p95.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-02-p95.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-05-switch.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-05-switch.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-19-p95.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-19-p95.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-46-live.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/alone-W1-46-live.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/eng-1.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/eng-1.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-W1-29.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-W1-29.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-W1-49.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-W1-49.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-W2-62.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-W2-62.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-all.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-check.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-check.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-checkpoint.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-collect-before.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-gov-file.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-unit.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/r2-unit.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/rebuild-1.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/rebuild-1.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/rebuild-2.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/rebuild-2.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/rebuild-3.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/rebuild-3.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W1-29.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W1-29.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W1-49.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W1-49.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W2-62-live.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W2-62-live.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W2-62.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-W2-62.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/red-gov-file.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/rev-1.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/rev-1.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/td-1.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/td-2.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/td-2.json
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-01.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-01.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-02.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-02.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-03.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-03.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-04.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-04.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-05.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-05.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-06.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-06.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-07.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-07.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-08.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-08.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-09.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-09.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-10.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-10.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-11.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-11.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-12.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-12.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-13.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-13.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-14.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-14.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-15.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-15.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-16.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-16.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-17.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-17.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-18.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-18.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-19.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-19.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-20.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-20.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-21.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-21.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-22.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-22.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-23.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-23.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-24.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-24.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-25.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-25.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-26.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-26.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-27.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-27.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-28.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-28.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-29.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-29.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-30.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-30.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-31.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-31.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-32.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-32.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-33.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-33.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-34.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-34.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-35.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-35.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-36.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-36.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-37.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-37.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-38.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-38.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-39.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-39.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-40.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-40.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-41.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-41.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-42.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-42.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-44.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-44.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-45.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-45.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-46.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-46.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-47.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-47.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-48.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-48.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-49.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-49.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-50.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W1-50.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-01.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-01.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-53.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-53.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-54.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-54.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-62-live.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-62-live.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-62.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-W2-62.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-check.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-check.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-gov-file.txt
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-unit.exit
+- governance/project/orchestration/worktrees/W2-62/lead/log/verify-unit.txt
+- governance/project/orchestration/worktrees/W2-62/lead/probes/rev-1-body.md
+- governance/project/orchestration/worktrees/W2-62/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-62/lead/tripwire-before-2.json
+- governance/project/orchestration/worktrees/W2-62/lead/tripwire-before-3.json
+- governance/project/orchestration/worktrees/W2-62/lead/tripwire-before-4.json
+- governance/project/orchestration/worktrees/W2-62/lead/verify-r2.sh
+- governance/project/orchestration/worktrees/W2-62/lead/verify.py
+- governance/project/orchestration/worktrees/W2-63/checkpoints/DAEO-pl6k/CP-DAEO-pl6k-0001.md
+- governance/project/orchestration/worktrees/W2-63/lead/CHECKPOINT.md
+- governance/project/orchestration/worktrees/W2-63/lead/briefs/td-1.md
+- governance/project/orchestration/worktrees/W2-63/lead/log/td-1.json
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-W1-29.exit
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-W1-29.txt
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-W1-49.exit
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-W1-49.txt
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-W2-62.exit
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-W2-62.txt
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-all.done
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-gov-file.txt
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-unit-hooks.exit
+- governance/project/orchestration/worktrees/W2-63/lead/log/verify-unit-hooks.txt
+- governance/project/orchestration/worktrees/W2-63/lead/tripwire-before-1.json
+- governance/project/orchestration/worktrees/W2-63/lead/verify.sh
+- governance/project/path-map.yaml
+- governance/project/prompts/w2-orchestrator.md
+- governance/project/roster.yaml
+- governance/project/tool-registry.yaml
+- src/gov/check/schema.py
+- src/gov/context/__init__.py
+- src/gov/guard/decide.py
+- src/gov/guard/protected.py
+- src/gov/guard/runs.py
+- src/gov/launch/launcher.py
+- src/gov/retrieval/ollama.py
+- src/gov/retrieval/semantic.py
+- src/gov/secrets/__init__.py
+- template/.rulesync/skills/checkpoint/SKILL.md
+- template/governance/kernel/checks/context-reproducibility.yaml
+- template/governance/kernel/hooks/sessionstart.py
+- template/governance/kernel/schemas/audit-report.schema.json
+- template/governance/kernel/skills/checkpoint/SKILL.md
+- tests/acceptance/W1-19/README.md
+- tests/acceptance/W1-19/test_w1_19_semantic_index.py
+- tests/acceptance/W1-19/w1_19_support.py
+- tests/acceptance/W1-20/README.md
+- tests/acceptance/W1-20/test_w1_20_code.py
+- tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py
+- tests/acceptance/W1-21/README.md
+- tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py
+- tests/acceptance/W1-21/test_w1_21_command.py
+- tests/acceptance/W1-21/w1_21_support.py
+- tests/acceptance/W1-22/README.md
+- tests/acceptance/W1-22/w1_22_support.py
+- tests/acceptance/W1-27/README.md
+- tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py
+- tests/acceptance/W1-30/README.md
+- tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py
+- tests/acceptance/W1-41/README.md
+- tests/acceptance/W1-41/w1_41_support.py
+- tests/acceptance/W1-46/README.md
+- tests/acceptance/W1-46/test_w1_46_live_sessions.py
+- tests/acceptance/W1-49/README.md
+- tests/acceptance/W1-49/test_w1_49_live_session.py
+- tests/acceptance/W1-49/test_w1_49_sessionstart.py
+- tests/acceptance/W1-49/test_w1_49_threshold.py
+- tests/acceptance/W1-49/w1_49_support.py
+- tests/acceptance/W2-50/README.md
+- tests/acceptance/W2-50/conftest.py
+- tests/acceptance/W2-50/test_w2_50_code_under_test.py
+- tests/acceptance/W2-50/test_w2_50_extra_review.py
+- tests/acceptance/W2-50/test_w2_50_guard_own_folder.py
+- tests/acceptance/W2-50/test_w2_50_guard_refusals.py
+- tests/acceptance/W2-50/test_w2_50_last_review.py
+- tests/acceptance/W2-50/test_w2_50_launcher.py
+- tests/acceptance/W2-50/test_w2_50_link_replaced.py
+- tests/acceptance/W2-50/test_w2_50_never_indexed.py
+- tests/acceptance/W2-50/test_w2_50_one_reader.py
+- tests/acceptance/W2-50/test_w2_50_owner_answers.py
+- tests/acceptance/W2-50/test_w2_50_review_findings.py
+- tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py
+- tests/acceptance/W2-50/test_w2_50_short_round.py
+- tests/acceptance/W2-50/w2_50_scan_support.py
+- tests/acceptance/W2-50/w2_50_support.py
+- tests/acceptance/W2-54/README.md
+- tests/acceptance/W2-54/conftest.py
+- tests/acceptance/W2-54/test_w2_54_audit_report.py
+- tests/acceptance/W2-54/test_w2_54_cpu_embedder.py
+- tests/acceptance/W2-54/test_w2_54_dropped_order.py
+- tests/acceptance/W2-54/test_w2_54_green_here.py
+- tests/acceptance/W2-54/test_w2_54_query_cache.py
+- tests/acceptance/W2-54/test_w2_54_query_vector.py
+- tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+- tests/acceptance/W2-54/test_w2_54_shared_gpu.py
+- tests/acceptance/W2-54/test_w2_54_time_limit.py
+- tests/acceptance/W2-54/w2_54_support.py
+- tests/acceptance/W2-62/README.md
+- tests/acceptance/W2-62/conftest.py
+- tests/acceptance/W2-62/test_w2_62_documents.py
+- tests/acceptance/W2-62/test_w2_62_live_resume.py
+- tests/acceptance/W2-62/test_w2_62_prompt_in_force.py
+- tests/acceptance/W2-62/test_w2_62_resume_in_full.py
+- tests/acceptance/W2-62/w2_62_support.py
+- tests/unit/check/test_schema_audit_report.py
+- tests/unit/context/test_dropped_order.py
+- tests/unit/guard/test_protected_one_reader.py
+- tests/unit/guard/test_runs.py
+- tests/unit/hooks/test_resume_hooks.py
+- tests/unit/hooks/test_w29_hooks.py
+- tests/unit/launch/test_runs.py
+- tests/unit/retrieval/test_semantic_cpu_embedder.py
+- tests/unit/retrieval/test_semantic_query_vector.py
+- tests/unit/secrets/test_scan_scale.py
+- tests/unit/semantic/test_semantic.py
+- docs/close/DAEO-0rfi/CL-DAEO-0rfi.md
+- docs/checkpoints/DAEO-0rfi/CP-DAEO-0rfi-0036.md
+packet_hash: 55dc6dad465c7564ccaf04a7cfa020765d23a148e041250b6e5865f8796baa1a
+inputs:
+- id: DAEO-0rfi
+  hash: sha256:2cf75f70d3c890736a1523db356332aae6f4fa1cf97559027d03fec862327890
+- id: DEC-768
+  hash: sha256:be69dcf6218ca09c4ffebc16ba5222b32244a979247d226b26d01dff52e33021
+- id: DEC-626
+  hash: sha256:be69dcf6218ca09c4ffebc16ba5222b32244a979247d226b26d01dff52e33021
+- id: DEC-441
+  hash: sha256:be69dcf6218ca09c4ffebc16ba5222b32244a979247d226b26d01dff52e33021
+- id: DEC-565
+  hash: sha256:be69dcf6218ca09c4ffebc16ba5222b32244a979247d226b26d01dff52e33021
+- id: CAP-33
+  hash: sha256:72ed7a6c8d6f12dfc5b578f9559500142a551dd1fe3c013405f24c05a7dffe26
+requirements_implemented:
+- DEC-768
+- DEC-773
+- DEC-868
+- DEC-874
+decisions_applied:
+- DEC-768
+- DEC-626
+- DEC-441
+- DEC-565
+tests_produced:
+- tests/acceptance/W1-19/test_w1_19_semantic_index.py
+- tests/acceptance/W1-20/test_w1_20_code.py
+- tests/acceptance/W1-20/test_w1_20_facets_and_no_model.py
+- tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py
+- tests/acceptance/W1-21/test_w1_21_command.py
+- tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py
+- tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py
+- tests/acceptance/W1-46/test_w1_46_live_sessions.py
+- tests/acceptance/W1-49/test_w1_49_live_session.py
+- tests/acceptance/W1-49/test_w1_49_sessionstart.py
+- tests/acceptance/W1-49/test_w1_49_threshold.py
+- tests/acceptance/W2-50/test_w2_50_code_under_test.py
+- tests/acceptance/W2-50/test_w2_50_extra_review.py
+- tests/acceptance/W2-50/test_w2_50_guard_own_folder.py
+- tests/acceptance/W2-50/test_w2_50_guard_refusals.py
+- tests/acceptance/W2-50/test_w2_50_last_review.py
+- tests/acceptance/W2-50/test_w2_50_launcher.py
+- tests/acceptance/W2-50/test_w2_50_link_replaced.py
+- tests/acceptance/W2-50/test_w2_50_never_indexed.py
+- tests/acceptance/W2-50/test_w2_50_one_reader.py
+- tests/acceptance/W2-50/test_w2_50_owner_answers.py
+- tests/acceptance/W2-50/test_w2_50_review_findings.py
+- tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py
+- tests/acceptance/W2-50/test_w2_50_short_round.py
+- tests/acceptance/W2-54/test_w2_54_audit_report.py
+- tests/acceptance/W2-54/test_w2_54_cpu_embedder.py
+- tests/acceptance/W2-54/test_w2_54_dropped_order.py
+- tests/acceptance/W2-54/test_w2_54_green_here.py
+- tests/acceptance/W2-54/test_w2_54_query_cache.py
+- tests/acceptance/W2-54/test_w2_54_query_vector.py
+- tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+- tests/acceptance/W2-54/test_w2_54_shared_gpu.py
+- tests/acceptance/W2-54/test_w2_54_time_limit.py
+- tests/acceptance/W2-62/test_w2_62_documents.py
+- tests/acceptance/W2-62/test_w2_62_live_resume.py
+- tests/acceptance/W2-62/test_w2_62_prompt_in_force.py
+- tests/acceptance/W2-62/test_w2_62_resume_in_full.py
+- tests/unit/check/test_schema_audit_report.py
+- tests/unit/context/test_dropped_order.py
+- tests/unit/guard/test_protected_one_reader.py
+- tests/unit/guard/test_runs.py
+- tests/unit/hooks/test_resume_hooks.py
+- tests/unit/hooks/test_w29_hooks.py
+- tests/unit/launch/test_runs.py
+- tests/unit/retrieval/test_semantic_cpu_embedder.py
+- tests/unit/retrieval/test_semantic_query_vector.py
+- tests/unit/secrets/test_scan_scale.py
+- tests/unit/semantic/test_semantic.py
+tests_run:
+  passed: 15729
+  failed: 2
+  errors: 0
+  skipped: 31
+test_runs:
+- run: acceptance
+  form: parallel
+  seconds: 464.65
+  passed: 97
+  failed: 0
+  errors: 0
+  skipped: 0
+  workers: auto
+- run: regression
+  form: parallel
+  seconds: 2095.54
+  passed: 15369
+  failed: 2
+  errors: 0
+  skipped: 31
+  workers: auto
+- run: regression
+  form: serial-afterwards
+  seconds: 1943.3
+  passed: 263
+  failed: 0
+  errors: 0
+  skipped: 0
+  cases:
+  - tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms
+  - tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook
+  - tests/acceptance/W1-05/test_w1_05_switch_over_record.py::test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over
+  - tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought
+  - tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays
+  - tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path
+  - tests/acceptance/W1-25/test_w1_25_live_session.py
+  - tests/acceptance/W1-46/test_w1_46_live_sessions.py
+  - tests/acceptance/W1-49/test_w1_49_live_session.py
+  - tests/acceptance/W1-07/test_w1_07_help.py::test_help_answers_in_under_300_ms
+  - tests/acceptance/W1-10/test_w1_10_dev_tier.py::test_a_full_load_of_a_dev_tier_takes_less_than_5_seconds
+  - tests/acceptance/W1-17/test_w1_17_dev_tier.py::test_one_changed_file_is_re_indexed_by_the_next_retrieval_within_the_bound
+  - tests/acceptance/W1-18/test_w1_18_deadline.py::test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline
+  - tests/acceptance/W1-18/test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call
+  - tests/acceptance/W1-19/test_w1_19_real_models.py
+  - tests/acceptance/W1-20/test_w1_20_code.py
+  - tests/acceptance/W1-21/test_w1_21_dev_tier.py
+  - tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder
+  - tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim
+  - tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder
+  - tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py
+  - tests/acceptance/W1-16/test_w1_16_code_answers.py
+  - tests/acceptance/W1-16/test_w1_16_one_daemon.py
+  - tests/acceptance/W1-16/test_w1_16_paths_and_roots.py
+  - tests/acceptance/W1-16/test_w1_16_secret_exclusion.py
+  - tests/acceptance/W1-16/test_w1_16_ui_off.py
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_body_that_begins_with_a_separator_is_flagged_only_when_the_rest_is_token_shaped
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_directory_given_by_the_callers_environment_is_not_used
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_file_with_a_token_whose_body_begins_with_a_separator_is_not_indexable
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_path_name_that_holds_a_secret_is_told_from_an_ordinary_one
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_run_does_not_use_the_tools_shared_default
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_socket_path_in_the_daemon_directory_fits_in_a_socket_address
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_an_allowlist_of_the_project_does_not_shelter_a_path_name
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_each_repository_has_a_daemon_directory_of_its_own
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_the_daemon_directory_is_outside_the_repository
+  - tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_the_tool_alone_keeps_its_daemon_files_in_one_shared_default
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_a_repository_answers_only_from_its_own_code
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_indexing_again_keeps_one_project
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_list_projects_in_one_repository_shows_only_its_own_project
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_the_home_is_under_the_repositorys_gov_runtime
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_the_tools_default_home_is_not_used
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_this_repository_is_not_indexed_by_the_run
+  - tests/acceptance/W1-16/test_w1_16_home.py::test_two_repositories_have_two_homes
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_body_with_a_digit_or_with_mixed_case_is_flagged
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_body_without_a_digit_and_without_mixed_case_is_not_flagged
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_whose_only_match_is_an_ordinary_identifier_is_indexable
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_whose_only_match_is_an_ordinary_identifier_reaches_the_index
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped_string_is_not_indexable
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped_string_stays_out_of_the_index
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_token_shaped_string_is_still_flagged
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_every_file_holding_a_dev_canary_is_still_reported
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_no_prefix_and_no_separator_flags_an_ordinary_identifier
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_ordinary_identifiers_in_code_are_not_flagged
+  - tests/acceptance/W1-16/test_w1_16_token_rule.py::test_the_length_floor_of_sixteen_characters_stays
+deviations: not measured
+skill_versions:
+- name: adopt
+  version: 1.0.0
+- name: audit
+  version: 1.1.0
+- name: change
+  version: 1.0.0
+- name: checkpoint
+  version: 1.1.0
+- name: discovery
+  version: 1.0.0
+- name: orchestration
+  version: 1.0.0
+- name: planning
+  version: 1.0.0
+- name: retrieval
+  version: 1.0.0
+- name: test-design
+  version: 1.0.0
+- name: systematic-debugging
+  version: no version
+- name: test-driven-development
+  version: no version
+- name: verification-before-completion
+  version: no version
+commits:
+- commit: 92897e74ca09d9edb5c4a8a280075f79a54f1449
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: b644d28ad314454b62094178aa953c6a65761572
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 93ace3dc9a592a354dffa90146df8a825a8cbd87
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: ba095f946abf08971c020927fe12757ee9e1768a
+  role: orchestrator
+  model: not measured
+- commit: 4f753c72159b6684d11c9e5c8219f8bdecce21d2
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 316f36550d14c4fc638ef3c2a0fa111e4ff7087b
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 71a3a592e58c5f66ed2b178d7547209a138685c9
+  role: orchestrator
+  model: not measured
+- commit: 5ac58b7a3a144d01471ac893866c432de2407dee
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 2fb42c81719e33394b6a3b4c413bf428ca88615a
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 4844e12450f84067993259199653a96d2016753d
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: e8255c8a29f914ccb583a4a2e56f93227cd0750c
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: db9830d762f6c44f0618c562abf18303793c9210
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 51f422842551ef3e25a84ba3b936ec48672628f4
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: da798c9e4ed0e7c9f6685e6e781016a44253a839
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 3bee9a50851a215fe6083095c0a9692574ec22c6
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 1f45dc10b02f067e828c6c9128ee4f07b45bfd3e
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: b23e1b64c4f88b0925bf26f9d3db105c62638ba6
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 5f038b47a111c7a72ca07c79a0a870ddbf99eb04
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 77bf7cc78402c63b4bfa028bc22fd7c1812b579c
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: b33ef9b394a03bdf46fb232f52f94a4562054ed7
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 08c63a7ae8f2e2ca35a668e8d171b88e1a9d3502
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 5c930db8f71f31485877d8d062e5ef93bfb981b8
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 9579bff0bb91b3a5e3732994c56e6a72c097d249
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 0914d8f8fda603b1d6cf8449a23a855ef7144a21
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 986353ccca580074f899587b6d8f91dd559e3cb9
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: cd363a8ee88869023c164913909d03f0b6733be1
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: a93d5f7202b31fa37a6daaf564a54428f73a5c9a
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: a4801649a41ba51f76c32bbf5dc409fbd3c97b67
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: c53022d78ec6019d2883bc39f0b362ad087813d1
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: fd66ed9c2b173b7f459d1db39e3b904db6035ca7
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 4662871af23b3dcbbf7b8c89fc6adb454db6202c
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 7504971410e99d08bfccdc8cd20ae1ee3af59684
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: a0cb797e6314bda62c38f25141931ac319e2a58f
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 7661402c041b048d637977ef4c3be5f11a729aa3
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 226ec4583d5c3a047dc09c45d245174dfdec9008
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 6f7d4f9eb25078b9b76208a800753aa917397a22
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 58b80710d3aa67e2da0df2401c0e618f95ad8a2d
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 7bacecd21045f56eb1d3b3da9afd9a9ccd1d5197
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: f5738e5a4e4138f14de3c514122dca3c6664a51f
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: de42a87d7303a49d6de9dd2a73aa93f79a11429f
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 49f1f81e1593b916ed990bf539983f0b3a55f695
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 40909d21b805ce527402fabf1129573fcbc55164
+  role: engineer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 0ccafe256a2ca30fd9ab5cf79d7e3345dd80abd6
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 92ba6f02cbca917664933571db14c0ecaa0513ba
+  role: independent-test-designer
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: ed2037fd6a5821f7c4e96e0dae4d25cc75b96c06
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 49f749f0b9eee74cbd5202c396dfeb11abe14b91
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: 6855cdf33b3f318c960a1b6263aab55aa5298b2b
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+- commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+  role: orchestrator
+  model: Claude Opus 5.5 <noreply@anthropic.com>
+check_commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+governance_checks:
+  families:
+    schema/invariants:
+      status: GREEN
+      family: schema/invariants
+      check_count: 1
+    graph integrity:
+      status: GREEN
+      family: graph integrity
+      check_count: 1
+    index freshness:
+      status: GREEN
+      family: index freshness
+      check_count: 1
+    retrieval regression:
+      status: GREEN
+      family: retrieval regression
+      check_count: 1
+    authority/role limits:
+      status: YELLOW
+      family: authority/role limits
+      check_count: 2
+    mutation scope:
+      status: GREEN
+      family: mutation scope
+      check_count: 1
+    path-map compliance:
+      status: GREEN
+      family: path-map compliance
+      check_count: 1
+    context reproducibility:
+      status: GREEN
+      family: context reproducibility
+      check_count: 1
+    concurrency/claims:
+      status: GREEN
+      family: concurrency/claims
+      check_count: 1
+    adapter/model portability:
+      status: GREEN
+      family: adapter/model portability
+      check_count: 1
+    skill regression:
+      status: GREEN
+      family: skill regression
+      check_count: 4
+    command-contract consistency:
+      status: GREEN
+      family: command-contract consistency
+      check_count: 1
+    secrets indexing:
+      status: GREEN
+      family: secrets indexing
+      check_count: 1
+    recovery/rebuild:
+      status: GREEN
+      family: recovery/rebuild
+      check_count: 1
+    fresh-agent reconstruction:
+      status: GREEN
+      family: fresh-agent reconstruction
+      check_count: 1
+    product traceability:
+      status: YELLOW
+      family: product traceability
+      check_count: 3
+    audit reproducibility:
+      status: GREEN
+      family: audit reproducibility
+      check_count: 1
+  checks:
+  - id: adapter-portability
+    family: adapter/model portability
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: c6759f9fcea3c243
+  - id: audit-reproducibility
+    family: audit reproducibility
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 3e104ed3b7118449
+  - id: context-reproducibility
+    family: context-reproducibility
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: a2ce8acfdbf3ba96
+  - id: core-authority
+    family: authority/role limits
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: ba6c45e462da1a34
+  - id: core-claims
+    family: concurrency/claims
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: c5d72be2dfc1b950
+  - id: core-commands
+    family: command-contract consistency
+    severity: warning
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 738978de771a42c0
+  - id: core-decision-citations
+    family: authority/role limits
+    severity: warning
+    status: YELLOW
+    findings:
+    - code: DECISION_UNRECORDED
+      commit: 666f56d1c2ff7bd1e653c3f792c2d3454048525a
+      decision: DEC-872
+      message: commit 666f56d1c2ff cites DEC-872, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d4096ddeb3751a95895bba381749edd60ced49c9
+      decision: DEC-863
+      message: commit d4096ddeb375 cites DEC-863, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7c2930f7284202e50684b83d1c1cf28f6716f9aa
+      decision: DEC-837
+      message: commit 7c2930f72842 cites DEC-837, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: ead078ed5e44091eca022f8c4d8a2a601fcf0759
+      decision: DEC-837
+      message: commit ead078ed5e44 cites DEC-837, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 198738e027c7361a3e00aa06c303bf6d5e83941b
+      decision: DEC-861
+      message: commit 198738e027c7 cites DEC-861, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3501362f857d373662a6fb4c58f69e1083f8249a
+      decision: DEC-859
+      message: commit 3501362f857d cites DEC-859, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3501362f857d373662a6fb4c58f69e1083f8249a
+      decision: DEC-860
+      message: commit 3501362f857d cites DEC-860, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7d8e49d84aff7f448f6f9fc09630f78f44fb3aa9
+      decision: DEC-837
+      message: commit 7d8e49d84aff cites DEC-837, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 87cad875cd1f8f5ca1ffec709cf1519c0e039b8b
+      decision: DEC-837
+      message: commit 87cad875cd1f cites DEC-837, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 0243701f6d5af29914f19fc0f27c32405d48de59
+      decision: DEC-856
+      message: commit 0243701f6d5a cites DEC-856, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 0243701f6d5af29914f19fc0f27c32405d48de59
+      decision: DEC-858
+      message: commit 0243701f6d5a cites DEC-858, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 926066e50b144e398dba6e4dc26da1d55b054902
+      decision: DEC-853
+      message: commit 926066e50b14 cites DEC-853, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 926066e50b144e398dba6e4dc26da1d55b054902
+      decision: DEC-855
+      message: commit 926066e50b14 cites DEC-855, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: c5100159b368ec9a5c8f9dc7496e189c3e850228
+      decision: DEC-854
+      message: commit c5100159b368 cites DEC-854, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: ce03cb6da7d59123e8c46bc971a19236789be941
+      decision: DEC-837
+      message: commit ce03cb6da7d5 cites DEC-837, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a57985219b9a781113a3c43e7bd07eddfe12d31c
+      decision: DEC-831
+      message: commit a57985219b9a cites DEC-831, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a57985219b9a781113a3c43e7bd07eddfe12d31c
+      decision: DEC-852
+      message: commit a57985219b9a cites DEC-852, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 226ec4583d5c3a047dc09c45d245174dfdec9008
+      decision: DEC-801
+      message: commit 226ec4583d5c cites DEC-801, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7661402c041b048d637977ef4c3be5f11a729aa3
+      decision: DEC-811
+      message: commit 7661402c041b cites DEC-811, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a0cb797e6314bda62c38f25141931ac319e2a58f
+      decision: DEC-773
+      message: commit a0cb797e6314 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a0cb797e6314bda62c38f25141931ac319e2a58f
+      decision: DEC-811
+      message: commit a0cb797e6314 cites DEC-811, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7504971410e99d08bfccdc8cd20ae1ee3af59684
+      decision: DEC-773
+      message: commit 7504971410e9 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7504971410e99d08bfccdc8cd20ae1ee3af59684
+      decision: DEC-802
+      message: commit 7504971410e9 cites DEC-802, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7504971410e99d08bfccdc8cd20ae1ee3af59684
+      decision: DEC-811
+      message: commit 7504971410e9 cites DEC-811, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 4662871af23b3dcbbf7b8c89fc6adb454db6202c
+      decision: DEC-773
+      message: commit 4662871af23b cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 4662871af23b3dcbbf7b8c89fc6adb454db6202c
+      decision: DEC-811
+      message: commit 4662871af23b cites DEC-811, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: c53022d78ec6019d2883bc39f0b362ad087813d1
+      decision: DEC-773
+      message: commit c53022d78ec6 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: c53022d78ec6019d2883bc39f0b362ad087813d1
+      decision: DEC-798
+      message: commit c53022d78ec6 cites DEC-798, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a4801649a41ba51f76c32bbf5dc409fbd3c97b67
+      decision: DEC-773
+      message: commit a4801649a41b cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a4801649a41ba51f76c32bbf5dc409fbd3c97b67
+      decision: DEC-798
+      message: commit a4801649a41b cites DEC-798, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a93d5f7202b31fa37a6daaf564a54428f73a5c9a
+      decision: DEC-773
+      message: commit a93d5f7202b3 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a93d5f7202b31fa37a6daaf564a54428f73a5c9a
+      decision: DEC-798
+      message: commit a93d5f7202b3 cites DEC-798, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: cd363a8ee88869023c164913909d03f0b6733be1
+      decision: DEC-773
+      message: commit cd363a8ee888 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: cd363a8ee88869023c164913909d03f0b6733be1
+      decision: DEC-798
+      message: commit cd363a8ee888 cites DEC-798, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 986353ccca580074f899587b6d8f91dd559e3cb9
+      decision: DEC-773
+      message: commit 986353ccca58 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 986353ccca580074f899587b6d8f91dd559e3cb9
+      decision: DEC-798
+      message: commit 986353ccca58 cites DEC-798, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 0914d8f8fda603b1d6cf8449a23a855ef7144a21
+      decision: DEC-773
+      message: commit 0914d8f8fda6 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 0121e48580652c85c31c3e7c5e1c53474d59376e
+      decision: DEC-786
+      message: commit 0121e4858065 cites DEC-786, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 08c63a7ae8f2e2ca35a668e8d171b88e1a9d3502
+      decision: DEC-782
+      message: commit 08c63a7ae8f2 cites DEC-782, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: b33ef9b394a03bdf46fb232f52f94a4562054ed7
+      decision: DEC-782
+      message: commit b33ef9b394a0 cites DEC-782, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 77bf7cc78402c63b4bfa028bc22fd7c1812b579c
+      decision: DEC-782
+      message: commit 77bf7cc78402 cites DEC-782, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5f038b47a111c7a72ca07c79a0a870ddbf99eb04
+      decision: DEC-773
+      message: commit 5f038b47a111 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5f038b47a111c7a72ca07c79a0a870ddbf99eb04
+      decision: DEC-784
+      message: commit 5f038b47a111 cites DEC-784, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: b23e1b64c4f88b0925bf26f9d3db105c62638ba6
+      decision: DEC-773
+      message: commit b23e1b64c4f8 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: b23e1b64c4f88b0925bf26f9d3db105c62638ba6
+      decision: DEC-782
+      message: commit b23e1b64c4f8 cites DEC-782, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 1f45dc10b02f067e828c6c9128ee4f07b45bfd3e
+      decision: DEC-773
+      message: commit 1f45dc10b02f cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 0affa1623e1fc04f5a34c7aecb5f14b2a81ab08d
+      decision: DEC-779
+      message: commit 0affa1623e1f cites DEC-779, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3bee9a50851a215fe6083095c0a9692574ec22c6
+      decision: DEC-773
+      message: commit 3bee9a50851a cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fc9e6a2ad67df3e9536e5236e957bc95930c3def
+      decision: DEC-774
+      message: commit fc9e6a2ad67d cites DEC-774, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fc9e6a2ad67df3e9536e5236e957bc95930c3def
+      decision: DEC-778
+      message: commit fc9e6a2ad67d cites DEC-778, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fc9e6a2ad67df3e9536e5236e957bc95930c3def
+      decision: DEC-779
+      message: commit fc9e6a2ad67d cites DEC-779, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 6f9bc03a77c76e696829790635f934c10460efdb
+      decision: DEC-774
+      message: commit 6f9bc03a77c7 cites DEC-774, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 6f9bc03a77c76e696829790635f934c10460efdb
+      decision: DEC-778
+      message: commit 6f9bc03a77c7 cites DEC-778, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 1c80aa9731de889673e1dc6e15bab9b7d6c1b40c
+      decision: DEC-774
+      message: commit 1c80aa9731de cites DEC-774, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 1c80aa9731de889673e1dc6e15bab9b7d6c1b40c
+      decision: DEC-778
+      message: commit 1c80aa9731de cites DEC-778, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: e8255c8a29f914ccb583a4a2e56f93227cd0750c
+      decision: DEC-773
+      message: commit e8255c8a29f9 cites DEC-773, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 397a80de1470d5d7b99489527f37500ac272dd88
+      decision: DEC-778
+      message: commit 397a80de1470 cites DEC-778, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 2956f9e7386f288b3cf02c2033593af4aef886f5
+      decision: DEC-774
+      message: commit 2956f9e7386f cites DEC-774, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 2d60cdd3b8773ac6803d004afb16b10e85652a92
+      decision: DEC-764
+      message: commit 2d60cdd3b877 cites DEC-764, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 2d60cdd3b8773ac6803d004afb16b10e85652a92
+      decision: DEC-765
+      message: commit 2d60cdd3b877 cites DEC-765, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3787cc795d7f5822ca291d20bab6e81f00e54b56
+      decision: DEC-764
+      message: commit 3787cc795d7f cites DEC-764, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3787cc795d7f5822ca291d20bab6e81f00e54b56
+      decision: DEC-765
+      message: commit 3787cc795d7f cites DEC-765, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 83756def50742181e8ecee389d51ffdcc5891534
+      decision: DEC-764
+      message: commit 83756def5074 cites DEC-764, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 83756def50742181e8ecee389d51ffdcc5891534
+      decision: DEC-765
+      message: commit 83756def5074 cites DEC-765, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 41aa00c09dd3cdaf135ee8e17cc23ba8ce545464
+      decision: DEC-764
+      message: commit 41aa00c09dd3 cites DEC-764, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 41aa00c09dd3cdaf135ee8e17cc23ba8ce545464
+      decision: DEC-765
+      message: commit 41aa00c09dd3 cites DEC-765, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 8a310cb2d5111ca7c64386b75e9970c2555b189f
+      decision: DEC-758
+      message: commit 8a310cb2d511 cites DEC-758, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d5334c0fe5f1e0a35c6f136af555b9d606291b69
+      decision: DEC-758
+      message: commit d5334c0fe5f1 cites DEC-758, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 83b0f2f493789ef0e2b1c134cc47c7fa83822f08
+      decision: DEC-758
+      message: commit 83b0f2f49378 cites DEC-758, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: ef7c18354c8a5eabbb20cd5e85af5fc387b9c063
+      decision: DEC-758
+      message: commit ef7c18354c8a cites DEC-758, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 8a304166610b0416b7a22b8b3c32f11b9237d4c6
+      decision: DEC-757
+      message: commit 8a304166610b cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: b247d77009cd2521ededec513eda991a28aee30b
+      decision: DEC-762
+      message: commit b247d77009cd cites DEC-762, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fb694fe39c7f8339f0f2c4a9f6fdc76b7a88b100
+      decision: DEC-757
+      message: commit fb694fe39c7f cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 49e4aca090f5c25a70c3bdff2ab14dee7e13a22b
+      decision: DEC-757
+      message: commit 49e4aca090f5 cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a10a9eb35098d91d4a588a5a8c33b0451b53b181
+      decision: DEC-757
+      message: commit a10a9eb35098 cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: f082bc6899d2ca2ba2d7feed4be21b4f5cebc4c0
+      decision: DEC-757
+      message: commit f082bc6899d2 cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: f15ac648c087df99673bc979690dae8b4b282bcc
+      decision: DEC-757
+      message: commit f15ac648c087 cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 14657729e991d333a4c5f66504d60c2ae4913e6a
+      decision: DEC-757
+      message: commit 14657729e991 cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fa3554e8c98e3f539d77fa3ed9c4d491ed332938
+      decision: DEC-757
+      message: commit fa3554e8c98e cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5b4b703f98b0246ae80cbb0ccb5dc3adbd158567
+      decision: DEC-757
+      message: commit 5b4b703f98b0 cites DEC-757, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 19a4e9fd20b9562c24b1824076c67403fb323db5
+      decision: DEC-752
+      message: commit 19a4e9fd20b9 cites DEC-752, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d5abd7867fc8e286aef512de1b1939901ce7a4ce
+      decision: DEC-752
+      message: commit d5abd7867fc8 cites DEC-752, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 6d5ad6d0e2977359c08fdc38775d0ea76c26a02f
+      decision: DEC-751
+      message: commit 6d5ad6d0e297 cites DEC-751, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 645ecbdf4891faa3949b8e94d9982c621a367a07
+      decision: DEC-755
+      message: commit 645ecbdf4891 cites DEC-755, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3022c2df7b794c170ebae4c723db351ed9b7e5df
+      decision: DEC-750
+      message: commit 3022c2df7b79 cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3022c2df7b794c170ebae4c723db351ed9b7e5df
+      decision: DEC-754
+      message: commit 3022c2df7b79 cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 184cd3ef47c67d0a04a95d7e9987065732e9a3b8
+      decision: DEC-754
+      message: commit 184cd3ef47c6 cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 8a3c27e9396d43f30ea99d39bbb5d3e5f55eb560
+      decision: DEC-751
+      message: commit 8a3c27e9396d cites DEC-751, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: df5f1e5001936fd1be3eeaaaf4a15550c30b5a2a
+      decision: DEC-751
+      message: commit df5f1e500193 cites DEC-751, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a2bc5e35d22f15a125c86728e1015ac485fdd91b
+      decision: DEC-754
+      message: commit a2bc5e35d22f cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fbc6da0afce2fd9a05b524828f4ed7ea3c6eeca7
+      decision: DEC-754
+      message: commit fbc6da0afce2 cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 15943bd0b02f23966a9f5122b8e9c9a04d9fcc09
+      decision: DEC-754
+      message: commit 15943bd0b02f cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: cb49fe973f309f722d1583eb1a7e70b92771314c
+      decision: DEC-754
+      message: commit cb49fe973f30 cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 2cf78313a094877e5c6f398dbe85f4f5445cc146
+      decision: DEC-754
+      message: commit 2cf78313a094 cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: f7159e399bea9d69f4f5bae8c96f5e251c5bd3e3
+      decision: DEC-754
+      message: commit f7159e399bea cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: ee30c9de09b9fe3944eab40ddec270d72c22e903
+      decision: DEC-750
+      message: commit ee30c9de09b9 cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: ee30c9de09b9fe3944eab40ddec270d72c22e903
+      decision: DEC-754
+      message: commit ee30c9de09b9 cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a678e5b2fa8cc2dfe597a9376d4bb4c53737a2eb
+      decision: DEC-750
+      message: commit a678e5b2fa8c cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a678e5b2fa8cc2dfe597a9376d4bb4c53737a2eb
+      decision: DEC-754
+      message: commit a678e5b2fa8c cites DEC-754, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: e5d1c52862fd6e28d8e8b88d685de45f2c54549b
+      decision: DEC-750
+      message: commit e5d1c52862fd cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: f3d4b6f0dc3d6509b36ea8213e49b244c3737663
+      decision: DEC-752
+      message: commit f3d4b6f0dc3d cites DEC-752, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: f3d4b6f0dc3d6509b36ea8213e49b244c3737663
+      decision: DEC-753
+      message: commit f3d4b6f0dc3d cites DEC-753, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 131e2e2d87ada60327b8ad5bad1a7d4c69add9f8
+      decision: DEC-752
+      message: commit 131e2e2d87ad cites DEC-752, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 3df9d3963a514551a30d02b56600ff08c1aebe70
+      decision: DEC-751
+      message: commit 3df9d3963a51 cites DEC-751, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: e58081beb1b14160fb246d6c793eab50fb809864
+      decision: DEC-751
+      message: commit e58081beb1b1 cites DEC-751, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: b283af775cf9eb6c6ca1011a4c997969d95a65b9
+      decision: DEC-750
+      message: commit b283af775cf9 cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: c00c003f73f2691ec91bf14d769e6a083102ff6f
+      decision: DEC-750
+      message: commit c00c003f73f2 cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 40dbe546584714200c846e4fa996103230974a8d
+      decision: DEC-750
+      message: commit 40dbe5465847 cites DEC-750, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 728b657ca3d6b518cfa4a4046639542f3e3233fb
+      decision: DEC-749
+      message: commit 728b657ca3d6 cites DEC-749, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: c7827891fc317c8a8f9a6f0ae8ac92decccf9a75
+      decision: DEC-746
+      message: commit c7827891fc31 cites DEC-746, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 993a3f7e5d16e78acb5eb56afe39d0f1c33eb1ac
+      decision: DEC-739
+      message: commit 993a3f7e5d16 cites DEC-739, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 887c288c5bad71cd1c402f2c8eec23e5302e3eaf
+      decision: DEC-743
+      message: commit 887c288c5bad cites DEC-743, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a5ef3c690695fed2f9e57c2c803714fd6c79fa9f
+      decision: DEC-743
+      message: commit a5ef3c690695 cites DEC-743, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5bc27b7ce0228314dae18293b784524ca00934a6
+      decision: DEC-747
+      message: commit 5bc27b7ce022 cites DEC-747, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 17ed8106976d44b2dc25c6d35387ee0450336075
+      decision: DEC-746
+      message: commit 17ed8106976d cites DEC-746, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a814cd3b8d7cdcb5dd5b9fa97e31dfc849cc4598
+      decision: DEC-739
+      message: commit a814cd3b8d7c cites DEC-739, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 27af72938bef9207e014e7652b721b0330674c80
+      decision: DEC-745
+      message: commit 27af72938bef cites DEC-745, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d977009909a18e8f0642a55c0790b4009d23c100
+      decision: DEC-745
+      message: commit d977009909a1 cites DEC-745, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 61ca9c1aa62bb4ad7a6e5bfb180e622187658fec
+      decision: DEC-737
+      message: commit 61ca9c1aa62b cites DEC-737, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 61ca9c1aa62bb4ad7a6e5bfb180e622187658fec
+      decision: DEC-744
+      message: commit 61ca9c1aa62b cites DEC-744, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 92f04d6457d810272510598285d00ddd83794bea
+      decision: DEC-739
+      message: commit 92f04d6457d8 cites DEC-739, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: bfb5647381fd818be93a8ffcb034e64523437ef2
+      decision: DEC-743
+      message: commit bfb5647381fd cites DEC-743, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 00fe09b6fc5cde672103c5ea4788e5d70dd6eef1
+      decision: DEC-742
+      message: commit 00fe09b6fc5c cites DEC-742, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: ed88d81147ee0b46dbae2ef21edf257903872699
+      decision: DEC-741
+      message: commit ed88d81147ee cites DEC-741, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 1586b5ccb2697eb78b03b72f7e37cc714494a18f
+      decision: DEC-743
+      message: commit 1586b5ccb269 cites DEC-743, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 630d1fd2b22a1f0c9f31bc42e3c23708fc10ea1e
+      decision: DEC-743
+      message: commit 630d1fd2b22a cites DEC-743, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 34680ffe88ebb9007d425ca854f8c3674452bc53
+      decision: DEC-738
+      message: commit 34680ffe88eb cites DEC-738, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d7c5f5f2a609b0b5d76a43b4a47d3caa719ebb21
+      decision: DEC-741
+      message: commit d7c5f5f2a609 cites DEC-741, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 1d5449eb647807e0a20b7862f82bb19194de447a
+      decision: DEC-741
+      message: commit 1d5449eb6478 cites DEC-741, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 1d5449eb647807e0a20b7862f82bb19194de447a
+      decision: DEC-744
+      message: commit 1d5449eb6478 cites DEC-744, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 2077cb57ea024351ac6ed5c9dd32417ea5dca2a1
+      decision: DEC-743
+      message: commit 2077cb57ea02 cites DEC-743, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d09e8c1b46ae0a3c72fbda549aa6cd6ad218c2de
+      decision: DEC-738
+      message: commit d09e8c1b46ae cites DEC-738, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d09e8c1b46ae0a3c72fbda549aa6cd6ad218c2de
+      decision: DEC-739
+      message: commit d09e8c1b46ae cites DEC-739, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7de0e524b07c6ced2215b8c26dfec1a27cd609c4
+      decision: DEC-741
+      message: commit 7de0e524b07c cites DEC-741, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 048e19bbdc42453be0f02d9890792f7dc17c95fc
+      decision: DEC-744
+      message: commit 048e19bbdc42 cites DEC-744, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a02e3485b85e01ab8e77417e6a00334b2b8ae6bf
+      decision: DEC-737
+      message: commit a02e3485b85e cites DEC-737, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 689bd17e1a41e3ec59d3c85ea45cb6250f999907
+      decision: DEC-737
+      message: commit 689bd17e1a41 cites DEC-737, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 0e817fe14302035b9e3aee66030f427847a638d6
+      decision: DEC-737
+      message: commit 0e817fe14302 cites DEC-737, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: eefea284aa6a5ff14aad05cd24a9555a9a80c88b
+      decision: DEC-737
+      message: commit eefea284aa6a cites DEC-737, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 6e7e17f519f4e61fa1c922d0f2924fcf64277805
+      decision: DEC-736
+      message: commit 6e7e17f519f4 cites DEC-736, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: abd86ef5679f43f29d8ef70480c77a86d9ae2c7a
+      decision: DEC-736
+      message: commit abd86ef5679f cites DEC-736, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: be0e7a8f5d848a5b5cc6de599f9bfe753f2664a5
+      decision: DEC-736
+      message: commit be0e7a8f5d84 cites DEC-736, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7ebe54892c9dd13d5be4485dd476e7eaf99ef23b
+      decision: DEC-734
+      message: commit 7ebe54892c9d cites DEC-734, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7217bfa992556290b37be7eabed5c67ebe8caed9
+      decision: DEC-710
+      message: commit 7217bfa99255 cites DEC-710, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5eb3b0129d8a094651eb03b48435e6bf19700e8a
+      decision: ADR-012
+      message: commit 5eb3b0129d8a cites ADR-012, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: c579c932f73033ca42c381f4c4468ae77ce1cd88
+      decision: DEC-675
+      message: commit c579c932f730 cites DEC-675, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 6ce6e8eb29568087978ff030c246bd2029250002
+      decision: DEC-675
+      message: commit 6ce6e8eb2956 cites DEC-675, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: abcb3095d267d88c93d19115e9c06ba0fd9fad6f
+      decision: DEC-594
+      message: commit abcb3095d267 cites DEC-594, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: a1c03c5b76cfdb31f7c5076fcc71a758cc8d4083
+      decision: DEC-480
+      message: commit a1c03c5b76cf cites DEC-480, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: be2e8c142ec2cc2b0eccaa6a8335b799ed493895
+      decision: DEC-480
+      message: commit be2e8c142ec2 cites DEC-480, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5505ba57e163427559c47fddc9a8f0e441df1fa7
+      decision: DEC-476
+      message: commit 5505ba57e163 cites DEC-476, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 5505ba57e163427559c47fddc9a8f0e441df1fa7
+      decision: DEC-480
+      message: commit 5505ba57e163 cites DEC-480, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 4b84321d595f0772fc72ce463b2c252acafc6490
+      decision: DEC-480
+      message: commit 4b84321d595f cites DEC-480, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: fd7ad4f0561aeb8f8d85a32b87926d947f5e77b6
+      decision: DEC-476
+      message: commit fd7ad4f0561a cites DEC-476, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 569bdcd3a728ec597d04d9968112b801d21725ca
+      decision: DEC-471
+      message: commit 569bdcd3a728 cites DEC-471, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 7439c6d004853cdaa434a7c1e56a478008c2de0b
+      decision: DEC-470
+      message: commit 7439c6d00485 cites DEC-470, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: 495cff52caba357724ab5e6933dd49442d57a0ed
+      decision: DEC-470
+      message: commit 495cff52caba cites DEC-470, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: d2c2d6ff1a1e4c3c052dd63505f61f74a6475da5
+      decision: DEC-468
+      message: commit d2c2d6ff1a1e cites DEC-468, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: e0b438501e856ee65078fe4c8eaa9af1bd7ed8ce
+      decision: DEC-468
+      message: commit e0b438501e85 cites DEC-468, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: af6fe34ec733fd676f37e194754e21373ad92ebd
+      decision: DEC-453
+      message: commit af6fe34ec733 cites DEC-453, which its tree does not record
+    - code: DECISION_UNRECORDED
+      commit: af6fe34ec733fd676f37e194754e21373ad92ebd
+      decision: DEC-454
+      message: commit af6fe34ec733 cites DEC-454, which its tree does not record
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 8553ae300a11d162
+  - id: core-graph
+    family: graph integrity
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: ee72cf81ae343fd3
+  - id: core-mutation
+    family: mutation scope
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: b59eab2a64969eb4
+  - id: core-pathmap
+    family: path-map compliance
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 60d0533627ff6990
+  - id: core-schema
+    family: schema/invariants
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 549f9221e865cb6c
+  - id: fresh-agent-reconstruction
+    family: fresh-agent-reconstruction
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 9d0391b8286fa420
+  - id: index-freshness
+    family: index-freshness
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 33b74bd83153fd75
+  - id: product-traceability-trailers
+    family: product traceability
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: a475b3046319365d
+  - id: recovery-rebuild
+    family: recovery/rebuild
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: a2c2466375e75e2e
+  - id: retrieval-regression
+    family: retrieval-regression
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 4b3f42bd40ea7e55
+  - id: secrets-indexing
+    family: secrets-indexing
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 755759fc8df7d269
+  - id: skill-regression-a
+    family: skill regression
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: dd068587016d1cd6
+  - id: skill-regression-b1
+    family: skill regression
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 7b611731f0dfea51
+  - id: skill-regression-orchestration
+    family: skill regression
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: b4180b892dea9a3b
+  - id: openspec-validate
+    family: product traceability
+    severity: hard-block
+    status: YELLOW
+    findings:
+    - code: OPENSPEC_ABSENT
+      message: openspec is not on PATH
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 71c19255bcf92ece
+  - id: skill-version
+    family: skill regression
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 4a11bc95111d0dc5
+  - id: readiness
+    family: product traceability
+    severity: hard-block
+    status: GREEN
+    findings: []
+    provenance:
+      commit: a3c1d7174937a8eb797e161a556f2e4acbed82b1
+      check_version: 1.0.0
+      inputs_hash: 7be62bece2ff6ee1
+accepted_reds:
+- test: tests/acceptance/W1-42/test_w1_42_exit_report.py::test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason[RETR-X-02]
+  decision: DEC-757
+  reason: RETR-X-02 has no named parent expansion yet (DEC-714)
+  fixed_by: W2-13
+  result: failed
+- test: tests/acceptance/W1-42/test_w1_42_exit_report.py::test_governance_share_is_measured_and_at_most_15_percent_on_each_programme
+  decision: DEC-757
+  reason: The governance share is not measured per programme yet (DEC-713)
+  fixed_by: W2-14
+  result: failed
+load_sensitive: []
+governance_share:
+  measured: not measured
+  estimated: not measured
+  total: not measured
+---
+
+# CL-DAEO-0rfi — Close record for DAEO-0rfi

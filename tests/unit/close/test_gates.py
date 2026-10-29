@@ -195,8 +195,8 @@ def test_a_plain_merge_back_is_measured_by_the_probed_code(repo, strategy):
 
 @pytest.mark.parametrize("change", ["removed", "replaced"])
 def test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses(repo, change):
-    """DEC-750 (2): after the merge-back, a second one naming another task that removes or replaces a probed file
-    (in neither parent's version) refuses, naming it."""
+    """DEC-750 (2), DEC-754 P-5 (c): after the merge-back, a second one naming another task that removes or
+    replaces a probed file (not git's own merge of its parents) refuses, naming it."""
     repo.commit("start")
     repo.git("checkout", "-q", "-b", "side")
     probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
@@ -215,7 +215,7 @@ def test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself
     with pytest.raises(_Finding) as raised:
         _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own,
                      frozenset({TICKET, "T-0002"}))
-    assert later[:12] in raised.value.message and "neither parent" in raised.value.message
+    assert later[:12] in raised.value.message and "git's own merge" in raised.value.message
 
 
 def test_a_merge_holding_the_probed_commit_on_neither_side_is_not_the_merge_back(repo):

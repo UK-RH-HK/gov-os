@@ -203,10 +203,14 @@ def test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_com
 def test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing(
         rel, project, sandbox, interface):
     """The converse: the folder holds none of the ticket's acceptance tests, is not inside its allowed paths,
-    holds neither its file nor a governance file."""
+    holds neither its file nor a governance file.
+
+    Revised for W2-07 (DEC-868 item 1 (b), KPI 5; DEC-480's "the checks only when governance files change"
+    changed, DEC-908): the commit still refuses nothing of its own, and ``gov check`` runs on every close, so
+    the close record states the check result of the commit it closed, although no governance file changed."""
     support.build_ticket(project, TICKET, WBS)
     commit = support.no_trailers_commit(project, "elsewhere", {rel: "# none of the ticket's\n"})
-    support.checkpointed(project, TICKET)
+    head = support.checkpointed(project, TICKET)
     _task_less(project, commit, rel)
     assert not rel.startswith(support.GOVERNANCE_PREFIXES + (support.ACCEPTANCE_PREFIX, support.TICKETS_PREFIX,
                                                              "src/example/"))
@@ -216,8 +220,11 @@ def test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_th
     support.result_of(run, interface)
     assert support.ticket_status(project.root, TICKET) == "closed"
     front = support.the_close_record(project, TICKET)
-    claimed = {key: front[key] for key in (support.CHECK_COMMIT_KEY, support.CHECK_RESULT_KEY) if front.get(key)}
-    assert not claimed, f"the close record claims a check result although no governance file changed: {claimed}"
+    assert front.get(support.CHECK_COMMIT_KEY) == head, \
+        f"the checks were not run at the commit being closed although they run on every close: " \
+        f"{support.CHECK_COMMIT_KEY} is {front.get(support.CHECK_COMMIT_KEY)!r}, not {head}"
+    assert support.recorded_check_statuses(front), \
+        f"the close record states no check's status under {support.CHECK_RESULT_KEY!r}: {sorted(front)}"
 
 
 def test_a_commit_that_names_another_ticket_refuses_nothing(project, sandbox, interface):

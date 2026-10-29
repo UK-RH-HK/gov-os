@@ -400,13 +400,20 @@ def test_a_commit_without_a_task_inside_the_tickets_paths_after_the_probed_commi
     assert "stale" in said and rewrite[:12] in said and "src/a.py" in said
 
 
-def test_a_merge_of_the_ticket_is_judged_with_the_paths_it_brings_after_the_probed_commit(repo):
+def test_a_merge_of_the_ticket_is_measured_against_gits_own_merge_of_its_parents(repo):
+    """DEC-754 P-5 (c): the ticket's merge that is git's own merge of its parents passes; one that changes a
+    probed path beyond it refuses, naming the merge and the path."""
     _probe(repo, _work(repo))
     repo.git("checkout", "-q", "-b", "side")
     repo.commit("another ticket's work on the side", "Task: T-0002", "Role: engineer", files={"src/side.py": "s\n"})
     repo.git("checkout", "-q", "main")
     repo.git("merge", "-q", "--no-ff", "--no-gpg-sign", "-m", "merge\n\n" + "\n".join(TRAILERS) + "\n", "side")
-    merge = repo.git("rev-parse", "HEAD").strip()
+    _gate(repo)
+    repo.git("checkout", "-q", "side")
+    repo.commit("more on the side", "Task: T-0002", "Role: engineer", files={"docs/side.md": "d\n"})
+    repo.git("checkout", "-q", "main")
+    repo.git("merge", "-q", "--no-ff", "--no-commit", "side")
+    merge = repo.commit("merge again", *TRAILERS, files={"src/side.py": "changed in the merge\n"})
     said = _refused(repo)
     assert merge[:12] in said and "src/side.py" in said
 
@@ -547,17 +554,17 @@ def test_a_record_that_cannot_be_taken_back_is_named_in_the_error(root, monkeypa
 
 
 def test_a_finding_and_could_not_measure_are_two_ways_out(root):
-    """A finding is counted with a repair ticket (exit code 3); what precedes the measuring is neither."""
+    """A finding refuses with a repair ticket (exit code 3), uncounted when a commit gate finds it before any test
+    (DEC-868 item 3); what precedes the measuring is neither."""
     with patch.object(command, "_ticket_commits", return_value=[]), patch.object(command, "_commits_since",
                                                                                return_value=[]):
         with pytest.raises(GovError) as raised:
             run(root, _args(), {})
-    # every gate was asked (DEC-492): the one refusal holds each gate's finding, counted once
-    assert (raised.value.code, raised.value.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
-    assert [part["code"] for part in raised.value.details["parts"]] == [
-        "TRAILER_MISSING", "NO_ACCEPTANCE_TESTS", "CHECKPOINT_MISSING", "CONTEXT_FAILED"]
-    assert len(raised.value.details["findings"]) == 4
+    # every commit gate was asked (DEC-492): the refusal holds the commit gates' finding, before any test
+    assert (raised.value.code, raised.value.exit_code) == ("TRAILER_MISSING", EXIT_CHECK_FAILED)
+    assert "parts" not in raised.value.details and raised.value.details["test_runs"] == []
+    assert len(raised.value.details["findings"]) == 1
     assert [part.split(":")[0] for part in raised.value.details["not_measured"]] == [
-        f"the containment of the commits of {TICKET}", f"the acceptance run of {TICKET}"]
-    assert json.loads(_count_path(root, TICKET).read_text(encoding="utf-8"))["count"] == 1
+        f"the containment of the commits of {TICKET}"]
+    assert not _count_path(root, TICKET).exists() and raised.value.details["counted"] is False
     assert len(list((root / ".tickets").glob("*.md"))) == 2

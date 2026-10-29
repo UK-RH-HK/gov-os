@@ -1,6 +1,6 @@
 ---
 id: DAEO-0z8c
-status: open
+status: in_progress
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:10Z
@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/util/gitenv.py
 - lefthook.yml
 - template/lefthook.yml
+- template/.rulesync/hooks.jsonc
 - tests/unit/gitenv/**
 - docs/research/AR-2-git-sweep.md
 kpis:

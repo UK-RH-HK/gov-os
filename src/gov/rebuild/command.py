@@ -34,6 +34,37 @@ def none_embedded(config: dict) -> str | None:
             "reaches the semantic vectors")
 
 
+def _compact(root: Path, rels) -> dict:
+    """Each SQLite store at ``rels`` with its full-text indexes optimised, then vacuumed, so that no deleted text is
+    left in its rows or its freed space (DEC-897); what could not be compacted is named with its reason."""
+    import sqlite3
+    import sys
+
+    done: dict = {}
+    for rel in rels:
+        path = root / rel
+        try:
+            with open(path, "rb") as handle:
+                if handle.read(16) != b"SQLite format 3\0":
+                    continue
+            connection = sqlite3.connect(path, isolation_level=None, timeout=30.0)
+            try:
+                for (name,) in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table' AND "
+                                                  "sql LIKE 'CREATE VIRTUAL TABLE % USING fts5%'").fetchall():
+                    quoted = name.replace('"', '""')
+                    connection.execute(f'INSERT INTO "{quoted}"("{quoted}") VALUES (\'optimize\')')
+                connection.execute("VACUUM")
+            finally:
+                connection.close()
+            done[rel] = "compacted"
+        except FileNotFoundError:
+            continue
+        except (OSError, sqlite3.Error) as exc:
+            done[rel] = f"not compacted: {exc}"
+            print(f"rebuild: {rel} not compacted: {exc}", file=sys.stderr)
+    return done
+
+
 def add_arguments(parser) -> None:
     parser.add_argument(NO_EMBEDDINGS, action="store_true",
                         help="rebuild everything but the semantic vectors: the embedding endpoint is not asked "
@@ -106,9 +137,13 @@ def run(root: Path, args, config: dict) -> dict:
     note = none_embedded(config)
     if note:
         stores["semantic"]["embedding"] = note
+    from gov.retrieval.semantic import QUERY_VECTORS_REL
+    from gov.store.loader import STORE_REL
+
+    compaction = _compact(root, (STORE_REL, QUERY_VECTORS_REL))
 
     try:
-        from gov.codeintel import index as codeintel_index
+        from gov.codeintel import home as codeintel_home, index as codeintel_index
 
         try:
             codeintel_index(root)
@@ -123,10 +158,15 @@ def run(root: Path, args, config: dict) -> dict:
             "status": "not_recreated",
             "reason": str(exc),
         }
+    else:
+        tool_home, project = codeintel_home(root), Path(root).resolve()  # the tool's home is a resolved path
+        compaction |= _compact(project, sorted(path.relative_to(project).as_posix() for path in tool_home.rglob("*")
+                                                if path.is_file()) if tool_home.is_dir() else ())
 
     return {
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
+        "compaction": compaction,
         "timing": {"lexical_s": lex_s},
     }

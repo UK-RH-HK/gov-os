@@ -1,0 +1,98 @@
+"""Fixtures for the W2-54 acceptance tests (the dropped list's order, the context check's limit, audit-report)."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import w2_54_support as support  # noqa: E402
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "local_only: starts a real worker session through gov launch (CLI, bwrap, socat); not for CI")
+    config.addinivalue_line(
+        "markers", "shared_gpu: needs this machine's shared Ollama with the model on the GPU and the real CPU "
+                   "embedder; run by the lead outside any sandbox, selected with -m shared_gpu (README, Round 4)")
+
+
+def pytest_collection_modifyitems(config, items):
+    """The ``shared_gpu`` cases run only when ``-m`` names them; otherwise they are deselected (and counted so)."""
+    if "shared_gpu" in (config.getoption("markexpr", "") or ""):
+        return
+    dropped = [item for item in items if item.get_closest_marker("shared_gpu")]
+    if dropped:
+        config.hook.pytest_deselected(items=dropped)
+        items[:] = [item for item in items if not item.get_closest_marker("shared_gpu")]
+
+
+@pytest.fixture(scope="session")
+def code_under_test():
+    """Every process the suite starts imports ``gov`` from this worktree's ``src/`` (DEC-732)."""
+    where = support.gov_file(support.worktree_env())
+    assert where == str(support.SRC / "gov" / "__init__.py"), \
+        f"gov is imported from {where}, not from this worktree's src/ ({support.SRC})"
+    return where
+
+
+@pytest.fixture(scope="session")
+def box(tmp_path_factory, code_under_test):
+    """The scratch HOME, PATH and retrieval stand-in of every child process."""
+    box = support.Box(tmp_path_factory.mktemp("w2-54-box"))
+    where = support.gov_file(box.env("identity"))
+    assert where == str(support.SRC / "gov" / "__init__.py"), \
+        f"under the retrieval stand-in gov is imported from {where}, not from {support.SRC}"
+    return box
+
+
+@pytest.fixture(scope="session")
+def indexed(box):
+    """A project with its store and its lexical index: two tickets, one past the default ceiling."""
+    if not box.has_gitleaks():
+        pytest.fail("gitleaks is not on PATH: the lexical index of the fixture cannot be built", pytrace=False)
+    return support.context_project(box, box.workdir / "indexed")
+
+
+@pytest.fixture(scope="session")
+def big_only(box):
+    """A project whose one ticket has a mandatory input past the default ceiling (this repository's shape)."""
+    if not box.has_gitleaks():
+        pytest.fail("gitleaks is not on PATH: the lexical index of the fixture cannot be built", pytrace=False)
+    return support.context_project(box, box.workdir / "big-only", tickets=(support.TK_BIG,))
+
+
+@pytest.fixture(scope="session")
+def unindexed(box):
+    """A project with its record store and no lexical index."""
+    return support.context_project(box, box.workdir / "unindexed", index=False)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_log(request):
+    """Each test sees only its own retrieval calls."""
+    if "box" in request.fixturenames:
+        request.getfixturevalue("box").reset_log()
+    yield
+
+
+@pytest.fixture()
+def embedder():
+    """Round 2: the stand-in embedder, healthy, on its own loopback port (README, "The stand-in embedder")."""
+    stand_in = support.EmbedderStandIn()
+    try:
+        yield stand_in
+    finally:
+        stand_in.close()
+
+
+@pytest.fixture(scope="session")
+def gov_check_here(code_under_test):
+    """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+    inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+    runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+    store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+    return support.green_here_check()

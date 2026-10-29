@@ -59,6 +59,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import sys
 from pathlib import Path
 
 import pytest
@@ -493,12 +494,22 @@ def test_home_tool_wrong_sha256_not_ok(
     DEC-425: sha256_match must not be true when no hash was computed.
 
     RED on this machine (the real tool is installed under the real home).
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the planted input is not where
+    doctor reads it): it placed only a ``placeholder`` file, so every branch
+    answered "not found" before any hash was compared.  The case now places
+    the file each branch reads, with fake content (``vec0.so``; an Ollama
+    manifest naming a model blob; the venv's ``bin/python``; the
+    ``model.safetensors`` at the pinned revision), under the sandbox home,
+    which doctor reads; the entry must then be not ok with a reason other
+    than absence.
     """
     fake_dir = home_path_fn(sandbox.home)
     fake_dir.mkdir(parents=True, exist_ok=True)
     (fake_dir / "placeholder").write_text(
         "fake content for testing\n", encoding="utf-8",
     )
+    _place_the_file_doctor_reads(name, version, fake_dir)
 
     wrong_sha = "0" * 64
     registry = support.tool_entry_yaml(
@@ -523,3 +534,34 @@ def test_home_tool_wrong_sha256_not_ok(
         f"(DEC-425)\n"
         f"entry: {entry}\n{run.describe()}"
     )
+    assert entry.get("ok") is not True, (
+        f"{name} passes with a wrong pin ({wrong_sha}) (DEC-452)\nentry: {entry}\n{run.describe()}"
+    )
+    reason = str(entry.get("reason") or "")
+    assert reason and "not found" not in reason, (
+        f"doctor did not reach {name}'s file under the home (its reason is absence, or none), so no hash was "
+        f"compared\nentry: {entry}\n{run.describe()}"
+    )
+
+
+def _place_the_file_doctor_reads(name, version, folder):
+    """The file the entry's check reads, with fake content, in ``folder`` (the parametrised home path)."""
+    fake = b"fake content for testing\n"
+    if name == "sqlite-vec":
+        (folder / "vec0.so").write_bytes(fake)
+    elif name == "qwen3-embedding":
+        blob_digest = hashlib.sha256(fake).hexdigest()
+        (folder / "blobs").mkdir(parents=True, exist_ok=True)
+        (folder / "blobs" / f"sha256-{blob_digest}").write_bytes(fake)
+        manifest = folder / "manifests" / "registry.ollama.ai" / "library" / name / version
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        manifest.write_text(json.dumps({"layers": [{"mediaType": "application/vnd.ollama.image.model",
+                                                    "digest": f"sha256:{blob_digest}"}]}), encoding="utf-8")
+    elif name == "reranker-venv":
+        (folder / "bin").mkdir(parents=True, exist_ok=True)
+        (folder / "bin" / "python").symlink_to(sys.executable)
+    elif name == "reranker":
+        revision = version.rpartition("@")[2]
+        model = folder / "snapshots" / revision / "model.safetensors"
+        model.parent.mkdir(parents=True, exist_ok=True)
+        model.write_bytes(fake)

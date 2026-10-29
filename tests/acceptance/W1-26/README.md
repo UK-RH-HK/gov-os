@@ -111,6 +111,7 @@ before and after.
   file's case count stays 45. In the row "The decision register in a project" of the section "A commit citing
   an unrecorded decision" below, the words "or an `id` in the `decision_id` grammar" are superseded by this case.
 - `test_planted_commands_defect_reserved_command_no_module` (`test_w1_26_planted_defects.py`): the case removes the module file of one reserved command (`adopt`) from its temporary project's own copy of `src/`, then holds what it held before: the command-contract consistency family is not green, and a finding of the case's declared check names that command and no command whose module is present. Until W1-41 the project showed this defect without anything planted, because `adopt` was the one reserved command not built; revised after implementation: W1-41 builds `gov adopt --lite`, so every reserved command has a module ("planned: command implemented"). The code that runs stays this worktree's `src/`, which the case does not touch. One case added beside it for the other side, `test_commands_check_green_when_every_reserved_command_has_a_module`: with nothing removed, the family is green for the same declaration and the check reports no finding. Support: `Project.reserved_command_module_files()` and `Project.remove_reserved_command_module()`, added.
+- `test_planted_authority_defect_decision_checker_exception_not_swallowed` (`test_w1_26_planted_defects.py`): revised after implementation (DEC-864 item 1; `Rewrite-Reason: DEC-822 item 3, DEC-835`): the judge no longer imports the judged project's `src/gov`, so the raising checker moves from the project into the judge's own code: the judge runs from an overlay in the case's temporary folder (`gov` and `gov.decisions` packages that continue into this worktree's `src/`; `gov.decisions.checker` runs the real module, then replaces `check` with one that leaves a marker and raises). The project is as the suite builds it; the case now also requires the marker (the plant was reached), and its expectation is unchanged: authority/role limits RED or YELLOW.
 - `test_no_check_family_reason`, `test_check_count_zero_for_uncovered_families`: derived uncovered families from the runner's `check_count` field instead of a fixed list of uncovered families; another ticket registered one (W1-24, `context-reproducibility`).
 - `test_lifecycle`, `test_opted_in_family_is_yellow`, `test_not_applicable_never_green_json`, `test_not_applicable_never_green_text`, `test_family_only_red_check_not_green`: each case removes the kernel's `audit-reproducibility` declaration from the temporary project so the family status reflects only the case's own check; revised after implementation: W1-36's kernel declaration of the audit-reproducibility check is now in every project built from the template (DEC-447).
 
@@ -657,3 +658,11 @@ fixed. The check that reads `template/governance/kernel/vendor/` for skill versi
 checks' own readings of kernel paths are not part of this piece.
 
 **Packages:** none. The three choices above are stricter readings and each is reversible by changing its case.
+
+## W2-67 (DAEO-9nys): the planted-defect cases and a base green before any defect
+
+W2-67's test designer (round 1, batch 2) gave the planted-defect cases a base project green before any defect
+(`support.green_base`, held by `test_w1_26_green_base.py`) and revised 42 weak cases so that each asserts the named
+check's own entry and finding, each shown red against a planted fault and green on the head, with a
+`Rewrite-Reason:` trailer. The base, the plants, each case's red and green, and the cases left:
+`README-W2-67.md`.

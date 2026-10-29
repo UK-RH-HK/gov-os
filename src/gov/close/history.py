@@ -12,6 +12,7 @@ from pathlib import Path
 
 import yaml
 
+from gov.cli.errors import GovError
 from gov.close.repo import git
 
 BASE_KEY = "trailers_base"  # DEC-482: a commit id, full or abbreviated; only the commits after it are judged
@@ -66,6 +67,23 @@ def adds_nothing(root: Path, sha: str) -> bool:
     return len(merged) == 1 and merged[0] == git(root, "rev-parse", f"{sha}^{{tree}}").strip()
 
 
+def own_merge(root: Path, parents: list[str]) -> str | None:
+    """The tree git's own merge of ``parents`` gives (DEC-754), an octopus as git merges one: each further parent
+    merged into the merge of those before it. None where git cannot compute it, for a conflict or for anything it
+    cannot read: no tree is a guess."""
+    try:
+        merged = parents[0]
+        for at, parent in enumerate(parents[1:], start=2):
+            tree = git(root, "merge-tree", "--write-tree", "--no-messages", merged, parent).split()[0]
+            if at == len(parents):
+                return tree
+            merged = git(root, "-c", "user.name=gov", "-c", "user.email=gov@localhost", "commit-tree", tree,
+                         *[arg for p in parents[:at] for arg in ("-p", p)], "-m", "git's own merge").strip()
+    except (GovError, IndexError):
+        return None
+    return None
+
+
 def differing(root: Path, older: str, newer: str) -> list[str]:
     """The paths whose content at ``newer`` is not their content at ``older``."""
     return [p for p in git(root, "-c", "core.quotePath=false", "diff-tree", "-r", "-z", "--no-renames",
@@ -95,26 +113,35 @@ def register_entries(root: Path, rel) -> dict[str, list[str]] | str:
     return {key: ["\n".join(lines) for lines in found] for key, found in entries.items()}
 
 
-def _refused_because(commit: str | None, decision, register) -> str | None:
-    """Why an entry is not accepted history (DEC-734), or None: its decision is one entry of the register whose
-    own status line is ACCEPTED by the owner (not delegated), not undone after it, and whose text names the
-    commit by an id of at least eight characters that the commit's id begins with."""
-    if not commit:
-        return "it names no commit of the project"
+def owner_decision(decision, register) -> tuple[str | None, str]:
+    """``(why, text)``: why ``decision`` is not one entry of the register whose own status line is ACCEPTED by
+    the owner (not delegated) and not undone after it, or None with the entry's text (DEC-734). The register's
+    entries are ``register_entries``'s, or the reason it cannot be read."""
     if isinstance(register, str):
-        return register
+        return register, ""
     texts = register.get(decision, []) if isinstance(decision, str) else []
     if len(texts) != 1:
-        return f"the register holds {'no entry' if not texts else f'{len(texts)} entries'} {decision}"
+        return f"the register holds {'no entry' if not texts else f'{len(texts)} entries'} {decision}", ""
     status = next((m.group(1).strip() for m in map(_STATUS.match, texts[0].splitlines()) if m), "no status")
     if not status.startswith("ACCEPTED"):
-        return f"{decision} is not accepted (its status: {status})"
+        return f"{decision} is not accepted (its status: {status})", ""
     if not _OWNER_ACCEPTED.match(status):
-        return f"{decision} is accepted, but not by the owner: not the owner's decision (its status: {status})"
+        return f"{decision} is accepted, but not by the owner: not the owner's decision (its status: {status})", ""
     undone = _UNDONE.search(status)
     if undone:
-        return f"{decision} was accepted by the owner, then {undone.group(1).lower()} (its status: {status})"
-    if not any(commit.startswith(named.lower()) for named in _NAMED_ID.findall(texts[0])):
+        return f"{decision} was accepted by the owner, then {undone.group(1).lower()} (its status: {status})", ""
+    return None, texts[0]
+
+
+def _refused_because(commit: str | None, decision, register) -> str | None:
+    """Why an entry is not accepted history (DEC-734), or None: its decision is the owner's (``owner_decision``)
+    and its text names the commit by an id of at least eight characters that the commit's id begins with."""
+    if not commit:
+        return "it names no commit of the project"
+    why, text = owner_decision(decision, register)
+    if why:
+        return why
+    if not any(commit.startswith(named.lower()) for named in _NAMED_ID.findall(text)):
         return f"{decision} does not name the commit {commit[:12]}"
     return None
 

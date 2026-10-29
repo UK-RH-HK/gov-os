@@ -7,6 +7,7 @@ written in this worktree.
 
 from __future__ import annotations
 
+import json
 import math
 import os
 import re
@@ -32,6 +33,16 @@ import w1_07_support as cli_support  # noqa: E402  (the gov command line, as W1-
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 RULESYNC_BIN = Path(os.environ.get("RULESYNC_BIN", "/home/usain/.local/bin/rulesync"))
+# The suite's own waits for rulesync: limits a loaded machine meets, not times the ticket promises (DEC-892
+# item 2, W2-57). Under a close's parallel load ``--version`` has passed 10 s (W2-53's and W2-63's closes) and
+# ``generate`` 30 s (W2-50's run 9, row W2-L415). A rulesync that is there and gives no answer within them fails
+# the case, naming the timeout: a timeout is not an absent tool.
+RULESYNC_PROBE_TIMEOUT_S = 60
+RULESYNC_GENERATE_TIMEOUT_S = 180
+CHECK_TIMEOUT_S = 180   # the declared check's whole run, its two rulesync calls included
+# What a finding says when a rulesync call gave no answer in time, and what it says when rulesync is absent.
+NO_ANSWER_IN_TIME = re.compile(r"no answer|did not answer|not answer|timed? ?out|time ?limit", re.IGNORECASE)
+READ_AS_ABSENT = re.compile(r"not found|not installed|absent|missing", re.IGNORECASE)
 TOKEN_CHARS = 4
 AGENTS_MD_TOKEN_LIMIT = 1500
 
@@ -213,17 +224,30 @@ def normalise_family(name: str) -> str:
 # ---------------------------------------------------------------------------
 
 def rulesync_version() -> str | None:
+    """What the installed rulesync answers to ``--version``; None only when rulesync is truly absent
+    (``RULESYNC_BIN`` names no file). A rulesync that is there but gives no answer within the probe's limit,
+    cannot be started or fails ``--version`` is a failure that names what happened, never "not installed"
+    (DEC-892 item 2: a probe timeout is not an absent tool)."""
     if not RULESYNC_BIN.is_file():
         return None
     try:
         result = subprocess.run(
             [str(RULESYNC_BIN), "--version"],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, timeout=RULESYNC_PROBE_TIMEOUT_S, stdin=subprocess.DEVNULL,
         )
-    except (subprocess.TimeoutExpired, OSError):
-        return None
-    if result.returncode != 0:
-        return None
+    except subprocess.TimeoutExpired:
+        raise AssertionError(
+            f"rulesync at {RULESYNC_BIN} gave no answer to --version within {RULESYNC_PROBE_TIMEOUT_S} s: "
+            "a timeout, not an absent tool (DEC-892 item 2)"
+        ) from None
+    except OSError as exc:
+        raise AssertionError(
+            f"rulesync at {RULESYNC_BIN} is there but could not be started ({exc}): not an absent tool"
+        ) from None
+    assert result.returncode == 0, (
+        f"rulesync at {RULESYNC_BIN} is there but --version ended with {result.returncode}: "
+        f"{(result.stderr or result.stdout).strip()[-300:]!r}; not an absent tool"
+    )
     return result.stdout.strip()
 
 
@@ -545,9 +569,16 @@ def run_rulesync_generate(
     if input_roots is not None:
         cmd.extend(["--input-roots", *input_roots])
     cmd.extend(extra_args)
-    return subprocess.run(
-        cmd, capture_output=True, text=True, timeout=30, cwd=str(project_dir),
-    )
+    try:
+        return subprocess.run(
+            cmd, capture_output=True, text=True, timeout=RULESYNC_GENERATE_TIMEOUT_S, cwd=str(project_dir),
+            stdin=subprocess.DEVNULL,
+        )
+    except subprocess.TimeoutExpired:
+        raise AssertionError(
+            f"rulesync {' '.join(('generate', *extra_args))} gave no answer within {RULESYNC_GENERATE_TIMEOUT_S} s: "
+            "a timeout, not an absent tool (DEC-892 item 2)"
+        ) from None
 
 
 def run_rulesync_check(
@@ -666,23 +697,53 @@ def run_portability_check(
     project_dir: Path,
     *,
     env_override: dict[str, str] | None = None,
-    timeout: int = 60,
+    timeout: int = CHECK_TIMEOUT_S,
 ) -> subprocess.CompletedProcess:
-    """Run the declared command in the project, as ``gov check`` does."""
+    """Run the declared command in the project, as ``gov check`` does. A run that does not end within
+    ``timeout`` fails the case, naming the wait (DEC-892 item 2)."""
     env = {**os.environ}
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     env.pop("RULESYNC_EXPECTED_VERSION", None)   # the expected version is the project's, never the caller's
     if env_override:
         env.update(env_override)
-    return subprocess.run(
-        declared_command(),
-        capture_output=True, text=True, timeout=timeout,
-        cwd=str(project_dir), env=env, stdin=subprocess.DEVNULL,
-    )
+    try:
+        return subprocess.run(
+            declared_command(),
+            capture_output=True, text=True, timeout=timeout,
+            cwd=str(project_dir), env=env, stdin=subprocess.DEVNULL,
+        )
+    except subprocess.TimeoutExpired:
+        raise AssertionError(
+            f"the declared check did not end within {timeout} s: it is not bounded by its own time limits"
+        ) from None
 
 
 def output_of(result) -> str:
     return result.stdout + result.stderr
+
+
+def printed_findings(result) -> list[dict]:
+    """The findings the declared command printed: its standard output is one JSON object with a list
+    ``findings``. A run that printed none (a traceback, an endless wait cut short) fails here."""
+    try:
+        printed = json.loads(result.stdout)
+    except ValueError:
+        raise AssertionError(
+            f"the check printed no result (exit {result.returncode}): it stopped without a finding\n"
+            f"standard error ends: {result.stderr[-300:]!r}"
+        ) from None
+    findings = printed.get("findings") if isinstance(printed, dict) else None
+    assert isinstance(findings, list), f"the check's result holds no list of findings: {result.stdout[:300]!r}"
+    return findings
+
+
+def timeout_findings(findings: list) -> list[dict]:
+    """The findings that say a rulesync call gave no answer in time: they name rulesync and the wait."""
+    return [
+        finding for finding in findings if isinstance(finding, dict)
+        and "rulesync" in str(finding.get("message", "")).lower()
+        and NO_ANSWER_IN_TIME.search(str(finding.get("message", "")))
+    ]
 
 
 def run_gov(project_dir: Path, sandbox, *args: str):

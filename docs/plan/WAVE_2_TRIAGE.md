@@ -428,7 +428,7 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732), 
 | W2-M329 | W1-46 live-session cases error when run beside other suites | medium | backlog | Test-quality debt; taken up when a ticket touches that suite (DEC-136). |
 | W2-M330 | Cross-process ordering of the supplementary block untested | medium | W2-04 | Fits W2-04's paths and KPIs (gov context bounded); its builder takes it. |
 | W2-M331 | W1-35 and W1-36 suites cannot be collected in one pytest run | medium | backlog | Test-quality debt; taken up when a ticket touches that suite (DEC-136). |
-| W2-M332 | p95 latency and time-limit cases fail under machine load | medium | backlog | Load-sensitive timing cases; W2-20's machine-wide gate lowers the load; otherwise test debt (DEC-136). |
+| W2-M332 | p95 latency and time-limit cases fail under machine load | medium | Wave 3 | The fix of `load_sensitive`'s three p95 entries: robust under load, or run serially (DEC-762). |
 | W2-M333 | W1-43's acceptance tests (tests/acceptance/W1-43/) do not exist; the audit-to-repair loop is untested | medium | W2-47 | Named in W2-47's KPIs (Wave 2 exit audit). |
 | W2-M334 | File-tool Read/Edit/Write run outside the sandbox | medium | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |
 | W2-M335 | Hooks and MCP servers run outside the sandbox | medium | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |
@@ -662,7 +662,7 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732), 
 | W2-L204 | Extra unjudged path field of Edit or MultiEdit ignored | low | W2-42 | Fits W2-42's paths and KPIs (guard holes); its builder takes it. |
 | W2-L205 | A3 does not pin the path map's hash | low | W2-23 | Named in W2-23's KPIs (adoption safety). |
 | W2-L206 | Doctor's 'no namespace embedded' words only under the semantic canary's answer | low | W2-22 | Named in W2-22's KPIs (gov doctor green). |
-| W2-L207 | Merge queue with batch testing and automatic culprit split | low | Wave 3 | Merge queue with batch testing is a scale feature; the close bottleneck is met in Wave 2 by W2-38. |
+| W2-L207 | Merge queue with batch testing and automatic culprit split | low | Wave 3 | Merge queue with batch testing is a scale feature; the close bottleneck is met in Wave 2 by W2-66 (path-scoped closes) and W2-68 (batched closes with the red batch's bisect), DEC-880, DEC-883, DEC-890; W2-38 itself is Wave 3. |
 | W2-L208 | Each session's own Claude Code version in the telemetry record | low | W2-07 | Fits W2-07's paths and KPIs (close by ticket class, repair tickets, share); its builder takes it. |
 | W2-L209 | gov close leaves its repair ticket untracked, and without role in b-dev | low | W2-07 | Named in W2-07's KPIs (close by ticket class, repair tickets, share). |
 | W2-L210 | gov close residuals: overwritten close record, undeclared escalation folder, unresolved Implements ids | low | W2-07 | Named in W2-07's KPIs (close by ticket class, repair tickets, share). |
