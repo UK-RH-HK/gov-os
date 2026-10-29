@@ -11211,7 +11211,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - **Where it goes (DEC-851):** this register; the prompt §15 (the pre-close gate), v3.32; RESUME HERE; the daily digest.
 
 ### DEC-930 — A re-plan package for the rest of Wave 2 after this queue and the second re-pin; four numbers reported weekly from now (standing)
-- **Status:** ACCEPTED (a fifth weekly number, the orchestrator's drift (DEC-943 item 2); owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-855, DEC-878, DEC-851, DEC-861
+- **Status:** ACCEPTED (item 2's weekly numbers gain the ticket total and its growth (DEC-949); a fifth weekly number, the orchestrator's drift (DEC-943 item 2); owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-855, DEC-878, DEC-851, DEC-861
 - **Decision:**
   1. **The re-plan package**, in the six-part form, once this queue and the second re-pin are done:
      - the minimum needed to start EXAMIN's copy: fast closes, memory proven (K4, W2-61's measure included), agents loading role, skills and model at launch (K3), and the leads' sandbox; everything else proposed for Wave 3, with what each deferral costs;
@@ -11420,7 +11420,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-938 — The morning package: investigate after the nightly, one P1-MORNING file, one ping at 07:30 from the orchestrator's session; hold only what an item blocks (standing)
-- **Status:** ACCEPTED (item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
+- **Status:** ACCEPTED (the morning package's scope refined by DEC-949 (overnight only); item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
 - **Decision (the owner's six points):**
   1. **Investigate before reporting.** After the nightly ends, for every finding (a red test, a refused close, a missed or failed night, any alert):
      - re-run failing tests alone and in the close's form;
@@ -11761,3 +11761,44 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.331 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-948 (every report ends with the five-line block: progress, leads, closes, toward EXAMIN's copy, OWNER_ACTION). Next free id: DEC-949. |
+
+
+### DEC-949 — The morning package carries only the night; daytime decisions reach the owner as they arise; scope growth in the weekly numbers (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-938, DEC-936, DEC-930, DEC-941, DEC-946 · **Changes:** DEC-938 (refined: the morning package's scope) and DEC-930 item 2 (the weekly numbers)
+- **Decision:**
+  1. **The 07:30 morning package is only for what happens overnight:** the nightly's findings, night-time alerts, and anything that arose between the end of the owner's day and 07:30.
+  2. **Decisions that arise during the day** (from leads, closes, reviews, merges, the orchestrator's own findings) come to the owner as they arise:
+     - a P1, or a decision only the owner can take, is sent at once as a package with a ping, between 07:30 and midnight;
+     - P2s the orchestrator may decide as delegated stay listed in the daily document, for the owner to overturn.
+  3. **P-W2-20-SCOPE and the W2-H063 guard fix are sent now,** not in the next morning package. W2-H063 goes first: it blocks the hidden half of W2-61's memory measure, on the critical path.
+  4. **The weekly numbers add the ticket total and how much it grew that week,** with the new tickets named, so scope growth is visible.
+- **How it is applied:**
+  - The prompt §7: the morning package's scope, a daytime-decisions rule beside "Only P1s and ACTs ping", and the weekly numbers.
+  - `packages/P-W2-H063-1.md` and `packages/P-W2-20-SCOPE.md`, committed and pinged on 2026-10-29, W2-H063 first.
+- **Where it goes (DEC-851):** this register, with DEC-938's and DEC-930's status lines; the prompt §7, v3.43; RESUME HERE.
+- Next free id: DEC-950.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.332 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-949 (the morning package carries only the night; daytime P1s and owner-only decisions are sent as they arise with a ping between 07:30 and midnight; delegated P2s stay in the daily document; P-W2-H063-1 and P-W2-20-SCOPE sent at once; the weekly numbers add the ticket total and its growth). Next free id: DEC-950. |
+
+
+### DEC-950 — The owner's answers to P-W2-H063-1 and P-W2-20-SCOPE: W2-84 makes the hidden-set refusal cover every tree; W2-20 gets one more run aligned with DEC-942 and DEC-947
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`) · **Under:** DEC-820, DEC-845, DEC-873, DEC-942, DEC-946, DEC-947, DEC-817, DEC-949 · **Basis:** `packages/P-W2-H063-1.md`, `packages/P-W2-20-SCOPE.md` (sent 2026-10-29 21:52)
+- **Decision:**
+  1. **P-W2-H063-1: (a).**
+     - W2-84 (FULL, about 120 lines) makes the hidden-set refusal cover every tree: the main tree, all worktrees and the run clones.
+     - It is on memory's critical path: priority 3 (DEC-946), ahead of the hidden half of W2-61 (W2-61h). It starts as soon as the gate allows.
+     - Not (b) or (c).
+  2. **P-W2-20-SCOPE: (a),** one more run for W2-20, aligned with DEC-942 and DEC-947: no fixed cap; the floor, the verification peak, and the disk and inode floors as decided. The two design points:
+     1. each session's working size comes from the measured figures in the configuration file, re-measured weekly, with the gate reading the running sessions' live usage;
+     2. the GPU is checked only for jobs that declare a GPU need, against that declared need plus a 10 % margin. Nothing in the Gov OS needs the GPU today, so that part stays minimal.
+- **How it is applied:**
+  - **W2-84** is filed (row W2-H063). It goes first in the lead queue as soon as the gate allows. W2-61h starts after W2-84 is merged and pinned.
+  - **W2-20's ticket** is amended to these KPIs before its run 3, which takes priority 4's place (DEC-946).
+- **Where it goes (DEC-851):** this register; `.tickets/` (W2-84 filed, W2-20 amended); `docs/plan/WAVE_2_WBS.md` (W2-84's card); RESUME HERE.
+- Next free id: DEC-951.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.333 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-950 (P-W2-H063-1 (a): W2-84, the hidden-set refusal in every tree, priority 3 ahead of W2-61h; P-W2-20-SCOPE (a): W2-20 run 3 aligned with DEC-942 and DEC-947, working sizes from the measured configuration, the GPU only for declared needs plus 10 %). Next free id: DEC-951. |
