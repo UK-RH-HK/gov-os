@@ -241,6 +241,14 @@ PROJECT_FILES = {
     "docs/audit/earlier.md": "audit\n",
     "experiments/spikes/exp-901/README.md": "# Experiment 901\n",
 }
+# W2-60a (DEC-826 Q1): gov launch reads the role file of the tree it starts in, with its version line and its
+# default line (DEC-839 items 1 and 5), and refuses a tree without one. One fixture role file per worker role.
+ROLE_EFFORT = {ENGINEER: "high", TEST_DESIGNER: "high", AUDITOR: "max", PRODUCT_SPEC: "high", RESEARCH: "high"}
+PROJECT_FILES.update({
+    f"template/governance/kernel/roles/{role}.md": (f"# {role} role (W2-50 fixture)\n\n- **Version:** 1.0.0\n"
+                                                    f"- **Launch default:** model claude-opus-5-5, effort {effort}\n")
+    for role, effort in ROLE_EFFORT.items()
+})
 # Single named files of this repository the fixture project holds where a product repository has them.
 COPIED_FILES = {
     GUARD_REL: GUARD_SOURCE,
