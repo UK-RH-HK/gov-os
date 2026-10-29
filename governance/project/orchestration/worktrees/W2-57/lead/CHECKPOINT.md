@@ -4,5 +4,7 @@
 - **Start head:** `d0cb962998b5` (end of run 3, clean).
 - **Judged x changed since `8d9d78d93529`:** `src/gov/close/command.py` (W2-68: `_batch.check_red_run`, `_scope` moved before the pre-close gate, `reused_check` standing for gov check, `reused_form`, fingerprints and `reused` in the evidence block) and `docs/plan/WAVE_2_WBS.md` (new W2-75 card only). Lists in `log/run4/judged.txt`, `log/run4/changed.txt`.
 - **Containment note on the merge:** flagged, left in place, two Role: owner decision-record commits already on integrate (`6367e96597e4` DEC-931, `bc37c419359c` DEC-933); brought in by the merge, not made here.
+- **Rebuild:** exit 0 (12:29:05 to 12:36:15; lexical, semantic, codeintel recreated). Keyword warn 0 files. `gov.__file__` in this worktree.
+- **Incident (report in return):** the rebuild started while CLOSE-RUNNING existed (flag made 12:28:30, during the script's load wait, after its close check). Script fixed (one combined until-test) and the chain restarted at about 13:22.
 - **Next:** rebuild, keyword warn, gov check, W2-57 + tests/unit/close close-form, collect-only; gov checkpoint + commit; reviewer rev-4 (gov launch, effort max) at that head; probe record if pass; trailer_gate; return.
 - **Loop count:** run 4 adds no code; no implementer.

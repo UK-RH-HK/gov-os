@@ -11,8 +11,8 @@ O=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator
 part="$1"
 mkdir -p /tmp/gov-os-lead-W2-57
 export TMPDIR=/tmp/gov-os-lead-W2-57
-until [ ! -e "$O/CLOSE-RUNNING" ] && [ ! -e "$O/NIGHTLY-RUNNING" ]; do sleep 60; done
-until awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
+# all three conditions in one test, so that a flag that appears while the load is high is still seen
+until [ ! -e "$O/CLOSE-RUNNING" ] && [ ! -e "$O/NIGHTLY-RUNNING" ] && awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
 echo "$part start $(date '+%F %T') load $(cut -d' ' -f1-3 /proc/loadavg) | $(bash "$O/tools/disk_gate.sh")" >> "$V/times.txt"
 SRC=/home/usain/gov-os-worktrees/W2-57/src
 case "$part" in
