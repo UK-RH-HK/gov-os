@@ -1,1 +1,2 @@
 {"when": 1793186653.0702734, "parallel": {"cases": 16510, "sum": 19748.629, "longest": 630.1, "wall": 2793.062}, "serial": {"cases": 180, "sum": 1261.644, "longest": 176.546, "wall": 1261.912}, "setup_s": 942.0, "actual_s": 5707.0, "estimate_s": null, "source": "history"}
+{"when": 1793243638.519745, "parallel": {"cases": 16510, "sum": 20683.864, "longest": 897.786, "wall": 2746.996}, "serial": {"cases": 180, "sum": 1108.936, "longest": 122.93, "wall": 1109.196}, "setup_s": 1509.0, "actual_s": 5623.0, "estimate_s": 5214.0, "source": "history"}

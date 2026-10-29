@@ -1,0 +1,10 @@
+gov check exit 3 in 649 s
+set-green: exit 0 in 2 s; spy lines 0
+set-missing: exit 1 in 2 s; spy lines 0
+set-notjson: exit 1 in 3 s; spy lines 0
+planted RED on 1 check(s) into /home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/red-context.json
+set-redcontext: exit 1 in 2 s; spy lines 0
+unset: exit 1 in 2 s; spy lines 0
+file-set-green: exit 0 in 2 s; spy lines 0
+collect: exit 0 last: 16694/16696 tests collected (2 deselected) in 27.33s
+unset2: exit 0 in 553 s; spy lines 105

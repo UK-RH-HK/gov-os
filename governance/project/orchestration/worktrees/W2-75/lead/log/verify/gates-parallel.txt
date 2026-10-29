@@ -1,0 +1,5 @@
+disk gate open: 880 GiB free, 65165076 inodes free
+2701	/home/usain/gov-os-worktrees/W2-75/.gov-runtime
+30	/tmp/gov-os-lead-W2-75
+392M	/home/usain/gov-os-worktrees/W2-75/.gov-runtime
+108K	/tmp/gov-os-lead-W2-75

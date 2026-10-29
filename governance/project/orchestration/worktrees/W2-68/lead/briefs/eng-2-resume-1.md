@@ -1,0 +1,10 @@
+The lead's answer to P-W2-68-RED-WAIT, and your next task in this session. All the session rules of your first brief still hold (the load wait inside each background command, the nightly and close windows, no TMPDIR of your own, refused twice: stop). Then return again, the twelve fields first.
+
+**Settled by the ticket's own KPI line** ("nothing closes on a red run; the causing ticket is repaired and the batch re-runs; an unrelated ticket waits for a green run", DEC-883 item 2 c): your option (a), limited to batches.
+
+- **The rule:** a close on HEAD refuses before the pre-close gate, not counted (a `GovError`, exit 1, code `RED_RUN_ON_CODE`, its details naming the red run's record and head), when, among the batch run records of the nightly folder (`kind: batch`) whose head is HEAD or an ancestor of it and whose stated code fingerprint equals HEAD's code fingerprint computed now, the newest by ancestry (ties by the record's name) is red, and no green full run in that folder (a night or a batch) on the same code fingerprint is newer than it by ancestry. Where HEAD's code fingerprint cannot be computed, no batch record can be on its code: the rule asks nothing. The refusal states no evidence block.
+- **Where:** the logic in `src/gov/close/batch.py`; in `src/gov/close/command.py` only its call (with the existing "could not measure" checks, before the pre-close gate). A builder test for each branch (red newest: refused; a newer green on the same code: closes; other code: not asked).
+- **The design note:** add point F to section 11 (the rule, and why: DEC-883 item 2 c and the KPI line), and name in section 9 the residual that a red *night* on the same code does not hold closes (the nightly's P1 package flow stays as it is; the orchestrator's to extend).
+- Commit code with its builder test, and the note alone, each by path, with your trailers.
+- Then run, each after the load wait, to its end: `tests/acceptance/W2-68`, `tests/unit/close`, `tests/acceptance/W1-30`, `tests/acceptance/W2-66`, and the collection command. Report each one's counts, and every W2-68 case's state.
+- **Time:** about 45 minutes.

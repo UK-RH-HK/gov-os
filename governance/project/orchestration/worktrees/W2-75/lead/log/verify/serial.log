@@ -1,0 +1,40 @@
+...............F........................................................ [ 40%]
+........................................................................ [ 80%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+______________________ test_help_answers_in_under_300_ms _______________________
+
+gov = <function gov.<locals>._gov at 0x7b86bb905940>
+
+    def test_help_answers_in_under_300_ms(gov):
+        """The median of nine runs, after one run that fills the bytecode cache (an installed package has one)."""
+        warm_up = gov("--help")
+        assert warm_up.returncode == 0, f"gov --help does not end with exit code 0\n{warm_up.describe()}"
+        times = []
+        for _ in range(RUNS):
+            run = gov("--help")
+            assert run.returncode == 0, run.describe()
+            times.append(run.seconds)
+        median = statistics.median(times)
+>       assert median < HELP_BUDGET_S, \
+            f"gov --help took {median * 1000:.0f} ms (median of {RUNS}: {[round(t * 1000) for t in times]} ms)"
+E       AssertionError: gov --help took 765 ms (median of 9: [688, 718, 714, 752, 1010, 807, 765, 897, 840] ms)
+E       assert 0.7652133099036291 < 0.3
+
+tests/acceptance/W1-07/test_w1_07_help.py:27: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:174: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+1 failed, 179 passed, 1 warning in 1322.46s (0:22:02)

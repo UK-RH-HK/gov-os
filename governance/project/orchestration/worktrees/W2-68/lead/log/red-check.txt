@@ -1,0 +1,230 @@
+bringing up nodes...
+bringing up nodes...
+
+FFFFFFFFFFFFFFFFFFF.FF.F                                                 [100%]
+=================================== FAILURES ===================================
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse0/project --json gave no API-0002 envelope
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw3/test_a_ticket_of_the_batch_who0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw3/test_a_ticket_of_the_batch_who0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw3/test_a_ticket_of_the_batch_who0/project --json gave no API-0002 envelope
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/w2_68_same_code0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/w2_68_same_code0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/w2_68_same_code0/project --json gave no API-0002 envelope
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/w2_68_same_code0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/w2_68_same_code0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/w2_68_same_code0/project --json gave no API-0002 envelope
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw1/w2_68_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw1/w2_68_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw1/w2_68_batch0/project --json gave no API-0002 envelope
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw1/w2_68_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw1/w2_68_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw1/w2_68_batch0/project --json gave no API-0002 envelope
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw7/w2_68_red_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw7/w2_68_red_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw7/w2_68_red_batch0/project --json gave no API-0002 envelope
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw5/w2_68_red_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw5/w2_68_red_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw5/w2_68_red_batch0/project --json gave no API-0002 envelope
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw0/w2_68_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw0/w2_68_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw0/w2_68_batch0/project --json gave no API-0002 envelope
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw0/w2_68_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw0/w2_68_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw0/w2_68_batch0/project --json gave no API-0002 envelope
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw5/w2_68_red_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw5/w2_68_red_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw5/w2_68_red_batch0/project --json gave no API-0002 envelope
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw2/w2_68_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw2/w2_68_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw2/w2_68_batch0/project --json gave no API-0002 envelope
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw2/w2_68_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw2/w2_68_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw2/w2_68_batch0/project --json gave no API-0002 envelope
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw6/w2_68_red_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw6/w2_68_red_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw6/w2_68_red_batch0/project --json gave no API-0002 envelope
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw6/w2_68_red_batch0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw6/w2_68_red_batch0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa PROJ-cccc --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw6/w2_68_red_batch0/project --json gave no API-0002 envelope
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse1/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse1/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse1/project --json gave no API-0002 envelope
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw7/w2_68_same_code0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw7/w2_68_same_code0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw7/w2_68_same_code0/project --json gave no API-0002 envelope
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/test_a_close_that_cannot_reuse0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/test_a_close_that_cannot_reuse0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw8/test_a_close_that_cannot_reuse0/project --json gave no API-0002 envelope
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse2/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse2/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch run PROJ-aaaa --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw9/test_a_close_that_cannot_reuse2/project --json gave no API-0002 envelope
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw4/test_after_a_code_commit_the_s0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw4/test_after_a_code_commit_the_s0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw4/test_after_a_code_commit_the_s0/project --json gave no API-0002 envelope
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw3/test_a_record_only_commit_is_l0/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw3/test_a_record_only_commit_is_l0/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw3/test_a_record_only_commit_is_l0/project --json gave no API-0002 envelope
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+E   AssertionError: python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw4/test_after_a_code_commit_the_s1/project --json gave no API-0002 envelope
+    python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw4/test_after_a_code_commit_the_s1/project --json
+    exit code: 1
+    stdout:
+    
+    stderr:
+    /usr/bin/python3: No module named gov.close.batch
+/home/usain/gov-os-worktrees/W2-68/tests/acceptance/W2-68/w2_68_support.py:275: AssertionError: python3 -m gov.close.batch refresh --root /tmp/gov-os-lead-W2-68/pytest-of-usain/pytest-0/popen-gw4/test_after_a_code_commit_the_s1/project --json gave no API-0002 envelope
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py::test_a_store_rebuilt_without_embeddings_is_stale_one_commit_later
+PASSED tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py::test_a_ticket_closes_on_a_store_rebuilt_without_embeddings
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_a_close_that_cannot_reuse_the_run_runs_fresh_and_does_not_cite_it[code-commit]
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_a_ticket_of_the_batch_whose_own_check_fails_does_not_close_and_the_other_does
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_a_reused_close_runs_its_own_suite_and_the_record_reading_set_and_nothing_else
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_reused_evidence_states_the_reused_run_s_skip_count_and_its_skip
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_one_full_regression_on_the_head_then_each_ticket_s_own_checks
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_each_close_record_cites_the_batch_s_run_and_states_its_scope
+FAILED tests/acceptance/W2-68/test_w2_68_red_batch.py::test_a_close_after_a_red_batch_does_not_cite_its_run
+FAILED tests/acceptance/W2-68/test_w2_68_red_batch.py::test_nothing_closes_on_a_red_batch
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_the_batch_closes_both_tickets
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_one_gov_check_for_the_whole_batch
+FAILED tests/acceptance/W2-68/test_w2_68_red_batch.py::test_failing_tests_re_run_alone_first_at_the_batch_s_head
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_the_batch_s_closes_reuse_its_governance_checks
+FAILED tests/acceptance/W2-68/test_w2_68_batch.py::test_the_batch_s_run_record_states_its_head_its_fingerprint_and_its_junit_xml
+FAILED tests/acceptance/W2-68/test_w2_68_red_batch.py::test_a_red_that_passes_alone_is_a_flaky_candidate_and_is_not_bisected
+FAILED tests/acceptance/W2-68/test_w2_68_red_batch.py::test_a_red_that_fails_alone_is_attributed_with_the_evidence
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_a_close_that_cannot_reuse_the_run_runs_fresh_and_does_not_cite_it[path-map-change]
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_a_close_on_the_same_code_after_a_record_only_commit_reuses_the_passing_run
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_a_close_that_cannot_reuse_the_run_runs_fresh_and_does_not_cite_it[no-record-only-list]
+FAILED tests/acceptance/W2-68/test_w2_68_reuse.py::test_a_close_that_cannot_reuse_the_run_runs_fresh_and_does_not_cite_it[junit-xml-gone]
+FAILED tests/acceptance/W2-68/test_w2_68_fingerprints.py::test_after_a_code_commit_the_store_is_stale_and_the_incremental_load_refuses[code-commit]
+FAILED tests/acceptance/W2-68/test_w2_68_fingerprints.py::test_a_record_only_commit_is_loaded_incrementally_and_the_store_and_the_lexical_index_are_fresh
+FAILED tests/acceptance/W2-68/test_w2_68_fingerprints.py::test_after_a_code_commit_the_store_is_stale_and_the_incremental_load_refuses[path-map-change]
+22 failed, 2 passed in 47.85s

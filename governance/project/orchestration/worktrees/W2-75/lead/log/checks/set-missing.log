@@ -1,0 +1,126 @@
+
+SETUP    S event_loop_policy
+SETUP    S _real_mirror_folder_unchanged
+SETUP    S code_under_test
+SETUP    S gov_check_here (fixtures used: code_under_test)EEE
+TEARDOWN S gov_check_here
+TEARDOWN S code_under_test
+TEARDOWN S _real_mirror_folder_unchanged
+TEARDOWN S event_loop_policy
+==================================== ERRORS ====================================
+__ ERROR at setup of test_gov_check_gives_context_reproducibility_green_here ___
+
+fixturedef = <FixtureDef argname='gov_check_here' scope='session' baseid='tests/acceptance/W2-54'>
+request = <SubRequest 'gov_check_here' for <Function test_gov_check_gives_context_reproducibility_green_here>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/conftest.py:98: in gov_check_here
+    return support.green_here_check()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-54/w2_54_support.py:765: in green_here_check
+    return read_check_result(given)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json'
+
+    def read_check_result(path):
+        """``(CheckResult, checks by id)`` from the ``gov check --json`` envelope at ``path``; an AssertionError naming
+        the file and what is wrong with it when it is missing, unreadable, not JSON, or not gov check's envelope with
+        its list of checks."""
+        named = f"the close's check result {path} ({CHECK_RESULT_VARIABLE})"
+        try:
+            text = Path(path).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as e:
+>           raise AssertionError(f"{named} cannot be read: {e}") from None
+E           AssertionError: the close's check result /home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json (GOV_CLOSE_CHECK_RESULT) cannot be read: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json'
+
+tests/acceptance/W2-54/w2_54_support.py:745: AssertionError
+________ ERROR at setup of test_gov_check_gives_core_schema_green_here _________
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-75/src/gov/__init__.py'
+
+    @pytest.fixture(scope="session")
+    def gov_check_here(code_under_test):
+        """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+        inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+        runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+        store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+>       return support.green_here_check()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/conftest.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/w2_54_support.py:765: in green_here_check
+    return read_check_result(given)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json'
+
+    def read_check_result(path):
+        """``(CheckResult, checks by id)`` from the ``gov check --json`` envelope at ``path``; an AssertionError naming
+        the file and what is wrong with it when it is missing, unreadable, not JSON, or not gov check's envelope with
+        its list of checks."""
+        named = f"the close's check result {path} ({CHECK_RESULT_VARIABLE})"
+        try:
+            text = Path(path).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as e:
+>           raise AssertionError(f"{named} cannot be read: {e}") from None
+E           AssertionError: the close's check result /home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json (GOV_CLOSE_CHECK_RESULT) cannot be read: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json'
+
+tests/acceptance/W2-54/w2_54_support.py:745: AssertionError
+__________ ERROR at setup of test_the_w1_43_audit_report_is_untouched __________
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-75/src/gov/__init__.py'
+
+    @pytest.fixture(scope="session")
+    def gov_check_here(code_under_test):
+        """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+        inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+        runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+        store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+>       return support.green_here_check()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/conftest.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/w2_54_support.py:765: in green_here_check
+    return read_check_result(given)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json'
+
+    def read_check_result(path):
+        """``(CheckResult, checks by id)`` from the ``gov check --json`` envelope at ``path``; an AssertionError naming
+        the file and what is wrong with it when it is missing, unreadable, not JSON, or not gov check's envelope with
+        its list of checks."""
+        named = f"the close's check result {path} ({CHECK_RESULT_VARIABLE})"
+        try:
+            text = Path(path).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as e:
+>           raise AssertionError(f"{named} cannot be read: {e}") from None
+E           AssertionError: the close's check result /home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json (GOV_CLOSE_CHECK_RESULT) cannot be read: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-75/.gov-runtime/scratch/lead/log/checks/no-such-result.json'
+
+tests/acceptance/W2-54/w2_54_support.py:745: AssertionError
+============================== slowest durations ===============================
+0.03s setup    tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+ERROR tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+ERROR tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+ERROR tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+3 errors in 0.20s

@@ -1,0 +1,10 @@
+2026-10-29 02:00:05 nightly night: estimate {"estimate_s": 5214, "parallel_s": 3041, "serial_s": 757, "setup_s": 942, "effective_workers": 7.07, "margin": 1.1, "runs": ["/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/close/DAEO-5j8b/20261028T203108982716Z/02-regression-parallel.xml", "history", "/tmp/gov-os-nightly-junit/20261028-1011/parallel.xml"]}
+latest start 03:33
+head 8fa67ec8468a
+clone rebuilt
+parallel exit 0 in 2927 s: 16478 passed, 32 skipped in 2749.10s (0:45:49)
+serial exit 0 in 1187 s: 180 passed, 1 warning in 1109.63s (0:18:29)
+verdict: green
+duration: estimate 5214 s, actual 5623 s (setup 1509 s)
+clone removed
+2026-10-29 03:33:48 done

@@ -1,0 +1,7 @@
+set-green: exit 0 in 2 s; spy lines 0
+set-missing: exit 1 in 2 s; spy lines 0
+set-notjson: exit 1 in 3 s; spy lines 0
+set-redcontext: exit 1 in 2 s; spy lines 0
+unset: exit 1 in 2 s; spy lines 0
+file-set-green: exit 0 in 2 s; spy lines 0
+collect: exit 0 last: 16694/16696 tests collected (2 deselected) in 27.33s

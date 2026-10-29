@@ -1,0 +1,29 @@
+
+SETUP    S event_loop_policy
+SETUP    S _real_mirror_folder_unchanged
+SETUP    S code_under_test
+SETUP    S gov_check_here (fixtures used: code_under_test)
+        SETUP    F _fresh_log
+        tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here (fixtures used: _fresh_log, _real_mirror_folder_unchanged, code_under_test, event_loop_policy, gov_check_here, request).
+        TEARDOWN F _fresh_log
+        SETUP    F _fresh_log
+        tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here (fixtures used: _fresh_log, _real_mirror_folder_unchanged, code_under_test, event_loop_policy, gov_check_here, request).
+        TEARDOWN F _fresh_log
+        SETUP    F _fresh_log
+        tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched (fixtures used: _fresh_log, _real_mirror_folder_unchanged, code_under_test, event_loop_policy, gov_check_here, request).
+        TEARDOWN F _fresh_log
+TEARDOWN S gov_check_here
+TEARDOWN S code_under_test
+TEARDOWN S _real_mirror_folder_unchanged
+TEARDOWN S event_loop_policy
+==================================== PASSES ====================================
+============================== slowest durations ===============================
+0.03s setup    tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+0.02s call     tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+PASSED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+PASSED tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+3 passed in 0.09s

@@ -1,0 +1,15 @@
+batch 3 of 3: the trial (DEC-884 item 4), measured and written into the design note's section 10
+
+Batches 1 and 2 (commits on this branch) built the fingerprints, the store's row and incremental load, the store check, `python3 -m gov.close.batch run|refresh`, reuse and the close's record lines. Change no code in this batch unless the trial finds a defect: then fix it inside the allowed paths, with a builder test, in its own commit, and say so.
+
+**The trial,** on a fixture programme you build from scratch in a temporary folder under your sandbox's temp folder (a small Python project with a test map holding `record_only`, `record_reading` and `shared_core` entries, a path map with the close's settings and a namespace, a `.gitleaks.toml` (W1-07's minimal one, as a single named file), three or four tickets with acceptance suites of a few tests each, a `tests/unit` folder, and a green base). You may import W2-66's acceptance support (`tests/acceptance/W2-66/w2_66_support.py`) to build it; never read `tests/acceptance/W2-68/`. Keep the trial's script and logs under `.gov-runtime/scratch/` (no programme or clone under `.gov-runtime/`: the fixture itself lives in the temp folder) and remove the fixture when done. Measure, each with wall-clock seconds and the commands' envelopes:
+
+1. **Time per batch:** a batch of two tickets and a batch of three on one head, against the same tickets closed one by one as the orchestrator's queue does today (before each close: a full rebuild and `gov check`, then `gov close`). Give each step's time (rebuild, check, regression, each close).
+2. **Reuse correct:** after a batch, a record-only commit (a checkpoint) and a plain `gov close` of another ticket: it reuses the batch's run, and its runs are its acceptance suite and the record-reading set only (show the close record's `scope`, `reused` block and test runs).
+3. **A planted code change** after a batch: the next close runs fresh and cites no earlier run.
+4. **A planted record-only commit** after a batch: the next close runs the record-reading set and nothing else of the regression.
+5. **A red batch:** a planted red that fails alone and a planted flaky (fails once, then passes): the batch is red, the real red is attributed (bisect or own ticket) with its evidence, the flaky one is a candidate and not bisected, and nothing closes.
+
+**Write the results into section 10** of `docs/research/W2-68-batched-close.md`: the fixture's shape, the commands, a table of the times, each observable's result, the machine's 1-minute load during each run, and the caveat that a sandboxed session embeds on a CPU Ollama of its own (so rebuild times are not the shared GPU's). Commit the note alone, by path, with your trailers.
+
+**Then** run to their end (after the load wait and outside the nightly and close windows): your builder tests, `tests/unit/close`, `tests/unit/store`, `tests/acceptance/W2-68`, `tests/acceptance/W1-30` and `tests/acceptance/W2-66`, and the collection command; report each one's counts.

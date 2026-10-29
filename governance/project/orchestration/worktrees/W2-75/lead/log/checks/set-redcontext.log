@@ -1,0 +1,49 @@
+
+SETUP    S event_loop_policy
+SETUP    S _real_mirror_folder_unchanged
+SETUP    S code_under_test
+SETUP    S gov_check_here (fixtures used: code_under_test)
+        SETUP    F _fresh_log
+        tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here (fixtures used: _fresh_log, _real_mirror_folder_unchanged, code_under_test, event_loop_policy, gov_check_here, request)F
+        TEARDOWN F _fresh_log
+        SETUP    F _fresh_log
+        tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here (fixtures used: _fresh_log, _real_mirror_folder_unchanged, code_under_test, event_loop_policy, gov_check_here, request).
+        TEARDOWN F _fresh_log
+        SETUP    F _fresh_log
+        tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched (fixtures used: _fresh_log, _real_mirror_folder_unchanged, code_under_test, event_loop_policy, gov_check_here, request).
+        TEARDOWN F _fresh_log
+TEARDOWN S gov_check_here
+TEARDOWN S code_under_test
+TEARDOWN S _real_mirror_folder_unchanged
+TEARDOWN S event_loop_policy
+=================================== FAILURES ===================================
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.CheckResult object at 0x76f862a3bf20>, {'adapter-portability': {'family': 'adapter/model portability',...ersion': '1.0.0', 'commit': '12957c13186d3be9d7f312b63f4296ba4f7575bc', 'inputs_hash': '7ab763c900f92b0d'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75")."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: []
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:39: AssertionError
+==================================== PASSES ====================================
+============================== slowest durations ===============================
+0.02s setup    tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+0.01s call     tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+PASSED tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+1 failed, 2 passed in 0.11s
