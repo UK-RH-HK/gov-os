@@ -75,6 +75,34 @@ def test_a_git_that_cannot_answer_answers_nothing(project, monkeypatch):
     assert secrets._commits(root, {ids["commit"]}) == set()
 
 
+@pytest.mark.parametrize("setting", [("extensions.partialClone", "origin"), ("remote.Origin.Promisor", "Yes"),
+                                     ("remote.origin.promisor", "2"), ("remote.origin.partialCloneFilter", "blob:none")])
+def test_a_partial_clone_is_asked_about_no_object(project, monkeypatch, setting):
+    root, ids = project
+    _git(root, "config", *setting)
+    real, asked = subprocess.run, []
+    monkeypatch.setattr(secrets.subprocess, "run", lambda command, **options: asked.append(command) or real(command, **options))
+    assert secrets._commits(root, {ids["commit"]}) == set()
+    assert [command[command.index("-C") + 2] for command in asked] == ["config"]
+
+
+def test_a_remote_that_is_no_promisor_leaves_the_commit_exempt_and_the_lookup_never_fetches(project, monkeypatch):
+    root, ids = project
+    _git(root, "remote", "add", "origin", str(root))
+    _git(root, "config", "remote.origin.promisor", "Off")
+    real, envs = subprocess.run, []
+    monkeypatch.setattr(secrets.subprocess, "run", lambda command, **options: envs.append(options["env"]) or real(command, **options))
+    assert secrets._commits(root, {ids["commit"]}) == {ids["commit"]}
+    assert len(envs) == 2 and all(env["GIT_NO_LAZY_FETCH"] == "1" for env in envs)
+
+
+def test_a_configuration_git_cannot_read_counts_as_a_partial_clone(project):
+    root, ids = project
+    (root / ".git" / "config").write_text("[remote \"origin\"\n")
+    assert secrets._partial(root, {**os.environ}) is True
+    assert secrets._commits(root, {ids["commit"]}) == set()
+
+
 def test_only_that_rule_and_exactly_forty_digits_are_candidates(project):
     _, ids = project
     sha = ids["commit"]

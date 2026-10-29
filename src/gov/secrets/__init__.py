@@ -158,6 +158,29 @@ _COMMIT_RULE = "".join(("source", "graph", "-access-token"))
 _HASH = re.compile("[0-9a-fA-F]{40}")
 _GIT_S = 10  # how long git may take to say which matches name a commit of the project
 _GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false")
+_FALSE = ("false", "no", "off", "0")  # git's spellings of a false boolean; any other value of promisor counts as true
+
+
+def _partial(root: Path, env: dict[str, str]) -> bool:
+    """Whether the repository at ``root`` may fetch an object it lacks from a remote: a partial clone, or unsure.
+
+    Only the configuration git would use is read (its own, a worktree's, the user's, the system's and their includes),
+    never the object store. A read that fails or does not answer in time counts as a partial clone.
+    """
+    try:
+        done = subprocess.run([*_GIT, "-C", str(root), "config", "--list", "-z"], capture_output=True, text=True,
+                              errors="replace", timeout=_GIT_S, env=env)
+    except (OSError, subprocess.SubprocessError):
+        return True
+    if done.returncode != 0:
+        return True
+    for entry in done.stdout.split("\0"):
+        key, _, value = entry.partition("\n")
+        key = key.lower()
+        if key == "extensions.partialclone" or key.startswith("remote.") and (
+                key.endswith(".partialclonefilter") or key.endswith(".promisor") and value.strip().lower() not in _FALSE):
+            return True
+    return False
 
 
 def _commits(root: Path, names: set[str]) -> set[str]:
@@ -165,11 +188,14 @@ def _commits(root: Path, names: set[str]) -> set[str]:
 
     Git reads only that repository: no inherited variable can point it elsewhere, no replace object stands in, and a
     root that is not itself a repository is not answered by one above it. Whatever git does not answer clearly is no
-    commit, so its match stays a finding.
+    commit, so its match stays a finding. A partial clone is asked about no object at all, since a lookup there could
+    fetch the match from its remote; the lookup itself runs with lazy fetching off too.
     """
     root = Path(root).resolve()
     env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
-    env |= {"GIT_CEILING_DIRECTORIES": str(root.parent), "GIT_NO_REPLACE_OBJECTS": "1"}
+    env |= {"GIT_CEILING_DIRECTORIES": str(root.parent), "GIT_NO_REPLACE_OBJECTS": "1", "GIT_NO_LAZY_FETCH": "1"}
+    if _partial(root, env):
+        return set()
     asked = sorted(names)
     try:
         done = subprocess.run([*_GIT, "-C", str(root), "cat-file", "--batch-check=%(objectname) %(objecttype)"],
