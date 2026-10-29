@@ -1,0 +1,17 @@
+# Lens B's Q08 (Table 2): "DAEO-kia7 (W2-06); WBS 100 or 164": alternatives of one entry. The WBS card has moved from
+# line 164 to 269 since; its heading is given.
+id: Q08
+category: ownership
+commit: 23079f92a6fa
+question: Which ticket builds the commit-time re-index?
+gold_answer: W2-06 (DAEO-kia7), "Fast pre-commit tier and commit-time re-index", an engineer's FULL ticket.
+sources:
+  - - path: .tickets/DAEO-kia7.md
+      heading: "wbs_id: W2-06"
+      lines: [12, 13]
+    - path: docs/plan/WAVE_2_WBS.md
+      heading: "| W2-06 | A | Fast pre-commit tier and commit-time re-index | implementation | engineer | FULL | W2-05 | 220 | AR-2 (DEC-719), CAP-17.b |"
+      lines: [100, 100]
+    - path: docs/plan/WAVE_2_WBS.md
+      heading: "#### W2-06 Fast pre-commit tier and commit-time re-index (FULL, engineer)"
+      lines: [269, 278]
