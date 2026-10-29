@@ -21,14 +21,11 @@
 - **Nightly:** committed `governance/project/orchestration/nightly/` (DEC-934; ping gate DEC-936, 28/28 tests);
   crontab 3 lines + Windows wake task (owner, checked). Morning: read status.txt + pings.log, relay P1s (prompt §7);
   digest reports each night's line, estimate vs actual.
-- **Lessons 2026-10-28:** checks on untracked files prove nothing about tracked ones (`a999f97b`, W1-08); no commit
-  chained after `;` (`1916501d`); a ticket citing a new DEC: commit the register first. W2-58's review cases fail
-  from inside a Claude session (env leak): row.
+- **Lessons:** check tracked, not untracked, files; never commit after `;`; register before a ticket citing it;
+  long commands in the background. W2-58's review cases fail inside a Claude session (env leak): row.
 - **Rows added:** W2-L449, W2-M407, W2-L450. Run clones under ~/gov-os-runs/W2-00 (3G+) never removed ->
   P-TOOLS-REVIEW-1.
 - **W2-67** held (probe stale: W1-26/W1-27 + w1_07_support.py; `d0140d4d`).
-- **Owner's asks in the register:** DEC-929 (P-SCOPE-RECORDS-1), DEC-930 + DEC-936 item 3 (the re-plan package with
-  its 5 + 6 points), DEC-936 item 2 (carry on, leads in parallel, P2 delegated, only P1/ACT ping).
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
