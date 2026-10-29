@@ -32,7 +32,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,10 +50,6 @@ IMPLEMENTS = "DEC-883"
 DEFAULT_ROLE = "orchestrator"
 CO_AUTHOR_VARIABLE = "GOV_CO_AUTHORED_BY"
 OUTSIDE = "outside"
-# What the commits of the batch keep of the caller's git environment: who commits, and when. Nothing else of it
-# reaches git (DEC-500), as ``gov.close.repo.git`` gives none.
-_IDENTITY = ("GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_AUTHOR_DATE",
-             "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL", "GIT_COMMITTER_DATE")
 
 
 # ---------------------------------------------------------------------------
@@ -330,20 +325,17 @@ def _measure(root: Path, tickets: list[str]) -> dict:
 # ---------------------------------------------------------------------------
 
 def _commit(root: Path, subject: str, paths: list[str], task: str | None = None) -> str:
-    """A commit of ``paths`` alone, with the batch's trailers; its id."""
-    env = {key: value for key, value in os.environ.items()
-           if not key.startswith("GIT_") or key in _IDENTITY}
+    """A commit of ``paths`` alone, with the batch's trailers, as the close commits a repair ticket
+    (``gov.close.tool``: the repository's identity, else ``gov``'s); its id."""
     trailers = ([f"Task: {task}"] if task else []) + [f"Role: {os.environ.get('GOV_ROLE') or DEFAULT_ROLE}",
                                                       f"Implements: {IMPLEMENTS}"]
     if os.environ.get(CO_AUTHOR_VARIABLE):
         trailers.append(f"Co-Authored-By: {os.environ[CO_AUTHOR_VARIABLE]}")
-    git = ["git", "-C", str(root), "--no-replace-objects"]
-    for cmd in (git + ["add", "--all", "--", *paths],
-                git + ["commit", "-q", "-m", subject, *[a for t in trailers for a in ("--trailer", t)], "--", *paths]):
-        done = subprocess.run(cmd, capture_output=True, text=True, env=env, stdin=subprocess.DEVNULL)
-        if done.returncode != 0:
-            raise GovError("BATCH_COMMIT_FAILED", f"git {cmd[4]} failed: {done.stderr.strip()[:200]}",
-                           {"paths": paths})
+    named = _git(root, "config", "user.email", ok=(0, 1), code=True) == 0
+    identity = [] if named else ["-c", "user.name=gov", "-c", "user.email=gov@localhost"]
+    _git(root, "add", "--all", "--", *paths)
+    _git(root, *identity, "commit", "-q", "-m", subject, *[a for t in trailers for a in ("--trailer", t)],
+         "--", *paths)
     return _git(root, "rev-parse", "HEAD").strip()
 
 
