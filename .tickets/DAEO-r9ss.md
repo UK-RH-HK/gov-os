@@ -1,6 +1,6 @@
 ---
 id: DAEO-r9ss
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-zflj, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
