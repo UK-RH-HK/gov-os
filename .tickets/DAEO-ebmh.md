@@ -1,6 +1,6 @@
 ---
 id: DAEO-ebmh
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-28T21:33:04Z
