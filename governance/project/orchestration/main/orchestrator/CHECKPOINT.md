@@ -24,7 +24,7 @@
   the background. W2-58's review cases fail inside a Claude session: row.
 - **Rows added:** W2-L449, W2-M407, W2-L450. Run clones under ~/gov-os-runs/W2-00 (3G+) never removed ->
   P-TOOLS-REVIEW-1.
-- **W2-67** held (probe stale: W1-26/W1-27 + w1_07_support.py; `d0140d4d`).
+- **W2-67** held (probe stale; `d0140d4d`).
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
