@@ -13,23 +13,29 @@ hold them whole either). Here they are "the vendor keyword" (`"source" + "graph"
 (`"sgp" + "_"`). Assertion messages mask both (`support.say`), and print paths, rule ids and booleans, never a hash
 or a token; the run records' `repr` (what pytest prints of a failed assertion) holds the exit code only.
 
-**213 cases in 6 files**, a support module and a conftest:
+**304 cases in 9 files** (run 1: 213 in 6; run 2: 91 in 3, see "Run 2" below), a support module and a conftest:
 
-| File | Cases | KPI | Today |
+| File | Cases | KPI | Red on the code before run 1 / on run 1's code |
 |---|---|---|---|
-| `test_w2_71_exemption.py` | 24 | K1 | **19 red**, 5 premises green |
+| `test_w2_71_exemption.py` | 24 | K1 | **19 red**, 5 premises green / green |
 | `test_w2_71_real_tokens_still_fail.py` | 30 | K2 | guards, green |
 | `test_w2_71_only_that_rule_and_match.py` | 87 | K3 (other rules, other matches, other objects) | guards, green |
 | `test_w2_71_verification_cannot_run.py` | 35 | K3 (fails closed) | guards, green |
-| `test_w2_71_nothing_printed_or_written.py` | 35 | K4 | **4 red**, 31 guards green |
+| `test_w2_71_nothing_printed_or_written.py` | 35 | K4 | **4 red**, 31 guards green / green |
 | `test_w2_71_keywords_in_parts.py` | 2 | K5 | guards, green |
+| `test_w2_71_partial_clone.py` (run 2) | 26 | K4 (a partial clone) | — / **13 red**, 9 premises and 4 guards green |
+| `test_w2_71_promisor_config.py` (run 2) | 52 | K4 (a promisor remote, wherever configured; a configuration that cannot be read) | — / **30 red**, 14 premises and 8 guards green |
+| `test_w2_71_lazy_fetch_guard.py` (run 2) | 13 | K4 (the second guard), K1 (the control) | — / **2 red**, 3 premises and 8 guards green |
 
 ## Run
 
 ```sh
 PYTHONPATH=/home/usain/gov-os-worktrees/W2-71/src \
-  python3 -m pytest tests/acceptance/W2-71 -q -p no:cacheprovider -rs
+  python3 -m pytest tests/acceptance/W2-71 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rs
 ```
+
+While the machine is held by a nightly run or a close (`NIGHTLY-RUNNING` or `CLOSE-RUNNING` in the orchestrator's
+scratch folder), run one file at a time with the same options.
 
 - **The code under test (DEC-732) is this worktree's `src/`.** `PYTHONPATH` is set per command, never in settings.
   Every child process (the check, run by `sh -c` with its declared command `python3 -m gov.secrets`; the filter,
@@ -204,6 +210,149 @@ the check itself writes there (the clean-result record) is tested by K4 to hold 
 | A match let through that names no commit object of this repository | K2 (40 hex digits naming nothing); K3 (another repository's commit, a tree, a blob, 39, 41 and 12 digits, every verification that cannot run) |
 | A match or a finding printed, logged or written to a file | K4 (report paths, the temp folder, the project's files, standard output and error, the clean record) |
 | A file the check scanned before no longer scanned, or a scan that cannot finish passing as clean | K4 (both rule sets for every clean and exempt file, three depths and `scratch/`, the record never holding a finding); K3 (`git-hangs`: the check ends within its limit and fails closed) |
+| A match or a finding … written to a file, read as **sent off the machine** (run 2) | Run 2: a partial clone and every promisor configuration send no request to the remote during the check or the filter; the source-only commit is not fetched; in a partial clone git is asked about no object; elsewhere every object lookup carries `GIT_NO_LAZY_FETCH` |
+
+## Run 2 — partial clones, promisor remotes and lazy fetches
+
+Written by a fresh test designer (MR-3) for run 2 of the ticket, from KPI 4 ("the matches are held in memory only"),
+the failure KPI "a match … written to a file" (read as "sent off the machine"), DEC-911 item 4 and the orchestrator's
+delegated decision P1-MORNING-2026-10-29 item 4 (stricter only). **Written before run 2's implementation**; run 1's
+implementation (this branch's head when written) was not read: it was only run, to show the red.
+
+**What run 1's review found:** in a partial clone, when the check or the filter asks git whether a candidate names a
+commit, git fetches an object it does not hold from the promisor remote (a lazy fetch), so the candidate, which may be
+a real token, leaves the machine; and a commit present only on the remote is fetched during the check, then exempt.
+
+**The decided behaviour the cases state:**
+
+1. In a partial clone, no exemption, and git is asked about no object: a match of row W2-L423's rule stays a finding
+   even when it names a real commit of the repository, and no fetch is made. A repository counts as a partial clone
+   when the configuration git would use for it has `extensions.partialClone`, any remote with `promisor` true (git's
+   spellings of a boolean), or any remote with a `partialclonefilter`; a configuration that cannot be read counts as
+   one (fail closed).
+2. The second guard, never the only one: every git process the check or the filter starts to look up objects runs
+   with `GIT_NO_LAZY_FETCH` true in its environment; a process that only reads configuration need not.
+3. Unchanged: in a full clone with an ordinary remote, a real commit's hash beside a keyword stays exempt, and run 1's
+   213 cases still hold (none was changed).
+
+### Facts the run-2 cases are built on (measured on this machine)
+
+- **A partial clone** is built at test time: a bare source built from scratch (`make_source`: a committed project
+  pushed to `git init --bare`, with `uploadpack.allowFilter` and `uploadpack.allowAnySHA1InWant`), cloned with
+  `git clone --filter=blob:none file://<source>` (a plain path would ignore the filter). git 2.43 writes
+  `remote.origin.promisor = true` and `remote.origin.partialclonefilter = blob:none` (and format version 1), **not**
+  `extensions.partialClone`; a premise checks the clone is partial (those keys, an old blob missing from its store).
+- **git lazy-fetches a missing id in every form the decision names**, measured with a plain `git cat-file -e`: a real
+  partial clone; a full clone with only `promisor` (`[Remote "origin"] Promisor = yes`); only a `partialclonefilter`;
+  only `extensions.partialClone` (format version 1, and also 0); `promisor = 1` through `include.path`; `promisor =
+  true` in the user's global file only. Each scene's control shows it.
+- **This machine's git (2.43.0 as packaged) honours `GIT_NO_LAZY_FETCH=1`**: with it, a lookup of a missing id in the
+  partial clone prints "lazy fetching disabled" and makes no request (the security fixes of git 2.43.4 appear
+  backported). The brief's premise ("2.43.0 ignores that variable") does not hold here. The cases do not depend on it:
+  the partial-clone and promisor cases state item 1 (no exemption, no request, and in the partial clone no object
+  lookup at all), which no setting of the variable meets alone.
+- **A configuration that cannot be read:** the repository's `.git/config` at mode 000, a malformed `.git/config`
+  (`[broken`), a `.git/config` that is a folder, and an `include.path` naming an unreadable file all make every git
+  command fail (`git config --list` and `git cat-file` both exit 128). So run 1's verification fails and fails
+  closed: those cases are **guards, green today**. **A form where git still reads the object store but part of the
+  configuration cannot be read was found at one level only:** the user's global `.gitconfig` at mode 000 is skipped by
+  git without a word (`git config --list` exits 0, `git cat-file` reads the commit). git then does not use what that
+  file says either, so a promisor named there is not a promisor to git and no lazy fetch can follow from it. Whether
+  that file "cannot be read" in the decision's sense is not settled: no case demands either outcome (returned to the
+  lead as a package).
+
+### How "no fetch" is proved, and how the counter is shown to count
+
+Each clone's remote has a logging `uploadpack` program (`remote.origin.uploadpack`, `upload_pack_counter`): a shell
+script that writes one line (`request`, never an argument or an id) to its log, then runs the real `git upload-pack`.
+Every fetch over `file://`, lazy or not, starts it once. The counts are taken around the check's run and the filter's
+run only. **Controls**, after the runs, in each scene's own environment:
+
+- the partial clone: the test's own `git cat-file -e <an old blob the filter left out>` makes at least one request and
+  the blob lands in the clone (no run asks about that blob);
+- each promisor scene: the test's own `git cat-file -e <an id no run quotes>^{commit}` makes at least one request;
+- the full clone: the test's own `git fetch origin` makes at least one request.
+
+Measured on run 1's code: the partial clone's check run 3 requests, its filter run 2; each promisor scene's check
+and filter 1 each; every control 1 or more; the full clone 0.
+
+Object presence is read by enumerating the store (`git cat-file --batch-all-objects --batch-check=%(objectname)`,
+`local_objects`), which names no object and so asks no remote.
+
+### The second guard: how an object lookup is told from a configuration read
+
+A recording `git` first on `PATH` (`recording_git`) records, per call, its arguments (hex runs of 16 digits or more
+masked), whether a 40-hex string stood in its arguments or its standard input (a boolean), and the value of
+`GIT_NO_LAZY_FETCH`; it then runs the real git with the same arguments, environment and input (input passed through
+as it comes, so a long-running `--batch` call works; output untouched). The rule (`looks_up_objects`), loose on
+purpose:
+
+- a `git config` call is a configuration read, never a lookup;
+- any other call is a lookup when a 40-hex string stands in its arguments or its input (a candidate is asked about),
+  or when its command is one of git's object readers: `cat-file`, `rev-list`, `show`, `log`, `merge-base`,
+  `name-rev`, `describe`, `ls-tree`, `fsck`, or `rev-parse --verify`;
+- anything else is free (`rev-parse` with options only, `ls-files`, `status`, `--version`).
+
+"Carries it" means `GIT_NO_LAZY_FETCH` is `1` or another of git's spellings of true. git's own child processes (the
+fetch a lazy fetch starts) run from git's exec path, not `PATH`, so they are not recorded. The cases expect the check
+to find git on `PATH`, as run 1's `no-git` and `git-fails` cases already do. A premise runs the recorder on four known
+calls and checks its classification and that its log holds no whole hash.
+
+### KPI 4 — "The matches are held in memory only" (run 2)
+
+`test_w2_71_partial_clone.py`: one partial clone quoting, after each keyword, in a log under `.gov-runtime/scratch/`
+(the check) and a page under `docs/` (the filter): its own head commit (`own-commit`), 40 random hex digits
+(`random`), and a commit made in the source after the clone (`source-only`). The check and the filter run through a
+recording git.
+
+| Test | Red on run 1's code because |
+|---|---|
+| `premise_the_clone_is_a_partial_clone_of_the_source`; `premise_the_source_holds_the_source_only_commit_and_not_the_random_id`; `premise_the_line_is_a_finding_of_row_w2_l423s_rule_and_of_no_other` × 6; `premise_the_counter_sees_a_lazy_fetch_in_the_clone` | green: premises and the control |
+| `in_a_partial_clone_the_match_stays_a_finding_of_the_check` × own-commit, source-only × 2 keywords | **red, 4**: "the check passes `<path>` … as clean" (it exempts the own commit; it fetches the source-only commit, then exempts it) |
+| the same × random × 2 keywords | guard, green: the fetch fails and the id stays a finding |
+| `in_a_partial_clone_the_match_is_left_out_by_the_filter` × own-commit, source-only × 2 | **red, 4**: "the filter lets `<path>` through" |
+| the same × random × 2 | guard, green |
+| `in_a_partial_clone_the_check_sends_nothing_to_the_remote` | **red**: "reached the promisor remote 3 times" |
+| `in_a_partial_clone_the_filter_sends_nothing_to_the_remote` | **red**: "reached the promisor remote 2 times" |
+| `the_commit_only_the_remote_has_is_not_fetched_into_the_clone` | **red**: the commit is in the clone's store after the runs (3 objects added) |
+| `in_a_partial_clone_the_check_asks_git_about_no_object`; `…_the_filter_asks_git_about_no_object` | **red, 2**: "asked git about objects, 6 calls: `cat-file` …" |
+
+`test_w2_71_promisor_config.py`: seven full clones, each with one setting (module docstring): `promisor-only`
+(`[Remote "origin"] Promisor = yes`: a mixed-case section and key, `yes` for true), `filter-only`, `extension-only`,
+`global-promisor` (a temporary `HOME` with a `.gitconfig`, `XDG_CONFIG_HOME` an empty folder, `GIT_CONFIG_GLOBAL`
+unset), `included-promisor` (`promisor = 1` through `include.path`), `unreadable-config` (mode 000 during the runs),
+`malformed-config`. Each quotes its own head commit after each keyword, and a random id after the vendor keyword (a
+lookup of it reaches the remote on code that asks git).
+
+| Test | Red on run 1's code because |
+|---|---|
+| `premise_the_scene_is_configured_as_said` × 5; `premise_the_global_setting_is_read_only_through_the_users_file`; `premise_the_counter_sees_a_lazy_fetch_in_the_scene` × 5; `premise_git_cannot_read_the_configuration` × 2 (not root; `git config --list` and `git cat-file` fail); `premise_the_own_commit_lines_are_findings_of_row_w2_l423s_rule` | green: premises and controls |
+| `with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check` × 5 scenes × 2 keywords | **red, 10**: "`<scene>`: the check passes `<path>` … as clean" |
+| `with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter` × 5 × 2 | **red, 10**: "the filter lets `<path>` through" |
+| `with_a_promisor_remote_the_check_sends_nothing_to_the_remote` × 5 | **red, 5**: "reached the remote 1 times" |
+| `with_a_promisor_remote_the_filter_sends_nothing_to_the_remote` × 5 | **red, 5**: "reached the remote 1 times" |
+| `with_a_configuration_that_cannot_be_read_its_own_commit_stays_a_finding_of_the_check` × 2 scenes × 2 keywords (fails closed: a non-zero exit naming the file, or naming none of the case's files) | guard, green: git cannot read the configuration, so run 1's verification fails closed |
+| `with_a_configuration_that_cannot_be_read_its_own_commit_is_left_out_by_the_filter` × 2 × 2 | guard, green, for the same reason |
+
+`test_w2_71_lazy_fetch_guard.py`:
+
+| Test | Red on run 1's code because |
+|---|---|
+| `premise_the_control_clone_is_a_full_clone_with_an_ordinary_remote`; `premise_the_counter_sees_a_fetch_in_the_full_clone`; `premise_the_recording_git_records_as_said` | green: premises and the control |
+| **The control (item 3):** `in_a_full_clone_a_commit_of_its_own_history_is_still_no_finding_of_the_check` × 2 keywords; `…_still_passes_the_filter` × 2; `in_a_full_clone_the_check_fetches_nothing`; `in_a_full_clone_the_filter_fetches_nothing` | guards, green: run 1 exempts the commit, judges the random id a finding, and fetches nothing |
+| `through_the_recording_git_the_check_still_exempts_the_commit`; `…_the_filter_still_passes_the_commit` | guards, green: the recorder changes nothing |
+| `every_git_call_of_the_check_that_looks_up_objects_carries_git_no_lazy_fetch`; `…_of_the_filter_…` (at least one call recorded, at least one lookup, every lookup carrying the variable) | **red, 2**: "2 git calls recorded, 2 look up objects, 2 of them without `GIT_NO_LAZY_FETCH` set to true: `cat-file`, `cat-file`" |
+
+### Run 2: how the tests run this worktree's `src/`, and load
+
+- The check and the filter run as in run 1 (`run_check`, `run_filter`), with the runner's `PYTHONPATH`, else this
+  worktree's `src/` (DEC-732). The global-config scene's environment is run 1's (`base_environment`) with `HOME` and
+  `XDG_CONFIG_HOME` replaced and `GIT_CONFIG_GLOBAL` removed; every other git setting of this machine stays unread.
+- Everything is local (`file://` to a bare repository in the case's temporary folder); no network. Every repository
+  is built from scratch; none clones this repository. Commit ids are fixed by run 1's fixed identity and date.
+- **Parallel load:** no case is serial-only. Each scene has its own source, clone, counter log and recorder log; no
+  count is shared. The `unreadable-config` premise needs a user other than root (mode 000 does not stop root); it says
+  so when it fails. Run time: about 25 s for the three files, one process.
 
 ## Decisions of this suite
 

@@ -27,6 +27,7 @@ import json
 import math
 import os
 import re
+import shlex
 import shutil
 import signal
 import site
@@ -682,3 +683,215 @@ def in_memory(report_path):
     """Whether a report path stays in the caller's memory: standard output or error, or a descriptor it holds."""
     return report_path in ("-", "/dev/stdout", "/dev/stderr") or bool(
         re.fullmatch(r"/dev/fd/\d+|/proc/self/fd/\d+", report_path))
+
+
+# --------------------------------------------------------------------------
+# Run 2: partial clones, promisor remotes, and git calls that could fetch (DEC-911 item 4, KPI 4; the orchestrator's
+# decision P1-MORNING-2026-10-29 item 4)
+# --------------------------------------------------------------------------
+
+NO_LAZY_FETCH = "GIT_NO_LAZY_FETCH"
+_GIT_TRUE = {"1", "true", "yes", "on"}
+
+
+@dataclass
+class Clone:
+    """A project that is a clone, over ``file://``, of a bare source repository built from scratch.
+
+    ``seed`` is the work repository the source was pushed from: its commits are the clone's history. Every request
+    the clone's remote serves goes through a logging ``uploadpack`` program (``remote.origin.uploadpack``), one line
+    a request in ``requests``: the count of what reached the remote. The log holds no object id.
+    """
+    root: Path
+    source: Path
+    seed: Repo
+    requests: Path
+
+    @property
+    def head(self):
+        return self.seed.head
+
+    def request_count(self):
+        return len(self.requests.read_text(encoding="utf-8").splitlines()) if self.requests.exists() else 0
+
+
+def upload_pack_counter(sandbox, name):
+    """An ``uploadpack`` program that writes one line a call to its log, then is the real ``git upload-pack``."""
+    log = sandbox.elsewhere / f"{name}-upload-pack-requests.log"
+    path = sandbox.elsewhere / f"{name}-upload-pack"
+    path.write_text("#!/bin/sh\n"
+                    f"echo request >> {shlex.quote(str(log))}\n"
+                    f"exec {shlex.quote(REAL_GIT)} upload-pack \"$@\"\n", encoding="utf-8")
+    path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    return path, log
+
+
+def make_source(sandbox, name, label):
+    """A committed project (``make_repo``) pushed to a bare source repository that serves filters and any object id
+    asked for (``uploadpack.allowFilter``, ``uploadpack.allowAnySHA1InWant``), as a promisor remote must."""
+    seed = make_repo(sandbox, f"{name}-seed", label=label)
+    source = sandbox.base / f"{name}-source.git"
+    git(sandbox.base, "init", "-q", "--bare", str(source))
+    git(source, "config", "uploadpack.allowFilter", "true")
+    git(source, "config", "uploadpack.allowAnySHA1InWant", "true")
+    git(seed.root, "push", "-q", str(source), "main", "side")
+    return seed, source
+
+
+def make_clone(sandbox, name, label=None, partial=False):
+    """A clone of a new source over ``file://`` (a plain path would ignore a filter): ``--filter=blob:none`` when
+    ``partial``, else a full clone. Its remote's requests are counted from here on (the clone's own are not)."""
+    seed, source = make_source(sandbox, name, label or name)
+    root = sandbox.base / name
+    git(sandbox.base, "clone", "-q", *(["--filter=blob:none"] if partial else []), f"file://{source}", str(root))
+    wrapper, log = upload_pack_counter(sandbox, name)
+    git(root, "config", "remote.origin.uploadpack", str(wrapper))
+    return Clone(root, source, seed, log)
+
+
+def push_source_only_commit(clone, label="later"):
+    """A commit made in the source after the clone (above the entropy floor): the remote has it, the clone not."""
+    write(clone.seed.root / "src/later.txt", f"{label}: a note committed after the clone\n")
+    git(clone.seed.root, "add", "-A")
+    sha = _commit(clone.seed.root, f"{label}: a commit made after the clone")
+    git(clone.seed.root, "push", "-q", str(clone.source), "main")
+    return sha
+
+
+def _git_env_without_fetch():
+    environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+    environment.update(GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_SYSTEM=os.devnull, GIT_NO_LAZY_FETCH="1")
+    return environment
+
+
+def local_objects(root):
+    """Every object id in the local object store of the repository at ``root``: an enumeration of the store, which
+    names no object and so asks no remote for one."""
+    proc = subprocess.run([REAL_GIT, "-C", str(root), "cat-file", "--batch-all-objects", "--batch-check=%(objectname)"],
+                          capture_output=True, text=True, env=_git_env_without_fetch(), timeout=120)
+    assert proc.returncode == 0, f"the object store of {Path(root).name} cannot be listed"
+    return set(proc.stdout.split())
+
+
+def config_list(root, env):
+    """``git config --list`` in ``root`` with ``env``: (exit code, the lines). A configuration read only."""
+    proc = subprocess.run([REAL_GIT, "-C", str(root), "config", "--list"], capture_output=True, text=True, env=env,
+                          timeout=60)
+    return proc.returncode, proc.stdout.lower().splitlines()
+
+
+def lookup_by_the_test(root, oid, env, kind="commit"):
+    """``git cat-file -e <oid>^{kind}`` (``<oid>`` alone when ``kind`` is None) run by the test itself in ``env``: a
+    control (in a promisor repository, git fetches what it does not hold). Returns the exit code."""
+    name = oid if kind is None else f"{oid}^{{{kind}}}"
+    proc = subprocess.run([REAL_GIT, "-C", str(root), "cat-file", "-e", name], capture_output=True, env=env,
+                          timeout=120)
+    return proc.returncode
+
+
+def lookups_named(calls):
+    """The recorded calls that look up objects, named by their git command only (for an assertion message)."""
+    return sorted(git_subcommand(call.get("args", [])) or "(none)" for call in calls if looks_up_objects(call))
+
+
+def finds(run, rel):
+    """The check found ``rel``: it ended with exit 1 or more and named the file."""
+    return run.returncode not in (0, None) and run.names(rel)
+
+
+# ---- a recording git first on PATH (the second guard) ----------------------------------------------------------
+
+def recording_git(sandbox, name="recording-git"):
+    """A ``git`` first on PATH that records, per call, its arguments (hex runs of 16 digits or more masked), whether a
+    40-hex string stood in its arguments or its standard input (a boolean, never the string) and the value of
+    ``GIT_NO_LAZY_FETCH`` in its environment; then runs the real git with the same arguments, environment and input
+    (standard input is passed through as it comes, so a long-running batch call works; output is not touched)."""
+    folder = sandbox.elsewhere / name
+    log = sandbox.elsewhere / f"{name}-calls.jsonl"
+    body = f"""import json, os, re, subprocess, sys, threading
+REAL = {REAL_GIT!r}
+LOG = {str(log)!r}
+HEX = re.compile(rb"[0-9a-fA-F]{{40}}")
+args = sys.argv[1:]
+pid = os.getpid()
+def note(entry):
+    with open(LOG, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(dict(entry, pid=pid)) + "\\n")
+note({{"phase": "start", "args": [re.sub(r"[0-9a-fA-F]{{16,}}", "<hex>", arg) for arg in args],
+      "hex_in_args": any(HEX.search(arg.encode("utf-8", "surrogateescape")) for arg in args),
+      "no_lazy_fetch": os.environ.get({NO_LAZY_FETCH!r})}})
+child = subprocess.Popen([REAL] + args, stdin=subprocess.PIPE)
+seen = []
+def pump():
+    tail = b""
+    try:
+        while True:
+            chunk = os.read(0, 65536)
+            if not chunk:
+                break
+            if HEX.search(tail + chunk):
+                seen.append(True)
+            tail = (tail + chunk)[-40:]
+            child.stdin.write(chunk)
+            child.stdin.flush()
+    except OSError:
+        pass
+    finally:
+        try:
+            child.stdin.close()
+        except OSError:
+            pass
+threading.Thread(target=pump, daemon=True).start()
+code = child.wait()
+note({{"phase": "end", "hex_in_stdin": bool(seen), "code": code}})
+sys.exit(code if code >= 0 else 128 - code)
+"""
+    _script(folder / "git", body)
+    return folder, log
+
+
+def read_git_calls(log):
+    """The recorded calls, one dict a call (its start and end records joined by process id)."""
+    calls = {}
+    for entry in read_log(log):
+        calls.setdefault(entry["pid"], {}).update(entry)
+    return list(calls.values())
+
+
+_GIT_OPTIONS_WITH_VALUE = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env", "--super-prefix",
+                           "--attr-source"}
+OBJECT_READERS = {"cat-file", "rev-list", "show", "log", "merge-base", "name-rev", "describe", "ls-tree", "fsck"}
+
+
+def git_subcommand(args):
+    """The git command a call runs: its first argument that is not a global option or a global option's value."""
+    index = 0
+    while index < len(args):
+        arg = args[index]
+        if arg in _GIT_OPTIONS_WITH_VALUE:
+            index += 2
+        elif arg.startswith("-"):
+            index += 1
+        else:
+            return arg
+    return ""
+
+
+def looks_up_objects(call):
+    """Whether a recorded call looks up objects (README, "the second guard"): a ``git config`` call never does (a
+    configuration read); any other call does when a 40-hex string stands in its arguments or its standard input (a
+    candidate is asked about), or when it is one of git's object readers (``cat-file``, ``rev-list``, ``show``,
+    ``log``, ``merge-base``, ``name-rev``, ``describe``, ``ls-tree``, ``fsck``, ``rev-parse --verify``). Anything else
+    (``rev-parse`` with options only, ``ls-files``, ``status``, ``--version``) is left free."""
+    command = git_subcommand(call.get("args", []))
+    if command == "config":
+        return False
+    if call.get("hex_in_args") or call.get("hex_in_stdin") or command in OBJECT_READERS:
+        return True
+    return command == "rev-parse" and "--verify" in call.get("args", [])
+
+
+def carries_no_lazy_fetch(call):
+    """Whether the call ran with ``GIT_NO_LAZY_FETCH`` set to true (``1``, or git's other spellings of true)."""
+    value = call.get("no_lazy_fetch")
+    return value is not None and value.strip().lower() in _GIT_TRUE
