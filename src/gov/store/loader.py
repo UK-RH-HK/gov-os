@@ -264,7 +264,7 @@ def connect(root: Path) -> sqlite3.Connection:
 def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict, dict | None]:
     """Write the record graph of ``HEAD`` and the fingerprints row of the load, in one transaction: the load's
     result and ``HEAD``'s fingerprints (None where they cannot be computed). Without ``records_fingerprint`` the
-    row states none yet, so the store is not fresh until the load writes it (``_finish``)."""
+    row states none yet, so the store is not fresh until ``load_records`` writes it after the indexes."""
     from gov.close.fingerprint import of_commit
 
     head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
