@@ -21,3 +21,53 @@
 1271417 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
 1271451 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
 1271463 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+== 12:25:03 load 23.30 7.59 2.79
+1251279 S futex_do_wait /home/usain/.local/share/gov-os/pin-5c401220/bin/python /home/usain/.local/bin/gov rebuild --json 
+1284279 Z 0 
+1284353 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1284404 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1284419 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1284425 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1284436 R futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+== 12:25:37 load 26.57 9.90 3.71
+1251279 S futex_do_wait /home/usain/.local/share/gov-os/pin-5c401220/bin/python /home/usain/.local/bin/gov rebuild --json 
+1297373 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297398 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297418 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297427 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297435 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297461 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297474 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297495 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297509 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1297521 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+== 12:26:11 load 27.07 11.58 4.46
+1251279 S futex_do_wait /home/usain/.local/share/gov-os/pin-5c401220/bin/python /home/usain/.local/bin/gov rebuild --json 
+1310774 Z  
+1310816 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1310832 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1310863 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1310889 R futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1310897 R futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+== 12:26:45 load 28.50 13.38 5.29
+1251279 S futex_do_wait /home/usain/.local/share/gov-os/pin-5c401220/bin/python /home/usain/.local/bin/gov rebuild --json 
+1323905 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1323947 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324000 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324018 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324035 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324044 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324075 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324088 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324093 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324109 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1324114 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+== 12:27:19 load 29.13 15.01 6.09
+1251279 S futex_do_wait /home/usain/.local/share/gov-os/pin-5c401220/bin/python /home/usain/.local/bin/gov rebuild --json 
+1337159 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1337241 S 0 
+1337247 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1337272 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1337291 Z  
+1337332 R 0 gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
+1337339 S futex_do_wait gitleaks stdin --no-banner --redact --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null --log-level error --exit-code 3 
