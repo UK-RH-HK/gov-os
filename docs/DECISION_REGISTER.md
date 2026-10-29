@@ -8729,7 +8729,7 @@ The orchestrator's quality-control check (the owner's item 7 of 2026-10-18) foun
 W2-54's run 3b found that the shared GPU Ollama gives a text a vector that depends on the prompt computed before it; W2-52's run 1b and W2-54's run 3b ran the `gov launch` trial of DEC-789; W2-52 needs two lines and two copies outside its paths. The owner answered P-W2-40, P-W2-38 and P-W2-39.
 
 ### DEC-798 — Query embeddings on a CPU-only embedder of their own; DEC-261 amended (P-W2-40 (b))
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-261, DEC-773, DEC-782, DEC-768 · **Basis:** W2-54 run 3b (`9579bff0`): on the shared GPU Ollama 0.35.0, 50 of 216 reads of one text gave a different vector (largest component difference 0.005548); the vector is a function of the prefix the text shares with the prompt before it; on the CPU (`num_gpu: 0`) 420 runs gave none, but that option moves the shared runner to the CPU for every session.
+- **Status:** ACCEPTED (the fixed gate figures replaced by the measured gate (DEC-942); owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-261, DEC-773, DEC-782, DEC-768 · **Basis:** W2-54 run 3b (`9579bff0`): on the shared GPU Ollama 0.35.0, 50 of 216 reads of one text gave a different vector (largest component difference 0.005548); the vector is a function of the prefix the text shares with the prompt before it; on the CPU (`num_gpu: 0`) 420 runs gave none, but that option moves the shared runner to the CPU for every session.
 - **Decision:**
   1. **A CPU-only embedder that `gov` starts on its own port answers query embeddings, and only those.** The shared GPU runner keeps building the index. No request to the shared runner names `num_gpu: 0`.
   2. **The query-vector cache's key names the device** that computed the vector, so a vector computed on the GPU is never served as a CPU one.
@@ -9207,7 +9207,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
 - **Decision:** the held-out index check, the lefthook measure (before W2-08) and the removal of S0b2's leftovers each come to the owner as exact operator commands, when its time comes, in the report that needs it. The bootstrap pin is done (`70aea435`).
 
 ### DEC-847 — Parallelism: no fixed number; as many leads as the tickets, the measured gate and the owner's limits allow, at most 10 (plan §11 item 12, replaced; standing)
-- **Status:** ACCEPTED (the leads' ceiling: up to 4 at once beside one verification run, until W2-20 (DEC-941 item 1d); owner, 2026-10-19, in a follow-up that replaces the owner's first answer to item 12; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-780, DEC-786, DEC-798, DEC-838 · **Basis:** OWNER, 2026-10-19 · **Replaces:** the fixed caps of DEC-737 and DEC-776 (at most 3), DEC-786 item 1's "at most 3 leads", the w2 prompt §3's "up to 6", and the plan's 3 and 4. · **Changed by:** DEC-880: "fewer until W2-48 lands" reads "fewer until W2-66 lands"
+- **Status:** ACCEPTED (the hard ceiling of 10 leads removed and the gate measured on WSL as it is (DEC-942); the leads' ceiling: up to 4 at once beside one verification run, until W2-20 (DEC-941 item 1d); owner, 2026-10-19, in a follow-up that replaces the owner's first answer to item 12; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-780, DEC-786, DEC-798, DEC-838 · **Basis:** OWNER, 2026-10-19 · **Replaces:** the fixed caps of DEC-737 and DEC-776 (at most 3), DEC-786 item 1's "at most 3 leads", the w2 prompt §3's "up to 6", and the plan's 3 and 4. · **Changed by:** DEC-880: "fewer until W2-48 lands" reads "fewer until W2-66 lands"
 - **Decision:**
   1. **No fixed number.** The orchestrator starts as many leads as all of these allow, and decides it each time a slot could open:
      - **eligible tickets:** dependencies closed, or stackable under DEC-786;
@@ -11508,7 +11508,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - **Where it goes (DEC-851):** this register; `packages/` (the final files); RESUME HERE.
 
 ### DEC-941 — The re-plan of Wave 2 accepted with amendments: memory, K3 and K6 start today in parallel; the nine held tickets merged back and closed in priority order; release path an entry criterion for EXAMIN's real repository; Wave 2-grade evidence for everything EXAMIN's copy relies on (standing)
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; items 1d, 4, 6 and 7 standing) · **Under:** DEC-940, DEC-930, DEC-936, DEC-939, DEC-929, DEC-933, DEC-851, DEC-861 · **Changes:** DEC-831's slot order (replaced by item 1 and the re-plan's blocks), DEC-847's ceiling (item 1d), DEC-936 item 2.5 and DEC-938 item 2 (item 4c: one daily document) · **Basis:** `REPLAN-W2.md`, `STATE-OF-GOV-OS` (drafts, DEC-940), `P-SCOPE-RECORDS-1`, `P-TOOLS-REVIEW-1`.
+- **Status:** ACCEPTED (item 1d's ceiling of 4 leads removed (DEC-942); owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; items 1d, 4, 6 and 7 standing) · **Under:** DEC-940, DEC-930, DEC-936, DEC-939, DEC-929, DEC-933, DEC-851, DEC-861 · **Changes:** DEC-831's slot order (replaced by item 1 and the re-plan's blocks), DEC-847's ceiling (item 1d), DEC-936 item 2.5 and DEC-938 item 2 (item 4c: one daily document) · **Basis:** `REPLAN-W2.md`, `STATE-OF-GOV-OS` (drafts, DEC-940), `P-SCOPE-RECORDS-1`, `P-TOOLS-REVIEW-1`.
 - **Decision (the owner's eight amendments to an accepted re-plan):**
   1. **Start today, in parallel; do not wait for block A.**
      1. File W2-55, W2-56, W2-60, W2-61, W2-64 and the proving-ground ticket today.
@@ -11560,3 +11560,45 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.324 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-940 (the state of the Gov OS, cited, with the re-plan and two packages; drafted and shared the same day), DEC-941 (the re-plan accepted with amendments: memory, K3 and K6 today in parallel, up to 4 leads beside one verification run; the nine held tickets merged back and closed in priority order; deferrals of unbuilt work, a release path for EXAMIN's real repository; the guard's command forms in the lead brief, close-breaking rows first, one daily document; W2-78, W2-79, W2-80, runs_sweep.sh by ACT; the 18 November target; Wave 2-grade evidence before EXAMIN's copy; a spot-check of the state's claims). Next free id: DEC-942. |
+
+
+### DEC-942 — No fixed number of leads; the resource gate measured on WSL as it is; closes first (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-847, DEC-880, DEC-798, DEC-898, DEC-904, DEC-933, DEC-939, DEC-941, DEC-938 · **Changes:** DEC-941 item 1d (the interim ceiling of 4 leads, removed), DEC-847's hard ceiling of 10 leads (removed), DEC-798's fixed gate figures (load below 20, MemAvailable at least 6,710,886 kB: replaced by item 2) · **Basis:** the owner's message of 2026-10-29, which supersedes the same day's message on a `.wslconfig` change and a WSL restart (neither happens: WSL keeps its 20 threads and its memory).
+- **Decision:**
+  1. **No fixed number of leads.** Every ready ticket that dependencies and paths allow is launched (no overlapping running ticket, or the overlap split by file), critical path first (memory), then K3, K6 and the held merge-backs, until the machine's capacity is reached.
+  2. **Capacity is measured at each launch by the resource gate, on WSL as it is:**
+     - the load below `nproc` (20);
+     - available memory kept above a floor plus the measured reservation of each running lead (what a lead and its workers actually use, measured);
+     - the disk floor (100 GiB) and the inode floor (10,000,000) as they are (DEC-898).
+     If the memory floor is what stops launches while the CPU is idle, the orchestrator proposes a lower floor with the measurements, rather than leaving capacity unused.
+  3. **If the load stays above the gate for more than 15 minutes,** nothing new is launched until it falls. A running lead is never stopped for load.
+  4. **Closes take priority:** when one or more tickets are ready to close, no new lead is launched until the close (or batch) has started; the leads already running continue. Closes never starve for a quiet window.
+  5. **The locks and windows stay:** one verification run at a time (until its trial after W2-67), the close lock, and no starts between 00:30 and 05:30.
+  6. **The daily document reports:**
+     - how many leads ran at once (the peak and the average);
+     - the machine's utilisation;
+     - the lead runs and their measured cost;
+     - whether the owner's plan's usage limits are close, with a ping before they are.
+- **How it is applied:**
+  - **`tools/gate_check.py`** decides each launch:
+    - the load: launch while `min(load1, load15) < nproc`, so a short peak does not hold launches but a load above `nproc` for 15 minutes does;
+    - memory: `MemAvailable` at least the floor plus, for each running lead and the new one, its reservation less what it already uses;
+    - the reservation: the measured peak per lead (`tools/lead_mem.py`, a sample a minute into `log/lead-mem.jsonl`), at least a provisional 2 GiB until a lead has been sampled through a full run;
+    - the floor: DEC-798's 6,710,886 kB until the measurements support a lower one (item 2);
+    - the disk gate as before.
+  - **`tools/lead_chain.sh`** has no ceiling. It holds new starts while `CLOSE-PENDING` exists (a ticket ready to close whose close has not started) and between 00:30 and 05:30. It starts each lead detached from its own task, so stopping the chain stops no lead.
+  - **`tools/close_queue.sh`**:
+    - sets `CLOSE-PENDING` and the close lock;
+    - takes the verification lock, so a running full run ends first and none starts beside the close;
+    - waits for quiet (the 1-minute load below 3 for 5 minutes) for at most 20 minutes, then starts and records the load it started at;
+    - removes `CLOSE-PENDING` when the first close starts.
+  - **W2-20's KPIs** carry the gate when it lands (DEC-941 item 6, the capacity minimum).
+- **Where it goes (DEC-851):**
+  - this register, with the status lines of DEC-847, DEC-798 and DEC-941;
+  - the prompt §3 (parallelism, the gate, closes first) and §7 (the daily document's lines), v3.39;
+  - RESUME HERE.
+- Next free id: DEC-943.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.325 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-942 (no fixed number of leads; the gate measured on WSL as it is: load below nproc, memory above a floor plus each running lead's measured reservation, the disk floors as they are; no launch after 15 minutes above the gate, no lead stopped for load; closes first, never starved; the locks and the 00:30–05:30 window stay; the daily document reports leads at once, utilisation, lead costs and the usage limits). Next free id: DEC-943. |
