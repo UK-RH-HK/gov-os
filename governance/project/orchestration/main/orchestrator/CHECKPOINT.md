@@ -8,8 +8,7 @@
   the latest the morning package of 2026-11-01. Seven parts: one-page summary (solid / weak / blocks EXAMIN / top 3
   recommendations); capability x Contract v4.2 + 9 keystones (status, evidence, what remains and why); progress
   numbers; stalls with measured causes + my slips by kind; build order (EXAMIN minimum first); standing practices'
-  homes; weekly numbers. Cite a commit/file/record for every claim (an auditor will sample). Research agents running
-  (findings -> drafts/state/A..E-*.md).
+  homes; weekly numbers. Cite every claim (an auditor samples). Research agents -> drafts/state/A..E-*.md.
 
 ### Now
 - **Pin:** gov = pin-5c401220 (DEC-935, registry `bc37c419`); pin-6a4696eb kept. Tools read the pin from
