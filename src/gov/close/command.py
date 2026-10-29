@@ -29,8 +29,8 @@ import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import (evidence as _evidence, gates as _gates, history as _history, ratchet as _ratchet,
-                       select as _select, state as _state, tool as _tool)
+from gov.close import (batch as _batch, evidence as _evidence, fingerprint as _fingerprint, gates as _gates,
+                       history as _history, ratchet as _ratchet, select as _select, state as _state, tool as _tool)
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
@@ -205,12 +205,15 @@ def run(root: Path, args, config: dict):
     if found:
         _refuse_for(root, ticket, found, disposition, None, [], report, counted=False)
 
+    # W2-66: what the regression run selects, and its evidence; W2-68: the run it reuses, decided before gov check
+    scope = _scope(root, ticket, wbs, args)
     # The pre-close gate (DEC-868 item 1): the collection of every suite in one process, gov check, the checkpoint
     kind = _gates.ticket_class(front)
     folder = _gates.acceptance_folder(root, front, wbs)
     gate(_gates.check_collection, root, [(folder, None), (root / "tests", folder)], timeout)
-    checked = gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c, tickets)],
-                   every=True)
+    reused_check = _batch.reused_check(root, scope["reused"])  # the reused run's check stands for the close's own
+    checked = {CHECKS_REUSED_KEY: reused_check} if reused_check else \
+        gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c, tickets)], every=True)
     gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
     if found:
         _refuse_for(root, ticket, found, disposition, None, [], report, counted=False)
@@ -228,7 +231,6 @@ def run(root: Path, args, config: dict):
     # result, and the reds of the runs are judged by the lists, after both runs.
     told = {"results": {}, "rootdirs": {}, "env": None} \
         if any(settings.get(key) for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE)) else None
-    scope = _scope(root, ticket, wbs, args)  # W2-66: what the regression run selects, and its evidence
     no_counts = dict.fromkeys(("passed", "failed", "errors", "skipped"), 0)
     if kind in _gates.EVIDENCE_CLASSES and not _gates.has_tests(folder):  # judged on its evidence (W2-H045)
         test_counts = no_counts
@@ -285,7 +287,7 @@ def run(root: Path, args, config: dict):
 
     return {"ticket": ticket, "close_record": close_record_path,
             "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report, **(reds or {}),
-            _evidence.KEY: evidence, **judged}
+            _evidence.KEY: evidence, **judged, **({CHECKS_REUSED_KEY: reused_check} if reused_check else {})}
 
 
 def _judged_by(kind: str, judged_on: list[str] | None, accepted_probes: dict, disk: dict) -> dict:
@@ -1305,12 +1307,17 @@ def _read_skill_versions(root: Path) -> list[dict]:
 
 CHECK_RESULT_VARIABLE = "GOV_CLOSE_CHECK_RESULT"
 _TIMEOUT_PLUGIN = "pytest_timeout"
+# W2-68: what a reusing close states of the run it reused, and of the check that stands for its own gov check
+REUSED_KEYS = ("record", "head", "code_fingerprint", "junit_xml", "skip_count", "skips", "tests_run")
+CHECKS_REUSED_KEY = "governance_checks_reused"
 
 
 def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
     """What the regression run selects (``gov.close.select``), with what every run of the close needs: the
     folder of its JUnit XML (under ``.gov-runtime/``) and the pre-close gate's ``gov check`` result, copied byte
-    for byte, where ``--check-result`` gives one. ``CHECK_RESULT_UNREADABLE`` when it cannot be read: nothing ran."""
+    for byte, where ``--check-result`` gives one. ``CHECK_RESULT_UNREADABLE`` when it cannot be read: nothing ran.
+    W2-68: where the last fully passing run on this code is reused (``gov.close.batch.reuse``), the regression run
+    is the record-reading set alone; the head's two fingerprints go with it."""
     from datetime import datetime, timezone
 
     given = getattr(args, "check_result", None)
@@ -1321,7 +1328,11 @@ def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
         except OSError as e:
             raise GovError("CHECK_RESULT_UNREADABLE", f"the check result {given} cannot be read: {e}",
                             {"check_result": str(given)})
-    scope = _select.plan(root, wbs, full_asked=bool(getattr(args, "full", False)), ticket=ticket)
+    full_asked = bool(getattr(args, "full", False))
+    scope = _select.plan(root, wbs, full_asked=full_asked, ticket=ticket)
+    reused = _batch.reuse(root, scope, full_asked)  # W2-68: the last fully passing run on this code, or None
+    if reused is not None:
+        scope = _batch.reused_form(root, _select._own(_select._tickets(root), ticket, wbs), scope)
     folder = f"{_evidence.JUNIT_DIR}/{ticket}/{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')}"
     (root / folder).mkdir(parents=True, exist_ok=True)
     check = None
@@ -1329,7 +1340,8 @@ def _scope(root: Path, ticket: str, wbs: str, args) -> dict:
         check = root / folder / "check-result.json"
         check.write_bytes(content)
     return {**scope, "folder": folder, "check_result": str(check) if check else None, "runs": [],
-            "junit_xml": [], "limit": None}
+            "junit_xml": [], "limit": None, "reused": reused,
+            "fingerprints": _fingerprint.of_commit(root, scope["head"])}
 
 
 def _scope_form(root: Path, scope: dict, ignore: Path | None) -> list[str]:
@@ -1382,7 +1394,8 @@ def _scope_junit(root: Path, scope: dict, run: str, form: str) -> str:
 
 def _scope_evidence(root: Path, scope: dict | None) -> dict | None:
     """The evidence block (``gov.close.evidence``); a run that wrote no JUnit XML (one cut at the time limit)
-    has a file that says so, so that each file the block names exists."""
+    has a file that says so, so that each file the block names exists. W2-68: the head's two fingerprints (null
+    where they cannot be computed) and, of a reusing close, the run it reused (``reused``)."""
     if scope is None:
         return None
     for rel in scope["junit_xml"]:
@@ -1390,7 +1403,13 @@ def _scope_evidence(root: Path, scope: dict | None) -> dict | None:
             (root / rel).write_text('<?xml version="1.0" encoding="utf-8"?>\n'
                                     "<!-- the run wrote no JUnit XML: it did not come to its end -->\n<testsuites/>\n",
                                     encoding="utf-8")
-    return _evidence.block(scope, scope["runs"], scope["junit_xml"])
+    evidence = _evidence.block(scope, scope["runs"], scope["junit_xml"])
+    prints = scope.get("fingerprints")
+    evidence["code_fingerprint"] = prints["code"] if prints else None
+    evidence["records_fingerprint"] = prints["records"] if prints else None
+    if scope.get("reused"):
+        evidence["reused"] = {key: scope["reused"][key] for key in REUSED_KEYS}
+    return evidence
 
 
 # ---------------------------------------------------------------------------
