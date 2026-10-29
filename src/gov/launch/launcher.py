@@ -5,8 +5,10 @@ one ``--settings`` value built here: the strict sandbox block, the role's networ
 profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
 ``GOV_TICKET`` and a per-session temp directory, removed when the session ends
 (DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
-(DEC-392). Nothing fails open: whatever cannot be read or is not of the stated
-shape refuses the launch.
+(DEC-392). The session starts as its role: the role file's text and its named
+skills appended, its default model and effort, no compaction threshold, and one
+launch record written before it starts (W2-60a). Nothing fails open: whatever
+cannot be read or is not of the stated shape refuses the launch.
 
 No message of this module carries a held-out path.
 """
@@ -22,6 +24,8 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
+import uuid
 from pathlib import Path
 
 import yaml
@@ -32,6 +36,7 @@ from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 from gov.guard.reads import PolicyError, check_sets
 from gov.guard import runs
+from gov.launch import record, role as roles
 
 # DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
 WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
@@ -61,6 +66,20 @@ PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
 END_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 INTERRUPT_EXIT = 130
 END_WAIT_S = 5  # whole seconds a session that was asked to end may still run before it is killed
+# W2-60a (DEC-826 Q5): what the launcher's own line keeps out: connectors, user-level agents and skills.
+OWN_SWITCHES = ("--setting-sources", "project,local", "--strict-mcp-config")
+KEPT_OUT = ["--strict-mcp-config", "--setting-sources project,local", "autoMemoryEnabled false"]
+# W2-60a: the arguments the launcher sets itself, refused after "--", and why.
+SET_ITSELF = {
+    "--agent": "the launcher starts the session as its role, with the role file's text appended (DEC-826 Q1)",
+    "--append-system-prompt": "the launcher appends the role's text itself (DEC-826 Q1)",
+    "--append-system-prompt-file": "the launcher appends the role's text itself (DEC-826 Q1)",
+    "--session-id": "the launcher gives the session its id and keys the launch record by it",
+    "--autocompact": "no launch sets a compaction threshold (DEC-838)",
+}
+RESUME_RULE = "a launch resumes a session by its id (--resume <session id>), so that the record can name it"
+COMPACT_ENV, COMPACT_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW", "autoCompactWindow"
+_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
 
 
@@ -238,6 +257,14 @@ def _check_repository_settings(root: Path) -> None:
         if "additionalDirectories" in permissions:
             raise _refuse(f"{rel} carries permissions.additionalDirectories: a worker session gets no added "
                           f"directory (DEC-313)")
+        # W2-60a: either would change the session's prompt or its compaction threshold.
+        if "agent" in data:
+            raise _refuse(f"{rel} carries an agent key: the launcher starts the session as its role, with the role "
+                          f"file's text appended (DEC-826 Q1)")
+        env = data.get("env", {})
+        if not isinstance(env, dict) or COMPACT_ENV in env or COMPACT_KEY in data:
+            raise _refuse(f"{rel} sets {COMPACT_KEY} or env.{COMPACT_ENV}, or carries an env that is not a map: no "
+                          f"launch sets a compaction threshold (DEC-838)")
         wired = wired or (rel == REPO_SETTINGS[0] and _guard_wired(data))
     if not wired:
         raise _refuse(f"{REPO_SETTINGS[0]} does not register the guard ({GUARD_HOOK}) as a PreToolUse hook for "
@@ -261,6 +288,53 @@ def _check_cli_args(cli_args: list[str]) -> None:
         if arg == "--setting-sources" or arg.startswith("--setting-sources="):
             raise _refuse("the CLI arguments carry --setting-sources: without the project's settings the session "
                           "would have no guard hook")
+
+
+def _given_value(name: str, arg: str, value: str | None, given: dict) -> str | None:
+    """The value of ``--model`` or ``--effort`` in ``arg`` (spaced or ``=``); ``None`` when ``arg`` is neither."""
+    if arg == name:
+        found = value if value is not None and not value.startswith("-") else ""
+    elif arg.startswith(name + "="):
+        found = arg[len(name) + 1:]
+    else:
+        return None
+    if not found:
+        raise _refuse(f"the CLI arguments carry {name} without a value")
+    if name in given:
+        raise _refuse(f"the CLI arguments carry {name} twice: the session has one")
+    return found
+
+
+def _check_own_args(cli_args: list[str]) -> dict:
+    """Refuse the arguments the launcher sets itself (W2-60a) and return the ``model``, ``effort`` and ``resume`` given.
+
+    Judged word by word, as ``_check_cli_args``: a prompt that only names one as a word passes."""
+    given: dict = {}
+    for arg, value in zip(cli_args, [*cli_args[1:], None]):
+        for name, why in SET_ITSELF.items():
+            if arg == name or arg.startswith(name + "="):
+                raise _refuse(f"the CLI arguments carry {name}: {why}")
+        if arg == "--fork-session":
+            raise _refuse("the CLI arguments carry --fork-session: the launcher forks a resumed session itself, so "
+                          "that it has an id of its own")
+        if arg in ("--continue", "-c") or (re.fullmatch(r"-[A-Za-z]{2,}", arg) and "c" in arg) \
+                or (arg.startswith("-c") and len(arg) > 2):
+            raise _refuse(f"the CLI arguments carry {arg} (--continue, -c): {RESUME_RULE}")
+        if arg in ("--resume", "-r") or arg.startswith("--resume="):
+            found = value if arg in ("--resume", "-r") else arg[len("--resume="):]
+            if found is None or not _UUID.fullmatch(found) or "resume" in given:
+                raise _refuse(f"the CLI arguments carry {arg} without one session id (a UUID): {RESUME_RULE}")
+            given["resume"] = found
+        elif (re.fullmatch(r"-[A-Za-z]{2,}", arg) and "r" in arg) or (arg.startswith("-r") and len(arg) > 2):
+            raise _refuse(f"the CLI arguments carry {arg}, a resume (--resume, -r) spelled otherwise: {RESUME_RULE}")
+        for name, key in (("--model", "model"), ("--effort", "effort")):
+            found = _given_value(name, arg, value, given)
+            if found is not None:
+                if key == "effort" and found not in roles.EFFORTS:
+                    raise _refuse(f"the CLI arguments carry --effort {found}: the effort is one of "
+                                  f"{', '.join(roles.EFFORTS)}")
+                given[name] = found
+    return {"model": given.get("--model"), "effort": given.get("--effort"), "resume": given.get("resume")}
 
 
 def _say(line: str) -> None:
@@ -287,6 +361,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     if role not in WORKER_ROLES:
         raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)})")
     _check_cli_args(cli_args)
+    given = _check_own_args(cli_args)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
     cli = Path.home() / CLI_REL
@@ -296,6 +371,18 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
+    # W2-60a: the role read once; the session's model is the role's, and an effort after "--" is the launch's own.
+    loaded = roles.read_role(root, role)
+    if given["model"] is not None and given["model"] != loaded["model"]:
+        raise _refuse(f"the CLI arguments carry --model {given['model']}, which is not the {role}'s model "
+                      f"{loaded['model']} (DEC-839 item 1)")
+    model, effort = loaded["model"], given["effort"] or loaded["effort"]
+    ticket_class = (_load_ticket(str(root), ticket_id) or {}).get("class")
+    records = record.folder(root)
+    settings["permissions"]["deny"] += [rule for rule in record.deny_rules(records)
+                                        if rule not in settings["permissions"]["deny"]]
+    # Corrections to Behaviour 8: a resumed, forked session keeps its original's prompt, so its record holds that.
+    resumed = record.original(records, given["resume"], role, ticket_id) if given["resume"] else None
     # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
     # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
     # folder made here is marked as this repository's; a folder that is there without this repository's marker,
@@ -326,13 +413,34 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
         # DEC-159: a temp directory of the session's own, for the CLI and for its sandboxed commands.
         tmpdir = tempfile.mkdtemp(prefix=f"gov-launch-{role}-")
         settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
+        settings["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] = model  # DEC-839 item 3
+        settings["autoMemoryEnabled"] = False  # DEC-826 Q5: no model-side memory
         settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
         env = {**os.environ, **settings["env"]}
         if not state["ended"]:  # a signal that came first: no session is started
+            appended = Path(tmpdir) / f"role-{role}.md"
+            appended.write_bytes(loaded["appended"])
+            session_id = str(uuid.uuid4())
+            origin = resumed or {"role_text": loaded["role_text"], "skills": loaded["skills"],
+                                 "appended_sha256": roles.sha256(loaded["appended"])}
+            written = record.write(records, {
+                "record": "gov-launch", "format": record.FORMAT, "session_id": session_id,
+                "resumes": given["resume"], "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "root": str(root), "role": role, "ticket": ticket_id, "ticket_class": ticket_class,
+                "model": model, "model_source": "after --" if given["model"] else "role default",
+                "effort": effort, "effort_source": "after --" if given["effort"] else "role default",
+                "subagent_model": model, "compaction_threshold": "none",
+                "role_text": origin["role_text"], "appended_sha256": origin["appended_sha256"],
+                "skills": origin["skills"], "kept_out": KEPT_OUT,
+                "cli": {"path": f"~/{CLI_REL}", "version": record.cli_version(cli)}})
+            line = [*OWN_SWITCHES, *([] if given["model"] else ["--model", model]),
+                    *([] if given["effort"] else ["--effort", effort]), "--session-id", session_id,
+                    "--append-system-prompt-file", str(appended), *(["--fork-session"] if resumed else [])]
             try:
-                state["session"] = subprocess.Popen([str(cli), "--settings", json.dumps(settings), *cli_args],
+                state["session"] = subprocess.Popen([str(cli), "--settings", json.dumps(settings), *line, *cli_args],
                                                     cwd=root, env=env)
             except OSError:
+                record.remove(written)
                 raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
             if state["ended"]:  # a signal that came while the session was started
                 end()

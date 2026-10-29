@@ -1,0 +1,154 @@
+"""The role a worker is launched as: its role file, its skills and its default line (W2-60a; DEC-826 Q1, DEC-839).
+
+The role file ``template/governance/kernel/roles/<role>.md`` carries a version
+line and a default line (model and effort, nothing else), and may name its skills.
+The skills the session can load are the project's copies under ``.claude/skills/``;
+each is described from that copy. The text appended to the session's prompt is the
+role file's bytes, then each named skill's ``SKILL.md``, in the order named.
+Whatever cannot be read or is not of the stated form refuses the launch.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import os
+import re
+import stat
+from pathlib import Path
+
+import yaml
+
+from gov.cli.errors import GovError
+from gov.guard.heldout import load_yaml_unique
+
+ROLES_REL = "template/governance/kernel/roles"
+SKILLS_REL = ".claude/skills"
+EFFORTS = ("low", "medium", "high", "xhigh", "max")  # the CLI's --effort values
+NO_VERSION = "no version"  # as gov close writes it
+VERSION_HEAD, DEFAULT_HEAD, SKILLS_HEAD = "- **Version:**", "- **Launch default:**", "- **Skills:**"
+VERSION_LINE = re.compile(r"- \*\*Version:\*\* (\d+\.\d+\.\d+)")
+MODEL = r"claude(?:-[a-z0-9]+)+"
+DEFAULT_LINE = re.compile(rf"- \*\*Launch default:\*\* model ({MODEL}), effort ({'|'.join(EFFORTS)})")
+SKILLS_LINE = re.compile(r"- \*\*Skills:\*\* ([a-z0-9-]+(?:, [a-z0-9-]+)*)")
+DEFAULT_FORM = "- **Launch default:** model <model>, effort <effort>"
+
+
+def _refuse(reason: str) -> GovError:
+    return GovError("LAUNCH_REFUSED", reason)
+
+
+def sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _one_line(lines: list[str], head: str, form: re.Pattern, rel: str, shown: str, required: bool):
+    """The match of the one line of ``form`` that begins with ``head``; ``None`` when none does and none is needed."""
+    found = [line for line in lines if line.lstrip().startswith(head)]
+    if not found:
+        if required:
+            raise _refuse(f"the role file {rel} has no line '{shown}'")
+        return None
+    match = form.fullmatch(found[0]) if len(found) == 1 else None
+    if match is None:
+        raise _refuse(f"the role file {rel} must hold its line '{shown}' once, whole and of that form")
+    return match
+
+
+def _front_matter(text: str, rel: str) -> dict:
+    """The YAML front matter of a ``SKILL.md``: empty when it has none; refused when it is not a YAML map."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return {}
+    try:
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+        front = load_yaml_unique("\n".join(lines[1:end]))
+    except (StopIteration, yaml.YAMLError):
+        raise _refuse(f"the skill {rel} has a front matter that is not YAML") from None
+    if front is None:
+        return {}
+    if not isinstance(front, dict):
+        raise _refuse(f"the skill {rel} has a front matter that is not a YAML map")
+    return front
+
+
+def _folder_sha256(folder: Path, rel: str) -> str:
+    """The sha256 of each regular file's path and sha256, in path order; a link or another kind of entry refuses."""
+    entries = []
+    for here, dirs, files in os.walk(folder):
+        for name in dirs + files:
+            path = Path(here, name)
+            mode = os.lstat(path).st_mode
+            if stat.S_ISLNK(mode):
+                raise _refuse(f"the skill folder {rel} holds a link, {path.relative_to(folder)}")
+            if stat.S_ISREG(mode):
+                entries.append((path.relative_to(folder).as_posix(), sha256(path.read_bytes())))
+            elif not stat.S_ISDIR(mode):
+                raise _refuse(f"the skill folder {rel} holds an entry that is not a file or a folder")
+    return sha256("".join(f"{sha}  {path}\n" for path, sha in sorted(entries)).encode())
+
+
+def _skills(root: Path) -> dict[str, dict]:
+    """Every skill the session can load, by name: each folder directly under ``.claude/skills/`` with a ``SKILL.md``."""
+    base = root / SKILLS_REL
+    if not os.path.lexists(base):
+        return {}
+    if base.is_symlink() or not base.is_dir():
+        raise _refuse(f"{SKILLS_REL} is a link or not a folder")
+    skills: dict[str, dict] = {}
+    try:
+        for name in sorted(os.listdir(base)):
+            folder, rel = base / name, f"{SKILLS_REL}/{name}"
+            if folder.is_symlink():
+                raise _refuse(f"the skill folder {rel} is a link")
+            if not folder.is_dir() or not os.path.lexists(folder / "SKILL.md"):
+                continue
+            folder_hash = _folder_sha256(folder, rel)
+            data = (folder / "SKILL.md").read_bytes()
+            front = _front_matter(data.decode("utf-8"), f"{rel}/SKILL.md")
+            skill_name = str(front.get("name") or name)
+            if skill_name in skills:
+                raise _refuse(f"two skill folders of {SKILLS_REL} give the name '{skill_name}'")
+            version = front.get("version")
+            skills[skill_name] = {"name": skill_name, "path": f"{rel}/SKILL.md",
+                                  "version": str(version) if version else NO_VERSION,
+                                  "sha256": sha256(data), "folder_sha256": folder_hash,
+                                  "named": False, "text": data}
+    except (OSError, UnicodeDecodeError):
+        raise _refuse(f"the skills under {SKILLS_REL} cannot be read, so the record could not say what the session "
+                      f"may load") from None
+    return skills
+
+
+def read_role(root: Path, role: str) -> dict:
+    """The role file read once: its path, bytes, version, sha256, default model and effort, and the skills.
+
+    ``skills`` holds every loadable skill, named or not, in the record's form; ``appended`` the bytes of the text
+    appended to the session's prompt: the role file, then each named skill's ``SKILL.md`` in the order named.
+    """
+    rel = f"{ROLES_REL}/{role}.md"
+    try:
+        data = (root / rel).read_bytes()
+        lines = data.decode("utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        raise _refuse(f"the role file {rel} cannot be read: the session would start without its role (DEC-826 Q1)") \
+            from None
+    version = _one_line(lines, VERSION_HEAD, VERSION_LINE, rel, "- **Version:** <major>.<minor>.<patch>", True)
+    default = _one_line(lines, DEFAULT_HEAD, DEFAULT_LINE, rel, DEFAULT_FORM, True)
+    named_line = _one_line(lines, SKILLS_HEAD, SKILLS_LINE, rel, "- **Skills:** <name>, <name>", False)
+    named = named_line.group(1).split(", ") if named_line else []
+    if len(set(named)) != len(named):
+        raise _refuse(f"the role file {rel} names a skill twice in its line '- **Skills:**'")
+    skills = _skills(root)
+    appended = [data]
+    for name in named:
+        skill = skills.get(name)
+        if skill is None or skill["path"] != f"{SKILLS_REL}/{name}/SKILL.md":
+            raise _refuse(f"the role file {rel} names the skill '{name}', which is not at {SKILLS_REL}/{name}/SKILL.md")
+        if skill["version"] == NO_VERSION:
+            raise _refuse(f"the skill '{name}' that {rel} names carries no version in its front matter")
+        skill["named"] = True
+        appended.append(skill["text"])
+    text = b"".join(part if part.endswith(b"\n") else part + b"\n" for part in appended)
+    return {"role_text": {"path": rel, "version": version.group(1), "sha256": sha256(data)},
+            "model": default.group(1), "effort": default.group(2), "appended": text,
+            "skills": [{k: v for k, v in skill.items() if k != "text"} for skill in skills.values()]}
