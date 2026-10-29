@@ -163,6 +163,7 @@ def run(root: Path, args, config: dict):
     _gates.take_back_interrupted(root, ticket, _close_record_rel(ticket))
     _check_tree(root, ticket)
     _check_store(root)
+    _batch.check_red_run(root)  # W2-68: on the code of a red batch run, the close waits for a green run
     if owner_decision:
         state = _state.lift_escalation(root, ticket, owner_decision, state, settings.get(REGISTER_KEY))
 

@@ -18,7 +18,8 @@
   ``STORE_STALE`` where the load left it stale.
 
 Reuse (section 4): ``reuse`` gives a close the last fully passing run on its code, or None, and ``reused_check``
-the governance check that run's record names, where it may stand in for the close's own.
+the governance check that run's record names, where it may stand in for the close's own. ``check_red_run`` holds a
+close on the code of a red batch run until a green run on that code (point F).
 
 The commits the batch makes carry ``Role:`` (the caller's ``GOV_ROLE``, else ``orchestrator``), ``Implements:
 DEC-883`` and a ``Co-Authored-By:`` only where the caller's environment gives one (``GOV_CO_AUTHORED_BY``).
@@ -183,6 +184,47 @@ def reused_check(root: Path, reused: dict | None) -> dict | None:
         return None
     return {"record": reused["record"], "commit": reused["head"], "code_fingerprint": reused["code_fingerprint"],
             "check_result": named["path"]}
+
+
+def check_red_run(root: Path) -> None:
+    """``RED_RUN_ON_CODE`` (exit 1, not counted) when the newest batch run on ``HEAD``'s code is red and no green full
+    run on that code is newer (the design note, section 11, point F; DEC-883 item 2 c: an unrelated ticket waits for
+    a green run).
+
+    The batch runs are the nightly folder's records of ``kind: batch`` whose head is ``HEAD`` or an ancestor of it and
+    whose stated code fingerprint is ``HEAD``'s, computed now; the newest is the deepest, ties by the record's name. A
+    green full run (a night or a batch) is on that code where the fingerprint it states, else its head's computed
+    now, is ``HEAD``'s. Where ``HEAD``'s code fingerprint cannot be computed, no batch is on its code: nothing is
+    asked."""
+    root = Path(root)
+    now = _fingerprint.of_commit(root, "HEAD")
+    if now is None:
+        return
+    batches, greens = [], []
+    for path in sorted((root / _select.NIGHTLY_REL).glob("*.json")):
+        try:
+            run = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        head = _select.full_id(root, run.get("head")) if isinstance(run, dict) and isinstance(run.get("head"), str) \
+            else None
+        if not head or not _select.is_ancestor(root, head):
+            continue
+        at = (int(_git(root, "rev-list", "--count", head).strip() or 0), path.name)
+        if run.get("kind") == KIND and run.get("code_fingerprint") == now["code"]:
+            batches.append((at, path.relative_to(root).as_posix(), head, run.get("verdict")))
+        if run.get("verdict") == "green" and run.get("scope") == "full":
+            stated = run["code_fingerprint"] if "code_fingerprint" in run else \
+                (_fingerprint.of_commit(root, head) or {}).get("code")
+            if stated == now["code"]:
+                greens.append(at)
+    if not batches:
+        return
+    at, rel, head, verdict = max(batches)
+    if verdict != "green" and not any(green > at for green in greens):
+        raise GovError("RED_RUN_ON_CODE", f"the newest batch run on HEAD's code ({rel}, at {head[:12]}) is red and no "
+                       "green run on that code is newer: the close waits for a green run",
+                       {"record": rel, "head": head, "code_fingerprint": now["code"]})
 
 
 def reused_form(root: Path, own: str, plan: dict) -> dict:

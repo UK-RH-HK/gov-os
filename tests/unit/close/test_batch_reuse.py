@@ -3,7 +3,8 @@
 Regression evidence only (DEC-136): the last fully passing run is reused on the same code and never where it
 failed, was cut short, hides a skip or ran on other code (section 4, conditions 1 to 7); its check result stands
 for the close's own only where it ran at its head and does not block; the reused regression is the record-reading
-set alone; the batch refuses before anything runs; a red that fails alone is attributed, a flaky one is not.
+set alone; the batch refuses before anything runs; a red that fails alone is attributed, a flaky one is not; a close
+on the code of a red batch waits for a green run (point F).
 """
 from __future__ import annotations
 
@@ -166,3 +167,37 @@ def test_the_close_s_evidence_states_both_fingerprints_and_the_reused_run():
     evidence = command._scope_evidence(Path("."), scope)
     assert (evidence["scope"], evidence["code_fingerprint"], evidence["records_fingerprint"]) == ("reused", "c", "r")
     assert evidence["reused"] == {key: reused[key] for key in command.REUSED_KEYS}
+
+
+def _run(repo, name: str, head: str, verdict: str, **record) -> None:
+    data = {"head": head, "verdict": verdict, "scope": "full", "kind": "batch",
+            "code_fingerprint": of_commit(repo.root)["code"], **record}
+    repo.commit(f"the run {name}", files={f"docs/close/nightly/NR-{name}.json": json.dumps(
+        {key: value for key, value in data.items() if value is not None})})
+
+
+def test_a_close_on_the_code_of_a_red_batch_waits_for_a_green_run(repo):
+    head, _ = _green(repo)
+    _run(repo, "20261029T010000Z-red", head, "red")
+    with pytest.raises(GovError) as waits:
+        batch.check_red_run(repo.root)
+    assert waits.value.code == "RED_RUN_ON_CODE" and waits.value.exit_code == 1
+    assert waits.value.details["record"] == "docs/close/nightly/NR-20261029T010000Z-red.json"
+    assert waits.value.details["head"] == head
+
+
+def test_a_newer_green_run_on_the_same_code_lets_the_close_go_on(repo):
+    head, _ = _green(repo)
+    _run(repo, "20261029T010000Z-red", head, "red")
+    later = repo.commit("a record", files={"docs/close/T/CL-T.md": "closed\n"})
+    _run(repo, "20261029T020000Z-night", later, "green", kind="night", code_fingerprint=None)  # a night states none
+    assert batch.check_red_run(repo.root) is None
+
+
+def test_a_red_batch_on_other_code_asks_nothing(repo):
+    head, _ = _green(repo)
+    _run(repo, "20261029T010000Z-red", head, "red")
+    repo.commit("code", files={"src/a.py": "A = 2\n"})
+    assert batch.check_red_run(repo.root) is None
+    repo.commit("a map that does not parse", files={MAP_REL: "version: [1\n"})
+    assert batch.check_red_run(repo.root) is None
