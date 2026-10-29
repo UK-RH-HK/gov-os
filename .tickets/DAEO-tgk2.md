@@ -1,6 +1,6 @@
 ---
 id: DAEO-tgk2
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
