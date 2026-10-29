@@ -1,3 +1,6 @@
 2026-10-29 12:45:09 quiet
 2026-10-29 12:45:09 rebuild before DAEO-ebmh
 2026-10-29 12:49:31 collect ok: 16751/16753 tests collected (2 deselected) in 6.88s
+2026-10-29 12:51:33 records ok: 80 passed in 108.38s (0:01:48)
+2026-10-29 12:51:36 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-29 12:57:00 check ok; close DAEO-ebmh (load 6.37)
