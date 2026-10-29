@@ -11723,17 +11723,20 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
   2. **The reserve:** the floor, plus one verification run's measured peak, plus each running lead's measured working size outside verification (about 2.1 GiB, measured on 2026-10-29).
   3. **Both figures are re-measured weekly.**
   4. **Applied at once,** not held for the morning package; the staggered launches stay (DEC-946 item 8).
+  5. **The floor goes from 6.4 GiB to 3 GiB** (the owner's amendment the same day, not at the weekly re-measure): the verification run's peak is now reserved separately, and seven leads ran without memory trouble. If available memory ever falls below 2 GiB, or the kernel journal shows any out-of-memory kill, the floor goes back to 6.4 GiB at once and the next package reports it. The load gate stays as it is.
 - **How it is applied:**
-  - `tools/gate_check.py` opens memory when MemAvailable plus what the running leads already hold is at least the floor (6,710,886 kB), plus the verification peak (7,404,492 kB), plus the working size (2,140,236 kB) for each running lead and for the new one.
+  - `tools/gate_check.py` opens memory when MemAvailable plus what the running leads already hold is at least the floor (3,145,728 kB from item 5; 6,710,886 kB before), plus the verification peak (7,404,492 kB), plus the working size (2,140,236 kB) for each running lead and for the new one.
   - The figures live in `tools/gate-config.json` with their date and source.
   - The weekly numbers carry the re-measure, from `log/lead-mem.jsonl` (`tools/lead_mem.py --summary`), old and new side by side.
 - **Effect, measured at 20:35 on 2026-10-29:**
   - WSL holds 23.5 GiB; available plus the leads' memory came to 20.6 GiB;
   - the rule then admits about three leads at once (20.6 − 6.4 − 7.1 = 7.1 GiB, at 2.04 GiB each);
   - the seven leads already running continue (DEC-942 item 3); none starts until they are down to two.
+  - **Item 5's trip-wire:** `tools/oom_watch.sh`, every 30 seconds: MemAvailable below 2,097,152 kB, or an out-of-memory line in `journalctl -k` since the watch began, puts the floor back to 6,710,886 kB in `gate-config.json` and logs it to `log/oom-watch.txt`. With item 5 the rule admits about five leads at once (21.1 − 3.0 − 7.1 = 11.0 GiB, at 2.04 GiB each; 20:47 on 2026-10-29).
 - **Where it goes (DEC-851):** this register, with DEC-942's status line; the prompt §3 (the gate) and §7 (the weekly re-measure), v3.41; RESUME HERE.
 - Next free id: DEC-948.
 
 | Version | Date | Change |
 |---|---|---|
 | 0.329 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-947 (the memory gate: the floor, plus one verification run's measured peak reserved once, plus a measured working size per running lead and the new one; both figures re-measured weekly; applied at once, launches still staggered). Next free id: DEC-948. |
+| 0.330 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-947 item 5 (the floor from 6.4 GiB to 3 GiB, put back at once if available memory falls below 2 GiB or an out-of-memory kill appears). Next free id: DEC-948. |
