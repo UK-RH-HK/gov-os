@@ -66,6 +66,8 @@ namespaces:
       - "governance/project/prompts/**"
       - "governance/project/orchestration/*"
       - "governance/project/orchestration/packages/**"
+      # DEC-934: the nightly's committed, reviewed scripts and their tests
+      - "governance/project/orchestration/nightly/**"
       - "governance/project/orchestration/sessions/**"
       - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
       - "governance/project/orchestration/main/orchestrator/PR-*.md"
@@ -361,6 +363,12 @@ accepted_history:
   - commit: "f409ad97575a32f6aab96e6ee6bcb4b7bc008691"
     decision: DEC-927
     should_implement: [DEC-889, DEC-892, DEC-899, DEC-906, DEC-908, DEC-912]
+  - commit: "6be837bbbe4158768ca88ae47972308386e008cf"
+    decision: DEC-927
+    should_implement: [DEC-813, DEC-823, DEC-871, DEC-883, DEC-889, DEC-890, DEC-892, DEC-784]
+  - commit: "d0bfeb6afd9523b4ee6a4e6e2da5333f54b283bf"
+    decision: DEC-927
+    should_implement: [DEC-813, DEC-823, DEC-871, DEC-883, DEC-889, DEC-890, DEC-892, DEC-784]
 # Commits that W1-01's MR-3 history case accepts though they touch tests/acceptance/ without the test designer's
 # role (DEC-906): each by its exact sha, with the owner's decision. Only the owner's commit adds an entry; any other
 # commit touching tests/acceptance/ without that role stays red.
@@ -474,30 +482,6 @@ load_sensitive:
     decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
     fixed_by: W2-M364
-  - test: "tests/unit/close/test_follow_up.py::test_at_the_time_limit_the_processes_a_run_started_are_ended_with_it"
-    decision: DEC-762
-    reason: "fails once under parallel load (-n 8) and passes alone (W2-53's review, 2026-10-17)"
-    fixed_by: W2-L352
-  - test: "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py::test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project"
-    decision: DEC-823
-    reason: "fails once in the full regression at load about 25 and passes alone, 3 of 3 in 17.8 s with a 2 s reaping margin (W2-53's re-close, 2026-10-19 12:01)"
-    fixed_by: W2-M384
-  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project"
-    decision: DEC-871
-    reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
-    fixed_by: W2-57
-  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSettingsHandEdit::test_key_added_by_hand_is_found_and_named[top-level-env]"
-    decision: DEC-871
-    reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
-    fixed_by: W2-57
-  - test: "tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]"
-    decision: DEC-886
-    reason: "fails in the close's parallel regression (W2-02's closes, 2026-10-21 15:36 at load about 3 and 17:26 at load 2.9) and passes alone, 3 of 3 in 5.4 to 6.0 s at load 2.8 to 3.9"
-    fixed_by: W2-57
-  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]"
-    decision: DEC-892
-    reason: "RULESYNC_FAILED in the close's parallel regression (W2-63's close, 2026-10-22 00:11): rulesync --version gave no answer within the portability check's 10-second probe under load, as DEC-871's two W1-38 cases; passes alone (2 passed in 2.9 s, 2026-10-22 00:2x)"
-    fixed_by: W2-57
 # The evaluation sets (DEC-820 (d), DEC-845, W2-58): a session a set measures (its role in `roles`, or its ticket
 # in `tickets`) is refused reads of the hidden part by the guard (no sandbox Read rule, DEC-873), and reads the visible part.
 # memory-retrieval is W2-61's: lens B's 20 questions are visible; the hidden part, which W2-61 fills, lies under

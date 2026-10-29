@@ -91,7 +91,8 @@ def embedder():
 
 @pytest.fixture(scope="session")
 def gov_check_here(code_under_test):
-    """One ``gov check --json`` in this worktree, against the store the lead built (about six minutes)."""
-    done = support.run([sys.executable, "-c", support._GOV, "check", "--json"], cwd=support.REPO_ROOT,
-                       env=support.worktree_env(), timeout=support.GOV_CHECK_TIMEOUT_S)
-    return done, support.checks_of(done.envelope())
+    """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+    inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+    runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+    store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+    return support.green_here_check()
