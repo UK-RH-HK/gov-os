@@ -255,7 +255,7 @@ def _check(root: Path, head: str, stamp: str) -> dict:
         envelope = {"ok": False, "command": "check", "result": {}, "session": "",
                     "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed",
                               "details": result}}
-    rel = f"{BATCH_DIR}/{stamp}-{head[:12]}/{CHECK_FILE}"
+    rel = f"{BATCH_DIR}/{stamp}/{CHECK_FILE}"
     (root / rel).parent.mkdir(parents=True, exist_ok=True)
     (root / rel).write_text(json.dumps(envelope, indent=1) + "\n", encoding="utf-8")
     return {"path": rel, "commit": stated["check_commit"], "blocks": blocking is not None}
@@ -348,13 +348,16 @@ def _commit(root: Path, subject: str, paths: list[str], task: str | None = None)
 
 
 def _fresh(root: Path) -> dict:
-    """The store made fresh at ``HEAD`` before a close: the incremental record load where ``HEAD``'s fingerprints can
-    be computed, else a full rebuild."""
+    """The store made fresh at ``HEAD`` before a close: the incremental record load where the store's code
+    fingerprint is ``HEAD``'s, else (one that cannot be computed, or other code) a full rebuild."""
     from gov.store import load_records
 
-    if _fingerprint.of_commit(root, "HEAD") is None:
+    try:
+        loaded = load_records(root)
+    except GovError as e:
+        if e.code != "STORE_CODE_CHANGED":
+            raise
         return _rebuild(root)
-    loaded = load_records(root)
     return {"kind": "records", "head": loaded["head"], "digest": loaded["digest"]}
 
 
