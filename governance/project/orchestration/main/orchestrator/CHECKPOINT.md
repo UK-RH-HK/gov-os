@@ -81,9 +81,11 @@
 1. **Queue end:** commit DEC-939 + DEC-940 (state request) + prompt v3.38 + LEAD-w2-common (rebuild lock, 01:00 cut-off,
    AND the guard's command-form rules: no $VAR write targets, heredocs, backticks, inline python with braces; slip S10)
    + rows + nightly folder (drafts/nightly-next2) + ACT-PUSHOVER-1; tk W2-76, W2-77; queue W2-58; leads W2-77, W2-76.
-2. **STATE-OF-GOV-OS + re-plan + P-SCOPE-RECORDS-1 + P-TOOLS-REVIEW-1:** evidence in drafts/state/A..E; write the
-   head (drafts/state/STATE-head.md); deliver in the first morning package after re-pin 3 (measured close times), at
-   the latest 2026-11-01's.
+2. **STATE-OF-GOV-OS + re-plan + P-SCOPE-RECORDS-1 + P-TOOLS-REVIEW-1: ALL DRAFTED** in drafts/state/ (STATE-head.md +
+   annexes A..E; REPLAN-W2.md, target EXAMIN start 2026-11-18, range 11-14..11-25; P-SCOPE-RECORDS-1.md -> W2-78;
+   P-TOOLS-REVIEW-1.md -> W2-79/80 + auditor). At delivery: add re-pin 3's measured close times to STATE §3, make
+   STATE one file (head + annexes) under packages/, commit with the others in the first morning package after re-pin
+   3 (latest 2026-11-01's).
 3. ACT-REPIN-3, ACT-W2-57-LS-2, W2-67 merge-back + re-probe, then K4 (file W2-55, W2-61, W2-64; resume W2-03, W2-05,
    W2-37) and K3 (file W2-60, W2-56) leads in parallel up to the resource gate.
 4. Next free: DEC-940; ticket W2-78; rows W2-M408, W2-L451 (drafted), W2-L452.
