@@ -8,7 +8,8 @@
 - Loop count: 0 (engineer iterations this run).
 - td-2 DONE (session 3bf09bf5, sandboxed, xhigh): commit c99395875f80, 91 new cases (304 total), 45 red on run 1's code by its own run; tripwire: this worktree only head + acceptance W2-71; other trees' heads moved (main 848f5ab366b9 -> 2f2fb03e5076, W2-00-record 9948338c117f -> 76c175126fbd), not the worker's.
   - Its P-1 (mode-000 user ~/.gitconfig, git skips it silently): not demanded; residual, recommend (a). P-2: git 1:2.43.0-1ubuntu7.4 honours GIT_NO_LAZY_FETCH (backport) — premise corrected in eng-2. P-3: keep the "asks git about no object" cases (the decision's own words).
-- State: waiting for CLOSE-RUNNING to clear, then the red check of tests/acceptance/W2-71, then eng-2 (draft in the session scratchpad, to be copied to briefs/eng-2.md).
+- Red check (lead, file by file during the close queue, log/red2.out): 45 failed / 259 passed, reasons as the README states; gov.__file__ in this worktree; log holds no keyword, no full hash.
+- State: briefs/eng-2.md ready (head c99395875f80). Waiting for CLOSE-RUNNING (close queue, set 12:28) to clear before launching eng-2 (tripwire-before-5).
 
 ---
 

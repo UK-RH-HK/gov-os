@@ -1,0 +1,897 @@
+Thu Oct 29 13:38:17 GMT 2026
+/home/usain/gov-os-worktrees/W2-71/src/gov/__init__.py
+=== tests/acceptance/W2-71/test_w2_71_exemption.py
+........................                                                 [100%]
+24 passed in 5.85s
+exit=0
+=== tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py
+..                                                                       [100%]
+2 passed in 0.03s
+exit=0
+=== tests/acceptance/W2-71/test_w2_71_lazy_fetch_guard.py
+...........FF                                                            [100%]
+=================================== FAILURES ===================================
+_ test_every_git_call_of_the_check_that_looks_up_objects_carries_git_no_lazy_fetch _
+
+guard = <test_w2_71_lazy_fetch_guard.Guard object at 0x7839699ad970>
+
+    def test_every_git_call_of_the_check_that_looks_up_objects_carries_git_no_lazy_fetch(guard):
+        assert guard.check.ended, f"the check did not end\n{guard.check.describe()}"
+        ok, message = _judge(support.read_git_calls(guard.check_log), "the check")
+>       assert ok, message
+E       AssertionError: the check: 2 git calls recorded, 2 look up objects, 2 of them without GIT_NO_LAZY_FETCH set to true: ['cat-file', 'cat-file']
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_lazy_fetch_guard.py:197: AssertionError
+_ test_every_git_call_of_the_filter_that_looks_up_objects_carries_git_no_lazy_fetch _
+
+guard = <test_w2_71_lazy_fetch_guard.Guard object at 0x7839699ad970>
+
+    def test_every_git_call_of_the_filter_that_looks_up_objects_carries_git_no_lazy_fetch(guard):
+        assert guard.filter.ended, f"the filter did not end\n{guard.filter.describe()}"
+        ok, message = _judge(support.read_git_calls(guard.filter_log), "the filter")
+>       assert ok, message
+E       AssertionError: the filter: 2 git calls recorded, 2 look up objects, 2 of them without GIT_NO_LAZY_FETCH set to true: ['cat-file', 'cat-file']
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_lazy_fetch_guard.py:203: AssertionError
+2 failed, 11 passed in 3.27s
+exit=1
+=== tests/acceptance/W2-71/test_w2_71_nothing_printed_or_written.py
+...................................                                      [100%]
+35 passed in 4.76s
+exit=0
+=== tests/acceptance/W2-71/test_w2_71_only_that_rule_and_match.py
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed in 13.30s
+exit=0
+=== tests/acceptance/W2-71/test_w2_71_partial_clone.py
+.........FF..FFFF..FFFFFFF                                               [100%]
+=================================== FAILURES ===================================
+_ test_in_a_partial_clone_the_match_stays_a_finding_of_the_check[own-commit-vendor-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('own-commit', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_stays_a_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        found = support.finds(scene.check, rel)
+>       assert found, (f"in a partial clone the check passes {rel} ({place[0]} after the rule's keyword) as clean\n"
+                       f"{scene.check.describe()}")
+E       AssertionError: in a partial clone the check passes .gov-runtime/scratch/own-commit-vendor-keyword.log (own-commit after the rule's keyword) as clean
+E         exit code: 1 after 1.4 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random-prefix-keyword.log
+E         secret found in derived store: .gov-runtime/scratch/random-vendor-keyword.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:130: AssertionError
+_ test_in_a_partial_clone_the_match_stays_a_finding_of_the_check[own-commit-prefix-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('own-commit', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_stays_a_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        found = support.finds(scene.check, rel)
+>       assert found, (f"in a partial clone the check passes {rel} ({place[0]} after the rule's keyword) as clean\n"
+                       f"{scene.check.describe()}")
+E       AssertionError: in a partial clone the check passes .gov-runtime/scratch/own-commit-prefix-keyword.log (own-commit after the rule's keyword) as clean
+E         exit code: 1 after 1.4 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random-prefix-keyword.log
+E         secret found in derived store: .gov-runtime/scratch/random-vendor-keyword.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:130: AssertionError
+_ test_in_a_partial_clone_the_match_stays_a_finding_of_the_check[source-only-vendor-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('source-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_stays_a_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        found = support.finds(scene.check, rel)
+>       assert found, (f"in a partial clone the check passes {rel} ({place[0]} after the rule's keyword) as clean\n"
+                       f"{scene.check.describe()}")
+E       AssertionError: in a partial clone the check passes .gov-runtime/scratch/source-only-vendor-keyword.log (source-only after the rule's keyword) as clean
+E         exit code: 1 after 1.4 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random-prefix-keyword.log
+E         secret found in derived store: .gov-runtime/scratch/random-vendor-keyword.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:130: AssertionError
+_ test_in_a_partial_clone_the_match_stays_a_finding_of_the_check[source-only-prefix-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('source-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_stays_a_finding_of_the_check(scene, place):
+        rel = scene.check_rels[place]
+        assert scene.check.ended, f"the check did not end within its declared limit\n{scene.check.describe()}"
+        found = support.finds(scene.check, rel)
+>       assert found, (f"in a partial clone the check passes {rel} ({place[0]} after the rule's keyword) as clean\n"
+                       f"{scene.check.describe()}")
+E       AssertionError: in a partial clone the check passes .gov-runtime/scratch/source-only-prefix-keyword.log (source-only after the rule's keyword) as clean
+E         exit code: 1 after 1.4 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random-prefix-keyword.log
+E         secret found in derived store: .gov-runtime/scratch/random-vendor-keyword.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:130: AssertionError
+_ test_in_a_partial_clone_the_match_is_left_out_by_the_filter[own-commit-vendor-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('own-commit', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_is_left_out_by_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        assert scene.filter.ended, f"the filter did not end within its declared limit\n{scene.filter.describe()}"
+        passes = scene.filter.passes(rel)
+>       assert not passes, (f"in a partial clone the filter lets {rel} ({place[0]} after the rule's keyword) through\n"
+                            f"{scene.filter.describe()}")
+E       AssertionError: in a partial clone the filter lets docs/own-commit-vendor-keyword.md (own-commit after the rule's keyword) through
+E         the filter's exit code: 0 after 1.6 s; paths returned: 4
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:139: AssertionError
+_ test_in_a_partial_clone_the_match_is_left_out_by_the_filter[own-commit-prefix-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('own-commit', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_is_left_out_by_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        assert scene.filter.ended, f"the filter did not end within its declared limit\n{scene.filter.describe()}"
+        passes = scene.filter.passes(rel)
+>       assert not passes, (f"in a partial clone the filter lets {rel} ({place[0]} after the rule's keyword) through\n"
+                            f"{scene.filter.describe()}")
+E       AssertionError: in a partial clone the filter lets docs/own-commit-prefix-keyword.md (own-commit after the rule's keyword) through
+E         the filter's exit code: 0 after 1.6 s; paths returned: 4
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:139: AssertionError
+_ test_in_a_partial_clone_the_match_is_left_out_by_the_filter[source-only-vendor-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('source-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_is_left_out_by_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        assert scene.filter.ended, f"the filter did not end within its declared limit\n{scene.filter.describe()}"
+        passes = scene.filter.passes(rel)
+>       assert not passes, (f"in a partial clone the filter lets {rel} ({place[0]} after the rule's keyword) through\n"
+                            f"{scene.filter.describe()}")
+E       AssertionError: in a partial clone the filter lets docs/source-only-vendor-keyword.md (source-only after the rule's keyword) through
+E         the filter's exit code: 0 after 1.6 s; paths returned: 4
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:139: AssertionError
+_ test_in_a_partial_clone_the_match_is_left_out_by_the_filter[source-only-prefix-keyword] _
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+place = ('source-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PLACES, ids=IDS)
+    def test_in_a_partial_clone_the_match_is_left_out_by_the_filter(scene, place):
+        rel = scene.filter_rels[place]
+        assert scene.filter.ended, f"the filter did not end within its declared limit\n{scene.filter.describe()}"
+        passes = scene.filter.passes(rel)
+>       assert not passes, (f"in a partial clone the filter lets {rel} ({place[0]} after the rule's keyword) through\n"
+                            f"{scene.filter.describe()}")
+E       AssertionError: in a partial clone the filter lets docs/source-only-prefix-keyword.md (source-only after the rule's keyword) through
+E         the filter's exit code: 0 after 1.6 s; paths returned: 4
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:139: AssertionError
+________ test_in_a_partial_clone_the_check_sends_nothing_to_the_remote _________
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+
+    def test_in_a_partial_clone_the_check_sends_nothing_to_the_remote(scene):
+        assert scene.check.ended, f"the check did not end\n{scene.check.describe()}"
+>       assert scene.check_requests == 0, (f"in a partial clone the check's run reached the promisor remote "
+                                           f"{scene.check_requests} times (a lazy fetch sends the candidate off the "
+                                           "machine)")
+E       AssertionError: in a partial clone the check's run reached the promisor remote 3 times (a lazy fetch sends the candidate off the machine)
+E       assert 3 == 0
+E        +  where 3 = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>.check_requests
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:147: AssertionError
+________ test_in_a_partial_clone_the_filter_sends_nothing_to_the_remote ________
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+
+    def test_in_a_partial_clone_the_filter_sends_nothing_to_the_remote(scene):
+        assert scene.filter.ended, f"the filter did not end\n{scene.filter.describe()}"
+>       assert scene.filter_requests == 0, (f"in a partial clone the filter's run reached the promisor remote "
+                                            f"{scene.filter_requests} times")
+E       AssertionError: in a partial clone the filter's run reached the promisor remote 2 times
+E       assert 2 == 0
+E        +  where 2 = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>.filter_requests
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:154: AssertionError
+______ test_the_commit_only_the_remote_has_is_not_fetched_into_the_clone _______
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+
+    def test_the_commit_only_the_remote_has_is_not_fetched_into_the_clone(scene):
+        fetched = scene.later in scene.objects_after
+        added = len(scene.objects_after - scene.objects_before)
+>       assert not fetched and added == 0, (f"after the check and the filter, the source-only commit is in the clone's "
+                                            f"object store: {fetched}; objects added by the runs: {added}")
+E       AssertionError: after the check and the filter, the source-only commit is in the clone's object store: True; objects added by the runs: 3
+E       assert (not True)
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:161: AssertionError
+__________ test_in_a_partial_clone_the_check_asks_git_about_no_object __________
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+
+    def test_in_a_partial_clone_the_check_asks_git_about_no_object(scene):
+        lookups = support.lookups_named(support.read_git_calls(scene.check_calls_log))
+>       assert not lookups, f"in a partial clone the check asked git about objects, {len(lookups)} calls: {lookups}"
+E       AssertionError: in a partial clone the check asked git about objects, 6 calls: ['cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file']
+E       assert not ['cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file']
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:167: AssertionError
+_________ test_in_a_partial_clone_the_filter_asks_git_about_no_object __________
+
+scene = <test_w2_71_partial_clone.Scene object at 0x7e6441ee9190>
+
+    def test_in_a_partial_clone_the_filter_asks_git_about_no_object(scene):
+        lookups = support.lookups_named(support.read_git_calls(scene.filter_calls_log))
+>       assert not lookups, f"in a partial clone the filter asked git about objects, {len(lookups)} calls: {lookups}"
+E       AssertionError: in a partial clone the filter asked git about objects, 6 calls: ['cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file']
+E       assert not ['cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file', 'cat-file']
+
+tests/acceptance/W2-71/test_w2_71_partial_clone.py:172: AssertionError
+13 failed, 13 passed in 7.41s
+exit=1
+=== tests/acceptance/W2-71/test_w2_71_promisor_config.py
+..............FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........                     [100%]
+=================================== FAILURES ===================================
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[promisor-only-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('promisor-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: promisor-only: the check passes .gov-runtime/scratch/own-commit-vendor-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[promisor-only-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('promisor-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: promisor-only: the check passes .gov-runtime/scratch/own-commit-prefix-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[filter-only-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('filter-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: filter-only: the check passes .gov-runtime/scratch/own-commit-vendor-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[filter-only-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('filter-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: filter-only: the check passes .gov-runtime/scratch/own-commit-prefix-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[extension-only-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('extension-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: extension-only: the check passes .gov-runtime/scratch/own-commit-vendor-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[extension-only-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('extension-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: extension-only: the check passes .gov-runtime/scratch/own-commit-prefix-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[global-promisor-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('global-promisor', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: global-promisor: the check passes .gov-runtime/scratch/own-commit-vendor-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[global-promisor-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('global-promisor', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: global-promisor: the check passes .gov-runtime/scratch/own-commit-prefix-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[included-promisor-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('included-promisor', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: included-promisor: the check passes .gov-runtime/scratch/own-commit-vendor-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check[included-promisor-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('included-promisor', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_stays_a_finding_of_the_check(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.check_rels[keyword_name]
+        assert case.check.ended, f"{name}: the check did not end within its declared limit\n{case.check.describe()}"
+        found = support.finds(case.check, rel)
+>       assert found, (f"{name}: the check passes {rel} (a commit of the repository's own history after the rule's "
+                       f"keyword, with a promisor remote) as clean\n{case.check.describe()}")
+E       AssertionError: included-promisor: the check passes .gov-runtime/scratch/own-commit-prefix-keyword.log (a commit of the repository's own history after the rule's keyword, with a promisor remote) as clean
+E         exit code: 1 after 0.7 s
+E         stdout (tail, masked):
+E         secret found in derived store: .gov-runtime/scratch/random.log
+E         
+E         stderr (tail, masked):
+E         
+E       assert False
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:216: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[promisor-only-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('promisor-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: promisor-only: the filter lets docs/own-commit-vendor-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[promisor-only-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('promisor-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: promisor-only: the filter lets docs/own-commit-prefix-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[filter-only-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('filter-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: filter-only: the filter lets docs/own-commit-vendor-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[filter-only-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('filter-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: filter-only: the filter lets docs/own-commit-prefix-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[extension-only-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('extension-only', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: extension-only: the filter lets docs/own-commit-vendor-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[extension-only-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('extension-only', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: extension-only: the filter lets docs/own-commit-prefix-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[global-promisor-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('global-promisor', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: global-promisor: the filter lets docs/own-commit-vendor-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[global-promisor-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('global-promisor', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: global-promisor: the filter lets docs/own-commit-prefix-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[included-promisor-vendor-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('included-promisor', 'vendor-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: included-promisor: the filter lets docs/own-commit-vendor-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter[included-promisor-prefix-keyword] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+place = ('included-promisor', 'prefix-keyword')
+
+    @pytest.mark.parametrize("place", PROMISOR_PLACES, ids=PROMISOR_IDS)
+    def test_with_a_promisor_remote_its_own_commit_is_left_out_by_the_filter(cases, place):
+        name, keyword_name = place
+        case = cases[name]
+        rel = case.filter_rels[keyword_name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+        passes = case.filter.passes(rel)
+>       assert not passes, (f"{name}: the filter lets {rel} (a commit of the repository's own history, with a promisor "
+                            f"remote) through\n{case.filter.describe()}")
+E       AssertionError: included-promisor: the filter lets docs/own-commit-prefix-keyword.md (a commit of the repository's own history, with a promisor remote) through
+E         the filter's exit code: 0 after 0.7 s; paths returned: 2
+E         stderr (tail, masked):
+E         
+E       assert not True
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:227: AssertionError
+_ test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote[promisor-only] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'promisor-only'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.check.ended, f"{name}: the check did not end\n{case.check.describe()}"
+>       assert case.check_requests == 0, f"{name}: the check's run reached the remote {case.check_requests} times"
+E       AssertionError: promisor-only: the check's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a2676a6840>.check_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:235: AssertionError
+_ test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote[filter-only] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'filter-only'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.check.ended, f"{name}: the check did not end\n{case.check.describe()}"
+>       assert case.check_requests == 0, f"{name}: the check's run reached the remote {case.check_requests} times"
+E       AssertionError: filter-only: the check's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a267479fa0>.check_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:235: AssertionError
+_ test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote[extension-only] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'extension-only'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.check.ended, f"{name}: the check did not end\n{case.check.describe()}"
+>       assert case.check_requests == 0, f"{name}: the check's run reached the remote {case.check_requests} times"
+E       AssertionError: extension-only: the check's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a2676a67e0>.check_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:235: AssertionError
+_ test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote[global-promisor] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'global-promisor'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.check.ended, f"{name}: the check did not end\n{case.check.describe()}"
+>       assert case.check_requests == 0, f"{name}: the check's run reached the remote {case.check_requests} times"
+E       AssertionError: global-promisor: the check's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a267479880>.check_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:235: AssertionError
+_ test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote[included-promisor] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'included-promisor'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_check_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.check.ended, f"{name}: the check did not end\n{case.check.describe()}"
+>       assert case.check_requests == 0, f"{name}: the check's run reached the remote {case.check_requests} times"
+E       AssertionError: included-promisor: the check's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a2674a12e0>.check_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:235: AssertionError
+_ test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote[promisor-only] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'promisor-only'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+>       assert case.filter_requests == 0, f"{name}: the filter's run reached the remote {case.filter_requests} times"
+E       AssertionError: promisor-only: the filter's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a2676a6840>.filter_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:242: AssertionError
+_ test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote[filter-only] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'filter-only'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+>       assert case.filter_requests == 0, f"{name}: the filter's run reached the remote {case.filter_requests} times"
+E       AssertionError: filter-only: the filter's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a267479fa0>.filter_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:242: AssertionError
+_ test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote[extension-only] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'extension-only'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+>       assert case.filter_requests == 0, f"{name}: the filter's run reached the remote {case.filter_requests} times"
+E       AssertionError: extension-only: the filter's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a2676a67e0>.filter_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:242: AssertionError
+_ test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote[global-promisor] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'global-promisor'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+>       assert case.filter_requests == 0, f"{name}: the filter's run reached the remote {case.filter_requests} times"
+E       AssertionError: global-promisor: the filter's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a267479880>.filter_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:242: AssertionError
+_ test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote[included-promisor] _
+
+cases = <test_w2_71_promisor_config.Cases object at 0x74a267443e60>
+name = 'included-promisor'
+
+    @pytest.mark.parametrize("name", PROMISOR_SCENES)
+    def test_with_a_promisor_remote_the_filter_sends_nothing_to_the_remote(cases, name):
+        case = cases[name]
+        assert case.filter.ended, f"{name}: the filter did not end\n{case.filter.describe()}"
+>       assert case.filter_requests == 0, f"{name}: the filter's run reached the remote {case.filter_requests} times"
+E       AssertionError: included-promisor: the filter's run reached the remote 1 times
+E       assert 1 == 0
+E        +  where 1 = <test_w2_71_promisor_config.Case object at 0x74a2674a12e0>.filter_requests
+
+tests/acceptance/W2-71/test_w2_71_promisor_config.py:242: AssertionError
+30 failed, 22 passed in 16.78s
+exit=1
+=== tests/acceptance/W2-71/test_w2_71_real_tokens_still_fail.py
+..............................                                           [100%]
+30 passed in 7.40s
+exit=0
+=== tests/acceptance/W2-71/test_w2_71_verification_cannot_run.py
+...................................                                      [100%]
+35 passed in 27.21s
+exit=0
+Thu Oct 29 13:42:10 GMT 2026

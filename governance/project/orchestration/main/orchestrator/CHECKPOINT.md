@@ -88,7 +88,7 @@
    3 (latest 2026-11-01's).
 3. ACT-REPIN-3, ACT-W2-57-LS-2, W2-67 merge-back + re-probe, then K4 (file W2-55, W2-61, W2-64; resume W2-03, W2-05,
    W2-37) and K3 (file W2-60, W2-56) leads in parallel up to the resource gate.
-4. Next free: DEC-940; ticket W2-78; rows W2-M408, W2-L451 (drafted), W2-L452.
+4. KEEP until the owner says: .gov-runtime/scratch/owner-share/replan-2026-10-29/ and .zip (owner reviewing the re-plan). Next free: DEC-940; ticket W2-78; rows W2-M408, W2-L451 (drafted), W2-L452.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2
