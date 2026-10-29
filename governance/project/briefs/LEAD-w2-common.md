@@ -29,6 +29,15 @@ You are the ticket lead for ticket `{ID}` (`{W2}`), profile {PROFILE}, working o
   - **Passing the budget:** stop the heavy work at once, clean what you can, and return PACKAGES with the measure and its cause; the orchestrator pings the owner.
   - **Worker briefs:** every brief you write states this budget, with its share for that worker, and the same rules.
 - **DEC-904 and DEC-905, your full verification run:** the retention trial has reported. Your run uses `-o tmp_path_retention_policy=failed` (step 4 below), so it fits the 20 GB / 1,000,000 budget, and the bridge cap of 6,000,000 and 60 GB is ended. The lock stays.
+  - **The guard's command forms (owner, standing, DEC-941 item 4a; about 45 of 74 lead returns relearned them):** the guard refuses a shell command it cannot read whole, and you and your workers lose turns to it. Write commands so it can read them:
+    - no shell variable as a write target (`> "$OUT/x"`, `mkdir -p $D/t`, `sed -i` on a `$VAR` path): use literal paths;
+    - no here-document (`<<EOF`), no backticks, no `bash -c '…'` script it cannot read;
+    - no long inline `python3 -c` with braces;
+    - put anything longer in a script file under your scratch with the Write tool, and run that file.
+    
+    A refused form is not retried in another disguise: change the form, or return PACKAGES (DEC-409).
+  - **One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 lands):** run every `gov rebuild` as `flock /tmp/gov-os-rebuild.lock gov rebuild …`, so concurrent rebuilds never contend for the code-graph daemon or gitleaks.
+  - **The 01:00 cut-off (owner, DEC-939 item 6):** from about 01:00, start no full verification run that cannot finish before 02:00 (take its length as `nightly_estimate.py estimate`'s figure, in `governance/project/orchestration/nightly/`); wait until the nightly ends.
   - **One run at a time, machine-wide:** start the run under the lock, `flock /tmp/gov-os-verify.lock <the run's command>`, and let it wait while another session's run holds the lock. Never run two verification runs at once.
   - **The nightly (owner, standing, DEC-933 item 2.4):** while `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING` exists (most nights between 02:00 and 05:00), you and your workers run no suite and no full run, at most a single test file; wait, checking each few minutes, and go on the moment it is gone. Light work (reading, editing, commits, planning) goes on.
   - **The disk gate:** run `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/disk_gate.sh` just before the run, as above.

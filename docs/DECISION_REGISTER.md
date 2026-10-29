@@ -9081,7 +9081,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
 The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, PROPOSED, committed in `6a5d6b34`) with twelve decisions in its §11 (DEC-829). The owner answered them on 2026-10-19, after the bootstrap pin was installed (`70aea435`) and after the user-level `CLAUDE_CODE_AUTO_COMPACT_WINDOW` and agent-teams variables were removed (`CLAUDE_CODE_SUBAGENT_MODEL` is now `claude-opus-5-5`). The plan is marked ACCEPTED with these answers. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
 
 ### DEC-831 — The revised Wave 2 plan is approved, with the owner's changes (plan §11 item 1)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-829, DEC-105, DEC-825 item 7 · **Basis:** OWNER, 2026-10-19, on the revised plan · **Changes:** DEC-829 item 6 (Wave 2 is no longer paused).
+- **Status:** ACCEPTED (the slot order replaced by the re-plan's blocks (DEC-941 item 1); owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-829, DEC-105, DEC-825 item 7 · **Basis:** OWNER, 2026-10-19, on the revised plan · **Changes:** DEC-829 item 6 (Wave 2 is no longer paused).
 - **Decision:**
   1. The plan is approved: the nine keystones and their order, the adoption-ready set, the new tickets W2-59, W2-60 and W2-61, the widenings of its §5, the glue of its §7, and the moves of its §8, with the changes of DEC-832 to DEC-848.
   2. `docs/plan/WAVE_2_REVISED_PLAN.md` is marked ACCEPTED, and its text carries these changes.
@@ -9207,7 +9207,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
 - **Decision:** the held-out index check, the lefthook measure (before W2-08) and the removal of S0b2's leftovers each come to the owner as exact operator commands, when its time comes, in the report that needs it. The bootstrap pin is done (`70aea435`).
 
 ### DEC-847 — Parallelism: no fixed number; as many leads as the tickets, the measured gate and the owner's limits allow, at most 10 (plan §11 item 12, replaced; standing)
-- **Status:** ACCEPTED (owner, 2026-10-19, in a follow-up that replaces the owner's first answer to item 12; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-780, DEC-786, DEC-798, DEC-838 · **Basis:** OWNER, 2026-10-19 · **Replaces:** the fixed caps of DEC-737 and DEC-776 (at most 3), DEC-786 item 1's "at most 3 leads", the w2 prompt §3's "up to 6", and the plan's 3 and 4. · **Changed by:** DEC-880: "fewer until W2-48 lands" reads "fewer until W2-66 lands"
+- **Status:** ACCEPTED (the leads' ceiling: up to 4 at once beside one verification run, until W2-20 (DEC-941 item 1d); owner, 2026-10-19, in a follow-up that replaces the owner's first answer to item 12; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-780, DEC-786, DEC-798, DEC-838 · **Basis:** OWNER, 2026-10-19 · **Replaces:** the fixed caps of DEC-737 and DEC-776 (at most 3), DEC-786 item 1's "at most 3 leads", the w2 prompt §3's "up to 6", and the plan's 3 and 4. · **Changed by:** DEC-880: "fewer until W2-48 lands" reads "fewer until W2-66 lands"
 - **Decision:**
   1. **No fixed number.** The orchestrator starts as many leads as all of these allow, and decides it each time a slot could open:
      - **eligible tickets:** dependencies closed, or stackable under DEC-786;
@@ -11345,7 +11345,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-936 — ACT-NIGHTLY-1 installed; a night's P1s wait until 07:30 unless the owner is active; carry on without waiting, as many leads as the machine allows; P2s delegated; six additions for the re-plan package (standing)
-- **Status:** ACCEPTED (item 1's night-time pings replaced by DEC-938's morning package; owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 2 to 4 standing) · **Under:** DEC-930, DEC-933, DEC-934, DEC-935, DEC-855, DEC-847, DEC-898, DEC-851, DEC-861 · **Changes:** DEC-855 (pings: only P1s and ACTs; P2s decided as delegated, listed in the digest for the owner to overturn), DEC-934 item 2 (the morning check's P1 pings wait until 07:30 unless the owner is active).
+- **Status:** ACCEPTED (item 2.5's digest folded into the morning package (DEC-941 item 4c); item 1's night-time pings replaced by DEC-938's morning package; owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; items 2 to 4 standing) · **Under:** DEC-930, DEC-933, DEC-934, DEC-935, DEC-855, DEC-847, DEC-898, DEC-851, DEC-861 · **Changes:** DEC-855 (pings: only P1s and ACTs; P2s decided as delegated, listed in the digest for the owner to overturn), DEC-934 item 2 (the morning check's P1 pings wait until 07:30 unless the owner is active).
 - **Status reported by the owner, checked by the orchestrator (2026-10-28):**
   - **ACT-NIGHTLY-1 Part A:** the three crontab lines, cron active (the backup was empty). Checked: `crontab -l` shows them; `systemctl is-active cron` gives `active`.
   - **Part B:** the task "GovOS nightly wake" is Ready (next run 2026-10-29 01:50, `WakeToRun` true, start when available, a 4-hour limit, not on battery). Wake timers are allowed. Windows Update's active hours are 12:00 to 06:00, which cover 01:30 to 05:30.
@@ -11420,7 +11420,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-938 — The morning package: investigate after the nightly, one P1-MORNING file, one ping at 07:30 from the orchestrator's session; hold only what an item blocks (standing)
-- **Status:** ACCEPTED (owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
+- **Status:** ACCEPTED (item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
 - **Decision (the owner's six points):**
   1. **Investigate before reporting.** After the nightly ends, for every finding (a red test, a refused close, a missed or failed night, any alert):
      - re-run failing tests alone and in the close's form;
@@ -11455,3 +11455,108 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.322 | 2026-10-28 | Owner (recorded by the orchestrator, DEC-861): DEC-938 (standing: after the nightly, investigate every finding to its root cause; one P1-MORNING-<date>.md package in the six-part form with the overnight delegated P2s at its end; one ping at 07:30 from the orchestrator's session, none overnight; hold only what an item blocks; one answer, then resume; emergencies stop the affected work at once and come first). Next free id: DEC-939. |
+
+
+### DEC-939 — The owner's answers to P1-MORNING-2026-10-29: long commands in the background with a 07:45 watchdog; a rebuild time limit and a rebuild lock (W2-76); W2-58 re-closed; W2-71's partial-clone fix; W2-68 merged and re-pinned, the batch on after W2-M406's fix (W2-77); the nightly's lock-wait and a 01:00 cut-off for full runs; Pushover for emergencies (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; items 1, 2, 6 and 7 standing) · **Under:** DEC-938, DEC-937, DEC-936, DEC-934, DEC-933, DEC-915 item 4, DEC-898, DEC-851, DEC-861 · **Basis:** `governance/project/orchestration/packages/P1-MORNING-2026-10-29.md` (`d8882b3f`). The delegated P2s listed there (DEC-937, W2-75's merge, W2-71's run 2, the nightly's lock-wait) are accepted.
+- **Decision:**
+  1. **(a), standing:** every command that can take more than a few minutes runs in the background; the 07:45 watchdog pings "package late, with the reason" if the package has not gone. Prompt §7.
+  2. **The diagnosis plan, and two safeguards (standing):**
+     1. a time limit on rebuilds: past about 30 minutes, a rebuild records its per-stage timings and what its processes are waiting on, the next package flags it, and the rebuild continues;
+     2. one store rebuild at a time across all sessions on this machine (a rebuild lock), the likeliest cause being concurrent rebuilds contending for the code-graph daemon or gitleaks.
+     
+     Rows, or a small ticket if product code is needed.
+  3. **(a):** W2-58's close is re-run.
+  4. **(a):** W2-71's run 2 for the partial-clone leak, as started; it matters for every adopted repository that is a partial clone.
+  5. **(b):** W2-68 merged and re-pinned, its batch switched on only after row W2-M406's fix (the clean-up prunes only the nightly's own clone, by its exact path). That fix is a small ticket now, in the next free slot, so the batch can be used right after re-pin 3. Once the batch is on, its gain on this repository is measured (it was measured only on a fixture) and reported.
+  6. **(a), and a scheduling rule (standing):** the nightly records its lock-wait apart from its setup. From about 01:00, no lead starts a full verification run that its estimate says cannot finish before 02:00; it waits until the nightly ends.
+  7. **(b) for emergencies only (DEC-938 item 6), (a) for everything else; Pushover.** Prepared as an ACT. The account, the application and its token are the owner's act. The token is kept outside the repository like the other secrets. Messages are short status lines only, with no code, paths or secrets. Until it is in, the morning package covers it.
+- **How it is applied:**
+  - **Item 2:** ticket W2-76 (`gov rebuild`: per-stage timings in its output; a watchdog that at 30 minutes writes the stages done and their times, and each process's state and wait channel, into a record and flags it in its output, never stopping the rebuild; a machine-wide rebuild lock that every session takes, sandboxed or not). Rows W2-M408 (the lock) and W2-L451 (the time limit), which it takes.
+    - **Until it lands:** the orchestrator's main-tree rebuilds run through `tools/rebuild_diag.sh` under `flock /tmp/gov-os-rebuild.lock`, and leads' rebuilds under the same lock (`LEAD-w2-common.md`).
+    - The diagnosis so far: the post-merge rebuild of 12:23 took 271 s with Ollama answering; the slow one was not reproduced; the journal shows no memory pressure and no hung task.
+  - **Item 5:** ticket W2-77 (FULL, small): `gov.close.nightly`'s clean-up removes only its own clone, by its exact path, and never runs a repo-wide `git worktree prune`; it takes row W2-M406. Its merge (and its re-pin) is the entry criterion for switching `close_queue.sh` to the batch (P-W2-68-PRUNE (b); DEC-803, under DEC-915 item 4). Then the batch's gain is measured on the first real batch: wall time per close, against the queue's last full closes.
+  - **Item 6:** `nightly.sh` records `lock_wait_s` apart from `setup_s`, and `nightly_estimate.py` leaves it out (committed with its tests). The 01:00 rule goes in `LEAD-w2-common.md` and prompt §15: a lead about to start a full run after 00:30 compares its estimate (the nightly's, `nightly_estimate.py estimate`, for a full run in the close's form) with the time left to 02:00, and waits for the nightly's end if it does not fit.
+  - **Item 7:** `packages/ACT-PUSHOVER-1.md` (the owner's acts), and `push_emergency.sh` in the nightly folder:
+    - it reads the token from `~/.config/gov-os-notify/pushover.env` (mode 600, outside every repository);
+    - it sends one line of at most 120 characters from a fixed set (letters, digits, spaces and `. , : ; | ( ) + - _ %`), anything else replaced by "Gov OS emergency: see the morning package";
+    - it is called only for DEC-938 item 6's emergencies (a secret exposed, a risk of losing data or history, the disk below its floor, the guard failing open): by the nightly when the disk gate shuts, and by the orchestrator's session for any other. Tested with a fake sender before the ACT is sent.
+- **Where it goes (DEC-851):** this register, with DEC-938's status line; the prompt §7 and §15, v3.38; `LEAD-w2-common.md`; `.tickets/` (W2-76, W2-77) and their cards; rows W2-M408 and W2-L451; the nightly folder; `packages/ACT-PUSHOVER-1.md`; RESUME HERE.
+- Next free id: DEC-940.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.323 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-939 (answers to P1-MORNING-2026-10-29: long commands in the background and a 07:45 watchdog; a rebuild time limit and a rebuild lock, ticket W2-76; W2-58 re-closed; W2-71's partial-clone fix; W2-68 merged and re-pinned, the batch on after W2-M406's fix, ticket W2-77, then its gain measured; the nightly's lock-wait apart and no full run after 01:00 that cannot end by 02:00; Pushover for emergencies, ACT-PUSHOVER-1; the delegated P2s accepted). Next free id: DEC-940. |
+
+
+### DEC-940 — The state of the Gov OS: an honest, cited assessment with the re-plan, P-SCOPE-RECORDS-1 and P-TOOLS-REVIEW-1
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`) · **Under:** DEC-930, DEC-936 item 3, DEC-929, DEC-851, DEC-861
+- **Decision:** the orchestrator writes `governance/project/orchestration/packages/STATE-OF-GOV-OS-<date>.md`, measured wherever possible, every claim cited (an auditor will sample them), in seven parts:
+  1. a one-page summary (solid, weak, what blocks EXAMIN's copy, the three most important recommendations);
+  2. capability by capability against Contract v4.2 and the nine keystones;
+  3. the progress since Wave 2 started, in numbers;
+  4. where things stall and why, the orchestrator's own slips included;
+  5. what still needs building and in what order;
+  6. every standing practice, where it lives and where it must live;
+  7. the weekly numbers.
+  
+  It goes with the re-plan package (DEC-930 and DEC-936 item 3), P-SCOPE-RECORDS-1 and P-TOOLS-REVIEW-1. They were to be delivered in the first morning package after re-pin 3, at the latest that of 2026-11-01.
+- **Done:**
+  - **Drafted the same day** from five read-only research sessions (annexes A to E).
+  - **Shared early at the owner's request** (`.gov-runtime/scratch/owner-share/replan-2026-10-29/` and its zip, 64,442 bytes; gitleaks and the keyword warning clean). The share is deleted once DEC-941 is committed (the owner's instruction).
+  - **Answered by DEC-941.** The final STATE file is committed with re-pin 3's measured close times.
+- **Where it goes (DEC-851):** this register; `packages/` (the final files); RESUME HERE.
+
+### DEC-941 — The re-plan of Wave 2 accepted with amendments: memory, K3 and K6 start today in parallel; the nine held tickets merged back and closed in priority order; release path an entry criterion for EXAMIN's real repository; Wave 2-grade evidence for everything EXAMIN's copy relies on (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; items 1d, 4, 6 and 7 standing) · **Under:** DEC-940, DEC-930, DEC-936, DEC-939, DEC-929, DEC-933, DEC-851, DEC-861 · **Changes:** DEC-831's slot order (replaced by item 1 and the re-plan's blocks), DEC-847's ceiling (item 1d), DEC-936 item 2.5 and DEC-938 item 2 (item 4c: one daily document) · **Basis:** `REPLAN-W2.md`, `STATE-OF-GOV-OS` (drafts, DEC-940), `P-SCOPE-RECORDS-1`, `P-TOOLS-REVIEW-1`.
+- **Decision (the owner's eight amendments to an accepted re-plan):**
+  1. **Start today, in parallel; do not wait for block A.**
+     1. File W2-55, W2-56, W2-60, W2-61, W2-64 and the proving-ground ticket today.
+     2. W2-61's 20-question baseline on today's pinned stores: its lead starts as soon as the ticket is filed, beside everything else. Memory is the critical path.
+     3. Merge back and resume W2-03 and W2-05 now; start W2-60's (K3) and W2-56's (K6) leads as soon as they are filed. Block A continues alongside.
+     4. **Interim rule (standing until W2-20 carries it):** up to 4 leads at once beside one verification run, always within the resource gate and the nightly window.
+  2. **The nine held tickets are built and reviewed work; they are not left to rot.**
+     - Merge back, re-verify and close all of them, in priority order:
+       - first those in EXAMIN's minimum (W2-03, W2-05, W2-20, W2-26, W2-52);
+       - then W2-37 (the code graph by traversal, part of memory), W2-49 (the Contract text to v4.2), W2-16 (releases, needed before EXAMIN's real repository) and W2-51, in spare lead capacity, so they never take a slot from the critical path.
+     - A merge-back that grows beyond one lead run of repair is parked then, with a package naming the cost.
+     - "Deferred to Wave 3" means the unbuilt work in those keystones, not built work waiting for a close.
+  3. **The deferrals of unbuilt work are accepted:** K5's W2-12, the rest of K7 after W2-16, and most of K8 go to Wave 3; W2-08's commit-time tier stays in Wave 2.
+     - **One condition:** a release path (K7) is an entry criterion for EXAMIN's real repository, not for its copy. It is written into K9.
+  4. **Rules from now on (standing; the rule about rules):**
+     1. the lead brief carries the guard's command-form rules (about 45 of 74 lead returns relearned them);
+     2. a known close-breaking row is fixed before the full closes it would hit (annex C, S9);
+     3. one daily document: the morning package carries the digest's items.
+  5. **The packages:**
+     - **P-SCOPE-RECORDS-1 (a),** as W2-78.
+     - **P-TOOLS-REVIEW-1 (a):** commit and test the orchestrator's tools (W2-79, W2-80), and an independent auditor's review.
+     - **Run-clone removal:** a committed `runs_sweep.sh` run by the owner's cron, outside the guard, as an ACT. The guard's rules stay as they are.
+  6. **The rest as proposed:**
+     - the target of 2026-11-18 for the start of EXAMIN's copy, re-estimated weekly with old and new figures side by side;
+     - the verification-lock trial after W2-67;
+     - the mutation trial after W2-11;
+     - the capacity minimum in W2-20's KPIs;
+     - the RunPod row (Wave 3);
+     - the proving ground as an entry criterion for EXAMIN's copy.
+  7. **Before EXAMIN's copy (standing):** every capability EXAMIN's copy relies on has Wave 2-grade evidence (a clean close, the memory measure, or the proving ground), not only Wave 1's record.
+  8. **The independent spot-check** of STATE-OF-GOV-OS's claims: a short auditor session on a sample of them this week.
+- **How it is applied:**
+  - **Tickets** filed on 2026-10-29: W2-55, W2-56, W2-60, W2-61, W2-64, W2-81 (the proving ground); W2-76 (rebuild lock and watchdog, DEC-939 item 2); W2-77 (the nightly's own-clone clean-up, DEC-939 item 5); W2-78 (P-SCOPE-RECORDS-1); W2-79 and W2-80 (tests of the brief builder and of the queue's gates).
+  - **Leads started that day:** see RESUME HERE and the morning package of 2026-10-30.
+  - **K9 in `docs/plan/WAVE_2_WBS.md`** carries the two entry criteria:
+    - for EXAMIN's copy: memory measured (W2-61), the proving ground passed (W2-81), and Wave 2-grade evidence for every capability it relies on (item 7);
+    - for EXAMIN's real repository: also a release path (K7: W2-16 closed, a release cut).
+  - **The tools:** the orchestrator's tools are committed under `governance/project/orchestration/tools/` with W2-79's and W2-80's tests, then reviewed by an independent auditor (P-TOOLS-REVIEW-1 (a)).
+  - **`runs_sweep.sh`:** in the nightly folder, with its tests; ACT-RUNS-SWEEP-1 adds one crontab line.
+- **Where it goes (DEC-851):**
+  - this register, with the status lines of DEC-831, DEC-847, DEC-936 and DEC-938;
+  - the prompt §3 (slots and leads), §7 (one daily document) and §15 (held tickets, close-breaking rows, Wave 2-grade evidence), v3.38;
+  - `LEAD-w2-common.md` (the guard's command forms);
+  - `docs/plan/WAVE_2_WBS.md` (K9's entry criteria; the new cards);
+  - `.tickets/`;
+  - RESUME HERE; the daily document.
+- Next free id: DEC-942.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.324 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-940 (the state of the Gov OS, cited, with the re-plan and two packages; drafted and shared the same day), DEC-941 (the re-plan accepted with amendments: memory, K3 and K6 today in parallel, up to 4 leads beside one verification run; the nine held tickets merged back and closed in priority order; deferrals of unbuilt work, a release path for EXAMIN's real repository; the guard's command forms in the lead brief, close-breaking rows first, one daily document; W2-78, W2-79, W2-80, runs_sweep.sh by ACT; the 18 November target; Wave 2-grade evidence before EXAMIN's copy; a spot-check of the state's claims). Next free id: DEC-942. |

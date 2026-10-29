@@ -1,7 +1,7 @@
 """The nightly's measured duration estimate (owner, standing, DEC-933 item 2).
 
     python3 nightly_estimate.py estimate            -> one JSON line: estimate_s and its parts
-    python3 nightly_estimate.py record <parallel.xml> <serial.xml> <setup_s> <actual_s> <estimate_s>
+    python3 nightly_estimate.py record <parallel.xml> <serial.xml> <setup_s> <actual_s> <estimate_s> [<lock_wait_s>]
 
 The estimate is measured from the per-test durations in the last full runs' JUnit files, never fixed:
   parallel = the newest run's parallel sum / the effective parallelism, and never less than its longest case.
@@ -9,7 +9,9 @@ The estimate is measured from the per-test durations in the last full runs' JUni
              7.4 to 8.2, not the 20 workers (subprocess-heavy tests share the CPUs). sum / 20 would book about 45 %
              of the real time (measured 2026-10-28 on the nightly of 2026-10-25 and the full closes of W2-66, W2-70).
   serial   = the newest run's serial sum (one case at a time).
-  setup    = the newest recorded clone + rebuild + collection time (420 s until one is recorded).
+  setup    = the smallest recorded clone + rebuild + collection time of the last three runs (420 s until one is
+             recorded). The time spent waiting for the verification lock is recorded apart (lock_wait_s) and is never
+             setup (DEC-939 item 6); the smallest also drops a night whose setup was recorded before that split.
   estimate = (parallel + serial + setup) * 1.10.
 Sources, newest first: `log/nightly/history.jsonl` (one line per nightly, written by `record`), then the JUnit files
 of full runs still on disk (the nightly's, the ACT clone runs', and full closes' `*regression-parallel.xml`).
@@ -74,16 +76,18 @@ def estimate() -> dict:
     effective = min(r["parallel"]["sum"] / r["parallel"]["wall"] for r in runs)
     parallel = max(newest["parallel"]["sum"] / effective, newest["parallel"]["longest"])
     serial = newest["serial"]["sum"]
-    setup = next((r["setup_s"] for r in runs if r.get("setup_s")), DEFAULT_SETUP_S)
+    setups = [r["setup_s"] for r in runs if r.get("setup_s")]
+    setup = min(setups) if setups else DEFAULT_SETUP_S
     total = (parallel + serial + setup) * MARGIN
     return {"estimate_s": round(total), "parallel_s": round(parallel), "serial_s": round(serial),
             "setup_s": round(setup), "effective_workers": round(effective, 2), "margin": MARGIN,
             "runs": [r.get("source", "history") for r in runs]}
 
 
-def record(par: str, ser: str, setup_s: str, actual_s: str, estimate_s: str) -> None:
+def record(par: str, ser: str, setup_s: str, actual_s: str, estimate_s: str, lock_wait_s: str = "0") -> None:
     line = {"when": os.path.getmtime(par), "parallel": sums(par), "serial": sums(ser), "setup_s": float(setup_s),
-            "actual_s": float(actual_s), "estimate_s": float(estimate_s) if estimate_s else None, "source": "history"}
+            "actual_s": float(actual_s), "estimate_s": float(estimate_s) if estimate_s else None,
+            "lock_wait_s": float(lock_wait_s or 0), "source": "history"}
     HISTORY.parent.mkdir(parents=True, exist_ok=True)
     with HISTORY.open("a") as out:
         out.write(json.dumps(line) + "\n")
@@ -92,7 +96,7 @@ def record(par: str, ser: str, setup_s: str, actual_s: str, estimate_s: str) -> 
 if __name__ == "__main__":
     if sys.argv[1:2] == ["estimate"]:
         print(json.dumps(estimate()))
-    elif sys.argv[1:2] == ["record"] and len(sys.argv) == 7:
+    elif sys.argv[1:2] == ["record"] and len(sys.argv) in (7, 8):
         record(*sys.argv[2:])
     else:
         sys.exit(__doc__)

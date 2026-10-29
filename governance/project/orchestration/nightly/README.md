@@ -10,6 +10,7 @@ Every night between 02:00 and 05:00, a full uncached regression of `w2/integrate
 | `nightly_alone.py` | Re-runs each failing case alone once and gives the verdict: `green`, `flaky-candidates <n>` or `red <n>`. |
 | `nightly_check.sh` | The morning check, run by cron at 05:30 and five minutes after WSL starts. It writes one line per night to `log/nightly/status.txt` (`ran`, `FAILED` or `MISSED`) at once, and pings P1 on `FAILED` or `MISSED` through the gate: at once if the owner is active, otherwise at 07:30. It stays running until then to send the night's held pings. |
 | `ping_gate.sh` | Every ping of the nightly goes through it (DEC-936). From 07:30 to midnight it pings at once. From midnight to 07:30 it pings at once only if the owner used Windows in the last 15 minutes (Windows' last-input time, read through PowerShell); otherwise it holds the ping, and the morning check sends it at 07:30, or as soon as the owner is active, marked "held from". An unreadable idle time counts as inactive: held, never lost. |
+| `push_emergency.sh` | One emergency push to the owner's phone through Pushover (DEC-939 item 7), for DEC-938 item 6's emergencies only; the nightly calls it when the disk gate shuts at night. It reads the token from `~/.config/gov-os-notify/pushover.env` (mode 600, outside every repository) and passes it to curl on standard input, never on a command line. It sends one line of at most 120 characters from a fixed set; anything else is replaced by "Gov OS emergency: see the morning package". Every attempt is logged to `pings.log` as an `EMERGENCY` line, never with the token. |
 | `rotate.sh` | Keeps the logs under their budget: cron logs the newest 30 and at most 20 MB; run folders the newest 30 and at most 200 MB; JUnit folders the newest 3. |
 | `disk_gate.sh` | DEC-898's disk floor (100 GiB and 10,000,000 inodes free), or no run. |
 | `test_nightly.sh` | The tests: 28 cases, on copies against a temporary repository, folder and fake ping. |
@@ -31,16 +32,20 @@ Every night between 02:00 and 05:00, a full uncached regression of `w2/integrate
 
 ## Tests and review (2026-10-28)
 
-`bash governance/project/orchestration/nightly/test_nightly.sh` passes 28 of 28:
-- `nightly.sh`: a held lock, a start after 05:00, a close running past the latest start, a merge in progress, a dirty tree and a head under 5 minutes old each stop it with a P1. An estimate over the window pings P2 and goes on. By day it waits and never pings.
+`bash governance/project/orchestration/nightly/test_nightly.sh` passes 36 of 36 (2026-10-29):
+- `nightly.sh`: a held lock, a start after 05:00, a close running past the latest start, a merge in progress, a dirty tree and a head under 5 minutes old each stop it with a P1. An estimate over the window pings P2 and goes on; the disk gate shut at night pushes an emergency. By day it waits and never pings. It takes the machine's rebuild lock (`/tmp/gov-os-rebuild.lock`) for its clone's rebuild, and records the time spent waiting for the verification lock apart from its setup (DEC-939 items 2 and 6).
+- `push_emergency.sh`: nothing sent without a mode-600 file; the sender sees only `--config -` on its command line; the token never reaches the log; a path or a long hex string is replaced by the fixed line; a failed push is logged.
+- `nightly_estimate.py`: the lock wait recorded apart; the estimate's setup is the smallest recorded.
 - `nightly_cron.sh`: committed code runs with a session's PATH after a rotation. A changed or untracked file in this folder refuses the run with a P1.
 - `nightly_check.sh`: nothing before 05:00; `MISSED` with a P1; checked once a night; `FAILED`; `ran` with the verdict and the estimate against the actual; a day run is not a night's. With the owner inactive at 05:30, the line is written at once, the P1 is held, and it goes at 08:00 marked held.
 - `ping_gate.sh`: by day at once; at night at once when the owner is active; held when inactive or unreadable; `--wait-flush` waits at 04:00 and flushes at 07:30.
 - `rotate.sh`: the newest 30 logs kept; the newest 3 JUnit folders kept; over the budget, the oldest run folder goes first.
 
-Two mutation checks:
+Four mutation checks:
 - with the committed-code check removed from a copy of `nightly_cron.sh`, cases C2 and C3 fail;
-- with `ping_gate.sh` made to ping always, cases K7, K8 and G3 to G6 fail.
+- with `ping_gate.sh` made to ping always, cases K7, K8 and G3 to G6 fail;
+- with `push_emergency.sh`'s mode-600 check removed, case P2 fails;
+- with its message filter removed, cases P4 and P5 fail.
 
 The idle read was checked live on 2026-10-28: at a simulated 03:00, with the owner active (37 s idle), the ping went at once.
 
