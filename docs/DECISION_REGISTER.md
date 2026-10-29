@@ -11563,7 +11563,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-942 — No fixed number of leads; the resource gate measured on WSL as it is; closes first (standing)
-- **Status:** ACCEPTED (item 1's launch order within DEC-946's priorities; owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-847, DEC-880, DEC-798, DEC-898, DEC-904, DEC-933, DEC-939, DEC-941, DEC-938 · **Changes:** DEC-941 item 1d (the interim ceiling of 4 leads, removed), DEC-847's hard ceiling of 10 leads (removed), DEC-798's fixed gate figures (load below 20, MemAvailable at least 6,710,886 kB: replaced by item 2) · **Basis:** the owner's message of 2026-10-29, which supersedes the same day's message on a `.wslconfig` change and a WSL restart (neither happens: WSL keeps its 20 threads and its memory).
+- **Status:** ACCEPTED (item 2's memory rule changed by DEC-947; item 1's launch order within DEC-946's priorities; owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-847, DEC-880, DEC-798, DEC-898, DEC-904, DEC-933, DEC-939, DEC-941, DEC-938 · **Changes:** DEC-941 item 1d (the interim ceiling of 4 leads, removed), DEC-847's hard ceiling of 10 leads (removed), DEC-798's fixed gate figures (load below 20, MemAvailable at least 6,710,886 kB: replaced by item 2) · **Basis:** the owner's message of 2026-10-29, which supersedes the same day's message on a `.wslconfig` change and a WSL restart (neither happens: WSL keeps its 20 threads and its memory).
 - **Decision:**
   1. **No fixed number of leads.** Every ready ticket that dependencies and paths allow is launched (no overlapping running ticket, or the overlap split by file), critical path first (memory), then K3, K6 and the held merge-backs, until the machine's capacity is reached.
   2. **Capacity is measured at each launch by the resource gate, on WSL as it is:**
@@ -11714,3 +11714,26 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.328 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-946 (standing priorities until EXAMIN's copy: finish before you start; speed, memory, K3 and K6, the rest of EXAMIN's minimum; nothing else starts; a Wave 3 parking list; cuts, not a later date, if 18 November is at risk; staggered launches; the nightly frozen; ACT-RUNS-SWEEP-1 by the owner's operator). Next free id: DEC-947. |
+
+
+### DEC-947 — The memory gate: one verification run's peak reserved once, a working size per lead; re-measured weekly (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-942, DEC-946, DEC-904 · **Changes:** DEC-942 item 2's memory rule (each running lead's measured reservation) and its "how it is applied" (the highest peak charged per lead)
+- **Decision:**
+  1. The verification lock lets only one full test run happen at a time, so its peak (7.4 GiB measured on 2026-10-29) is reserved once, not per lead.
+  2. **The reserve:** the floor, plus one verification run's measured peak, plus each running lead's measured working size outside verification (about 2.1 GiB, measured on 2026-10-29).
+  3. **Both figures are re-measured weekly.**
+  4. **Applied at once,** not held for the morning package; the staggered launches stay (DEC-946 item 8).
+- **How it is applied:**
+  - `tools/gate_check.py` opens memory when MemAvailable plus what the running leads already hold is at least the floor (6,710,886 kB), plus the verification peak (7,404,492 kB), plus the working size (2,140,236 kB) for each running lead and for the new one.
+  - The figures live in `tools/gate-config.json` with their date and source.
+  - The weekly numbers carry the re-measure, from `log/lead-mem.jsonl` (`tools/lead_mem.py --summary`), old and new side by side.
+- **Effect, measured at 20:35 on 2026-10-29:**
+  - WSL holds 23.5 GiB; available plus the leads' memory came to 20.6 GiB;
+  - the rule then admits about three leads at once (20.6 − 6.4 − 7.1 = 7.1 GiB, at 2.04 GiB each);
+  - the seven leads already running continue (DEC-942 item 3); none starts until they are down to two.
+- **Where it goes (DEC-851):** this register, with DEC-942's status line; the prompt §3 (the gate) and §7 (the weekly re-measure), v3.41; RESUME HERE.
+- Next free id: DEC-948.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.329 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-947 (the memory gate: the floor, plus one verification run's measured peak reserved once, plus a measured working size per running lead and the new one; both figures re-measured weekly; applied at once, launches still staggered). Next free id: DEC-948. |
