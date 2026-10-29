@@ -6,10 +6,11 @@ second branch, a staged change), as a hook's environment would carry them. "Reac
 observed from outside: the decoy's every byte (its ``.git`` included) is as it was, and the call does its work
 on its own folder as it would with no plant (a check measures, a staged secret is found, a change is caught).
 
-Which ``GIT_*`` value a call may keep (package P-1, the tests' reading): one that names the call's own
-repository's git directory or a file inside it is git's own (``git commit -a`` gives the hook an
-``index.lock`` there); any other is cleared. The cases of ``_on_purpose`` hold that reading from the other
-side: a hooked ``git commit -a`` and ``git commit -- <path>`` still have their secret found.
+Which ``GIT_*`` value a call may keep (reading P-1, accepted by the owner, DEC-804 item 3): an inherited
+``GIT_INDEX_FILE`` is honoured only for git calls in the project root, when it is git's own index there (``git
+commit -a`` gives the hook an ``index.lock`` in the git directory); a program that may start git elsewhere gets no
+index (``test_w2_05_declared_check.py``); any other value is cleared. The cases of ``_on_purpose`` hold that reading
+from the other side: a hooked ``git commit -a`` and ``git commit -- <path>`` still have their secret found.
 
 The staged-secrets gate is held to the stricter behaviour that stands under either answer to P-1 (independent
 review F1, DEC-413 round 1): it never passes on an index other than the one being committed. An inherited
@@ -25,9 +26,9 @@ The list rows:
   configuration change nothing and write nothing.
 - W2-M161, every subprocess of ``gov close`` (its test run included: the test helper) runs with a sanitised
   environment and pinned configuration. Red until W2-53 merges (``src/gov/close/**``).
-- W2-L160, the guard hook resolves git by absolute path, and its freeze look-up has a limit of its own below
-  the hook's 20 s deadline (DEC-580: the guard answers refuse). Red until W2-50 merges
-  (``src/gov/guard/decide.py``).
+- W2-L160, the guard hook resolves git by absolute path, and its freeze look-up has a limit of its own of 15 s
+  (DEC-783 item 2), below the hook's 20 s deadline (DEC-580: the guard answers refuse). W2-50 has merged; this
+  ticket's resume makes the change to ``src/gov/guard/decide.py``.
 """
 
 from __future__ import annotations
@@ -43,7 +44,14 @@ import w2_05_support as support
 from w2_05_support import skip_without
 
 STAGED_SECRET_EXIT = "SECRET_STAGED"
-FREEZE_LIMIT_S = 18.0   # package P-2: the freeze look-up's own limit, below the hook's 20 s deadline
+# The freeze look-up's own limit (DEC-783 item 2; reading P-2 as decided), and the window its refusal is held to, on
+# the test's clock from the start of the hook's process to its end: not before FREEZE_FROM_S (the look-up was waited
+# for up to its limit; 0.5 s for the clocks), and by FREEZE_BY_S (3 s for the hook's start and its answer after the
+# limit; 1 s before 19 s, the earliest the hook deadline's answer comes in W1-02's deadline cases, and 2 s before the
+# hook's 20 s deadline, DEC-580).
+FREEZE_LIMIT_S = 15.0
+FREEZE_FROM_S = 14.5
+FREEZE_BY_S = 18.0
 
 
 def assert_untouched(decoy, what):
@@ -475,10 +483,12 @@ def test_the_guard_hook_does_not_run_the_git_first_on_path(tmp_path):
     assert result.decision == plain.decision, f"the guard decided otherwise: {result.describe()}"
 
 
+# Rewritten (DEC-783 item 2: the freeze look-up's own limit is 15 seconds; was held to "an answer within 18 s",
+# reading P-2): the refusal is the look-up's own, at its 15 s limit, never the hook deadline's at 20 s.
 def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs(tmp_path, fifo_cleanup):
     """The worktree's ``HEAD`` in its git directory is a fifo: every git that opens it waits. The guard's freeze
-    look-up must give up within its own limit and refuse (DEC-580), before the hook's 20 s deadline. Red until
-    W2-50 merges (``src/gov/guard/decide.py``)."""
+    look-up gives up at its own limit of 15 s (DEC-783 item 2) and the guard refuses (DEC-580): the answer is
+    ``deny``, not before 14.5 s and by 18 s, so it is the look-up's own and not the hook deadline's (20 s)."""
     w102, project, sandbox = _guard_project(tmp_path)
     tree = tmp_path / "wt"
     w102.git(project, "worktree", "add", "-q", str(tree), "-b", "w2-05/guard")
@@ -492,7 +502,15 @@ def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_han
 
     assert result.decision != "timeout", (
         f"the guard hook did not answer within the hook's {w102.HOOK_TIMEOUT_S:.0f} s deadline while its freeze "
-        f"look-up waited (W2-L160: the look-up has no limit of its own): {result.describe()}")
-    assert result.decision == "deny" and result.seconds < FREEZE_LIMIT_S, (
-        f"the guard hook did not refuse within {FREEZE_LIMIT_S:.0f} s (DEC-580): {result.describe()} "
+        f"look-up waited (W2-L160: the look-up has no limit of its own of {FREEZE_LIMIT_S:.0f} s, DEC-783 item 2): "
+        f"{result.describe()}")
+    assert result.decision == "deny", (
+        f"the guard hook did not refuse when its freeze look-up hung (DEC-580): {result.describe()} "
         f"after {result.seconds:.1f} s")
+    assert result.seconds >= FREEZE_FROM_S, (
+        f"the guard hook refused after {result.seconds:.1f} s: before the freeze look-up's own limit of "
+        f"{FREEZE_LIMIT_S:.0f} s (DEC-783 item 2; not before {FREEZE_FROM_S} s): {result.describe()}")
+    assert result.seconds <= FREEZE_BY_S, (
+        f"the guard hook refused after {result.seconds:.1f} s: not by the freeze look-up's own limit of "
+        f"{FREEZE_LIMIT_S:.0f} s (by {FREEZE_BY_S:.0f} s); a refusal this late is the hook deadline's "
+        f"({w102.HOOK_TIMEOUT_S:.0f} s, DEC-580), not the look-up's: {result.describe()}")

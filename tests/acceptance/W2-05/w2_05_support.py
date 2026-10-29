@@ -58,6 +58,9 @@ TEMPLATE_HOOKS = REPO_ROOT / "template" / "lefthook.yml.jinja"   # the template'
 CHECKS_REL = "template/governance/kernel/checks"
 RETRIEVAL_CHECK = REPO_ROOT / CHECKS_REL / "retrieval-regression.yaml"
 GITLEAKS_RULES = REPO_ROOT / "template" / ".gitleaks.toml"
+# The two Claude Code hooks sources adapter-portability compares (W2-M281; DEC-783 item 3, DEC-805).
+REPO_HOOKS_SOURCE_REL = ".rulesync/hooks.jsonc"
+TEMPLATE_HOOKS_SOURCE_REL = "template/.rulesync/hooks.jsonc"
 
 SYSTEM_PATH = "/usr/bin:/bin"
 CALL_TIMEOUT_S = 300.0
@@ -424,6 +427,22 @@ def index_outside_the_git_directory(repo, path, files):
 def staged_in(repo, index):
     """``git ls-files --stage`` of the index file ``index`` (read with the setup's clean git)."""
     return git(repo, "ls-files", "--stage", env=dict(clean_env(), GIT_INDEX_FILE=str(index)))
+
+
+def missing_from_the_index(tree):
+    """The entries of the index of ``tree`` (``git ls-files --stage``) whose object the repository does not hold,
+    each as ``(path, object)``; read with the setup's clean git."""
+    missing = []
+    for line in git(tree, "ls-files", "--stage").splitlines():
+        meta, _, path = line.partition("\t")
+        fields = meta.split()
+        if len(fields) < 2:
+            continue
+        held = subprocess.run([GIT, "-C", str(tree), "cat-file", "-e", fields[1]], env=clean_env(),
+                              capture_output=True, timeout=CALL_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        if held.returncode != 0:
+            missing.append((path, fields[1]))
+    return missing
 
 
 def names_path(output, path):
