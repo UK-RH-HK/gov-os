@@ -715,6 +715,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - memory measured: W2-61's standing measure at DEC-833's floor on the pinned stores;
   - the adoption proving ground passed (W2-81);
   - Wave 2-grade evidence (a clean close, the memory measure, or the proving ground) for every capability the copy relies on, not only Wave 1's record.
+  - a Definition of Ready checked at claim (W2-82, `DAEO-4k3l`) and a playbook per stream in the kernel template (W2-83a, `DAEO-dy7j`) (owner, DEC-944 items 2 and 3).
 - **For EXAMIN's real repository:** the same, and a release path (K7: W2-16 closed and a release cut and hash-verified).
 
 EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W2-28's verdict is in, and the owner gives the go (DEC-727). Before that, every EXAMIN step works on clones under `~/gov-os-runs/`, made from the owner's copy by its exact path (DEC-723). The one exception is W2-26's throwaway `/tmp` clone, before W2-50 (DEC-728).
@@ -1473,6 +1474,36 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
 - **KPIs, failure:**
   - a hidden question or answer readable by a measured role by an honest route;
   - a gold source that does not hold its answer.
+
+### DEC-944: the Definition of Ready and the stream playbooks (EXAMIN minimum)
+
+#### W2-82 A Definition of Ready: gov claim checks it, and gov launch refuses a lead on a ticket that is not ready (STANDARD, engineer; DEC-944 item 2; EXAMIN minimum)
+- **Ticket file:** `DAEO-4k3l`.
+- **Why:** a ticket can be claimed and launched today with any file at all. Adopted products need the check from their first ticket.
+- **Starts:** priority 5 (DEC-946), after W2-60a and W2-56 merge (both hold `src/gov/launch/launcher.py`).
+- **Allowed paths:** `src/gov/tasks/dor.py`, `src/gov/claim/**`, `src/gov/launch/launcher.py` (the ticket check only), the kernel's `templates/ticket.md` and `schemas/ticket.schema.json` (CIT-P for these two only), their unit tests, the CIT-P and CIT-E; acceptance tests in `tests/acceptance/W2-82/`.
+- **KPIs, success:**
+  - `gov claim` sets `in_progress` only when the six conditions hold (sources resolving; allowed paths; KPIs with at least one success line citing an id; profile; acceptance-test path; dependencies met), and otherwise names every failing condition and writes nothing;
+  - `gov launch` refuses a lead on a ticket that is not ready;
+  - fail closed; the kernel carries the rule.
+- **KPIs, failure:** a not-ready ticket claimed or launched; a condition that cannot be judged treated as met; any ticket-file rewrite by the guard (Wave 3).
+
+#### W2-83a A playbook per stream: the form in the kernel template, its schema in gov check, and the adopt step (STANDARD, product-spec; DEC-944 item 3; EXAMIN minimum)
+- **Ticket file:** `DAEO-dy7j`.
+- **Why:** an adopted product should start with the form for its streams: purpose, standing practices, usual ticket classes, roles and the skills they load.
+- **Starts:** priority 5 (DEC-946), after W2-64 (which holds `src/gov/check/schema.py`).
+- **Allowed paths:** the kernel's `templates/playbook.md` and `schemas/playbook.schema.json`, the schema map's one line in `src/gov/check/schema.py`, the adopt skill and its copies, unit tests, the CIT-P and CIT-E; acceptance tests in `tests/acceptance/W2-83a/`.
+- **KPIs, success:** the form and its schema in the kernel; `gov check` refuses a playbook missing any part; adoption writes the form into a product, which passes `gov check`; nothing project-specific in the kernel.
+- **KPIs, failure:** an incomplete playbook passes; a rule of this repository in the kernel; a kernel file changed without its CIT-P.
+
+#### W2-83b This project's nine keystone playbooks, placing annex D's standing practices (STANDARD, product-spec; DEC-944 item 3; spare capacity only)
+- **Ticket file:** `DAEO-mc6n`.
+- **Why:** 39 of annex D's 80 standing practices live only in the orchestrator's prompt, briefs and tools.
+- **Starts:** after W2-83a, in spare capacity only, never ahead of the standing priorities (DEC-946).
+- **Allowed paths:** `docs/playbooks/**`; acceptance tests in `tests/acceptance/W2-83b/`.
+- **KPIs, success:** nine playbooks in W2-83a's form; every annex D practice placed, or marked retired or project-only with its reason; every class and skill named exists.
+- **KPIs, failure:** a practice dropped; a skill or class named that does not exist.
+- **Kept current:** updated with each new standing rule of its stream (DEC-944 item 3).
 
 ## 3. Order, layers and critical path
 
