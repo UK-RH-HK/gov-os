@@ -16,8 +16,8 @@ Standard library and `pytest` only. No network, no dev tiers, no `local_only` te
 the working tree into a temporary directory and run the registered hook commands there. The repository itself is never
 written, and no hook is run against it.
 
-After the switch-over, one test runs the acceptance suites of W1-02, W1-03 and W1-04 in a child process, and nine
-cases time the hook, so the whole directory takes about three minutes.
+After the switch-over, nine cases time the hook. The case that ran the acceptance suites of W1-02, W1-03 and W1-04 in
+a child process is retired (see [Retired](#retired)).
 
 ## KPI → tests → red reason today
 
@@ -33,9 +33,9 @@ test functions). Before it: 12 failed, 41 errors (53 cases, 22 test functions).
 | **Success 2.** The interim operator diff check is retired and recorded as such | `test_w1_05_switch_over_record.py` | `test_the_operator_diff_check_is_recorded_as_retired` | `bootstrap.md` nowhere says the diff check is retired |
 | **Success 3–7.** A minimal subagent definition for the orchestrator, engineer, product-spec, independent-test-designer and independent-auditor role exists under `.claude/agents/`, with that subagent type name (DEC-119) | `test_w1_05_role_subagents.py` | `test_a_subagent_definition_exists_for_the_role[<role>]` · `test_the_live_guard_takes_the_definition_s_type_name_as_the_role[<role>]` · `test_the_engineer_subagent_can_work_on_an_engineer_ticket` | `.claude/agents/` does not exist |
 | **Failure 1.** A later ticket runs without the guard active | `test_w1_05_live_hooks.py` | `test_a_hook_runs_before_every_tool` · `test_hooks_are_not_switched_off` · `test_the_hooks_stay_wired_in_every_later_commit` · the W1-02 tests above | No hook is registered |
-| **Failure 2.** The switch-over happens before W1-02..04 acceptance tests pass | `test_w1_05_switch_over_record.py` | `test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` | Error in the fixture: the switch-over has not happened |
+| **Failure 2.** The switch-over happens before W1-02..04 acceptance tests pass | — | Retired by DEC-899: `test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` (see [Retired](#retired)) | — |
 
-**Count.** KPI lines with tests: 9 of 9. Covers ids: none; the ticket's KPI lines cite no covers id (DEC-119).
+**Count.** KPI lines with tests: 8 of 9; failure 2's case is retired (DEC-899). Covers ids: none; the ticket's KPI lines cite no covers id (DEC-119).
 
 ## How the tests decide "live"
 
@@ -122,8 +122,7 @@ A pytest run cannot open a harness session. Instead:
   `.claude/settings.json` must keep a PreToolUse command for every tool and a PostToolUse command for Bash. The first
   such commit is the first one that wires every tool; a commit before it that wires the four write tools alone is not
   counted. This check reads the settings file of each commit; it does not run the commands.
-- **Failure 2.** With the hooks wired, `tests/acceptance/W1-02`, `W1-03` and `W1-04` must each hold test files, and
-  `python3 -m pytest` on the three directories must pass.
+- **Failure 2.** Its case is retired (DEC-899): see [Retired](#retired).
 
 - **The before-snapshot must be wired.** The containment check restores an acceptance test only when the PreToolUse
   command for Bash took its snapshot before the call (DEC-124, DEC-126). The restore test fails if the PreToolUse
@@ -191,6 +190,17 @@ child run). A close of this repository needs a time limit that allows it (`gov c
 
 Run by hand, the suite is as under "Run"; with `-n auto`, deselect this case and run it alone
 afterwards.
+
+The case and its line in `serial-only.txt` are retired since 2026-10-23 (see [Retired](#retired)).
+
+## Retired
+
+`test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` (failure 2) is retired by the owner's decision
+DEC-899 (P-IS-3 (a)), on ticket `DAEO-uzme` (W2-70), with its line in `tests/acceptance/serial-only.txt` and its
+entry in W1-30's round 11 table. Why: its KPI was a one-time order at W1-05's close, and the case re-ran the
+acceptance suites of W1-02, W1-03 and W1-04 (4,355 cases) in a child test run, about 15 minutes of every close, while
+the same close already runs those suites as themselves; it also blocked worksteal (DEC-892 a). The three suites are
+not changed and still run in every close. The other case of `test_w1_05_switch_over_record.py` stays as it was.
 
 ## Not tested
 

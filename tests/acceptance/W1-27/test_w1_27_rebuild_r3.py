@@ -203,6 +203,25 @@ def test_rebuild_result_names_derived_stores_with_measured_status(rebuild_gov, r
         f"result: {result}\n{run.describe()}"
     )
 
+    # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): the facts
+    # computed above were never asserted. Every store has a status, recreated or not_recreated, and each store not
+    # recreated gives a reason that is not one of the constant sentences.
+    assert has_stores_key and isinstance(stores, dict) and stores and has_status_per_store, (
+        f"rebuild result does not name its derived stores with a status each\nresult: {result}\n{run.describe()}"
+    )
+    for name, entry in stores.items():
+        assert isinstance(entry, dict) and entry.get("status") in ("recreated", "not_recreated"), (
+            f"store {name} has no status recreated or not_recreated: {entry}\n{run.describe()}"
+        )
+        if entry["status"] == "not_recreated":
+            reason = entry.get("reason")
+            assert isinstance(reason, str) and reason and reason not in (
+                "requires ollama and qwen3-embedding model", "requires code intelligence tool", "skipped",
+            ), f"store {name} is not recreated with a constant or missing reason: {entry}\n{run.describe()}"
+    assert any(entry["status"] == "recreated" for entry in stores.values()) or not has_constant_only, (
+        f"no store is recreated and no reason is measured\nresult: {result}\n{run.describe()}"
+    )
+
 
 # --------------------------------------------------------------------------- #
 # Case 4: Rebuild does not hold a copy of another module's table DDL

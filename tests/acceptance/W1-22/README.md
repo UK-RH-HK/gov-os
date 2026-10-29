@@ -134,3 +134,24 @@ Not covered, and not coverable by the current runner API:
 ## W1-07 revision
 
 W1-22 does not build a `gov` subcommand. The validator and canary runner are Python functions (`gov.retrieval.validate.validate`, `gov.retrieval.canary.run_canaries`), not CLI commands. No revision of `tests/acceptance/W1-07/w1_07_support.py` is needed.
+
+## Revised cases (W2-59, DEC-864 item 1, 2026-10-20)
+
+- `TestCanaryRunner::test_lexical_canary_hits_after_reindex`: revised after implementation (`Rewrite-Reason: DEC-822 item 3, DEC-835`): the runner reads the canary declarations from the project, no longer from its install path, so the case indexes `adopted_base`, which carries `lexical.yaml` and `semantic.yaml` of `template/governance/kernel/canaries/` under `governance/kernel/canaries/`, as an adopted project does (DEC-579); assertion unchanged.
+- `TestCanaryRunner::test_semantic_canary_hits_after_reindex`: the same revision, for the same reason (DEC-864); assertion unchanged. Every other case keeps `base` (`build_fixture`'s `kernel_canaries` is off by default).
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only the fixture changes:
+
+- `scratch_env`: **before**, `OLLAMA_HOST` = the given stand-in or a dead port; **after**, the same, and
+  `GOV_QUERY_OLLAMA_HOST` = **the same** stand-in or the same dead port. One stand-in answers chunks and canary
+  questions with the same vectors, so every canary result is what it was.
+- `OllamaStandIn`: **before**, no `GET /api/ps` (404); **after**, `/api/ps` lists the model with `size_vram` 0, as
+  the CPU-only embedder must report it.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change: 25 passed (as
+before). Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the
+CPU-only embedder on its own port; the fixtures point it at a stand-in and change no expectation`.

@@ -12,16 +12,13 @@ two things through public interfaces.
 - What the hook does when the session's own role is missing or is not
   orchestrator: an ``orchestrator`` subagent gets no wide scope. This is the
   behaviour DEC-178 fixed, and the change must not loosen it.
-- That the builder tests in ``tests/unit/guard/`` pass. Whether one of them
-  calls the function without the argument is for the reviewer to read; this
-  suite does not import the guard.
+- That the builder tests in ``tests/unit/guard/`` pass: they run as themselves
+  in every close. The case that re-ran them in a child process is retired by
+  DEC-899 (P-IS-3 (a)). Whether one of them calls the function without the
+  argument is for the reviewer to read; this suite does not import the guard.
 """
 
 from __future__ import annotations
-
-import os
-import subprocess
-import sys
 
 import pytest
 
@@ -81,13 +78,3 @@ def test_the_orchestrator_s_own_session_keeps_the_wide_scope(project, guard):
     for who in ((ORCHESTRATOR, ORCHESTRATOR_TICKET, None), (ORCHESTRATOR, ORCHESTRATOR_TICKET, ORCHESTRATOR)):
         result = guard(project, "Write", _write(project, OUTSIDE), who)
         support.assert_allowed(result, f"Write on {OUTSIDE} in the orchestrator's own session, as {who}")
-
-
-def test_the_builder_tests_of_the_guard_pass():
-    """KPI success 7: "a builder test in tests/unit/guard/ shows it": the builder suite is green."""
-    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
-    proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "tests/unit/guard", "-q", "-p", "no:cacheprovider"],
-        cwd=str(support.REPO_ROOT), env=env, capture_output=True, text=True, timeout=300, check=False,
-    )
-    assert proc.returncode == 0, f"tests/unit/guard does not pass:\n{proc.stdout[-2000:]}\n{proc.stderr[-1000:]}"

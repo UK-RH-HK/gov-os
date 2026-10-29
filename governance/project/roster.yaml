@@ -12,6 +12,8 @@ roles:
   orchestrator:
     role_file: template/governance/kernel/roles/orchestrator.md
     agent: .claude/agents/orchestrator.md
+    # W2-62 (DEC-837, DEC-863): the prompt in force, which the session-start hook names.
+    prompt: governance/project/prompts/w2-orchestrator.md
   product-spec:
     role_file: template/governance/kernel/roles/product-spec.md
     agent: .claude/agents/product-spec.md

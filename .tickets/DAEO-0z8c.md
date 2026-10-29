@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/util/gitenv.py
 - lefthook.yml
 - template/lefthook.yml
+- template/.rulesync/hooks.jsonc
 - tests/unit/gitenv/**
 - docs/research/AR-2-git-sweep.md
 kpis:

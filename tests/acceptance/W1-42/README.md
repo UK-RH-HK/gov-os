@@ -82,8 +82,8 @@ case stops in the `report` fixture with
 |---|---|
 | WBS section 4, every criterion answered with evidence; every named path exists | `test_every_exit_criterion_is_answered_with_its_evidence`, `test_every_path_the_report_names_exists` |
 | 1. The cycle on a-dev and b-dev (DEC-088, DEC-089, DEC-658) | `test_programme_cycle_is_stated_step_by_step[ORION]`, `[ARGUS]`; `test_programme_close_is_stated_as_the_kept_answer_says[ORION]`, `[ARGUS]` |
-| 2. RETR-A-04 and RETR-X-02 | `test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason[RETR-A-04]`, `[RETR-X-02]` |
-| 2. Governance share at most 15 % (DEC-655) | `test_governance_share_is_measured_and_at_most_15_percent_on_each_programme` (waits) |
+| 2. RETR-A-04 (RETR-X-02 retired, DEC-900: its accepted outcome is the stated gap, as W1-21 asserts) | `test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason[RETR-A-04]` |
+| 2. Governance share at most 15 % (DEC-655) | retired by DEC-900; W2-14's evidence (`governance-share.json`) holds the measured share per programme |
 | 2. Zero MR-3 breaches | `test_zero_mr3_breaches_with_what_was_checked` |
 | 3. 17 of 17 families `[CAP-38.b]` | `test_gov_check_reports_17_of_17_families_with_an_executable_check` |
 | 4. Twelve commands `[CAP-28.b]` | `test_all_twelve_wave_1_commands_are_implemented` |
@@ -105,7 +105,6 @@ missing file.
 
 | Case | The record that turns it green |
 |---|---|
-| `test_governance_share_is_measured_and_at_most_15_percent_on_each_programme` | `evidence/governance-share.json` with a measured share for ORION and for ARGUS, each naming the kept answer of the counter, after the session-log reader's round on W1-31 is merged (DEC-655); the report's Share cells carry the same figures. It stays red on a share above 15 %: that is the ticket's failure line. |
 | `test_git_worktree_list_shows_no_ticket_worktree_left` | `evidence/git-worktree-list.txt`, taken after this ticket's own worktree (`~/gov-os-worktrees/W1-42`) is removed, that is after the ticket's merge. Green in this worktree is impossible by construction; the main orchestrator supplies the file. |
 | `test_owner_froze_paused_and_lifted_on_a_throwaway_repository_and_on_this_one` | `evidence/owner-freeze-check.json`, from the owner's step B2 in a plain terminal on the throwaway clone and on this repository (DEC-428, DEC-660), and the row `B2` of the report saying `done` with that path. |
 

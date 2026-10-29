@@ -181,8 +181,12 @@ def test_a_project_file_named_like_the_closes_plugin_keeps_no_failing_case_out(f
 # 3. A run cut at the time limit leaves no process and writes nothing afterwards
 # --------------------------------------------------------------------------
 
-LIMIT_S = 5
-SLEEP_S = 14
+# Rewrite-Reason: W2-M384 (W2-57, I2 §2.2): the close's limit is one a loaded start of its parallel run meets. With
+# 5 s, under a load of 19 to 29 the run was cut before its workers reached the case, and the case's own premise
+# failed ("the case had not begun when the run was cut"). The case still sleeps well past the limit, so the run is
+# cut while it runs, whenever within the limit it began.
+LIMIT_S = 30
+SLEEP_S = LIMIT_S + 15
 MARKER = "written-after-the-limit.txt"
 
 

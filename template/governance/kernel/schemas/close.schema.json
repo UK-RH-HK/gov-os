@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "close",
+  "description": "Frontmatter of a close record, as `gov close` writes it at `docs/close/<ticket>/CL-<ticket>.md`: the shared frontmatter and `task`, the ticket closed. The close packet's other fields (created, outputs, inputs, tests, commits, the governance share) follow it and are not constrained here.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "required": ["task"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/record_id" },
+    "type": { "const": "close" },
+    "task": { "$ref": "common.schema.json#/$defs/ticket_id" }
+  }
+}

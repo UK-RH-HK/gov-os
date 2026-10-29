@@ -26,14 +26,17 @@ kpis:
   - gov resources reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under ~/.gov-os/machine/, whichever repository started it.
   - The gate opens or shuts with a named reason.
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
+  - 'The gate also reads the shared disk: it shuts below a floor of free space and of free inodes (100 GiB and 10,000,000 by default, set in the project configuration); gov launch refuses to start a session while it is shut, naming the reading, and the reading is one function gov close can call before a close (its call is W2-07''s or W2-66''s, whose paths hold the close) [DEC-898 item 1]'
   failure:
   - A session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
+  - A launch or a close that starts with the disk below either floor; a gate that reads disk space but not inodes.
 profile: STANDARD
 sources:
 - DEC-729
 - DEC-742
 - DEC-747
-est_loc: 120
+- DEC-898
+est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-20/
   author: independent-test-designer (MR-3); written before implementation

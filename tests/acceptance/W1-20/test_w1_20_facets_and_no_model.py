@@ -80,7 +80,8 @@ def test_a_closure_starts_no_ollama_and_asks_no_model(graph, box, tmp_path):
     with support.Listener() as listener:
         for ids, depth in (([support.HUB], 5), ([support.CHAIN[0]], 1), ([support.DANGLING_START, support.UNKNOWN], 5)):
             run = support.closure(graph, ids, box, depth=depth, path=f"{stubs}:{box.bare}",
-                                  GOV_OLLAMA_BIN=stubs / "ollama", OLLAMA_HOST=listener.address)
+                                  GOV_OLLAMA_BIN=stubs / "ollama", OLLAMA_HOST=listener.address,
+                                  GOV_QUERY_OLLAMA_HOST=listener.address)  # W2-54, DEC-798: the CPU embedder's
             support.result(run)
         assert listener.connections() == 0, "gov closure connected to the Ollama endpoint"
     assert not marker.exists(), f"gov closure ran ollama:\n{marker.read_text()}"

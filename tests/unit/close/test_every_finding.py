@@ -140,7 +140,10 @@ def test_several_gates_are_one_refusal_counted_once_with_one_repair_ticket_that_
     assert error.details["repair_ticket"] == repair.stem
     text = repair.read_text(encoding="utf-8")
     assert all(f"- {line}" in text for line in lines) and f"- {NO_ACCEPTANCE_RUN}" in text
-    assert text.count("FAILED test_x") == 1
+    # each finding once in the findings, and once among the KPIs of the complete repair ticket (KPI 8, AR-9)
+    assert text.count("- FAILED test_x\n") == 1
+    kpis = frontmatter(repair)["kpis"]["success"]
+    assert len(kpis) == len(lines) and sum("FAILED test_x" in kpi for kpi in kpis) == 1
 
 
 def test_gates_with_one_code_keep_it(root):
@@ -173,10 +176,24 @@ def test_with_a_class_a_context_that_failed_is_a_finding_and_is_named_on_the_rep
     assert "context_hash" not in frontmatter(_tickets(root)[0])
 
 
-# ---- the run asks every gate ----
+# ---- the run asks every gate of a phase (DEC-868 item 3: the commit gates, then the pre-close gate, then the
+# gates of the tests; a refusal of the first two spends no attempt) ----
 
-GATES = ("_check_trailers", "_check_unmeasured", "_check_containment", "_check_acceptance", "_check_tests",
-         "_check_governance_blocks", "_check_checkpoint", "_build_context")
+COMMIT_GATES = ("_check_trailers", "_check_unmeasured")
+PRE_CLOSE_GATES = ("check_collection", "_check_governance_blocks", "_check_checkpoint")
+TEST_GATES = ("_check_containment", "_check_acceptance", "_check_tests", "_build_context")
+PHASES = (COMMIT_GATES, PRE_CLOSE_GATES, TEST_GATES)
+GATES = COMMIT_GATES + PRE_CLOSE_GATES + TEST_GATES
+
+
+def _phase_of(name):
+    return next(phase for phase in PHASES if name in phase)
+
+
+def _through(name):
+    """The gates asked up to the end of ``name``'s phase."""
+    phase = _phase_of(name)
+    return list(GATES[:GATES.index(phase[-1]) + 1])
 
 
 def _run(root, **answers):
@@ -185,7 +202,7 @@ def _run(root, **answers):
     asked = []
 
     def gate(name):
-        def check(*given):
+        def check(*given, **named):
             asked.append(name)
             if name in answers:
                 raise answers[name]
@@ -196,34 +213,52 @@ def _run(root, **answers):
     args = SimpleNamespace(ticket=TICKET, disposition=None, owner_decision=None, timeout=None)
     with patch.object(command, "_ticket_commits", return_value=[_commit("a", "src/example/a.py")]), \
             patch.object(command, "_commits_since", return_value=[]), patch.object(command, "_check_tree"), \
-            patch.multiple(command, **{name: gate(name) for name in GATES}):
+            patch.object(command._gates, "check_collection", gate("check_collection")), \
+            patch.multiple(command, **{name: gate(name) for name in GATES if name != "check_collection"}):
         with pytest.raises(GovError) as raised:
             run(root, args, {})
     return raised.value, asked
 
 
-@pytest.mark.parametrize("early", GATES[:4])
+@pytest.mark.parametrize("early", COMMIT_GATES + TEST_GATES[:2])
 def test_an_early_finding_does_not_end_the_run(root, early):
+    """Within its phase an early finding ends nothing: a test gate's finding is beside the failing test, counted;
+    a commit gate's finding is beside every other commit gate's and stops the run before any test, uncounted."""
     error, asked = _run(root, **{early: _Finding("EARLY", "the early finding"),
                                  "_check_tests": _Finding("CHECK_FAILED", "tests or checks failed", None,
                                                           ["FAILED test_fail"])})
-    assert asked == list(GATES)
-    assert error.details["findings"] == ["the early finding", "FAILED test_fail"]
-    assert (error.code, error.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
-    assert _counted(root)["count"] == 1 and len(_tickets(root)) == 1
+    assert asked == _through(early)
+    assert len(_tickets(root)) == 1
     assert frontmatter(root / ".tickets" / f"{TICKET}.md")["status"] == "in_progress"
     assert not (root / "docs" / "close").exists()
+    if early in TEST_GATES:
+        assert error.details["findings"] == ["the early finding", "FAILED test_fail"]
+        assert (error.code, error.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
+        assert _counted(root)["count"] == 1
+    else:
+        assert error.details["findings"] == ["the early finding"] and error.details["test_runs"] == []
+        assert (error.code, error.exit_code) == ("EARLY", EXIT_CHECK_FAILED)
+        assert not _count_path(root, TICKET).exists() and error.details["counted"] is False
 
 
-def test_a_finding_of_every_gate_is_in_the_one_refusal(root):
-    error, asked = _run(root, **{name: _Finding(name.upper(), f"finding of {name}") for name in GATES})
-    assert asked == list(GATES) and error.details["findings"] == [f"finding of {name}" for name in GATES]
-    assert _counted(root)["count"] == 1 and len(_tickets(root)) == 1
+@pytest.mark.parametrize("phase", range(len(PHASES)), ids=["commit", "pre-close", "tests"])
+def test_a_finding_of_every_gate_is_in_the_one_refusal(root, phase):
+    """Every gate of the phase that refuses is asked, and the one refusal names each gate's finding once; only a
+    refusal of the test gates is counted."""
+    named = PHASES[phase]
+    error, asked = _run(root, **{name: _Finding(name.upper(), f"finding of {name}") for name in named})
+    assert asked == _through(named[0]) and error.details["findings"] == [f"finding of {name}" for name in named]
+    assert len(_tickets(root)) == 1
+    if named is TEST_GATES:
+        assert _counted(root)["count"] == 1
+    else:
+        assert not _count_path(root, TICKET).exists()
 
 
 @pytest.mark.parametrize("failing", GATES)
 def test_could_not_measure_ends_the_run_at_once_uncounted_whatever_was_found_before(root, failing):
-    answers = {name: _Finding("EARLY", f"finding of {name}") for name in GATES[:GATES.index(failing)]}
+    phase = _phase_of(failing)
+    answers = {name: _Finding("EARLY", f"finding of {name}") for name in phase[:phase.index(failing)]}
     error, asked = _run(root, **answers, **{failing: GovError("GIT_FAILURE", "planted")})
     assert (error.code, error.exit_code) == ("GIT_FAILURE", 1)
     assert asked == list(GATES[:GATES.index(failing) + 1])
@@ -231,10 +266,13 @@ def test_could_not_measure_ends_the_run_at_once_uncounted_whatever_was_found_bef
 
 
 def test_a_full_ticket_has_its_probe_gate_asked_first_and_its_finding_beside_the_others(root):
+    """The probe gate is a commit gate (W2-M403): its finding is beside the other commit gates', before any test,
+    uncounted."""
     path = root / ".tickets" / f"{TICKET}.md"
     path.write_text(path.read_text(encoding="utf-8").replace("priority: 2\n", "priority: 2\nprofile: FULL\n"),
                     encoding="utf-8")
-    error, asked = _run(root, _check_tests=_Finding("CHECK_FAILED", "tests or checks failed", None, ["FAILED t"]))
-    assert asked == list(GATES)
-    assert [part["code"] for part in error.details["parts"]] == ["PROBE_MISSING", "CHECK_FAILED"]
-    assert _counted(root)["count"] == 1
+    error, asked = _run(root, _check_trailers=_Finding("TRAILER_MISSING", "lacks Role:"),
+                        _check_tests=_Finding("CHECK_FAILED", "tests or checks failed", None, ["FAILED t"]))
+    assert asked == list(COMMIT_GATES)
+    assert [part["code"] for part in error.details["parts"]] == ["PROBE_MISSING", "TRAILER_MISSING"]
+    assert not _count_path(root, TICKET).exists() and len(_tickets(root)) == 1

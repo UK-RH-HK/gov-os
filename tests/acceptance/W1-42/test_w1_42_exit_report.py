@@ -195,10 +195,10 @@ def test_callers_impact_hit5_is_measured_on_the_code_classes(report, read):
 
 
 # ---------------------------------------------------------------------------
-# KPI 2: RETR-A-04 and RETR-X-02
+# KPI 2: RETR-A-04 (RETR-X-02 retired by DEC-900: its accepted outcome is the stated gap)
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("query", ("RETR-A-04", "RETR-X-02"))
+@pytest.mark.parametrize("query", ("RETR-A-04",))  # RETR-X-02 retired: DEC-900, the stated gap
 def test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason(report, read, query):
     name = f"{query}.json"
     kept = read.load_json(name)
@@ -319,27 +319,7 @@ def test_worker_sessions_were_started_through_gov_launch(report, read):
 # KPI 2 and the failure lines: governance share, MR-3
 # ---------------------------------------------------------------------------
 
-def test_governance_share_is_measured_and_at_most_15_percent_on_each_programme(report, read):
-    """Waits for a record: the measured share (DEC-655)."""
-    kept = read.load_json("governance-share.json")
-    rows = _share_rows(report, read)
-    for programme in PROGRAMMES:
-        part = kept.get(programme) if isinstance(kept, dict) else None
-        assert isinstance(part, dict), f"governance-share.json: no entry for {programme}"
-        share = read.number(part.get("share_percent"))
-        assert share is not None and 0 <= share <= 100, (
-            f"governance-share.json, {programme}: share_percent is not a measured figure from 0 to 100")
-        assert type(part.get("cache_read_tokens")) is int, (
-            f"governance-share.json, {programme}: cache_read_tokens (reported separately, DEC-086) is not a count")
-        record = str(part.get("record", ""))
-        assert record.startswith(read.EVIDENCE_REL + "/") and (read.ROOT / record).is_file(), (
-            f"governance-share.json, {programme}: 'record' must be the kept answer of the counter, a file under "
-            f"{read.EVIDENCE_REL}/")
-        stated = _stated_share(rows[programme]["share"], read)
-        assert stated is not None and abs(stated - share) < 0.05, (
-            f"Governance share, {programme}: the report says '{rows[programme]['share']}', the record {share}")
-        assert record in read.paths_in(rows[programme]["record"]), f"Governance share, {programme}: record not named"
-        assert share <= read.SHARE_LIMIT, f"{programme}: governance share {share} % is above {read.SHARE_LIMIT} %"
+# The governance share per programme (DEC-713) is retired here by DEC-900: W2-14's evidence holds it.
 
 
 def test_zero_mr3_breaches_with_what_was_checked(report, read):

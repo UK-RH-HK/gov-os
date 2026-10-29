@@ -1,0 +1,66 @@
+---
+id: DAEO-cv58
+status: in_progress
+deps: []
+links: []
+created: 2026-10-29T15:55:50Z
+type: task
+priority: 1
+assignee: engineer
+external-ref: W2-60a
+tags: [wave-2, implementation, full, launch, roles, keystone-3]
+wbs_id: W2-60a
+title: 'The role, its skills and its model and effort loaded at launch; the launch record'
+class: implementation
+state_class: AUTHORITATIVE
+role: engineer
+depends_on: []
+allowed_paths:
+- src/gov/launch/launcher.py
+- src/gov/launch/role.py
+- src/gov/launch/record.py
+- tests/unit/launch/test_role*
+- tests/unit/launch/test_launch_record*
+- docs/changes/W2-60a-CIT-E.md
+- docs/research/W2-60-rules-probe.md
+kpis:
+  success:
+  - 'gov launch <role> <ticket> starts the session as its role: the role''s text (its generated agent, or the role file''s text appended) is in the session''s context at its start, shown by a launched session''s log; the launch record holds the role file''s path, version and content hash [DEC-826 Q1, lens E F2]'
+  - 'The skills the session can load are in the launch record, each with its name, version and content hash, taken from the copy the session loads; a role file that names its skills gets those, so the engineer''s skill packs load with no code change once W2-33 writes them; a named skill that is missing refuses the launch [DEC-826 Q1, DEC-832 item 1, lens E F15]'
+  - 'The role''s default model and effort, read from its role file''s default line, are applied on the launch line (--model, --effort) and recorded; a missing or malformed default line refuses the launch; an effort given after -- is applied and recorded as the launch''s own [DEC-839 items 1, 2 and 5, CAP-35.c lite, lens F R1]'
+  - 'A model given after -- that is not the role''s is refused, naming both; the subagent model is set to the session''s model (CLAUDE_CODE_SUBAGENT_MODEL in the settings'' env) and recorded [DEC-839 items 1 and 3, lens E F14]'
+  - 'No launch sets a compaction threshold: no --autocompact on the line, no CLAUDE_CODE_AUTO_COMPACT_WINDOW in the settings or the session''s environment, one given after -- refused; the launch record states the threshold as none [DEC-838 items 1 and 2]'
+  - 'A launched session loads no connectors, no user-level agents or skills and no model-side memory: a test home planted with one of each shows none in the session''s start; what the CLI gives no switch for is a package naming it, never passed silently [DEC-826 Q5, lens E R6]'
+  - 'The arguments the launcher now sets itself are refused after --: --agent, --append-system-prompt and its file form, --session-id [lens E R6, DEC-826 Q5]'
+  - 'Every launch writes one launch record, keyed by the session id the launcher gives with --session-id, before the session starts: role, ticket, the ticket''s class, model, effort, subagent model, threshold none, the role text''s and each skill''s version and hash, the CLI''s version and the start time; in one folder every worktree of the repository shares, stated in the CIT-E; a record that cannot be written refuses the launch [DEC-826 Q1, CAP-36.a lite, lens F R6]'
+  - 'Research first, by the lead before the engineer starts: whether a paths:-scoped .claude/rules/ file loads in a headless worker started by gov launch, its token cost, and whether the worker can change it; recorded in docs/research/W2-60-rules-probe.md [lens G Q4]'
+  failure:
+  - A launch that starts with no role text, an unrecorded skill, a model not the role's, a compaction threshold, a user-level agent, skill or connector, or model-side memory.
+  - A role file without its default line that still launches; a launch with no record, or a record naming another session.
+  - A refusal the launcher makes today that no longer refuses.
+profile: FULL
+sources:
+- DEC-826
+- DEC-838
+- DEC-839
+- DEC-832
+- DEC-801
+- DEC-786
+- DEC-941
+est_loc: 250
+acceptance_tests:
+  path: tests/acceptance/W2-60a/
+  author: independent-test-designer (MR-3); written before implementation
+track: A
+list_rows: []
+---
+# W2-60a The role, its skills and its model and effort loaded at launch; the launch record
+
+Card: the draft card `W2-60` (W2-60a part), from the accepted plan (`docs/plan/WAVE_2_REVISED_PLAN.md` §4.3, §2 row 5 and the CAP-35.c and CAP-36.a lite rows; DEC-826 Q1 and Q5, DEC-838, DEC-839); keystone 3, agents know what to do. Started now by the re-plan the owner accepted on 2026-10-29 (DEC-941), beside the memory work.
+
+- **Why:** a launched session loads none of its role's text (lens E F2). No launch sets effort, and the compaction threshold was a user-level value (lens F F1). The model a subagent runs on is not the one recorded (lens E F14), and the loaded skill copy has no version (lens E F15). Until this lands, the prompt's launch forms carry the values by hand (prompt v3 §6, DEC-839 item 5).
+- **Profile FULL (the plan said STANDARD):** this ticket rewrites the CLI line and the settings that carry the sandbox. It also keeps connectors out, and connectors run outside the sandbox with network. A mistake here fails open in ordinary work (DEC-801).
+- **Place:** starts as soon as filed (DEC-941), stacked on `w2/integrate` (DEC-786), where W2-58's launcher is merged (`af5d1a25`). It runs beside W2-56 on `launcher.py`: each keeps its work in modules of its own and touches `launcher.py` at its call sites and argument checks only, and the second to merge merges the first back first. W2-05 (`DAEO-0z8c`) holds `src/gov/**/*.py` for git-environment lines only, so those lines are left alone. W2-21 follows. W2-60b follows it.
+- **Merges after the role files carry their default line** (model and effort, no threshold), which W2-11's widening writes through CIT-P (DEC-839 item 5). It is built and tested against fixture role files until then.
+- **Paths:** `launcher.py` for the CLI line, the settings' env lines it sets, its argument checks and the calls only. The probe record is the lead's. The role files, generated agents and skills are not in the paths (W2-11, W2-33).
+- **The test designer's files** (MR-3): `tests/acceptance/W2-60a/**`.

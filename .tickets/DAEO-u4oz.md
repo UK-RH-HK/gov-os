@@ -30,11 +30,14 @@ kpis:
     [AR-9, W2-M294, W2-M239, W2-M330].
   - An unreadable mandatory record blocks the context or is marked not read; it is never shown as read with an empty hash [W2-H034, W2-M215].
   - The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126].
+  - 'Never one giant query or context: within the packet''s ceiling, the supplementary evidence comes from retrieval in batches, ranked and stacked in order of relevance; the packet names what it
+    left for a further batch [DEC-860]'
   failure:
   - DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source.
 profile: FULL
 sources:
 - CAP-15.d
+- DEC-860
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-04/
@@ -70,4 +73,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-04), as approved (DEC-729). The list row
   - Two builds of one ticket's context, on stores rebuilt from one commit, give the same packet hash with or without a live semantic index. Ties in the supplementary block are ordered deterministically [AR-9, W2-M294, W2-M239, W2-M330].
   - An unreadable mandatory record blocks the context or is marked not read; it is never shown as read with an empty hash [W2-H034, W2-M215].
   - The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126].
+  - **Never one giant query or context (DEC-860, owner, 2026-10-20):** within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and stacked in order of relevance; the packet names what it left for a further batch.
 - **KPIs, failure:** DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source.

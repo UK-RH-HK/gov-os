@@ -54,13 +54,15 @@ def project(tmp_path, monkeypatch):
     was asked to embed, and the digest its model list reports."""
     endpoint = {"sent": [], "digest": "ac6da0dfba84" + "0" * 52}
 
-    def ask(path, body=None):
+    def ask(path, body=None, host=None):
         if path == "/api/tags":
             return {"models": [{"name": semantic.MODEL, "digest": endpoint["digest"]}]}
+        if path == "/api/ps":  # the CPU-only embedder reports the model wholly on the CPU (DEC-798)
+            return {"models": [{"name": semantic.MODEL, "size": 1, "size_vram": 0}]}
         endpoint["sent"] += body["input"]
         return {"embeddings": [[float("pear" in text), float("plum" in text)] for text in body["input"]]}
 
-    def ready(connection):
+    def ready(connection, ensure=None):
         connection.create_function("vec_distance_cosine", 2, _distance)
 
     monkeypatch.setattr(lexical, "indexable", lambda root, paths: list(paths))

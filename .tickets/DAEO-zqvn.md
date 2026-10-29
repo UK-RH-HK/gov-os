@@ -32,13 +32,14 @@ kpis:
   - The fusion receives a ranked lexical list beside the semantic one, so that lexical, semantic and the reranker each contribute. The dev queryset's lexical-only hit@5 is recorded in the ticket's evidence
     [DEC-725].
   - Lexical search returns "unavailable" instead of raising [W2-M071]. Retrieval latency stays within the retrieve budget on the dev tiers.
-  - A question about an id that exists nowhere stops with a named reason and no unrelated items, or shows a named parent expansion, as the owner rules [AR-9, W2-M296].
+  - 'A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap, as the owner ruled for RETR-X-02 (DEC-900, AR-9), and as W1-21 asserts; W1-42''s RETR-X-02 case is retired, so this ticket''s own acceptance tests hold the requirement [AR-9, W2-M296, DEC-900].'
   failure:
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - 'The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.'
 profile: FULL
 sources:
 - DEC-725
+- DEC-900
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-13/
@@ -61,13 +62,13 @@ list_rows:
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
-- **Needs first:** the owner's ruling on RETR-X-02 (queued Q-1).
+- **The owner's ruling on RETR-X-02 (Q-1) is made (DEC-900, 2026-10-23):** the accepted outcome is the stated gap.
 - **Allowed paths:** `src/gov/retrieve/**`, `src/gov/retrieval/lexical*`, `src/gov/retrieval/fusion*`, `src/gov/rebuild/lexical*`, `tests/unit/retrieve/**`, `tests/unit/retrieval/**`.
 - **KPIs, success:**
   - **The ranked lexical route.** The lexical index is an SQLite FTS5 table over the same parents and spans as today, built by `gov rebuild` (and, after W2-06, by the commit-time re-index). A plain-word question returns hits ranked by BM25, with field weights for id, title and body. An exact identifier still ranks first: the exact-match route is kept as a boost, not replaced [DEC-725, W2-M102, W2-L233, W2-M292, W2-M072, W2-M100].
   - The fusion receives a ranked lexical list beside the semantic one, so that lexical, semantic and the reranker each contribute. The dev queryset's lexical-only hit@5 is recorded in the ticket's evidence [DEC-725].
   - Lexical search returns "unavailable" instead of raising [W2-M071]. Retrieval latency stays within the retrieve budget on the dev tiers.
-  - A question about an id that exists nowhere stops with a named reason and no unrelated items, or shows a named parent expansion, as the owner rules [AR-9, W2-M296].
+  - A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap, as the owner ruled for RETR-X-02 (DEC-900, AR-9), and as W1-21 asserts; W1-42's RETR-X-02 case is retired, so this ticket's own acceptance tests hold the requirement [AR-9, W2-M296, DEC-900].
 - **KPIs, failure:**
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.

@@ -31,10 +31,12 @@ kpis:
   - Signals reach the session's process group, and temporary folders are removed on every ending [W2-M187, W2-M095, W2-L105].
   - Launched sessions can run gov check, gov rebuild and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181].
   - The kernel template's settings carry one narrow allow rule, Bash(gov launch:*) [DEC-715].
+  - 'A sandboxed worker''s temp folder is removed when the worker ends, whatever its exit, and a test shows none left under /tmp after a worker''s run [W2-M405, DEC-902]'
   failure:
   - A raw claude launch stays unallowed in the template.
 profile: FULL
 sources:
+- DEC-902
 - DEC-715
 - DEC-434
 - DEC-743
@@ -48,9 +50,11 @@ closes:
 - DEC-715
 - DEC-434
 - W2-H001
+- W2-M405
 - W2-H046
 list_rows:
 - W2-H001
+- W2-M405
 - W2-H012
 - W2-H046
 - W2-H054

@@ -29,6 +29,9 @@ kpis:
   - 'The scale probe: EXAMIN''s clone and ~/workspace against DEC-078''s envelope (≈ 80k nodes, 270k edges, ≈ 2.2 GB peak RSS), including the brute-force vector scan and the graph cache [W2-M351, W2-L317,
     W2-L320, W2-M089].'
   - CAP-10's hit@5 against 85, per class beside the single-class figure, for the owner's CAP-10 package (Q-10) [W2-M017, F-m2].
+  - 'Batched, ranked, stacked retrieval: a question whose evidence exceeds one batch is answered in batches, ranked and stacked within the agent''s budget, never by one giant query or context; the
+    measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner''s target of 99 % [DEC-860]'
+  - 'Both figures in every report: hit@5 against CAP-10''s floor of 85, and the complete-stacked-evidence share against 99 % [DEC-833]'
   failure: []
 profile: FULL
 sources:
@@ -36,6 +39,8 @@ sources:
 - CAP-10
 - DEC-725
 - DEC-727
+- DEC-833
+- DEC-860
 est_loc: 60
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
@@ -61,6 +66,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-15b), as approved (DEC-729). The list ro
   - **The stacking test**, final: complete and no duplicates, or each gap named [AR-10].
   - **The scale probe:** EXAMIN's clone and `~/workspace` against DEC-078's envelope (≈ 80k nodes, 270k edges, ≈ 2.2 GB peak RSS), including the brute-force vector scan and the graph cache [W2-M351, W2-L317, W2-L320, W2-M089].
   - CAP-10's hit@5 against 85, per class beside the single-class figure, for the owner's CAP-10 package (Q-10) [W2-M017, F-m2].
+  - **Batched, ranked, stacked retrieval (DEC-860, owner, 2026-10-20):** a question whose evidence exceeds one batch is answered in batches, ranked and stacked within the agent's budget, never by one giant query or context; the measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner's target of 99 %.
+  - **Both figures in every report (DEC-833):** hit@5 against CAP-10's floor of 85, and the complete-stacked-evidence share against 99 %.
 - **Under the finish line (DEC-725):** one run plus its probe; what is short of 99 % becomes a named residual with its cause, and goes to the owner.
 - **Gates:** W2-29 (DEC-727).
 

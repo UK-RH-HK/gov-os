@@ -298,7 +298,8 @@ def test_a_log_of_any_version_in_the_specimens_forms_is_read_with_the_versions_i
 
 
 def test_the_record_names_one_version_only_when_every_named_log_carries_that_one(project):
-    """Not decided (package G): more than one version, in one log or across the sessions. None is picked."""
+    """DEC-663 G: more than one version, in one log or across the sessions. None is picked; the record says why
+    (W2-L196) and lists each session's own versions (W2-L208)."""
     other = "22222222-2222-4222-8222-222222222222"
     lines = [{**line, "sessionId": other, **({"version": "2.1.292"} if "version" in line else {})}
              for line in specimen_form()]
@@ -306,8 +307,10 @@ def test_the_record_names_one_version_only_when_every_named_log_carries_that_one
     report(project, row(), row(sessionId=other))
     for sessions, version in (([other], "2.1.292"), ([SESSION, other], NOT_MEASURED)):
         record, _code = command.run(project, argparse.Namespace(ticket=TICKET, ticket_session=sessions), {})
-        assert record["agent"] == {"harness": "Claude Code", "version": version}
+        assert (record["agent"]["harness"], record["agent"]["version"]) == ("Claude Code", version)
         assert record["governance_tokens"]["gov_output"] == 7 * len(sessions), "the counts stay measured"
+    assert "2.1.288" in record["agent"]["version_reason"] and "2.1.292" in record["agent"]["version_reason"]
+    assert [entry["versions"] for entry in record["sessions"]] == [["2.1.288"], ["2.1.292"]]
 
 
 def test_the_record_of_a_bare_project_and_the_commands_exit_code(project):

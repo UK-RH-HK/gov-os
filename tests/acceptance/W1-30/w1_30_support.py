@@ -123,6 +123,20 @@ PRODUCT_TRACEABILITY = "product traceability"
 
 TEMPLATE_OPENSPEC = REPO_ROOT / "template" / "openspec"
 
+# The kernel's checks a project of this suite does not declare (DEC-868 item 1 (b)): the close runs ``gov check``
+# on every close and refuses on a RED hard-block check, and each of these reads what a project built from scratch
+# does not hold, so it is RED in every such project whatever the ticket did. The project declares every other
+# check of the kernel; a case about a red check declares its own (``project_with_checks``).
+KERNEL_CHECKS_NOT_DECLARED = {
+    "adapter-portability": "an installed kernel's roles and skills, their rulesync sources and the tool registry",
+    "index-freshness": "a lexical index, which is built only through gitleaks and the project's .gitleaks.toml",
+    "retrieval-regression": "the development tiers (GOV_DEV_TIERS)",
+    "secrets-indexing": "the project's .gitleaks.toml and gitleaks",
+    "skill-regression-a": "the kernel's skills",
+    "skill-regression-b1": "the kernel's skills",
+    "skill-regression-orchestration": "the kernel's skills",
+}
+
 # Where a project writes its settings for ``gov close`` (README, round 12, settlement 21): top-level keys of
 # its path map, the one project file every command is handed (DEC-185, DEC-479).
 PATH_MAP_REL = "governance/project/path-map.yaml"
@@ -380,7 +394,7 @@ class Project:
 
     def __init__(self, root, checks=None, settings=SUITE_SETTINGS):
         """``checks`` is the project's own set of check declarations (``declared_check``); without it the
-        project holds a copy of the kernel's declarations. ``settings`` are the project's settings for
+        project holds a copy of the kernel's declarations but ``KERNEL_CHECKS_NOT_DECLARED``. ``settings`` are the project's settings for
         ``gov close``, written as a project writes them (``path_map_text``; a value is written as given, so
         a case may give a wrong one); ``None`` is a project without a path map."""
         self.root = Path(root)
@@ -412,7 +426,9 @@ class Project:
             for declaration in self._checks:
                 self.add_check_declaration(**declaration)
         elif checks_src.is_dir():
-            shutil.copytree(checks_src, checks_dst, dirs_exist_ok=True)
+            shutil.copytree(checks_src, checks_dst, dirs_exist_ok=True,
+                            ignore=lambda folder, names: [name for name in names
+                                                          if Path(name).stem in KERNEL_CHECKS_NOT_DECLARED])
         schemas_src = REPO_ROOT / "template" / "governance" / "kernel" / "schemas"
         schemas_dst = self.root / "template" / "governance" / "kernel" / "schemas"
         if schemas_src.is_dir():

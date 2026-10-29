@@ -1,9 +1,14 @@
-"""Builder tests for the W1-02 follow-up: reads of the settings file and
-of the held-out file are refused (DEC-508, DEC-525), and the helper that
-lists the registered hooks.
+"""Builder tests for the W1-02 follow-up, as W2-58 leaves it: reads of the
+settings file and of the held-out file are open to every role (DEC-821
+item 3, DEC-857 item 3; they were refused under DEC-508, DEC-525, DEC-557),
+a second name of either is refused (DEC-548, DEC-553, DEC-821 item 4), a
+call the guard cannot read in bounded time is refused (DEC-562, DEC-570),
+and the helper that lists the registered hooks.
 
 Regression evidence only (DEC-136).  Both files are stand-ins in a
-temporary project; their paths come from the guard's own constants.
+temporary project; their paths come from the guard's own constants.  The
+cases that asserted a read refusal DEC-821 removes now assert the read is
+let through.
 """
 
 from __future__ import annotations
@@ -25,11 +30,10 @@ from gov.guard.decide import (LONG_PATH_REFUSAL, LONG_REFUSAL, MOST_PATH,  # noq
                               MOST_READ, decide)
 from gov.guard.heldout import CONFIG_KEY, CONFIG_REL, SETTINGS_REL  # noqa: E402
 from gov.guard.hooks import REDACTED, listing  # noqa: E402
-from gov.guard.protected import (NUL_REFUSAL, READ_REFUSAL,  # noqa: E402
-                                 SEARCH_REFUSAL, _MOST_RESOLVED, _Protected,
-                                 _behind, _braces, _glob_rx, _options,
-                                 _shell_search, _substitutions, _takes_folder,
-                                 _tokenised, _uncommented, read_refusal)
+from gov.guard.protected import (NUL_REFUSAL, SECOND_NAME_REFUSAL,  # noqa: E402
+                                 _MOST_RESOLVED, _Protected, _behind, _braces,
+                                 _glob_rx, _options, _shell_search, _substitutions,
+                                 _uncommented, read_refusal)
 
 FILES = (CONFIG_REL, SETTINGS_REL)
 DENY = "Read(//stand-in/**)"
@@ -73,7 +77,8 @@ def _ext(rel):
 # -- the file tools ------------------------------------------------------------
 
 @pytest.mark.parametrize("rel", FILES)
-def test_file_tool_reads_are_refused(project, tmp_path, rel):
+def test_file_tool_reads_of_the_two_files_are_let_through(project, tmp_path, rel):
+    """Refused before W2-58 (DEC-508, DEC-525, DEC-557); open now (DEC-821 item 3)."""
     folder, name, ext = _folder(rel), os.path.basename(rel), _ext(rel)
     for tool_name, tool_input in (
         ("Read", {"file_path": rel}),
@@ -99,13 +104,13 @@ def test_file_tool_reads_are_refused(project, tmp_path, rel):
         ("Glob", {"pattern": "**/*"}),
         ("Glob", {"pattern": rel}),
     ):
-        assert _refused(project, tool_name, tool_input), (tool_name, tool_input)
+        assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
 
 
-def test_a_read_through_a_symbolic_link_is_refused(project, tmp_path):
-    assert _refused(project, "Read", {"file_path": str(tmp_path / "link")})
-    assert _refused(project, "Grep", {"pattern": ".", "path": str(tmp_path / "link")})
-    assert _refused(project, "Bash", {"command": f"cat {tmp_path / 'link'}"})
+def test_a_read_through_a_symbolic_link_is_let_through(project, tmp_path):
+    assert not _refused(project, "Read", {"file_path": str(tmp_path / "link")})
+    assert not _refused(project, "Grep", {"pattern": ".", "path": str(tmp_path / "link")})
+    assert not _refused(project, "Bash", {"command": f"cat {tmp_path / 'link'}"})
 
 
 @pytest.mark.parametrize("rel", FILES)
@@ -132,7 +137,8 @@ def test_file_tool_calls_that_take_neither_file_in_are_let_through(project, rel)
 # -- the shell -----------------------------------------------------------------
 
 @pytest.mark.parametrize("rel", FILES)
-def test_shell_reads_are_refused(project, tmp_path, rel):
+def test_shell_reads_of_the_two_files_are_let_through(project, tmp_path, rel):
+    """Refused before W2-58; open now, a plain copy included (DEC-821 item 3)."""
     folder, name = _folder(rel), os.path.basename(rel)
     for command in (
         f"cat {rel}",
@@ -161,10 +167,10 @@ def test_shell_reads_are_refused(project, tmp_path, rel):
         f"git show HEAD:{rel}",
         f"git status -v {rel}",
         f"git diff --stat {rel} && cat {rel}",
-        f"cat '{rel}",  # cannot be tokenised: the words are still read
-        "grep -rn x .",  # DEC-557: the unrestricted search from the root
+        f"cat '{rel}",
+        "grep -rn x .",
     ):
-        assert _refused(project, "Bash", {"command": command}), command
+        assert not _refused(project, "Bash", {"command": command}), command
 
 
 @pytest.mark.parametrize("rel", FILES)
@@ -206,11 +212,8 @@ def test_shell_commands_that_read_neither_file_are_let_through(project, rel):
      "command": "cat src/missing/deep.py"},
 ])
 def test_an_odd_input_is_decided_without_an_error(project, tool_name, tool_input):
-    # DEC-557: a Grep call that gives no path and no glob searches from the root.
-    path, glob = tool_input.get("path"), tool_input.get("glob")
-    from_the_root = tool_name == "Grep" and not (isinstance(path, str) and path) and not (
-        isinstance(glob, str) and glob)
-    assert _refused(project, tool_name, tool_input) == from_the_root
+    # A search from the root is no longer refused for the two files (DEC-821).
+    assert not _refused(project, tool_name, tool_input)
 
 
 NUL_INPUT = {"file_path": "a\x00b", "path": "a\x00b", "pattern": "a\x00b/*",
@@ -289,19 +292,8 @@ def test_the_commands_inside_substitutions_are_found():
     assert _substitutions(")))($(") == [""]
 
 
-def test_a_listing_or_a_search_with_no_path_takes_the_folder():
-    for name, args in (("ls", []), ("ls", ["-la"]), ("rg", ["x"]), ("rg", ["--files"]),
-                       ("grep", ["-r", "x"]), ("grep", ["-rn", "x"]), ("grep", ["x", "-R"]),
-                       ("grep", ["--recursive", "x"])):
-        assert _takes_folder(name, args), (name, args)
-    for name, args in (("ls", ["src"]), ("rg", ["x", "src"]), ("grep", ["x"]),
-                       ("grep", ["-n", "x"]), ("grep", ["-rn", "x", "src"]),
-                       ("grep", ["--color", "x"]), ("cat", []), ("git", ["status"])):
-        assert not _takes_folder(name, args), (name, args)
-
-
 @pytest.mark.parametrize("rel", FILES)
-def test_more_spellings_of_a_read_are_refused(project, rel):
+def test_more_spellings_of_a_read_are_let_through(project, rel):
     folder, name = _folder(rel), os.path.basename(rel)
     for tool_name, tool_input in (
         ("Grep", {"pattern": ".", "path": str(project), "glob": name}),
@@ -311,7 +303,7 @@ def test_more_spellings_of_a_read_are_refused(project, rel):
         ("Grep", {"pattern": ".", "path": folder.split("/")[0], "glob": name}),
         ("Glob", {"pattern": f"{folder}/{{{name},other.md}}"}),
     ):
-        assert _refused(project, tool_name, tool_input), (tool_name, tool_input)
+        assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
     for command in (
         f"echo a;<{rel} cat",
         f"(<{rel} cat)",
@@ -340,10 +332,10 @@ def test_more_spellings_of_a_read_are_refused(project, rel):
         f"python3 -m pytest @{rel}",
         f"gcc @{rel}",
         f"grep -f{rel} README.md",
-        f"cd {project} && rg VALUE",  # DEC-557: the unrestricted search from the root
+        f"cd {project} && rg VALUE",
     ):
-        assert _refused(project, "Bash", {"command": command}), command
-    assert _refused(project, "Bash", {"command": "grep -r VALUE"}, cwd=project / folder)
+        assert not _refused(project, "Bash", {"command": command}), command
+    assert not _refused(project, "Bash", {"command": "grep -r VALUE"}, cwd=project / folder)
 
 
 @pytest.mark.parametrize("rel", FILES)
@@ -397,8 +389,12 @@ def site(project, tmp_path):
 
 
 @pytest.mark.parametrize("rel", FILES)
-def test_a_copy_is_refused_as_the_file_is(project, site, rel):
+def test_a_copy_is_read_as_the_file_is_and_given_no_second_name(project, site, rel):
+    """Reads of a copy are open as the file's are (DEC-820 item 1); a second
+    name of one stays refused (DEC-548, DEC-821 item 4)."""
     copy, folder, name = site / rel, site / _folder(rel), os.path.basename(rel)
+    assert read_refusal("Bash", {"command": f"mv {copy} docs/moved"}, str(project),
+                        str(project)) == SECOND_NAME_REFUSAL
     for tool_name, tool_input, cwd in (
         ("Read", {"file_path": str(copy)}, None),
         ("Read", {"file_path": rel}, site),
@@ -413,20 +409,19 @@ def test_a_copy_is_refused_as_the_file_is(project, site, rel):
         ("Bash", {"command": f"wc -c < {copy}"}, None),
         ("Bash", {"command": f"ls -la {folder}"}, None),
         ("Bash", {"command": f"python3 -c \"open('{copy}')\""}, None),
-        ("Bash", {"command": f"mv {copy} docs/moved"}, None),
-        # DEC-557: the unrestricted search from the copy's folder.
+        ("Bash", {"command": f"cp {copy} docs/copied"}, None),
         ("Grep", {"pattern": "x", "path": str(site)}, None),
         ("Bash", {"command": f"grep -rn x {site}"}, None),
     ):
-        assert _refused(project, tool_name, tool_input, cwd), (tool_name, tool_input)
+        assert not _refused(project, tool_name, tool_input, cwd), (tool_name, tool_input)
 
 
 def test_the_user_level_settings_file_is_a_copy(project, site):
+    assert read_refusal("Bash", {"command": f"ln -s ~/{SETTINGS_REL} docs/second"},
+                        str(project), str(project)) == SECOND_NAME_REFUSAL
     for command in (f"cat ~/{SETTINGS_REL}", f"cat $HOME/{SETTINGS_REL}",
-                    f"ls ~/{_folder(SETTINGS_REL)}", f"ln -s ~/{SETTINGS_REL} docs/second"):
-        assert _refused(project, "Bash", {"command": command}), command
-    for command in ("ls ~", f"cat ~/{_folder(SETTINGS_REL)}/neighbour.md",
-                    f"echo x > ~/{SETTINGS_REL}"):
+                    f"ls ~/{_folder(SETTINGS_REL)}", "ls ~",
+                    f"cat ~/{_folder(SETTINGS_REL)}/neighbour.md", f"echo x > ~/{SETTINGS_REL}"):
         assert not _refused(project, "Bash", {"command": command}), command
 
 
@@ -449,7 +444,7 @@ def test_what_is_beside_or_above_a_copy_is_let_through(project, site, rel):
 
 
 @pytest.mark.parametrize("rel", FILES)
-def test_a_second_name_for_a_file_is_a_read(project, rel):
+def test_a_second_name_for_a_file_is_refused(project, rel):
     for command in (
         f"mv {rel} docs/moved", f"mv -t docs {rel}", f"mv {project / rel} docs",
         f"mv {_folder(rel)}/* docs", f"ln {rel} docs/second", f"link {rel} docs/second",
@@ -457,8 +452,15 @@ def test_a_second_name_for_a_file_is_a_read(project, rel):
         f"cp --link {rel} docs/linked", f"cp -al {rel} docs/linked",
         f"sed -i.bak s/a/b/ {rel}", f"sed -i .bak s/a/b/ {rel}",
         f"sed --in-place=.bak s/a/b/ {rel}", f"echo $(mv {rel} docs/moved)",
+        # W2-58: behind a prefix command, as the command it is; a symbolic
+        # linking copy; an interpreter's in-place edit, which the allow-list
+        # does not read as a write.
+        f"timeout 5 mv {rel} docs/moved", f"env X=1 ln -s {project / rel} docs/second",
+        f"cp -s {project / rel} docs/linked", f"cp --symbolic-link {project / rel} docs/l",
+        f"perl -pi.bak -e s/a/b/ {rel}", f"perl -pi -e s/a/b/ {rel}", f"ruby -i -pe 1 {rel}",
     ):
-        assert _refused(project, "Bash", {"command": command}), command
+        assert read_refusal("Bash", {"command": command}, str(project),
+                            str(project)) == SECOND_NAME_REFUSAL, command
 
 
 @pytest.mark.parametrize("rel", FILES)
@@ -477,7 +479,7 @@ def test_a_plain_write_or_a_second_name_for_another_file_is_no_read(project, rel
 
 # -- wildcards alone from a copy's folder, a holding folder's second name (DEC-553) --
 
-def test_wildcards_alone_from_a_copy_s_folder_are_refused_as_from_the_root(project, site):
+def test_wildcards_alone_from_a_copy_s_folder_are_let_through(project, site):
     home = os.environ["HOME"]
     depth = "/".join("*" * len(SETTINGS_REL.split("/")))
     for start in (project, site, home):
@@ -488,8 +490,10 @@ def test_wildcards_alone_from_a_copy_s_folder_are_refused_as_from_the_root(proje
             ("Grep", {"pattern": "x", "path": str(start), "glob": f"/{depth}"}),
             ("Bash", {"command": f"cat {start}/**"}),
             ("Bash", {"command": f"cd {start} && ls -d */**"}),
+            # DEC-562: many star pairs, decided within the bound.
+            ("Glob", {"pattern": "**/*" * 400, "path": str(start)}),
         ):
-            assert _refused(project, tool_name, tool_input), (tool_name, tool_input)
+            assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
         for tool_name, tool_input in (
             ("Glob", {"pattern": "*", "path": str(start)}),
             ("Glob", {"pattern": "*/*/*/*/*/*", "path": str(start)}),
@@ -499,11 +503,11 @@ def test_wildcards_alone_from_a_copy_s_folder_are_refused_as_from_the_root(proje
         ):
             assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
     for command in ("cat ~/**/*", "cat $HOME/**", "cd && cat */*"):
-        assert _refused(project, "Bash", {"command": command}), command
+        assert not _refused(project, "Bash", {"command": command}), command
 
 
 @pytest.mark.parametrize("rel", FILES)
-def test_a_second_name_for_a_holding_folder_is_a_read(project, site, rel):
+def test_a_second_name_for_a_holding_folder_is_refused(project, site, rel):
     parts = rel.split("/")
     for root in (project, site):
         for n in range(1, len(parts)):
@@ -652,8 +656,9 @@ def test_the_paths_and_the_name_filters_of_a_shell_search_are_found():
     assert _shell_search("find", [".", "-name", "*.py"], True) is None
 
 
-def test_a_search_that_nothing_narrows_is_refused_from_the_root_and_from_a_copy_s_folder(
+def test_a_search_that_nothing_narrows_is_let_through_from_the_root_and_a_copy_s_folder(
         project, site):
+    """Refused before W2-58 (DEC-557); open now (DEC-821 item 3)."""
     home = os.environ["HOME"]
     for start in (project, site, home):
         for tool_name, tool_input, cwd in (
@@ -683,10 +688,10 @@ def test_a_search_that_nothing_narrows_is_refused_from_the_root_and_from_a_copy_
             ("Bash", {"command": f"echo $(grep -r x {start})"}, None),
         ):
             assert read_refusal(tool_name, tool_input, str(project),
-                                str(cwd or project)) == SEARCH_REFUSAL, (tool_name, tool_input)
+                                str(cwd or project)) == "", (tool_name, tool_input)
     for command in ("grep -r x ~", "rg x $HOME", "cd && grep -r x", "find ~ -type f", "ls -R ~/"):
         assert read_refusal("Bash", {"command": command}, str(project),
-                            str(project)) == SEARCH_REFUSAL, command
+                            str(project)) == "", command
 
 
 def test_a_search_with_a_path_or_a_glob_that_keeps_both_files_out_is_let_through(project, site):
@@ -712,7 +717,7 @@ def test_a_search_with_a_path_or_a_glob_that_keeps_both_files_out_is_let_through
             assert not _refused(project, "Bash", {"command": command}, start), command
 
 
-def test_rg_fed_by_a_pipe_or_an_input_redirect_searches_no_folder(project, site):
+def test_rg_fed_or_not_is_let_through(project, site):
     (project / "src" / "main.py").write_text("x\n", encoding="utf-8")
     named = project / "src" / "main.py"
     for start in (project, site, os.environ["HOME"]):
@@ -737,18 +742,17 @@ def test_rg_fed_by_a_pipe_or_an_input_redirect_searches_no_folder(project, site)
             "rg --version; rg x", "rg --version | head -1",
         ):
             assert read_refusal("Bash", {"command": command}, str(project),
-                                str(start)) == SEARCH_REFUSAL, command
+                                str(start)) == "", command
 
 
 @pytest.mark.parametrize("rel", FILES)
-def test_rg_fed_by_a_pipe_is_refused_as_before_where_a_file_is_read(project, rel):
+def test_rg_where_a_file_is_read_is_let_through(project, rel):
     folder, name = _folder(rel), os.path.basename(rel)
     for command in (f"cat {rel} | rg x", f"rg x < {rel}", f"ls | rg x {folder}",
                     f"ls | rg -g '{name}' x"):
-        assert _refused(project, "Bash", {"command": command}), command
-    # In the folder that holds a file: the rule from before the round.
+        assert not _refused(project, "Bash", {"command": command}), command
     for command in ("git log --oneline | rg x", "rg --version", "rg x < neighbour.md"):
-        assert _refused(project, "Bash", {"command": command}, project / folder), command
+        assert not _refused(project, "Bash", {"command": command}, project / folder), command
 
 
 def test_the_decision_refuses_a_path_longer_than_the_guard_resolves(project, tmp_path):
@@ -785,7 +789,7 @@ def test_the_decision_refuses_a_path_longer_than_the_guard_resolves(project, tmp
 
 
 @pytest.mark.parametrize("rel", FILES)
-def test_a_shell_search_whose_name_filter_takes_a_file_in_is_refused(project, site, rel):
+def test_a_shell_search_whose_name_filter_takes_a_file_in_is_let_through(project, site, rel):
     name, ext = os.path.basename(rel), _ext(rel)
     for start in (project, site):
         for f in (name, f"*{ext}", name[:4] + "*", "*"):
@@ -798,7 +802,7 @@ def test_a_shell_search_whose_name_filter_takes_a_file_in_is_refused(project, si
                 f"cd {start} && rg x -g '{f}'", f"rg x -g '{f}' ..",
             ):
                 cwd = f"{start}/src" if command.endswith("..") else start
-                assert _refused(project, "Bash", {"command": command}, cwd), command
+                assert not _refused(project, "Bash", {"command": command}, cwd), command
         # The filter names the file; the search cannot reach it.
         for command in (f"grep -rn x --include='{name}' src", f"rg x -g '{name}' {start}/src",
                         f"rg x --iglob '{name.upper()}' src", f"rg x --glob='*{ext}' docs"):
@@ -858,7 +862,7 @@ def test_the_decision_refuses_a_command_longer_than_the_guard_reads(project, tmp
 
 
 def test_the_refusals_of_the_round_name_a_decision_and_no_path():
-    for reason, decision in ((SEARCH_REFUSAL, "DEC-557"), (NUL_REFUSAL, "DEC-562"),
+    for reason, decision in ((SECOND_NAME_REFUSAL, "DEC-821"), (NUL_REFUSAL, "DEC-562"),
                              (LONG_REFUSAL, "DEC-562")):
         assert decision in reason
         for rel in FILES:
@@ -895,15 +899,6 @@ def test_the_comments_of_a_command_are_cut_and_nothing_else():
         assert _uncommented(command) == command, command
     assert _uncommented("ls # " + "word " * 6000) == "ls "
     assert _uncommented("ls # a\n" * 4000) == "ls \n" * 4000
-
-
-def test_a_command_is_tokenised_once():
-    assert _tokenised("ls | rg x") and _tokenised("")
-    assert not _tokenised("ls ' | rg x") and not _tokenised('a "')
-    _tokenised.cache_clear()
-    for _ in range(5):
-        assert _tokenised("ls | rg \"don't\"")
-    assert (_tokenised.cache_info().misses, _tokenised.cache_info().hits) == (1, 4)
 
 
 def test_a_path_is_resolved_once_and_no_more_folders_than_the_bound(project, tmp_path):
@@ -946,7 +941,7 @@ def test_the_brace_pattern_finds_what_the_one_it_replaced_found():
     assert _braces("{" + "a," * 16000) == ["{" + "a," * 16000]  # in the time of its length
 
 
-def test_a_search_of_the_root_in_its_daily_spellings_is_refused(project, site):
+def test_a_search_of_the_root_in_its_daily_spellings_is_let_through(project, site):
     named = project / "src" / "main.py"
     named.write_text("x\n", encoding="utf-8")
     for start in (project, site, os.environ["HOME"]):
@@ -973,27 +968,25 @@ def test_a_search_of_the_root_in_its_daily_spellings_is_refused(project, site):
             "nice grep -rn x 2>&1 | head", "timeout 5 find . -type f", "echo $(time rg x # all\n)",
         ):
             assert read_refusal("Bash", {"command": command}, str(project),
-                                str(start)) == SEARCH_REFUSAL, command
+                                str(start)) == "", command
 
 
 @pytest.mark.parametrize("rel", FILES)
-def test_the_daily_spellings_are_refused_where_a_file_is_read(project, rel):
+def test_the_daily_spellings_are_let_through_where_a_file_is_read(project, rel):
     folder, name = _folder(rel), os.path.basename(rel)
-    # In the folder that holds a file: the rule from before the round.
     for command in ("rg x 2>/dev/null", "ls -R 2>&1 | head", "grep -rn x 2>/dev/null",
                     "if rg -q x; then echo y; fi", "for p in A B; do rg $p; done",
                     "if false; then :; else ls -R; fi", "rg x # all", "grep -2r x", "egrep -r x",
                     "fgrep -r x", "timeout 10 rg x", "do ls", "time ls -la", "ls 1>/dev/null"):
         assert read_refusal("Bash", {"command": command}, str(project),
-                            str(project / folder)) == READ_REFUSAL, command
-    # A name filter that takes the file in, and a read of the file.
+                            str(project / folder)) == "", command
     for command in (f"grep -rn x --include='{name}' 2>/dev/null", f"rg x -g '*{_ext(rel)}' 2>/dev/null",
                     f"egrep -rn x --include='{name}' .", f"fgrep -rn --include=*{_ext(rel)} x",
                     f"timeout 5 rg x -g '{name}'", f"if true; then cat {rel}; fi",
                     f"for f in a; do cat {rel}; done", f"! cat {project / rel}", f"ls # {rel}",
                     f"timeout 5 cat {rel}", f"cat {rel} 2>/dev/null"):
         assert read_refusal("Bash", {"command": command}, str(project),
-                            str(project)) == READ_REFUSAL, command
+                            str(project)) == "", command
 
 
 def test_the_daily_spellings_that_search_no_root_are_let_through(project, site):
@@ -1036,7 +1029,7 @@ def test_a_brace_word_past_its_bound_is_refused_and_one_at_it_is_judged(project,
     for tool_name, tool_input in (("Bash", {"command": f"cat {at}"}), ("Glob", {"pattern": at}),
                                   ("Grep", {"pattern": "x", "glob": at}),
                                   ("Bash", {"command": f"rg x -g '{at}'"})):
-        assert read_refusal(tool_name, tool_input, str(project), str(project)) == READ_REFUSAL
+        assert read_refusal(tool_name, tool_input, str(project), str(project)) == ""
     for tool_name, tool_input in (
         ("Bash", {"command": "ls src/{a,b,c}.py"}), ("Bash", {"command": "ls src/" + "{a,b}" * 6 + ".py"}),
         ("Bash", {"command": "cat {yy,zz}" + "{,a}" * 7}), ("Glob", {"pattern": "src/**/*.{py,md}"}),
@@ -1054,14 +1047,11 @@ def test_what_the_rule_resolves_for_one_call_is_bounded(project, tmp_path, monke
     monkeypatch.setattr(os.path, "realpath",
                         lambda path, **more: resolved.append(path) or real(path, **more))
     # More folders than the rule resolves: refused, and no more are resolved.
+    # W2-58: only a second name's words are resolved here; the read rules'
+    # own bound is gov.guard.reads's (tests/unit/guard/test_reads.py).
     for tool_name, tool_input in (
-        ("Grep", {"pattern": "x", "glob": wide + "/" + deep * 2000 + "*"}),
-        ("Glob", {"pattern": wide + "/" + deep * 2000 + "*"}),
-        ("Glob", {"path": deep * 2048, "pattern": wide + "/*"}),
-        ("Bash", {"command": "cat " + wide + "/" + deep * 16000}),
-        ("Bash", {"command": "cat " + "{a,b}" * 4 + "/" + deep * 16000}),
         ("Bash", {"command": "ln -s " + wide + deep * 15000 + " b"}),
-        ("Bash", {"command": "rg " + "".join(f"-gx{i} " for i in range(2000)) + "V " + deep * 7000}),
+        ("Bash", {"command": "mv " + "{a,b}" * 4 + "/" + deep * 16000 + " b"}),
     ):
         for root in (project, tmp_path):
             del resolved[:]
@@ -1084,30 +1074,34 @@ def test_what_the_rule_resolves_for_one_call_is_bounded(project, tmp_path, monke
                   + " " + " ".join(f"src/pkg_{i:02}" for i in range(60))}),
     ):
         del resolved[:]
-        _tokenised.cache_clear()
         assert not _refused(project, tool_name, tool_input), tool_input.get("command", "")[:16]
-        assert len(resolved) <= 6000 and _tokenised.cache_info().misses <= 1
+        assert len(resolved) <= 6000
     for command in ("timeout 1 " * 3200 + "rg x .", "rg x # " + "word " * 6000,
                     "rg x " + "2>&1 " * 6400,
                     "for p in A; do grep -rn $p src; done; " * 800 + "for p in A; do grep -rn $p .; done"):
         assert read_refusal("Bash", {"command": command}, str(project),
-                            str(project)) == SEARCH_REFUSAL, command[:16]
+                            str(project)) == "", command[:16]
 
 
 # -- the decision --------------------------------------------------------------
 
-@pytest.mark.parametrize("role", [None, "developer", "orchestrator", "engineer"])
+@pytest.mark.parametrize("role", [None, "developer", "orchestrator", "engineer",
+                                  "independent-auditor"])
 @pytest.mark.parametrize("rel", FILES)
-def test_the_decision_refuses_a_read_for_every_role(project, role, rel):
+def test_the_decision_lets_a_read_through_and_refuses_a_second_name_for_every_role(
+        project, role, rel):
     for tool_name, tool_input in (
         ("Read", {"file_path": str(project / rel)}),
         ("Bash", {"command": f"cat {rel}"}),
+        ("Bash", {"command": "grep -rn x ."}),
     ):
-        decision, reason = decide(tool_name, tool_input, str(project), role, None,
-                                  cwd=str(project), flag="frozen")
-        assert (decision, reason) == ("deny", READ_REFUSAL)
-    assert "DEC-508" in READ_REFUSAL and "DEC-525" in READ_REFUSAL
-    assert os.path.basename(CONFIG_REL) not in READ_REFUSAL
+        assert decide(tool_name, tool_input, str(project), role, None,
+                      cwd=str(project), flag="frozen") == ("allow", ""), tool_input
+    decision, reason = decide("Bash", {"command": f"ln {rel} docs/second"}, str(project),
+                              role, None, cwd=str(project), flag="absent")
+    assert (decision, reason) == ("deny", SECOND_NAME_REFUSAL)
+    assert "DEC-548" in SECOND_NAME_REFUSAL and "DEC-821" in SECOND_NAME_REFUSAL
+    assert os.path.basename(CONFIG_REL) not in SECOND_NAME_REFUSAL
 
 
 def test_the_decision_on_a_write_to_the_settings_file_is_the_allow_list_s(project):
@@ -1118,7 +1112,7 @@ def test_the_decision_on_a_write_to_the_settings_file_is_the_allow_list_s(projec
         args = (tool_name, tool_input, str(project))
         assert decide(*args, "orchestrator", None, cwd=str(project), flag="absent")[0] == "allow"
         decision, reason = decide(*args, "engineer", None, cwd=str(project), flag="absent")
-        assert decision == "deny" and reason != READ_REFUSAL
+        assert decision == "deny" and reason != SECOND_NAME_REFUSAL
 
 
 # -- the helper ----------------------------------------------------------------

@@ -9,9 +9,9 @@
       "pattern": "^[A-Za-z0-9]+-[a-z0-9]{4}$"
     },
     "wbs_id": {
-      "description": "A work-breakdown id: the wave and a number, as in W1-08.",
+      "description": "A work-breakdown id: the wave and a number, as in W1-08, with at most one lower-case letter after the number, as in W2-15a (DEC-730).",
       "type": "string",
-      "pattern": "^W[0-9]+-[0-9]{2,}$"
+      "pattern": "^W[0-9]+-[0-9]{2,}[a-z]?$"
     },
     "decision_id": {
       "description": "A decision id: an ADR file (ADR-0002) or a register entry (DEC-012).",

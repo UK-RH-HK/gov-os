@@ -14,6 +14,7 @@ from pathlib import Path
 
 from gov.cli.errors import GovError
 from gov.close import state as _state
+from gov.close.repo import git as _git
 
 TOOL_NAME = "tk"
 NOT_OPENED = "not opened"  # how the answer begins where the tool opened no repair ticket
@@ -95,8 +96,14 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     with ``tk dep``. Returns what the answer says of it: its id, or that none
     was opened and why. No ticket file is written by any other means.
     """
+    import hashlib
     from gov.tasks.tickets import TICKETS_REL
 
+    # A short fingerprint, which no reader takes for the context hash (64 digits) a repair ticket may carry
+    fingerprint = "findings-" + hashlib.sha256("\n".join(sorted(set(findings))).encode("utf-8")).hexdigest()[:16]
+    again = _open_repair_of(root, ticket, fingerprint)
+    if again:  # a repeated identical refusal reuses its repair ticket (W2-M252)
+        return again
     held = findings_held(findings)
     description = [f"Findings of the refused close of {ticket} "
                    f"(disposition: {disposition or 'unclassed'}):"]
@@ -123,6 +130,7 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     if context_hash:
         fields.append(f"context_hash: {context_hash}")
     try:
+        fields += _contract(root, ticket, findings[:held], fingerprint)
         lines = path.read_text(encoding="utf-8").split("\n")
         end = lines.index("---", 1)
         _state.write_whole(path, "\n".join(lines[:end] + fields + lines[end:]))
@@ -132,4 +140,52 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
         tk(root, "dep", repair_id, ticket)
     except GovError as e:
         return f"{repair_id} opened; its dependency on {ticket} was not recorded: {e.message}"
+    try:
+        _commit_alone(root, f"{TICKETS_REL}/{repair_id}.md", repair_id, ticket)
+    except GovError as e:  # it stays untracked, as the tree check allows (DEC-490)
+        return f"{repair_id} opened; it could not be committed: {e.message}"
     return repair_id
+
+
+def _commit_alone(root: Path, rel: str, repair_id: str, ticket: str) -> None:
+    """Commit the repair ticket and nothing else, as the orchestrator's record (AR-9, W2-L209): it stays tracked,
+    no worker's later commit carries it in (DEC-390), and the tree of the next close is its commit."""
+    named = _git(root, "config", "user.email", ok=(0, 1), code=True) == 0
+    identity = [] if named else ["-c", "user.name=gov", "-c", "user.email=gov@localhost"]
+    _git(root, "add", "--", rel)
+    _git(root, *identity, "commit", "-q", "-m", f"Repair ticket {repair_id} of the refused close of {ticket}",
+         "--trailer", f"Task: {repair_id}", "--trailer", "Role: orchestrator", "--trailer", "Implements: AR-9",
+         "--", rel)
+
+
+FINGERPRINT_KEY = "repair_of_findings"
+
+
+def _contract(root: Path, ticket: str, findings: list[str], fingerprint: str) -> list[str]:
+    """The repair ticket's contract as frontmatter lines (A7): the role and the allowed paths of ``ticket``, a
+    KPI for each finding held, and the fingerprint of the findings by which a repeated refusal reuses it."""
+    import yaml
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    parent = frontmatter(Path(root) / TICKETS_REL / f"{ticket}.md") or {}
+    role = parent.get("role") if isinstance(parent.get("role"), str) and parent["role"].strip() else "engineer"
+    paths = parent.get("allowed_paths")
+    if not isinstance(paths, list) or not paths or not all(isinstance(p, str) and p for p in paths):
+        paths = [f"{TICKETS_REL}/{ticket}.md"]
+    kpis = {"success": [f"gov close {ticket} no longer refuses for: {finding}" for finding in findings]
+            or [f"gov close {ticket} passes"],
+            "failure": [f"gov close {ticket} refuses again for a finding of this ticket"]}
+    return yaml.safe_dump({"role": role, "allowed_paths": paths, "kpis": kpis, FINGERPRINT_KEY: fingerprint},
+                          sort_keys=False, allow_unicode=True, width=10 ** 6).rstrip("\n").split("\n")
+
+
+def _open_repair_of(root: Path, ticket: str, fingerprint: str) -> str | None:
+    """The open repair ticket of ``ticket`` opened for the same findings, if there is one."""
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    for path in sorted((Path(root) / TICKETS_REL).glob("*.md")):
+        front = frontmatter(path) or {}
+        if front.get("parent") == ticket and front.get(FINGERPRINT_KEY) == fingerprint \
+                and str(front.get("status")) != "closed":
+            return path.stem
+    return None

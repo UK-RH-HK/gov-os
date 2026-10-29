@@ -2,7 +2,7 @@
 id: ADR-0001
 title: Threat model — the Gov OS guards against mistakes and drift, not a same-privilege adversary
 type: decision
-status: PROPOSED
+status: ACCEPTED
 date: 2026-09-30
 depends_on: []
 decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096, DEC-152, DEC-156, DEC-161, DEC-163]

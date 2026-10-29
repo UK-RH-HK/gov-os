@@ -52,6 +52,8 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_doctor
+import w2_67b_support
 
 
 # --------------------------------------------------------------------------- #
@@ -391,36 +393,29 @@ def test_stale_path_in_historical_record_is_not_reported(gov, project, interface
 #         reported
 # --------------------------------------------------------------------------- #
 
-def test_stale_path_in_live_document_is_reported(gov, project, interface):
+def test_stale_path_in_live_document_is_reported(sandbox, tmp_path):
     """A reference to a moved path inside a live document IS reported.
 
     DEC-448: the exclusion is narrow — a live document beside an excluded
     one is still checked.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
+    that doctor always emits): ``moved`` is always there (the key
+    ``moved_references``).  The case reads the live document's entry in
+    ``path_compliance.moved_references``, with the decision register (a
+    DEC-448 historical record) naming the same old path beside it, on a
+    small committed project of its own.
     """
-    support.write_path_map(project, support.minimal_valid_path_map())
+    project = w2_67_doctor.small_project(tmp_path / "repo")
+    old_rel, new_rel = "src/gov/doctor/old_live_module.py", "src/gov/doctor/new_live_module.py"
+    w2_67b_support.move_committed(project, old_rel, new_rel)
+    w2_67b_support.write_committed(project, "docs/DECISION_REGISTER.md", f"### DEC-999\nMoved {old_rel}.\n")
+    w2_67b_support.write_committed(project, "docs/live-reference.md", f"Reference to the old path: {old_rel}\n")
 
-    old_path = project / "src" / "gov" / "doctor" / "old_live_module.py"
-    old_path.parent.mkdir(parents=True, exist_ok=True)
-    old_path.write_text("# old module\n", encoding="utf-8")
-    support.commit_all(project, "add old module")
+    run = w2_67_doctor.doctor(project, sandbox)
+    references = w2_67b_support.moved_references(run)
 
-    new_path = project / "src" / "gov" / "doctor" / "new_live_module.py"
-    old_path.rename(new_path)
-    support.commit_all(project, "move old module to new module")
-
-    live_file = project / "docs" / "live-reference.md"
-    live_file.parent.mkdir(parents=True, exist_ok=True)
-    live_file.write_text(
-        "Reference to the old path: src/gov/doctor/old_live_module.py\n",
-        encoding="utf-8",
-    )
-    support.commit_all(project, "add live reference")
-
-    run = gov("doctor", "--json")
-    envelope = run.envelope()
-    text = json.dumps(envelope)
-
-    assert "old_live_module" in text or "moved" in text.lower() or "stale" in text.lower(), (
+    assert w2_67b_support.references_to(references, old_rel, "docs/live-reference.md"), (
         f"doctor does not report a reference to a moved path inside a "
         f"live document — the stale-path check should report it\n"
         f"{run.describe()}"
