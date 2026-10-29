@@ -212,8 +212,10 @@ Readings these cases take:
 ### The live cases
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
-credentials, `--model haiku`, at most 6 turns, Bash only) in a fixture project built from scratch
-(`w2_58_support.make_project`, with `w2/integrate` as T's base). The session runs one probe script,
+credentials, at most 6 turns, Bash only) in a fixture project built from scratch
+(`w2_58_support.make_project`, with `w2/integrate` as T's base). Since W2-60a the builder writes one fixture role
+file per worker role (DEC-826 Q1), and a live case's copy names Haiku 4.5 at effort low in its default line in place
+of `--model haiku` (DEC-839 items 2 and 5). The session runs one probe script,
 `.gov-runtime/scratch/w2-58/probe.sh`, which writes the commands' output there. The test reads those files from
 outside. A live case is skipped when `bwrap`, `socat` or `~/.local/bin/claude` is missing (W1-46's conditions). It
 fails with "did not run the probe to its end" when the session could not run (no network to the model's API).

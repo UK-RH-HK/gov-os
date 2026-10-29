@@ -664,3 +664,32 @@ def write_probe_wheel(directory):
         for name, text in files.items():
             archive.writestr(name, text)
     return directory / WHEEL_NAME
+
+
+# --------------------------------------------------------------------------
+# W2-60a: a live session's model and effort come from the role file's default line
+# --------------------------------------------------------------------------
+
+ROLES_REL = "template/governance/kernel/roles"
+LAUNCH_DEFAULT = "- **Launch default:**"
+# DEC-839 item 2: live harness tests run on Haiku 4.5 at effort low where the case only checks that a hook fired.
+LIVE_LAUNCH_DEFAULT = f"{LAUNCH_DEFAULT} model claude-haiku-4-5-20251001, effort low"
+
+
+def set_live_launch_default(project, role, line=LIVE_LAUNCH_DEFAULT):
+    """Write ``line`` as the role's default line in the project's own copy of its role file.
+
+    Since W2-60a the launcher takes the session's model and effort from the role
+    file's default line and refuses a model after ``--`` that is not the role's
+    (DEC-839 items 1 and 5), so a live case no longer passes ``--model haiku``:
+    its copy of the role file says Haiku at effort low instead, in place of the
+    line W2-11 writes, or after the file's last line when it has none. The rest
+    of the file, its version line included, is this repository's.
+    """
+    path = Path(project) / ROLES_REL / f"{role}.md"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    at = next((index for index, text in enumerate(lines) if text.startswith(LAUNCH_DEFAULT)), len(lines))
+    kept = [text for text in lines if not text.startswith(LAUNCH_DEFAULT)]
+    kept.insert(min(at, len(kept)), line)
+    path.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return path
