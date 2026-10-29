@@ -16,7 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: [DAEO-zflj]
 allowed_paths:
-- template/governance/kernel/schemas/**
+- template/governance/kernel/schemas/close.schema.json
 - src/gov/check/schema.py
 - tests/unit/check/test_schema*
 kpis:
