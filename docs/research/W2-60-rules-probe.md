@@ -15,7 +15,8 @@ state_class: EVIDENCE
 - **CLI:** Claude Code 2.1.292 at `~/.local/bin/claude`. **Model:** `claude-opus-5-5`, `--effort low`, every session.
 - **Launcher:** the pinned `gov` (`~/.local/bin/gov`, interpreter `~/.local/share/gov-os/pin-5c401220/bin/python`),
   whose `src/gov/launch/` and `src/gov/guard/` are `w2/integrate`'s at the time of writing. No `PYTHONPATH`.
-- **15 live sessions in all,** about USD 1.80: 4 for the three questions, 11 for the switches the CIT-E needs (part 2).
+- **18 live sessions in all,** about USD 2.32: 4 for the three questions, 11 for the switches the CIT-E needs (part 2),
+  3 for the CIT-E's unmeasured points (part 2b).
 
 ## 1. The rules probe
 
@@ -154,6 +155,25 @@ here so the CIT-E can say how it treats them.
 sets `effortLevel` and the env `CLAUDE_CODE_SUBAGENT_MODEL` (names only read), so a launch with it gets neither from
 there. The caller's process environment here carries `CLAUDE_EFFORT` and `CLAUDE_CODE_SUBAGENT_MODEL` (names only),
 which a launcher that passes the caller's environment hands on (lens E F13; W2-56's environment).
+
+## 2b. Three follow-up measurements (after the CIT-E's package P-W2-60a-2)
+
+Same runner and settings as part 2, each with `--strict-mcp-config --setting-sources project,local` and settings
+`"autoMemoryEnabled": false`. The probe repository also held a fixture project skill
+`.claude/skills/probe-skill/SKILL.md` (skill token WAGTAIL-8842-FLINT) and a second fixture role file
+`roles/engineer2.md` (token IBIS-6670-MARL).
+
+| Session | What | Result | Session id |
+|---|---|---|---|
+| k1 | `--permission-mode acceptEdits --allowedTools Read Bash Edit Write Grep Glob` (no `Skill`); asked to load `probe-skill` with the Skill tool | **loaded:** `SKILL=WAGTAIL-8842-FLINT`. A `-p` worker loads a project skill on request without `Skill` in `--allowedTools`. The start lists `probe-skill` first among the skills. | 2d820436-d5c4-48f3-a34f-59d4ab1a1f18 |
+| f1 | `--append-system-prompt-file roles/engineer.md --session-id <A>`; "READY" (the token never appears in a message) | `READY` | aede90ec-ebd5-450d-bf08-30590655bed6 (A) |
+| f2 | `--resume <A> --fork-session --session-id <B> --append-system-prompt-file roles/engineer2.md`; asked for both tokens from its system instructions only | **`FIRST=HERON-5518-SHALE`, `SECOND=NONE`:** the forked, resumed session keeps the original session's system prompt (the text appended at its first launch) and does not take the text appended at the resume. | d9f62b1b-642c-4a75-8353-3cefb4ae9c22 (B) |
+
+- So the role text a resumed session has is the one its original launch appended, whatever the resume passes.
+- **Not measured:** whether `--setting-sources project,local` drops a user-level `~/.claude/CLAUDE.md` and
+  `~/.claude/rules/`. Neither exists on this machine (checked 2026-10-29); measuring it would mean planting one in
+  the real home, which every running session on the machine would load, or copying the CLI's sign-in into a test
+  home, which Policy 2 (a) refuses. A named residual.
 
 ## 3. Left behind
 

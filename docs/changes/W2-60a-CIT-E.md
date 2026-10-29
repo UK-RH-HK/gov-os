@@ -1,12 +1,12 @@
 ---
 id: W2-60a-CIT-E
 type: change-execution-record
-status: PROPOSED
+status: APPLIED
 date: 2026-10-29
 branch: w2/W2-60a
 base: a1629f1860ca
 ticket: DAEO-cv58 (W2-60a)
-author: engineer (DAEO-cv58), design batch
+author: engineer (DAEO-cv58), design batch; engineer (DAEO-cv58), implementation batch 1, with the lead's corrections
 decisions_recorded: [DEC-826, DEC-838, DEC-839, DEC-832, DEC-786, DEC-801, DEC-941]
 state_class: EVIDENCE
 ---
@@ -16,7 +16,22 @@ state_class: EVIDENCE
 The design of W2-60a (DAEO-cv58): `gov launch` starts a worker as its role, with the role's text, its skills and its
 default model and effort, sets no compaction threshold, keeps connectors, user-level agents and skills, and
 model-side memory out, and writes one launch record before the session starts (DEC-826 Q1 and Q5, DEC-838, DEC-839,
-DEC-832 item 1). Status **PROPOSED**: no code exists. A later engineer implements it (about 250 lines).
+DEC-832 item 1). Status **APPLIED**: the code exists (implementation batch 1, §1), with the lead's corrections
+after the lead's follow-up measurements (Behaviour 8, P-W2-60a-2; probe part 2b).
+
+## 1. The changes
+
+| # | File | Change | Evidence |
+|---|---|---|---|
+| 1 | `src/gov/launch/role.py` (new) | The role file `template/governance/kernel/roles/<role>.md` read once: its version line, default line and skills line, each found by the line's head, required once, whole and of its form (Behaviour 3, D); the skills folder `.claude/skills/` read, each folder with a `SKILL.md` described from that copy (name, path, version or `no version`, sha256, folder sha256, named), a link, an unreadable file or a front matter that is not a YAML map refused; each named skill at `.claude/skills/<name>/SKILL.md` with a version; the text appended composed (the role file's bytes, then each named `SKILL.md`, in the order named). | `tests/unit/launch/test_role.py` (21 cases); acceptance `test_w2_60a_role_text.py`, `test_w2_60a_skills.py`, `test_w2_60a_model_and_effort.py` |
+| 2 | `src/gov/launch/record.py` (new) | The record folder `.gov-runtime/launches/` of the main checkout, found from `.git` with `gov.guard.runs.common_dir` (unchanged), made when missing, refused when `.git` gives no common directory, the common directory is not named `.git`, or a part is a link or not a folder; its two literal `Edit` deny rules; the CLI's version from its link's target; the original's record of a resume, required and of this role and ticket; the record written exclusively (`O_EXCL`, `O_NOFOLLOW`), flushed, a partly written file removed; the record removed when the CLI cannot be started. | `tests/unit/launch/test_launch_record.py` (9 cases); acceptance `test_w2_60a_launch_record.py` |
+| 3 | `src/gov/launch/launcher.py` | At Section B's places only: the module's text; imports (`time`, `uuid`, the two modules); constants (the launcher's own switches, the arguments of Behaviour 7, the compaction names); in `_check_repository_settings`, an `agent` key, `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW`, a top-level `autoCompactWindow` or an `env` that is not a map refused; `_check_own_args` (new, after `_check_cli_args`, which is unchanged) and its call; after the sandbox faults the role read, the model after `--` compared, the record folder and its deny rules, the resume's original record; after the temp folder's env, `CLAUDE_CODE_SUBAGENT_MODEL` and `autoMemoryEnabled`; inside `if not state["ended"]:` `role-<role>.md`, the session id and the record; the start's argument list (`cwd=root, env=env` untouched); the record removed before the refusal of a CLI that cannot be started. `build_settings`, `_runtime_rules`, `_tree_rules`, `sandbox_faults` and the git-environment lines are as they were. | acceptance `tests/acceptance/W2-60a/` (151 of 152 not `local_only`; the one red is W2-56's, below) |
+| 4 | `docs/research/W2-60-rules-probe.md` | The lead's part 2b (k1, f1, f2) and the opening's count (18 sessions, about USD 2.32). | the lead's scratch record |
+| 5 | this note | Status, this table, Behaviour 1's tools, 4's residual, 6's `autoCompactWindow`, 8 as the lead corrected it, 10's steps 4 and 8, P-W2-60a-2. | — |
+
+**The red that stays** (Section B, "two edges"): `test_w2_60a_no_compaction_threshold.py::test_a_compaction_threshold_in_the_caller_s_environment_does_not_reach_the_session`,
+a caller's `CLAUDE_CODE_AUTO_COMPACT_WINDOW` reaching the session's process environment: W2-56's cleaned environment;
+the `env=` of the start is not edited here.
 
 - **Sections A** state only what is seen from outside, for the independent test designer (DEC-462): they name no
   function, module or internal name of the code to be written.
@@ -71,8 +86,8 @@ root:
 - **The tools a worker is given are unchanged.** With the default prompt kept, the session has the CLI's default
   tools, as today. `--allowedTools "Bash" "Read" "Edit" "Write" "Grep" "Glob"`, as the leads pass it, still says
   which tools run without asking. A skill the role names is in the start's text and needs no tool. A skill loaded
-  on request goes through the CLI's `Skill` tool, which that list does not name; whether a `-p` worker may use it
-  unnamed is not measured, and this ticket does not change it.
+  on request goes through the CLI's `Skill` tool, which that list does not name; a `-p` worker loads a project
+  skill on request without it (probe k1), so the leads' form needs no `Skill`.
 - `CLAUDE.md` and the guard hooks still apply (r4; the project setting source is kept).
 
 ### Behaviour 2: the skills
@@ -149,7 +164,7 @@ root:
 - `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` (w5) is a process-environment switch, W2-56's environment; the settings key
   is used instead.
 - **No switch known:** the CLI's built-ins (P-W2-60a-1); user-level `CLAUDE.md` and rules, not measured under
-  `--setting-sources project,local` (P-W2-60a-2). Named there, not passed silently.
+  `--setting-sources project,local`, a named residual (P-W2-60a-2; probe part 2b). Named there, not passed silently.
 
 ### Behaviour 5: the subagent model
 
@@ -163,7 +178,8 @@ environment (B, "two edges").
 - No `--autocompact` on the launcher's line; no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` in the settings' `env`.
 - Refused after `--`: `--autocompact <v>` and `--autocompact=<v>`.
 - Refused in the repository's settings: `.claude/settings.json` or `.claude/settings.local.json` whose `env` holds
-  `CLAUDE_CODE_AUTO_COMPACT_WINDOW` (the CLI would apply it to the session).
+  `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, or that sets the top-level key `autoCompactWindow` (the CLI would apply either
+  to the session), or whose `env` is not a map (it could not be shown to hold neither).
 - The record states `"compaction_threshold": "none"` (DEC-838 items 1 and 2).
 - The process environment's copy (a parent's `CLAUDE_CODE_AUTO_COMPACT_WINDOW`) falls on W2-56's cleaned
   environment: this ticket does not change what process environment the session is started with.
@@ -183,7 +199,7 @@ Each is judged word by word, as today (a prompt that only names one as a word pa
 | `--model`, `--effort` without a value or twice; `--effort` not one of the five | spaced, `=` | names the argument and the rule |
 | `--autocompact` | spaced, `=` | no launch sets a compaction threshold (DEC-838) |
 | `--continue`, `-c`, a short-option word holding `c` (`-pc`) | as given | a launch resumes a session by its id (`--resume <session id>`), so that the record can name it |
-| `--resume`/`-r` without a UUID; a resume spelled otherwise (`-r<id>`, a short-option word holding `r`) | as given | the same |
+| `--resume`/`-r` without a UUID, or twice; a resume spelled otherwise (`-r<id>`, a short-option word holding `r`) | as given | the same |
 
 Each message begins as today's: `LAUNCH_REFUSED`, "the CLI arguments carry …".
 
@@ -193,13 +209,17 @@ Each message begins as today's: `LAUNCH_REFUSED`, "the CLI arguments carry …".
   a UUID. The CLI refuses `--session-id` with `--resume` unless `--fork-session` is given (x1), and runs with it
   (x2). So a resumed launch is started with `--session-id <a new UUID> --fork-session`, and the passed `--resume
   <id>` unchanged: the session continues the conversation under an id of its own.
+- **Measured (probe f2, after this note's design):** a resumed, forked session keeps the original session's system
+  prompt and does not take the text appended at the resume.
 - **Its record** is a new one, keyed by the new id, with `"resumes": "<the id given>"`; the resumed session's own
-  record is never touched. A fresh launch has `"resumes": null`.
-- **It refuses all that a fresh launch refuses,** in the same order: the role's text, skills, default line and
-  record are read and written afresh.
-- **Not measured:** the CLI keeps a conversation's first system prompt for later requests and resumes until it is
-  compacted (`--help`, `--system-prompt-snapshot`); whether a fork sends the original's appended text or this
-  launch's is not measured (P-W2-60a-2). The record holds what this launch passed.
+  record is never touched. A fresh launch has `"resumes": null`. **Its `role_text`, `appended_sha256` and `skills`
+  are the original launch's, taken from the original's launch record** (the text the session has); its model,
+  effort, sources, start time and CLI are this launch's.
+- **Refused:** a resume when no launch record exists for the id given, or the original's record cannot be read or
+  is not of the record's form, or its role or ticket is not this launch's; a second `--resume`.
+- **It still refuses all that a fresh launch refuses,** in the same order: the role file, its lines and the skills
+  are read afresh (so the default model and effort hold), and `role-<role>.md` is still written and named on the
+  line, which the resumed session does not take.
 
 ### Behaviour 9: the launch record
 
@@ -261,14 +281,14 @@ refusal the launcher makes today still refuses with its message:
    `--effort`);
 3. the ticket: known, `in_progress`, of the role's own for engineer, research, product-spec (today);
 4. the repository's settings: no sandbox key (DEC-233), no `disableAllHooks`, no bypass mode or added directory
-   (DEC-313), the guard wired (today); then no `agent` key and no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` in `env`
-   (this ticket: either would change the session's prompt or threshold);
+   (DEC-313), the guard wired (today); then no `agent` key, no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` in `env` and no
+   `autoCompactWindow` (this ticket: either would change the session's prompt or threshold);
 5. the CLI at `~/.local/bin/claude` (DEC-205, today);
 6. the settings built: the research folder and allowlist (DEC-242, DEC-273), the held-out list (DEC-218), the
    evaluation sets (DEC-820, DEC-873), the sandbox strict (today);
 7. the role file: readable, its version line, its default line, its skills line; the skills folder and each named
    skill; then a model after `--` against the role's (this ticket);
-8. the record's folder found and made (this ticket);
+8. the record's folder found and made; on a resume, the original's record (Behaviour 8) (this ticket);
 9. the run folder (DEC-728, DEC-743, DEC-751, today; refuses nothing);
 10. the temp folder (DEC-159, DEC-386), `role-<role>.md` written in it, the record written, the session started
     (DEC-392's signals as today).
@@ -415,21 +435,25 @@ the revisions named, and none of them is handled by launching without the role.
 - **Recommendation:** (a), high confidence. W2-60b can list the names from the session's start event.
 - **Blocks:** nothing.
 
-### P-W2-60a-2: three things not measured
+### P-W2-60a-2: three things not measured (two now answered)
 
 - **Context:** Behaviours 1, 4 and 8; the probe measured each switch's effect on the start, not these.
-- **What happened:** not measured: (1) whether `--setting-sources project,local` also drops a user-level
-  `~/.claude/CLAUDE.md` and `~/.claude/rules/`; (2) whether a resumed launch with `--fork-session` sends the
-  original's appended text or this launch's (`--system-prompt-snapshot`); (3) whether a `-p` worker whose
-  `--allowedTools` lacks `Skill` can load a skill on request.
+- **What happened:** the lead took option (a) (probe part 2b, three sessions, about USD 0.52):
+  - (2) **answered** (f2): a resumed launch with `--fork-session` keeps the original's appended text and does not
+    take this launch's. Behaviour 8 now takes the record's role text and skills from the original's record;
+  - (3) **answered** (k1): a `-p` worker whose `--allowedTools` lacks `Skill` still loads a project skill on
+    request. The leads' form needs no `Skill`;
+  - (1) **a named residual, not measured:** whether `--setting-sources project,local` also drops a user-level
+    `~/.claude/CLAUDE.md` and `~/.claude/rules/`. Neither exists on this machine; measuring it would mean planting
+    one in the real home, which every running session would load, or copying the CLI's sign-in into a test home,
+    which Policy 2 (a) refuses.
 - **Why it matters:** (1) is KPI line 6's "planted home"; if they still load, the CLI has no switch for them but
-  `--bare`, which skips the hooks (lens E R6), and it goes to the owner. (2) decides whether a resumed record's
-  role hash is the text the session has. (3) decides whether the leads' form must add `Skill`.
-- **Options:** (a) the lead measures the three live before the engineer's merge (three sessions, about USD 0.40,
-  as in the probe), and the findings go into this note; (b) leave them to the acceptance tests and live with a red
-  case; (c) leave them unmeasured.
-- **Recommendation:** (a), high confidence.
-- **Blocks:** KPI line 6's case for (1); nothing else.
+  `--bare`, which skips the hooks (lens E R6), and it goes to the owner.
+- **Options for (1):** (a) leave it a named residual, since neither file exists here (no cost); (b) measure it in a
+  dedicated machine account with its own sign-in (an owner's setup, about USD 0.15); (c) refuse a launch when
+  either exists in the caller's home (a few lines; a check the CLI's own behaviour may make needless).
+- **Recommendation:** (a) now, (b) when a second account exists, medium confidence.
+- **Blocks:** nothing in this ticket.
 
 ### P-W2-60a-3: `--system-prompt-file` is on no refusal list
 
