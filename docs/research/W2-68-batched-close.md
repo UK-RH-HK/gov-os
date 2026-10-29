@@ -183,16 +183,78 @@ The design needs no change to `select.py`, `evidence.py`, `nightly.py`, `src/gov
 - A red *night* on the same code does not hold closes: the wait of section 11, point F, reads batch runs only. A red night goes on through the nightly's own P1 packages (bisect and selection miss) as it does today; extending the hold to nights is the orchestrator's to propose.
 - The governance checks are not run again over the records committed after H (close records, ticket status, checkpoints): a reusing close states the batch's check result, made at H. The reason is the owner's own text, DEC-883 item 1 a (one `gov check` for the whole batch, on that head) and item 1 b (each ticket's own checks, which do not include `gov check`). Those records are judged by the record-reading set, which every reusing close runs; the next batch's or night's check sees them in full.
 
-## 10. The trial (DEC-884 item 4), to be measured and added here
+## 10. The trial (DEC-884 item 4)
 
-The trial runs on a fixture programme built from scratch in a temporary folder, or on a dev tier cloned into a temporary folder. It measures:
-- the time per batch, for two and for three tickets, against the same closes run one by one;
-- that reuse is correct;
-- that a planted code change forces a fresh run;
-- that a planted record-only commit runs the record-reading set and nothing else;
-- that a red batch is attributed, with nothing closing on it.
+Measured on 2026-10-29, 03:34 to 03:48 UTC, after the nightly had ended, with the 1-minute load below 20 at the start of each run. The code was this branch at `6563856f` (`PYTHONPATH` set to the worktree's `src/`).
 
-Figures: to be added after implementation.
+**The fixture programme.** Each scenario built a fresh git repository from scratch under the session's temporary folder, and removed it when the scenario ended. The commit dates are fixed, so every scenario starts from the same commits. The repository holds:
+- a Python package `src/app/` (`core.py`, plus one module for each ticket);
+- `tests/unit/test_core.py` (3 tests);
+- four open STANDARD tickets, `PROJ-aaaa` to `PROJ-dddd` (W9-aa to W9-dd). Each has its ticket file (orchestrator), an acceptance suite of 3 tests (test designer) and one work commit inside its `allowed_paths` (engineer). There is also one closed ticket, `PROJ-rrrr`, whose `tests/acceptance/W9-rr/test_records.py` (2 tests, reading the register) is the record-reading set;
+- the test map: `shared_core` holds `src/app/core.py`, the path map and the test map; `record_only` holds `.tickets/**`, `docs/checkpoints/**`, `docs/close/**`, `docs/probes/**`, the register and `docs/notes/**`; `record_reading` holds the W9-rr file;
+- the path map: four namespaces with their memory keys (records `embedded`), and `close_workers: 2`;
+- W1-07's minimal `.gitleaks.toml`;
+- ten of the kernel's check declarations, written as text: core-graph, core-pathmap, core-authority, core-claims, core-mutation, core-decision-citations, index-freshness, recovery-rebuild, secrets-indexing and product-traceability-trailers. core-schema was left out because the fixture carries no copy of the kernel's schemas;
+- the decisions `DEC-000` and `DEC-883` (the batch's commits cite `DEC-883`);
+- a green base: a planted green night record on the initial head, naming no JUnit XML.
+
+In the full run, the regression is 17 tests.
+
+**The commands.** Every command ran with `GOV_ROLE=orchestrator`, from the programme's root.
+- The queue, one by one: `gov checkpoint --ticket <t> --role orchestrator --trigger ticket-transition` (committed), `gov rebuild --json`, `python3 -m pytest tests --collect-only -q`, `gov check --json`, `gov close <t> --check-result <check.json> --json`, then the outputs committed.
+- The batch: `gov checkpoint` for each ticket (committed), then `python3 -m gov.close.batch run <t> ... --root <programme> --json`. It ran through a wrapper that times the batch's own functions in-process (`_rebuild`, `_check`, `nightly.night`, `_fresh`, `_close`, `_commit`) and then calls `batch.main`.
+- After a batch: `python3 -m gov.close.batch refresh --root <programme> --json` and a plain `gov close <t> --json`.
+
+The trial's script and logs were kept in the session's own scratch folder, because the guard refused writes to the worktree's `.gov-runtime/scratch/` for this session.
+
+**Times (wall-clock seconds; load is the 1-minute load before → after).**
+
+| Run | Step | Seconds | Load |
+|---|---|---|---|
+| queue, `PROJ-aaaa` | checkpoint 0.1, rebuild 8.9, collection 0.2, check 1.6, close 59.7 | 70.5 | 9.8 → 14.2 |
+| queue, `PROJ-bbbb` | checkpoint 0.1, rebuild 9.5, collection 0.2, check 1.0, close 60.9 | 71.7 | 14.2 → 12.1 |
+| queue, `PROJ-cccc` | checkpoint 0.1, rebuild 11.1, collection 0.2, check 1.2, close 55.3 | 67.9 | 12.1 → 15.1 |
+| **queue, 2 tickets** | | **142.2** | |
+| **queue, 3 tickets** | | **210.1** | |
+| batch of 2 | checkpoints 0.1; rebuild 7.5, check 1.4, regression 1.0, record commit 0.0; store load 1.1, close `aaaa` 52.5; store load 4.1, close `bbbb` 71.7; commits 0.0 | **140.0** (command 139.9) | 15.1 → 23.1 |
+| batch of 3 | checkpoints 0.3; rebuild 8.0, check 1.5, regression 1.0; store loads 1.1, 3.8 and 4.2; closes 44.6, 41.9 and 42.1 | **149.1** (command 148.8) | 17.0 → 11.4 |
+| red batch of 3 | rebuild 8.0, check 1.5, regression with its re-runs alone and its bisect 2.4; nothing closed | 11.9 | 10.7 → 12.2 |
+
+**What the times say.**
+- On this fixture, the steps a batch shares are small: a rebuild of 8 to 11 s, a check of 1 to 2 s and a regression of about 1 s. Each close's own fixed cost dominates, at 42 to 72 s. Of that, its test runs take under 2 s; its standard error shows a model's weights being loaded, and the cost was not broken down further.
+- So the batch of two (140 s) is no faster than the queue (142 s). The batch of three is 29 % faster (149 s against 210 s), because two rebuilds, two checks and two broad regressions are not run.
+- On the programme itself, the shared steps are the expensive ones: a rebuild of about 6 minutes, `gov check` of about 7 minutes, and a full regression. The saving then grows with each ticket by about one rebuild plus one check plus the difference between a scoped regression and the record-reading set. That is an extrapolation, not a measurement.
+- The close of `PROJ-bbbb` in the batch of two (71.7 s) ran while the load rose to 23. That figure is load-sensitive.
+- **Caveat:** a sandboxed session embeds on a CPU Ollama of its own, started by `gov` in the sandbox, so the rebuild times are not the shared GPU's. The code index was not recreated in the sandbox (`codeintel: not_recreated`, a read-only `/tmp/gov-cbm-1000`), so the rebuilds above exclude it.
+
+**1. Reuse correct (batch of 2, then `PROJ-cccc`).**
+- Each close in the batch, and the later plain `gov close PROJ-cccc` (after its checkpoint, a record-only commit, and `batch refresh`, 5.1 s), states `scope: reused`.
+- Its `reused` block names `docs/close/nightly/NR-20261029T033809Z-969143eb5abc.json`, head `969143eb5abc`, `code_fingerprint` `sha256:b0505e53…`, the run's JUnit XML file, `skip_count: 0`, `skips: []` and `tests_run` (17 passed, 0 skipped).
+- `governance_checks_reused` names the same record and commit and the batch's `check.json`.
+- Its runs were its acceptance suite (the 3 W9-cc tests) and, as the regression, the record-reading set alone (`selected: [tests/acceptance/W9-rr/test_records.py]`, the 2 W9-rr tests): 5 passed, 0 skipped.
+- The batch's record states `kind: batch`, `verdict: green`, `scope: full`, both fingerprints, `skip_count: 0` and the check result (`blocks: false`). Its store loads were one `rebuild` before the run and one `records` load before each close.
+
+**2. A planted code change forces a fresh run (then `PROJ-dddd`).**
+- `PROJ-dddd`'s engineer changed `src/app/delta.py` after the batch, then made its checkpoint.
+- `batch refresh` refused with `STORE_CODE_CHANGED` (exit 1, 0.1 s). A `gov rebuild` (7.4 s) followed, then `gov close PROJ-dddd` (47.5 s).
+- That close states `scope: scoped`, a new `code_fingerprint` (`sha256:cf10ffea…`), no `reused` block and no `governance_checks_reused`; it ran its own `gov check`.
+- Its regression was W2-66's scoped selection: W9-dd, `tests/unit` and the record-reading set, 8 passed.
+- It cites no earlier run. Its `base` is the batch's head, which is W2-66's selection base: the newest green record.
+
+**3. A planted record-only commit runs the record-reading set and nothing else (batch of 3, then `PROJ-dddd`).**
+- After the batch, a record-only commit (`docs/notes/trial.md` and a register line), the checkpoint, and `batch refresh` (5.2 s), then `gov close PROJ-dddd` (45.5 s).
+- That close states `scope: reused`, citing the batch's record at `dec233d78698`. Its code fingerprint equals the batch's (`sha256:b0505e53…`).
+- Its runs were the W9-dd acceptance suite (3 tests) and, of the regression, the 2 W9-rr record-reading tests only.
+
+**4. A red batch (3 tickets; `PROJ-bbbb`'s work sets `beta.VALUE = 2`, which `tests/unit/test_core.py::test_beta_value` reads; a planted `tests/unit/test_flaky.py` fails on its first run only).**
+- The batch ended `BATCH_RED`, exit 3: "2 failing tests, 2 findings; nothing closes on a red run".
+- The record's verdict is `red`.
+- `test_fails_once` was run again alone and passed, so it is a `flaky_candidate`, with no bisect package.
+- `test_beta_value` was run again alone and failed, so it is `red`. One P1 `bisect` package spans `b4e509c1…231ec094` (from the green base to H), with `first_bad` `88299c83`, `PROJ-bbbb`'s work commit. The attribution names `ticket: PROJ-bbbb`, `by: bisect`, with the failure text, the run alone and the range.
+- No close ran (`closes: []`). All three tickets are still `in_progress` and none has a close record.
+- In a second run of the same scenario (03:47 UTC, load 6.9), after `batch refresh`, a plain `gov close PROJ-aaaa` (a ticket the red is not attributed to) refused `RED_RUN_ON_CODE` (exit 1, not counted), naming the red record and its head (point F). In the first run, the same close without the record load refused `STORE_STALE`, because the red record's commit had moved HEAD.
+
+No defect was found in the code; no code changed in this batch.
 
 ## 11. Settled points
 
