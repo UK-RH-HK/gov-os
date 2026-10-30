@@ -261,6 +261,47 @@ def _measured_map(data: Path, tree: Path) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# The clone's clean-up: only the clone, by its exact path, and never a prune (DEC-939 item 5, row W2-M406)
+# ---------------------------------------------------------------------------
+
+def _entry_of(tree: Path) -> Path | None:
+    """The clone's administrative entry, as its own ``.git`` file names it; None if that cannot be read."""
+    try:
+        line = (tree / ".git").read_text(encoding="utf-8").strip()
+    except (OSError, ValueError):
+        return None
+    return tree / line[len("gitdir:"):].strip() if line.startswith("gitdir:") else None
+
+
+def _own_entry(root: Path, tree: Path, entry: Path) -> bool:
+    """Whether ``entry`` lies directly under the common directory's ``worktrees/`` and names the clone's ``.git``."""
+    try:
+        common = root / _git(root, "rev-parse", "--git-common-dir").strip()
+        named = Path((entry / "gitdir").read_text(encoding="utf-8").strip())
+        return entry.resolve().parent == (common / "worktrees").resolve() \
+            and named.resolve() == (tree / ".git").resolve()
+    except (OSError, ValueError, GovError):
+        return False
+
+
+def _remove_clone(root: Path, tree: Path, entry: Path | None) -> dict | None:
+    """Remove the clone by its exact path; when that fails, its own confirmed entry alone. The failure, or None."""
+    done = subprocess.run(["git", "-C", str(root), "worktree", "remove", "--force", str(tree)],
+                          capture_output=True, text=True)
+    if done.returncode == 0 and not (entry and entry.exists()):
+        return None
+    error = " ".join(done.stderr.split()) or f"the entry {entry} is still there after git worktree remove"
+    removed = False
+    if entry and _own_entry(root, tree, entry):
+        shutil.rmtree(entry, ignore_errors=True)
+        removed = not entry.exists()
+    print(f"{COMMAND}: the clone {tree} was not removed ({error}); its entry {entry} "
+          f"{'removed' if removed else 'left in place'}", file=sys.stderr)
+    return {"ok": False, "clone": str(tree), "entry": str(entry) if entry else None, "entry_removed": removed,
+            "error": error}
+
+
+# ---------------------------------------------------------------------------
 # The night
 # ---------------------------------------------------------------------------
 
@@ -280,6 +321,7 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
     work = Path(tempfile.mkdtemp(prefix="gov-nightly-"))
     tree = work / "tree"
     _git(root, "worktree", "add", "--detach", "--force", str(tree), head)
+    entry = _entry_of(tree)
     try:
         test_map, _ = _select.load_map(tree)
         per_test, distribution = _select.settings(test_map)
@@ -322,9 +364,8 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
                                              encoding="utf-8")
             measured = measured_rel
     finally:
-        subprocess.run(["git", "-C", str(root), "worktree", "remove", "--force", str(tree)], capture_output=True)
+        cleanup = _remove_clone(root, tree, entry)
         shutil.rmtree(work, ignore_errors=True)
-        subprocess.run(["git", "-C", str(root), "worktree", "prune"], capture_output=True)
 
     junit = []
     for path in scope["junit_xml"]:
@@ -339,7 +380,9 @@ def night(root: Path, branch: str, coverage: bool = False) -> dict:
               "tmp_path_retention_policy": scope["tmp_path_retention_policy"], "created": _close._now()}
     if coverage:
         record["measured_map"] = measured
-    rel = f"{_select.NIGHTLY_REL}/NR-{stamp}-{head[:12]}.json"
+    if cleanup:
+        record["cleanup"] = cleanup
+    rel =f"{_select.NIGHTLY_REL}/NR-{stamp}-{head[:12]}.json"
     (root / rel).parent.mkdir(parents=True, exist_ok=True)
     (root / rel).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     return {"record": rel, **record}

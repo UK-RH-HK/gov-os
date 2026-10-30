@@ -38,6 +38,7 @@ allowed_paths:
 - template/.rulesync/skills/test-design/**
 kpis:
   success:
+  - 'The test-design skill says how much is enough: acceptance tests in proportion to the change (the minimum that shows each KPI line and each failure line), with W2-60a''s 2,980 test lines for 713 code lines named as out of proportion [DEC-951 item 5]'
   - Every brief template and the orchestration skill carry the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
   - They also carry Policy 2's read rule (DEC-820, which replaced DEC-723's listing refusal and DEC-508) and the decision-record rule (DEC-861, DEC-862, which changed DEC-724's owner commits) [DEC-866].
   - The audit brief states DEC-430 [F-m1, W2-L268].

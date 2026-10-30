@@ -149,6 +149,6 @@ def test_the_parallel_scan_reads_every_store_file_once_and_keeps_the_order_of_th
                for name in ("pair/zz.md", "pair-b/00a.md")]
     scanned = []
     real = secrets._scan
-    monkeypatch.setattr(secrets, "_scan", lambda rules, chunks: scanned.append(chunks[0]) or real(rules, chunks))
+    monkeypatch.setattr(secrets, "_scan", lambda rules, chunks, *rest: scanned.append(chunks[0]) or real(rules, chunks, *rest))
     assert secrets.stores_with_secrets(project) == planted
     assert sorted(scanned) == sorted((project / rel).read_bytes() for rel in rels + planted)
