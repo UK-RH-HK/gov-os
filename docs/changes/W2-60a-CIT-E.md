@@ -6,8 +6,8 @@ date: 2026-10-29
 branch: w2/W2-60a
 base: a1629f1860ca
 ticket: DAEO-cv58 (W2-60a)
-author: engineer (DAEO-cv58), design batch; engineer (DAEO-cv58), implementation batch 1, with the lead's corrections
-decisions_recorded: [DEC-826, DEC-838, DEC-839, DEC-832, DEC-786, DEC-801, DEC-941]
+author: engineer (DAEO-cv58), design batch; engineer (DAEO-cv58), implementation batch 1, with the lead's corrections; engineer (DAEO-cv58), round 2
+decisions_recorded: [DEC-826, DEC-838, DEC-839, DEC-832, DEC-786, DEC-801, DEC-802, DEC-941]
 state_class: EVIDENCE
 ---
 
@@ -17,7 +17,7 @@ The design of W2-60a (DAEO-cv58): `gov launch` starts a worker as its role, with
 default model and effort, sets no compaction threshold, keeps connectors, user-level agents and skills, and
 model-side memory out, and writes one launch record before the session starts (DEC-826 Q1 and Q5, DEC-838, DEC-839,
 DEC-832 item 1). Status **APPLIED**: the code exists (implementation batch 1, §1), with the lead's corrections
-after the lead's follow-up measurements (Behaviour 8, P-W2-60a-2; probe part 2b).
+after the lead's follow-up measurements (Behaviour 8, P-W2-60a-2; probe part 2b), and round 2's changes (§2).
 
 ## 1. The changes
 
@@ -28,6 +28,9 @@ after the lead's follow-up measurements (Behaviour 8, P-W2-60a-2; probe part 2b)
 | 3 | `src/gov/launch/launcher.py` | At Section B's places only: the module's text; imports (`time`, `uuid`, the two modules); constants (the launcher's own switches, the arguments of Behaviour 7, the compaction names); in `_check_repository_settings`, an `agent` key, `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW`, a top-level `autoCompactWindow` or an `env` that is not a map refused; `_check_own_args` (new, after `_check_cli_args`, which is unchanged) and its call; after the sandbox faults the role read, the model after `--` compared, the record folder and its deny rules, the resume's original record; after the temp folder's env, `CLAUDE_CODE_SUBAGENT_MODEL` and `autoMemoryEnabled`; inside `if not state["ended"]:` `role-<role>.md`, the session id and the record; the start's argument list (`cwd=root, env=env` untouched); the record removed before the refusal of a CLI that cannot be started. `build_settings`, `_runtime_rules`, `_tree_rules`, `sandbox_faults` and the git-environment lines are as they were. | acceptance `tests/acceptance/W2-60a/` (151 of 152 not `local_only`; the one red is W2-56's, below) |
 | 4 | `docs/research/W2-60-rules-probe.md` | The lead's part 2b (k1, f1, f2) and the opening's count (18 sessions, about USD 2.32). | the lead's scratch record |
 | 5 | this note | Status, this table, Behaviour 1's tools, 4's residual, 6's `autoCompactWindow`, 8 as the lead corrected it, 10's steps 4 and 8, P-W2-60a-2. | — |
+| 6 | `src/gov/launch/role.py` (round 2) | The command files under `.claude/commands/` described as skills (Behaviour 2): `<name>.md` as `<name>`, `<namespace>/<name>.md` as `<namespace>:<name>`, the same keys as a skill folder's entry, after them in path order; a link (the folder, a namespace folder or a file) or a front matter that is not a YAML map refused. The user settings file's `permissions.ask` and `permissions.deny` read (Behaviour 4), nothing else of it; a file that cannot be read or is not of that shape refused, an absent one carries nothing. | `tests/unit/launch/test_role.py` (45 cases); acceptance `test_w2_60a_command_skills.py`, `test_w2_60a_user_permissions.py` |
+| 7 | `src/gov/launch/launcher.py` (round 2) | `SET_ITSELF` gains `--fallback-model`, `--chrome`, `--ide`, `--system-prompt-snapshot` (Behaviour 7); `_check_repository_settings` refuses `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, `env.CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS`, `modelSettings.<model>.autoCompactWindow`, and a `modelSettings` that is not a map of maps (Behaviour 6); after the role read, the user's rules read; beside `autoMemoryEnabled`, the user's deny rules added after the launcher's and the user's ask rules set as `permissions.ask` (Behaviour 4). `_check_cli_args`, `build_settings` and the `env=` of the start unchanged. | acceptance `tests/acceptance/W2-60a/` (200 of 201 not `local_only`; the one red is W2-56's, below) |
+| 8 | this note (round 2) | Behaviours 2, 4, 6, 7, 9 and 10 for round 2's changes; §2; this table. | — |
 
 **The red that stays** (Section B, "two edges"): `test_w2_60a_no_compaction_threshold.py::test_a_compaction_threshold_in_the_caller_s_environment_does_not_reach_the_session`,
 a caller's `CLAUDE_CODE_AUTO_COMPACT_WINDOW` reaching the session's process environment: W2-56's cleaned environment;
@@ -39,6 +42,23 @@ the `env=` of the start is not edited here.
   touches; D is what W2-11 must write; E the open points.
 - **The facts it rests on** are the lead's measurements in `docs/research/W2-60-rules-probe.md` (CLI 2.1.292),
   cited by session name (w1, r2, x2, c1 …), and the CLI's own `--help` (2.1.292).
+
+## 2. Round 2 (review 1)
+
+Review 1 found two gaps, and the round takes two ride-alongs with them (DEC-802: small, same files, same kind):
+
+- **F1, the command files:** the session also loads each Markdown file under `.claude/commands/` as a skill, and the
+  record listed only `.claude/skills/`, so it did not say all the session may load (KPI line 2). The record now holds
+  one entry per command file, from that file (Behaviour 2).
+- **F2, the user's protections:** `--setting-sources project,local` drops the user settings file, and with it the
+  user's `ask` and `deny` rules, so a launched session ran with fewer protections than the caller's own. Those two
+  lists are now carried into the `--settings` value, and nothing else of the file (Behaviour 4).
+- **Ride-along 1:** three more spellings of a compaction threshold in the repository's settings are refused
+  (Behaviour 6).
+- **Ride-along 2:** four more arguments are refused after `--`: a fallback model, two connectors, a prompt
+  snapshot (Behaviour 7).
+
+Every refusal of round 1 still refuses with its message; round 2's run after them in the same step (Behaviour 10).
 
 ## A. Behaviour
 
@@ -58,9 +78,10 @@ root:
   passed once: the caller's copy where the caller put it, or the launcher's.
 - `--fork-session` only on a resumed launch (Behaviour 8).
 - The `--settings` value is today's (the `env` with `GOV_ROLE`, `GOV_TICKET`, `TMPDIR`, `CLAUDE_CODE_TMPDIR`; the
-  deny rules; the sandbox block) with three additions: `env.CLAUDE_CODE_SUBAGENT_MODEL` set to the session's model;
+  deny rules; the sandbox block) with these additions: `env.CLAUDE_CODE_SUBAGENT_MODEL` set to the session's model;
   the key `"autoMemoryEnabled": false`; two deny rules naming the launch record's folder literally,
-  `Edit(/<folder>)` and `Edit(/<folder>/**)` (Behaviour 9). It holds no `CLAUDE_CODE_AUTO_COMPACT_WINDOW`.
+  `Edit(/<folder>)` and `Edit(/<folder>/**)` (Behaviour 9); the user settings file's deny rules after the
+  launcher's, and its ask rules as `permissions.ask` (Behaviour 4). It holds no `CLAUDE_CODE_AUTO_COMPACT_WINDOW`.
 - The launcher writes nothing new to stdout or stderr.
 
 ### Behaviour 1: the role's text
@@ -98,6 +119,12 @@ root:
   that copy: its name (the front matter's `name`, else the folder's), its path, its version (the front matter's
   `version` as written, else the words `no version`, as `gov close` writes it), the sha256 of its `SKILL.md`, the
   sha256 of its folder (each regular file's path and sha256, in path order), and whether the role names it.
+- **The command files are skills too** (round 2, F1): the CLI loads each Markdown file under `.claude/commands/` as
+  a skill, `<name>.md` as `<name>` and `<namespace>/<name>.md` as `<namespace>:<name>`. Each is recorded from that
+  file with the same keys, after the skill folders' entries, in path order: its name from its path (not the front
+  matter), its path, its version (the front matter's `version`, else `no version`), the sha256 of the file, as
+  `folder_sha256` the same sha256 (the file is the whole command), and `named: false`. Files not ending in `.md` are
+  not loaded and not recorded. An absent `.claude/commands/` adds nothing.
 - **A role file names its skills** in one line (form in D): `- **Skills:** <name>, <name>`. No line names none.
   Each named skill must be at `.claude/skills/<name>/SKILL.md` and must carry a `version` in its front matter; its
   `SKILL.md` text is appended after the role's text in `role-<role>.md`, in the order named, so it is in the
@@ -107,7 +134,11 @@ root:
 - **Refused:** a named skill that is missing, unreadable or without a version; a skills line that is malformed;
   any skill folder of `.claude/skills/` that is a link or holds one, or whose `SKILL.md` cannot be read or has a
   front matter that is not YAML (the record could not say what the session may load). An absent `.claude/skills/`
-  is an empty list, not a refusal, unless the role names a skill.
+  is an empty list, not a refusal, unless the role names a skill. The same for the commands: a `.claude/commands/`,
+  a namespace folder or a command file that is a link, a file that cannot be read, or a front matter that is not a
+  YAML map refuses the launch.
+- **A role names only skill folders:** a command file is never a named skill; a skills line naming a command's name
+  is refused as a skill not at `.claude/skills/<name>/SKILL.md`.
 - **Today's loaded copies carry no version** (lens E F15; all 18 under `.claude/skills/` at the base): their record
   says `no version`, and the hashes identify the text. No fallback reads the kernel's copy instead. A named skill
   needs a version in the loaded copy: a requirement on W2-11 (one versioned source per skill, DEC-832 item 2; D).
@@ -158,9 +189,18 @@ root:
 - `--setting-sources` stays refused after `--` with today's message: the launcher's own line carries it (the "two
   edges" rule, B). The project and local sources are kept, so the guard's hooks stay wired.
 - Dropping the user's settings file also drops what it sets for every session on the machine: `effortLevel` and
-  the env `CLAUDE_CODE_SUBAGENT_MODEL` (probe part 2, "Also seen"), and the user's `model`, permissions and hooks.
+  the env `CLAUDE_CODE_SUBAGENT_MODEL` (probe part 2, "Also seen"), and the user's `model`, permissions (but for
+  the ask and deny rules, kept below) and hooks.
   The launcher sets model, effort and subagent model itself, so a launched session's values come from the
   repository alone (lens F recommendation 1).
+- **The user's ask and deny rules are kept** (round 2, F2). Dropping the user settings file must not take a
+  protection away, so the launcher reads `~/.claude/settings.json` and carries its `permissions.ask` and
+  `permissions.deny` into the `--settings` value: the deny rules after the launcher's own (no rule twice), the ask
+  rules as `permissions.ask`. Nothing else of the file is carried: never an `allow` rule, a `defaultMode`, a model,
+  an env or a hook, each of which could only add to what the session may do or change what it is. An absent file
+  carries nothing. Refused: a file that cannot be read (a folder, no read permission), that is not JSON or not a
+  map, whose `permissions` is not a map, or whose `ask` or `deny` is not a list of strings (it could not be shown to
+  keep its rules).
 - `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1` (w5) is a process-environment switch, W2-56's environment; the settings key
   is used instead.
 - **No switch known:** the CLI's built-ins (P-W2-60a-1); user-level `CLAUDE.md` and rules, not measured under
@@ -179,7 +219,10 @@ environment (B, "two edges").
 - Refused after `--`: `--autocompact <v>` and `--autocompact=<v>`.
 - Refused in the repository's settings: `.claude/settings.json` or `.claude/settings.local.json` whose `env` holds
   `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, or that sets the top-level key `autoCompactWindow` (the CLI would apply either
-  to the session), or whose `env` is not a map (it could not be shown to hold neither).
+  to the session), or whose `env` is not a map (it could not be shown to hold neither). Round 2 adds the other
+  spellings the CLI takes: `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, `env.CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS`, and
+  `modelSettings.<model>.autoCompactWindow` for any model, the role's or another; a `modelSettings` that is not a
+  map, or holds a value that is not a map, is refused too (it could not be shown to hold none).
 - The record states `"compaction_threshold": "none"` (DEC-838 items 1 and 2).
 - The process environment's copy (a parent's `CLAUDE_CODE_AUTO_COMPACT_WINDOW`) falls on W2-56's cleaned
   environment: this ticket does not change what process environment the session is started with.
@@ -198,6 +241,9 @@ Each is judged word by word, as today (a prompt that only names one as a word pa
 | `--model` not the role's | spaced, `=` | names the model given and the role's (DEC-839 item 1) |
 | `--model`, `--effort` without a value or twice; `--effort` not one of the five | spaced, `=` | names the argument and the rule |
 | `--autocompact` | spaced, `=` | no launch sets a compaction threshold (DEC-838) |
+| `--fallback-model` (round 2) | spaced, `=` | the session runs on the role's model alone, never on another (DEC-839 item 1) |
+| `--chrome`, `--ide` (round 2) | as given, `=` | a launched session loads no connector, and these run outside the sandbox (DEC-826 Q5); `--no-chrome` passes |
+| `--system-prompt-snapshot` (round 2) | spaced, `=` | the session's prompt is the CLI's default with the role's text appended (DEC-826 Q1) |
 | `--continue`, `-c`, a short-option word holding `c` (`-pc`) | as given | a launch resumes a session by its id (`--resume <session id>`), so that the record can name it |
 | `--resume`/`-r` without a UUID, or twice; a resume spelled otherwise (`-r<id>`, a short-option word holding `r`) | as given | the same |
 
@@ -241,7 +287,7 @@ Each message begins as today's: `LAUNCH_REFUSED`, "the CLI arguments carry …".
   | `compaction_threshold` | `"none"` |
   | `role_text` | `{"path": "template/governance/kernel/roles/<role>.md", "version": "<x.y.z>", "sha256": "…"}` |
   | `appended_sha256` | the sha256 of `role-<role>.md` as written |
-  | `skills` | one entry per skill of Behaviour 2: `name`, `path`, `version`, `sha256`, `folder_sha256`, `named` |
+  | `skills` | one entry per skill of Behaviour 2, skill folders then command files: `name`, `path`, `version`, `sha256`, `folder_sha256`, `named` |
   | `kept_out` | `["--strict-mcp-config", "--setting-sources project,local", "autoMemoryEnabled false"]` |
   | `cli` | `{"path": "~/.local/bin/claude", "version": "<x.y.z>"}`, the version read from the name of the file the CLI's link resolves to (`…/versions/2.1.292`); when the CLI is not such a link, `"not measured: <why>"` (W2-60b reads the session's own log) |
 
@@ -282,12 +328,14 @@ refusal the launcher makes today still refuses with its message:
 3. the ticket: known, `in_progress`, of the role's own for engineer, research, product-spec (today);
 4. the repository's settings: no sandbox key (DEC-233), no `disableAllHooks`, no bypass mode or added directory
    (DEC-313), the guard wired (today); then no `agent` key, no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` in `env` and no
-   `autoCompactWindow` (this ticket: either would change the session's prompt or threshold);
+   `autoCompactWindow` (this ticket: either would change the session's prompt or threshold); then round 2's
+   spellings and `modelSettings` (Behaviour 6);
 5. the CLI at `~/.local/bin/claude` (DEC-205, today);
 6. the settings built: the research folder and allowlist (DEC-242, DEC-273), the held-out list (DEC-218), the
    evaluation sets (DEC-820, DEC-873), the sandbox strict (today);
 7. the role file: readable, its version line, its default line, its skills line; the skills folder and each named
-   skill; then a model after `--` against the role's (this ticket);
+   skill; the command files (round 2); then a model after `--` against the role's; then the user settings file's
+   ask and deny rules (round 2) (this ticket);
 8. the record's folder found and made; on a resume, the original's record (Behaviour 8) (this ticket);
 9. the run folder (DEC-728, DEC-743, DEC-751, today; refuses nothing);
 10. the temp folder (DEC-159, DEC-386), `role-<role>.md` written in it, the record written, the session started
