@@ -11,6 +11,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-945: no paid notifier and no app install.
 - DEC-105: a finding against a closed specification gets three costed options: apply now, defer or re-baseline.
 - DEC-954: the plan is approved, with amendments. The order ahead (RESUME HERE): ACT 1, the five-rule guard; then the 10 built tickets and the streams; the roles spec first (W2-60b, W2-11, W2-33 and W2-83 wait for its approval); memory for this repository and any adopted repository; the roles; ACT 2, one re-pin; the three layers in new sessions.
+- DEC-957: the work order (product-spec, then KPIs to the test designer, the engineer to the spec never to the tests, the QA engineer alone reads both); installs ask only in the CTO's session; the escalation rubric P3/P2/P1/emergency (prompt §0); the domain skill packs in Wave 2; memory's target 95 % (floor 85 %), all seven gaps before ready; a roles research session.
 - DEC-955: ACT 1 first: a close refused before ACT 1 waits for it; right after ACT 1 is committed, a handover and a fresh session under the five-rule guard.
 - DEC-954 Q1: EXAMIN's copy starts only when K9's entry criteria are met, never because a date arrived. Dates are weekly estimates.
 - DEC-954 Q13: the master orchestrator is the CTO; each sub-orchestrator is a Senior Engineer for its stream, with a coordination ticket each, and the CTO's watchers track their state.

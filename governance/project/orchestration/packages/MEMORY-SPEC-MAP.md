@@ -1,5 +1,8 @@
 # MEMORY-SPEC-MAP: the memory spec mapped to the tickets (DEC-954 Q9d), and the enlarged measure (Q9a)
 
+> **The owner's decision (DEC-957, 2026-10-30):** memory's target is 95 % or more; 85 % is the floor worked with, and if room for improvement is found at 85 %, memory is not closed: an escalation to the owner. All seven gaps below are resolved before memory is called ready, with the 48-question measure judged on the hidden half (at least 21 of 24), the combined retrieval and search, and W2-88's tools for any adopted repository.
+
+
 From the W2 orchestrator's helper, 2026-10-30, for the owner. Draft. Read-only sources:
 - the code at `w2/integrate` `29389754`;
 - `.tickets/`;

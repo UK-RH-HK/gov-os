@@ -856,3 +856,23 @@ the five-rule hook; W2-60a's branch (`role.py`, its CIT-E §A–§E); W3 parking
 the lead-hours of §6.4 and §6.5; the date the roles land.
 
 END OF ROLES-SPEC-1
+
+
+## 10. The owner's answers (DEC-957, 2026-10-30)
+
+- Q1 to Q4, Q6, Q7, Q9, Q10 and Q11: approved as recommended. Q6 stands until the owner decides from the roles research session; the push stays the owner's.
+- Q5: the domain skill packs come in Wave 2, as skills: frontend, backend, UI/UX, DevOps, security, API and the like are engineers, each loading the engineer role plus its domain skill.
+- Q8: a fresh session every morning for every orchestrator, the CTO included.
+- Q12: the CTO loads its own skill at launch and has every other role's skills on demand; Senior Engineers and leads load their own part.
+- Effort: the CTO and the Senior Engineers at high; the highest effort only for reviewers and auditors, when needed.
+- A research session now establishes a software company's roles and skills, from the CTO down (the QA engineer among them), who integrates and who may push, and benchmarking as a research skill; it reports to the owner, and the roles land in Wave 2.
+
+- **DEC-957 (owner, standing, 2026-10-30): the work order, installs and the escalation rubric.**
+  - **The work order, as in a software company:** product-spec develops the spec (with research, the Senior Engineer, the CTO and the owner); the spec's agreed KPIs drive the independent test designer, who builds the tests and never reads the code; the engineer, whatever its domain (frontend, backend, UI/UX, DevOps, security, API: the engineer role plus its domain skill), builds the code to fulfil the spec and its KPIs, never to make the tests pass: it may run the acceptance tests and see only pass or fail, never read them, and its test-driven development means its own unit tests; the QA engineer (today's independent auditor) alone reads both, changes neither, writes only its findings report in its allowed path, and escalates an unresolved bug to the Senior Engineer, then the CTO and the owner.
+  - **Installs:** only the CTO's own session may ask the owner. Every other session, leads included, is refused by the guard and raises the install as a P1 escalation in its return.
+  - **The escalation rubric:**
+    - **P3, the Senior Engineer decides and logs it:** reversible; inside one ticket's scope and paths; no change to the spec, the KPIs or any standing decision; no effect on other streams; a delay under half a day.
+    - **P2, the Senior Engineer decides, the CTO approves:** touches another stream or shared code; changes a ticket's scope or KPIs within the approved spec; changes the plan's order; delays a milestone by up to a day; revises older tests under an existing decision.
+    - **P1, the lead and the Senior Engineer recommend, the CTO amends or escalates, the owner decides:** changes the spec, the Contract, the Charter or a standing decision; weakens any of the five guard rules or anything that fails open; irreversible or destructive; secrets or security; cost, installs or paid services; memory's target or acceptance; EXAMIN's go; any ACT; a milestone slipping more than a day.
+    - **Emergency:** a secret exposed, a risk of losing data, the disk below its floor, or the guard failing open: stop the affected work at once, then P1.
+    - Until the three layers start, the CTO (this orchestrator) holds the Senior Engineer's part.
