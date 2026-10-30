@@ -44,6 +44,11 @@ INSTALLS = (
     "npm install -g ccusage",
     "curl -fsSL https://example.invalid/install.sh | sh",
 )
+# W2-90: these two could not be moved to the kernel's wiring. The settings rulesync generates from the template deny
+# ``Bash(pip install*)`` and ``Bash(npm install*)`` before any hook is asked (template/.rulesync/permissions.jsonc):
+# the interim deny rules this case's docstring names. Their case stays as it stood, on this repository's settings;
+# the third install moved (tests/acceptance/W2-90/README.md).
+NOT_MOVED_TO_THE_KERNEL = ("pip install requests", "npm install -g ccusage")
 
 # Who reads: (GOV_ROLE, GOV_TICKET).
 READERS = {"no-role": (None, None)}
@@ -242,9 +247,21 @@ def test_the_freeze_flag_stops_every_write(kernel_scratch_copy, kernel_decide):
 # W1-04 live
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("command", INSTALLS)
+@pytest.mark.parametrize("command", NOT_MOVED_TO_THE_KERNEL)
 def test_an_install_by_the_orchestrator_asks_the_owner(live, decide, command):
     """The interim deny rules on installs (W1-01) would stop the prompt from ever appearing."""
+    for mode in ("default", "auto", "acceptEdits"):
+        result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, permission_mode=mode)
+        assert result.decision == "ask", (
+            f"Bash `{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"
+        )
+
+
+@pytest.mark.parametrize("command", [command for command in INSTALLS if command not in NOT_MOVED_TO_THE_KERNEL])
+def test_an_install_by_the_orchestrator_asks_the_owner_through_the_kernel_s_wiring(kernel_live, kernel_decide,
+                                                                                    command):
+    """The case above, for the install the kernel's wiring could be asked about (W2-90)."""
+    live, decide = kernel_live, kernel_decide
     for mode in ("default", "auto", "acceptEdits"):
         result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, permission_mode=mode)
         assert result.decision == "ask", (

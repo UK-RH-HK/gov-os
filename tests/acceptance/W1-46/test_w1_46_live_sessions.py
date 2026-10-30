@@ -43,6 +43,11 @@ with ``-m "not local_only"``.
 
 Each session is told the exact commands. Whether the model ran them is checked
 first: a session that left no result file fails every test with that reason.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The two sessions are launched in W1-46's launch project
+built on a project generated from the template (``kernel_launcher``): its ``.claude/settings.json`` is the one rulesync
+generates from the template's sources, so the session's guard and containment check are the kernel's, run from
+``governance/kernel/hooks/`` as those settings register them, no longer this repository's live wiring.
 """
 
 from __future__ import annotations
@@ -177,7 +182,8 @@ ENGINEER_PROMPT = (
 
 
 @pytest.fixture(scope="module")
-def engineer(launcher, tmp_path_factory):
+def engineer(kernel_launcher, tmp_path_factory):
+    launcher = kernel_launcher
     return _start(launcher, tmp_path_factory.mktemp("w1-46-live-engineer"), support.ENGINEER, ENGINEER_PROMPT,
                   f"{SCRATCH}/probe.sh", ENGINEER_PROBE, f"{SCRATCH}/results.txt", watch=PROTECTED_TREES)
 
@@ -301,8 +307,9 @@ RESEARCH_PROMPT = (
 
 
 @pytest.fixture(scope="module")
-def research(launcher, tmp_path_factory):
+def research(kernel_launcher, tmp_path_factory):
     """The wheel is made by hand and put in the experiment folder before the launch: nothing is downloaded."""
+    launcher = kernel_launcher
     return _start(launcher, tmp_path_factory.mktemp("w1-46-live-research"), support.RESEARCH, RESEARCH_PROMPT,
                   f"{FOLDER}/probe.sh", RESEARCH_PROBE, f"{FOLDER}/results.txt",
                   prepare=lambda project: support.write_probe_wheel(project / FOLDER / "vendor"))

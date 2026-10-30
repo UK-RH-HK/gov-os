@@ -40,6 +40,12 @@ other options with a value (``-o``, ``-g``, ``--owner``, ``--group``),
 
 The guard is asked through the PreToolUse commands the project's committed
 settings register. No session is started.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
+ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
+template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
+lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
+Each moved case names its fixtures by their old names in its first line; its verdict is the same.
 """
 
 from __future__ import annotations
@@ -89,14 +95,16 @@ def test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_th
                        f"`{command}` by an engineer, working directory {directory or 'the repository root'}")
 
 
-def test_the_guard_does_not_refuse_install_with_its_option_before_the_operands(guard, project):
+def test_the_guard_does_not_refuse_install_with_its_option_before_the_operands(kernel_guard, kernel_project):
     """The control: the usual spelling, to a new name inside the engineer's paths, from the repository root."""
+    guard, project = kernel_guard, kernel_project
     command = f"install -m 644 {OWN}/{OWN_NAME} {OWN}/w1_46_installed.py"
     w47.assert_allowed(_ask(guard, project, "", command), f"`{command}` by an engineer")
 
 
 def test_the_guard_does_not_refuse_cp_between_two_names_of_the_working_directory_inside_the_roles_paths(
-        guard, project):
+        kernel_guard, kernel_project):
     """The control on the working directory: the session's ``cwd`` is inside the engineer's paths, and so are both names."""
+    guard, project = kernel_guard, kernel_project
     command = f"cp {OWN_NAME} w1_46_copy.py"
     w47.assert_allowed(_ask(guard, project, OWN, command), f"`{command}` by an engineer, working directory {OWN}")
