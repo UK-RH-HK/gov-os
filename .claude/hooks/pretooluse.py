@@ -11,8 +11,9 @@ It keeps exactly five rules and nothing else (DEC-953 item 2, DEC-954):
      docs/audit/ and docs/assessment/, their own scratch under .gov-runtime/scratch/review/ or /audit/, and /tmp;
      never code, tests, tickets, records, handovers or anything else (DEC-954);
   3. no reads of secrets or keys (every role, DEC-820 (a));
-  4. no installs without the owner: an install asks the owner in the orchestrator's session and is refused in every
-     other; sudo is refused.
+  4. no installs without the owner: an install asks the owner only in the CTO's own session (the orchestrator on the
+     coordination ticket W2-00) and is refused in every other, leads included, which escalate it (DEC-957); sudo is
+     refused.
 It reuses the product's own checks (gov.guard.reads, heldout, install, decide), imported from the pinned judge that
 runs this file. The product's full guard (template/governance/kernel/hooks/pretooluse.py, src/gov/guard/) stays built
 and tested; it is not wired here until the Gov OS is whole. Fail closed: an error or the 20-second deadline refuses.
@@ -32,6 +33,7 @@ REVIEWERS = ("independent-auditor", "independent-reviewer", "reviewer", "auditor
 REVIEW_PATHS = ("docs/probes/", "docs/audit/", "docs/assessment/", ".gov-runtime/scratch/review/",
                 ".gov-runtime/scratch/audit/")
 RUNS = os.path.expanduser("~/gov-os-runs")
+CTO_WBS = "W2-00"  # the coordination ticket whose orchestrator session is the CTO
 
 
 def tree_roots(root):
@@ -160,9 +162,13 @@ def main():
         if has_sudo(command):
             answer("deny", "sudo is refused to every session")
         if has_install(command):
-            if acting == "orchestrator" or role == "orchestrator":
+            # Only the CTO's own session asks the owner: the orchestrator role on the coordination ticket (W2-00).
+            # Every other session, leads (orchestrator on a ticket of their own) included, is refused (DEC-957).
+            cto = role == "orchestrator" and acting == "orchestrator" and reads._ticket(root, ticket)[1] == CTO_WBS
+            if cto:
                 answer("ask", "an install needs the owner's approval")
-            answer("deny", "installs are refused without the owner; the orchestrator proposes them")
+            answer("deny", "installs are refused here: raise the install as a P1 escalation to the CTO, who asks "
+                           "the owner")
     sys.exit(0)
 
 

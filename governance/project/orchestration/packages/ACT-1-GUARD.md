@@ -7,7 +7,7 @@ For the owner's operator, in the main tree. It needs no re-pin and no plain term
   1. the implementer never writes acceptance tests;
   2. no reads of the hidden half of an evaluation set (from any worktree, run clone or origin) or of the held-out material;
   3. no reads of secrets;
-  4. no installs without the owner;
+  4. no installs without the owner: only the CTO's own session (the orchestrator on W2-00) asks you; every other session, leads included, is refused and escalates (DEC-957);
   5. independent reviewers and auditors write only their own review and audit records.
 - **The containment hooks** after each command (`PostToolUse`, `PostToolUseFailure`) are removed.
 - **Unchanged:** every permission and deny rule (6 in force, 6 generated, none lost or added), and the PreCompact, SessionStart, Stop and SubagentStop hooks.
@@ -16,7 +16,7 @@ For the owner's operator, in the main tree. It needs no re-pin and no plain term
 ## Checked on a trial clone (`/tmp/gov-os-act1/repo`, the integration head plus this change)
 - The regeneration reported deny rules in force 6, generated 6, lost 0, added 0; one generated file changed.
 - `settings.json` by structure: `$schema` the same; `permissions` the same; PreToolUse changed (it runs `.claude/hooks/pretooluse.py`, and no longer names the kernel guard); PostToolUse and PostToolUseFailure removed; the rest the same.
-- The registered hook line itself, run as Claude Code runs it: **35 of 35 planted cases pass**.
+- The registered hook line itself, run as Claude Code runs it: **38 of 38 planted cases pass** (re-run after DEC-957's install rule, 2026-10-30 21:30).
   - Each rule refuses: an engineer's Write and redirect into `tests/acceptance/`; the measured role reading the hidden half here, in another worktree, in a run clone and in the main tree; held-out; `.env`; an SSH key; an engineer's install; sudo; an auditor editing code, a test, a ticket, the register or a lead's handover, or running an unreadable command.
   - Each allowed form passes: the test designer writing tests; an auditor writing its probe or audit record or `/tmp`; heredocs; `$VAR` targets; backticks; inline Python with braces; `rm`; an engineer reading acceptance tests; CronCreate; a general-purpose helper writing.
 - The hook takes about 0.2 s a call (one call of 3.9 s at load 34).
@@ -60,11 +60,11 @@ git commit -m "ACT-1-GUARD: the five-rule guard switched on (DEC-953 item 2, DEC
   - W1-28: 2 and W1-50: 2, the launcher and freeze through the live settings.
 
   They assert that this repository runs the kernel's full guard and its containment hooks: exactly what DEC-953 item 2 lifts. The product's own guard tests (on the template and `src/gov/guard/`) stay green. Full list: `/tmp/gov-os-act1/confirmed.json`; the script is `tools/act1_confirm.py`.
-- **Your named decision asked for (DEC-906): (a) recommended.** A fresh independent test designer revises the 235 cases so they judge the kernel's wiring (the template and a generated fixture repository), not this repository's live settings, lowering no expectation on the product, with `Rewrite-Reason: DEC-953 item 2`. It is a new LITE ticket, W2-90, the first lead after ACT 1. Until it lands:
+- **Your named decision (DEC-906): (a), given in DEC-957.** A fresh independent test designer revises the 235 cases so they judge the kernel's wiring (the template and a generated fixture repository), not this repository's live settings, lowering no expectation on the product, with `Rewrite-Reason: DEC-953 item 2`. It is a new LITE ticket, W2-90, the first lead after ACT 1. Until it lands:
   - the nightly shows these 235 as known reds, named in the morning package;
   - closes test on the head pinned before ACT 1 (`.gov-runtime/scratch/orchestrator/CLOSE-HEAD`), which already holds every merge they close.
   - (b) would instead revise the tests first and switch afterwards, holding ACT 1 back by one test-designer run, about 2–3 hours.
-- **What else ran:** the hook's 35 planted cases through the registered line (PASS). No permission rule changes, so no other test reads a difference.
+- **What else ran:** the hook's 38 planted cases through the registered line (PASS). No permission rule changes, so no other test reads a difference.
 
 ## After the commit (DEC-955)
 The orchestrator writes the handover (the checkpoint and RESUME HERE), tells you it is ready, and stops. The fresh session starts under the five-rule guard; it files W2-90 first, then runs the ten built tickets and the streams. The four-ticket close batch (W2-57, W2-77, W2-03, W2-26) is running on a clone of the head before ACT 1 and is not affected.
