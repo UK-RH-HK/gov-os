@@ -44,7 +44,7 @@ def scanned(monkeypatch):
     """The contents given to gitleaks, in the order they were judged: of a file that is no store, its bytes."""
     seen = []
     real = secrets._scan
-    monkeypatch.setattr(secrets, "_scan", lambda rules, chunks: seen.append(chunks[0]) or real(rules, chunks))
+    monkeypatch.setattr(secrets, "_scan", lambda rules, chunks, *rest: seen.append(chunks[0]) or real(rules, chunks, *rest))
     return seen
 
 

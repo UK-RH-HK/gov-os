@@ -29,11 +29,13 @@ def _edges(rows) -> list[dict]:
 
 
 def records(root: Path, type: str | None = None, status: str | None = None) -> list[dict]:
-    """The records whose frontmatter matches every filter given; a register entry with its heading and title."""
-    rows = _rows(root, "SELECT records.id, type, status, path, heading, title FROM records"
+    """The records whose frontmatter matches every filter given; a register entry with its heading, title, span and
+    ``content_hash`` (the sha256 of its span, AR-1)."""
+    rows = _rows(root, "SELECT records.id, type, status, path, heading, title, span, content_hash FROM records"
                        " LEFT JOIN register_entries ON register_entries.id = records.id", type=type, status=status)
     return [dict(zip(("id", "type", "status", "path"), row)) if row[4] is None
-            else dict(zip(("id", "type", "status", "path", "heading", "title"), row)) for row in rows]
+            else dict(zip(("id", "type", "status", "path", "heading", "title", "span", "content_hash"), row))
+            for row in rows]
 
 
 def active(root: Path, type: str | None = None) -> list[str]:

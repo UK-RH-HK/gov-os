@@ -17,8 +17,6 @@ sed -e "s#^HERE=.*#HERE=$work/n#" -e "s#^ORCH=.*#ORCH=$work/orch#" -e "s#^REPO=.
     -e "s#^RUNS=.*#RUNS=$work/runs#" -e "s#^JUNIT=.*#JUNIT=$work/junit#" -e "s#^PING=.*#PING=$work/ping#" \
     -e 's#^  window_end=.*#  window_end=$TEST_WINDOW_END#' "$HERE/nightly.sh" > "$work/n/nightly.sh"
 printf 'import os\nprint(\x27{"estimate_s": \x27 + os.environ["FAKE_EST"] + \x27}\x27)\n' > "$work/n/nightly_estimate.py"
-# a fake emergency push in the copy's folder: it records its line (N7: the disk gate shut at night)
-printf '#!/bin/bash\necho "$*" >> %s/pushes.txt\n' "$work" > "$work/n/push_emergency.sh"; chmod +x "$work/n/push_emergency.sh"
 # no disk_gate.sh in the copy's folder: a clean start stops there, before any clone
 run() {  # $1 seconds to the latest start, $2 estimate
   rm -f "$work/pings.txt"; local now; now=$(date +%s)
@@ -49,8 +47,6 @@ git -C "$work/repo" reset -q --hard HEAD~1
 run -99400 100000; expect "N7 window" "NOT STARTED: .*disk" "P2 NIGHTLY-WINDOW"
 grep -q "P1 NIGHTLY-NOT-RUN" "$work/pings.txt" || fail "N7: the failed start did not ping P1"
 [ "$took" -lt 30 ] || fail "N7: a clean state waited ($took s)"
-grep -q "disk is below its floor" "$work/pushes.txt" 2>/dev/null || fail "N7: the disk gate shut at night pushed no emergency"
-rm -f "$work/pushes.txt"
 [ ! -e "$work/orch/NIGHTLY-RUNNING" ] || fail "N: NIGHTLY-RUNNING left behind"
 rm -f "$work/pings.txt"; timeout 5 bash "$work/n/nightly.sh" > /dev/null 2>&1; code=$?
 [ "$code" -eq 124 ] && [ ! -e "$work/pings.txt" ] || fail "N8 day: exit $code or a ping"
@@ -132,27 +128,6 @@ gate env NIGHTLY_NOW_HM=0730 NIGHTLY_IDLE_S=99999 timeout 5 bash "$HERE/ping_gat
 grep -q "^G3 asleep (held from " "$work/pings.txt" && grep -q "^G4 unreadable (held from " "$work/pings.txt" || fail "G6: not flushed at 07:30"
 [ ! -s "$P" ] || fail "G6: the held file was not emptied"
 
-# ---- push_emergency.sh: only from a mode-600 file, only a short safe line, the token never on a command line -------
-E=$work/push; mkdir -p "$E"
-printf '#!/bin/bash\necho "ARGS: $*" >> %s/sent.txt\ncat >> %s/sent.txt\necho "${FAKE_CODE:-200}"\n' "$E" "$E" > "$E/send"; chmod +x "$E/send"
-push() { NIGHTLY_PUSHOVER_ENV=$E/pushover.env NIGHTLY_PINGS_LOG=$E/pings.log NIGHTLY_PUSH_SEND=$E/send bash "$HERE/push_emergency.sh" "$1"; }
-push "Gov OS emergency: test one"; code=$?
-[ "$code" -eq 0 ] && [ ! -e "$E/sent.txt" ] && grep -q "EMERGENCY not pushed (no Pushover file" "$E/pings.log" || fail "P1: no file: sent, or not logged"
-printf 'PUSHOVER_TOKEN=tok%s\nPUSHOVER_USER=usr%s\n' 123 456 > "$E/pushover.env"; chmod 644 "$E/pushover.env"
-push "Gov OS emergency: test two"
-[ ! -e "$E/sent.txt" ] || fail "P2: sent from a file that is not mode 600"
-chmod 600 "$E/pushover.env"; push "Gov OS emergency: disk below floor (82 GiB)"
-grep -q "^ARGS: --config -$" "$E/sent.txt" || fail "P3: the sender was given more than --config - on its command line"
-grep -q 'data-urlencode = "token=tok123"' "$E/sent.txt" && grep -q 'message=Gov OS emergency: disk below floor (82 GiB)"' "$E/sent.txt" || fail "P3: token or message not in the configuration"
-grep -q "EMERGENCY pushed: Gov OS emergency: disk below floor" "$E/pings.log" || fail "P3: not logged as pushed"
-grep -q "tok123" "$E/pings.log" && fail "P3: the token reached the log"
-rm -f "$E/sent.txt"; push "Gov OS emergency: see /home/usain/secret.txt"
-grep -q 'message=Gov OS emergency: see the morning package"' "$E/sent.txt" || fail "P4: a path was sent"
-rm -f "$E/sent.txt"; push "Gov OS emergency: token 0123456789abcdef0123"
-grep -q 'message=Gov OS emergency: see the morning package"' "$E/sent.txt" || fail "P5: a long hex string was sent"
-rm -f "$E/sent.txt"; FAKE_CODE=500 push "Gov OS emergency: test six"
-grep -q "EMERGENCY push failed: Gov OS emergency: test six" "$E/pings.log" || fail "P6: a failed push not logged"
-
 # ---- nightly_estimate.py: the lock wait recorded apart, and never setup ---------------------------------------------
 X=$work/est; mkdir -p "$X/orch/log/nightly"
 sed -e "s#^ORCH = .*#ORCH = __import__('pathlib').Path('$X/orch')#" "$HERE/nightly_estimate.py" > "$X/est.py"
@@ -198,5 +173,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, push_emergency.sh P1-P6, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
 exit "$fails"

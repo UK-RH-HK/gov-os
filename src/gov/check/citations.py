@@ -1,8 +1,9 @@
 """core-decision-citations: a commit citing a decision its own tree does not record (DEC-463).
 
-A decision is recorded as a decision file or as an entry of the register file the project names (DEC-473); the
-commits judged are those after the base commit the project records (DEC-474). Both are optional keys of the
-project's path map, read as the project holds it now (DEC-479)."""
+A decision is recorded as a schema-valid decision file or as a live entry of the register file the project names
+(DEC-473, W2-M267, W2-M145), counted as the store counts it; the commits judged are those after the base commit the
+project records (DEC-474). Both are optional keys of the project's path map, read as the project holds it now
+(DEC-479)."""
 from __future__ import annotations
 
 import json
@@ -12,15 +13,27 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.config.loader import PROJECT_DIR, load_config
 from gov.decisions.checker import DECISION_ID, _front, _git, _Objects, _once
+from gov.store.loader import register_entries
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 CITATION = re.compile(rf"\b(?:{DECISION_ID.pattern})\b")  # the kernel's decision_id grammar, as a whole word
 REGISTER_KEY, BASE_KEY = "decision_register", "decision_citations_base"
-# DEC-473: a level-3 heading at the start of a line, the id, a space, a colon or a dash, and the title
+# DEC-473: a level-3 heading at the start of a line, the id, a space, a colon or a dash, and the title. The check
+# counts entries by the store's rule (register_entries); gov close's lookup of an owner's entry reads these two.
 ENTRY = re.compile(r"### (DEC-[0-9]+)(?=[ :\-–—])[ \t:\-–—]*[^\s:\-–—]")
 FENCE = re.compile(r" {0,3}(`{3,}|~{3,})")
 COMMIT_ID = re.compile(r"[0-9a-fA-F]{4,64}")
+STATE_CLASSES = ("AUTHORITATIVE", "DERIVED", "NARRATIVE", "EVIDENCE", "HISTORICAL", "UNKNOWN_OR_CONFLICTING")
+
+
+def _decision(front: dict) -> str:
+    """The id a schema-valid decision record states, "" for any other file (W2-M267): madr.schema.json's id of the
+    decision_id grammar, ``type: decision``, a status and a state_class of common.schema.json."""
+    record_id, status = front.get("id"), front.get("status")
+    valid = (isinstance(record_id, str) and DECISION_ID.fullmatch(record_id) and front.get("type") == "decision"
+             and isinstance(status, str) and status and front.get("state_class") in STATE_CLASSES)
+    return record_id if valid else ""
 
 
 def _configured(root: Path) -> tuple[str | None, str | None]:
@@ -58,24 +71,14 @@ def _commits(root: Path, base: str | None) -> list[tuple[str, str]]:
 
 
 def _entries(content: bytes) -> set[str] | None:
-    """The ids a register file records by its entry headings outside fenced code blocks; None where it is not text."""
+    """The ids a register file records by its live entries, as the store loads them; None where it is not text."""
     try:
         text = content.decode("utf-8")
     except UnicodeDecodeError:
         return None
     if "\0" in text:
         return None
-    recorded, fence = set(), None
-    for line in text.split("\n"):
-        mark, entry = FENCE.match(line), ENTRY.match(line)
-        if fence is None:
-            if mark:
-                fence = mark.group(1)
-            elif entry:
-                recorded.add(entry.group(1))
-        elif mark and mark.group(1).startswith(fence) and not line[mark.end():].strip():
-            fence = None  # closed by a fence of the same mark, at least as long, with nothing after it
-    return recorded
+    return {entry["id"] for entry in register_entries(text)[0]}
 
 
 def _register(root: Path, objects: _Objects, commit: str, register: str | None) -> tuple[set[str], list[tuple]]:
@@ -100,8 +103,7 @@ def _register(root: Path, objects: _Objects, commit: str, register: str | None) 
         if blob not in objects.known:  # the id a file records, "" for none, None where it cannot be read
             try:
                 front = _front(_content(objects, blob, commit, path).decode("utf-8", "replace"))
-                objects.known[blob] = str(front["id"]) if "id" in front and (
-                    front.get("type") == "decision" or DECISION_ID.fullmatch(str(front["id"]))) else ""
+                objects.known[blob] = _decision(front)
             except ValueError:
                 objects.known[blob] = None
         if objects.known[blob] is None:

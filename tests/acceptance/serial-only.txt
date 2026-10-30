@@ -101,3 +101,7 @@ tests/acceptance/W1-19/test_w1_19_real_models.py  # nightly: real-model: the pin
 tests/acceptance/W1-21/test_w1_21_dev_tier.py  # nightly: real-model: the embedder and the reranker on the dev tiers
 tests/acceptance/W1-21/test_w1_21_family_check.py::test_the_check_is_green_when_the_dev_tiers_meet_the_baselines  # nightly: real-model: the real embedder and reranker over both dev tiers
 tests/acceptance/W2-54/test_w2_54_query_vector.py::test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before  # nightly: real-model: this machine's embedder answers a question
+# DEC-951 item 3 (W2-85): W2-54's two time-limit cases; outside a close each builds every ticket's context here.
+# Rewrite-Reason: DEC-951 item 3
+tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit  # nightly: real-model: the context check as declared, over this repository's tickets through this machine's embedder and reranker, ends green within its declared limit
+tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here  # nightly: real-model: gov check over this repository's tickets, each context built through this machine's embedder and reranker, gives context-reproducibility green

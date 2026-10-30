@@ -222,10 +222,11 @@ def test_a_heading_inside_a_fenced_code_block_records_nothing(declaration, histo
 
 
 def test_a_heading_after_a_closed_fence_records_its_id(declaration, history):
-    """The fence ends where it is closed: a heading after it is an entry again."""
+    """The fence ends where it is closed: a heading after it, with its status line, is an entry again
+    (DEC-755: a heading alone is no entry)."""
     text = register(CONTROL_HEADING) + (
         "\nHow an entry is written:\n\n```\n### DEC-nnn — The title\n```\n\n"
-        f"### {SUBJECT} — The parser changes\n- **Decision:** A fixture.\n")
+        f"### {SUBJECT} — The parser changes\n- **Status:** ACCEPTED\n- **Decision:** A fixture.\n")
     judged_with(declaration, history, text, [WITNESS])
 
 

@@ -32,7 +32,10 @@ def test_the_suite_runs_this_worktree_s_code(code_under_test):
 
 def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
     """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
-    that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75")."""
+    that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+
+    Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+    real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
     done, checks = gov_check_here
     entry = checks.get(S.CONTEXT_CHECK_ID)
     assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"

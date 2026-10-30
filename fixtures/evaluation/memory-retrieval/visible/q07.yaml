@@ -1,0 +1,17 @@
+# Lens B's Q07 (Table 2): "The front matter's dependency list (DAEO-0mab.md 1–72) or WBS:118": one piece of
+# evidence in two places, alternatives of one entry. The list is lines 17–44 at the commit.
+id: Q07
+category: ticket
+commit: 23079f92a6fa
+ticket: DAEO-0mab
+question: Which tickets must be done before the Track A gate run?
+gold_answer: >-
+  Every other Track A ticket: DAEO-0mab's depends_on lists the 27 tickets from DAEO-g0ip to DAEO-7rr2 (among them
+  W2-03 DAEO-ym8a, W2-04 DAEO-u4oz and W2-06 DAEO-kia7).
+sources:
+  - - path: .tickets/DAEO-0mab.md
+      heading: "depends_on:"
+      lines: [17, 44]
+    - path: docs/plan/WAVE_2_WBS.md
+      heading: "| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket | 0 | AR-1 … AR-10 |"
+      lines: [118, 118]

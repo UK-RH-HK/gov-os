@@ -1,0 +1,21 @@
+# RSS samples of the code-intelligence tool's processes during each CLI rebuild (DEC-078's correction)
+# Sampler: every 2 s until the run's exit-code file existed,
+#   ps -eo pid=,ppid=,rss=,args= | awk '/codebase-memory-mcp|gitleaks|gov\.cli\.main|gov\.codeintel|gov\.retrieval/'
+# Columns: epoch, pid, ppid, rss (KiB), command (first 120 characters)
+
+## rebuild on /tmp/gov-os-W2-26/examin (2 samples, all of them)
+1792172005 3926607 3926603 1492 /usr/bin/time -v python3 -m gov.cli.main rebuild --root /tmp/gov-os-W2-26/examin --json
+1792172005 3926608 3926607 8716 python3 -m gov.cli.main rebuild --root /tmp/gov-os-W2-26/examin --json
+
+## rebuild on "/tmp/gov-os-W2-26/EXAMIN APP" (2 samples, all of them)
+1792172813 3975965 3975961 1496 /usr/bin/time -v python3 -m gov.cli.main rebuild --root /tmp/gov-os-W2-26/EXAMIN APP --json
+1792172813 3975966 3975965 8744 python3 -m gov.cli.main rebuild --root /tmp/gov-os-W2-26/EXAMIN APP --json
+
+No codebase-memory-mcp process (daemon, worker or CLI) and no gitleaks process was seen: the tool was never started.
+
+# gov's daemon folders (gov.codeintel.daemon_dir), computed with
+$ PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src python3 -c "from pathlib import Path; from gov.codeintel import daemon_dir; print(daemon_dir(Path('/tmp/gov-os-W2-26/examin'))); print(daemon_dir(Path('/tmp/gov-os-W2-26/EXAMIN APP')))"
+/tmp/gov-cbm-1000/40258c8d5975c146
+/tmp/gov-cbm-1000/de3654f2e4ec8811
+After all runs: "ls: cannot access ...: No such file or directory" for both. gov wrote no daemon folder for these clones
+(the filter raised before the tool's environment was made). Nothing under /tmp/gov-cbm-1000/ was deleted.

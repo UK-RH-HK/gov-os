@@ -1,6 +1,6 @@
 ---
 id: DAEO-5j8b
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-20T07:08:28Z

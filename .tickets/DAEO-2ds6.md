@@ -30,6 +30,8 @@ sources:
 - DEC-727
 est_loc: 60
 acceptance_tests:
+  evidence:
+  - docs/research/EXP-003/examin/README.md
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
 track: B
 closes:

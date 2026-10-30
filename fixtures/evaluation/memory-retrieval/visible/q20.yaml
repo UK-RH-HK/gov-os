@@ -1,0 +1,27 @@
+# Lens B's Q20 (Table 2): "CAP-37 (573–590), CAP-37.g.md, CAP-37.md, sessionstart.py, record.py 150–170". My reading:
+# two pieces. (1) The rule: CAP-37 in the Contract, CAP-37.md or CAP-37.g.md, alternatives. (2) The mechanism: the
+# SessionStart hook's injection or the checkpoint's resume brief (record.brief), alternatives.
+id: Q20
+category: policy
+commit: 23079f92a6fa
+question: How does a session resume after compaction?
+gold_answer: >-
+  From its structured checkpoint (CAP-37): the PreCompact hook writes a current checkpoint, and on compact, clear and
+  resume the SessionStart hook injects the context packet's brief and the checkpoint's resume brief (its next action
+  and inputs), and for the orchestrator the prompt path and the RESUME HERE section, within its size cap.
+sources:
+  - - path: docs/contract/CONTRACT_v4.md
+      heading: "### CAP-37 — Structured checkpoints and mandatory triggers"
+      lines: [573, 590]
+    - path: docs/contract/capabilities/CAP-37.md
+      heading: "# CAP-37: Structured checkpoints and mandatory triggers"
+      lines: [11, 19]
+    - path: docs/contract/capabilities/CAP-37.g.md
+      heading: "# CAP-37.g: Light auto-resume hooks, a light form brought forward into Wave 1: a PreCompact hook ensures the checkpoint is current (the orchestrator's, and in a worktree the lead's); a SessionStart hook on compact, clear and resume injects the prompt path and the checkpoint's RESUME HERE section within the hook's size cap; after a forced compaction the session knows the active tickets, the open owner decisions and the loop counts without the owner restating them; W1-29 upgrades the injection to the full context packet"
+      lines: [11, 16]
+  - - path: template/governance/kernel/hooks/sessionstart.py
+      heading: "SessionStart hook (W1-49 resume injection + W1-29 context packet, CAP-37)."
+      lines: [3, 30]
+    - path: src/gov/checkpoint/record.py
+      heading: "def brief(root: Path, ticket: str) -> dict:"
+      lines: [153, 157]
