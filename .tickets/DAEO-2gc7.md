@@ -1,6 +1,6 @@
 ---
 id: DAEO-2gc7
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-28T22:19:23Z

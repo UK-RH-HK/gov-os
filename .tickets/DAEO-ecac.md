@@ -30,11 +30,15 @@ kpis:
   - 'The window recorded is the one the session ran with, as its log states it (1M for Opus 5.5), and each compaction is counted [DEC-838 items 1 and 2]'
   - 'A record that cannot be written leaves the session''s exit code as it is, with one line on stderr naming it; a record is written whole or not at all [DEC-392]'
   - 'W2-07''s close can join it: the record''s path and keys are stated in the CIT-E, and a test reads a record back by ticket and session id; pass or fail and the repair count stay the close''s [CAP-36.a lite, lens F R6]'
+  - 'The launcher''s set of launchable roles (today the fixed WORKER_ROLES and OWN_TICKET_ROLES tuples in launcher.py) is read from the kernel''s role files, so a new role is a file, not a code change; a role file that is missing or unreadable refuses the launch; the five roles launch exactly as before [DEC-946 (W3-P09), DEC-826 Q1]'
+  - 'A role named in a ticket but with no role file is refused at launch, naming the role [DEC-946 (W3-P09)]'
   failure:
+  - A fixed list of launchable roles left in code.
   - A value the log does not hold reported as measured; a zero for not measured; log text in a record.
   - A changed exit code; a session that started with no record.
 profile: STANDARD
 sources:
+- DEC-946
 - DEC-838
 - DEC-839
 - DEC-826
