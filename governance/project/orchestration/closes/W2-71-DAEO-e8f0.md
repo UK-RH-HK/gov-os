@@ -1,0 +1,15 @@
+# W2-71 (DAEO-e8f0) closed: build-phase close (DEC-953)
+
+- Merges: e9c40bb2a19d,cd2566415936; tested on w2/integrate head a4939b458d2d; profile FULL
+- Its own selection: scoped
+- Run: scoped
+- Selected: tests/acceptance/W2-71/, tests/unit, tests/acceptance/W1-15/, tests/acceptance/W2-50/, tests/acceptance/W1-16/, tests/acceptance/W2-69/, tests/acceptance/W1-26/, tests/acceptance/W1-40/, tests/acceptance/W1-28/test_w1_28_fixture_copies.py, tests/acceptance/W1-07/test_w1_07_envelope.py, tests/acceptance/W1-07/test_w1_07_read_act.py, tests/acceptance/W1-07/test_w1_07_registry.py, tests/acceptance/W1-06/test_w1_06_approvals.py, tests/acceptance/W1-08/test_w1_08_path_map.py, tests/acceptance/W1-27/test_w1_27_path_compliance.py, tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py, tests/acceptance/W2-54/test_w2_54_green_here.py, tests/acceptance/W1-33/test_w1_33_agent_definitions.py, tests/acceptance/W1-49/test_w1_49_threshold.py, tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths, tests/acceptance/W1-48/, tests/acceptance/W1-26/test_w1_26_probe_records.py, tests/acceptance/W1-42/, tests/acceptance/W1-30/test_w1_30_r11_declared_here.py, tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails, tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph, tests/acceptance/W2-02/test_w2_02_green_here.py, tests/acceptance/W1-08/test_w1_08_ticket.py, tests/acceptance/W1-08/test_w1_08_probe.py, tests/acceptance/W1-06/test_w1_06_install_approvals.py, tests/acceptance/W1-07/test_w1_07_config.py, tests/acceptance/W1-07/test_w1_07_config_details.py, tests/acceptance/W1-27/test_w1_27_doctor.py, tests/acceptance/W1-27/test_w1_27_doctor_r5.py, tests/acceptance/W1-27/test_w1_27_doctor_r6.py, tests/acceptance/W1-27/test_w1_27_doctor_r7.py, tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py
+- Parallel: {'exit': 1, 's': 7767, 'tests': 5091, 'failures': 1, 'errors': 0, 'skipped': 2}
+- Serial: {'exit': 0, 's': 881, 'entries': 37, 'tests': 71, 'failures': 0, 'errors': 0, 'skipped': 0}
+- Reds alone: none; flaky candidates: tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+- Review: ['docs/probes/DAEO-e8f0/PR-DAEO-e8f0-review-2.md', 'docs/probes/DAEO-e8f0/PR-DAEO-e8f0.md']
+- gitleaks on the merge's change: clean
+- Times: rebuild 1455 s, tests 8649 s, wall 10666 s
+- Closed: 2026-10-30 19:14:45 GMT, by the orchestrator under DEC-953 items 1 and 5
+- Back-fill, 2026-10-30 21:10 GMT: the scoped run above left out the ticket's own acceptance suite, a fault in the close script that W2-85's lead found and that is now fixed. The suite was then run alone on the same head `a4939b458d2d`, in a clean clone: `tests/acceptance/W2-71`, 304 passed in 163.84 s. With this run, practice 2 is met.
+- Timing note: the parallel phase's 7,767 s includes about 83 minutes waiting for the test lock (16:41 to 18:04), so its test time was about 46 minutes, at a load near 35.

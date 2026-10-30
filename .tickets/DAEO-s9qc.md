@@ -1,0 +1,84 @@
+---
+id: DAEO-s9qc
+status: in_progress
+deps: []
+links: []
+created: 2026-10-30T16:27:09Z
+type: task
+priority: 1
+assignee: engineer
+external-ref: W2-87
+tags: [wave-2, implementation, memory, standard, quick-win]
+wbs_id: W2-87
+title: 'Retrieval ranks by authority: for the same match, an accepted decision, the Contract, a specification or an ADR comes before a test or an assessment report, by an order the path map states'
+class: implementation
+state_class: AUTHORITATIVE
+role: engineer
+depends_on:
+- DAEO-ym8a
+allowed_paths:
+- src/gov/retrieval/authority.py
+- src/gov/retrieval/retrieve.py
+- governance/project/path-map.yaml
+- tests/unit/retrieval/test_w2_87*
+- docs/research/W2-87-memory-measure.md
+kpis:
+  success:
+  - 'For the same match, a governing source outranks a test or an assessment report: in a planted repository where an accepted register decision, a Contract capability, a specification and an ADR each carry the same matching text as a test and an assessment report, gov retrieve gives every governing chunk a better rank than every test or report chunk, with and without the reranker [DEC-952, CAP-10]'
+  - 'The order counts where it decides what is gathered: it is applied to the fused list before the first call''s items are cut, so a governing chunk that today''s order leaves just past them can enter them, and again after the rerank, so the rerank does not undo it; the lift is bounded and its size is configuration, so a governing chunk does not overtake a lower-authority chunk whose match is better by more than that lift [DEC-952, DEC-860]'
+  - 'The order is configuration, not code: the tiers, by path pattern and by the store''s record type and status, and the lift are read from one block of the path map (retrieval_authority); no path, record type or tier is written in the code; with the block absent the bundle is today''s, item for item, so an adopted product without it is unchanged; a block that cannot be read or holds an unknown tier refuses with CONFIG_INVALID and is never read as empty [DEC-952, DEC-694]'
+  - 'A superseded decision never outranks its successor: a chunk of the register is ranked as the entry whose span holds it, never as the register as a whole; an entry SUPERSEDED by its status or by a SUPERSEDES edge, or of a status the store does not treat as current, gets no lift; what the bundle leaves out is unchanged by this ticket (leaving superseded and done entries out, and counting them, is W2-55''s, which reuses this ticket''s entry mapping) [DEC-952, DEC-866, DEC-423, DEC-791 item 1]'
+  - 'Nothing else changes: the budget, the batches, the continuation token, the stopping reasons, the parent expansion and DEC-424''s failure and lesson records ahead of the rest; two runs on one store give the same bundle (ties ordered deterministically); the retrieval acceptance suites (W1-19, W1-21, W1-42''s retrieval cases) and the regression in the close''s form pass apart from reds the ticket does not own [DEC-424, DEC-860, DEC-880]'
+  - 'W2-61''s measure is re-run on the visible half, on one clone at the branch head with one set of stores, twice: with the base''s retrieval code (the control) and with the head''s (the code under test, DEC-877); both figures together (hit@5 against CAP-10''s floor of 85, full evidence against the owner''s target of 99 %) and the in-the-bundle count, per question, beside W2-61''s baseline (8 of 20, 12 of 20, 14 of 20), with Q17 and Q20 named, in docs/research/W2-87-memory-measure.md [DEC-952, DEC-941, DEC-833 item 3]'
+  failure:
+  - 'A test or an assessment report outranks a governing source of the same match.'
+  - 'A superseded entry outranks the entry that replaced it, or a register chunk ranked by another entry''s status.'
+  - 'A path, a record type or a tier written in the code, or a missing or unreadable block read as an order.'
+  - 'A chunk left out of the bundle that today''s code keeps, or kept that it leaves out.'
+  - 'Two runs on one store give different bundles.'
+  - 'A figure of the measure reported without the other, or the hidden half read or run.'
+profile: STANDARD
+sources:
+- DEC-952
+- DEC-953
+- DEC-866
+- DEC-423
+- DEC-424
+- DEC-791
+- DEC-694
+- DEC-860
+- DEC-877
+- DEC-880
+- DEC-941
+- DEC-833
+- DEC-951
+- CAP-10
+est_loc: 120
+acceptance_tests:
+  path: tests/acceptance/W2-87/
+  author: independent-test-designer (MR-3); written before implementation; planted repository, register, store and path map in a temporary folder, a stub reranker; never this repository's store
+track: B
+list_rows: []
+---
+# W2-87 Retrieval ranks by authority
+
+Card: from the owner's order of 2026-10-30 (DEC-952): quick wins first, before the longer memory chain, each re-measured with W2-61's measure. This is quick win (b).
+
+- **Why:** in W2-61's baseline (`docs/research/W2-61-baseline.md` §5), Q17 and Q20 miss the first five and the bundle (first gold rank 21) because tests and assessment reports take the top ranks: Q20's first five are a W1-29 test, a W1-49 README and three assessment chunks. Lens B: tests fill 37 of the 100 first-five places.
+- **Where ranking happens today:** `src/gov/retrieval/retrieve.py`. `rrf` fuses the routes (line 135, from `fusion.py:25`); the first `(rounds + 1) × batch_size` fused chunks are gathered (line 150) and the rest dropped as NOT_GATHERED; those are reranked once (line 208); DEC-424's records are moved ahead (lines 137 to 145 and 213 to 216). No step knows a source's authority, so the order goes in at the same two places as DEC-424's.
+- **Why the path map, and not namespaces or memory_class:** `memory_class` is a closed list of two (`src/gov/config/path_map_schema.py:20`, governance and product) and cannot carry an order. Namespaces are too coarse: `docs` (`docs/**`) holds the register, the Contract, the specs and the ADRs, and also the assessment, audit, probe and research reports. So one top-level block, `retrieval_authority`, holds ordered tiers by path pattern and by the record type and status the store already holds (`decision`, `capability`, `specification`, …; W2-03's per-decision records). No new store. The path map's schema allows the key (`path-map.schema.json` sets no `additionalProperties`; `src/gov/config/loader.py` refuses no unknown top-level key), so neither W2-19's schema nor the loader changes.
+- **The first tiers (the block's content, the orchestrator to confirm):** governing: decisions whose status is ACCEPTED, the Contract's capabilities and `docs/contract/**`, `docs/charter/**`, `docs/spec/**`, `docs/adr/**`, the kernel's roles and skills. Reports and tests, below the rest: `tests/**`, `docs/assessment/**`, `docs/audit/**`, `docs/probes/**`. Everything else is in the middle.
+- **A hazard found on the way:** `retrieve.py:52` maps each path to one record id. W2-03 made each decision its own record, but all 953 share the register's path, so the register's chunks take the id and status of whichever entry sorts last (`records()` sorts by id, so the newest decision). Today that one is accepted. If it were superseded, every register chunk would be dropped. The closure route (line 130) has the same fault: a register chunk joins only when the newest decision is reached. This ticket maps a register chunk to its own entry for the order. W2-55 puts the same mapping into what is left out.
+- **Profile STANDARD, not FULL:** it changes no judge, no gate and nothing the close's verdict reads. It changes what the retrieval suites and `gov check`'s retrieval-regression family measure, so the lead runs those in full. The path map is shared core, so the close runs in full anyway.
+- **Division with W2-55 (`DAEO-arrl`):** this ticket owns the order: authority tiers, the entry mapping, and no lift for a superseded entry. W2-55 owns what is left out (superseded and done entries, with the count, DEC-791 item 1) and the tags. W2-55 reuses `authority.py`'s entry mapping and copies none of it. Its paths name `src/gov/retrieve/**` (the CLI), but its KPI 3 lands in `src/gov/retrieval/retrieve.py`. That widening, and the merge-back after this ticket, are the orchestrator's when W2-55 starts.
+- **Other overlaps (split by file):**
+  - **W2-13** (`DAEO-zqvn`) holds `fusion*` and `lexical*`: not touched.
+  - **W2-32** (`DAEO-0pyc`) holds `src/gov/retrieval/**` and `tests/unit/retrieval/**` (open). This ticket takes `authority.py`, `retrieve.py` and new `test_w2_87*` only.
+  - **W2-04** (`DAEO-u4oz`) holds `src/gov/context/**` and `supplementary*`. Its packet inherits the order, and its determinism KPI is kept.
+  - **W2-03** (merged into `w2/integrate` at `a8eaf26e`, its close queued) holds `src/gov/store/**` and `src/gov/records/**`: read only.
+  - **W2-61** holds `measure.py`: run, never edited.
+  - **W2-84** holds `src/gov/guard/reads.py`: not touched.
+  - **W2-86 and W2-78** edit other lines of the path map. Whichever merges second merges back.
+- **Files:** new `src/gov/retrieval/authority.py` (the tiers, the entry mapping, the lift); `src/gov/retrieval/retrieve.py` (two calls); `governance/project/path-map.yaml` (the one new block); new `tests/unit/retrieval/test_w2_87*`; `docs/research/W2-87-memory-measure.md`.
+- **The re-measure:** the change is code, so the retriever must be the code under test (DEC-877). The lead runs the measure with `--gov` set to a small launcher in its run folder whose first line sets `PYTHONPATH` to a checkout's `src/` and runs the pinned interpreter. The record's `retriever.gov_file` names that checkout. If W2-61's measure is not merged into `w2/integrate` when the lead reaches that step, the lead returns DONE and the orchestrator re-measures.
+- **Place:** DEC-952's second quick win, ahead of W2-55. If W2-86 has merged first, both measure runs include its vectors.

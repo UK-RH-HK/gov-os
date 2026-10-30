@@ -55,15 +55,20 @@ def test_copy_installs_the_rulesync_sources(installed, pristine_source):
 
 
 def test_copy_creates_the_overlay(installed):
-    """The created project has its overlay, ``governance/project/``: a path map, and nothing else (DEC-493).
+    """The created project has its overlay, ``governance/project/``: a path map and a test map, and nothing else
+    (DEC-493, changed by DEC-896 item 2 and DEC-903: the test-selection lists are in their own file).
 
-    The path map lies where ``gov`` reads a project's path map: ``governance/project/path-map.yaml``.
+    The path map lies where ``gov`` reads a project's path map: ``governance/project/path-map.yaml``; the test
+    map beside it: ``governance/project/test-map.yaml``.
     """
+    test_map_rel = f"{support.OVERLAY_REL}/test-map.yaml"
     files = support.files_under(installed, support.OVERLAY_REL) if (installed / support.OVERLAY_REL).is_dir() else []
     assert support.PATH_MAP_REL in files, \
         f"`copier copy` created no {support.PATH_MAP_REL} (the overlay of KPI success 1; DEC-493). It created: {files}"
-    assert files == [support.PATH_MAP_REL], \
-        f"`copier copy` created more in the overlay than the path map DEC-493 names: {files}"
+    assert test_map_rel in files, \
+        f"`copier copy` created no {test_map_rel} (DEC-896 item 2, DEC-903). It created: {files}"
+    assert files == sorted([support.PATH_MAP_REL, test_map_rel]), \
+        f"`copier copy` created more in the overlay than the path map and the test map DEC-903 names: {files}"
 
 
 def test_the_path_map_of_a_fresh_project_is_one_doctors_path_map_part_accepts(project, sandbox):

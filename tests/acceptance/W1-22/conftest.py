@@ -67,3 +67,11 @@ def ollama():
 def base(tmp_path_factory):
     """The fixture repository. Never indexed: it is the source of every per-test project."""
     return support.build_fixture(tmp_path_factory.mktemp("w1-22-base") / "repo")
+
+
+@pytest.fixture(scope="session")
+def adopted_base(tmp_path_factory):
+    """The fixture repository with the kernel's canary declarations, as an adopted project holds them (DEC-579).
+
+    Revised after implementation (DEC-864 item 1): the runner reads the declarations from the project (DEC-835)."""
+    return support.build_fixture(tmp_path_factory.mktemp("w1-22-adopted-base") / "repo", kernel_canaries=True)

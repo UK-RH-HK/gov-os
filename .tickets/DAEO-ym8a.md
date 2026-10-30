@@ -25,6 +25,7 @@ allowed_paths:
 - tests/unit/store/**
 - tests/unit/records/**
 - tests/unit/decisions/**
+- tests/unit/check/test_citations.py
 kpis:
   success:
   - 'The store loads each ### DEC-nnn entry of the register as a record of its own, with its own sha256 over its own span; two decisions never share a hash [AR-1, F-M5].'
@@ -37,6 +38,7 @@ profile: STANDARD
 sources:
 - DEC-729
 - DEC-752
+- DEC-755
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-03/
@@ -59,7 +61,7 @@ list_rows:
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-03), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
-- **Allowed paths:** `src/gov/store/**`, `src/gov/records/**`, `src/gov/decisions/**`, `src/gov/check/citations.py`, `tests/unit/store/**`, `tests/unit/records/**`, `tests/unit/decisions/**`.
+- **Allowed paths:** `src/gov/store/**`, `src/gov/records/**`, `src/gov/decisions/**`, `src/gov/check/citations.py`, `tests/unit/store/**`, `tests/unit/records/**`, `tests/unit/decisions/**`, `tests/unit/check/test_citations.py` (its fixtures only; DEC-755).
 - **KPIs, success:**
   - The store loads each `### DEC-nnn` entry of the register as a record of its own, with its own sha256 over its own span; two decisions never share a hash [AR-1, F-M5].
   - A decision id resolves to its entry, not to the register [AR-1].
@@ -67,3 +69,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-03), as approved (DEC-729). The list row
   - Decision status and id comparisons follow the schema's grammar, case included [W2-M106, W2-L069].
 - **KPIs, failure:** an edited entry changes only its own hash; a duplicate DEC id is refused with both locations.
 - **DEC-752 (owner, 2026-10-17):** a stacked early start on W2-02's held branch; it merges W2-02's later changes in and re-verifies, and merges only after W2-02 has closed.
+- **DEC-755 (delegated, 2026-10-17):** P-1 and P-2, two W1-26 fixtures revised by a test designer, stricter; `tests/unit/check/test_citations.py` joins the paths for its nine fixtures; no folder rule for decision files (P-3); register entries held to the id grammar and a canonical status (P-4).

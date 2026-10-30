@@ -7,7 +7,9 @@ import yaml
 
 from gov.retrieval import lexical, semantic
 
-_TEMPLATE = Path(__file__).resolve().parents[3] / "template" / "governance" / "kernel" / "canaries"
+# the declarations of the project under check, in either layout of its kernel (DEC-579), never the install path's (DEC-835)
+_TEMPLATE = Path("template/governance/kernel/canaries")
+_INSTALLED = Path("governance/kernel/canaries")
 FACET_UNAVAILABLE = "FACET_UNAVAILABLE"
 AVAILABLE = "AVAILABLE"
 _SEARCHERS = {"lexical": lexical.search, "semantic": semantic.search}
@@ -18,7 +20,9 @@ def run_canaries(root: Path) -> dict:
     results = {}
     for index, searcher in _SEARCHERS.items():
         try:
-            decl = yaml.safe_load((_TEMPLATE / f"{index}.yaml").read_text(encoding="utf-8"))
+            found = [path for path in (root / _TEMPLATE / f"{index}.yaml", root / _INSTALLED / f"{index}.yaml")
+                     if path.is_file()]
+            decl = yaml.safe_load(found[0].read_text(encoding="utf-8"))
             if not isinstance(decl, dict):
                 raise ValueError("malformed canary declaration")
         except Exception:

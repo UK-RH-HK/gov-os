@@ -614,6 +614,18 @@ Test Designer in the W1-45 test design batch (DEC-106). No test for another role
 | `test_w1_03_head_moves.py` `NOT_THEIR_PATH`: `orchestrator-on-the-engineer-s-ticket` | Moved to `COMMITS_INSIDE` (the commit is a record, not a finding) | DEC-156, DEC-171 |
 | `test_w1_03_calls_known_to_be_over.py` `_a_bash_call_the_guard_denied` and `_a_file_tool_call_the_guard_denied` | The denied path is now actor-specific: for the orchestrator it is under `tests/acceptance/` (still denied); for every other actor it stays `src/app/main.py`. Affects test ids `orchestrator-main-thread-then-an-engineer-subagent-bash-call-the-guard-denied` and `...-file-tool-call-the-guard-denied` | DEC-156: `src/app/main.py` is no longer denied for the orchestrator |
 
+### W2-73 (DEC-921): an amend that always moves HEAD
+
+Reason: **DEC-921 item 2**. In `test_w1_03_head_move_and_acceptance_test.py` the amend with nothing staged was
+`git commit -q --amend --no-edit`. Landing in the same second as the commit it replaces, it wrote that commit again
+byte for byte (same tree, parent, message and dates), `HEAD` did not move, and the case failed on the fixture's own
+"did not move HEAD" check before containment was judged. The four such commands (`amended-commit-then-a-changed-test`,
+the "nothing else" case, the overlapping-call case and the designer's-draft case) now use
+`git commit -q --amend -m amended` (`AMEND`): its message differs from `second revision`, so the new commit differs
+whatever the clock. The move is the same kind (a commit replaced by an amend, not forward, DEC-129). The
+`amended-commit-of-own-work-then-a-new-test` form already changes the tree and the message and is unchanged. No
+expectation changed.
+
 ## Not tested
 
 With the owner: KD-7 in `W1-03-kpi-disputes-round-4.md`, the name of the ten-minute setting and the place it is read

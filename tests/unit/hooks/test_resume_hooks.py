@@ -49,6 +49,53 @@ def test_resume_section_ends_at_a_heading_of_the_same_or_a_higher_level():
     assert sessionstart.resume_section("# Top\n\nRESUME HERE in prose\n") == ""
 
 
+def test_resume_lines_gives_the_exact_range_without_trailing_empty_lines():
+    """W2-62: 1-based lines of the file, heading to the last line that is not empty; a fenced # is no heading."""
+    text = "# Top\n\n## RESUME HERE\na\n```\n# not a heading\n```\nb\n\n \n## After\nc\n"
+    first, last, section = sessionstart.resume_lines(text)
+    assert (first, last) == (3, 8)
+    assert section == "\n".join(text.split("\n")[2:8]) and section.endswith("```\nb")
+    assert sessionstart.resume_lines("## RESUME HERE\nonly\n") == (1, 2, "## RESUME HERE\nonly")
+    assert sessionstart.resume_lines("# Top\n") == (0, 0, "")
+
+
+def test_roster_prompt_is_read_from_the_roster_or_is_none(tmp_path):
+    """W2-M373: roles: orchestrator: prompt:, else no prompt at all."""
+    roster = tmp_path / "governance/project/roster.yaml"
+    assert sessionstart.roster_prompt(str(tmp_path)) == ""
+    roster.parent.mkdir(parents=True)
+    for text, expected in (("roles:\n  orchestrator:\n    prompt: p/w2.md\n", "p/w2.md"),
+                           ("roles:\n  orchestrator:\n    agent: a.md\n", ""),
+                           ("roles:\n  engineer:\n    prompt: p/w2.md\n", ""),
+                           ("roles: [orchestrator]\n", ""), ("roles: {\n", ""), ("", "")):
+        roster.write_text(text, encoding="utf-8")
+        assert sessionstart.roster_prompt(str(tmp_path)) == expected, text
+
+
+def test_a_long_section_is_named_by_its_lines_and_a_short_one_is_whole(tmp_path):
+    """W2-62: within the bound always; the whole section when it fits, else its range and size, never a cut."""
+    long_line = "y" * 20_000
+    path = _checkpoint(tmp_path, age_s=60, text=f"# C\n\n## RESUME HERE\n\n{long_line}\nEND-71\n\n## Next\n")
+    injection = _injection(_run("sessionstart.py", tmp_path))
+    assert len(injection) <= sessionstart.CAP_CHARS
+    assert f"{ORCH} in full" in injection and "lines 3-6, 20,023 characters" in injection
+    assert "y" * 50 not in injection and "END-71" not in injection and "truncated" not in injection
+    assert "prompts/" not in injection  # no roster here: no prompt is named
+    path.write_text(WRITTEN, encoding="utf-8")
+    injection = _injection(_run("sessionstart.py", tmp_path))
+    assert "lines 3-5, 27 characters" in injection and "## RESUME HERE\n\n- SECRET-71" in injection
+
+
+def test_input_that_is_not_an_object_still_injects(tmp_path):
+    _checkpoint(tmp_path, age_s=60)
+    for stdin in ("", "[1]", '"x"', "{"):
+        run = subprocess.run([sys.executable, str(HOOKS / "sessionstart.py")], input=stdin, capture_output=True,
+                             text=True, cwd=str(tmp_path), timeout=30, check=False,
+                             env={"PATH": str(tmp_path / "no-bin"), "CLAUDE_PROJECT_DIR": str(tmp_path),
+                                  "GOV_ROLE": "orchestrator", "PYTHONDONTWRITEBYTECODE": "1"})
+        assert run.returncode == 0 and "SECRET-71" in _injection(run)
+
+
 def _block(rest="git head: h\n"):
     rest = rest.encode() + precompact.END + b"\n"
     return precompact.BEGIN + b"\ngenerated: g " + precompact.digest(b"g", rest) + b"\n" + rest

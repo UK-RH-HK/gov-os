@@ -22,7 +22,7 @@ Red run on `w1/integrate` at `b4d7ede`: 49 failed, 10 errors, 0 passed (59 cases
 | **Success 2.** The operator diff procedure (`git diff --name-only` vs `allowed_paths` at each ticket close) is written and used from the first implementation ticket | `test_operator_diff_procedure_is_written` ("written") · `test_implementer_commits_stay_inside_allowed_paths` ("used", KD-1) | Error in the fixture: `governance/project/bootstrap.md` does not exist |
 | **Success 3.** Interim install rule recorded and in force until W1-05; install commands denied in every session settings file | `test_install_command_is_denied` · `test_pipe_to_shell_and_sudo_are_denied` (KD-3) · `test_interim_install_rule_is_recorded` · `test_install_rule_lists_every_agent_session_settings_file` (KD-2) · `test_a_denied_install_attempt_is_recorded` (KD-4) · `test_interim_rule_stays_in_force_once_introduced[installs]` | No `Bash(...)` deny rule exists; `bootstrap.md` does not exist |
 | **Failure 1.** Any implementer commit touching `tests/acceptance/**` before W1-05 lands | `test_only_the_test_designer_commits_to_acceptance_tests` · the tests of `test_w1_01_integration_merges.py` (DEC-253, see below) | The guardrail is not in force: Edit on `tests/acceptance/**` is not denied |
-| **Failure 2.** An existing `docs/source` deny rule is lost | `test_docs_source_deny_rules_survive_the_change` | W1-01's rules are not in place: Edit on `.env` is not denied |
+| **Failure 2.** An existing `docs/source` deny rule is lost | **Retired** by DEC-925 item 1 (2026-10-27): `test_docs_source_deny_rules_survive_the_change` and its four cases (Read and Edit on `docs/source/framework-v4.1.2.md` and `docs/source/protocol/distribution-v1.2.md`). The `docs/source` folder left the tree on 2026-10-01, and DEC-922's settings regeneration dropped its two deny rules (P-I1-2, DEC-899). See "Retired cases" below | — |
 | **Failure 3.** Any install runs before W1-05 | `test_no_install_is_recorded_before_w1_05` | The interim install rule is not in force: `pip install` is not denied |
 
 **Covers ids:** none. Contract v4 names W1-01 as a provider of CAP-03 and CAP-58 at capability level, and no `covers`
@@ -53,7 +53,8 @@ every reading:
   attempted here.
 - **Not over-blocking.** With the rules in place, an Edit under `src/gov/guard/`, a Write under `tests/unit/guard/`,
   `python3 -m pytest tests/unit/guard -q` and `git diff --name-only` must stay allowed.
-- **`docs/source`** is checked by behaviour: Read and Edit under `docs/source/**` stay denied. The rule text may change.
+- **`docs/source`** was checked by behaviour (Read and Edit under `docs/source/**` stay denied) until DEC-925 item 1
+  retired that check; see "Retired cases".
 - **Failure 1** treats every commit that touches `tests/acceptance/**` without the trailer
   `Role: independent-test-designer` as an implementer commit.
 - **Failure 3** checks what the repository can show: the deny rule is in force, W1-06 still depends on W1-05 (named
@@ -64,8 +65,7 @@ every reading:
   the commit-history test for KD-1 first needs `bootstrap.md`. A check that only says "nothing bad has happened yet"
   would pass before implementation.
 - **After W1-05.** The checks on `tests/acceptance/**` and on installs are interim (DEC-084). They skip once the ticket
-  with `wbs_id: W1-05` has `status: closed`. The secret-file, `docs/source`, record and commit-history checks keep
-  running.
+  with `wbs_id: W1-05` has `status: closed`. The secret-file, record and commit-history checks keep running.
 
 ## What `bootstrap.md` must hold
 
@@ -129,6 +129,19 @@ closed: such a merge is made by a test designer, or the owner decides.
 | Every merge on this repository's history that touches `tests/acceptance/**` | `test_the_integration_merges_of_this_repository_pass` | passes |
 
 These tests build their repositories under pytest's temporary directory. They write nothing in this repository.
+
+## Retired cases (DEC-925 item 1, 2026-10-27)
+
+Retired by a fresh Independent Test Designer on ticket `DAEO-2azm` (W2-74), `Rewrite-Reason: DEC-925 item 1, P-I1-2`.
+
+- **Retired:** `test_docs_source_deny_rules_survive_the_change`, its four cases (`Read` and `Edit` on
+  `docs/source/framework-v4.1.2.md` and on `docs/source/protocol/distribution-v1.2.md`). They held KPI failure 2.
+- **Why:** the `docs/source` folder left the tree on 2026-10-01. P-I1-2 (DEC-899) dropped its two deny rules
+  (`Read(./docs/source/**)`, `Edit(./docs/source/**)`) in the settings regeneration of DEC-922 (Part B). The cases
+  enforced rules for a folder that no longer exists, and the owner retired them (DEC-925 item 1).
+- **Unchanged:** every other deny rule this suite checks (`tests/acceptance/**`, the secret files, the installs, the
+  pipes to a shell and `sudo`) is checked as before, with the same assertions. The case's gate (Edit on `.env` is
+  denied) is still held by `test_write_to_secret_file_is_denied` and `test_guardrails_leave_ordinary_implementer_work_alone`.
 
 ## Owner answers to the KPI disputes (2026-10-01)
 

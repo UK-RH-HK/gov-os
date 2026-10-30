@@ -1,0 +1,56 @@
+# gov rebuild on the two clones (DEC-732: this worktree's src/). The envelope is kept as printed except
+# result.store.invalid: its 18 entries name EXAMIN files and quote fragments of their YAML front matter
+# (file contents), so the list is DROPPED here and only its count kept. The digest is gov's store digest.
+
+## On /tmp/gov-os-W2-26/examin
+$ cd /home/usain/gov-os-worktrees/W2-26 && PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src /usr/bin/time -v python3 -m gov.cli.main rebuild --root /tmp/gov-os-W2-26/examin --json
+exit code: 0
+{"ok": true, "command": "rebuild", "result": {"digest": "900ae23233b9d15cc49ad2c9561a936890774cb144155a31818c61e552405a01",
+ "store": {"digest": "900ae23233b9d15cc49ad2c9561a936890774cb144155a31818c61e552405a01", "invalid": [<18 entries dropped: "the frontmatter is not valid YAML: mapping values are not allowed here ..." for 18 Markdown files>]},
+ "stores": {"lexical": {"status": "not_recreated", "reason": "no path map: nothing is classified as indexable"},
+            "semantic": {"status": "not_recreated", "reason": ".gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/examin/.gitleaks.toml'"},
+            "codeintel": {"status": "not_recreated", "reason": ".gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/examin/.gitleaks.toml'"}},
+ "timing": {"lexical_s": 0.0}}, "session": ""}
+	User time (seconds): 0.50
+	System time (seconds): 0.05
+	Percent of CPU this job got: 109%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.51
+	Maximum resident set size (kbytes): 58916
+	Exit status: 0
+
+## On "/tmp/gov-os-W2-26/EXAMIN APP"
+$ cd /home/usain/gov-os-worktrees/W2-26 && PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src /usr/bin/time -v python3 -m gov.cli.main rebuild --root "/tmp/gov-os-W2-26/EXAMIN APP" --json
+exit code: 0
+ok: true; store.invalid: 18 entries (dropped, as above);
+ "stores": {"lexical": {"status": "not_recreated", "reason": "no path map: nothing is classified as indexable"},
+            "semantic": {"status": "not_recreated", "reason": ".gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/EXAMIN APP/.gitleaks.toml'"},
+            "codeintel": {"status": "not_recreated", "reason": ".gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/EXAMIN APP/.gitleaks.toml'"}},
+ "timing": {"lexical_s": 0.0}
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.50
+	Maximum resident set size (kbytes): 58920
+	Exit status: 0
+
+## The stores each rebuild left (row counts only, read-only)
+$ du -sh <clone>/.gov-runtime/store.db
+1.1M	/tmp/gov-os-W2-26/examin/.gov-runtime/store.db
+1.1M	/tmp/gov-os-W2-26/EXAMIN APP/.gov-runtime/store.db
+(.gov-runtime/ holds store.db only: no codeintel/ folder, no vectors)
+
+$ python3 -c "... select count(*) from each table of store.db, opened ?mode=ro ..."    (first clone)
+commit_paths 5712
+commits 392
+edges 0
+lexical_chunk 0
+lexical_file 0
+lexical_fts 0
+lexical_fts_config 1
+lexical_fts_content 0
+lexical_fts_data 2
+lexical_fts_docsize 0
+lexical_fts_idx 0
+lexical_parent 0
+records 0
+register_entries 0
+trailers 0
+(the lexical tables exist and are empty: the semantic step calls the lexical refresh, which creates its schema before
+the pre-index filter raises; there is no semantic_vector or semantic_manifest table.)

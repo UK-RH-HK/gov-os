@@ -103,7 +103,8 @@ def test_a_closure_over_code_starts_no_ollama_and_asks_no_model(indexed, box, tm
     stubs = support.stub(tmp_path / "models", "ollama", marker, exit_code=0)
     with support.Listener() as listener:
         run = support.closure(indexed, [LEAF, support.HUB], box, depth=3, path=f"{stubs}:{box.full}",
-                              GOV_OLLAMA_BIN=stubs / "ollama", OLLAMA_HOST=listener.address)
+                              GOV_OLLAMA_BIN=stubs / "ollama", OLLAMA_HOST=listener.address,
+                              GOV_QUERY_OLLAMA_HOST=listener.address)  # W2-54, DEC-798: the CPU embedder's
         assert support.ids(support.result(run), "symbol") == ALL
         assert listener.connections() == 0, "gov closure connected to the Ollama endpoint"
     assert not marker.exists(), f"gov closure ran ollama:\n{marker.read_text()}"
