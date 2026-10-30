@@ -3,7 +3,7 @@
 
 Enforces the 12-field worker return contract of Framework S61.
 Parses last_assistant_message for the fields as JSON keys or text labels.
-Exit 0 if all present; exit 2 (block) if any missing, naming them once.
+Exit 0 if all present; exit 2 (block) if any missing, naming them once on stderr.
 """
 from __future__ import annotations
 
@@ -48,16 +48,20 @@ def main() -> None:
     if not missing:
         sys.exit(0)
 
+    reason = f"Worker return contract incomplete. Missing fields: {', '.join(missing)}"
     sys.stdout.write(json.dumps({"hookSpecificOutput": {
         "hookEventName": "SubagentStop",
-        "blockReason": f"Worker return contract incomplete. Missing fields: {', '.join(missing)}",
+        "blockReason": reason,
         "missingFields": missing,
     }}))
+    # Claude Code reads a SubagentStop block's reason from stderr on exit 2 (stdout is not delivered).
+    sys.stderr.write(reason + "\n")
     sys.exit(2)
 
 
 if __name__ == "__main__":
     try:
         main()
-    except Exception:
+    except Exception as exc:
+        sys.stderr.write(f"Worker return contract could not be checked: {exc}\n")
         sys.exit(2)

@@ -50,8 +50,17 @@ FLAG = support.FLAG_REL
 SCRATCH = ".gov-runtime/scratch/w1-50-pause"
 SESSION_TIMEOUT_S = 420.0
 PROBE_SLEEP_S = 15
-NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET", "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_PROJECT_DIR",
-                 "CLAUDE_CODE_SSE_PORT")
+# Rewrite-Reason: DEC-784 (W2-57, I1 F-7): the session launches with no CLAUDE* variable in the environment
+# (CLAUDECODE, CLAUDE_CODE_* and every other name beginning CLAUDE), as W1-46's live sessions do, not only a fixed
+# list of them: a run from a Claude session then launches as a run from a plain shell does.
+NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
+NOT_INHERITED_PREFIX = "CLAUDE"
+
+
+def inherited(environ):
+    """The caller's environment less ``GOV_ROLE``, ``GOV_TICKET`` and every name beginning ``CLAUDE`` (DEC-784)."""
+    return {key: value for key, value in environ.items()
+            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
 # The flag at launch, and the flag the test puts over the placeholder: told apart by their times.
 FLAG_AT_LAUNCH = b"FROZEN owner 2026-10-05T00:00:00Z\n"
 FLAG_PUT_DURING_THE_COMMAND = b"FROZEN owner 2026-10-05T11:11:11Z\nput by the acceptance test during the command\n"
@@ -227,7 +236,7 @@ def test_a_flag_put_over_the_placeholder_during_a_command_stays(freeze_launch_ba
             pytest.fail(f"the launcher's TMPDIR {launch_tmp} is longer than {LAUNCH_TMP_MAX_BYTES} bytes: the "
                         f"sandbox's sockets under the session's temp folder may not fit a socket path", pytrace=False)
         owner = _Owner(flag, launch_tmp, new_flag, results_path)
-        env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
+        env = inherited(os.environ)
         env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
                     "TMPDIR": str(launch_tmp)})
         owner.start()

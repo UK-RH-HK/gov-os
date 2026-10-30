@@ -149,6 +149,8 @@ def gov(tiny, sandbox, endpoint, program):
         "PYTHONPATH": str(support.REPO_ROOT / "src"),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
         "OLLAMA_HOST": endpoint.host,
+        # W2-54, DEC-798: the CPU-only embedder's address is the same stand-in.
+        "GOV_QUERY_OLLAMA_HOST": endpoint.host,
         "GOV_OLLAMA_BIN": str(program),
         **({"PYTHONUSERBASE": site.getuserbase()} if site.ENABLE_USER_SITE else {}),
     }
@@ -266,13 +268,22 @@ def test_two_rebuilds_in_the_mode_give_the_same_digest(gov, interface):
 
 
 def test_the_mode_writes_only_under_gov_runtime(gov, interface, tiny, sandbox):
+    # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): it
+    # snapshotted sandbox.elsewhere, which nothing uses. The home the command is given (HOME) is snapshotted too.
+    # The code index's daemon folder is not (W2-67 batch 1c): every rebuild that reaches the code index, this mode
+    # included and the tool absent included, makes /tmp/gov-cbm-<uid>/<its root's hash>/ for the tool's lock and
+    # socket files, which cannot live under .gov-runtime/ (DEC-338: a socket path is limited to 108 bytes). That
+    # place is written by design; the evidence is in README-W2-67.md.
     before = support.snapshot(tiny)
     before_elsewhere = support.snapshot(sandbox.elsewhere, skip=())
+    before_home = support.snapshot(sandbox.home, skip=())
 
     _rebuilt(gov, interface, MODE)
 
     assert not support.snapshot_difference(before, support.snapshot(tiny)), "the mode wrote outside .gov-runtime/"
     assert not support.snapshot_difference(before_elsewhere, support.snapshot(sandbox.elsewhere, skip=()))
+    written = support.snapshot_difference(before_home, support.snapshot(sandbox.home, skip=()))
+    assert not written, "the mode wrote in the home it was given:\n" + "\n".join(written)
 
 
 # =========================================================================== #

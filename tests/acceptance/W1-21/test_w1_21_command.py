@@ -105,10 +105,13 @@ def test_repeated_runs_print_the_same_bytes(cli, project, ollama, tmp_path):
 
 
 def test_the_command_writes_nothing(cli, repo, ollama):
+    """Rewritten by DEC-782 (owner, 2026-10-18, P-W2-32 (a)): nothing but the query-vector cache, one derived file
+    under ``.gov-runtime/`` (it was: no file at all)."""
     cli.build(repo, ollama.host)
     before = support.tree(repo)
     answered(cli.command(repo, "--ticket", support.TICKET_IN_SCOPE, support.PHRASE, host=ollama.host)).bundle()
-    assert support.tree(repo) == before, "gov retrieve wrote or changed a file of the project"
+    assert support.beyond_the_query_vector_cache(before, support.tree(repo)) == [], \
+        "gov retrieve wrote or changed a file of the project beyond the query-vector cache"
 
 
 def test_in_a_project_without_an_index_the_command_answers_and_builds_nothing(cli, repo, ollama):

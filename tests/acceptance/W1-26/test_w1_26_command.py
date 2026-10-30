@@ -58,19 +58,30 @@ def test_exit_nonzero_when_a_hard_block_is_red(project, sandbox, interface):
 
 
 def test_warning_yellow_does_not_change_exit_code(project, sandbox, interface):
-    """Warning-severity checks may be YELLOW without making the exit code non-zero."""
+    """Warning-severity checks may be YELLOW without making the exit code non-zero.
+
+    Revised (W2-67, P-I2-6 (a), I2 F7): its ``if envelope["ok"]:`` was never true, because its project was red
+    before the warning (I2 R1), so it asserted nothing. The project now holds its own declarations only (every
+    kernel declaration removed): one passing hard-block check and one failing warning. The warning is YELLOW with
+    its finding, the hard-block check GREEN, no check RED, and ``gov check`` answers ``ok`` with exit 0,
+    unconditionally."""
+    for path in sorted((project.root / support.CHECKS_REL).glob("*.yaml")):
+        path.unlink()
+    project.add_check_declaration("w1-26-pass", "graph integrity", severity="hard-block", command="true")
     project.add_check_declaration("w1-26-warn", "command-contract consistency",
                                   severity="warning", command="false")
-    for check_id in list(support.CORE_CHECKS):
-        project.remove_check_declaration(check_id)
-    for check_id in support.ALREADY_DECLARED:
-        project.remove_check_declaration(check_id)
     project.commit()
     run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    if envelope["ok"]:
-        assert run.returncode == support.EXIT_OK, \
-            f"only warnings failed but exit code is non-zero\n{run.describe()}"
+    result, envelope = support.result_and_envelope(run, interface)
+    warning = support.check_entry(result, "w1-26-warn")
+    assert warning.get("status") == support.YELLOW and warning.get("findings"), \
+        f"the failing warning is not YELLOW with a finding: {warning}\n{run.describe()}"
+    assert support.check_entry(result, "w1-26-pass").get("status") == support.GREEN, run.describe()
+    red = [entry.get("id") for entry in support.checks_of(result)
+           if isinstance(entry, dict) and entry.get("status") == support.RED]
+    assert not red, f"checks other than the project's own are RED: {red}\n{run.describe()}"
+    assert envelope["ok"] is True and run.returncode == support.EXIT_OK, \
+        f"only a warning failed but gov check did not answer ok with exit 0\n{run.describe()}"
 
 
 # --------------------------------------------------------------------------

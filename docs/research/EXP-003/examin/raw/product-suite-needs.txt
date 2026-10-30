@@ -1,0 +1,32 @@
+# Why the product suite was not run: what it needs against what this machine has
+
+$ for m in <module>; do python3 -c "import $m, sys; print('$m', getattr($m,'__version__','ok'))" 2>/dev/null || echo "$m MISSING"; done
+pytest 9.0.3
+pytest_asyncio 1.3.0
+respx MISSING
+xdist 3.8.0
+pydantic 2.13.3
+httpx 0.28.1
+anthropic MISSING
+docx MISSING            (python-docx)
+pypdf MISSING
+fastapi 0.136.1
+uvicorn 0.46.0
+multipart MISSING       (python-multipart)
+pgserver MISSING
+sqlalchemy 2.0.49
+psycopg MISSING
+pytesseract MISSING
+pdf2image MISSING
+fastembed MISSING
+numpy 2.4.4
+yaml 6.0.1
+
+Needs (from product/pyproject.toml's dependencies and markers):
+- installs: 10 of its packages are absent (respx, anthropic, python-docx, pypdf, python-multipart, pgserver,
+  psycopg, pytesseract, pdf2image, fastembed);
+- a database: pgserver bundles a local Postgres, and the "slow" marker "boots a throwaway postgres";
+- system binaries for OCR (Tesseract, Poppler), which the code tolerates when absent;
+- network for live tests (Anthropic and paid APIs; deselected by addopts "-m 'not live'"), and fastembed
+  fetches its model on first use.
+Under the brief (no install, no database), the suite was not started.

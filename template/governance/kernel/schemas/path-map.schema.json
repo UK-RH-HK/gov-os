@@ -100,6 +100,11 @@
         "emergency-stop-and-rollback": { "$ref": "#/$defs/system" }
       }
     },
+    "evaluation_sets": {
+      "description": "Optional. The evaluation sets (DEC-820 (d), DEC-845): each set by its name, with a visible part, a hidden part and the sessions it measures. A measured session is refused reads of the hidden part (W2-58).",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/evaluation_set" }
+    },
     "close_timeout": {
       "description": "Optional. The time limit of one test run of `gov close`, in seconds: a positive number (DEC-554).",
       "type": "number",
@@ -127,6 +132,31 @@
   },
   "$defs": {
     "text": { "type": "string", "minLength": 1 },
+    "set_path": {
+      "description": "A project-relative path or glob in the path map's language: `*` stays inside one folder, `**` crosses folders.",
+      "type": "string",
+      "pattern": "^[^/]"
+    },
+    "evaluation_set": {
+      "description": "One evaluation set: `visible` the measured sessions read, `hidden` (non-empty) they are refused, and `measures`, the roles and/or tickets it measures (at least one non-empty list).",
+      "type": "object",
+      "required": ["hidden", "measures"],
+      "properties": {
+        "visible": { "type": "array", "items": { "$ref": "#/$defs/set_path" } },
+        "hidden": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/set_path" } },
+        "measures": {
+          "type": "object",
+          "properties": {
+            "roles": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+            "tickets": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+          },
+          "anyOf": [
+            { "required": ["roles"], "properties": { "roles": { "minItems": 1 } } },
+            { "required": ["tickets"], "properties": { "tickets": { "minItems": 1 } } }
+          ]
+        }
+      }
+    },
     "namespace": {
       "description": "One namespace: its paths, its memory class and the seven fields of CAP-03.c.",
       "type": "object",

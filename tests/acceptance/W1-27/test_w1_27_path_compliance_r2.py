@@ -28,6 +28,8 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_doctor
+import w2_67b_support
 
 
 # =========================================================================== #
@@ -69,35 +71,28 @@ def test_stale_path_in_sources_md_is_not_reported(gov, project, interface):
     )
 
 
-def test_stale_path_in_live_document_not_sources_is_reported(gov, project, interface):
+def test_stale_path_in_live_document_not_sources_is_reported(sandbox, tmp_path):
     """The same old path in a live document IS reported.
 
     Counter-case for point 1: the exclusion of docs/SOURCES.md does not
     suppress stale-path reports in other documents.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
+    that doctor always emits): ``moved`` is always there (the key
+    ``moved_references``).  The case reads the live document's entry in
+    ``path_compliance.moved_references``, with docs/SOURCES.md holding the
+    same old path beside it, on a small committed project of its own.
     """
-    support.write_path_map(project, support.minimal_valid_path_map())
+    project = w2_67_doctor.small_project(tmp_path / "repo")
+    old_rel, new_rel = "src/gov/doctor/old_live_src_mod.py", "src/gov/doctor/new_live_src_mod.py"
+    w2_67b_support.move_committed(project, old_rel, new_rel)
+    w2_67b_support.write_committed(project, "docs/SOURCES.md", f"| {old_rel} | {new_rel} | moved |\n")
+    w2_67b_support.write_committed(project, "docs/live-note.md", f"See {old_rel} for the implementation.\n")
 
-    old = project / "src" / "gov" / "doctor" / "old_live_src_mod.py"
-    old.parent.mkdir(parents=True, exist_ok=True)
-    old.write_text("# old module\n", encoding="utf-8")
-    support.commit_all(project, "add old_live_src_mod")
+    run = w2_67_doctor.doctor(project, sandbox)
+    references = w2_67b_support.moved_references(run)
 
-    new = project / "src" / "gov" / "doctor" / "new_live_src_mod.py"
-    old.rename(new)
-    support.commit_all(project, "move old_live_src_mod to new_live_src_mod")
-
-    live = project / "docs" / "live-note.md"
-    live.parent.mkdir(parents=True, exist_ok=True)
-    live.write_text(
-        "See src/gov/doctor/old_live_src_mod.py for the implementation.\n",
-        encoding="utf-8",
-    )
-    support.commit_all(project, "add live reference")
-
-    run = gov("doctor", "--json")
-    text = json.dumps(run.envelope())
-
-    assert "old_live_src_mod" in text or "moved" in text.lower() or "stale" in text.lower(), (
+    assert w2_67b_support.references_to(references, old_rel, "docs/live-note.md"), (
         "doctor does not report a reference to a moved path in a live "
         f"document — the stale-path check should report it\n{run.describe()}"
     )
@@ -143,36 +138,29 @@ def test_stale_path_in_old_cli_tree_is_not_reported(gov, project, interface):
     )
 
 
-def test_stale_path_in_src_gov_cli_is_reported(gov, project, interface):
+def test_stale_path_in_src_gov_cli_is_reported(sandbox, tmp_path):
     """A reference to the same moved path in src/gov/cli/ IS reported.
 
     Counter-case for point 2: src/gov/cli/ is the live CLI and is NOT
     excluded.  DEC-456 excludes only the old cli/ tree at the repository
     root.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
+    that doctor always emits): the case reads the entry for
+    src/gov/cli/commands_ref.py in ``path_compliance.moved_references``,
+    with the old cli/ tree holding the same old path beside it, on a small
+    committed project of its own.
     """
-    support.write_path_map(project, support.minimal_valid_path_map())
+    project = w2_67_doctor.small_project(tmp_path / "repo")
+    old_rel, new_rel = "src/gov/doctor/old_src_cli_mod.py", "src/gov/doctor/new_src_cli_mod.py"
+    w2_67b_support.move_committed(project, old_rel, new_rel)
+    w2_67b_support.write_committed(project, "cli/legacy_commands.py", f"# old reference: {old_rel}\n")
+    w2_67b_support.write_committed(project, "src/gov/cli/commands_ref.py", f"# reference: {old_rel}\n")
 
-    old = project / "src" / "gov" / "doctor" / "old_src_cli_mod.py"
-    old.parent.mkdir(parents=True, exist_ok=True)
-    old.write_text("# old module\n", encoding="utf-8")
-    support.commit_all(project, "add old_src_cli_mod")
+    run = w2_67_doctor.doctor(project, sandbox)
+    references = w2_67b_support.moved_references(run)
 
-    new = project / "src" / "gov" / "doctor" / "new_src_cli_mod.py"
-    old.rename(new)
-    support.commit_all(project, "move old_src_cli_mod to new_src_cli_mod")
-
-    cli_live = project / "src" / "gov" / "cli" / "commands_ref.py"
-    cli_live.parent.mkdir(parents=True, exist_ok=True)
-    cli_live.write_text(
-        "# reference: src/gov/doctor/old_src_cli_mod.py\n",
-        encoding="utf-8",
-    )
-    support.commit_all(project, "add src/gov/cli reference")
-
-    run = gov("doctor", "--json")
-    text = json.dumps(run.envelope())
-
-    assert "old_src_cli_mod" in text or "moved" in text.lower() or "stale" in text.lower(), (
+    assert w2_67b_support.references_to(references, old_rel, "src/gov/cli/commands_ref.py"), (
         "doctor does not report a reference to a moved path in "
         "src/gov/cli/ — the live CLI is not excluded from the stale-path "
         f"check (DEC-456)\n{run.describe()}"
@@ -183,7 +171,7 @@ def test_stale_path_in_src_gov_cli_is_reported(gov, project, interface):
 # Point 3: an old path inside its new path is not a stale reference (DEC-456)
 # =========================================================================== #
 
-def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
+def test_old_path_inside_its_new_path_is_not_stale(sandbox, tmp_path):
     """An occurrence of an old path that is only a part of its own new path,
     in the file that names the new path, is not a stale reference.
 
@@ -191,8 +179,25 @@ def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
     docs/source/originals/<file>, which contains the old path (the bare
     file name) as a suffix.  Doctor reports it because the old path is
     contained in the new one.  This is not a stale reference.
+
+    Revised (W2-67, I4 §2.1; Rewrite-Reason: the result depends on every
+    tracked file's text): the case builds a small committed project of its
+    own instead of a copy of the whole tree, and runs this worktree's code
+    in it (DEC-732).  It reads doctor's ``path_compliance`` section, and a
+    control in the same project (a standalone reference to another moved
+    file) must be reported, so a doctor that reports nothing cannot pass.
     """
-    support.write_path_map(project, support.minimal_valid_path_map())
+    project = w2_67_doctor.small_project(tmp_path / "repo")
+
+    control_old = "control_target.py"
+    control_new = f"docs/source/originals/{control_old}"
+    (project / control_old).write_text("# control\n", encoding="utf-8")
+    support.commit_all(project, f"add {control_old}")
+    (project / control_new).parent.mkdir(parents=True, exist_ok=True)
+    (project / control_old).rename(project / control_new)
+    support.commit_all(project, f"move {control_old} to {control_new}")
+    (project / "notes.md").write_text(f"See {control_old} for the old layout.\n", encoding="utf-8")
+    support.commit_all(project, "a standalone reference to the control's old path")
 
     old_name = "subpath_target.py"
     new_rel = f"docs/source/originals/{old_name}"
@@ -214,7 +219,19 @@ def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
     )
     support.commit_all(project, "add validator referencing new path")
 
-    run = gov("doctor", "--json")
+    run = w2_67_doctor.doctor(project, sandbox)
+    compliance = w2_67_doctor.section(run, "path_compliance")
+    references = compliance.get("moved_references")
+    assert isinstance(references, list), f"path_compliance.moved_references is not a list\n{run.describe()}"
+    assert any(ref.get("old_path") == control_old and ref.get("referenced_in") == "notes.md"
+               for ref in references), (
+        f"the control's standalone reference to {control_old} in notes.md is not reported, so the "
+        f"stale-path check did not run on this project\n{run.describe()}"
+    )
+    assert not [ref for ref in references if old_name in str(ref.get("old_path"))], (
+        f"doctor reports {old_name} as a moved-path reference although it appears only as part of its own "
+        f"new path ({new_rel}) in the file that names the new path (DEC-456 point 3)\n{run.describe()}"
+    )
     text = json.dumps(run.envelope())
 
     assert "subpath_target" not in text, (
@@ -225,41 +242,31 @@ def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
     )
 
 
-def test_old_path_standalone_is_stale_when_new_path_elsewhere(gov, project, interface):
+def test_old_path_standalone_is_stale_when_new_path_elsewhere(sandbox, tmp_path):
     """A file that names the old path on its own is reported as stale, also
     when the same file names the new path elsewhere.
 
     Counter-case for point 3: the exception is narrow — only an occurrence
     of the old path that is a part of the new path is suppressed.  A
     standalone old path in the same file is still reported.
-    """
-    support.write_path_map(project, support.minimal_valid_path_map())
 
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
+    that doctor always emits): the case reads the entry for the file that
+    names both paths in ``path_compliance.moved_references``, on a small
+    committed project of its own.
+    """
+    project = w2_67_doctor.small_project(tmp_path / "repo")
     old_name = "standalone_target.py"
     new_rel = f"docs/source/originals/{old_name}"
+    w2_67b_support.move_committed(project, old_name, new_rel)
+    refs_rel = "docs/plan/tools/validate_refs.py"
+    w2_67b_support.write_committed(project, refs_rel, f'NEW_PATH = "{new_rel}"\nOLD_PATH = "{old_name}"\n',
+                                   "add file with both old and new path")
 
-    old = project / old_name
-    old.write_text("# content\n", encoding="utf-8")
-    support.commit_all(project, f"add {old_name}")
+    run = w2_67_doctor.doctor(project, sandbox)
+    references = w2_67b_support.moved_references(run)
 
-    new = project / new_rel
-    new.parent.mkdir(parents=True, exist_ok=True)
-    old.rename(new)
-    support.commit_all(project, f"move {old_name} to {new_rel}")
-
-    refs = project / "docs" / "plan" / "tools" / "validate_refs.py"
-    refs.parent.mkdir(parents=True, exist_ok=True)
-    refs.write_text(
-        f'NEW_PATH = "{new_rel}"\n'
-        f'OLD_PATH = "{old_name}"\n',
-        encoding="utf-8",
-    )
-    support.commit_all(project, "add file with both old and new path")
-
-    run = gov("doctor", "--json")
-    text = json.dumps(run.envelope())
-
-    assert "standalone_target" in text or "moved" in text.lower() or "stale" in text.lower(), (
+    assert w2_67b_support.references_to(references, old_name, refs_rel), (
         "doctor does not report the standalone old path as stale even "
         "though it appears on its own (not as part of the new path) — "
         f"DEC-456 says a standalone old path is still reported\n"

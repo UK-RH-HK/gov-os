@@ -165,10 +165,15 @@ def store_is_of_head(root: Path) -> bool | None:
 
     The store keeps the commits of the ``HEAD`` it was loaded from (``gov.store``: its ``commits`` table,
     every commit of that history). It is of this ``HEAD`` when it holds ``HEAD`` and as many commits as
-    ``HEAD``'s history has. ``STORE_UNREADABLE`` when the store cannot be asked.
+    ``HEAD``'s history has. Where the store has a fingerprints row (W2-68), the row's head is ``HEAD`` too and
+    both its fingerprints are ``HEAD``'s; where ``HEAD``'s cannot be computed, the row is a ``rebuild`` of
+    ``HEAD``. A store without the row is judged by the commits alone. ``STORE_UNREADABLE`` when the store cannot
+    be asked.
     """
     import sqlite3
-    from gov.store import STORE_REL, connect
+    from gov.close.fingerprint import of_commit
+    from gov.store import STORE_REL, connect, fingerprints
+    from gov.store.loader import REBUILD
 
     head = git(root, "rev-parse", "HEAD").strip()
     history = git(root, "rev-list", "--count", "HEAD").strip()
@@ -181,10 +186,18 @@ def store_is_of_head(root: Path) -> bool | None:
     try:
         held = connection.execute("SELECT COUNT(*) FROM commits").fetchone()[0]
         holds_head = connection.execute("SELECT COUNT(*) FROM commits WHERE id = ?", (head,)).fetchone()[0]
+        row = fingerprints(connection)
     except sqlite3.Error as e:
         raise GovError("STORE_UNREADABLE",
                         f"the record store {STORE_REL} cannot be read ({e}); run gov rebuild",
                         {"store": STORE_REL})
     finally:
         connection.close()
-    return bool(holds_head) and str(held) == history
+    if not (bool(holds_head) and str(held) == history):
+        return False
+    if row is None:
+        return True
+    prints = of_commit(root, head)
+    if prints is None:  # nothing to compare: only a full rebuild of HEAD itself is of HEAD
+        return row["head"] == head and row["kind"] == REBUILD
+    return row["head"] == head and row["code"] == prints["code"] and row["records"] == prints["records"]

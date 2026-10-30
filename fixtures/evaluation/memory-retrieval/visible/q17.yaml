@@ -1,0 +1,18 @@
+# Lens B's Q17 (Table 2): "path-map.yaml 6–116; semantic.py 206–220". My reading: two pieces, the rule (_wanted:
+# a file is embedded when every namespace it falls in says embedded) and the namespaces that say so (the path map's
+# namespaces block, lines 6–135 at the commit).
+id: Q17
+category: code location
+commit: 23079f92a6fa
+question: Which paths are embedded for semantic search?
+gold_answer: >-
+  The chunks of every file whose every path-map namespace says embedding_policy: embedded (semantic._wanted); a file
+  with another value, or in no namespace, is not embedded. The namespaces and their policies are in the path map's
+  namespaces block.
+sources:
+  - path: src/gov/retrieval/semantic.py
+    heading: "def _wanted(root: Path, connection: sqlite3.Connection) -> list[str]:"
+    lines: [206, 220]
+  - path: governance/project/path-map.yaml
+    heading: "namespaces:"
+    lines: [6, 135]

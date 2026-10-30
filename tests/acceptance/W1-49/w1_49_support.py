@@ -45,6 +45,10 @@ GUARD_REL = f"{HOOKS_REL}/pretooluse.py"
 CONTAINMENT_REL = f"{HOOKS_REL}/posttooluse.py"
 
 PROMPT_REL = "governance/project/prompts/w1-orchestrator.md"
+# W2-62 (DEC-837, W2-M373): the hook names the prompt the project's roster names, so the fixture's roster names its
+# stand-in prompt. See tests/acceptance/W2-62/README.md.
+ROSTER_REL = "governance/project/roster.yaml"
+STAND_IN_ROSTER = f"roles:\n  orchestrator:\n    prompt: {PROMPT_REL}\n"
 ORCHESTRATOR_CHECKPOINT_REL = ".gov-runtime/scratch/orchestrator/CHECKPOINT.md"
 LEAD_CHECKPOINT_REL = ".gov-runtime/scratch/lead/CHECKPOINT.md"
 
@@ -89,9 +93,10 @@ TK_SAVING_STAND_IN = (                     # batch 4: the session saves its chec
 )
 FAILING_STAND_IN ="#!/bin/sh\necho \"$(basename \"$0\"): stand-in failure\" >&2\nexit 1\n"
 
-WINDOW_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW"
-WINDOW_TOKENS = 300_000
-WINDOW_TOLERANCE = 30_000                  # "about 300k": 270,000 to 330,000
+WINDOW_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW"   # DEC-838: no launch and no settings file sets it
+WINDOW_REPORT = "auto-compact window for"  # how `/autocompact` begins its answer (case of letters ignored)
+WINDOW_DEFAULT_FORMS = ("default for this model", ": auto")   # the model's own window, in the two forms seen
+WINDOW_ORIGIN = "(from "                   # how the answer names a setting a window was taken from
 
 HOOK_TIMEOUT_S = 30.0
 HOUR_S = 3600.0
@@ -199,6 +204,7 @@ def make_project(directory, root=REPO_ROOT):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, target)
     write(directory, PROMPT_REL, STAND_IN_PROMPT)
+    write(directory, ROSTER_REL, STAND_IN_ROSTER)
     write(directory, ".gitignore", ".gov-runtime/\n__pycache__/\n")
     write(directory, "README.md", "# W1-49 fixture project\n")
     git(directory, "init", "-q", "-b", "main")
