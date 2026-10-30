@@ -23,7 +23,7 @@ import yaml
 from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
-from gov.retrieval import lexical, semantic
+from gov.retrieval import authority, lexical, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import rerank
 
@@ -117,6 +117,10 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
 
     root = Path(root)
     record_of, not_current, record_types = _graph(root)
+    # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
+    known = records.records(root)
+    register, entry_of = authority.register_path(known), authority.register_entries_of(
+        known, records.edges(root, type=authority.SUPERSEDES), root)
     answers = {lexical.FACET: lexical.search(root, query, refresh=False),
                semantic.FACET: semantic.search(root, query, refresh=False)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
@@ -127,7 +131,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     if start:
         closed = closures.closure(root, start, closures.depth_of_radius(radius))
         reached = {item["id"] for item in closed["closure"]}
-        routes[CLOSURE] = [chunk for chunk in chunks.values() if record_of.get(chunk["path"]) in reached]
+        routes[CLOSURE] = [chunk for chunk in chunks.values()
+                           if (record_of.get(chunk["path"]) if chunk["path"] != register
+                               else (entry_of(chunk["path"], chunk["start_line"]) or {}).get("id")) in reached]
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         closure_gaps += closed["gaps"]
@@ -182,8 +188,12 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         chunk = chunks[hit["chunk_id"]]
         record_id = record_of.get(chunk["path"])
 
+        # W2-87: a register chunk is never dropped for another entry's status, and its own entry's drops nothing
+        # new here: leaving entries out is W2-55's (DEC-791 item 1)
+        in_register = chunk["path"] == register
+
         # DEC-329, G-19: superseded records
-        if record_id is not None and record_id in not_current:
+        if not in_register and record_id is not None and record_id in not_current:
             if chunk["path"] not in dropped:
                 dropped[chunk["path"]] = {"path": chunk["path"], "id": record_id, "reason": not_current[record_id]}
             continue
