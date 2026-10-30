@@ -16,6 +16,13 @@ The PreToolUse hook is wired for every tool, not for the write tools alone
 as over once the hook has seen a later tool call of that actor, of any tool. So
 a read-only call must reach the hook too, be let through, and wait for it no
 longer than W1-02's budget of 100 ms p95.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). Since ACT 1 this repository's own settings run a
+five-rule hook and no containment hooks; the kernel's guard and containment check stay in the product. The cases
+that asserted this repository's live wiring now assert the same of the kernel's wiring, with the same verdict: the
+``kernel_*`` fixtures are a project generated from the template (Copier, then rulesync), its ``.claude/settings.json``
+and the hook lines it registers, run as Claude Code runs them with ``CLAUDE_PROJECT_DIR`` set to that project
+(``tests/acceptance/W2-90/README.md``). Each moved case names its fixtures by their old names in its first line.
 """
 
 from __future__ import annotations
@@ -23,6 +30,7 @@ from __future__ import annotations
 import pytest
 
 import w1_05_support as support
+import w2_90_kernel_wiring as kernel_wiring   # on sys.path through the suite's conftest
 
 ENGINEER = support.ENGINEER
 ORCHESTRATOR = support.ORCHESTRATOR
@@ -84,16 +92,18 @@ def test_a_hook_runs_before_every_tool(settings, tool_name):
 
 
 @pytest.mark.parametrize("event", ("PostToolUse", "PostToolUseFailure"))
-def test_a_hook_runs_after_every_bash_call(settings, event):
+def test_a_hook_runs_after_every_bash_call(kernel_settings, event):
     """A call that fails, times out or is interrupted ends in PostToolUseFailure, and may still have written."""
+    settings = kernel_settings
     commands = support.hook_commands(settings, event, "Bash")
     assert commands, (
-        f"{support.SETTINGS_REL} registers no {event} command for Bash: "
+        f"the generated {support.SETTINGS_REL} registers no {event} command for Bash: "
         "the containment check would not run after such a call"
     )
 
 
-def test_hooks_are_not_switched_off(switched_over):
+def test_hooks_are_not_switched_off(kernel_switched_over):
+    switched_over = kernel_switched_over
     assert switched_over.get("disableAllHooks") is not True, (
         f"{support.SETTINGS_REL} sets disableAllHooks: no hook would run"
     )
@@ -104,19 +114,22 @@ def test_hooks_are_not_switched_off(switched_over):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("tool_name", support.FILE_TOOLS)
-def test_a_session_without_a_role_cannot_write(live, decide, tool_name):
+def test_a_session_without_a_role_cannot_write(kernel_live, kernel_decide, tool_name):
+    live, decide = kernel_live, kernel_decide
     target = live / ("docs/analysis.ipynb" if tool_name == "NotebookEdit" else "README.md")
     result = decide(live, tool_name, support.write_input(tool_name, target))
     assert result.decision == "deny", f"{tool_name} on {target.name} with no role was not denied: {result.describe()}"
 
 
-def test_a_session_without_a_role_cannot_write_through_bash(live, decide):
+def test_a_session_without_a_role_cannot_write_through_bash(kernel_live, kernel_decide):
+    live, decide = kernel_live, kernel_decide
     command = "echo changed > README.md"
     result = decide(live, "Bash", support.bash_input(command))
     assert result.decision == "deny", f"Bash `{command}` with no role was not denied: {result.describe()}"
 
 
-def test_the_engineer_writes_only_inside_the_ticket_paths(live, decide):
+def test_the_engineer_writes_only_inside_the_ticket_paths(kernel_live, kernel_decide):
+    live, decide = kernel_live, kernel_decide
     result = decide(live, "Write", support.write_input("Write", live / SOURCE), ENGINEER, TICKET)
     assert result.decision == "allow", f"Write on {SOURCE} by the engineer on {TICKET}: {result.describe()}"
     result = decide(live, "Bash", support.bash_input(f"echo changed > {SOURCE}"), ENGINEER, TICKET)
@@ -129,8 +142,9 @@ def test_the_engineer_writes_only_inside_the_ticket_paths(live, decide):
         assert result.decision == "deny", f"Bash write to {relpath} by the engineer on {TICKET}: {result.describe()}"
 
 
-def test_the_test_designer_writes_only_acceptance_tests(live, decide):
+def test_the_test_designer_writes_only_acceptance_tests(kernel_live, kernel_decide):
     """The interim deny rule on ``tests/acceptance/**`` (W1-01) would stop the test designer too."""
+    live, decide = kernel_live, kernel_decide
     for tool_name in ("Edit", "Write"):
         target = live / support.ACCEPTANCE_REL / "W1-90" / "test_new.py"
         result = decide(live, tool_name, support.write_input(tool_name, target), DESIGNER, TICKET)
@@ -141,7 +155,8 @@ def test_the_test_designer_writes_only_acceptance_tests(live, decide):
     assert result.decision == "deny", f"Write on {SOURCE} by the test designer: {result.describe()}"
 
 
-def test_ordinary_reads_stay_open(live, decide):
+def test_ordinary_reads_stay_open(kernel_live, kernel_decide):
+    live, decide = kernel_live, kernel_decide
     for command in ("ls -la", "git status --porcelain", "python3 -m pytest tests/unit/guard -q"):
         result = decide(live, "Bash", support.bash_input(command), ENGINEER, TICKET)
         assert result.decision == "allow", f"Bash `{command}` by the engineer on {TICKET}: {result.describe()}"
@@ -151,8 +166,9 @@ def test_ordinary_reads_stay_open(live, decide):
 
 @pytest.mark.parametrize("reader", sorted(READERS), ids=sorted(READERS))
 @pytest.mark.parametrize("tool_name", support.READ_ONLY_TOOLS)
-def test_a_read_only_tool_goes_through_the_hook_and_is_allowed(live, decide, tool_name, reader):
+def test_a_read_only_tool_goes_through_the_hook_and_is_allowed(kernel_live, kernel_decide, tool_name, reader):
     """The guard denies writes, not reads: with the hook before every tool, Read, Grep and Glob stay open to all."""
+    live, decide = kernel_live, kernel_decide
     role, ticket = READERS[reader]
     result = decide(live, tool_name, support.read_input(tool_name, live), role, ticket)
     assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
@@ -160,8 +176,9 @@ def test_a_read_only_tool_goes_through_the_hook_and_is_allowed(live, decide, too
 
 
 @pytest.mark.parametrize("tool_name", support.READ_ONLY_TOOLS)
-def test_a_read_only_tool_is_allowed_while_frozen(scratch_copy, decide, tool_name):
+def test_a_read_only_tool_is_allowed_while_frozen(kernel_scratch_copy, kernel_decide, tool_name):
     """The freeze flag stops writes. Reading goes on."""
+    scratch_copy, decide = kernel_scratch_copy, kernel_decide
     flag = scratch_copy / ".gov-runtime" / "freeze"
     flag.parent.mkdir(parents=True, exist_ok=True)
     flag.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")   # the marker line (DEC-402)
@@ -171,7 +188,7 @@ def test_a_read_only_tool_is_allowed_while_frozen(scratch_copy, decide, tool_nam
 
 
 @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
-def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
     """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
 
     The time is what the call waits: every PreToolUse command registered for the
@@ -179,6 +196,7 @@ def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox
     calls after a warm-up. A round that misses the bound is repeated, up to
     three rounds, so a single stall of the machine does not fail the test.
     """
+    live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
     tool_name, reader, relpath = TIMED_CALLS[name]
     role, ticket = READERS[reader]
     if relpath is None:
@@ -209,7 +227,8 @@ def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox
     )
 
 
-def test_the_freeze_flag_stops_every_write(scratch_copy, decide):
+def test_the_freeze_flag_stops_every_write(kernel_scratch_copy, kernel_decide):
+    scratch_copy, decide = kernel_scratch_copy, kernel_decide
     result = decide(scratch_copy, "Write", support.write_input("Write", scratch_copy / SOURCE), ENGINEER, TICKET)
     assert result.decision == "allow", f"Write on {SOURCE} before the freeze: {result.describe()}"
     flag = scratch_copy / ".gov-runtime" / "freeze"
@@ -235,13 +254,15 @@ def test_an_install_by_the_orchestrator_asks_the_owner(live, decide, command):
 
 @pytest.mark.parametrize("command", INSTALLS)
 @pytest.mark.parametrize("role", (ENGINEER, DESIGNER, support.PRODUCT_SPEC, support.AUDITOR))
-def test_an_install_by_any_other_role_is_denied(live, decide, command, role):
+def test_an_install_by_any_other_role_is_denied(kernel_live, kernel_decide, command, role):
+    live, decide = kernel_live, kernel_decide
     result = decide(live, "Bash", support.bash_input(command), role, TICKET)
     assert result.decision == "deny", f"Bash `{command}` by {role} was not denied: {result.describe()}"
 
 
 @pytest.mark.parametrize("role", support.ROLES)
-def test_sudo_is_denied_to_every_role(live, decide, role):
+def test_sudo_is_denied_to_every_role(kernel_live, kernel_decide, role):
+    live, decide = kernel_live, kernel_decide
     command = "sudo apt-get install -y jq"
     result = decide(live, "Bash", support.bash_input(command), role, TICKET)
     assert result.decision == "deny", f"Bash `{command}` by {role} was not denied: {result.describe()}"
@@ -251,7 +272,9 @@ def test_sudo_is_denied_to_every_role(live, decide, role):
 # W1-03 live
 # --------------------------------------------------------------------------
 
-def test_the_containment_check_reports_a_change_outside_the_ticket_paths(scratch_copy, switched_over, sandbox):
+def test_the_containment_check_reports_a_change_outside_the_ticket_paths(kernel_scratch_copy, kernel_switched_over,
+                                                                         kernel_sandbox):
+    scratch_copy, switched_over, sandbox = kernel_scratch_copy, kernel_switched_over, kernel_sandbox
     command = "python3 -c \"open('README.md', 'a').write('changed')\""
     support.run_bash(scratch_copy, command, sandbox)
     assert "README.md" in support.git(scratch_copy, "status", "--porcelain"), "the fixture command changed nothing"
@@ -262,7 +285,7 @@ def test_the_containment_check_reports_a_change_outside_the_ticket_paths(scratch
     )
 
 
-def test_the_containment_check_restores_an_acceptance_test(scratch_copy, switched_over, sandbox):
+def test_the_containment_check_restores_an_acceptance_test(kernel_scratch_copy, kernel_switched_over, kernel_sandbox):
     """One whole call through the wiring: the PreToolUse commands, the command, the PostToolUse commands.
 
     The check restores only what the call changed, and it knows that from the
@@ -270,6 +293,7 @@ def test_the_containment_check_restores_an_acceptance_test(scratch_copy, switche
     shows that the snapshot is wired: with the PostToolUse commands alone, the
     check flags the change and leaves it.
     """
+    scratch_copy, switched_over, sandbox = kernel_scratch_copy, kernel_switched_over, kernel_sandbox
     before = (scratch_copy / ACCEPTANCE_FILE).read_text(encoding="utf-8")
     command = f"python3 -c \"open('{ACCEPTANCE_FILE}', 'a').write('changed')\""
     report, results = support.bash_call(scratch_copy, switched_over, sandbox, command, ENGINEER, TICKET,
@@ -281,7 +305,8 @@ def test_the_containment_check_restores_an_acceptance_test(scratch_copy, switche
     assert ACCEPTANCE_FILE in report, f"the breach was not reported to the agent: {detail}"
 
 
-def test_the_containment_check_runs_after_a_failed_call(scratch_copy, switched_over, sandbox):
+def test_the_containment_check_runs_after_a_failed_call(kernel_scratch_copy, kernel_switched_over, kernel_sandbox):
+    scratch_copy, switched_over, sandbox = kernel_scratch_copy, kernel_switched_over, kernel_sandbox
     command = "python3 -c \"open('README.md', 'a').write('changed')\"; exit 3"
     support.run_bash(scratch_copy, command, sandbox)
     report, results = support.post_bash(scratch_copy, switched_over, sandbox, command, ENGINEER, TICKET,
@@ -292,7 +317,8 @@ def test_the_containment_check_runs_after_a_failed_call(scratch_copy, switched_o
     )
 
 
-def test_the_containment_check_leaves_in_scope_work_alone(scratch_copy, switched_over, sandbox):
+def test_the_containment_check_leaves_in_scope_work_alone(kernel_scratch_copy, kernel_switched_over, kernel_sandbox):
+    scratch_copy, switched_over, sandbox = kernel_scratch_copy, kernel_switched_over, kernel_sandbox
     command = f"python3 -c \"open('{SOURCE}', 'a').write('# changed')\""
     support.run_bash(scratch_copy, command, sandbox)
     report, results = support.post_bash(scratch_copy, switched_over, sandbox, command, ENGINEER, TICKET)
@@ -325,8 +351,8 @@ def _engineer_subagent_changes_an_acceptance_test(project, settings, sandbox):
 
 
 @pytest.mark.parametrize("tool_name", sorted(LATER_CALLS))
-def test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over(scratch_copy, switched_over, sandbox,
-                                                                           tool_name):
+def test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over(kernel_scratch_copy, kernel_switched_over,
+                                                                           kernel_sandbox, tool_name):
     """DEC-142, DEC-144: "the same actor's session has issued a later tool call". The hook must see that call.
 
     The orchestrator's Bash call never ends. Its next call is not a write: it
@@ -334,6 +360,7 @@ def test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over(scra
     subagent changes an acceptance test in one whole Bash call. The test is
     restored from HEAD, which it is only if the later call reached the hook.
     """
+    scratch_copy, switched_over, sandbox = kernel_scratch_copy, kernel_switched_over, kernel_sandbox
     before = (scratch_copy / ACCEPTANCE_FILE).read_text(encoding="utf-8")
     _leave_a_bash_call_unfinished(scratch_copy, switched_over, sandbox)
     later = support.pre_tool_use(scratch_copy, switched_over, sandbox, tool_name, LATER_CALLS[tool_name](scratch_copy),
@@ -348,12 +375,14 @@ def test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over(scra
     assert ACCEPTANCE_FILE in report, f"the breach was not reported to the agent: {detail}"
 
 
-def test_without_a_later_call_the_unfinished_call_still_blocks_the_restore(scratch_copy, switched_over, sandbox):
+def test_without_a_later_call_the_unfinished_call_still_blocks_the_restore(kernel_scratch_copy, kernel_switched_over,
+                                                                           kernel_sandbox):
     """DEC-130: for all the check knows, the orchestrator's call is still running. Flagged, and not reverted.
 
     The same steps as the test above without the later call. It shows that the
     restore there is owed to the later call.
     """
+    scratch_copy, switched_over, sandbox = kernel_scratch_copy, kernel_switched_over, kernel_sandbox
     _leave_a_bash_call_unfinished(scratch_copy, switched_over, sandbox)
     report, detail = _engineer_subagent_changes_an_acceptance_test(scratch_copy, switched_over, sandbox)
     assert (scratch_copy / ACCEPTANCE_FILE).read_text(encoding="utf-8").endswith("changed"), (
@@ -366,9 +395,9 @@ def test_without_a_later_call_the_unfinished_call_still_blocks_the_restore(scrat
 # Every later ticket
 # --------------------------------------------------------------------------
 
-def _settings_at(commit):
+def _settings_at(commit, rel=support.SETTINGS_REL):
     import json
-    text = support.git(support.REPO_ROOT, "show", f"{commit}:{support.SETTINGS_REL}", check=False)
+    text = support.git(support.REPO_ROOT, "show", f"{commit}:{rel}", check=False)
     try:
         data = json.loads(text) if text.strip() else {}
     except ValueError:
@@ -376,12 +405,18 @@ def _settings_at(commit):
     return data if isinstance(data, dict) else {}
 
 
-def test_the_hooks_stay_wired_in_every_later_commit(switched_over):
-    """Once a commit wires the hooks, for every tool, no later commit on this branch takes them out."""
+def test_the_hooks_stay_wired_in_every_later_commit(kernel_switched_over):
+    """Once a commit wires the hooks, for every tool, no later commit on this branch takes them out.
+
+    Rewrite-Reason: DEC-953 item 2 (W2-90). The history read is the kernel's: the template's shipped settings file
+    (``template/governance/kernel/settings.json``), which carries the kernel's hook wiring in the harness's form;
+    this repository's own settings stopped running the kernel's hooks by the owner's decision.
+    """
+    rel = kernel_wiring.TEMPLATE_SETTINGS_REL
     commits = support.git(
-        support.REPO_ROOT, "log", "--first-parent", "--reverse", "--format=%H", "--", support.SETTINGS_REL,
+        support.REPO_ROOT, "log", "--first-parent", "--reverse", "--format=%H", "--", rel,
     ).split()
-    wired = [support.is_wired_for_every_tool(_settings_at(commit)) for commit in commits]
+    wired = [support.is_wired_for_every_tool(_settings_at(commit, rel)) for commit in commits]
     if True not in wired:
         return   # the switch-over is in the working tree and not committed yet
     first = wired.index(True)
