@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-a3m2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 1
+priority: 4
 assignee: engineer
 external-ref: W2-10
-tags: [wave-2, implementation, full]
+tags: [wave-2, implementation, full, wave-3, deferred]
 wbs_id: W2-10
 title: Guardrails explain themselves, refuse once, then record
 class: implementation
@@ -56,6 +56,8 @@ list_rows:
 - W2-M314
 ---
 # W2-10 Guardrails explain themselves, refuse once, then record
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** Deferred in REPLAN §2.2; the guard is down to its rules; W2-11 no longer depends on it.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-10), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
