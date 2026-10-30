@@ -1,0 +1,29 @@
+diff --git a/.rulesync/hooks.jsonc b/.rulesync/hooks.jsonc
+index 3320c036..eda9cb75 100644
+--- a/.rulesync/hooks.jsonc
++++ b/.rulesync/hooks.jsonc
+@@ -4,23 +4,7 @@
+     "preToolUse": [
+       {
+         "type": "command",
+-        "command": "h=\"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\"; g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused\" >&2; exit 2; }; \"$p\" -E \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
+-        "timeout": 60
+-      }
+-    ],
+-    "postToolUse": [
+-      {
+-        "type": "command",
+-        "matcher": "Bash",
+-        "command": "h=\"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"; g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused\" >&2; exit 2; }; \"$p\" -E \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
+-        "timeout": 60
+-      }
+-    ],
+-    "postToolUseFailure": [
+-      {
+-        "type": "command",
+-        "matcher": "Bash",
+-        "command": "h=\"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"; g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused\" >&2; exit 2; }; \"$p\" -E \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
++        "command": "h=\"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py\"; g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused\" >&2; exit 2; }; \"$p\" -E \"$h\"; r=$?; case $r in 0|2) exit $r;; esac; echo \"gov hook: $h ended with exit $r (it could not run or crashed); refused\" >&2; exit 2",
+         "timeout": 60
+       }
+     ],
