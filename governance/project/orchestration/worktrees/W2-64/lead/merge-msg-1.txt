@@ -1,0 +1,6 @@
+W2-64: merge w2/integrate into w2/W2-64 before the engineer (the gate of DEC-942 item 4: W2-58 closed)
+
+Task: DAEO-0uhh
+Implements: DEC-872, DEC-844, DEC-890
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,11 @@
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -64,6 +64,8 @@
+       - "governance/project/*"
+       - "governance/project/briefs/**"
+       - "governance/project/prompts/**"
++      # DEC-941 item 5 (W2-78): the moved lists, record files of their own
++      - "governance/project/records/**"
+       - "governance/project/orchestration/*"
+       - "governance/project/orchestration/packages/**"
+       # DEC-934: the nightly's committed, reviewed scripts and their tests

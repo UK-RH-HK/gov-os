@@ -1,0 +1,3 @@
+Fri Oct 30 09:04:42 GMT 2026
+{"ok": true, "command": "rebuild", "result": {"digest": "ea7aa8831ccd3672ea86fecf05fdb72c904a996f3da632c6bc8bbe281e45d40f", "store": {"digest": "ea7aa8831ccd3672ea86fecf05fdb72c904a996f3da632c6bc8bbe281e45d40f", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "recreated"}}, "compaction": {".gov-runtime/store.db": "compacted", ".gov-runtime/codeintel/home/_config.db": "compacted", ".gov-runtime/codeintel/home/code.db": "compacted"}, "timing": {"lexical_s": 3.4}}, "session": ""}
+Fri Oct 30 09:10:57 GMT 2026

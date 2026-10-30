@@ -1,0 +1,1311 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="63" skipped="0" tests="83" time="45.446" timestamp="2026-10-30T13:55:51.712881+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_this_repository_s_close_records_validate[docs/close/DAEO-c1uz/CL-DAEO-c1uz.md]" time="0.472" /><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_this_repository_s_close_records_validate[docs/close/DAEO-uzme/CL-DAEO-uzme.md]" time="0.544" /><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_this_repository_s_close_records_validate[docs/close/DAEO-0rfi/CL-DAEO-0rfi.md]" time="1.709" /><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_evidence_null_validates" time="0.700" /><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_the_close_s_other_fields_and_a_later_key_validate" time="0.450" /><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[scope]" time="0.678"><failure message="AssertionError: an evidence block without 'scope' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9667e0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without0')
+field = 'scope'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'scope' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9667e0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[why_full]" time="0.620"><failure message="AssertionError: an evidence block without 'why_full' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d931e50&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without1')
+field = 'why_full'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'why_full' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d931e50&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[base]" time="0.546"><failure message="AssertionError: an evidence block without 'base' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d907860&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without2')
+field = 'base'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'base' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d907860&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[head]" time="0.533"><failure message="AssertionError: an evidence block without 'head' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e09d640&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without3')
+field = 'head'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'head' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e09d640&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[tree]" time="0.611"><failure message="AssertionError: an evidence block without 'tree' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3eb77fe0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without4')
+field = 'tree'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'tree' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3eb77fe0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[changed]" time="0.715"><failure message="AssertionError: an evidence block without 'changed' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d8dccb0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without5')
+field = 'changed'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'changed' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d8dccb0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[selected]" time="0.455"><failure message="AssertionError: an evidence block without 'selected' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3dae8fb0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without6')
+field = 'selected'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'selected' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3dae8fb0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[left_out]" time="0.588"><failure message="AssertionError: an evidence block without 'left_out' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d8dccb0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without7')
+field = 'left_out'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'left_out' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d8dccb0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[skips]" time="0.514"><failure message="AssertionError: an evidence block without 'skips' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3eb77fe0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without8')
+field = 'skips'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'skips' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3eb77fe0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[skip_count]" time="0.703"><failure message="AssertionError: an evidence block without 'skip_count' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3ea3f890&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without9')
+field = 'skip_count'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'skip_count' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3ea3f890&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[failures]" time="0.620"><failure message="AssertionError: an evidence block without 'failures' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9329f0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without10')
+field = 'failures'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'failures' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9329f0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_without_a_required_field_is_refused[junit_xml]" time="0.624"><failure message="AssertionError: an evidence block without 'junit_xml' passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_without11')
+field = 'junit_xml'
+
+    @pytest.mark.parametrize("field", S.EVIDENCE_REQUIRED)
+    def test_an_evidence_block_without_a_required_field_is_refused(tmp_path, field):
+        """*Red.* W2-66's block without ``field`` is refused: exit non-zero, a finding on the record's path, under the
+        field ``evidence``, that names the schema file and the missing field. Today: no finding (the close schema
+        states no evidence block)."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front["evidence"].pop(field))
+&gt;       assert run.code != 0, f"an evidence block without '{field}' passes\n{run.describe()}"
+E       AssertionError: an evidence block without 'junit_xml' passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:66: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[a failure with no text]" time="0.604"><failure message="AssertionError: an evidence block where a failure with no text passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da40800&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_0')
+case = 'a failure with no text'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where a failure with no text passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da40800&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[a full scope with no reason]" time="0.696"><failure message="AssertionError: an evidence block where a full scope with no reason passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_1')
+case = 'a full scope with no reason'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where a full scope with no reason passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[a left-out entry with no why]" time="0.605"><failure message="AssertionError: an evidence block where a left-out entry with no why passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_2')
+case = 'a left-out entry with no why'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where a left-out entry with no why passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[a reason with no text]" time="0.474"><failure message="AssertionError: an evidence block where a reason with no text passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d907860&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_3')
+case = 'a reason with no text'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where a reason with no text passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d907860&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[a selected target with no why]" time="0.606"><failure message="AssertionError: an evidence block where a selected target with no why passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_4')
+case = 'a selected target with no why'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where a selected target with no why passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[a skip with no reason]" time="0.460"><failure message="AssertionError: an evidence block where a skip with no reason passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e09d640&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_5')
+case = 'a skip with no reason'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where a skip with no reason passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e09d640&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[base is no commit id]" time="0.592"><failure message="AssertionError: an evidence block where base is no commit id passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_6')
+case = 'base is no commit id'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where base is no commit id passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[changed is no list]" time="0.598"><failure message="AssertionError: an evidence block where changed is no list passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_7')
+case = 'changed is no list'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where changed is no list passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[head is abbreviated]" time="0.419"><failure message="AssertionError: an evidence block where head is abbreviated passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d942930&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_8')
+case = 'head is abbreviated'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where head is abbreviated passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d942930&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[junit_xml is no list]" time="0.471"><failure message="AssertionError: an evidence block where junit_xml is no list passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da16660&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_9')
+case = 'junit_xml is no list'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where junit_xml is no list passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da16660&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[per_test_timeout is text]" time="0.678"><failure message="AssertionError: an evidence block where per_test_timeout is text passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da9b620&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_10')
+case = 'per_test_timeout is text'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where per_test_timeout is text passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da9b620&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[scope is neither scoped nor full]" time="0.489"><failure message="AssertionError: an evidence block where scope is neither scoped nor full passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_11')
+case = 'scope is neither scoped nor full'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where scope is neither scoped nor full passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3df24050&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[skip_count is negative]" time="0.519"><failure message="AssertionError: an evidence block where skip_count is negative passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d976d20&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_12')
+case = 'skip_count is negative'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where skip_count is negative passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d976d20&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[skip_count is text]" time="0.552"><failure message="AssertionError: an evidence block where skip_count is text passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_13')
+case = 'skip_count is text'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where skip_count is text passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_of_the_wrong_shape_is_refused[tree is no text]" time="0.580"><failure message="AssertionError: an evidence block where tree is no text passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_of_the_14')
+case = 'tree is no text'
+
+    @pytest.mark.parametrize("case", sorted(WRONG_SHAPES))
+    def test_an_evidence_block_of_the_wrong_shape_is_refused(tmp_path, case):
+        """*Red.* W2-66's block (DAEO-uzme's, ``scope: full``) with one field of the wrong shape is refused:
+        ``SCHEMA_INVALID_FIELD`` on the record's path under ``evidence``, naming the schema file. Today: no finding."""
+        path, value = WRONG_SHAPES[case]
+        rel, run = _run(tmp_path, S.CLOSE_BASE_UNKNOWN, _set(path, value))
+&gt;       assert run.code != 0, f"an evidence block where {case} passes\n{run.describe()}"
+E       AssertionError: an evidence block where tree is no text passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_an_evidence_block_that_is_no_object_is_refused" time="0.449"><failure message="AssertionError: exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3dae8fb0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_an_evidence_block_that_is0')
+
+    def test_an_evidence_block_that_is_no_object_is_refused(tmp_path):
+        """*Red.* ``evidence`` as a list is refused under ``evidence``. Today: no finding."""
+        rel, run = _run(tmp_path, S.CLOSE_WITH_EVIDENCE, lambda front: front.__setitem__("evidence", ["scoped"]))
+&gt;       assert run.code != 0, run.describe()
+E       AssertionError: exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3dae8fb0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_close_schema.py:119: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_close_schema" name="test_task_stays_required" time="0.567" /><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_a_valid_ticket_passes" time="0.261" /><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_lens_g_planted_ticket_is_refused_naming_record_and_rule" time="0.229"><failure message="AssertionError: lens G's planted ticket passes core-schema&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_lens_g_planted_ticket_is_0')
+
+    def test_lens_g_planted_ticket_is_refused_naming_record_and_rule(tmp_path):
+        """*Red.* Run G-4's planted ticket (status ``banana``, state_class ``NOT-A-CLASS``, profile ``HUGE``, est_loc
+        -5, deps ``["not an id"]``, empty ``allowed_paths`` and ``kpis``) is refused: core-schema exits non-zero, and
+        for each fault the schemas refuse there is a finding on the record's path that names the schema file, the
+        place and the validator's message. ``status: banana`` breaks no rule (the shared ``status`` is any non-empty
+        text) and gives no finding. Today: exit 0, no finding (the subset checks required fields only)."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(**S.PLANTED)}).core_schema()
+&gt;       assert run.code != 0, f"lens G's planted ticket passes core-schema\n{run.describe()}"
+E       AssertionError: lens G's planted ticket passes core-schema
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:44: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_one_fault_the_subset_passed_is_refused[state_class-NOT-A-CLASS-words0]" time="0.156"><failure message="AssertionError: a ticket with state_class='NOT-A-CLASS' passes core-schema&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da41040&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_one_fault_the_subset_pass0')
+field = 'state_class', value = 'NOT-A-CLASS', words = ('NOT-A-CLASS',)
+
+    @pytest.mark.parametrize("field, value, words", (
+        ("state_class", "NOT-A-CLASS", ("NOT-A-CLASS",)),
+        ("profile", "HUGE", ("HUGE",)),
+        ("deps", ["not an id"], ("not an id",)),
+        ("wbs_id", "W9-1", ("W9-1",)),
+    ))
+    def test_one_fault_the_subset_passed_is_refused(tmp_path, field, value, words):
+        """*Red.* The subset's gap closed: a valid ticket but for one value its schema (or ``common.schema.json``, through
+        a ``$ref``) refuses is refused, ``SCHEMA_INVALID_FIELD`` on its path naming the field, the schema file and the
+        validator's message. Today: exit 0, no finding."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(**{field: value})}).core_schema()
+&gt;       assert run.code != 0, f"a ticket with {field}={value!r} passes core-schema\n{run.describe()}"
+E       AssertionError: a ticket with state_class='NOT-A-CLASS' passes core-schema
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da41040&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:74: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_one_fault_the_subset_passed_is_refused[profile-HUGE-words1]" time="0.181"><failure message="AssertionError: a ticket with profile='HUGE' passes core-schema&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_one_fault_the_subset_pass1')
+field = 'profile', value = 'HUGE', words = ('HUGE',)
+
+    @pytest.mark.parametrize("field, value, words", (
+        ("state_class", "NOT-A-CLASS", ("NOT-A-CLASS",)),
+        ("profile", "HUGE", ("HUGE",)),
+        ("deps", ["not an id"], ("not an id",)),
+        ("wbs_id", "W9-1", ("W9-1",)),
+    ))
+    def test_one_fault_the_subset_passed_is_refused(tmp_path, field, value, words):
+        """*Red.* The subset's gap closed: a valid ticket but for one value its schema (or ``common.schema.json``, through
+        a ``$ref``) refuses is refused, ``SCHEMA_INVALID_FIELD`` on its path naming the field, the schema file and the
+        validator's message. Today: exit 0, no finding."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(**{field: value})}).core_schema()
+&gt;       assert run.code != 0, f"a ticket with {field}={value!r} passes core-schema\n{run.describe()}"
+E       AssertionError: a ticket with profile='HUGE' passes core-schema
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3f923770&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:74: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_one_fault_the_subset_passed_is_refused[deps-value2-words2]" time="0.131"><failure message="AssertionError: a ticket with deps=['not an id'] passes core-schema&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da40d40&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_one_fault_the_subset_pass2')
+field = 'deps', value = ['not an id'], words = ('not an id',)
+
+    @pytest.mark.parametrize("field, value, words", (
+        ("state_class", "NOT-A-CLASS", ("NOT-A-CLASS",)),
+        ("profile", "HUGE", ("HUGE",)),
+        ("deps", ["not an id"], ("not an id",)),
+        ("wbs_id", "W9-1", ("W9-1",)),
+    ))
+    def test_one_fault_the_subset_passed_is_refused(tmp_path, field, value, words):
+        """*Red.* The subset's gap closed: a valid ticket but for one value its schema (or ``common.schema.json``, through
+        a ``$ref``) refuses is refused, ``SCHEMA_INVALID_FIELD`` on its path naming the field, the schema file and the
+        validator's message. Today: exit 0, no finding."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(**{field: value})}).core_schema()
+&gt;       assert run.code != 0, f"a ticket with {field}={value!r} passes core-schema\n{run.describe()}"
+E       AssertionError: a ticket with deps=['not an id'] passes core-schema
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da40d40&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:74: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_one_fault_the_subset_passed_is_refused[wbs_id-W9-1-words3]" time="0.191"><failure message="AssertionError: a ticket with wbs_id='W9-1' passes core-schema&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_one_fault_the_subset_pass3')
+field = 'wbs_id', value = 'W9-1', words = ('W9-1',)
+
+    @pytest.mark.parametrize("field, value, words", (
+        ("state_class", "NOT-A-CLASS", ("NOT-A-CLASS",)),
+        ("profile", "HUGE", ("HUGE",)),
+        ("deps", ["not an id"], ("not an id",)),
+        ("wbs_id", "W9-1", ("W9-1",)),
+    ))
+    def test_one_fault_the_subset_passed_is_refused(tmp_path, field, value, words):
+        """*Red.* The subset's gap closed: a valid ticket but for one value its schema (or ``common.schema.json``, through
+        a ``$ref``) refuses is refused, ``SCHEMA_INVALID_FIELD`` on its path naming the field, the schema file and the
+        validator's message. Today: exit 0, no finding."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(**{field: value})}).core_schema()
+&gt;       assert run.code != 0, f"a ticket with {field}={value!r} passes core-schema\n{run.describe()}"
+E       AssertionError: a ticket with wbs_id='W9-1' passes core-schema
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:74: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_a_missing_required_field_is_schema_missing_field" time="0.181" /><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_every_finding_is_on_a_record_s_repository_path" time="0.190"><failure message="AssertionError: exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3dae8fb0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_every_finding_is_on_a_rec0')
+
+    def test_every_finding_is_on_a_record_s_repository_path(tmp_path):
+        """*Red.* Findings carry today's shape (``code``, ``path``, ``field``, ``message``), and the path is the record's
+        path in the repository, never a temporary instance file's; each record's own errors are its own. Today: no
+        finding at all."""
+        records = {TICKET_REL: S.ticket(state_class="NOT-A-CLASS"),
+                   ".tickets/PROJ-cccc.md": S.ticket(id="PROJ-cccc", profile="HUGE"),
+                   "docs/plan/PLAN-ONE.md": S.markdown(S.shared("PLAN-ONE", "plan", state_class="NOT-A-CLASS"))}
+        run = _project(tmp_path, records).core_schema()
+&gt;       assert run.code != 0, run.describe()
+E       AssertionError: exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3dae8fb0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:100: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_several_errors_of_one_record_are_several_findings" time="0.184"><failure message="AssertionError: not one finding per fault: []&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert [] == ['est_loc', '...'state_class']&#10;  &#10;  Right contains 3 more items, first extra item: 'est_loc'&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_several_errors_of_one_rec0')
+
+    def test_several_errors_of_one_record_are_several_findings(tmp_path):
+        """*Red.* A record with three faults has a finding for each, not a count. Today: none."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(state_class="NOT-A-CLASS", profile="HUGE",
+                                                       est_loc=-5)}).core_schema()
+        fields = sorted(finding.get("field") for finding in S.about(run.findings, TICKET_REL))
+&gt;       assert fields == ["est_loc", "profile", "state_class"], f"not one finding per fault: {fields}\n{run.describe()}"
+E       AssertionError: not one finding per fault: []
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert [] == ['est_loc', '...'state_class']
+E         
+E         Right contains 3 more items, first extra item: 'est_loc'
+E         Use -v to get more diff
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:116: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_a_finding_under_both_layouts_is_given_once" time="0.210"><failure message="AssertionError: 0 findings on state_class under two layouts; one expected&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 == 1&#10; +  where 0 = len([])">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_finding_under_both_layo0')
+
+    def test_a_finding_under_both_layouts_is_given_once(tmp_path):
+        """*Red.* With the schema files in both kernel layouts (``template/governance/kernel/schemas/`` and
+        ``governance/kernel/schemas/``), a fault gives as many findings as under one layout: one. Today: none."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(state_class="NOT-A-CLASS")},
+                       layouts=(S.KERNEL_SCHEMAS_REL, S.INSTALLED_SCHEMAS_REL)).core_schema()
+        mine = [finding for finding in S.about(run.findings, TICKET_REL) if finding.get("field") == "state_class"]
+&gt;       assert len(mine) == 1, f"{len(mine)} findings on state_class under two layouts; one expected\n{run.describe()}"
+E       AssertionError: 0 findings on state_class under two layouts; one expected
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:125: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_the_installed_layout_alone_is_measured" time="0.165"><failure message="AssertionError: the installed layout's schema is not applied&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d977230&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_the_installed_layout_alon0')
+
+    def test_the_installed_layout_alone_is_measured(tmp_path):
+        """*Red.* A project holding only the installed layout (``governance/kernel/schemas/``) is held to it: the fault
+        is refused. Today: no finding."""
+        run = _project(tmp_path, {TICKET_REL: S.ticket(state_class="NOT-A-CLASS")},
+                       layouts=(S.INSTALLED_SCHEMAS_REL,)).core_schema()
+&gt;       assert run.code != 0, f"the installed layout's schema is not applied\n{run.describe()}"
+E       AssertionError: the installed layout's schema is not applied
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d977230&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_full_validator.py:134: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_a_standalone_record_owes_no_shared_frontmatter" time="0.187" /><testcase classname="tests.acceptance.W2-64.test_w2_64_full_validator" name="test_a_shared_field_is_owed_by_every_other_record" time="0.241" /><testcase classname="tests.acceptance.W2-64.test_w2_64_imported" name="test_a_refused_record_under_docs_imported_does_not_fail_and_is_named_as_history" time="0.180"><failure message="AssertionError: core-schema does not print the success form on a pass&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert (False)&#10; +  where False = isinstance(None, dict)&#10; +    where None = &lt;w2_64_support.Run object at 0x7bee3da418e0&gt;.output">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_refused_record_under_do0')
+
+    def test_a_refused_record_under_docs_imported_does_not_fail_and_is_named_as_history(tmp_path):
+        """*Red.* A record its schema refuses, under ``docs/imported/``, beside a valid ticket: core-schema exits 0 with
+        no finding, and prints the success form ``{"ok": true, "result": ...}`` whose result names ``docs/imported/``
+        as left out and why (history, DEC-844). Today: exit 0 and nothing printed."""
+        run = _project(tmp_path, {IMPORTED_REL: _refused_decision(), VALID_REL: S.ticket()}).core_schema()
+        assert run.code == 0 and run.findings == [], f"a record under {S.IMPORTED} fails the check\n{run.describe()}"
+&gt;       assert isinstance(run.output, dict) and run.output.get("ok") is True and "result" in run.output, \
+            f"core-schema does not print the success form on a pass\n{run.describe()}"
+E       AssertionError: core-schema does not print the success form on a pass
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert (False)
+E        +  where False = isinstance(None, dict)
+E        +    where None = &lt;w2_64_support.Run object at 0x7bee3da418e0&gt;.output
+
+tests/acceptance/W2-64/test_w2_64_imported.py:35: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_imported" name="test_the_pass_counts_the_records_validated" time="0.210"><failure message="AssertionError: the result gives no count of 2 records validated&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert (None is not None)">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_the_pass_counts_the_recor0')
+
+    def test_the_pass_counts_the_records_validated(tmp_path):
+        """*Red.* The success form's result gives the count of records validated: two records outside
+        ``docs/imported/``, one inside, and the number 2 is in the result. Today: nothing printed."""
+        records = {IMPORTED_REL: _refused_decision(), VALID_REL: S.ticket(),
+                   ".tickets/PROJ-cccc.md": S.ticket(id="PROJ-cccc")}
+        run = _project(tmp_path, records).core_schema()
+        assert run.code == 0, run.describe()
+        result = run.output.get("result") if isinstance(run.output, dict) else None
+&gt;       assert result is not None and 2 in set(S.integers_in(result)), \
+            f"the result gives no count of 2 records validated\n{run.describe()}"
+E       AssertionError: the result gives no count of 2 records validated
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert (None is not None)
+
+tests/acceptance/W2-64/test_w2_64_imported.py:49: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_imported" name="test_the_refusal_also_names_docs_imported_as_left_out" time="0.201"><failure message="AssertionError: exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert (0 != 0)&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9320f0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_the_refusal_also_names_do0')
+
+    def test_the_refusal_also_names_docs_imported_as_left_out(tmp_path):
+        """*Red.* When another record is refused, the output holds the findings and, beside them, the same statement
+        that ``docs/imported/`` is left out as history; nothing under ``docs/imported/`` is a finding. Today: a list of
+        findings and no statement (and the subset passes the fault)."""
+        run = _project(tmp_path, {IMPORTED_REL: _refused_decision(),
+                                  VALID_REL: S.ticket(state_class="NOT-A-CLASS")}).core_schema()
+&gt;       assert run.code != 0 and S.about(run.findings, VALID_REL), run.describe()
+E       AssertionError: exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert (0 != 0)
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9320f0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_imported.py:59: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_imported" name="test_the_same_record_anywhere_else_fails[docs/adr/OWNER-AMENDMENT-P2-0010.md]" time="0.170"><failure message="AssertionError: a refused record at docs/adr/OWNER-AMENDMENT-P2-0010.md passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da98530&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_the_same_record_anywhere_0')
+rel = 'docs/adr/OWNER-AMENDMENT-P2-0010.md'
+
+    @pytest.mark.parametrize("rel", (
+        "docs/adr/OWNER-AMENDMENT-P2-0010.md",
+        "docs/imported-notes/OWNER-AMENDMENT-P2-0010.md",
+        "docs/plan/imported/OWNER-AMENDMENT-P2-0010.md",
+    ))
+    def test_the_same_record_anywhere_else_fails(tmp_path, rel):
+        """*Red.* No other folder is left out: the same record outside ``docs/imported/`` (in ``docs/adr/``, in a folder
+        whose name only begins with ``imported``, in an ``imported`` folder elsewhere) is refused, naming its path and
+        ``id``. Today: no finding (the subset does not check the id's grammar)."""
+        run = _project(tmp_path, {rel: _refused_decision()}).core_schema()
+&gt;       assert run.code != 0, f"a refused record at {rel} passes\n{run.describe()}"
+E       AssertionError: a refused record at docs/adr/OWNER-AMENDMENT-P2-0010.md passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da98530&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_imported.py:78: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_imported" name="test_the_same_record_anywhere_else_fails[docs/imported-notes/OWNER-AMENDMENT-P2-0010.md]" time="0.170"><failure message="AssertionError: a refused record at docs/imported-notes/OWNER-AMENDMENT-P2-0010.md passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d941bb0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_the_same_record_anywhere_1')
+rel = 'docs/imported-notes/OWNER-AMENDMENT-P2-0010.md'
+
+    @pytest.mark.parametrize("rel", (
+        "docs/adr/OWNER-AMENDMENT-P2-0010.md",
+        "docs/imported-notes/OWNER-AMENDMENT-P2-0010.md",
+        "docs/plan/imported/OWNER-AMENDMENT-P2-0010.md",
+    ))
+    def test_the_same_record_anywhere_else_fails(tmp_path, rel):
+        """*Red.* No other folder is left out: the same record outside ``docs/imported/`` (in ``docs/adr/``, in a folder
+        whose name only begins with ``imported``, in an ``imported`` folder elsewhere) is refused, naming its path and
+        ``id``. Today: no finding (the subset does not check the id's grammar)."""
+        run = _project(tmp_path, {rel: _refused_decision()}).core_schema()
+&gt;       assert run.code != 0, f"a refused record at {rel} passes\n{run.describe()}"
+E       AssertionError: a refused record at docs/imported-notes/OWNER-AMENDMENT-P2-0010.md passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d941bb0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_imported.py:78: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_imported" name="test_the_same_record_anywhere_else_fails[docs/plan/imported/OWNER-AMENDMENT-P2-0010.md]" time="0.209"><failure message="AssertionError: a refused record at docs/plan/imported/OWNER-AMENDMENT-P2-0010.md passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da41f40&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_the_same_record_anywhere_2')
+rel = 'docs/plan/imported/OWNER-AMENDMENT-P2-0010.md'
+
+    @pytest.mark.parametrize("rel", (
+        "docs/adr/OWNER-AMENDMENT-P2-0010.md",
+        "docs/imported-notes/OWNER-AMENDMENT-P2-0010.md",
+        "docs/plan/imported/OWNER-AMENDMENT-P2-0010.md",
+    ))
+    def test_the_same_record_anywhere_else_fails(tmp_path, rel):
+        """*Red.* No other folder is left out: the same record outside ``docs/imported/`` (in ``docs/adr/``, in a folder
+        whose name only begins with ``imported``, in an ``imported`` folder elsewhere) is refused, naming its path and
+        ``id``. Today: no finding (the subset does not check the id's grammar)."""
+        run = _project(tmp_path, {rel: _refused_decision()}).core_schema()
+&gt;       assert run.code != 0, f"a refused record at {rel} passes\n{run.describe()}"
+E       AssertionError: a refused record at docs/plan/imported/OWNER-AMENDMENT-P2-0010.md passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da41f40&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_imported.py:78: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_live" name="test_core_schema_is_green_here_and_names_docs_imported" time="6.569"><failure message="AssertionError: core-schema does not print the success form here&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert (False)&#10; +  where False = isinstance(None, dict)&#10; +    where None = &lt;w2_64_support.Run object at 0x7bee3d7fdfd0&gt;.output">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_core_schema_is_green_here0')
+
+    def test_core_schema_is_green_here_and_names_docs_imported(tmp_path):
+        """*Red.* core-schema in this worktree: exit 0, no finding, and the success form whose result names
+        ``docs/imported/`` as left out, as history. Today: exit 0, nothing printed."""
+        place = S.Place(tmp_path).real_tool()
+        run = S.run_core_schema(S.REPO_ROOT, place)
+        assert run.code == 0 and run.findings == [], f"core-schema is not green here\n{run.describe()}"
+&gt;       assert isinstance(run.output, dict) and run.output.get("ok") is True, \
+            f"core-schema does not print the success form here\n{run.describe()}"
+E       AssertionError: core-schema does not print the success form here
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert (False)
+E        +  where False = isinstance(None, dict)
+E        +    where None = &lt;w2_64_support.Run object at 0x7bee3d7fdfd0&gt;.output
+
+tests/acceptance/W2-64/test_w2_64_live.py:27: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_live" name="test_this_worktree_holds_close_records_of_both_forms" time="4.317" /><testcase classname="tests.acceptance.W2-64.test_w2_64_live" name="test_every_close_record_here_validates_under_the_pinned_validator" time="4.554" /><testcase classname="tests.acceptance.W2-64.test_w2_64_live" name="test_the_installed_validator_is_the_pinned_one" time="0.438" /><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_check_jsonschema_absent_from_path_is_red_naming_the_tool" time="0.221"><failure message="AssertionError: core-schema is green with no check-jsonschema on PATH&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da40f50&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_check_jsonschema_absent_f0')
+
+    def test_check_jsonschema_absent_from_path_is_red_naming_the_tool(tmp_path):
+        """*Red.* No check-jsonschema on ``PATH``: core-schema exits non-zero with a finding that names the tool; it is
+        never green and never a skip. Today: exit 0, no finding (the subset needs no validator)."""
+        run = _project(S.Place(tmp_path).no_tool()).core_schema()
+&gt;       assert run.code != 0, f"core-schema is green with no {S.TOOL} on PATH\n{run.describe()}"
+E       AssertionError: core-schema is green with no check-jsonschema on PATH
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da40f50&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:34: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_gov_check_shows_core_schema_red_without_the_tool" time="0.361"><failure message="AssertionError: gov check gives core-schema GREEN with no check-jsonschema: {'id': 'core-schema', 'family': 'schema/invariants', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bcc7471567c1c451e1bd374b20321b36aab1e882', 'check_version': '1.0.0', 'inputs_hash': '780ad58f9e132483'}}&#10;  exit 0&#10;  --- stdout ---&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;check&quot;, &quot;result&quot;: {&quot;families&quot;: {&quot;schema/invariants&quot;: {&quot;status&quot;: &quot;GREEN&quot;, &quot;family&quot;: &quot;schema/invariants&quot;, &quot;check_count&quot;: 1}, &quot;graph integrity&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;graph integrity&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;index freshness&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;index freshness&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;retrieval regression&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;retrieval regression&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;authority/role limits&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;authority/role limits&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;mutation scope&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;mutation scope&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;path-map compliance&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;path-map compliance&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;context reproducibility&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;context reproducibility&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;concurrency/claims&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;concurrency/claims&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;adapter/model portability&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;adapter/model portability&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;skill regression&quot;: {&quot;status&quot;: &quot;GREEN&quot;, &quot;family&quot;: &quot;skill regression&quot;, &quot;check_count&quot;: 1}, &quot;command-contract consistency&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;command-contract consistency&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;secrets indexing&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;secrets indexing&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;recovery/rebuild&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;recovery/rebuild&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;fresh-agent reconstruction&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;fresh-agent reconstruction&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}, &quot;product traceability&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;check_count&quot;: 2}, &quot;audit reproducibility&quot;: {&quot;status&quot;: &quot;YELLOW&quot;, &quot;family&quot;: &quot;audit reproducibility&quot;, &quot;check_count&quot;: 0, &quot;reason&quot;: &quot;no registered check&quot;}}, &quot;checks&quot;: [{&quot;id&quot;: &quot;core-schema&quot;, &quot;family&quot;: &quot;schema/invariants&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;bcc7471567c1c451e1bd374b20321b36aab1e882&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;780ad58f9e132483&quot;}}, {&quot;id&quot;: &quot;openspec-validate&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;YELLOW&quot;, &quot;findings&quot;: [{&quot;code&quot;: &quot;OPENSPEC_ABSENT&quot;, &quot;message&quot;: &quot;openspec is not on PATH&quot;}], &quot;provenance&quot;: {&quot;commit&quot;: &quot;bcc7471567c1c451e1bd374b20321b36aab1e882&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;309c7a423085eb4e&quot;}}, {&quot;id&quot;: &quot;skill-version&quot;, &quot;family&quot;: &quot;skill regression&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;bcc7471567c1c451e1bd374b20321b36aab1e882&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;890d8732d622318d&quot;}}, {&quot;id&quot;: &quot;readiness&quot;, &quot;family&quot;: &quot;product traceability&quot;, &quot;severity&quot;: &quot;hard-block&quot;, &quot;status&quot;: &quot;GREEN&quot;, &quot;findings&quot;: [], &quot;provenance&quot;: {&quot;commit&quot;: &quot;bcc7471567c1c451e1bd374b20321b36aab1e882&quot;, &quot;check_version&quot;: &quot;1.0.0&quot;, &quot;inputs_hash&quot;: &quot;a9eebc6f3794c0a3&quot;}}]}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  --- stderr ---&#10;  families with no registered check: graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility&#10;    adapter/model portability: YELLOW (no registered check)&#10;    audit reproducibility: YELLOW (no registered check)&#10;    authority/role limits: YELLOW (no registered check)&#10;    command-contract consistency: YELLOW (no registered check)&#10;    concurrency/claims: YELLOW (no registered check)&#10;    context reproducibility: YELLOW (no registered check)&#10;    fresh-agent reconstruction: YELLOW (no registered check)&#10;    graph integrity: YELLOW (no registered check)&#10;    index freshness: YELLOW (no registered check)&#10;    mutation scope: YELLOW (no registered check)&#10;    path-map compliance: YELLOW (no registered check)&#10;    product traceability: YELLOW&#10;    recovery/rebuild: YELLOW (no registered check)&#10;    retrieval regression: YELLOW (no registered check)&#10;    schema/invariants: GREEN&#10;    secrets indexing: YELLOW (no registered check)&#10;    skill regression: GREEN&#10;  &#10;assert 'GREEN' == 'RED'&#10;  &#10;  - RED&#10;  + GREEN">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_gov_check_shows_core_sche0')
+
+    def test_gov_check_shows_core_schema_red_without_the_tool(tmp_path):
+        """*Red.* ``gov check --json`` in that project gives the ``core-schema`` entry RED with a finding that names the
+        tool. Today: GREEN."""
+        project = _project(S.Place(tmp_path).no_tool()).declaration()
+        run, entry = project.gov_check()
+&gt;       assert entry.get("status") == "RED", f"gov check gives core-schema {entry.get('status')} with no {S.TOOL}: " \
+                                             f"{entry}\n{run.describe()}"
+E       AssertionError: gov check gives core-schema GREEN with no check-jsonschema: {'id': 'core-schema', 'family': 'schema/invariants', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bcc7471567c1c451e1bd374b20321b36aab1e882', 'check_version': '1.0.0', 'inputs_hash': '780ad58f9e132483'}}
+E         exit 0
+E         --- stdout ---
+E         {"ok": true, "command": "check", "result": {"families": {"schema/invariants": {"status": "GREEN", "family": "schema/invariants", "check_count": 1}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "YELLOW", "family": "adapter/model portability", "check_count": 0, "reason": "no registered check"}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "core-schema", "family": "schema/invariants", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "bcc7471567c1c451e1bd374b20321b36aab1e882", "check_version": "1.0.0", "inputs_hash": "780ad58f9e132483"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "bcc7471567c1c451e1bd374b20321b36aab1e882", "check_version": "1.0.0", "inputs_hash": "309c7a423085eb4e"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "bcc7471567c1c451e1bd374b20321b36aab1e882", "check_version": "1.0.0", "inputs_hash": "890d8732d622318d"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "bcc7471567c1c451e1bd374b20321b36aab1e882", "check_version": "1.0.0", "inputs_hash": "a9eebc6f3794c0a3"}}]}, "session": ""}
+E         
+E         --- stderr ---
+E         families with no registered check: graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: GREEN
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert 'GREEN' == 'RED'
+E         
+E         - RED
+E         + GREEN
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:44: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_that_fails_to_run_or_answers_no_json_is_red[fails-every-call]" time="0.235"><failure message="AssertionError: core-schema is not RED when the validator stand-in 'fails-every-call' is on PATH&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d975e50&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_that_fails_to0')
+kind = 'fails-every-call'
+
+    @pytest.mark.parametrize("kind", sorted(S.STAND_INS))
+    def test_a_validator_that_fails_to_run_or_answers_no_json_is_red(tmp_path, kind):
+        """*Red.* A check-jsonschema stand-in on ``PATH`` that prints text that is not its JSON answer and exits 1
+        (``prints-text``), exits 0 printing nothing (``silent-exit-0``), answers ``ok`` naming none of the instances it
+        was given (``names-no-instance``), is killed (``killed``), or fails every call, ``--version`` included
+        (``fails-every-call``): core-schema is RED. Today: exit 0, no finding (the validator is never called)."""
+        run = _project(S.Place(tmp_path).stand_in(kind)).core_schema()
+&gt;       _assert_red(run, f"the validator stand-in '{kind}' is on PATH")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3d975e50&gt;
+what = "the validator stand-in 'fails-every-call' is on PATH"
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the validator stand-in 'fails-every-call' is on PATH
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d975e50&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_that_fails_to_run_or_answers_no_json_is_red[killed]" time="0.227"><failure message="AssertionError: core-schema is not RED when the validator stand-in 'killed' is on PATH&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_that_fails_to1')
+kind = 'killed'
+
+    @pytest.mark.parametrize("kind", sorted(S.STAND_INS))
+    def test_a_validator_that_fails_to_run_or_answers_no_json_is_red(tmp_path, kind):
+        """*Red.* A check-jsonschema stand-in on ``PATH`` that prints text that is not its JSON answer and exits 1
+        (``prints-text``), exits 0 printing nothing (``silent-exit-0``), answers ``ok`` naming none of the instances it
+        was given (``names-no-instance``), is killed (``killed``), or fails every call, ``--version`` included
+        (``fails-every-call``): core-schema is RED. Today: exit 0, no finding (the validator is never called)."""
+        run = _project(S.Place(tmp_path).stand_in(kind)).core_schema()
+&gt;       _assert_red(run, f"the validator stand-in '{kind}' is on PATH")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;
+what = "the validator stand-in 'killed' is on PATH"
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the validator stand-in 'killed' is on PATH
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_that_fails_to_run_or_answers_no_json_is_red[names-no-instance]" time="0.157"><failure message="AssertionError: core-schema is not RED when the validator stand-in 'names-no-instance' is on PATH&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d8dec90&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_that_fails_to2')
+kind = 'names-no-instance'
+
+    @pytest.mark.parametrize("kind", sorted(S.STAND_INS))
+    def test_a_validator_that_fails_to_run_or_answers_no_json_is_red(tmp_path, kind):
+        """*Red.* A check-jsonschema stand-in on ``PATH`` that prints text that is not its JSON answer and exits 1
+        (``prints-text``), exits 0 printing nothing (``silent-exit-0``), answers ``ok`` naming none of the instances it
+        was given (``names-no-instance``), is killed (``killed``), or fails every call, ``--version`` included
+        (``fails-every-call``): core-schema is RED. Today: exit 0, no finding (the validator is never called)."""
+        run = _project(S.Place(tmp_path).stand_in(kind)).core_schema()
+&gt;       _assert_red(run, f"the validator stand-in '{kind}' is on PATH")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3d8dec90&gt;
+what = "the validator stand-in 'names-no-instance' is on PATH"
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the validator stand-in 'names-no-instance' is on PATH
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d8dec90&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_that_fails_to_run_or_answers_no_json_is_red[prints-text]" time="0.188"><failure message="AssertionError: core-schema is not RED when the validator stand-in 'prints-text' is on PATH&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d7fdfd0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_that_fails_to3')
+kind = 'prints-text'
+
+    @pytest.mark.parametrize("kind", sorted(S.STAND_INS))
+    def test_a_validator_that_fails_to_run_or_answers_no_json_is_red(tmp_path, kind):
+        """*Red.* A check-jsonschema stand-in on ``PATH`` that prints text that is not its JSON answer and exits 1
+        (``prints-text``), exits 0 printing nothing (``silent-exit-0``), answers ``ok`` naming none of the instances it
+        was given (``names-no-instance``), is killed (``killed``), or fails every call, ``--version`` included
+        (``fails-every-call``): core-schema is RED. Today: exit 0, no finding (the validator is never called)."""
+        run = _project(S.Place(tmp_path).stand_in(kind)).core_schema()
+&gt;       _assert_red(run, f"the validator stand-in '{kind}' is on PATH")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3d7fdfd0&gt;
+what = "the validator stand-in 'prints-text' is on PATH"
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the validator stand-in 'prints-text' is on PATH
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d7fdfd0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_that_fails_to_run_or_answers_no_json_is_red[silent-exit-0]" time="0.196"><failure message="AssertionError: core-schema is not RED when the validator stand-in 'silent-exit-0' is on PATH&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_that_fails_to4')
+kind = 'silent-exit-0'
+
+    @pytest.mark.parametrize("kind", sorted(S.STAND_INS))
+    def test_a_validator_that_fails_to_run_or_answers_no_json_is_red(tmp_path, kind):
+        """*Red.* A check-jsonschema stand-in on ``PATH`` that prints text that is not its JSON answer and exits 1
+        (``prints-text``), exits 0 printing nothing (``silent-exit-0``), answers ``ok`` naming none of the instances it
+        was given (``names-no-instance``), is killed (``killed``), or fails every call, ``--version`` included
+        (``fails-every-call``): core-schema is RED. Today: exit 0, no finding (the validator is never called)."""
+        run = _project(S.Place(tmp_path).stand_in(kind)).core_schema()
+&gt;       _assert_red(run, f"the validator stand-in '{kind}' is on PATH")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;
+what = "the validator stand-in 'silent-exit-0' is on PATH"
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the validator stand-in 'silent-exit-0' is on PATH
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_that_cannot_be_executed_is_red" time="0.196"><failure message="AssertionError: core-schema is not RED when the check-jsonschema on PATH cannot be executed&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d932a20&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_that_cannot_b0')
+
+    def test_a_validator_that_cannot_be_executed_is_red(tmp_path):
+        """*Red.* A check-jsonschema on ``PATH`` without the execute bit: RED. Today: exit 0."""
+        run = _project(S.Place(tmp_path).not_executable()).core_schema()
+&gt;       _assert_red(run, f"the {S.TOOL} on PATH cannot be executed")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3d932a20&gt;
+what = 'the check-jsonschema on PATH cannot be executed'
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the check-jsonschema on PATH cannot be executed
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d932a20&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_errors_answered_with_exit_0_are_still_refused" time="0.156"><failure message="AssertionError: errors answered with exit 0 pass&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da41d60&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_errors_answered_with_exit0')
+
+    def test_errors_answered_with_exit_0_are_still_refused(tmp_path):
+        """*Red.* A stand-in that prints the real validator's answer and always exits 0: a record the schema refuses is
+        still refused on its path, not passed on the exit code. Today: no finding."""
+        place = S.Place(tmp_path).answers_exit_0()
+        run = _project(place, record=S.ticket(state_class="NOT-A-CLASS")).core_schema()
+&gt;       assert run.code != 0, f"errors answered with exit 0 pass\n{run.describe()}"
+E       AssertionError: errors answered with exit 0 pass
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3da41d60&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:70: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_validator_of_another_version_than_the_pin_is_red_naming_both" time="0.217"><failure message="AssertionError: a validator of version 0.37.0 against the pin 0.38.2 passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_validator_of_another_ve0')
+
+    def test_a_validator_of_another_version_than_the_pin_is_red_naming_both(tmp_path):
+        """*Red.* A stand-in that answers ``--version`` with another version than the registry's pin (and validates with
+        the real tool): RED, with a finding that names both versions (DEC-074: the pinned validator is the judge).
+        Today: exit 0, no finding."""
+        run = _project(S.Place(tmp_path).other_version()).core_schema()
+&gt;       assert run.code != 0, f"a validator of version {S.OTHER_VERSION} against the pin {S.pinned_version()} passes\n" \
+                              f"{run.describe()}"
+E       AssertionError: a validator of version 0.37.0 against the pin 0.38.2 passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:79: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_the_pinned_version_is_green" time="0.157" /><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_a_registry_that_cannot_be_read_is_red" time="0.184"><failure message="AssertionError: core-schema is not RED when the tool registry cannot be read&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e9443e0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_registry_that_cannot_be0')
+
+    def test_a_registry_that_cannot_be_read_is_red(tmp_path):
+        """*Red.* A tool registry that exists but is not YAML: RED. Today: exit 0 (the registry is not read)."""
+        project = _project(S.Place(tmp_path).real_tool(), registry=False)
+        project.write(S.REGISTRY_REL, "tools: [ {name: check-jsonschema, version: \n  : : :\n")
+        run = project.core_schema()
+&gt;       _assert_red(run, "the tool registry cannot be read")
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = &lt;w2_64_support.Run object at 0x7bee3e9443e0&gt;
+what = 'the tool registry cannot be read'
+
+    def _assert_red(run, what):
+&gt;       assert run.code != 0, f"core-schema is not RED when {what}\n{run.describe()}"
+E       AssertionError: core-schema is not RED when the tool registry cannot be read
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3e9443e0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:26: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_no_pin_stated_still_validates[absent]" time="0.157"><failure message="AssertionError: with no pin stated (absent), a refused record passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert (0 != 0)&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d7ff620&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_no_pin_stated_still_valid0')
+registry = 'absent'
+
+    @pytest.mark.parametrize("registry", ("absent", "no-entry"))
+    def test_no_pin_stated_still_validates(tmp_path, registry):
+        """*Red.* A project with no registry, or a registry with no check-jsonschema entry, states no pin: the check
+        still validates (a record its schema refuses is refused), and the absent pin is no finding of its own. Today:
+        the fault passes."""
+        project = _no_pin(_project(S.Place(tmp_path).real_tool(), registry=False,
+                                   record=S.ticket(state_class="NOT-A-CLASS")), registry)
+        run = project.core_schema()
+&gt;       assert run.code != 0 and S.about(run.findings, TICKET_REL), \
+            f"with no pin stated ({registry}), a refused record passes\n{run.describe()}"
+E       AssertionError: with no pin stated (absent), a refused record passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert (0 != 0)
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d7ff620&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:114: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_no_pin_stated_still_validates[no-entry]" time="0.158"><failure message="AssertionError: with no pin stated (no-entry), a refused record passes&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert (0 != 0)&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d7fda00&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_no_pin_stated_still_valid1')
+registry = 'no-entry'
+
+    @pytest.mark.parametrize("registry", ("absent", "no-entry"))
+    def test_no_pin_stated_still_validates(tmp_path, registry):
+        """*Red.* A project with no registry, or a registry with no check-jsonschema entry, states no pin: the check
+        still validates (a record its schema refuses is refused), and the absent pin is no finding of its own. Today:
+        the fault passes."""
+        project = _no_pin(_project(S.Place(tmp_path).real_tool(), registry=False,
+                                   record=S.ticket(state_class="NOT-A-CLASS")), registry)
+        run = project.core_schema()
+&gt;       assert run.code != 0 and S.about(run.findings, TICKET_REL), \
+            f"with no pin stated ({registry}), a refused record passes\n{run.describe()}"
+E       AssertionError: with no pin stated (no-entry), a refused record passes
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert (0 != 0)
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d7fda00&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:114: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_no_pin_stated_is_green_and_says_so[absent]" time="0.189"><failure message="AssertionError: the output does not say that no pin was stated&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 'pin' in ''&#10; +  where '' = &lt;built-in method lower of str object at 0xb3c3f0&gt;()&#10; +    where &lt;built-in method lower of str object at 0xb3c3f0&gt; = ''.lower&#10; +      where '' = &lt;w2_64_support.Run object at 0x7bee3d7ff8f0&gt;.stdout">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_no_pin_stated_is_green_an0')
+registry = 'absent'
+
+    @pytest.mark.parametrize("registry", ("absent", "no-entry"))
+    def test_no_pin_stated_is_green_and_says_so(tmp_path, registry):
+        """*Red.* With no pin stated and a valid record: exit 0, no finding, and the output says that no pin was stated
+        (it mentions a pin). Today: nothing is printed."""
+        run = _no_pin(_project(S.Place(tmp_path).real_tool(), registry=False), registry).core_schema()
+        assert run.code == 0 and run.findings == [], f"no pin stated ({registry}) is not green\n{run.describe()}"
+&gt;       assert "pin" in run.stdout.lower(), f"the output does not say that no pin was stated\n{run.describe()}"
+E       AssertionError: the output does not say that no pin was stated
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 'pin' in ''
+E        +  where '' = &lt;built-in method lower of str object at 0xb3c3f0&gt;()
+E        +    where &lt;built-in method lower of str object at 0xb3c3f0&gt; = ''.lower
+E        +      where '' = &lt;w2_64_support.Run object at 0x7bee3d7ff8f0&gt;.stdout
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:126: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_tool_red" name="test_no_pin_stated_is_green_and_says_so[no-entry]" time="0.160"><failure message="AssertionError: the output does not say that no pin was stated&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 'pin' in ''&#10; +  where '' = &lt;built-in method lower of str object at 0xb3c3f0&gt;()&#10; +    where &lt;built-in method lower of str object at 0xb3c3f0&gt; = ''.lower&#10; +      where '' = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.stdout">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_no_pin_stated_is_green_an1')
+registry = 'no-entry'
+
+    @pytest.mark.parametrize("registry", ("absent", "no-entry"))
+    def test_no_pin_stated_is_green_and_says_so(tmp_path, registry):
+        """*Red.* With no pin stated and a valid record: exit 0, no finding, and the output says that no pin was stated
+        (it mentions a pin). Today: nothing is printed."""
+        run = _no_pin(_project(S.Place(tmp_path).real_tool(), registry=False), registry).core_schema()
+        assert run.code == 0 and run.findings == [], f"no pin stated ({registry}) is not green\n{run.describe()}"
+&gt;       assert "pin" in run.stdout.lower(), f"the output does not say that no pin was stated\n{run.describe()}"
+E       AssertionError: the output does not say that no pin was stated
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 'pin' in ''
+E        +  where '' = &lt;built-in method lower of str object at 0xb3c3f0&gt;()
+E        +    where &lt;built-in method lower of str object at 0xb3c3f0&gt; = ''.lower
+E        +      where '' = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.stdout
+
+tests/acceptance/W2-64/test_w2_64_tool_red.py:126: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_type_absent_or_not_a_string_is_schema_invalid_type[absent]" time="0.169" /><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_type_absent_or_not_a_string_is_schema_invalid_type[not-a-string]" time="0.196" /><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_an_unknown_type_is_schema_unknown_type" time="0.226" /><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_type_whose_schema_is_in_neither_layout_is_unmeasured" time="0.134" /><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_record_schema_that_cannot_be_parsed_is_red" time="0.164" /><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_common_schema_that_cannot_be_parsed_is_red" time="0.152"><failure message="AssertionError: an unparsable common.schema.json is green&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9756d0&gt;.code">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_common_schema_that_cann0')
+
+    def test_a_common_schema_that_cannot_be_parsed_is_red(tmp_path):
+        """*Red.* ``common.schema.json``, which every record schema refers to, is not JSON; a valid ticket: RED, a finding
+        on the record or naming ``common.schema.json``. Today: green (the subset reads the ticket schema's own
+        ``required`` list without the shared file)."""
+        run = _project(tmp_path, {".tickets/PROJ-aaaa.md": S.ticket()},
+                       broken={"common.schema.json": "{ this is not json"}).core_schema()
+&gt;       assert run.code != 0, f"an unparsable common.schema.json is green\n{run.describe()}"
+E       AssertionError: an unparsable common.schema.json is green
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_64_support.Run object at 0x7bee3d9756d0&gt;.code
+
+tests/acceptance/W2-64/test_w2_64_what_stays.py:70: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding[a YAML error]" time="0.187"><failure message="AssertionError: a file whose frontmatter cannot be read (a YAML error) is skipped&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert []&#10; +  where [] = &lt;function about at 0x7bee3d8e0a40&gt;([], 'docs/records/REC-ONE.md')&#10; +    where &lt;function about at 0x7bee3d8e0a40&gt; = S.about&#10; +    and   [] = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.findings">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_file_that_opens_with_da0')
+case = 'a YAML error'
+
+    @pytest.mark.parametrize("case", sorted(UNREADABLE_FRONTMATTER))
+    def test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding(tmp_path, case):
+        """*Red.* A file under ``docs/`` that opens with ``---`` and whose frontmatter cannot be read (``case``) is a
+        finding on its path and core-schema exits non-zero: no silent skip. Today: skipped, exit 0."""
+        run = _project(tmp_path, {REL: UNREADABLE_FRONTMATTER[case]}).core_schema()
+&gt;       assert S.about(run.findings, REL), f"a file whose frontmatter cannot be read ({case}) is skipped\n{run.describe()}"
+E       AssertionError: a file whose frontmatter cannot be read (a YAML error) is skipped
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert []
+E        +  where [] = &lt;function about at 0x7bee3d8e0a40&gt;([], 'docs/records/REC-ONE.md')
+E        +    where &lt;function about at 0x7bee3d8e0a40&gt; = S.about
+E        +    and   [] = &lt;w2_64_support.Run object at 0x7bee3e0f6cf0&gt;.findings
+
+tests/acceptance/W2-64/test_w2_64_what_stays.py:87: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding[no closing line]" time="0.139"><failure message="AssertionError: a file whose frontmatter cannot be read (no closing line) is skipped&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert []&#10; +  where [] = &lt;function about at 0x7bee3d8e0a40&gt;([], 'docs/records/REC-ONE.md')&#10; +    where &lt;function about at 0x7bee3d8e0a40&gt; = S.about&#10; +    and   [] = &lt;w2_64_support.Run object at 0x7bee3d931ee0&gt;.findings">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_file_that_opens_with_da1')
+case = 'no closing line'
+
+    @pytest.mark.parametrize("case", sorted(UNREADABLE_FRONTMATTER))
+    def test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding(tmp_path, case):
+        """*Red.* A file under ``docs/`` that opens with ``---`` and whose frontmatter cannot be read (``case``) is a
+        finding on its path and core-schema exits non-zero: no silent skip. Today: skipped, exit 0."""
+        run = _project(tmp_path, {REL: UNREADABLE_FRONTMATTER[case]}).core_schema()
+&gt;       assert S.about(run.findings, REL), f"a file whose frontmatter cannot be read ({case}) is skipped\n{run.describe()}"
+E       AssertionError: a file whose frontmatter cannot be read (no closing line) is skipped
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert []
+E        +  where [] = &lt;function about at 0x7bee3d8e0a40&gt;([], 'docs/records/REC-ONE.md')
+E        +    where &lt;function about at 0x7bee3d8e0a40&gt; = S.about
+E        +    and   [] = &lt;w2_64_support.Run object at 0x7bee3d931ee0&gt;.findings
+
+tests/acceptance/W2-64/test_w2_64_what_stays.py:87: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding[not a mapping]" time="0.126"><failure message="AssertionError: a file whose frontmatter cannot be read (not a mapping) is skipped&#10;  exit 0&#10;  --- stdout ---&#10;  &#10;  --- stderr ---&#10;  &#10;assert []&#10; +  where [] = &lt;function about at 0x7bee3d8e0a40&gt;([], 'docs/records/REC-ONE.md')&#10; +    where &lt;function about at 0x7bee3d8e0a40&gt; = S.about&#10; +    and   [] = &lt;w2_64_support.Run object at 0x7bee3d7fd8b0&gt;.findings">tmp_path = PosixPath('/tmp/gov-os-lead-W2-64/pytest-of-usain/pytest-0/test_a_file_that_opens_with_da2')
+case = 'not a mapping'
+
+    @pytest.mark.parametrize("case", sorted(UNREADABLE_FRONTMATTER))
+    def test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding(tmp_path, case):
+        """*Red.* A file under ``docs/`` that opens with ``---`` and whose frontmatter cannot be read (``case``) is a
+        finding on its path and core-schema exits non-zero: no silent skip. Today: skipped, exit 0."""
+        run = _project(tmp_path, {REL: UNREADABLE_FRONTMATTER[case]}).core_schema()
+&gt;       assert S.about(run.findings, REL), f"a file whose frontmatter cannot be read ({case}) is skipped\n{run.describe()}"
+E       AssertionError: a file whose frontmatter cannot be read (not a mapping) is skipped
+E         exit 0
+E         --- stdout ---
+E         
+E         --- stderr ---
+E         
+E       assert []
+E        +  where [] = &lt;function about at 0x7bee3d8e0a40&gt;([], 'docs/records/REC-ONE.md')
+E        +    where &lt;function about at 0x7bee3d8e0a40&gt; = S.about
+E        +    and   [] = &lt;w2_64_support.Run object at 0x7bee3d7fd8b0&gt;.findings
+
+tests/acceptance/W2-64/test_w2_64_what_stays.py:87: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-64.test_w2_64_what_stays" name="test_a_file_whose_first_line_is_not_dashes_is_no_record" time="0.154" /></testsuite></testsuites>

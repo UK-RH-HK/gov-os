@@ -1,0 +1,16 @@
+FAIL wave2-tickets — ids on one side only: W2-59 (.tickets/ only), W2-60a (.tickets/ only), W2-60b (.tickets/ only), W2-61 (.tickets/ only), W2-61h (.tickets/ only), W2-62 (.tickets/ only), W2-63 (.tickets/ only), W2-64 (.tickets/ only), W2-65 (.tickets/ only), W2-66 (.tickets/ only), W2-67 (.tickets/ only), W2-68 (.tickets/ only), W2-69 (.tickets/ only), W2-70 (.tickets/ only), W2-71 (.tickets/ only), W2-72 (.tickets/ only), W2-73 (.tickets/ only), W2-74 (.tickets/ only), W2-75 (.tickets/ only), W2-76 (.tickets/ only), W2-77 (.tickets/ only), W2-78 (.tickets/ only), W2-79 (.tickets/ only), W2-80 (.tickets/ only), W2-81 (.tickets/ only), W2-82 (.tickets/ only), W2-83a (.tickets/ only), W2-83b (.tickets/ only), W2-84 (.tickets/ only)
+PASS contract-items-delivered — 17 Wave 2 items, each in a Wave 2 ticket's closes
+FAIL contract-items-cited-by-tests — no acceptance test cites: CAP-04.a, CAP-04.d, CAP-10.b, CAP-19.a, CAP-19.c, CAP-22.b, CAP-22.c, CAP-30.g, CAP-32.d, CAP-33.b, CAP-33.g, CAP-37.e, CAP-45.a, CAP-53.b
+PASS ticket-contract-ids-exist — every Contract id cited by 89 Wave 2 tickets exists
+PASS cit-p-moved-items — 0 items moved to Wave 2, each with a CIT-P line
+PASS cit-p-lines-applied — 0 CIT-P lines, each applied in the Contract
+PASS list-counts — 4 severity counts agree with 947 rows
+FAIL triage-counts — count disagrees: medium Wave 3 states 34, rows give 35, medium backlog states 15, rows give 14, all Wave 3 states 88, rows give 89, all backlog states 169, rows give 168
+NOT RUN scenario-ids-in-coverage-matrix — would need gov-os-workbench (synthetic/COVERAGE_MATRIX.md); never read by this validator (DEC-744)
+NOT RUN mr-rules-verbatim-in-architecture — would need gov-os-workbench (input/GOV_OS_ARCHITECTURE_v0.3.md); never read by this validator (DEC-744)
+NOT RUN register-prefix-v0.12 — would need gov-os-workbench (input/GOV_OS_DECISION_REGISTER_v0.12.md); never read by this validator (DEC-744)
+NOT RUN s1a-round-1-fingerprints — would need gov-os-workbench (s1a-round1.sha256); never read by this validator (DEC-744)
+NOT RUN readiness-dimensions-vs-framework — would need docs/source (the Framework's original, §37); never read by this validator (DEC-744)
+
+RESULT: 3 FAIL, 5 NOT RUN
+exit=1

@@ -1,0 +1,1 @@
+keyword-warn: 0 file(s) hold a keyword of row W2-L423's rule; 0 not read

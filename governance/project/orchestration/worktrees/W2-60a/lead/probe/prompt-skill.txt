@@ -1,0 +1,1 @@
+Use the Skill tool once to load the skill named probe-skill. Then answer with exactly one line and nothing else: SKILL=<the skill token it gives>, or SKILL=REFUSED: <the refusal's text, word for word> if the Skill tool was refused, or SKILL=NONE if you could not load it for another reason (say which).

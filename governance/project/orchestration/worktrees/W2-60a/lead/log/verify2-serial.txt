@@ -1,0 +1,513 @@
+........................................................................ [ 40%]
+................................EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEFF.. [ 80%]
+.............FF.F...................                                     [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_opaque_bash_write_outside_the_repository_fails[interpreter.txt] _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_an_opaque_bash_write_outside_the_repository_fails[substitution.txt] _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_an_opaque_bash_write_outside_the_repository_fails[here-string.txt] _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+__ ERROR at setup of test_a_file_tool_write_outside_the_repository_is_refused __
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+__________ ERROR at setup of test_ln_into_gov_runtime_fails[symlink] ___________
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+__________ ERROR at setup of test_ln_into_gov_runtime_fails[hardlink] __________
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails[an-acceptance-test] _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails[a-ticket] _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails[the-settings] _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_held_out_directory_looks_empty_from_the_sessions_bash _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_______ ERROR at setup of test_the_empty_allowlist_refuses_a_connection ________
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_role_and_the_ticket_reach_the_session_and_its_hooks _
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_a_research_install_succeeds_into_a_venv_inside_the_experiment_folder _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_a_research_install_outside_the_repository_fails_at_the_write_fence _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+__ ERROR at setup of test_a_research_bash_write_to_a_sibling_directory_fails ___
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[api.github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[raw.githubusercontent.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[objects.githubusercontent.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[codeload.github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[pypi.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[files.pythonhosted.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[registry.npmjs.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[huggingface.co] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[arxiv.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[export.arxiv.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.python.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.rs] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[crates.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[static.crates.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[developer.mozilla.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.readthedocs.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_ ERROR at setup of test_the_research_allowlist_refuses_a_domain_that_is_not_on_it _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/research.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_____ ERROR at setup of test_each_session_uses_a_temp_directory_of_its_own _____
+the launched engineer session did not run the probe to its end (no complete .gov-runtime/scratch/w1-46/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: bash .gov-runtime/scratch/w1-46/probe.sh  Step 2: use the Write tool to write the single letter x to the file /tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-46-live-engineer0/sandbox/elsewhere/outside/file-tool.txt  Then answer DONE. --permission-mode acceptEdits --max-turns 8 --allowedTools Bash,Write
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+=================================== FAILURES ===================================
+_________ test_a_flag_put_over_the_placeholder_during_a_command_stays __________
+
+freeze_launch_base = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/w1-50-freeze-launch-base0/repo')
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-52/test_a_flag_put_over_the_place0')
+
+    @pytest.mark.local_only
+    def test_a_flag_put_over_the_placeholder_during_a_command_stays(freeze_launch_base, tmp_path):
+        """A real engineer session, one Bash call of about fifteen seconds, with the owner acting from outside."""
+        missing = [name for name in ("bwrap", "socat") if shutil.which(name) is None]
+        if not (Path.home() / launch_support.CLI_REL).is_file():
+            missing.append("~/.local/bin/claude")
+        if missing:
+            pytest.fail(f"a launched session needs {missing} on this machine", pytrace=False)
+    
+        project = tmp_path / "repo"
+        shutil.copytree(freeze_launch_base, project, symlinks=True)
+        sandbox = launch_support.cli_support.make_sandbox(tmp_path / "sandbox")
+        support.w47.configure_stand_in(project, support.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
+        launch_support.write(project, f"{SCRATCH}/probe.sh", PROBE)
+        launch_support.set_live_launch_default(project, ENGINEER)
+        flag = support.put_text(project, FLAG_AT_LAUNCH)          # a marked flag exists at launch: the settings name it
+        new_flag = tmp_path / "the-flag-to-put"                   # on the project's file system: a rename, not a copy
+        new_flag.write_bytes(FLAG_PUT_DURING_THE_COMMAND)
+        results_path = project / SCRATCH / "results.txt"
+        try:
+            # The launcher's temp folder appears here, alone: a short path that is this test's own (see the module text).
+            launch_tmp = Path(tempfile.mkdtemp(prefix=LAUNCH_TMP_PREFIX, dir=TEMP_ROOT))
+        except OSError as error:
+            pytest.fail(f"this case needs a folder of its own directly under {TEMP_ROOT}, and cannot make one: {error}",
+                        pytrace=False)
+    
+        try:
+            if len(os.fsencode(str(launch_tmp))) > LAUNCH_TMP_MAX_BYTES:
+                pytest.fail(f"the launcher's TMPDIR {launch_tmp} is longer than {LAUNCH_TMP_MAX_BYTES} bytes: the "
+                            f"sandbox's sockets under the session's temp folder may not fit a socket path", pytrace=False)
+            owner = _Owner(flag, launch_tmp, new_flag, results_path)
+            env = inherited(os.environ)
+            env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+                        "TMPDIR": str(launch_tmp)})
+            owner.start()
+            try:
+                # The stream of messages, so that a failure can say what the session's Bash call returned.
+                run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER],
+                                             "--", "-p", PROMPT, "--output-format", "stream-json", "--verbose",
+                                             "--permission-mode", "acceptEdits", "--max-turns", "6",
+                                             "--allowedTools", "Bash", env=env, timeout=SESSION_TIMEOUT_S)
+                time.sleep(1.0)   # what the end of the session does at the path is in the log too
+            finally:
+                owner.stop.set()
+                owner.join(timeout=5)
+            at_the_end = _seen(flag)
+        finally:
+            shutil.rmtree(launch_tmp, ignore_errors=True)
+        history = "; ".join(f"{seconds} s after it was put ({'after' if ended else 'during'} the command): {what}"
+                            for seconds, ended, what in owner.log) or "nothing was noted"
+        session = (f"the session's exit code: {run.returncode}\n{_session_account(run.stdout)}\n"
+                   f"the end of its error output: {run.stderr[-600:]!r}")
+    
+        # Did the case observe what it is about? If not, it shows nothing: a failure, never a pass and never a skip.
+        assert owner.error is None, f"the test's own watcher failed: {owner.error!r}"
+>       assert owner.lifted, f"the launcher's temp folder never appeared in {launch_tmp}: no session was started\n" \
+                             f"{session}"
+E       AssertionError: the launcher's temp folder never appeared in /tmp/w150-txvky9hz: no session was started
+E         the session's exit code: 1
+E         the session's output holds no message of the stream; its end: ''
+E         the end of its error output: "gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'\n"
+E       assert False
+E        +  where False = <_Owner(Thread-31, stopped daemon 131454636574400)>.lifted
+
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:264: AssertionError
+_______ test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path _______
+the launched session did not run the probe to its end
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w1-50/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 6 --allowedTools Bash
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+_________ test_a_launched_session_shows_no_phantom_deletion[engineer] __________
+
+request = <FixtureRequest for <Function test_a_launched_session_shows_no_phantom_deletion[engineer]>>
+which = 'engineer'
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("which", ("engineer", "independent-test-designer"))
+    def test_a_launched_session_shows_no_phantom_deletion(request, which):
+        """``git status --short`` shows no tracked file as deleted, and ``git update-index --refresh`` succeeds."""
+        session = request.getfixturevalue("engineer_session" if which == "engineer" else "test_designer_session")
+        why = session.describe("status.txt", "refresh.txt")
+        deleted = [line for line in session.output("status.txt").splitlines() if line[:2] in (" D", "D ")]
+        assert session.results.get("status") == "0" and not deleted, (
+            f"the launched {which}'s git status shows tracked files as deleted: {deleted}\n{why}")
+>       assert session.results.get("refresh") == "0", f"the launched {which}'s git update-index --refresh failed\n{why}"
+E       AssertionError: the launched engineer's git update-index --refresh failed
+E         results: {'collect': '0', 'run': '1', 'status': '0', 'refresh': '1', 'end': '1'}
+E         --- status.txt:
+E          M template/governance/kernel/roles/engineer.md
+E         ?? .bash_profile
+E         ?? .bashrc
+E         ?? .gitconfig
+E         ?? .gitmodules
+E         ?? .idea
+E         ?? .mcp.json
+E         ?? .profile
+E         ?? .ripgreprc
+E         ?? .vscode
+E         ?? .zprofile
+E         ?? .zshrc
+E         
+E         --- refresh.txt:
+E         template/governance/kernel/roles/engineer.md: needs update
+E         
+E       assert '1' == '0'
+E         
+E         - 0
+E         + 1
+
+tests/acceptance/W2-58/test_w2_58_launched_sessions.py:229: AssertionError
+_ test_a_launched_session_shows_no_phantom_deletion[independent-test-designer] _
+
+request = <FixtureRequest for <Function test_a_launched_session_shows_no_phantom_deletion[independent-test-designer]>>
+which = 'independent-test-designer'
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("which", ("engineer", "independent-test-designer"))
+    def test_a_launched_session_shows_no_phantom_deletion(request, which):
+        """``git status --short`` shows no tracked file as deleted, and ``git update-index --refresh`` succeeds."""
+        session = request.getfixturevalue("engineer_session" if which == "engineer" else "test_designer_session")
+        why = session.describe("status.txt", "refresh.txt")
+        deleted = [line for line in session.output("status.txt").splitlines() if line[:2] in (" D", "D ")]
+        assert session.results.get("status") == "0" and not deleted, (
+            f"the launched {which}'s git status shows tracked files as deleted: {deleted}\n{why}")
+>       assert session.results.get("refresh") == "0", f"the launched {which}'s git update-index --refresh failed\n{why}"
+E       AssertionError: the launched independent-test-designer's git update-index --refresh failed
+E         results: {'import': '0', 'status': '0', 'refresh': '1', 'end': '1'}
+E         --- status.txt:
+E          M template/governance/kernel/roles/independent-test-designer.md
+E         ?? .bash_profile
+E         ?? .bashrc
+E         ?? .gitconfig
+E         ?? .gitmodules
+E         ?? .idea
+E         ?? .mcp.json
+E         ?? .profile
+E         ?? .ripgreprc
+E         ?? .vscode
+E         ?? .zprofile
+E         ?? .zshrc
+E         
+E         --- refresh.txt:
+E         template/governance/kernel/roles/independent-test-designer.md: needs update
+E         
+E       assert '1' == '0'
+E         
+E         - 0
+E         + 1
+
+tests/acceptance/W2-58/test_w2_58_launched_sessions.py:229: AssertionError
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --max-turns 6 --allowedTools Bash
+exit code: 1
+stdout:
+
+stderr:
+gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** <major>.<minor>.<patch>'
+
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:174: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+5 failed, 139 passed, 1 warning, 36 errors in 1071.51s (0:17:51)

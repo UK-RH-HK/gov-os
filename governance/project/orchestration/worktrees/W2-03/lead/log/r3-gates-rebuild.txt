@@ -1,0 +1,110 @@
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+close running, waiting
+Thu Oct 29 19:07:03 GMT 2026
+4.65 4.80 9.27 28/1287 1676426
+disk gate open: 885 GiB free, 65833538 inodes free
+disk_gate exit 0
+149	/home/usain/gov-os-worktrees/W2-03/.gov-runtime
+1	/tmp/gov-os-lead-W2-03
+267M	/home/usain/gov-os-worktrees/W2-03/.gov-runtime
+4.0K	/tmp/gov-os-lead-W2-03
+!! src/gov/__pycache__/
+!! src/gov/adapters/__pycache__/
+!! src/gov/adopt/__pycache__/
+!! src/gov/check/__pycache__/
+!! src/gov/checkpoint/__pycache__/
+!! src/gov/ci/__pycache__/
+!! src/gov/cli/__pycache__/
+!! src/gov/close/__pycache__/
+!! src/gov/close/pytest_plugin/__pycache__/
+!! src/gov/closure/__pycache__/
+!! src/gov/codeintel/__pycache__/
+!! src/gov/config/__pycache__/
+!! src/gov/context/__pycache__/
+!! src/gov/decisions/__pycache__/
+!! src/gov/doctor/__pycache__/
+!! src/gov/guard/__pycache__/
+!! src/gov/launch/__pycache__/
+!! src/gov/readiness/__pycache__/
+!! src/gov/rebuild/__pycache__/
+!! src/gov/records/__pycache__/
+Thu Oct 29 19:40:51 GMT 2026

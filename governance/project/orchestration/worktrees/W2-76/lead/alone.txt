@@ -1,0 +1,10 @@
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_not_unconditionally_exit_zero
+tests/acceptance/W1-07/test_w1_07_config.py::test_a_missing_path_map_is_not_an_error[rebuild]
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_exits_nonzero_on_tampered_store
+tests/acceptance/W1-07/test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths[rebuild]
+tests/acceptance/W1-41/test_w1_41_migration.py::test_the_index_refresh_follows_the_moves
+tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_index_freshness
+tests/acceptance/W1-07/test_w1_07_config_details.py::test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[rebuild]
+tests/acceptance/W1-07/test_w1_07_registry.py::test_each_wave_1_operation_is_a_gov_command[rebuild]
+tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_canaries
+tests/acceptance/W1-41/test_w1_41_dev_tier.py

@@ -1,0 +1,45 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "governance/project/test-map.yaml",
+    "src/gov/close/gates.py",
+    "src/gov/close/history.py",
+    "src/gov/close/ratchet.py"
+   ]
+  },
+  {
+   "reason": "UNPLACED",
+   "paths": [
+    "governance/project/orchestration/nightly/nightly.sh",
+    "governance/project/orchestration/nightly/push_emergency.sh",
+    "governance/project/orchestration/nightly/test_nightly.sh"
+   ]
+  }
+ ],
+ "base": "94e7115cd59a74c9ab8fc1fd11c8a05d5665ed99",
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-78/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-worktrees/W2-78/tests/acceptance/W2-78"
+ ],
+ "per_test_timeout": 900
+}

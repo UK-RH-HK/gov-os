@@ -1,0 +1,2267 @@
+FFFFFFFFFFFFFFFFFFF................................FFFFFFFFFFFFFFFFFFFFF [ 58%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                     [100%]
+=================================== FAILURES ===================================
+______________ test_a_second_declared_set_is_measured_by_its_name ______________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_second_declared_set_is_0'), repo=PosixPat... lines\nEvery finding carries two lines.\n\n', 'chunk_id': 'feb0bdeaaac4cf3f', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_a_second_declared_set_is_measured_by_its_name(world):
+>       document = world.measure(s.SECOND, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_any_set.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-second', '--json', '--root', '/tmp/gov-os-lead-W...clared_set_is_0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-second --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_second_declared_set_is_0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_second_declared_set_is_0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_____________ test_the_first_set_is_measured_by_its_name_beside_it _____________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_first_set_is_measured0'), repo=PosixPat... lines\nEvery finding carries two lines.\n\n', 'chunk_id': 'feb0bdeaaac4cf3f', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_first_set_is_measured_by_its_name_beside_it(world):
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_any_set.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...et_is_measured0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_first_set_is_measured0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_first_set_is_measured0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__________ test_an_undeclared_set_is_refused_by_name[planted-absent] ___________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_undeclared_set_is_refu0'), repo=PosixPat... lines\nEvery finding carries two lines.\n\n', 'chunk_id': 'feb0bdeaaac4cf3f', 'routes': ['semantic'], 'batch': 1}]]}})
+name = 'planted-absent'
+
+    @pytest.mark.parametrize("name", ["planted-absent", "memory-retrieval"])
+    def test_an_undeclared_set_is_refused_by_name(world, name):
+        run = world.measure(name, "--json")
+        assert run.returncode != 0, f"the undeclared set {name} was measured\n{run.describe()}"
+>       assert name in run.output, f"the refusal does not name {name}\n{run.describe()}"
+E       AssertionError: the refusal does not name planted-absent
+E         /usr/bin/python3 -m gov.retrieval.measure planted-absent --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_undeclared_set_is_refu0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_undeclared_set_is_refu0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-absent' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-absent', '--json', '--root', '/tmp/gov-os-lead-W...ed_set_is_refu0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_any_set.py:67: AssertionError
+_________ test_an_undeclared_set_is_refused_by_name[memory-retrieval] __________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_undeclared_set_is_refu1'), repo=PosixPat... lines\nEvery finding carries two lines.\n\n', 'chunk_id': 'feb0bdeaaac4cf3f', 'routes': ['semantic'], 'batch': 1}]]}})
+name = 'memory-retrieval'
+
+    @pytest.mark.parametrize("name", ["planted-absent", "memory-retrieval"])
+    def test_an_undeclared_set_is_refused_by_name(world, name):
+        run = world.measure(name, "--json")
+        assert run.returncode != 0, f"the undeclared set {name} was measured\n{run.describe()}"
+>       assert name in run.output, f"the refusal does not name {name}\n{run.describe()}"
+E       AssertionError: the refusal does not name memory-retrieval
+E         /usr/bin/python3 -m gov.retrieval.measure memory-retrieval --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_undeclared_set_is_refu1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_undeclared_set_is_refu1/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'memory-retrieval' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'memory-retrieval', '--json', '--root', '/tmp/gov-os-lead...ed_set_is_refu1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_any_set.py:67: AssertionError
+_______ test_a_path_map_without_an_evaluation_sets_block_declares_no_set _______
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_path_map_without_an_eva0')
+
+    def test_a_path_map_without_an_evaluation_sets_block_declares_no_set(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        world.write(s.PATH_MAP_REL, s.path_map_text(block={}))
+        world.commit()
+        run = world.measure(s.SET)
+>       assert run.returncode != 0 and s.SET in run.output, f"a set no block declares was measured\n{run.describe()}"
+E       AssertionError: a set no block declares was measured
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_path_map_without_an_eva0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_path_map_without_an_eva0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert (1 != 0 and 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n')
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--root', '/tmp/gov-os-lead-W2-61/pytes...without_an_eva0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+E        +  and   'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--root', '/tmp/gov-os-lead-W2-61/pytes...without_an_eva0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_any_set.py:77: AssertionError
+____________ test_the_sets_root_holds_the_sets_and_the_root_answers ____________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_sets_root_holds_the_s0')
+
+    def test_the_sets_root_holds_the_sets_and_the_root_answers(tmp_path):
+        """The measured clone has the documents but no question files and no evaluation_sets block; the sets
+        repository has the path map and the questions. Sources are resolved in the measured root."""
+        world = s.make_world(tmp_path / "w", commit=False)
+        world.write(s.PATH_MAP_REL, s.path_map_text(block={}))
+        measured_head = world.commit()
+        sets_root = s.make_plain_repo(tmp_path / "sets", {s.PATH_MAP_REL: s.path_map_text(),
+                                                          "README.md": "# The sets\n"})
+        s.standard_questions(world)  # writes the canned answers; the files land in the measured root, moved below
+        for path in sorted((world.repo / "fixtures/evaluation" / s.SET).rglob("*.yaml")):
+            rel = path.relative_to(world.repo)
+            s.write(sets_root / rel, path.read_text(encoding="utf-8"))
+            path.unlink()
+        s.git(sets_root, "add", "-A")
+        s.git(sets_root, "commit", "-q", "-m", "W2-61 fixture: the questions")
+        assert world.head() == measured_head and not s.git(world.repo, "status", "--porcelain").strip()
+>       document = world.measure(s.SET, "--sets-root", sets_root, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_any_set.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--sets-root', '/tmp/gov-os-lead-W2-61/..._holds_the_s0/w/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --sets-root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_sets_root_holds_the_s0/sets --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_sets_root_holds_the_s0/w/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_sets_root_holds_the_s0/w/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+________________________________ test_the_date _________________________________
+
+text = None
+
+    def test_the_date(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:51: AssertionError
+_______________________ test_the_measured_clone_s_commit _______________________
+
+text = None
+
+    def test_the_measured_clone_s_commit(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:56: AssertionError
+___________________ test_the_pinned_gov_s_version_and_commit ___________________
+
+text = None
+
+    def test_the_pinned_gov_s_version_and_commit(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:62: AssertionError
+_________________________ test_the_stores_fingerprint __________________________
+
+text = None
+
+    def test_the_stores_fingerprint(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:70: AssertionError
+_________________ test_both_figures_together_against_85_and_99 _________________
+
+text = None
+
+    def test_both_figures_together_against_85_and_99(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:76: AssertionError
+________________ test_a_per_question_table_of_the_visible_half _________________
+
+text = None
+
+    def test_a_per_question_table_of_the_visible_half(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:97: AssertionError
+_________________________ test_lens_b_s_figures_beside _________________________
+
+text = None
+
+    def test_lens_b_s_figures_beside(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:108: AssertionError
+__________________ test_a_labelled_place_for_the_hidden_half ___________________
+
+text = None
+
+    def test_a_labelled_place_for_the_hidden_half(text):
+>       assert text is not None, MISSING
+E       AssertionError: docs/research/W2-61-baseline.md does not exist
+E       assert None is not None
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:115: AssertionError
+_ test_quotes_ranked_first_are_no_hit_and_the_governing_source_sixth_is_no_hit_at_5 _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_quotes_ranked_first_are_n0')
+
+    def test_quotes_ranked_first_are_no_hit_and_the_governing_source_sixth_is_no_hit_at_5(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        world.commit()
+        for rel in (s.REPORT, s.FIXTURE_QUOTE, s.TEST_QUOTE):
+            assert s.GATE_ANSWER in (world.repo / rel).read_text(encoding="utf-8")
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_governing_source.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...ed_first_are_n0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_quotes_ranked_first_are_n0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_quotes_ranked_first_are_n0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_ test_a_source_naming_a_quoting_path_is_never_a_hit[a-hidden-path-the-set-declares] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting0')
+case = 'a-hidden-path-the-set-declares'
+
+    @pytest.mark.parametrize("case", sorted(QUOTING))
+    def test_a_source_naming_a_quoting_path_is_never_a_hit(tmp_path, case):
+        rel = QUOTING[case]
+        world = s.make_world(tmp_path, files={rel: f"The gate needs {s.GATE_ANSWER}.\n"}, commit=False)
+        world.question("q01", {"question": "Where does the report say what the gate needs?",
+                               "gold_answer": s.GATE_ANSWER, "sources": [{"path": rel}]},
+                       [[world.item(rel), world.section(s.DECISIONS, GATE)]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        if run.returncode != 0:
+>           assert "q01" in run.output, f"{case}: the refusal does not name the question\n{run.describe()}"
+E           AssertionError: a-hidden-path-the-set-declares: the refusal does not name the question
+E             /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting0/bin/gov
+E             exit code: 1
+E             stdout:
+E             
+E             stderr:
+E             /usr/bin/python3: No module named gov.retrieval.measure
+E             
+E           assert 'q01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E            +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...ming_a_quoting0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_governing_source.py:63: AssertionError
+____ test_a_source_naming_a_quoting_path_is_never_a_hit[an-evaluation-file] ____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting1')
+case = 'an-evaluation-file'
+
+    @pytest.mark.parametrize("case", sorted(QUOTING))
+    def test_a_source_naming_a_quoting_path_is_never_a_hit(tmp_path, case):
+        rel = QUOTING[case]
+        world = s.make_world(tmp_path, files={rel: f"The gate needs {s.GATE_ANSWER}.\n"}, commit=False)
+        world.question("q01", {"question": "Where does the report say what the gate needs?",
+                               "gold_answer": s.GATE_ANSWER, "sources": [{"path": rel}]},
+                       [[world.item(rel), world.section(s.DECISIONS, GATE)]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        if run.returncode != 0:
+>           assert "q01" in run.output, f"{case}: the refusal does not name the question\n{run.describe()}"
+E           AssertionError: an-evaluation-file: the refusal does not name the question
+E             /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting1/bin/gov
+E             exit code: 1
+E             stdout:
+E             
+E             stderr:
+E             /usr/bin/python3: No module named gov.retrieval.measure
+E             
+E           assert 'q01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E            +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...ming_a_quoting1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_governing_source.py:63: AssertionError
+___ test_a_source_naming_a_quoting_path_is_never_a_hit[the-set-s-own-report] ___
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting2')
+case = 'the-set-s-own-report'
+
+    @pytest.mark.parametrize("case", sorted(QUOTING))
+    def test_a_source_naming_a_quoting_path_is_never_a_hit(tmp_path, case):
+        rel = QUOTING[case]
+        world = s.make_world(tmp_path, files={rel: f"The gate needs {s.GATE_ANSWER}.\n"}, commit=False)
+        world.question("q01", {"question": "Where does the report say what the gate needs?",
+                               "gold_answer": s.GATE_ANSWER, "sources": [{"path": rel}]},
+                       [[world.item(rel), world.section(s.DECISIONS, GATE)]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        if run.returncode != 0:
+>           assert "q01" in run.output, f"{case}: the refusal does not name the question\n{run.describe()}"
+E           AssertionError: the-set-s-own-report: the refusal does not name the question
+E             /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting2/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_source_naming_a_quoting2/bin/gov
+E             exit code: 1
+E             stdout:
+E             
+E             stderr:
+E             /usr/bin/python3: No module named gov.retrieval.measure
+E             
+E           assert 'q01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E            +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...ming_a_quoting2/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_governing_source.py:63: AssertionError
+_ test_an_alternative_naming_the_report_never_counts_the_governing_alternative_does _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_alternative_naming_the0')
+
+    def test_an_alternative_naming_the_report_never_counts_the_governing_alternative_does(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        world.question("q01", {"question": "What does the gate need, by the report or the register?",
+                               "gold_answer": s.GATE_ANSWER,
+                               "sources": [[{"path": s.REPORT}, {"path": s.DECISIONS, "heading": GATE}]]},
+                       [[world.item(s.REPORT), world.noise(1), world.noise(2), world.noise(3), world.noise(4),
+                         world.section(s.DECISIONS, GATE)]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        if run.returncode != 0:
+>           assert "q01" in run.output, f"the refusal does not name the question\n{run.describe()}"
+E           AssertionError: the refusal does not name the question
+E             /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_alternative_naming_the0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_alternative_naming_the0/bin/gov
+E             exit code: 1
+E             stdout:
+E             
+E             stderr:
+E             /usr/bin/python3: No module named gov.retrieval.measure
+E             
+E           assert 'q01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E            +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...ive_naming_the0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_governing_source.py:80: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[role-engineer-hidden] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h0')
+session = 'role-engineer', part = 'hidden'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: role-engineer: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',..._refuses_the_h0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[role-engineer-all] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h1')
+session = 'role-engineer', part = 'all'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: role-engineer: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h1/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--root', '/..._refuses_the_h1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[role-research-hidden] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h2')
+session = 'role-research', part = 'hidden'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: role-research: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h2/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h2/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',..._refuses_the_h2/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[role-research-all] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h3')
+session = 'role-research', part = 'all'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: role-research: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h3/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h3/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--root', '/..._refuses_the_h3/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[ticket-by-its-wbs-id-hidden] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h4')
+session = 'ticket-by-its-wbs-id', part = 'hidden'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: ticket-by-its-wbs-id: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h4/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h4/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',..._refuses_the_h4/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[ticket-by-its-wbs-id-all] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h5')
+session = 'ticket-by-its-wbs-id', part = 'all'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: ticket-by-its-wbs-id: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h5/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h5/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--root', '/..._refuses_the_h5/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[ticket-id-hidden] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h6')
+session = 'ticket-id', part = 'hidden'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: ticket-id: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h6/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h6/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',..._refuses_the_h6/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[ticket-id-all] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h7')
+session = 'ticket-id', part = 'all'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: ticket-id: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h7/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h7/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--root', '/..._refuses_the_h7/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[wbs-id-as-ticket-hidden] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h8')
+session = 'wbs-id-as-ticket', part = 'hidden'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: wbs-id-as-ticket: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h8/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h8/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',..._refuses_the_h8/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+_ test_the_measure_refuses_the_hidden_part_to_a_measured_session[wbs-id-as-ticket-all] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h9')
+session = 'wbs-id-as-ticket', part = 'all'
+
+    @pytest.mark.parametrize("part", ["hidden", "all"])
+    @pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+    def test_the_measure_refuses_the_hidden_part_to_a_measured_session(tmp_path, session, part):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        role, ticket = MEASURED_SESSIONS[session]
+        before = world.snapshot()
+        run = world.measure(s.SET, "--part", part, "--json", role=role, ticket=ticket)
+        assert run.returncode != 0, f"{session}: the measure did not refuse --part {part}\n{run.describe()}"
+>       assert s.SET in run.output, f"{session}: the refusal does not name the set\n{run.describe()}"
+E       AssertionError: wbs-id-as-ticket: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h9/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_refuses_the_h9/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-memory' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-memory' = s.SET
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--root', '/..._refuses_the_h9/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:104: AssertionError
+______________ test_a_measured_session_measures_the_visible_part _______________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_measured_session_measur0')
+
+    def test_a_measured_session_measures_the_visible_part(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        s.hidden_questions(world)
+        world.commit()
+        run = world.measure(s.SET, "--json", role="engineer", ticket=s.MEASURED_TICKET)
+>       document = run.json()
+                   ^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...session_measur0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_measured_session_measur0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_measured_session_measur0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_____ test_a_hidden_folder_the_set_s_hidden_globs_do_not_cover_is_refused ______
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_hidden_folder_the_set_s0')
+
+    def test_a_hidden_folder_the_set_s_hidden_globs_do_not_cover_is_refused(tmp_path):
+        """Fail closed: planted-uncovered declares ``elsewhere/hidden/**``, but its questions lie under
+        ``fixtures/evaluation/planted-uncovered/hidden/``, where the guard would not refuse them."""
+        world = s.make_world(tmp_path, commit=False)
+        s.hidden_questions(world, set_name=s.UNCOVERED)
+        world.commit()
+        run = world.measure(s.UNCOVERED, "--part", "hidden", role="orchestrator")
+        assert run.returncode != 0, f"a hidden part outside the set's hidden globs was measured\n{run.describe()}"
+>       assert s.UNCOVERED in run.output, f"the refusal does not name the set\n{run.describe()}"
+E       AssertionError: the refusal does not name the set
+E         /usr/bin/python3 -m gov.retrieval.measure planted-uncovered --part hidden --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_hidden_folder_the_set_s0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_hidden_folder_the_set_s0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'planted-uncovered' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where 'planted-uncovered' = s.UNCOVERED
+E        +  and   '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-uncovered', '--part', 'hidden', '--root', '/tmp/...lder_the_set_s0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_half_refused.py:133: AssertionError
+_ test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word[all-json-out] _
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par0'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+case = 'all-json-out'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word(world, case):
+        args = [str(world.base / "out") if word == "OUT" else word for word in CASES[case]]
+        run, written = _run_and_scan(world, s.SET, *args)
+>       assert run.returncode == 0, f"{case}: the run did not end with 0\n{run.describe()}"
+E       AssertionError: all-json-out: the run did not end with 0
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par0/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--out', '/t...the_hidden_par0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:68: AssertionError
+__ test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word[all-text] ___
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par1'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+case = 'all-text'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word(world, case):
+        args = [str(world.base / "out") if word == "OUT" else word for word in CASES[case]]
+        run, written = _run_and_scan(world, s.SET, *args)
+>       assert run.returncode == 0, f"{case}: the run did not end with 0\n{run.describe()}"
+E       AssertionError: all-text: the run did not end with 0
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par1/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--root', '/tmp/gov-os...the_hidden_par1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:68: AssertionError
+_ test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word[hidden-json] _
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par2'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+case = 'hidden-json'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word(world, case):
+        args = [str(world.base / "out") if word == "OUT" else word for word in CASES[case]]
+        run, written = _run_and_scan(world, s.SET, *args)
+>       assert run.returncode == 0, f"{case}: the run did not end with 0\n{run.describe()}"
+E       AssertionError: hidden-json: the run did not end with 0
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par2/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par2/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',...the_hidden_par2/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:68: AssertionError
+_ test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word[hidden-out] __
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par3'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+case = 'hidden-out'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word(world, case):
+        args = [str(world.base / "out") if word == "OUT" else word for word in CASES[case]]
+        run, written = _run_and_scan(world, s.SET, *args)
+>       assert run.returncode == 0, f"{case}: the run did not end with 0\n{run.describe()}"
+E       AssertionError: hidden-out: the run did not end with 0
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par3/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par3/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par3/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--out', ...the_hidden_par3/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:68: AssertionError
+_ test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word[hidden-text] _
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par4'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+case = 'hidden-text'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_a_run_over_the_hidden_part_shows_and_writes_no_hidden_word(world, case):
+        args = [str(world.base / "out") if word == "OUT" else word for word in CASES[case]]
+        run, written = _run_and_scan(world, s.SET, *args)
+>       assert run.returncode == 0, f"{case}: the run did not end with 0\n{run.describe()}"
+E       AssertionError: hidden-text: the run did not end with 0
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par4/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_run_over_the_hidden_par4/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--root', '/tmp/gov...the_hidden_par4/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:68: AssertionError
+________________________ test_the_hidden_part_is_scored ________________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_hidden_part_is_scored0'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_hidden_part_is_scored(world):
+        run, _ = _run_and_scan(world, s.SET, "--part", "hidden", "--json")
+>       document = run.json()
+                   ^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--json', '--root',...part_is_scored0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_hidden_part_is_scored0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_hidden_part_is_scored0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_________________________ test_all_measures_both_parts _________________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_all_measures_both_parts0'), repo=PosixPath(...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_all_measures_both_parts(world):
+        run, _ = _run_and_scan(world, s.SET, "--part", "all", "--json")
+>       document = run.json()
+                   ^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'all', '--json', '--root', '/...res_both_parts0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --part all --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_all_measures_both_parts0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_all_measures_both_parts0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+______ test_the_text_of_the_hidden_part_still_gives_both_figures_together ______
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_of_the_hidden_pa0'), repo=PosixPat...qxw61hiddenitemtext zqxw61hiddengoldanswer\n', 'chunk_id': 'c9bc11cb075548b5', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_text_of_the_hidden_part_still_gives_both_figures_together(world):
+        run, _ = _run_and_scan(world, s.SET, "--part", "hidden")
+        assert not s.lone_figures(run.stdout), "\n".join(s.lone_figures(run.stdout))
+>       assert "h01" in run.stdout and "h02" in run.stdout, f"the hidden ids are not given\n{run.describe()}"
+E       AssertionError: the hidden ids are not given
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_of_the_hidden_pa0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_of_the_hidden_pa0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert ('h01' in '')
+E        +  where '' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--root', '/tmp/gov..._the_hidden_pa0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').stdout
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:100: AssertionError
+____ test_an_error_on_a_hidden_question_names_only_its_id[False-malformed] _____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques0')
+kind = 'malformed', json_flag = False
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: malformed: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques0/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_____ test_an_error_on_a_hidden_question_names_only_its_id[False-not-yaml] _____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques1')
+kind = 'not-yaml', json_flag = False
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: not-yaml: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques1/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques1/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+__ test_an_error_on_a_hidden_question_names_only_its_id[False-missing-source] __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques2')
+kind = 'missing-source', json_flag = False
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: missing-source: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques2/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques2/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques2/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques2/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_ test_an_error_on_a_hidden_question_names_only_its_id[False-no-heading-no-lines] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques3')
+kind = 'no-heading-no-lines', json_flag = False
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: no-heading-no-lines: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques3/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques3/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques3/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques3/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_ test_an_error_on_a_hidden_question_names_only_its_id[False-failing-retrieval] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques4')
+kind = 'failing-retrieval', json_flag = False
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: failing-retrieval: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques4/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques4/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques4/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques4/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_____ test_an_error_on_a_hidden_question_names_only_its_id[True-malformed] _____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques5')
+kind = 'malformed', json_flag = True
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: malformed: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques5/out --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques5/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques5/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques5/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_____ test_an_error_on_a_hidden_question_names_only_its_id[True-not-yaml] ______
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques6')
+kind = 'not-yaml', json_flag = True
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: not-yaml: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques6/out --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques6/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques6/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques6/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+__ test_an_error_on_a_hidden_question_names_only_its_id[True-missing-source] ___
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques7')
+kind = 'missing-source', json_flag = True
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: missing-source: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques7/out --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques7/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques7/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques7/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_ test_an_error_on_a_hidden_question_names_only_its_id[True-no-heading-no-lines] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques8')
+kind = 'no-heading-no-lines', json_flag = True
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: no-heading-no-lines: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques8/out --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques8/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques8/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques8/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_ test_an_error_on_a_hidden_question_names_only_its_id[True-failing-retrieval] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques9')
+kind = 'failing-retrieval', json_flag = True
+
+    @pytest.mark.parametrize("kind", ["malformed", "not-yaml", "missing-source", "no-heading-no-lines",
+                                      "failing-retrieval"])
+    @pytest.mark.parametrize("json_flag", [False, True])
+    def test_an_error_on_a_hidden_question_names_only_its_id(tmp_path, kind, json_flag):
+        world = _hidden_error_world(tmp_path, kind)
+        args = [s.SET, "--part", "hidden", "--out", str(world.base / "out")] + (["--json"] if json_flag else [])
+        run, _ = _run_and_scan(world, *args)
+        assert run.returncode != 0, f"{kind}: the hidden error did not end the run with an error\n{run.describe()}"
+>       assert "h03" in run.output, f"{kind}: the error does not name the question's id or file\n{run.describe()}"
+E       AssertionError: failing-retrieval: the error does not name the question's id or file
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --part hidden --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques9/out --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques9/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_on_a_hidden_ques9/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'h03' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--part', 'hidden', '--out', '/tmp/gov-..._a_hidden_ques9/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_hidden_never_shown.py:140: AssertionError
+_ test_the_json_names_the_retriever_the_root_the_commit_the_set_the_part_and_the_budgets _
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_json_names_the_retrie0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_json_names_the_retriever_the_root_the_commit_the_set_the_part_and_the_budgets(world):
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...mes_the_retrie0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_json_names_the_retrie0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_json_names_the_retrie0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_________________________ test_the_text_names_the_same _________________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_names_the_same0'), repo=PosixPath(...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_text_names_the_same(world):
+        run = world.measure(s.SET, "--batch-size", 7, "--bundle-budget", 4321, "--stack-budget", 12345)
+>       assert run.returncode == 0, run.describe()
+E       AssertionError: /usr/bin/python3 -m gov.retrieval.measure planted-memory --batch-size 7 --bundle-budget 4321 --stack-budget 12345 --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_names_the_same0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_names_the_same0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--batch-size', '7', '--bundle-budget',...names_the_same0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:57: AssertionError
+________________________ test_the_record_names_the_same ________________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_record_names_the_same0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_record_names_the_same(world):
+        out = world.base / "out"
+        run = world.measure(s.SET, "--out", out)
+        records = s.records_in(out)
+>       assert len(records) == 1, f"--out wrote {len(records)} records, not one\n{run.describe()}"
+E       AssertionError: --out wrote 0 records, not one
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_record_names_the_same0/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_record_names_the_same0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_record_names_the_same0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 0 == 1
+E        +  where 0 = len({})
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:70: AssertionError
+_____ test_the_retrieval_runs_in_the_root_without_pythonpath_or_gov_ticket _____
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_retrieval_runs_in_the0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_retrieval_runs_in_the_root_without_pythonpath_or_gov_ticket(world):
+>       world.measure(s.SET, "--json", ticket=s.MEASURED_TICKET, role="orchestrator").json()
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...al_runs_in_the0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_retrieval_runs_in_the0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_retrieval_runs_in_the0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_______ test_the_retrieval_runs_in_the_root_from_another_working_folder ________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_retrieval_runs_in_the1'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_retrieval_runs_in_the_root_from_another_working_folder(world):
+        elsewhere = world.base / "elsewhere"
+        elsewhere.mkdir()
+>       document = world.measure(s.SET, "--json", cwd=elsewhere).json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...al_runs_in_the1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_retrieval_runs_in_the1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_retrieval_runs_in_the1/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_________________ test_the_root_defaults_to_the_current_folder _________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_root_defaults_to_the_0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_root_defaults_to_the_current_folder(world):
+>       document = world.measure(s.SET, "--json", root=False, cwd=world.repo).json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--gov', '/tmp/gov-os-lead-W2...faults_to_the_0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_root_defaults_to_the_0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__________________ test_the_gov_defaults_to_the_first_on_path __________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_gov_defaults_to_the_f0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_gov_defaults_to_the_first_on_path(world):
+>       document = world.measure(s.SET, "--json", gov=False, path_first=str(world.gov.parent)).json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_retriever_named.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...defaults_to_the_f0/repo'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_gov_defaults_to_the_f0/repo
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__________________________ test_per_question_figures ___________________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_per_question_figures0'), repo=PosixPath('/t...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_per_question_figures(world):
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_scores.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...estion_figures0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_per_question_figures0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_per_question_figures0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_________________ test_totals_against_the_floor_and_the_target _________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_totals_against_the_floor_0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_totals_against_the_floor_and_the_target(world):
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_scores.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...nst_the_floor_0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_totals_against_the_floor_0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_totals_against_the_floor_0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+______ test_the_text_output_gives_both_figures_together_against_85_and_99 ______
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_output_gives_bot0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_text_output_gives_both_figures_together_against_85_and_99(world):
+        run = world.measure(s.SET)
+>       assert run.returncode == 0, run.describe()
+E       AssertionError: /usr/bin/python3 -m gov.retrieval.measure planted-memory --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_output_gives_bot0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_text_output_gives_bot0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--root', '/tmp/gov-os-lead-W2-61/pytes...tput_gives_bot0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_scores.py:85: AssertionError
+___________ test_every_json_object_and_the_record_give_both_figures ____________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_every_json_object_and_the0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_every_json_object_and_the_record_give_both_figures(world):
+        out = world.base / "out"
+        run = world.measure(s.SET, "--json", "--out", out)
+>       document = run.json()
+                   ^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_scores.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--out', '/tmp/gov-os-lead-W2...object_and_the0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --out /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_every_json_object_and_the0/out --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_every_json_object_and_the0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_every_json_object_and_the0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__________________ test_a_second_out_run_writes_a_new_record ___________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_second_out_run_writes_a0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_a_second_out_run_writes_a_new_record(world):
+        out = world.base / "out"
+        world.measure(s.SET, "--out", out)
+        first = s.records_in(out)
+        world.measure(s.SET, "--out", out)
+        second = s.records_in(out)
+>       assert len(first) == 1 and len(second) == 2 and set(first) <= set(second), (
+            f"a second run did not add one new record: {sorted(map(str, first))} then {sorted(map(str, second))}")
+E       AssertionError: a second run did not add one new record: [] then []
+E       assert (0 == 1)
+E        +  where 0 = len({})
+
+tests/acceptance/W2-61/test_w2_61_scores.py:114: AssertionError
+________________ test_the_run_ends_with_0_whatever_the_figures _________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_run_ends_with_0_whate0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_run_ends_with_0_whatever_the_figures(world):
+        run = world.measure(s.SET)
+>       assert run.returncode == 0, f"the measure did not end with 0 on a run with misses\n{run.describe()}"
+E       AssertionError: the measure did not end with 0 on a run with misses
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_run_ends_with_0_whate0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_run_ends_with_0_whate0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--root', '/tmp/gov-os-lead-W2-61/pytes...s_with_0_whate0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').returncode
+
+tests/acceptance/W2-61/test_w2_61_scores.py:120: AssertionError
+______ test_compare_on_an_unchanged_index_is_the_same_for_every_question _______
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_compare_on_an_unchanged_i0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_compare_on_an_unchanged_index_is_the_same_for_every_question(world):
+>       record = _first_record(world)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_scores.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_compare_on_an_unchanged_i0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def _first_record(world):
+        out = world.base / "first"
+        world.measure(s.SET, "--out", out)
+        records = s.records_in(out)
+>       assert len(records) == 1, f"--out wrote {len(records)} records"
+E       AssertionError: --out wrote 0 records
+E       assert 0 == 1
+E        +  where 0 = len({})
+
+tests/acceptance/W2-61/test_w2_61_scores.py:141: AssertionError
+___ test_compare_after_a_rebuild_names_each_question_and_figure_that_differs ___
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_compare_after_a_rebuild_n0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_compare_after_a_rebuild_names_each_question_and_figure_that_differs(world):
+>       record = _first_record(world)
+                 ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_scores.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_compare_after_a_rebuild_n0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def _first_record(world):
+        out = world.base / "first"
+        world.measure(s.SET, "--out", out)
+        records = s.records_in(out)
+>       assert len(records) == 1, f"--out wrote {len(records)} records"
+E       AssertionError: --out wrote 0 records
+E       assert 0 == 1
+E        +  where 0 = len({})
+
+tests/acceptance/W2-61/test_w2_61_scores.py:141: AssertionError
+___________________ test_compare_takes_more_than_one_record ____________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_compare_takes_more_than_o0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_compare_takes_more_than_one_record(world):
+>       first = _first_record(world)
+                ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_scores.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_compare_takes_more_than_o0'), repo=PosixPat...xt': '# Noise 5\n\nNothing of use, part 5.\n', 'chunk_id': '34d05dd8665c6428', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def _first_record(world):
+        out = world.base / "first"
+        world.measure(s.SET, "--out", out)
+        records = s.records_in(out)
+>       assert len(records) == 1, f"--out wrote {len(records)} records"
+E       AssertionError: --out wrote 0 records
+E       assert 0 == 1
+E        +  where 0 = len({})
+
+tests/acceptance/W2-61/test_w2_61_scores.py:141: AssertionError
+____________ test_items_match_sources_by_path_and_overlapping_span _____________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_items_match_sources_by_pa0')
+
+    def test_items_match_sources_by_path_and_overlapping_span(tmp_path):
+        world = s.make_world(tmp_path, files={"docs/trailing.md": "# Trailing file\n\n## Trailing   \nbody\n"},
+                             commit=False)
+        expected = _matching_cases(world)
+        world.commit()
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._sources_by_pa0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_items_match_sources_by_pa0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_items_match_sources_by_pa0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+____________ test_a_heading_that_moved_governs_over_its_stale_lines ____________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_heading_that_moved_gove0')
+
+    def test_a_heading_that_moved_governs_over_its_stale_lines(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        first_commit = world.commit()
+        old_dec1 = list(world.span(DEC, DEC1))
+        lines = world.lines(DEC)
+        world.write(DEC, "\n".join(lines[:4] + [f"Inserted line {n}." for n in range(1, 11)] + lines[4:]) + "\n")
+        code = world.lines(s.ARCHIVE_CODE)
+        world.write(s.ARCHIVE_CODE, "\n".join(["import os", "import sys", "", "", ""] + code) + "\n")
+        world.commit(message="W2-61 fixture: the headings move down")
+        new_dec1 = world.span(DEC, DEC1)
+        assert new_dec1[0] > old_dec1[1], (old_dec1, new_dec1)
+        md = [{"path": DEC, "heading": DEC1, "lines": old_dec1, "commit": first_commit}]
+        code_lines = [{"path": s.ARCHIVE_CODE, "heading": "def archive(path):", "lines": [1, 2]}]
+        code_bare = [{"path": s.ARCHIVE_CODE, "heading": "def archive(path):"}]
+        item = world.item
+        expected = {
+            "mv-markdown-new-span": (md, [item(DEC, *new_dec1)], True),
+            "mv-markdown-stale-span": (md, [item(DEC, *old_dec1)], False),
+            "mv-code-second-line-of-span": (code_lines, [item(s.ARCHIVE_CODE, 7, 7)], True),
+            "mv-code-stale-lines": (code_lines, [item(s.ARCHIVE_CODE, 1, 2)], False),
+            "mv-code-own-line": (code_bare, [item(s.ARCHIVE_CODE, 6, 6)], True),
+            "mv-code-past-its-own-line": (code_bare, [item(s.ARCHIVE_CODE, 7, 7)], False),
+        }
+        assert world.lines(s.ARCHIVE_CODE)[5] == "def archive(path):"
+        for qid, (sources, items, _) in expected.items():
+            _ask(world, qid, sources, items, commit=first_commit)
+        world.commit(message="W2-61 fixture: the questions")
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...hat_moved_gove0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_heading_that_moved_gove0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_heading_that_moved_gove0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__________ test_ticket_ids_radius_and_the_question_are_passed_through __________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_ticket_ids_radius_and_the0')
+
+    def test_ticket_ids_radius_and_the_question_are_passed_through(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        sources = [{"path": DEC, "heading": DEC1}]
+        world.question("p01", {"question": "Which tickets depend on it?", "gold_answer": "planted", "sources": sources,
+                               "ticket": s.MEASURED_TICKET, "ids": ["indexable", "rrf"], "radius": 1}, [[]])
+        world.question("p02", {"question": "Nothing else passed?", "gold_answer": "planted", "sources": sources}, [[]])
+        world.question("p03", {"question": ODD_QUESTION, "gold_answer": "planted", "sources": sources}, [[]])
+        world.commit()
+>       world.measure(s.SET, "--json").json()
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:149: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...radius_and_the0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_ticket_ids_radius_and_the0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_ticket_ids_radius_and_the0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_ test_ids_default_to_the_file_name_in_file_name_order_and_unknown_fields_stay_unprinted _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_ids_default_to_the_file_n0')
+
+    def test_ids_default_to_the_file_name_in_file_name_order_and_unknown_fields_stay_unprinted(tmp_path):
+        world = s.make_world(tmp_path, commit=False)
+        sources = [{"path": DEC, "heading": DEC1}]
+        world.question("b", {"question": "Second file?", "gold_answer": "planted", "sources": sources, "id": "zeta",
+                             "remarks": s.UNKNOWN_WORD}, [[]])
+        world.question("a", {"question": "First file?", "gold_answer": "planted", "sources": sources,
+                             "remarks": s.UNKNOWN_WORD, "category": "decision"}, [[]])
+        world.question("c", {"question": "Third file?", "gold_answer": "planted", "sources": sources, "id": "alpha"},
+                       [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+>       assert [q.get("id") for q in s.questions(run.json())] == ["a", "zeta", "alpha"]
+                                                 ^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._to_the_file_n0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_ids_default_to_the_file_n0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_ids_default_to_the_file_n0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[failing-retrieval] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que0')
+kind = 'failing-retrieval'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: failing-retrieval: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que0/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[heading-absent-no-lines] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que1')
+kind = 'heading-absent-no-lines'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: heading-absent-no-lines: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que1/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que1/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que1/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[missing-source-path] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que2')
+kind = 'missing-source-path'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: missing-source-path: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que2/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que2/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que2/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[no-gold-answer] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que3')
+kind = 'no-gold-answer'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: no-gold-answer: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que3/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que3/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que3/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[no-question] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que4')
+kind = 'no-question'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: no-question: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que4/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que4/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que4/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[no-sources] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que5')
+kind = 'no-sources'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: no-sources: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que5/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que5/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que5/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[source-without-path] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que6')
+kind = 'source-without-path'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: source-without-path: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que6/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que6/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que6/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+_ test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it[sources-not-a-list] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que7')
+kind = 'sources-not-a-list'
+
+    @pytest.mark.parametrize("kind", sorted(ERRORS))
+    def test_an_error_in_a_visible_question_ends_the_run_non_zero_and_names_it(tmp_path, kind):
+        world = s.make_world(tmp_path, commit=False)
+        s.standard_questions(world)
+        if kind == "failing-retrieval":
+            world.question("e01", {"question": "Q?", "gold_answer": "g", "sources": [{"path": DEC}]},
+                           fail="the planted store is missing")
+        else:
+            world.question("e01", ERRORS[kind], [[]])
+        world.commit()
+        run = world.measure(s.SET, "--json")
+        assert run.returncode != 0, f"{kind}: the run did not end with an error\n{run.describe()}"
+>       assert "e01" in run.output, f"{kind}: the error does not name the question\n{run.describe()}"
+E       AssertionError: sources-not-a-list: the error does not name the question
+E         /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que7/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_an_error_in_a_visible_que7/bin/gov
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         /usr/bin/python3: No module named gov.retrieval.measure
+E         
+E       assert 'e01' in '\n/usr/bin/python3: No module named gov.retrieval.measure\n'
+E        +  where '\n/usr/bin/python3: No module named gov.retrieval.measure\n' = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_visible_que7/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n').output
+
+tests/acceptance/W2-61/test_w2_61_sources_matched.py:211: AssertionError
+__ test_evidence_in_a_later_batch_counts_for_full_evidence_not_for_the_bundle __
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_evidence_in_a_later_batch0'), repo=PosixPat...ession resumes from its last checkpoint.\n\n', 'chunk_id': '8938f5fadc26dba6', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_evidence_in_a_later_batch_counts_for_full_evidence_not_for_the_bundle(world):
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W..._a_later_batch0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_evidence_in_a_later_batch0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_evidence_in_a_later_batch0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_________ test_each_next_call_continues_the_last_with_the_same_options _________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_each_next_call_continues_0'), repo=PosixPat...ession resumes from its last checkpoint.\n\n', 'chunk_id': '8938f5fadc26dba6', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_each_next_call_continues_the_last_with_the_same_options(world):
+>       world.measure(s.SET, "--batch-size", 3, "--bundle-budget", 500, "--json").json()
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--batch-size', '3', '--bundle-budget',...all_continues_0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --batch-size 3 --bundle-budget 500 --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_each_next_call_continues_0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_each_next_call_continues_0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+____________ test_the_defaults_are_10_6000_and_24000_and_are_named _____________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_defaults_are_10_6000_0'), repo=PosixPat...ession resumes from its last checkpoint.\n\n', 'chunk_id': '8938f5fadc26dba6', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_defaults_are_10_6000_and_24000_and_are_named(world):
+>       document = world.measure(s.SET, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--json', '--root', '/tmp/gov-os-lead-W...s_are_10_6000_0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_defaults_are_10_6000_0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_defaults_are_10_6000_0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__________________________ test_never_one_giant_call ___________________________
+
+world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_never_one_giant_call0'), repo=PosixPath('/t...ession resumes from its last checkpoint.\n\n', 'chunk_id': '8938f5fadc26dba6', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_never_one_giant_call(world):
+        """Whatever the stack budget, no call asks for a larger batch or bundle than stated."""
+        document = world.measure(s.SET, "--batch-size", 2, "--bundle-budget", 300, "--stack-budget", 100000,
+>                                "--json").json()
+                                           ^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--batch-size', '2', '--bundle-budget',...one_giant_call0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --batch-size 2 --bundle-budget 300 --stack-budget 100000 --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_never_one_giant_call0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_never_one_giant_call0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+____________ test_the_stack_budget_admits_an_item_that_fits_exactly ____________
+
+budget_world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_stack_budget_admits_a0'), repo=PosixPat...: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n', 'chunk_id': '69892d5885f61a05', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_stack_budget_admits_an_item_that_fits_exactly(budget_world):
+>       document = budget_world.measure(s.SET, "--stack-budget", 40, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--stack-budget', '40', '--json', '--ro...udget_admits_a0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --stack-budget 40 --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_stack_budget_admits_a0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_stack_budget_admits_a0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_____ test_the_stack_budget_stops_before_the_first_item_that_would_pass_it _____
+
+budget_world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_stack_budget_stops_be0'), repo=PosixPat...: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n', 'chunk_id': '69892d5885f61a05', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_the_stack_budget_stops_before_the_first_item_that_would_pass_it(budget_world):
+>       document = budget_world.measure(s.SET, "--stack-budget", 39, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--stack-budget', '39', '--json', '--ro...udget_stops_be0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --stack-budget 39 --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_stack_budget_stops_be0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_stack_budget_stops_be0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+__ test_a_stack_budget_reached_in_the_first_call_asks_for_no_more_than_needed __
+
+budget_world = World(base=PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_stack_budget_reached_in0'), repo=PosixPat...: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n', 'chunk_id': '69892d5885f61a05', 'routes': ['semantic'], 'batch': 1}]]}})
+
+    def test_a_stack_budget_reached_in_the_first_call_asks_for_no_more_than_needed(budget_world):
+>       document = budget_world.measure(s.SET, "--stack-budget", 15, "--json").json()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_stacked.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('/usr/bin/python3', '-m', 'gov.retrieval.measure', 'planted-memory', '--stack-budget', '15', '--json', '--ro...get_reached_in0/bin/gov'), returncode=1, stdout='', stderr='/usr/bin/python3: No module named gov.retrieval.measure\n')
+
+    def json(self):
+>       assert self.returncode == 0, f"the measure did not end with 0\n{self.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the measure did not end with 0
+E       /usr/bin/python3 -m gov.retrieval.measure planted-memory --stack-budget 15 --json --root /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_stack_budget_reached_in0/repo --gov /tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_a_stack_budget_reached_in0/bin/gov
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       /usr/bin/python3: No module named gov.retrieval.measure
+
+tests/acceptance/W2-61/w2_61_support.py:338: AssertionError
+_____ test_the_visible_half_holds_lens_b_s_twenty_questions_one_file_each ______
+
+    def test_the_visible_half_holds_lens_b_s_twenty_questions_one_file_each():
+>       files = _files()
+                ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+________ test_every_visible_question_has_the_required_fields[question] _________
+
+key = 'question'
+
+    @pytest.mark.parametrize("key", ["question", "gold_answer", "sources"])
+    def test_every_visible_question_has_the_required_fields(key):
+        faults = []
+>       for path in _files():
+                    ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+_______ test_every_visible_question_has_the_required_fields[gold_answer] _______
+
+key = 'gold_answer'
+
+    @pytest.mark.parametrize("key", ["question", "gold_answer", "sources"])
+    def test_every_visible_question_has_the_required_fields(key):
+        faults = []
+>       for path in _files():
+                    ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+_________ test_every_visible_question_has_the_required_fields[sources] _________
+
+key = 'sources'
+
+    @pytest.mark.parametrize("key", ["question", "gold_answer", "sources"])
+    def test_every_visible_question_has_the_required_fields(key):
+        faults = []
+>       for path in _files():
+                    ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+___________ test_each_question_is_table_2_s_command_with_its_options ___________
+
+    def test_each_question_is_table_2_s_command_with_its_options():
+        table = s.lens_b_commands()
+        assert len(table) == 20, f"Table 2 of lens B's report parsed to {len(table)} commands, not 20"
+        assert table["Q01"]["question"] == "DEC-782"
+        assert table["Q12"]["question"] == "CONTINUATION_INVALID"
+        assert table["Q09"]["question"] == "How large may the context packet be?"
+        expected = sorted((e["question"], e["ticket"], tuple(e["ids"]), e["radius"]) for e in table.values())
+        got = []
+>       for path in _files():
+                    ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+______ test_every_source_exists_at_head_and_every_heading_is_found_there _______
+
+    def test_every_source_exists_at_head_and_every_heading_is_found_there():
+        faults = []
+>       for path in _files():
+                    ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+___ test_no_source_names_the_report_the_set_declares_or_the_evaluation_files ___
+
+    def test_no_source_names_the_report_the_set_declares_or_the_evaluation_files():
+        sets = yaml.safe_load(s.REAL_PATH_MAP.read_text(encoding="utf-8"))["evaluation_sets"]
+        declared = [*sets[s.REAL_SET].get("visible", [])]
+        assert s.LENS_B_REL in declared
+        faults = []
+>       for path in _files():
+                    ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+________ test_the_measure_takes_the_real_visible_half_by_its_set_s_name ________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61/pytest-of-usain/pytest-0/test_the_measure_takes_the_rea0')
+
+    def test_the_measure_takes_the_real_visible_half_by_its_set_s_name(tmp_path):
+        """End to end on this worktree: ``memory-retrieval`` declared by this worktree's path map, its 20 visible files
+        read in the measure's own form, every source resolved in this worktree; the answers are the planted gov's
+        (empty bundles), so the figures are 0 of 20 and the run ends with 0. Only ``--part visible``: the real hidden
+        folder is never named to the measure."""
+>       files = _files()
+                ^^^^^^^^
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _files():
+        files = sorted(s.REAL_VISIBLE.glob("*.yaml")) if s.REAL_VISIBLE.is_dir() else []
+>       assert files, f"{s.REAL_VISIBLE.relative_to(s.REPO_ROOT)} holds no question file"
+E       AssertionError: fixtures/evaluation/memory-retrieval/visible holds no question file
+E       assert []
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:32: AssertionError
+92 failed, 32 passed in 47.80s

@@ -1,0 +1,260 @@
+FFFF..FFFF..                                                             [100%]
+=================================== FAILURES ===================================
+________ test_every_command_file_is_recorded_as_a_skill_from_that_file _________
+
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_every_command_file_is_rec0/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1a8ac00>
+
+    def test_every_command_file_is_recorded_as_a_skill_from_that_file(project, launch):
+        s.add_commands(project)
+        s.write_role(project, s.ENGINEER, skills=(s.BACKEND.folder,))
+        result = launch(s.ENGINEER)
+        s.assert_launched(result)
+        found = _by_name(result.record())
+        expected = {skill.recorded_name for skill in s.SKILLS} | {command.recorded_name for command in s.COMMANDS}
+>       assert set(found) == expected, (
+            f"the record's skills are not the {s.SKILLS_REL}/ folders and the {s.COMMANDS_REL}/ Markdown files: "
+            f"recorded {sorted(found)}, loadable {sorted(expected)}")
+E       AssertionError: the record's skills are not the .claude/skills/ folders and the .claude/commands/ Markdown files: recorded ['w260a-backend', 'w260a-folder-named', 'w260a-security', 'w260a-unversioned'], loadable ['w260a-backend', 'w260a-folder-named', 'w260a-ns:plain', 'w260a-ns:unquoted', 'w260a-ns:unversioned', 'w260a-security', 'w260a-top', 'w260a-unversioned']
+E       assert {'w260a-backe...-unversioned'} == {'w260a-backe...ecurity', ...}
+E         
+E         Extra items in the right set:
+E         'w260a-ns:plain'
+E         'w260a-ns:unversioned'
+E         'w260a-ns:unquoted'
+E         'w260a-top'
+E         Use -v to get more diff
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:66: AssertionError
+_______ test_a_command_entry_follows_the_file_as_it_stands_at_the_launch _______
+
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_entry_follows_t0/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1a8a340>
+
+    def test_a_command_entry_follows_the_file_as_it_stands_at_the_launch(project, launch):
+        s.add_commands(project)
+        first = launch(s.ENGINEER)
+        s.assert_launched(first)
+        changed = s.Command(s.TOP_COMMAND.rel, "1.3.0", title=s.TOP_COMMAND.title)
+        s.write(_command_path(project, changed), changed.text())
+        second = launch(s.ENGINEER)
+        s.assert_launched(second)
+        before = _by_name(first.record()).get(s.TOP_COMMAND.recorded_name)
+        after = _by_name(second.record()).get(s.TOP_COMMAND.recorded_name)
+>       assert before is not None and after is not None, (
+            f"the command {s.TOP_COMMAND.recorded_name} is not recorded: {before!r}, {after!r}")
+E       AssertionError: the command w260a-top is not recorded: None, None
+E       assert (None is not None)
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:95: AssertionError
+______________ test_the_skills_folder_s_entries_stay_as_they_are _______________
+
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_the_skills_folder_s_entri0/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1b30680>
+
+    def test_the_skills_folder_s_entries_stay_as_they_are(project, launch):
+        without = launch(s.ENGINEER)
+        s.assert_launched(without)
+        s.add_commands(project)
+        beside = launch(s.ENGINEER)
+        s.assert_launched(beside)
+        before, after = _by_name(without.record()), _by_name(beside.record())
+        for skill in s.SKILLS:
+            assert after.get(skill.recorded_name) == before.get(skill.recorded_name), (
+                f"{skill.folder}'s entry changed when command files were added: {before.get(skill.recorded_name)!r} "
+                f"became {after.get(skill.recorded_name)!r}")
+        added = sorted(set(after) - set(before))
+>       assert added == sorted(command.recorded_name for command in s.COMMANDS), (
+            f"the entries added beside the {s.SKILLS_REL}/ entries are not the command files: {added}")
+E       AssertionError: the entries added beside the .claude/skills/ entries are not the command files: []
+E       assert [] == ['w260a-ns:pl..., 'w260a-top']
+E         
+E         Right contains 4 more items, first extra item: 'w260a-ns:plain'
+E         Use -v to get more diff
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:114: AssertionError
+____________ test_command_files_with_no_skills_folder_are_recorded _____________
+
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_command_files_with_no_ski0/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1b300e0>
+
+    def test_command_files_with_no_skills_folder_are_recorded(project, launch):
+        shutil.rmtree(project / s.SKILLS_REL)
+        s.add_commands(project)
+        result = launch(s.ENGINEER)
+        s.assert_launched(result)
+>       assert set(_by_name(result.record())) == {command.recorded_name for command in s.COMMANDS}, (
+            f"no {s.SKILLS_REL}/: the record's skills are not the command files: {result.record().get('skills')!r}")
+E       AssertionError: no .claude/skills/: the record's skills are not the command files: []
+E       assert set() == {'w260a-ns:pl..., 'w260a-top'}
+E         
+E         Extra items in the right set:
+E         'w260a-top'
+E         'w260a-ns:plain'
+E         'w260a-ns:unquoted'
+E         'w260a-ns:unversioned'
+E         Use -v to get more diff
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:123: AssertionError
+_ test_a_command_file_the_record_could_not_describe_refuses_the_launch[command-file-in-a-namespace-is-a-link] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record0/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record0/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record0/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1b32700>
+case = 'command-file-in-a-namespace-is-a-link'
+
+    @pytest.mark.parametrize("case", sorted(UNDESCRIBABLE))
+    def test_a_command_file_the_record_could_not_describe_refuses_the_launch(sandbox, project, launch, case):
+        """The record could not say what the session may load. The role names no skill; the other commands launch."""
+        s.add_commands(project)
+        s.assert_launched(launch(s.ENGINEER))
+        word = UNDESCRIBABLE[case](project, sandbox)
+>       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", word)
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327222.0969827, ended=1793327222.4198487, passed=())
+words = ('LAUNCH_REFUSED', 'w260a-linked-in-ns')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['d1fbe77f-151b-4ed4-aa85-d37e468d3d3a.json']
+E       records after: ['d1fbe77f-151b-4ed4-aa85-d37e468d3d3a.json', 'e37a32ff-56f5-41ee-b898-7dafef541497.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_command_file_the_record_could_not_describe_refuses_the_launch[command-file-is-a-link] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record1/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record1/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record1/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1b33a60>
+case = 'command-file-is-a-link'
+
+    @pytest.mark.parametrize("case", sorted(UNDESCRIBABLE))
+    def test_a_command_file_the_record_could_not_describe_refuses_the_launch(sandbox, project, launch, case):
+        """The record could not say what the session may load. The role names no skill; the other commands launch."""
+        s.add_commands(project)
+        s.assert_launched(launch(s.ENGINEER))
+        word = UNDESCRIBABLE[case](project, sandbox)
+>       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", word)
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327222.772355, ended=1793327223.1045122, passed=())
+words = ('LAUNCH_REFUSED', 'w260a-linked')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['83368226-2f16-47ed-b378-d6198f44f3d1.json']
+E       records after: ['2f254713-dc78-4039-8074-690e529b2262.json', '83368226-2f16-47ed-b378-d6198f44f3d1.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_command_file_the_record_could_not_describe_refuses_the_launch[front-matter-not-yaml] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record2/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record2/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record2/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1b30180>
+case = 'front-matter-not-yaml'
+
+    @pytest.mark.parametrize("case", sorted(UNDESCRIBABLE))
+    def test_a_command_file_the_record_could_not_describe_refuses_the_launch(sandbox, project, launch, case):
+        """The record could not say what the session may load. The role names no skill; the other commands launch."""
+        s.add_commands(project)
+        s.assert_launched(launch(s.ENGINEER))
+        word = UNDESCRIBABLE[case](project, sandbox)
+>       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", word)
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327223.4689856, ended=1793327223.8045332, passed=())
+words = ('LAUNCH_REFUSED', 'w260a-broken')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['db8b07eb-3b31-401b-8555-60c80e7f8b79.json']
+E       records after: ['db8b07eb-3b31-401b-8555-60c80e7f8b79.json', 'ebfdd840-ac28-408d-99a1-74bdb52a3ea2.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_command_file_the_record_could_not_describe_refuses_the_launch[namespace-folder-is-a-link] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record3/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record3/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-24/test_a_command_file_the_record3/w2-60a/home/work/repo')
+launch = <function launch.<locals>._launch at 0x7881c1a8bd80>
+case = 'namespace-folder-is-a-link'
+
+    @pytest.mark.parametrize("case", sorted(UNDESCRIBABLE))
+    def test_a_command_file_the_record_could_not_describe_refuses_the_launch(sandbox, project, launch, case):
+        """The record could not say what the session may load. The role names no skill; the other commands launch."""
+        s.add_commands(project)
+        s.assert_launched(launch(s.ENGINEER))
+        word = UNDESCRIBABLE[case](project, sandbox)
+>       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", word)
+
+tests/acceptance/W2-60a/test_w2_60a_command_skills.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327224.1707065, ended=1793327224.5007923, passed=())
+words = ('LAUNCH_REFUSED', 'w260a-linked-ns')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['a1932aa8-d03b-4a60-9665-574f1c0f3dc7.json']
+E       records after: ['7efcb701-a112-41af-bb23-38569f92383e.json', 'a1932aa8-d03b-4a60-9665-574f1c0f3dc7.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_every_command_file_is_recorded_as_a_skill_from_that_file
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_a_command_entry_follows_the_file_as_it_stands_at_the_launch
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_the_skills_folder_s_entries_stay_as_they_are
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_command_files_with_no_skills_folder_are_recorded
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_a_command_file_the_record_could_not_describe_refuses_the_launch[command-file-in-a-namespace-is-a-link]
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_a_command_file_the_record_could_not_describe_refuses_the_launch[command-file-is-a-link]
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_a_command_file_the_record_could_not_describe_refuses_the_launch[front-matter-not-yaml]
+FAILED tests/acceptance/W2-60a/test_w2_60a_command_skills.py::test_a_command_file_the_record_could_not_describe_refuses_the_launch[namespace-folder-is-a-link]
+8 failed, 4 passed in 6.85s

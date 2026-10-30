@@ -1,0 +1,59 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "src/gov/check/citations.py",
+    "src/gov/check/schema.py",
+    "src/gov/close/nightly.py",
+    "src/gov/records/queries.py",
+    "src/gov/store/loader.py"
+   ]
+  },
+  {
+   "reason": "UNPLACED",
+   "paths": [
+    "docs/research/EXP-003/examin/README.md",
+    "docs/research/EXP-003/examin/raw/clone.txt",
+    "docs/research/EXP-003/examin/raw/direct-calls.txt",
+    "docs/research/EXP-003/examin/raw/environment.txt",
+    "docs/research/EXP-003/examin/raw/gov-rebuild.txt",
+    "docs/research/EXP-003/examin/raw/governance-suite.txt",
+    "docs/research/EXP-003/examin/raw/languages.tsv",
+    "docs/research/EXP-003/examin/raw/product-suite-needs.txt",
+    "docs/research/EXP-003/examin/raw/rss-samples.txt",
+    "docs/research/EXP-003/examin/raw/size.txt",
+    "docs/research/EXP-003/examin/raw/test-runners.txt",
+    "governance/project/briefs/LEAD-w2-common.md",
+    "governance/project/orchestration/nightly/nightly.sh",
+    "governance/project/orchestration/nightly/push_emergency.sh",
+    "governance/project/orchestration/nightly/test_nightly.sh",
+    "governance/project/prompts/w2-orchestrator.md"
+   ]
+  }
+ ],
+ "base": "94e7115cd59a74c9ab8fc1fd11c8a05d5665ed99",
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-64/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-worktrees/W2-64/tests/acceptance/W2-64"
+ ],
+ "per_test_timeout": 900
+}

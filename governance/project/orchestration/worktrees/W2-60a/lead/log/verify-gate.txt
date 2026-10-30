@@ -1,0 +1,4 @@
+disk gate open: 874 GiB free, 64778106 inodes free
+28879	/tmp/gov-os-lead-W2-60a
+118M	/tmp/gov-os-lead-W2-60a
+Thu Oct 29 22:50:23 GMT 2026

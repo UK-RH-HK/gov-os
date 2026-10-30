@@ -10,7 +10,12 @@ import re
 import sys
 from pathlib import Path
 
-COMMON = Path("/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/briefs/LEAD-w2-common.md")
+import os
+
+# GOV_BRIEF_COMMON names a draft of the common brief while the committed one cannot change (a close queue runs, and an
+# edit of a tracked file would stop its gate (d)); the draft is committed as soon as the queue ends.
+COMMON = Path(os.environ.get("GOV_BRIEF_COMMON",
+                             "/home/usain/Dynamic-Agentic-Engineering-OS/governance/project/briefs/LEAD-w2-common.md"))
 KEYS = ("ID", "W2", "PROFILE", "PATHS", "ROWS", "SOURCES", "IMPL", "EST")
 
 

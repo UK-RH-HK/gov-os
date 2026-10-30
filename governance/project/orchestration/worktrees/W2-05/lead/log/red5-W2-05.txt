@@ -1,0 +1,561 @@
+.FFFFFFFF....F.....................FFFFF.....F..                         [100%]
+=================================== FAILURES ===================================
+_ test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged[the main tree, a plain commit] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run0')
+box = <w2_05_support.Box object at 0x706606fccb30>
+shape = 'the main tree, a plain commit'
+
+    @pytest.mark.parametrize("shape", tuple(SHAPES))
+    def test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged(
+            tmp_path, box, shape):
+        skip_without("lefthook", "gitleaks")
+        linked, extra = SHAPES[shape]
+        main = _project(tmp_path, box)
+        tree = support.add_worktree(main, tmp_path / "wt") if linked else main
+        trees = [main, tree] if linked else [main]
+        _install(box, main)
+        staged = _stage(tree, bool(extra), tmp_path)
+        before = support.repo_state(main, trees)
+    
+        done = box.run([support.GIT, "commit", "-q", "-m", MESSAGE, *extra], cwd=tree, env=box.env(),
+                       timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+    
+        what = f"a hooked commit ({shape}) whose declared check runs git in a repository of its own"
+        environment, steps = _record(box, "check-env.json"), _record(box, "check-steps.json")
+        assert environment is not None, f"{what}: the declared check did not run:\n{support.said(done)}"
+>       assert "GIT_INDEX_FILE" not in environment, (
+            f"{what}: the declared check received GIT_INDEX_FILE={environment['GIT_INDEX_FILE']!r} (P-1, DEC-804 item 3: "
+            f"an inherited index is honoured only for git calls in the project root; a program that may start git "
+            f"elsewhere gets no index). Its own git calls:\n{_steps_said(steps)}")
+E       AssertionError: a hooked commit (the main tree, a plain commit) whose declared check runs git in a repository of its own: the declared check received GIT_INDEX_FILE='/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run0/repo/.git/index' (P-1, DEC-804 item 3: an inherited index is honoured only for git calls in the project root; a program that may start git elsewhere gets no index). Its own git calls:
+E           git init -q -b own: exit 0 
+E           git add -A: exit 0 
+E           git -c user.name=The check -c user.email=check@example.invalid commit -q -m the check's own commit: exit 0 
+E       assert 'GIT_INDEX_FILE' not in {'GIT_AUTHOR_DATE': '@1793309090 +0000', 'GIT_AUTHOR_EMAIL': 'w2-05@example.invalid', 'GIT_AUTHOR_NAME': 'W2-05 person...IT_INDEX_FILE': '/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run0/repo/.git/index', ...}
+
+tests/acceptance/W2-05/test_w2_05_declared_check.py:158: AssertionError
+_ test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged[the main tree, git commit -a] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run1')
+box = <w2_05_support.Box object at 0x706606fce780>
+shape = 'the main tree, git commit -a'
+
+    @pytest.mark.parametrize("shape", tuple(SHAPES))
+    def test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged(
+            tmp_path, box, shape):
+        skip_without("lefthook", "gitleaks")
+        linked, extra = SHAPES[shape]
+        main = _project(tmp_path, box)
+        tree = support.add_worktree(main, tmp_path / "wt") if linked else main
+        trees = [main, tree] if linked else [main]
+        _install(box, main)
+        staged = _stage(tree, bool(extra), tmp_path)
+        before = support.repo_state(main, trees)
+    
+        done = box.run([support.GIT, "commit", "-q", "-m", MESSAGE, *extra], cwd=tree, env=box.env(),
+                       timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+    
+        what = f"a hooked commit ({shape}) whose declared check runs git in a repository of its own"
+        environment, steps = _record(box, "check-env.json"), _record(box, "check-steps.json")
+        assert environment is not None, f"{what}: the declared check did not run:\n{support.said(done)}"
+>       assert "GIT_INDEX_FILE" not in environment, (
+            f"{what}: the declared check received GIT_INDEX_FILE={environment['GIT_INDEX_FILE']!r} (P-1, DEC-804 item 3: "
+            f"an inherited index is honoured only for git calls in the project root; a program that may start git "
+            f"elsewhere gets no index). Its own git calls:\n{_steps_said(steps)}")
+E       AssertionError: a hooked commit (the main tree, git commit -a) whose declared check runs git in a repository of its own: the declared check received GIT_INDEX_FILE='/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run1/repo/.git/index.lock' (P-1, DEC-804 item 3: an inherited index is honoured only for git calls in the project root; a program that may start git elsewhere gets no index). Its own git calls:
+E           git init -q -b own: exit 0 
+E           git add -A: exit 0 
+E           git -c user.name=The check -c user.email=check@example.invalid commit -q -m the check's own commit: exit 0 
+E       assert 'GIT_INDEX_FILE' not in {'GIT_AUTHOR_DATE': '@1793309091 +0000', 'GIT_AUTHOR_EMAIL': 'w2-05@example.invalid', 'GIT_AUTHOR_NAME': 'W2-05 person...DEX_FILE': '/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run1/repo/.git/index.lock', ...}
+
+tests/acceptance/W2-05/test_w2_05_declared_check.py:158: AssertionError
+_ test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged[a linked worktree, a plain commit] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run2')
+box = <w2_05_support.Box object at 0x706606fcf620>
+shape = 'a linked worktree, a plain commit'
+
+    @pytest.mark.parametrize("shape", tuple(SHAPES))
+    def test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged(
+            tmp_path, box, shape):
+        skip_without("lefthook", "gitleaks")
+        linked, extra = SHAPES[shape]
+        main = _project(tmp_path, box)
+        tree = support.add_worktree(main, tmp_path / "wt") if linked else main
+        trees = [main, tree] if linked else [main]
+        _install(box, main)
+        staged = _stage(tree, bool(extra), tmp_path)
+        before = support.repo_state(main, trees)
+    
+        done = box.run([support.GIT, "commit", "-q", "-m", MESSAGE, *extra], cwd=tree, env=box.env(),
+                       timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+    
+        what = f"a hooked commit ({shape}) whose declared check runs git in a repository of its own"
+        environment, steps = _record(box, "check-env.json"), _record(box, "check-steps.json")
+        assert environment is not None, f"{what}: the declared check did not run:\n{support.said(done)}"
+>       assert "GIT_INDEX_FILE" not in environment, (
+            f"{what}: the declared check received GIT_INDEX_FILE={environment['GIT_INDEX_FILE']!r} (P-1, DEC-804 item 3: "
+            f"an inherited index is honoured only for git calls in the project root; a program that may start git "
+            f"elsewhere gets no index). Its own git calls:\n{_steps_said(steps)}")
+E       AssertionError: a hooked commit (a linked worktree, a plain commit) whose declared check runs git in a repository of its own: the declared check received GIT_INDEX_FILE='/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run2/repo/.git/worktrees/wt/index' (P-1, DEC-804 item 3: an inherited index is honoured only for git calls in the project root; a program that may start git elsewhere gets no index). Its own git calls:
+E           git init -q -b own: exit 0 
+E           git add -A: exit 0 
+E           git -c user.name=The check -c user.email=check@example.invalid commit -q -m the check's own commit: exit 0 
+E       assert 'GIT_INDEX_FILE' not in {'GIT_AUTHOR_DATE': '@1793309093 +0000', 'GIT_AUTHOR_EMAIL': 'w2-05@example.invalid', 'GIT_AUTHOR_NAME': 'W2-05 person...': '/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_declared_check_that_run2/repo/.git/worktrees/wt/index', ...}
+
+tests/acceptance/W2-05/test_w2_05_declared_check.py:158: AssertionError
+_ test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event[an event in the template's source only] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_drift_in_the_template_s0')
+drift = "an event in the template's source only"
+
+    @pytest.mark.parametrize("drift", tuple(DRIFTS))
+    def test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event(
+            tmp_path, drift):
+        w138 = _w138()
+        event, plant = DRIFTS[drift]
+        repository, template = _repository(), _template_with_the_matcher()
+        plant(template)
+        project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    
+        done, findings = _check(w138, project)
+    
+>       assert_drift_seen(w138, done, findings, event, f"{drift} ({event})")
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+w138 = <module 'w1_38_support' from '/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W1-38/w1_38_support.py'>
+done = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='')
+findings = [], event = 'userPromptSubmit'
+what = "an event in the template's source only (userPromptSubmit)"
+
+    def assert_drift_seen(w138, done, findings, event, what):
+>       assert done.returncode != 0, (
+            f"adapter-portability stayed green on {what}: it did not see the drift in the hooks sources (W2-M281, "
+            f"DEC-805):\n{w138.output_of(done)[-2000:]}")
+E       AssertionError: adapter-portability stayed green on an event in the template's source only (userPromptSubmit): it did not see the drift in the hooks sources (W2-M281, DEC-805):
+E         {
+E          "findings": [],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:139: AssertionError
+_ test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event[an event in the repository's source only] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_drift_in_the_template_s1')
+drift = "an event in the repository's source only"
+
+    @pytest.mark.parametrize("drift", tuple(DRIFTS))
+    def test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event(
+            tmp_path, drift):
+        w138 = _w138()
+        event, plant = DRIFTS[drift]
+        repository, template = _repository(), _template_with_the_matcher()
+        plant(template)
+        project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    
+        done, findings = _check(w138, project)
+    
+>       assert_drift_seen(w138, done, findings, event, f"{drift} ({event})")
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+w138 = <module 'w1_38_support' from '/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W1-38/w1_38_support.py'>
+done = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='')
+findings = [], event = 'subagentStop'
+what = "an event in the repository's source only (subagentStop)"
+
+    def assert_drift_seen(w138, done, findings, event, what):
+>       assert done.returncode != 0, (
+            f"adapter-portability stayed green on {what}: it did not see the drift in the hooks sources (W2-M281, "
+            f"DEC-805):\n{w138.output_of(done)[-2000:]}")
+E       AssertionError: adapter-portability stayed green on an event in the repository's source only (subagentStop): it did not see the drift in the hooks sources (W2-M281, DEC-805):
+E         {
+E          "findings": [],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:139: AssertionError
+_ test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event[an event whose matcher differs] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_drift_in_the_template_s2')
+drift = 'an event whose matcher differs'
+
+    @pytest.mark.parametrize("drift", tuple(DRIFTS))
+    def test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event(
+            tmp_path, drift):
+        w138 = _w138()
+        event, plant = DRIFTS[drift]
+        repository, template = _repository(), _template_with_the_matcher()
+        plant(template)
+        project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    
+        done, findings = _check(w138, project)
+    
+>       assert_drift_seen(w138, done, findings, event, f"{drift} ({event})")
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+w138 = <module 'w1_38_support' from '/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W1-38/w1_38_support.py'>
+done = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='')
+findings = [], event = 'postToolUseFailure'
+what = 'an event whose matcher differs (postToolUseFailure)'
+
+    def assert_drift_seen(w138, done, findings, event, what):
+>       assert done.returncode != 0, (
+            f"adapter-portability stayed green on {what}: it did not see the drift in the hooks sources (W2-M281, "
+            f"DEC-805):\n{w138.output_of(done)[-2000:]}")
+E       AssertionError: adapter-portability stayed green on an event whose matcher differs (postToolUseFailure): it did not see the drift in the hooks sources (W2-M281, DEC-805):
+E         {
+E          "findings": [],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:139: AssertionError
+_ test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event[a matcher in the repository's source only] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_drift_in_the_template_s3')
+drift = "a matcher in the repository's source only"
+
+    @pytest.mark.parametrize("drift", tuple(DRIFTS))
+    def test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event(
+            tmp_path, drift):
+        w138 = _w138()
+        event, plant = DRIFTS[drift]
+        repository, template = _repository(), _template_with_the_matcher()
+        plant(template)
+        project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    
+        done, findings = _check(w138, project)
+    
+>       assert_drift_seen(w138, done, findings, event, f"{drift} ({event})")
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+w138 = <module 'w1_38_support' from '/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W1-38/w1_38_support.py'>
+done = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='')
+findings = [], event = 'sessionStart'
+what = "a matcher in the repository's source only (sessionStart)"
+
+    def assert_drift_seen(w138, done, findings, event, what):
+>       assert done.returncode != 0, (
+            f"adapter-portability stayed green on {what}: it did not see the drift in the hooks sources (W2-M281, "
+            f"DEC-805):\n{w138.output_of(done)[-2000:]}")
+E       AssertionError: adapter-portability stayed green on a matcher in the repository's source only (sessionStart): it did not see the drift in the hooks sources (W2-M281, DEC-805):
+E         {
+E          "findings": [],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:139: AssertionError
+_ test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event[a matcher in the template's source only] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_a_drift_in_the_template_s4')
+drift = "a matcher in the template's source only"
+
+    @pytest.mark.parametrize("drift", tuple(DRIFTS))
+    def test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event(
+            tmp_path, drift):
+        w138 = _w138()
+        event, plant = DRIFTS[drift]
+        repository, template = _repository(), _template_with_the_matcher()
+        plant(template)
+        project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    
+        done, findings = _check(w138, project)
+    
+>       assert_drift_seen(w138, done, findings, event, f"{drift} ({event})")
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+w138 = <module 'w1_38_support' from '/home/usain/gov-os-worktrees/W2-05/tests/acceptance/W1-38/w1_38_support.py'>
+done = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='')
+findings = [], event = 'preToolUse'
+what = "a matcher in the template's source only (preToolUse)"
+
+    def assert_drift_seen(w138, done, findings, event, what):
+>       assert done.returncode != 0, (
+            f"adapter-portability stayed green on {what}: it did not see the drift in the hooks sources (W2-M281, "
+            f"DEC-805):\n{w138.output_of(done)[-2000:]}")
+E       AssertionError: adapter-portability stayed green on a matcher in the template's source only (preToolUse): it did not see the drift in the hooks sources (W2-M281, DEC-805):
+E         {
+E          "findings": [],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=0, stdout='{\n "findings": [],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:139: AssertionError
+__ test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_adapter_portability_is_gr0')
+
+    def test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources(tmp_path):
+        """This repository's two files, byte for byte. Green once the template carries ``sessionStart``'s matcher
+        (DEC-805 item 2); the same project with that matcher taken out of the template's source is red, so that the
+        green is the comparison's and not the absence of one."""
+        w138 = _w138()
+        repository_text, _ = _read(support.REPO_HOOKS_SOURCE_REL)
+        template_text, template = _read(support.TEMPLATE_HOOKS_SOURCE_REL)
+        _repository()
+        project = _project(tmp_path, w138, repository_text, template_text)
+    
+        done, findings = _check(w138, project)
+    
+        assert_green(w138, done, findings, "this repository's two hooks sources")
+        matchers = [entry.get("matcher") for entry in template["hooks"].get("sessionStart", [])]
+>       assert matchers == [SESSION_START_MATCHER], (
+            f"{support.TEMPLATE_HOOKS_SOURCE_REL}'s sessionStart matchers are {matchers}, not the repository's "
+            f"[{SESSION_START_MATCHER!r}] (DEC-805 item 2: the template's missing sessionStart matcher is added)")
+E       AssertionError: template/.rulesync/hooks.jsonc's sessionStart matchers are [None], not the repository's ['compact|clear|resume'] (DEC-805 item 2: the template's missing sessionStart matcher is added)
+E       assert [None] == ['compact|clear|resume']
+E         
+E         At index 0 diff: None != 'compact|clear|resume'
+E         Use -v to get more diff
+
+tests/acceptance/W2-05/test_w2_05_hooks_source.py:276: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[trace variables] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_containment_check_cat1')
+decoy = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_containment_check_cat1/elsewhere/decoy'), {'.git/...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = 'trace variables'
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:401: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_containment_check_cat1/traces')
+what = 'the containment check with trace variables'
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with trace variables: a child git call wrote the planted trace target(s) ['git_trace', 'git_trace2', 'git_trace2_event']
+E       assert not ['git_trace', 'git_trace2', 'git_trace2_event']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:68: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[a trace setting in the person's git configuration] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_containment_check_cat2')
+decoy = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_containment_check_cat2/elsewhere/decoy'), {'.git/...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = "a trace setting in the person's git configuration"
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:401: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_containment_check_cat2/traces')
+what = "the containment check with a trace setting in the person's git configuration"
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with a trace setting in the person's git configuration: a child git call wrote the planted trace target(s) ['user-config-trace2']
+E       assert not ['user-config-trace2']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:68: AssertionError
+_ test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_gov_close_runs_its_subpro0')
+decoy = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_gov_close_runs_its_subpro0/elsewhere/decoy'), {'.git/...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+
+    def test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment(tmp_path, decoy):
+        """Red until W2-53 merges (``src/gov/close/**``)."""
+        import w2_01_support as w201
+        base = w201.base
+        ticket, wbs = "PROJ-genv", "W1-genv"
+        record = tmp_path / "seen-by-the-test.json"
+        traces = tmp_path / "traces"
+        project = w201.Project(tmp_path / "project")
+        w201.create_ticket(project, ticket, wbs)
+        project.write(f"tests/acceptance/{wbs}/test_records_its_environment.py", _ENV_TEST.format(record=str(record)))
+        project.commit("acceptance tests: the environment", who=w201.TEST_DESIGNER,
+                       trailers=w201.trailers_of(ticket, role="independent-test-designer"), exact=True)
+        w201.engineer_commit(project, ticket, {"src/example/feature.py": "# feature\n"})
+        w201.checkpointed(project, ticket)
+        sandbox = w201.cli_support.make_sandbox(tmp_path / "sandbox")
+        interface = w201.cli_support.load_interface(w201.REPO_ROOT)
+        plants = dict(support.planted(decoy[0]), **support.trace_plants(traces))
+        traces.mkdir(exist_ok=True)
+        gitconfig = Path(sandbox.home) / ".gitconfig"
+        gitconfig.write_text((gitconfig.read_text() if gitconfig.is_file() else "")
+                             + f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+        env = dict(base.sandbox_env(sandbox), **plants)
+    
+        run = base.run_close(project, sandbox, ticket, env=env)
+    
+        assert record.is_file(), f"gov close did not run the ticket's acceptance test:\n{run.describe()}"
+        reached = sorted(set(json.loads(record.read_text())) & set(plants))
+>       assert not reached, f"the planted {reached} reached the test run of gov close (W2-M161):\n{run.describe()}"
+E       AssertionError: the planted ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', 'GIT_TRACE_SETUP'] reached the test run of gov close (W2-M161):
+E         gov close PROJ-genv --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "close", "result": {"ticket": "PROJ-genv", "close_record": "docs/close/PROJ-genv/CL-PROJ-genv.md", "checkpoint": "docs/checkpoints/PROJ-genv/CP-PROJ-genv-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.0, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2, "distribution": "load"}, {"run": "regression", "form": "parallel", "seconds": 0.96, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2, "distribution": "load"}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": [], "evidence": {"scope": "full", "why_full": [{"reason": "TEST_MAP_MISSING"}, {"reason": "BASE_UNKNOWN"}], "base": null, "head": "0256ce290ff28d9d261d38669ba71e7b7bc1a068", "tree": "2512beeefcc2449815e2e25a8a6f4f907cb36800", "changed": [], "selected": [{"target": "tests/acceptance/W1-genv/", "why": [{"reason": "OWN"}]}, {"target": "tests", "why": [{"reason": "FULL"}]}], "left_out": [], "skips": [], "skip_count": 0, "failures": [], "junit_xml": [".gov-runtime/close/PROJ-genv/20261029T212630234108Z/01-acceptance-parallel.xml", ".gov-runtime/close/PROJ-genv/20261029T212630234108Z/02-regression-parallel.xml"], "per_test_timeout": 900, "distribution": "load", "tmp_path_retention_policy": "failed", "code_fingerprint": null, "records_fingerprint": null}, "ticket_class": "implementation", "disk": {"free_gib": 875.36, "free_inodes": 64848747, "close_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:450: AssertionError
+____________ test_the_guard_hook_does_not_run_the_git_first_on_path ____________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_guard_hook_does_not_r0')
+
+    def test_the_guard_hook_does_not_run_the_git_first_on_path(tmp_path):
+        """Red until W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tool_input = w102.edit_tool_input("Write", project / "src/gov/guard/decide.py")
+        plain = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID)
+        assert plain.decision == "allow", f"the guard did not allow an in-scope write; the case needs it: {plain.describe()}"
+        fake = tmp_path / "fake-bin"
+        fake.mkdir()
+        mark = tmp_path / "fake-git-ran"
+        (fake / "git").write_text(f"#!/bin/sh\necho \"$*\" >> {support.sh_quote(mark)}\nexec {support.GIT} \"$@\"\n")
+        (fake / "git").chmod(0o755)
+    
+        result = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID,
+                               extra_env={"PATH": f"{fake}:{os.environ.get('PATH', support.SYSTEM_PATH)}"})
+    
+        ran = mark.read_text().splitlines() if mark.is_file() else []
+>       assert not ran, f"the guard hook ran the git first on PATH, not git by absolute path (W2-L160): {ran[:3]}"
+E       AssertionError: the guard hook ran the git first on PATH, not git by absolute path (W2-L160): ['-C /tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+E       assert not ['-C /tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:482: AssertionError
+_ test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_guard_hook_refuses_wi0')
+fifo_cleanup = [PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-0/test_the_guard_hook_refuses_wi0/project/.git/worktrees/wt/HEAD')]
+
+    def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs(tmp_path, fifo_cleanup):
+        """The worktree's ``HEAD`` in its git directory is a fifo: every git that opens it waits. The guard's freeze
+        look-up gives up at its own limit of 15 s (DEC-783 item 2) and the guard refuses (DEC-580): the answer is
+        ``deny``, not before 14.5 s and by 18 s, so it is the look-up's own and not the hook deadline's (20 s)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tree = tmp_path / "wt"
+        w102.git(project, "worktree", "add", "-q", str(tree), "-b", "w2-05/guard")
+        head = support.git_dir_of(tree) / "HEAD"
+        head.unlink()
+        os.mkfifo(head)
+        fifo_cleanup.append(head)
+    
+        result = w102.run_hook(tree, "Write", w102.edit_tool_input("Write", tree / "src/gov/guard/decide.py"), sandbox,
+                               role=w102.ENGINEER, ticket=w102.TICKET_ID)
+    
+>       assert result.decision != "timeout", (
+            f"the guard hook did not answer within the hook's {w102.HOOK_TIMEOUT_S:.0f} s deadline while its freeze "
+            f"look-up waited (W2-L160: the look-up has no limit of its own of {FREEZE_LIMIT_S:.0f} s, DEC-783 item 2): "
+            f"{result.describe()}")
+E       AssertionError: the guard hook did not answer within the hook's 20 s deadline while its freeze look-up waited (W2-L160: the look-up has no limit of its own of 15 s, DEC-783 item 2): decision=timeout exit=None stdout='' stderr=''
+E       assert 'timeout' != 'timeout'
+E        +  where 'timeout' = HookResult(decision='timeout', returncode=None, stdout='', stderr='', seconds=20.021561276866123, cpu_seconds=0.11009900000004791).decision
+
+tests/acceptance/W2-05/test_w2_05_planted.py:503: AssertionError
+_____ test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep ______
+
+    def test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep():
+        text = _sweep_text()
+        starting = support.files_that_start_git()
+        assert starting, "no file of src/gov names git: the lower bound of the sweep is empty, the case is wrong"
+        unnamed = [rel for rel in starting if not support.names_file(text, rel)]
+>       assert not unnamed, (f"{support.SWEEP_REL} does not name {len(unnamed)} of the {len(starting)} files of "
+                             f"src/gov that start git: {unnamed}")
+E       AssertionError: docs/research/AR-2-git-sweep.md does not name 3 of the 27 files of src/gov that start git: ['src/gov/cli/main.py', 'src/gov/close/nightly.py', 'src/gov/guard/reads.py']
+E       assert not ['src/gov/cli/main.py', 'src/gov/close/nightly.py', 'src/gov/guard/reads.py']
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:42: AssertionError
+15 failed, 33 passed in 134.20s (0:02:14)

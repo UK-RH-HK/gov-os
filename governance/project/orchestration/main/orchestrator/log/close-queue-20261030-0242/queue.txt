@@ -1,0 +1,10 @@
+2026-10-30 02:42:06 waiting for the verification lock
+2026-10-30 03:45:52 verification lock held
+2026-10-30 03:53:23 quiet (5 quiet minutes of 7; load 0.28 2.56 8.25)
+2026-10-30 03:53:24 rebuild before DAEO-cy5o
+2026-10-30 03:57:56 collect ok: 17094/17096 tests collected (2 deselected) in 7.11s
+2026-10-30 04:00:04 records ok: 80 passed in 118.31s (0:01:58)
+2026-10-30 04:00:07 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-30 04:06:07 check ok; close DAEO-cy5o (load 4.11)
+2026-10-30 05:18:35 close DAEO-cy5o exit 3
+2026-10-30 05:18:35 DAEO-cy5o CLOSE REFUSED (exit 3); queue stopped

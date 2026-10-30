@@ -1,0 +1,1 @@
+disk gate open: 879 GiB free, 65420564 inodes free

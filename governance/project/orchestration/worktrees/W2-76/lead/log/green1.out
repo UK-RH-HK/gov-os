@@ -1,0 +1,56 @@
+...................F...........................                          [100%]
+=================================== FAILURES ===================================
+___________ test_a_slow_rebuild_records_what_it_waits_on_and_goes_on ___________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-1/test_a_slow_rebuild_records_wh0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-1/test_a_slow_rebuild_records_wh0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-1/test_a_slow_rebuild_records_wh0/w2-76/locks/rebuild.lock')
+
+    def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock):
+        project = support.make_project(box, "project", lock, slow_after_s=THRESHOLD_S)
+        unslowed = support.rebuild(project, support.environment(box), "--no-embeddings")
+        assert unslowed.returncode == 0, f"the unslowed rebuild of the same tree failed\n{unslowed.describe()}"
+        env = support.environment(box, support.slow_gitleaks(box, "slow-tools", SLEEP_S))
+    
+        background = support.Background(project, env, support.rebuild_argv("--no-embeddings"), box.base / "out")
+        live, writes, unreadable = [], set(), 0
+        try:
+            while background.running():
+                record, text = support.read_record(project)
+                if record is not None and background.running():
+                    procs = record.get(support.first_key(record, support.PROCESSES_KEYS) or "") or []
+                    if any(isinstance(p, dict) and p.get("pid") == background.pid for p in procs):
+                        written = record.get(support.first_key(record, support.WRITTEN_KEYS) or "")
+                        live.append((record, text))
+                        writes.add(json.dumps(written))
+                elif text is not None:
+                    unreadable += 1
+                time.sleep(0.25)
+        finally:
+            run = background.finish()
+    
+        assert run.returncode == 0 and run.envelope().get("ok") is True, \
+            f"the slow rebuild did not go on to a successful end\n{run.describe()}"
+        assert live, f"no record of this rebuild's processes while it ran ({unreadable} reads were not whole JSON)\n" \
+                     f"{run.describe()}"
+        assert len(writes) >= 2, f"the record was not rewritten while the rebuild ran (times of the writes: {writes})"
+        problems = _check_live_record(*live[-1], background.pid)
+        assert not problems, "the live record lacks what it must hold:\n- " + "\n- ".join(problems)
+    
+        flagged = [line for line in run.stderr.splitlines() if line.startswith("rebuild: slow:")]
+        assert len(flagged) == 1 and support.RECORD_REL in flagged[0], \
+            f"one `rebuild: slow:` line naming {support.RECORD_REL} was expected\nstderr:\n{run.stderr[-2000:]}"
+        result = run.result
+        assert result.get("slow") is True and result.get("slow_after_s") == THRESHOLD_S, \
+            f"the result does not flag the rebuild slow\n{run.describe()}"
+        timing = result.get("timing") or {}
+>       assert timing.get("secrets_s", 0) >= SLEEP_S - 1 and timing.get("lexical_s", 0) >= SLEEP_S - 1, \
+            f"the planted slow secrets filter is not in its stage times: {timing}"
+E       AssertionError: the planted slow secrets filter is not in its stage times: {'record_s': 0.4, 'lexical_s': 0.0, 'secrets_s': 10.5, 'semantic_s': 0.0, 'codeintel_s': 10.5, 'compaction_s': 0.0, 'total_s': 11.2}
+E       assert (10.5 >= (9.0 - 1) and 0.0 >= (9.0 - 1))
+E        +  where 10.5 = <built-in method get of dict object at 0x78414828b6c0>('secrets_s', 0)
+E        +    where <built-in method get of dict object at 0x78414828b6c0> = {'codeintel_s': 10.5, 'compaction_s': 0.0, 'lexical_s': 0.0, 'record_s': 0.4, ...}.get
+E        +  and   0.0 = <built-in method get of dict object at 0x78414828b6c0>('lexical_s', 0)
+E        +    where <built-in method get of dict object at 0x78414828b6c0> = {'codeintel_s': 10.5, 'compaction_s': 0.0, 'lexical_s': 0.0, 'record_s': 0.4, ...}.get
+
+tests/acceptance/W2-76/test_w2_76_watchdog.py:131: AssertionError
+1 failed, 46 passed in 150.77s (0:02:30)

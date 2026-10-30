@@ -1,0 +1,3 @@
+HOLDS 04:02 W2-03:r3b-parallel.xml
+waits 01:49 W2-61:full-1-serial.xml
+waits 01:00 ?

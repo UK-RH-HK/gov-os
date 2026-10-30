@@ -1,66 +1,100 @@
-# W2-03 (DAEO-ym8a) — lead checkpoint, run 2, 2026-10-17
+# W2-03 (DAEO-ym8a) — lead checkpoint, run 3 (merge-back, DEC-941 item 2), 2026-10-29
 
 ## State
 
-**DONE, held for the close order (DEC-737, DEC-752).** The loop ended green; nothing open for this ticket's packages.
-Worktree `/home/usain/gov-os-worktrees/W2-03`, branch `w2/W2-03`. Base: `f3d4b6f0` (w2/integrate, the claim), W2-02's
-held branch merged at `857a428c` (DEC-752), `w2/integrate` merged at `039740a1` (DEC-755's paths, W2-01's merged
-change `3022c2df`). Nothing merged into `w2/integrate`; no close run.
+Run 3, restarted lead (17:36). The first lead of run 3 was stopped at 16:57 by the orchestrator. It had made the merge
+of `w2/integrate` (`a1629f1860ca`) at `b23bf1ac0b4c` (no conflict; trailers Task: DAEO-ym8a, Implements: DEC-941,
+Role: orchestrator; `^### DEC-941` count 1). Checked by the restarted lead: head `b23bf1ac0b4c`, clean tree.
 
-Loop: run 1 — test design, one implementation round (converged). Run 2 — DEC-755 items 1–3 applied (one test-designer
-rewrite, one engineer fixture change), verified green. No repair round in either run.
+No re-merge: `git diff --name-only b23bf1ac^2 w2/integrate` names no file under src/ or tests/ (only the register,
+two checkpoint records, the list and the prompt: DEC-942's records). The brief's literal check
+(`git diff --stat b23bf1ac w2/integrate -- src tests`) is non-empty only because it includes this ticket's own 19 files.
 
-## Commits on this branch after 857a428c (this ticket's)
+keyword_warn: 0 files. Hooks: none but samples. Loop count: 0 repair batches.
 
-| Commit | Role | What |
-|---|---|---|
-| `dd991bec` | independent-test-designer | `tests/acceptance/W2-03/` (39 tests, README, readings R1–R7) |
-| `a30ee7ce` | orchestrator | CP-DAEO-ym8a-0002 (after test design) |
-| `cde5a3c7` | engineer | store/loader.py, records/queries.py, decisions/checker.py, check/citations.py, builder tests |
-| `4700e6c1` | engineer | tests/unit/records/test_records.py (span, content_hash) |
-| `fe0c1d58` | orchestrator | CP-DAEO-ym8a-0004 (packages open) |
-| `645ecbdf` | orchestrator (main) | ticket paths widened for `tests/unit/check/test_citations.py` (DEC-755) |
-| `039740a1` | orchestrator (main) | merge of `w2/integrate` (W2-01's change) |
-| `db002376` | independent-test-designer | W1-26: P-1 status line; P-2 id-only file now flagged (own case). `Rewrite-Reason:` W2-03 KPI 3 / W2-L221; W2-M267 / W2-M145; DEC-755 items 1–2 |
-| `30251706` | engineer | `tests/unit/check/test_citations.py`: status line under each entry heading of the nine red cases; no expectation changed (DEC-755 item 3) |
-| next | orchestrator | this hold checkpoint (CP record) |
+## Done in run 3 (restarted lead)
 
-## Verification, run 2 (this worktree's code, DEC-732)
+- Gates waited 17:37–19:07 for the close queue (DAEO-2gc7, DAEO-5j8b); disk gate open (885 GiB, 65.8 M inodes).
+- Rebuild (flock waited ~24 min for another rebuild), exit 0, `invalid: []`; `gov.__file__` =
+  `/home/usain/gov-os-worktrees/W2-03/src/gov/__init__.py`.
+- Real register: 937 decision records, 937 distinct hashes, each = sha256(span); dangling 429 (TASK 366, IMPLEMENTS 63).
+- `--collect-only`: `16795/16797 tests collected (2 deselected) in 23.55s`, no collection error.
+- First `gov check --json` killed by its own `timeout 1200` under load ~80 (another run); to redo after the suites.
+- Gated parallel job stopped before it began (its 2-hour clock would have run out in the lock queue): W2-71's run,
+  then W2-77's queued run, hold `/tmp/gov-os-verify.lock`. Start the parallel run only when the lock is free.
 
-- `gov.__file__` → `/home/usain/gov-os-worktrees/W2-03/src/gov/__init__.py`.
-- Full `gov rebuild --json`: exit 0, digest `0d4c39cc…`, `invalid: []`, lexical/semantic/codeintel recreated.
-- Real register: 745 decision records, 745 distinct `content_hash`, each sha256 of its own span; no duplicate refused.
-- Each suite in its own pytest process (logs `.gov-runtime/scratch/lead/log/r2-suite-*.txt`): all W1-01…W1-50, W2-01,
-  W2-02, W2-03 green except W1-42 (2 known reds, DEC-713/714) and W1-46 (23 setup errors in the live-session file under
-  parallel load; the file alone: 36 passed). tests/unit: 2151 passed, 1 skipped. Latency cases all passed in their
-  batches (W1-02 3653 passed, W1-05 99 passed, W1-19 41 passed): no re-run needed.
-- core-decision-citations: 75 DECISION_UNRECORDED; run 1's 50 all still there; the 25 new are W2-01's history commits
-  (and this branch's) citing DEC-734/739/750/754/755 before their trees record them. No new rule.
+- Parallel phase on `b23bf1ac0b4c` (23:00–00:05): 2 failed, 16582 passed, 31 skipped in 3880.74 s. Reds:
+  W2-66 `test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes` (known, DEC-919, lists only
+  `tests/acceptance/W2-03/conftest.py`); W2-54 `test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit`
+  (context_check past 630 s under load 60-100; profiled: ~1 s per context() call, all in retrieval, none in this
+  ticket's loader; 138 tickets x 2 calls; re-run alone at the end).
+- `w2/integrate` moved during the run (now `cd2566415936`: W2-71's secrets check merged, W2-60b's launcher roles).
+  By the brief's rule (src/tests diff non-empty), serial phase stopped before it began and **merged again**:
+  `308a843803e1` (no conflict; Task: DAEO-ym8a, Implements: DEC-941, Role: orchestrator; DEC-941 count 1).
+  The parallel result above is on the old head: verification is redone on `308a843803e1`.
 
-## What the resume lead must do
+- collect-only on `308a843803e1`: `17110/17112 tests collected (2 deselected) in 14.69s`, no error.
+- trailer gate (00:22): `DAEO-ym8a: 14 commits, 14 judged, 0 lacking, 0 Implements item(s) not a decision or
+  Contract id that resolves`.
+- Rebuild on the merged head not yet run: waited behind W2-71's close (00:07–02:10), then the nightly's cron
+  started (02:00); the waiting job was stopped before it began. Wait for the nightly to end (~05:00).
 
-1. **Hold:** this ticket merges only after **W2-02 has closed (DEC-752)** and after the close order the owner sets for
-   **W2-01 (P-W2-19)**. If W2-02 changes in its own close (repair round or its merge of `w2/integrate`), merge that in
-   and re-verify first.
-2. Then merge `w2/integrate` (holding both) into this branch with a merge commit carrying `Task: DAEO-ym8a` and
-   `Role: orchestrator` (never `-s ours`, never dropping this ticket's side; DEC-750 item 3), one full rebuild, every
-   suite again, each in its own pytest process (`.gov-runtime/scratch/lead/run-batch.sh <name> <suite>...`).
-3. Watch: the real-register case of W2-03 reads HEAD's register; entries added later with a lower-case status or no
-   status line are refused as records (by design) and named in the load's `invalid`. `src/gov/close/state.py` (W2-01)
-   imports `ENTRY`/`FENCE` from `citations.py`: both kept unchanged.
+- Nightly 02:00–03:46; close queue (DAEO-cy5o, DAEO-b6hm) to ~05:19. Rebuild on `308a843803e1`: exit 0,
+  `invalid: []` (05:30).
+- Parallel phase on `308a843803e1` (06:30–07:40): 3 failed, 16896 passed, 31 skipped in 3669.96 s. Reds: W2-66
+  (known, DEC-919, lists `tests/acceptance/W2-03/conftest.py`); W2-54 `test_gov_check_gives_context_reproducibility_green_here`
+  (context check past its 600 s limit, load); W2-71 `test_premise_the_list_holds_this_suites_own_files` (red on
+  any branch that receives W2-71 through w2/integrate, w2/integrate itself included: a package for the orchestrator).
+- Serial phase on `308a843803e1` (09:00–09:15): 104 passed in 909.51 s.
+- Focus: W2-03 39 passed; W1-26 415 passed 1 skipped; unit/store 20; unit/close 473; W2-68 22; W1-42 22.
+- `gov check --json` running (check-b.sh, 09:16), without the lock (not a suite; the lock queue ran past 11:30).
 
-## Residuals (for bootstrap.md and the Wave 2 list), unchanged from run 1 plus run 2's
+- `gov check --json` (09:16–09:27, load 13-25): 21 GREEN, 2 YELLOW: core-decision-citations (170 historical
+  findings, every one an id with no heading at that commit: none due to this ticket's rule); openspec-validate
+  (openspec not on PATH in check-b.sh). context-reproducibility GREEN within its limit: the W2-54 reds are load.
+- `gov checkpoint`: CP-DAEO-ym8a-0010, committed `92e03a72c25c` (Task: DAEO-ym8a, Implements: DEC-941, DEC-729,
+  Role: orchestrator). Trailer gate: 15 commits, 15 judged, 0 lacking, 0 not resolving. keyword_warn: 0 files.
+- `w2/integrate` moved again (`05009374427a`): W2-77's nightly.py and tests, W2-71's premise-case repair
+  (`46933767`). Disjoint from this ticket's files; dry merge clean. Not merged a third time (would need another
+  full run); stated in the return.
 
-- A span ends at the next heading of any level (`####` text inside an entry is in no span); 0 of 745 today.
-- W2-L031 for file records: no `content_hash` on file records (W1-10's pinned digests).
-- W2-M039: 289 dangling references remain (TASK 270, IMPLEMENTS 19).
-- W2-M055: READY rule reads `deps` only (`src/gov/tasks/queue.py`), outside W2-03's paths.
-- `citations.py` copies `common.schema.json`'s `state_class` enum; they can drift.
-- `gov close`'s owner-entry lookup (W2-01) reads headings by its own rule; still requires ACCEPTED.
-- Suites grouped in one pytest process collide on `conftest`.
-- P-3 (a): the folder part of W2-M145 becomes a list row. P-4 (a): aligning `register-entry.schema.json` (const
-  `register-entry`, required owner/date) becomes a list row (DEC-755 item 4).
-- Run 2: W1-26's README header counts are stale ("295 cases in 21 files"; 413 collected), and its DEC-463 settled-point
-  row still says "or an `id` in the `decision_id` grammar" (superseded by its new "Revised cases" entry).
-- Run 2: W1-46's live-session cases fail at setup under parallel load (a haiku session skips a step); it is on the
-  serial-only list, passes alone.
+## RETURNED DONE (2026-10-30 ~09:45), head `92e03a72c25c`. A resume lead: nothing to do unless the orchestrator
+## asks for a third merge-back and re-verification.
+
+## Next (on `308a843803e1`) — done
+
+1. collect-only; rebuild (gates); W2-54 case alone (a single file is allowed even during the nightly).
+2. After the nightly (NIGHTLY-RUNNING gone; nothing full started after 01:00 that cannot end by 02:00):
+   `verify.py parallel r3b`, `verify.py serial r3b`, then `gov check --json` (background, no `timeout 1200`).
+3. Verification in the close's form (`verify.py parallel r3`, then `verify.py serial r3`), `--collect-only`, `gov check --json`.
+4. Repair at most one batch; `gov checkpoint` record committed; trailer gate; return.
+
+## Residuals carried from run 2 (DEC-755 item 6, items 4 and 5; W2-M364)
+
+- a span ends at any heading, so text under a `####` inside an entry is in no span;
+- file records carry no `content_hash`;
+- W2-M039's dangling references (289 at run 1);
+- W2-M055 in `src/gov/tasks/queue.py`;
+- `citations.py`'s copy of the `state_class` list;
+- `gov close`'s owner-entry lookup with its own heading rule (fails closed);
+- acceptance suites colliding on `conftest` in one pytest process;
+- no folder rule for decision files (W2-M145's folder part, a list row);
+- `register-entry.schema.json`'s constant type and required owner and date (product-spec row);
+- W2-M364: W1-46's live-session cases fail at setup under parallel load, pass alone.
+
+## Brief gaps (running)
+
+- run 2's CHECKPOINT.md was overwritten by run 3's first lead (the file is git-ignored), so run 2's residual list had
+  to be rebuilt from DEC-755 item 6 and the list | this ticket's part | ~10 min, estimated
+- the "do not merge again" check includes this ticket's own diff, so it is never empty; read as
+  `b23bf1ac^2..w2/integrate` | this ticket's part | ~3 min, estimated
+
+- the Bash tool's two-hour limit runs while a job waits in the verify-lock queue; no rule for holding a queue place
+  (W2-61 uses `flock -E 75 -w` with a budget wrapper); two jobs stopped and requeued | common brief | ~60 min, estimated
+- `w2/integrate` moved twice during the run; no rule for when to stop merging again | this ticket's part | ~9 h
+  wall clock for the second verification (00:30 merge to 09:15 serial end), mostly queue, measured
+- `gov check` under `timeout 1200` was killed at load ~80; it takes ~11 min at load 13-25 | common brief | ~20 min, measured
+- `gov check` needs node's PATH for openspec-validate, like the suite run | common brief | ~2 min, estimated
+- other sessions' lock forms (`flock -E 75 -w`) hid the holder from my check | a tool | ~5 min, estimated
+
+## Guard read refusals (DEC-849): 0. One permission prompt (an `rm -f` of my own log file), not retried.

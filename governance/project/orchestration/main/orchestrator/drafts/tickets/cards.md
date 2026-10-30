@@ -1,0 +1,75 @@
+#### W2-79 Acceptance tests for the orchestrator's lead brief builder (LITE, independent-test-designer; DEC-941; P-TOOLS-REVIEW-1 §4 (a) item 2)
+- **Why:** `build_lead_brief.py` fills every lead's brief and every worker's `Implements:` trailer. It caused T7 (a role in IMPL: 41 commits, DEC-927). A check against the role's refusals would have caught P2, and a required guard-forms block would have caught S10. It is untested. Ticket file `ID-PLACEHOLDER`.
+- **Starts** once the orchestrator has committed the tool under `governance/project/orchestration/tools/` (P-TOOLS-REVIEW-1 §4 (a) item 1; not this ticket's). **Closes** after the orchestrator's change to the tool turns its red cases green.
+- **Allowed paths:** `tests/acceptance/W2-79/**`.
+- **KPIs, success:**
+  - a non-id IMPL refused (a role, a free word, an empty value, a mixed list, an id the register or Contract does not hold), with no brief written;
+  - a read the guard refuses to the role it is directed at is flagged by path, role and reason, from the guard's own decision; the committed common brief is not flagged;
+  - the guard-forms block required, and each form it names refused by the guard;
+  - every slot filled: missing, empty, unknown or repeated keys refused;
+  - no placeholder left, in the ticket's part as well as the common part (`{SLOT}` and DEC-893's forms);
+  - a refusal leaves no partial output; hermetic, under 30 s, never skipped.
+- **KPIs, failure:**
+  - a brief written with a role in IMPL, an unfilled slot or a placeholder;
+  - a refused read unflagged;
+  - no guard-forms block;
+  - a partial output.
+
+#### W2-80 Acceptance tests for the close queue's gates (a) to (h) and its refusal path (STANDARD, independent-test-designer; DEC-941; DEC-929 item 3; P-TOOLS-REVIEW-1 §4 (a) item 2)
+- **Why:** the queue decides whether a close starts and what reaches the commit. Its faults T8, S1, S2 and T9 cost closes this fortnight. Only the refusal path is tested, by a cut-out line range. Ticket file `ID-PLACEHOLDER`.
+- **Starts** once the orchestrator has committed the queue and its gate tools under `governance/project/orchestration/tools/` (not this ticket's). **Closes** after the orchestrator's change to the queue turns its red cases green: the settable interface, gate (d)'s fail-closed read, the wording of a stop after the close, and the self-check.
+- **Allowed paths:** `tests/acceptance/W2-80/**`.
+- **KPIs, success:**
+  - hermetic: a temporary repository and stand-ins through a settable interface; never this repository, its lock or the real pin; never skipped;
+  - a planted fault per gate (the disk floor, (c), the rebuild, row W2-L423's warning, (a), (f), (b), (e), (h), (d)) stops the queue before the close with exit 2 and its reason; (g) retries six times, then stops;
+  - each gate fails closed when its tool cannot run (gate (d) does not today);
+  - a refused close exits 4, logs it, removes the lock, commits nothing and stops the queue;
+  - outputs committed only after a clean close and the skip guard (exit 3 otherwise), with their trailers; a scanner finding commits nothing;
+  - the close gets gate (b)'s result and the item's owner decision;
+  - no close under load or with the nightly running;
+  - the queue refuses to run on a tool that differs from its commit;
+  - one mutant per gate's condition, each killed and listed.
+- **KPIs, failure:**
+  - a fault that reaches the close;
+  - a gate passing when its tool cannot run;
+  - a refused close exiting 0;
+  - outputs committed after a refusal or a failed guard;
+  - a run against this repository.
+
+#### W2-81 The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per repository (FULL, independent-test-designer; DEC-941, DEC-936 item 3.6, DEC-930; entry criterion for EXAMIN's copy)
+- **Why:** passing the proving ground becomes an entry criterion for EXAMIN's copy, beside the memory measure (DEC-936 item 3.6; re-plan §7.6). A planted problem that passes unnoticed means adoption is not ready. Ticket file `ID-PLACEHOLDER`.
+- **Starts** now, in a free slot: it is test code only, in block E of the re-plan, and shares no path with a ticket in flight. **Its first real run** is the orchestrator's, after blocks B and C. What it finds missed scopes W2-26, W2-52 and W2-27 to W2-30.
+- **Allowed paths:** `tests/acceptance/W2-81/**`: builders, manifest, judge, scorer, runner, the visible question half and the README. Only the judge's self-tests are `test_*.py`. The repositories are built at test time in temporary folders, or under `~/gov-os-runs/W2-81/` for the real run (DEC-728). Nothing is cloned from this repository or the dev tiers.
+- **KPIs, success:**
+  - five shapes: a Python app with drifted specs and plans, a Rust workspace, a TypeScript monorepo, legacy documents with large files, and a secret in history;
+  - planted problems (a stale spec that looks current, a superseded plan, a misleading file name, a secret, an orphaned test), each kind in at least two shapes, seeded per run, with the manifest kept outside the built repository;
+  - each kind's correct handling and the record that shows it, in the README;
+  - the secret generated at test time from parts, found in history, reported without its value, behind a human gate;
+  - controls that must not be flagged;
+  - a fail-closed judge: FOUND_AND_HANDLED, MISSED or MISHANDLED per problem, and READY only when all are handled, no control is flagged and both question figures (hit@5 against 85, the stacked share against 99 %) meet their floors;
+  - one killed mutant per planted problem;
+  - one command for the real run, writing nothing in this repository;
+  - the self-tests hermetic, under 120 s, never skipped.
+- **KPIs, failure:**
+  - a miss judged handled;
+  - READY with a control flagged, a stage unmeasured or a figure short;
+  - the secret's value anywhere whole;
+  - a hidden question or answer printed;
+  - a write in this repository.
+
+#### W2-81's held-out half (proposed companion; STANDARD, independent-auditor; DEC-941, DEC-820 (d), DEC-845, DEC-873; id the orchestrator's)
+- **Why:** the hidden half of each repository's question set must be written by a session independent of the sessions it measures, as W2-61 splits lens B's set. An independent auditor writes only its own ticket's paths, so it needs a ticket of its own.
+- **Starts** once W2-81's README states the hidden half's form and the builders exist. The auditor reads the builders and the README.
+- **Allowed paths:** `fixtures/evaluation/adoption-proving-ground/hidden/**`. This lies in the `fixtures` namespace, which the indexer never reads, like the memory-retrieval set.
+- **Before it starts, the orchestrator adds an `evaluation_sets` entry** to the path map, in a gap between queues (DEC-929 item 2):
+  - `adoption-proving-ground`, with `visible: tests/acceptance/W2-81/questions/**` and `hidden: fixtures/evaluation/adoption-proving-ground/hidden/**`;
+  - `measures` by tickets: the tickets that build adoption or retrieval, the tickets whose sessions run the adoption under test, and W2-81 itself;
+  - the writer's own ticket is not measured.
+- **KPIs, success:**
+  - at least 10 hidden questions per repository, with gold sources and forbidden citations, in W2-81's stated form;
+  - at least one hidden planted-problem variant per kind, which the visible builders do not produce, so that an adoption tuned to the visible generator is caught;
+  - nothing hidden written outside the hidden folder;
+  - the measured sessions are refused its reads by the guard.
+- **KPIs, failure:**
+  - a hidden question or answer readable by a measured session by any route an honest agent takes;
+  - a question whose gold answer the built repository does not hold.

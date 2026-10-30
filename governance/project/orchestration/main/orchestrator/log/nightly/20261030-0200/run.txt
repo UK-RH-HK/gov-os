@@ -1,0 +1,11 @@
+2026-10-30 02:00:05 nightly night: estimate {"estimate_s": 5069, "parallel_s": 2949, "serial_s": 717, "setup_s": 942, "effective_workers": 7.07, "margin": 1.1, "runs": ["/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/close/DAEO-2gc7/20261029T174054035010Z/02-regression-parallel.xml", "history", "history"]}
+latest start 03:35
+head 1eae249cba33
+clone rebuilt
+parallel exit 1 in 3111 s: 1 failed, 16853 passed, 32 skipped in 2911.24s (0:48:31)
+serial exit 0 in 1202 s: 180 passed, 1 warning in 1117.08s (0:18:37)
+red-alone tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py::test_premise_the_list_holds_this_suites_own_files: 1 failed in 0.03s
+verdict: red 1
+duration: estimate 5069 s, actual 5329 s (setup 1016 s, lock wait 0 s)
+clone kept for the diagnosis: /home/usain/gov-os-runs/W2-00/nightly/20261030-0200
+2026-10-30 03:45:52 done

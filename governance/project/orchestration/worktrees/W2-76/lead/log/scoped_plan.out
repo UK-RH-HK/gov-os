@@ -1,0 +1,38 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "UNPLACED",
+   "paths": [
+    "governance/project/briefs/LEAD-w2-common.md",
+    "governance/project/orchestration/nightly/nightly.sh",
+    "governance/project/orchestration/nightly/push_emergency.sh",
+    "governance/project/orchestration/nightly/test_nightly.sh",
+    "governance/project/prompts/w2-orchestrator.md"
+   ]
+  }
+ ],
+ "base": "94e7115cd59a74c9ab8fc1fd11c8a05d5665ed99",
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-76/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-worktrees/W2-76/tests/acceptance/W2-76"
+ ],
+ "per_test_timeout": 900
+}

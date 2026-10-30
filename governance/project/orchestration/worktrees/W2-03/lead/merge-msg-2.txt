@@ -1,0 +1,10 @@
+W2-03 (DAEO-ym8a): w2/integrate merged in again for the merge-back (DEC-941 item 2)
+
+w2/integrate moved during run 3: W2-71's secrets check (closed, merged) and
+W2-60b's launcher roles come in. Merged with git's own merge, no conflict,
+both sides kept.
+
+Task: DAEO-ym8a
+Implements: DEC-941
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

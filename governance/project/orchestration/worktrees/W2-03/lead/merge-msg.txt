@@ -1,0 +1,9 @@
+W2-03 (DAEO-ym8a): w2/integrate merged in for the merge-back (DEC-941 item 2)
+
+W2-02 and W2-01 closed; W2-68's store change and W2-67's revised W1-26 cases
+come in. Merged with git's own merge, no conflict, both sides kept.
+
+Task: DAEO-ym8a
+Implements: DEC-941
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

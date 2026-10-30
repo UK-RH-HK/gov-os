@@ -1,0 +1,8 @@
+{
+  "floor_kb": 3145728,
+  "verification_peak_kb": 7404492,
+  "working_kb": 2140236,
+  "measured_on": "2026-10-29",
+  "how": "verification_peak_kb: the largest lead process-tree RSS sampled (a lead's full test run, log/lead-mem.jsonl, 2026-10-29); working_kb: the owner's figure from the measurement of a lead outside verification (W2-71's peak, 2026-10-29). Re-measured weekly (DEC-947) with lead_mem.py --summary.",
+  "floor_note": "3 GiB (owner, DEC-947 item 5, 2026-10-29); oom_watch.sh puts it back to 6.4 GiB if MemAvailable < 2 GiB or an OOM kill"
+}

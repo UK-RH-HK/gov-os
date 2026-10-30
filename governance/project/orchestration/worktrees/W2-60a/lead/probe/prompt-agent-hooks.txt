@@ -1,0 +1,1 @@
+Do exactly two things. 1. Use the Bash tool once to run exactly: printf 'x\n' > .claude/agents/hooked.md  2. Then answer with exactly three lines and nothing else: BASH=<done, or refused: and the refusal's text>, CLAUDEMD=<the project-instructions token your context gives, or NONE> and AGENT=<the agent token your instructions give, or NONE>.

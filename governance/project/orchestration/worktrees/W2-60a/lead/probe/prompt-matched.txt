@@ -1,0 +1,1 @@
+Use the Read tool once, on src/probe/alpha.py. Then answer with exactly one line and do nothing else: if any instruction, rule or memory in your context gives a probe token, write TOKEN=<the token, exactly>; otherwise write TOKEN=NONE.

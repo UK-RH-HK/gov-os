@@ -1,0 +1,10 @@
+2026-10-30 00:07:00 waiting for the verification lock
+2026-10-30 00:45:24 verification lock held
+2026-10-30 00:52:45 quiet (5 quiet minutes of 7; load 0.17 7.94 22.78)
+2026-10-30 00:52:45 rebuild before DAEO-e8f0
+2026-10-30 00:57:24 collect ok: 17066/17068 tests collected (2 deselected) in 7.24s
+2026-10-30 00:59:38 records ok: 80 passed in 122.63s (0:02:02)
+2026-10-30 00:59:40 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-30 01:05:39 check ok; close DAEO-e8f0 (load 8.03)
+2026-10-30 02:12:03 close DAEO-e8f0 exit 3
+2026-10-30 02:12:03 DAEO-e8f0 CLOSE REFUSED (exit 3); queue stopped

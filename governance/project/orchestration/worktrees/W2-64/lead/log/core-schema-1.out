@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "result": {
+    "check": "core-schema",
+    "records_validated": 795,
+    "left_out": [
+      {
+        "path": "docs/imported/",
+        "files": 5,
+        "why": "history (DEC-844): imported records are kept as they came and are not held to the schemas"
+      }
+    ],
+    "validator": {
+      "tool": "check-jsonschema",
+      "pin": "0.38.2",
+      "version": "0.38.2"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+disk gate open: 877 GiB free, 64917854 inodes free
+gates passed 20:22:22 load 10.77
+192M	/tmp/gov-os-lead-W2-77
+396K	/home/usain/gov-os-worktrees/W2-77/.gov-runtime/scratch
+12479	/tmp/gov-os-lead-W2-77
+29	/home/usain/gov-os-worktrees/W2-77/.gov-runtime/scratch

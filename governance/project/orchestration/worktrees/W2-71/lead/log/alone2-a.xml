@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="334.704" timestamp="2026-10-29T22:14:50.638363+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-50.test_w1_50_move_of_very_many_merge_commits" name="test_a_move_of_very_many_merge_commits_with_24_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit[no-trailers-dropped-near-the-oldest]" time="4.159" /><testcase classname="tests.acceptance.W1-50.test_w1_50_move_of_very_many_merge_commits" name="test_a_move_of_very_many_merge_commits_with_24_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit[orchestrator-trailers-dropped-near-the-newest]" time="4.238" /><testcase classname="tests.acceptance.W1-19.test_w1_19_real_models" name="test_a_warm_query_answers_within_half_a_second_at_p95" time="326.248"><failure message="AssertionError: warm p95 is 0.630 s over 52 queries (limit 0.5 s; the three slowest: [0.63, 0.665, 0.694])&#10;assert 0.6300568268634379 &lt;= 0.5&#10; +  where 0.6300568268634379 = &lt;function p95 at 0x78e473aebec0&gt;([0.31149038998410106, 0.43940996401943266, 0.30451031401753426, 0.31106863799504936, 0.4197082619648427, 0.3367509909439832, ...])&#10; +    where &lt;function p95 at 0x78e473aebec0&gt; = support.p95&#10; +  and   0.5 = support.WARM_P95_LIMIT_S">measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...8583511, 0.5277034579776227, 0.4489193349145353, 0.499609227059409, 0.5039778959471732, 0.3914516980294138, ...], ...}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        # The timed pass's times: no memory sampler ran in that process (W2-M332).
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) &gt;= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+&gt;       assert support.p95(seconds) &lt;= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 0.630 s over 52 queries (limit 0.5 s; the three slowest: [0.63, 0.665, 0.694])
+E       assert 0.6300568268634379 &lt;= 0.5
+E        +  where 0.6300568268634379 = &lt;function p95 at 0x78e473aebec0&gt;([0.31149038998410106, 0.43940996401943266, 0.30451031401753426, 0.31106863799504936, 0.4197082619648427, 0.3367509909439832, ...])
+E        +    where &lt;function p95 at 0x78e473aebec0&gt; = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:204: AssertionError</failure></testcase></testsuite></testsuites>

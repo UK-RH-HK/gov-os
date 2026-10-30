@@ -1,0 +1,25 @@
+# Lead checkpoint, W2-77 (DAEO-b6hm), run 1
+
+- **State (00:15, 2026-10-30):** tests, implementation, full verification and the one review are done; the probe passed and its record is committed. Waiting only for the alone re-runs of the load-sensitive reds (rerun_alone.sh, queued on /tmp/gov-os-verify.lock behind another session's full run). Then: return DONE.
+- **Branch head:** 3ce51300 (probe record). Nothing may be committed after it.
+- **Commits this run:**
+  - 7e03022cdd17 independent-test-designer: the acceptance tests (Task DAEO-b6hm, Role, Implements DEC-939, DEC-915, Co-Authored-By).
+  - e9b233772142 engineer: the clean-up (same trailers).
+  - e96abbef2597 orchestrator: gov checkpoint record CP-DAEO-b6hm-0003.
+  - 3ce51300 orchestrator: probe record docs/probes/DAEO-b6hm/PR-DAEO-b6hm.md (alone).
+- **Workers (all sandboxed through gov launch; all twelve fields first, first time):**
+  - TD-1 b1ce7fec-f768-4a63-9a0f-430e25ae5622, xhigh, 66 turns, ~16 min; retrieve told, used once (STORE_MISSING); refusals 0; tripwire clean here.
+  - EN-1 3744d76e-6b0c-4aef-b9db-70d7c469b0da, high, 28 turns, ~14 min; retrieve told, used once (STORE_MISSING); refusals 0; tripwire clean here.
+  - RV-1 feb0b4a5-fff9-4bf6-a063-c7aeb0d4e74b, independent-auditor, max, 66 turns, ~25 min; retrieve told, used once (both facets "stale", nothing returned); read refusals 0, 2 permission refusals removing its temp folder; tripwire: nothing here; W2-05 and W2-61 heads moved by their own sessions.
+- **Verification:** rebuild ok; gov check exit 0 (2 YELLOW, not ours); parallel 16567 passed / 31 skipped / 1 failed (W2-54 green-here, W2-L429); serial 156 passed / 1 failed (W1-19 p95, load_sensitive) / 23 errors (W1-46, load_sensitive, W2-M364); collect-only 16779/16781 collected (2 deselected) in 14.40s; trailer gate 6 commits, 0 lacking; keyword_warn 0.
+- **Review findings (pass):** F1 no/other (entry_removed wording after a partial git removal; README vs design meaning) row; F2 yes/other (SIGTERM leaves the clone registered, no later sweep) row; F3 no/loses work, outside the change (git's auto gc after the batch's own commits prunes >3-month-old hidden registrations; reachable from 2027-01-16) Wave 3 row.
+- **Loop count:** converged.
+- **Temp left:** /tmp/gov-os-lead-W2-77 (421M, 47,366 inodes at 23:56); reviewer's /tmp/gov-launch-independent-auditor-te84yja1/claude-1000/w277p (102 MB, 7,695).
+- **Brief gaps (running list):**
+  - the worktree has no store at the start, so `gov retrieve` answers STORE_MISSING for workers before the lead's rebuild | this ticket's part (rebuild before the first worker) | ~2 min per worker, estimated
+  - a foreground wait loop passes the Bash tool's 10-minute limit and is moved to the background and killed; wait with a background script plus foreground polls under 10 minutes | common brief | ~15 min, estimated
+  - the probe gate reads `probed_commit` as a full commit id, while DEC-911 asks for 12 digits under .gov-runtime; the record under docs/probes/ uses the full id | common brief | ~3 min, measured
+  - the `gov checkpoint` record must be committed before the review (nothing after the probed head but the probe record), not after it as "step 7 before the final probe" can be read | this ticket's part | ~2 min, estimated
+- **Alone re-runs (final, 01:13):** W2-54 green-here passed alone (161 s). The job was stopped at the Bash tool's 2-hour limit while waiting for the lock: the orchestrator's close (close_queue.sh DAEO-e8f0, CLOSE-RUNNING since 00:07) held /tmp/gov-os-verify.lock, and the nightly window follows at 02:00. W1-19 warm p95 and W1-46's 23 cases (both on load_sensitive) were not re-run alone.
+- **Returned:** DONE at 01:15, with the two load_sensitive alone re-runs named as not done.
+- **A resume must:** nothing more is committed after 3ce51300. If asked, re-run W1-19's case and W1-46's file alone after the nightly (after 05:00), under the lock and gates.

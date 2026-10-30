@@ -1,0 +1,550 @@
+[
+ {
+  "w2": "W2-71",
+  "ticket": "DAEO-e8f0",
+  "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "merge": "e9c40bb2a19d4194d5a2bf68b209708ce4b0c2ae",
+  "scope": "scoped",
+  "why_full": [],
+  "base": "f625d103edd5",
+  "changed": 2,
+  "governance_left_out": 1,
+  "selected": [
+   [
+    "tests/acceptance/W2-71/",
+    [
+     "OWN",
+     "TEST_CHANGED"
+    ]
+   ],
+   [
+    "tests/unit",
+    [
+     "UNIT"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
+    [
+     "COUPLING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_envelope.py",
+    [
+     "EVERY_CLOSE",
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_read_act.py",
+    [
+     "EVERY_CLOSE"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_registry.py",
+    [
+     "EVERY_CLOSE"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-06/test_w1_06_approvals.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-08/test_w1_08_path_map.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_path_compliance.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W2-54/test_w2_54_green_here.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-49/test_w1_49_threshold.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-48/",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-26/test_w1_26_probe_records.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-42/",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W2-02/test_w2_02_green_here.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-08/test_w1_08_ticket.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-08/test_w1_08_probe.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-06/test_w1_06_install_approvals.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_config.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_config_details.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_r5.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_r6.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_r7.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py",
+    [
+     "RECORD_READING"
+    ]
+   ]
+  ],
+  "changed_paths": [
+   "tests/acceptance/W2-71/README.md",
+   "tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py"
+  ]
+ },
+ {
+  "w2": "W2-77",
+  "ticket": "DAEO-b6hm",
+  "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "merge": "490fd57567007abede31ed98b529476b31b16082",
+  "scope": "full",
+  "why_full": [
+   {
+    "reason": "SHARED_CORE",
+    "paths": [
+     "src/gov/close/nightly.py"
+    ]
+   }
+  ],
+  "base": "1eae249cba33",
+  "changed": 10,
+  "governance_left_out": 2,
+  "selected": [
+   [
+    "tests/acceptance/W2-77/",
+    [
+     "OWN"
+    ]
+   ],
+   [
+    "tests",
+    [
+     "FULL"
+    ]
+   ]
+  ],
+  "changed_paths": [
+   "src/gov/close/nightly.py",
+   "tests/acceptance/W2-77/README.md",
+   "tests/acceptance/W2-77/test_w2_77_batch.py",
+   "tests/acceptance/W2-77/test_w2_77_failed_removal.py",
+   "tests/acceptance/W2-77/test_w2_77_failure_line.py",
+   "tests/acceptance/W2-77/test_w2_77_hidden_worktree.py",
+   "tests/acceptance/W2-77/test_w2_77_own_clone_only.py",
+   "tests/acceptance/W2-77/test_w2_77_unchanged.py",
+   "tests/acceptance/W2-77/w2_77_support.py",
+   "tests/unit/close/test_nightly_cleanup.py"
+  ]
+ },
+ {
+  "w2": "W2-57",
+  "ticket": "DAEO-cy5o",
+  "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "merge": "6f7ace353a6a9c963b2b23b6614e55a28e85d488",
+  "scope": "scoped",
+  "why_full": [],
+  "base": "490fd5756700",
+  "changed": 0,
+  "governance_left_out": 2,
+  "selected": [
+   [
+    "tests/acceptance/W2-57/",
+    [
+     "OWN"
+    ]
+   ],
+   [
+    "tests/unit",
+    [
+     "UNIT"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_envelope.py",
+    [
+     "EVERY_CLOSE",
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_read_act.py",
+    [
+     "EVERY_CLOSE"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_registry.py",
+    [
+     "EVERY_CLOSE"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-06/test_w1_06_approvals.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-08/test_w1_08_path_map.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_path_compliance.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W2-54/test_w2_54_green_here.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-49/test_w1_49_threshold.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-48/",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-26/test_w1_26_probe_records.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-42/",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W2-02/test_w2_02_green_here.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-08/test_w1_08_ticket.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-08/test_w1_08_probe.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-06/test_w1_06_install_approvals.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_config.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-07/test_w1_07_config_details.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_r5.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_r6.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_r7.py",
+    [
+     "RECORD_READING"
+    ]
+   ],
+   [
+    "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py",
+    [
+     "RECORD_READING"
+    ]
+   ]
+  ],
+  "changed_paths": []
+ },
+ {
+  "w2": "W2-03",
+  "ticket": "DAEO-ym8a",
+  "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "merge": "a8eaf26e84f556745071812c4d94beba8953975c",
+  "scope": "full",
+  "why_full": [
+   {
+    "reason": "SHARED_CORE",
+    "paths": [
+     "src/gov/check/citations.py",
+     "src/gov/records/queries.py",
+     "src/gov/store/loader.py"
+    ]
+   }
+  ],
+  "base": "e6695c3025fa",
+  "changed": 19,
+  "governance_left_out": 4,
+  "selected": [
+   [
+    "tests/acceptance/W2-03/",
+    [
+     "OWN"
+    ]
+   ],
+   [
+    "tests",
+    [
+     "FULL"
+    ]
+   ]
+  ],
+  "changed_paths": [
+   "src/gov/check/citations.py",
+   "src/gov/decisions/checker.py",
+   "src/gov/records/queries.py",
+   "src/gov/store/loader.py",
+   "tests/acceptance/W1-26/README.md",
+   "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+   "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+   "tests/acceptance/W2-03/README.md",
+   "tests/acceptance/W2-03/conftest.py",
+   "tests/acceptance/W2-03/test_w2_03_code_under_test.py",
+   "tests/acceptance/W2-03/test_w2_03_entry_records.py",
+   "tests/acceptance/W2-03/test_w2_03_failure.py",
+   "tests/acceptance/W2-03/test_w2_03_grammar.py",
+   "tests/acceptance/W2-03/test_w2_03_not_records.py",
+   "tests/acceptance/W2-03/w2_03_support.py",
+   "tests/unit/check/test_citations.py",
+   "tests/unit/decisions/test_canonical.py",
+   "tests/unit/records/test_records.py",
+   "tests/unit/store/test_register_entries.py"
+  ]
+ },
+ {
+  "w2": "W2-26",
+  "ticket": "DAEO-2ds6",
+  "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "merge": "816f764f36b82e3f4944be3f31c26e98187e6a27",
+  "scope": "full",
+  "why_full": [
+   {
+    "reason": "UNPLACED",
+    "paths": [
+     "docs/research/EXP-003/examin/README.md",
+     "docs/research/EXP-003/examin/raw/clone.txt",
+     "docs/research/EXP-003/examin/raw/direct-calls.txt",
+     "docs/research/EXP-003/examin/raw/environment.txt",
+     "docs/research/EXP-003/examin/raw/gov-rebuild.txt",
+     "docs/research/EXP-003/examin/raw/governance-suite.txt",
+     "docs/research/EXP-003/examin/raw/languages.tsv",
+     "docs/research/EXP-003/examin/raw/product-suite-needs.txt",
+     "docs/research/EXP-003/examin/raw/rss-samples.txt",
+     "docs/research/EXP-003/examin/raw/size.txt",
+     "docs/research/EXP-003/examin/raw/test-runners.txt"
+    ]
+   }
+  ],
+  "base": "a8eaf26e84f5",
+  "changed": 11,
+  "governance_left_out": 2,
+  "selected": [
+   [
+    "tests",
+    [
+     "FULL"
+    ]
+   ]
+  ],
+  "changed_paths": [
+   "docs/research/EXP-003/examin/README.md",
+   "docs/research/EXP-003/examin/raw/clone.txt",
+   "docs/research/EXP-003/examin/raw/direct-calls.txt",
+   "docs/research/EXP-003/examin/raw/environment.txt",
+   "docs/research/EXP-003/examin/raw/gov-rebuild.txt",
+   "docs/research/EXP-003/examin/raw/governance-suite.txt",
+   "docs/research/EXP-003/examin/raw/languages.tsv",
+   "docs/research/EXP-003/examin/raw/product-suite-needs.txt",
+   "docs/research/EXP-003/examin/raw/rss-samples.txt",
+   "docs/research/EXP-003/examin/raw/size.txt",
+   "docs/research/EXP-003/examin/raw/test-runners.txt"
+  ]
+ }
+]

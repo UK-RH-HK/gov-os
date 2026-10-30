@@ -9,18 +9,33 @@ cd /home/usain/Dynamic-Agentic-Engineering-OS || exit 1
 LOG=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/close-queue-$(date +%Y%m%d-%H%M)
 LOCK=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING
 mkdir -p "$LOG"
+PENDING=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-PENDING
+# DEC-942 item 4: closes first. CLOSE-PENDING holds new leads until the first close starts (the lead chain reads it);
+# it goes on every exit.
+date '+%F %T close queue: '"$*" > "$PENDING"
+trap 'rm -f "$PENDING"' EXIT
 date '+%F %T close queue: lock set' > "$LOCK"
-quiet=0
-while [ "$quiet" -lt 5 ]; do
+# One verification run at a time (DEC-942 item 5): the queue holds the verification lock for its whole run, so a
+# running full run ends first and none starts beside the closes. Then quiet (the 1-minute load below 3 for 5 minutes,
+# no nightly), for at most 20 minutes: closes never starve for a quiet window (item 4); the start load is logged.
+exec 9> /tmp/gov-os-verify.lock
+date '+%F %T waiting for the verification lock' >> "$LOG/queue.txt"
+flock 9
+date '+%F %T verification lock held' >> "$LOG/queue.txt"
+quiet=0; waited=0
+while [ "$quiet" -lt 5 ] && [ "$waited" -lt 20 ]; do
   if [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING ] && awk '{exit !($1 < 3)}' /proc/loadavg; then quiet=$((quiet + 1)); else quiet=0; fi
-  sleep 60
+  sleep 60; waited=$((waited + 1))
 done
-date '+%F %T quiet' >> "$LOG/queue.txt"
+while [ -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING ]; do sleep 60; done
+date '+%F %T quiet ('"$quiet"' quiet minutes of '"$waited"'; load '"$(cut -d' ' -f1-3 /proc/loadavg)"')' >> "$LOG/queue.txt"
 for item in "$@"; do
   # An item is <tk id> or <tk id>:<DEC-n>, the owner's decision that lifts the ticket's escalation (DEC-862 (a)).
   ticket=${item%%:*}; lift=""
   [ "$item" != "$ticket" ] && lift="--owner-decision ${item#*:}"
   stop() { date '+%F %T '"$ticket"' STOPPED BEFORE THE CLOSE: '"$1" >> "$LOG/queue.txt"; rm -f "$LOCK"; exit 2; }
+  # After a clean close, a stop leaves its outputs uncommitted; it says so (2026-10-29: it was labelled "before").
+  stop_after() { date '+%F %T '"$ticket"' STOPPED AFTER THE CLOSE (exit 0), OUTPUTS NOT COMMITTED: '"$1" >> "$LOG/queue.txt"; rm -f "$LOCK"; exit 3; }
   # DEC-898: free disk space and free inodes above the floor, or no close.
   disk=$(bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/disk_gate.sh 2>&1) || stop "$disk"
   # (c) a fresh checkpoint of the ticket, committed before the rebuild.
@@ -31,7 +46,8 @@ for item in "$@"; do
     --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -- docs/checkpoints/ \
     > "$LOG/checkpoint-commit-$ticket.txt" 2>&1 || stop "the checkpoint could not be committed"
   date '+%F %T rebuild before '"$ticket" >> "$LOG/queue.txt"
-  gov rebuild > "$LOG/rebuild-$ticket.json" 2> "$LOG/rebuild-$ticket.err" || stop "gov rebuild failed"
+  # DEC-939 item 2 (ii), interim until W2-76: one store rebuild at a time on the machine.
+  flock /tmp/gov-os-rebuild.lock gov rebuild > "$LOG/rebuild-$ticket.json" 2> "$LOG/rebuild-$ticket.err" || stop "gov rebuild failed"
   # DEC-911 (b): row W2-L423's early warning, after the rebuild so the stores are as the check will read them; a file
   # holding the rule's keyword stops the queue before any close is spent (paths only; the backstop is gate (b), (e)).
   python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/keyword_warn.py \
@@ -85,11 +101,14 @@ for item in "$@"; do
   # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
   # Read as the close reads it (gov.close.repo.tree_differences): a file ignored only by an uncommitted .gitignore
   # counts (W2-02's refused close of 2026-10-21), which git status does not show.
-  dirty=$(PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src python3 \
-    /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_diff.py "$ticket" | head -5 | tr '\n' ' ')
-  [ -z "$dirty" ] || stop "the working tree is not the commit, as the close reads it: $dirty"
+  # The tool's own exit decides (2026-10-29): a pipe through head hid a crash, so the gate passed on no output.
+  PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src python3 \
+    /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_diff.py "$ticket" \
+    > "$LOG/tree-$ticket.txt" 2>&1 \
+    || stop "the working tree is not the commit, as the close reads it, or the tool failed (exit $?): $(head -5 "$LOG/tree-$ticket.txt" | tr '\n' ' ')"
   date '+%F %T check ok; close '"$ticket"' (load '"$(cut -d' ' -f1 /proc/loadavg)"')' >> "$LOG/queue.txt"
   # W2-66 (DEC-889 item 2, P-IS-2 (a)): the close's record-reading tests read gate (b)'s own gov check result.
+  rm -f "$PENDING"
   gov close "$ticket" $lift --check-result "$LOG/check-$ticket.json" --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
   echo "$code" > "$LOG/close-$ticket.exit"
   date '+%F %T close '"$ticket"' exit '"$code" >> "$LOG/queue.txt"
@@ -102,12 +121,12 @@ for item in "$@"; do
   date '+%F %T '"$skips" >> "$LOG/queue.txt"
   # A clean close leaves its ticket file and close record uncommitted; commit them, so that the next ticket's
   # gate (d) finds a clean tree (as W2-53's outputs were committed, a1565e56).
-  git add ".tickets/$ticket.md" "docs/close/$ticket/" "docs/checkpoints/$ticket/" > "$LOG/outputs-$ticket.txt" 2>&1 || stop "the close's outputs could not be staged"
-  gitleaks git --staged --redact --no-banner --config .gitleaks.toml . >> "$LOG/outputs-$ticket.txt" 2>&1 || stop "gitleaks flagged the close's outputs"
+  git add ".tickets/$ticket.md" "docs/close/$ticket/" "docs/checkpoints/$ticket/" > "$LOG/outputs-$ticket.txt" 2>&1 || stop_after "the close's outputs could not be staged"
+  gitleaks git --staged --redact --no-banner --config .gitleaks.toml . >> "$LOG/outputs-$ticket.txt" 2>&1 || stop_after "gitleaks flagged the close's outputs"
   git commit -q -m "$ticket closed by gov close (exit 0, $(date '+%F %H:%M')): the ticket, its close record and its closing checkpoint" \
     --trailer "Task: $ticket" --trailer "Implements: DEC-868" --trailer "Role: orchestrator" \
     --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -- ".tickets/$ticket.md" "docs/close/$ticket/" "docs/checkpoints/$ticket/" \
-    >> "$LOG/outputs-$ticket.txt" 2>&1 || stop "the close's outputs could not be committed"
+    >> "$LOG/outputs-$ticket.txt" 2>&1 || stop_after "the close's outputs could not be committed"
   date '+%F %T outputs of '"$ticket"' committed: '"$(git log -1 --format=%h)" >> "$LOG/queue.txt"
 done
 rm -f "$LOCK"

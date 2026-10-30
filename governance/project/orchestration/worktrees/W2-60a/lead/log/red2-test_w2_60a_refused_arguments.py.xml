@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="57" time="25.644" timestamp="2026-10-30T02:27:30.430422+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[agent-joined]" time="0.288" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[agent-spaced]" time="0.306" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[append-system-prompt-file-joined]" time="0.296" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[append-system-prompt-file-spaced]" time="0.287" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[append-system-prompt-joined]" time="0.289" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[append-system-prompt-spaced]" time="0.338" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[continue]" time="0.284" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[continue-in-a-short-word]" time="0.277" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[continue-short]" time="0.336" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[fork-session]" time="0.278" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[resume-in-a-short-word]" time="0.282" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[resume-joined-short]" time="0.280" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[resume-not-a-uuid]" time="0.282" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[resume-without-an-id]" time="0.282" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[session-id-joined]" time="0.293" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash[session-id-spaced]" time="0.279" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_prompt_that_names_them_as_words_is_launched" time="0.369" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[chrome]" time="0.354"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a -- --chrome -p Do the work.&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['16dc8f1a-229b-4b02-8f52-e2f1a9b379d3.json']">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f404d936020&gt;, case = 'chrome'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+&gt;       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--chrome', '-p', 'Do the work.'), returncode=0, ...ns folder"\n  }\n}\n'}, started=1793327257.491473, ended=1793327257.8191912, passed=('--chrome', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--chrome')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --chrome -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['16dc8f1a-229b-4b02-8f52-e2f1a9b379d3.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[fallback-model-joined]" time="0.361"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a -- --fallback-model=claude-sonnet-5-5 -p Do the work.&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['5629ae40-bc25-4593-93e7-6ba2583bed1b.json']">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f404d8a05e0&gt;
+case = 'fallback-model-joined'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+&gt;       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--fallback-model=claude-sonnet-5-5', '-p', 'Do t...arted=1793327257.866073, ended=1793327258.1983647, passed=('--fallback-model=claude-sonnet-5-5', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--fallback-model')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --fallback-model=claude-sonnet-5-5 -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['5629ae40-bc25-4593-93e7-6ba2583bed1b.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[fallback-model-spaced]" time="0.355"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a -- --fallback-model claude-sonnet-5-5 -p Do the work.&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['576f9a5c-f495-4dac-9a69-1f52c4175f8f.json']">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f404d970540&gt;
+case = 'fallback-model-spaced'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+&gt;       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--fallback-model', 'claude-sonnet-5-5', '-p', 'D...ed=1793327258.230363, ended=1793327258.5635562, passed=('--fallback-model', 'claude-sonnet-5-5', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--fallback-model')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --fallback-model claude-sonnet-5-5 -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['576f9a5c-f495-4dac-9a69-1f52c4175f8f.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[ide]" time="0.370"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a -- --ide -p Do the work.&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['05aee3a4-3f5d-4f19-9c94-47fd1daeed20.json']">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f404d970e00&gt;, case = 'ide'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+&gt;       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--ide', '-p', 'Do the work.'), returncode=0, std...ions folder"\n  }\n}\n'}, started=1793327258.6037693, ended=1793327258.9450104, passed=('--ide', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--ide')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --ide -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['05aee3a4-3f5d-4f19-9c94-47fd1daeed20.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[system-prompt-snapshot-joined]" time="0.362"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a -- --system-prompt-snapshot=w260a-snapshot -p Do the work.&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['465897a2-7894-443d-8950-e91ba48b578f.json']">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f404d9718a0&gt;
+case = 'system-prompt-snapshot-joined'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+&gt;       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--system-prompt-snapshot=w260a-snapshot', '-p', ...=1793327258.985193, ended=1793327259.3182569, passed=('--system-prompt-snapshot=w260a-snapshot', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--system-prompt-snapshot')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --system-prompt-snapshot=w260a-snapshot -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['465897a2-7894-443d-8950-e91ba48b578f.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[system-prompt-snapshot-spaced]" time="0.366"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a -- --system-prompt-snapshot w260a-snapshot -p Do the work.&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['3b059977-4867-45ef-a47d-edf4a2a59999.json']">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f404d9702c0&gt;
+case = 'system-prompt-snapshot-spaced'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+&gt;       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--system-prompt-snapshot', 'w260a-snapshot', '-p...93327259.350921, ended=1793327259.6937249, passed=('--system-prompt-snapshot', 'w260a-snapshot', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--system-prompt-snapshot')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --system-prompt-snapshot w260a-snapshot -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['3b059977-4867-45ef-a47d-edf4a2a59999.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_no_chrome_is_not_refused" time="0.346" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_prompt_that_names_the_round_2_arguments_as_words_is_launched" time="0.359" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[add-dir-joined]" time="0.601" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[add-dir-spaced]" time="0.614" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[additional-directories]" time="0.604" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[allow-skip-permissions]" time="0.617" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[another-role-s-ticket]" time="0.599" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[bare]" time="0.602" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[bypass-default-mode]" time="0.602" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[bypass-mode-joined]" time="0.611" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[bypass-mode-spaced]" time="0.604" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[disable-all-hooks]" time="0.619" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[guard-not-wired]" time="0.597" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[held-out-malformed]" time="0.601" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[no-cli]" time="0.611" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[orchestrator]" time="0.595" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[research-two-folders]" time="0.613" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[sandbox-key-committed]" time="0.602" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[sandbox-key-local]" time="0.588" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[setting-sources-spaced]" time="0.610" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[setting-sources-the-launcher-s-own-value]" time="0.603" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[settings-joined]" time="0.612" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[settings-not-json]" time="0.600" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[settings-spaced]" time="0.612" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[skip-permissions]" time="0.608" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[ticket-not-in-progress]" time="0.638" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[unknown-role]" time="0.636" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_every_refusal_the_launcher_makes_today_still_refuses[unknown-ticket]" time="0.615" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_today_s_checks_come_first_with_today_s_message[bare]" time="0.289" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_today_s_checks_come_first_with_today_s_message[setting-sources-spaced]" time="0.277" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_today_s_checks_come_first_with_today_s_message[unknown-ticket]" time="0.307" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_today_s_checks_come_first_with_today_s_message[sandbox-key-committed]" time="0.277" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_today_s_checks_come_first_with_today_s_message[no-cli]" time="0.284" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_refused_arguments" name="test_a_launch_record_id_is_never_one_the_caller_names" time="0.366" /></testsuite></testsuites>

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="18" time="6.124" timestamp="2026-10-30T02:27:24.048255+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_no_launch_sets_a_compaction_threshold" time="0.375" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_compaction_threshold_after_the_double_dash_is_refused[spaced]" time="0.288" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_compaction_threshold_after_the_double_dash_is_refused[joined]" time="0.281" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_compaction_threshold_in_the_repository_s_settings_is_refused[committed]" time="0.277" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_compaction_threshold_in_the_repository_s_settings_is_refused[local]" time="0.283" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_compaction_threshold_in_the_caller_s_environment_does_not_reach_the_session" time="0.356"><failure message="AssertionError: the caller's CLAUDE_CODE_AUTO_COMPACT_WINDOW reached the session's process environment (W2-56's cleaned environment)&#10;assert 'CLAUDE_CODE_AUTO_COMPACT_WINDOW' not in {'CLAUDE_CODE_AUTO_COMPACT_WINDOW': '300000', 'CLAUDE_CODE_SUBAGENT_MODEL': 'claude-opus-5-5', 'CLAUDE_CODE_TMPDIR': '...-26/test_a_compaction_threshold_in0/w2-60a/systmp/gov-launch-engineer-b0fdtd_1', 'GIT_CONFIG_GLOBAL': '/dev/null', ...}">launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f768b80&gt;
+
+    def test_a_compaction_threshold_in_the_caller_s_environment_does_not_reach_the_session(launch):
+        """Green only once W2-56 has merged: the session's process environment is W2-56's cleaned one (B, two edges)."""
+        result = launch(s.ENGINEER, extra_env={VARIABLE: "300000"})
+        s.assert_launched(result)
+&gt;       assert VARIABLE not in result.session()["env"], (
+            f"the caller's {VARIABLE} reached the session's process environment (W2-56's cleaned environment)")
+E       AssertionError: the caller's CLAUDE_CODE_AUTO_COMPACT_WINDOW reached the session's process environment (W2-56's cleaned environment)
+E       assert 'CLAUDE_CODE_AUTO_COMPACT_WINDOW' not in {'CLAUDE_CODE_AUTO_COMPACT_WINDOW': '300000', 'CLAUDE_CODE_SUBAGENT_MODEL': 'claude-opus-5-5', 'CLAUDE_CODE_TMPDIR': '...-26/test_a_compaction_threshold_in0/w2-60a/systmp/gov-launch-engineer-b0fdtd_1', 'GIT_CONFIG_GLOBAL': '/dev/null', ...}
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:71: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_an_auto_compact_window_key_in_the_repository_s_settings_is_refused[committed]" time="0.282" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_an_auto_compact_window_key_in_the_repository_s_settings_is_refused[local]" time="0.282" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[idle-compact-min-tokens-committed]" time="0.351"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['429f06bd-5eab-47d2-aee0-963ce3345362.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr0/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f769800&gt;
+spelling = 'idle-compact-min-tokens', rel = '.claude/settings.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327246.5274386, ended=1793327246.8576393, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['429f06bd-5eab-47d2-aee0-963ce3345362.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[idle-compact-min-tokens-local]" time="0.352"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['5a0f04ad-444a-44be-9f5a-020f610450c8.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr1/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f76a520&gt;
+spelling = 'idle-compact-min-tokens', rel = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327246.888615, ended=1793327247.2190976, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['5a0f04ad-444a-44be-9f5a-020f610450c8.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[model-settings-another-model-committed]" time="0.363"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['f4724626-f962-4cc8-b363-bcb592a2c7a5.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr2/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f768680&gt;
+spelling = 'model-settings-another-model', rel = '.claude/settings.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327247.251397, ended=1793327247.5914729, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'autoCompactWindow')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['f4724626-f962-4cc8-b363-bcb592a2c7a5.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[model-settings-another-model-local]" time="0.357"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['28417c3a-b67b-4c2c-b36b-0ec530670151.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr3/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f76a7a0&gt;
+spelling = 'model-settings-another-model', rel = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327247.6236494, ended=1793327247.9573276, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'autoCompactWindow')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['28417c3a-b67b-4c2c-b36b-0ec530670151.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[model-settings-the-role-s-model-committed]" time="0.365"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['7847ccb8-07ff-4494-bd9f-8aad3f92270b.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr4/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f768540&gt;
+spelling = 'model-settings-the-role-s-model', rel = '.claude/settings.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327247.987881, ended=1793327248.3310523, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'autoCompactWindow')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['7847ccb8-07ff-4494-bd9f-8aad3f92270b.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[model-settings-the-role-s-model-local]" time="0.358"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['22611a4a-e9b1-487a-833e-ee7caa981237.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr5/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f76b560&gt;
+spelling = 'model-settings-the-role-s-model'
+rel = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327248.3628347, ended=1793327248.697868, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'autoCompactWindow')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['22611a4a-e9b1-487a-833e-ee7caa981237.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[pct-override-committed]" time="0.378"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['b72cf3a3-21fe-45bd-9182-71f40bc8ad7d.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr6/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f7a0540&gt;
+spelling = 'pct-override', rel = '.claude/settings.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327248.7287328, ended=1793327249.0838876, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'CLAUDE_AUTOCOMPACT_PCT_OVERRIDE')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['b72cf3a3-21fe-45bd-9182-71f40bc8ad7d.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused[pct-override-local]" time="0.351"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: []&#10;records after: ['3e5208de-a730-4602-888c-4db44da8a1c5.json']">project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-26/test_another_spelling_of_a_thr7/w2-60a/home/work/repo')
+launch = &lt;function launch.&lt;locals&gt;._launch at 0x79c28f7a0220&gt;
+spelling = 'pct-override', rel = '.claude/settings.local.json'
+
+    @pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+    @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+    def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+        change, name = SPELLINGS[spelling]
+        s.rewrite_settings(project, change, rel)
+&gt;       s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327249.1149201, ended=1793327249.4444387, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'CLAUDE_AUTOCOMPACT_PCT_OVERRIDE')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['3e5208de-a730-4602-888c-4db44da8a1c5.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_model_settings_entry_without_a_window_launches[committed]" time="0.357" /><testcase classname="tests.acceptance.W2-60a.test_w2_60a_no_compaction_threshold" name="test_a_model_settings_entry_without_a_window_launches[local]" time="0.362" /></testsuite></testsuites>

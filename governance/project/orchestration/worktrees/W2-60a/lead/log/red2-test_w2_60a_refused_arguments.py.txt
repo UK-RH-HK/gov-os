@@ -1,0 +1,212 @@
+.................FFFFFF..................................                [100%]
+=================================== FAILURES ===================================
+_ test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[chrome] _
+
+launch = <function launch.<locals>._launch at 0x7f404d936020>, case = 'chrome'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+>       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--chrome', '-p', 'Do the work.'), returncode=0, ...ns folder"\n  }\n}\n'}, started=1793327257.491473, ended=1793327257.8191912, passed=('--chrome', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--chrome')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --chrome -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['16dc8f1a-229b-4b02-8f52-e2f1a9b379d3.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[fallback-model-joined] _
+
+launch = <function launch.<locals>._launch at 0x7f404d8a05e0>
+case = 'fallback-model-joined'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+>       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--fallback-model=claude-sonnet-5-5', '-p', 'Do t...arted=1793327257.866073, ended=1793327258.1983647, passed=('--fallback-model=claude-sonnet-5-5', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--fallback-model')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --fallback-model=claude-sonnet-5-5 -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['5629ae40-bc25-4593-93e7-6ba2583bed1b.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[fallback-model-spaced] _
+
+launch = <function launch.<locals>._launch at 0x7f404d970540>
+case = 'fallback-model-spaced'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+>       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--fallback-model', 'claude-sonnet-5-5', '-p', 'D...ed=1793327258.230363, ended=1793327258.5635562, passed=('--fallback-model', 'claude-sonnet-5-5', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--fallback-model')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --fallback-model claude-sonnet-5-5 -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['576f9a5c-f495-4dac-9a69-1f52c4175f8f.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[ide] _
+
+launch = <function launch.<locals>._launch at 0x7f404d970e00>, case = 'ide'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+>       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--ide', '-p', 'Do the work.'), returncode=0, std...ions folder"\n  }\n}\n'}, started=1793327258.6037693, ended=1793327258.9450104, passed=('--ide', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--ide')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --ide -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['05aee3a4-3f5d-4f19-9c94-47fd1daeed20.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[system-prompt-snapshot-joined] _
+
+launch = <function launch.<locals>._launch at 0x7f404d9718a0>
+case = 'system-prompt-snapshot-joined'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+>       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--system-prompt-snapshot=w260a-snapshot', '-p', ...=1793327258.985193, ended=1793327259.3182569, passed=('--system-prompt-snapshot=w260a-snapshot', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--system-prompt-snapshot')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --system-prompt-snapshot=w260a-snapshot -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['465897a2-7894-443d-8950-e91ba48b578f.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[system-prompt-snapshot-spaced] _
+
+launch = <function launch.<locals>._launch at 0x7f404d9702c0>
+case = 'system-prompt-snapshot-spaced'
+
+    @pytest.mark.parametrize("case", sorted(ROUND_2))
+    def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+        passed, name = ROUND_2[case]
+>       s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                         "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a', '--', '--system-prompt-snapshot', 'w260a-snapshot', '-p...93327259.350921, ended=1793327259.6937249, passed=('--system-prompt-snapshot', 'w260a-snapshot', '-p', 'Do the work.'))
+words = ('LAUNCH_REFUSED', 'the CLI arguments carry', '--system-prompt-snapshot')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a -- --system-prompt-snapshot w260a-snapshot -p Do the work.
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: []
+E       records after: ['3b059977-4867-45ef-a47d-edf4a2a59999.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[chrome]
+FAILED tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[fallback-model-joined]
+FAILED tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[fallback-model-spaced]
+FAILED tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[ide]
+FAILED tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[system-prompt-snapshot-joined]
+FAILED tests/acceptance/W2-60a/test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash[system-prompt-snapshot-spaced]
+6 failed, 51 passed in 25.64s

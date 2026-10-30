@@ -1,0 +1,60 @@
+.....................................F.......F..                         [100%]
+=================================== FAILURES ===================================
+_ test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-1/test_gov_close_runs_its_subpro0')
+decoy = (PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-1/test_gov_close_runs_its_subpro0/elsewhere/decoy'), {'.git/...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+
+    def test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment(tmp_path, decoy):
+        """Red until W2-53 merges (``src/gov/close/**``)."""
+        import w2_01_support as w201
+        base = w201.base
+        ticket, wbs = "PROJ-genv", "W1-genv"
+        record = tmp_path / "seen-by-the-test.json"
+        traces = tmp_path / "traces"
+        project = w201.Project(tmp_path / "project")
+        w201.create_ticket(project, ticket, wbs)
+        project.write(f"tests/acceptance/{wbs}/test_records_its_environment.py", _ENV_TEST.format(record=str(record)))
+        project.commit("acceptance tests: the environment", who=w201.TEST_DESIGNER,
+                       trailers=w201.trailers_of(ticket, role="independent-test-designer"), exact=True)
+        w201.engineer_commit(project, ticket, {"src/example/feature.py": "# feature\n"})
+        w201.checkpointed(project, ticket)
+        sandbox = w201.cli_support.make_sandbox(tmp_path / "sandbox")
+        interface = w201.cli_support.load_interface(w201.REPO_ROOT)
+        plants = dict(support.planted(decoy[0]), **support.trace_plants(traces))
+        traces.mkdir(exist_ok=True)
+        gitconfig = Path(sandbox.home) / ".gitconfig"
+        gitconfig.write_text((gitconfig.read_text() if gitconfig.is_file() else "")
+                             + f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+        env = dict(base.sandbox_env(sandbox), **plants)
+    
+        run = base.run_close(project, sandbox, ticket, env=env)
+    
+        assert record.is_file(), f"gov close did not run the ticket's acceptance test:\n{run.describe()}"
+        reached = sorted(set(json.loads(record.read_text())) & set(plants))
+>       assert not reached, f"the planted {reached} reached the test run of gov close (W2-M161):\n{run.describe()}"
+E       AssertionError: the planted ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', 'GIT_TRACE_SETUP'] reached the test run of gov close (W2-M161):
+E         gov close PROJ-genv --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "close", "result": {"ticket": "PROJ-genv", "close_record": "docs/close/PROJ-genv/CL-PROJ-genv.md", "checkpoint": "docs/checkpoints/PROJ-genv/CP-PROJ-genv-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.93, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2, "distribution": "load"}, {"run": "regression", "form": "parallel", "seconds": 1.81, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2, "distribution": "load"}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": [], "evidence": {"scope": "full", "why_full": [{"reason": "TEST_MAP_MISSING"}, {"reason": "BASE_UNKNOWN"}], "base": null, "head": "e1f4c847068a64bf0b0008f85675eb260b985018", "tree": "3f51fbc72ecafb2185dea39ebc34b3ab05cb550b", "changed": [], "selected": [{"target": "tests/acceptance/W1-genv/", "why": [{"reason": "OWN"}]}, {"target": "tests", "why": [{"reason": "FULL"}]}], "left_out": [], "skips": [], "skip_count": 0, "failures": [], "junit_xml": [".gov-runtime/close/PROJ-genv/20261029T235731106178Z/01-acceptance-parallel.xml", ".gov-runtime/close/PROJ-genv/20261029T235731106178Z/02-regression-parallel.xml"], "per_test_timeout": 900, "distribution": "load", "tmp_path_retention_policy": "failed", "code_fingerprint": null, "records_fingerprint": null}, "ticket_class": "implementation", "disk": {"free_gib": 873.71, "free_inodes": 64773143, "close_free_gib_floor": 100, "close_free_inodes_floor": 10000000}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:450: AssertionError
+_____ test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep ______
+
+    def test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep():
+        text = _sweep_text()
+        starting = support.files_that_start_git()
+        assert starting, "no file of src/gov names git: the lower bound of the sweep is empty, the case is wrong"
+        unnamed = [rel for rel in starting if not support.names_file(text, rel)]
+>       assert not unnamed, (f"{support.SWEEP_REL} does not name {len(unnamed)} of the {len(starting)} files of "
+                             f"src/gov that start git: {unnamed}")
+E       AssertionError: docs/research/AR-2-git-sweep.md does not name 3 of the 27 files of src/gov that start git: ['src/gov/cli/main.py', 'src/gov/close/nightly.py', 'src/gov/guard/reads.py']
+E       assert not ['src/gov/cli/main.py', 'src/gov/close/nightly.py', 'src/gov/guard/reads.py']
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:42: AssertionError
+2 failed, 46 passed in 88.91s (0:01:28)

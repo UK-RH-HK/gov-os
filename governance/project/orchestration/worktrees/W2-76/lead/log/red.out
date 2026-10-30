@@ -1,0 +1,795 @@
+FFFFFFFFFFFFFFFFFF.FFF                                                   [100%]
+=================================== FAILURES ===================================
+________ test_a_lock_whose_folder_is_missing_refuses_and_builds_nothing ________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_lock_whose_folder_is_mi0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_lock_whose_folder_is_mi0/w2-76/pycache'))
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_a_lock_whose_folder_is_missing_refuses_and_builds_nothing(box, env):
+        lock = box.base / "no-such-folder" / "rebuild.lock"
+        project = support.make_project(box, "project", lock)
+    
+        run = support.rebuild(project, env, "--no-embeddings")
+    
+>       _assert_refused(run, str(lock))
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9940030530560762, pid=3319889, started=1793369986.805897)
+named = ('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_lock_whose_folder_is_mi0/w2-76/no-such-folder/rebuild.lock',)
+code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...\n\', stderr=\'\', seconds=1.9940030530560762, pid=3319889, started=1793369986.805897).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "24b23b48ba8e967529432fcf3ffc582bdca4495920dfaa3658f6bcb23a43acd5", "store": {"digest": "24b23b48ba8e967529432fcf3ffc582bdca4495920dfaa3658f6bcb23a43acd5", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9940030530560762, pid=3319889, started=1793369986.805897).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+________ test_a_lock_in_an_unwritable_folder_refuses_and_builds_nothing ________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_lock_in_an_unwritable_f0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_lock_in_an_unwritable_f0/w2-76/pycache'))
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    @pytest.mark.skipif(os.geteuid() == 0, reason="root writes into a folder of mode 0555")
+    def test_a_lock_in_an_unwritable_folder_refuses_and_builds_nothing(box, env):
+        folder = box.base / "read-only-locks"
+        folder.mkdir()
+        lock = folder / "rebuild.lock"
+        project = support.make_project(box, "project", lock)
+        folder.chmod(0o555)
+        try:
+            run = support.rebuild(project, env, "--no-embeddings")
+        finally:
+            folder.chmod(0o755)
+    
+>       _assert_refused(run, str(lock))
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9766546220052987, pid=3320179, started=1793369988.826167)
+named = ('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_lock_in_an_unwritable_f0/w2-76/read-only-locks/rebuild.lock',)
+code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...\n\', stderr=\'\', seconds=1.9766546220052987, pid=3320179, started=1793369988.826167).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "960b4c499a0c62fa6f8b72c02c23af633865e70140dffc313e178cf9e52e6742", "store": {"digest": "960b4c499a0c62fa6f8b72c02c23af633865e70140dffc313e178cf9e52e6742", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9766546220052987, pid=3320179, started=1793369988.826167).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+_________ test_a_refused_rebuild_leaves_the_existing_stores_unchanged __________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_refused_rebuild_leaves_0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_refused_rebuild_leaves_0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_refused_rebuild_leaves_0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_a_refused_rebuild_leaves_the_existing_stores_unchanged(box, lock, env):
+        project = support.make_project(box, "project", lock)
+        built = support.rebuild(project, env, "--no-embeddings")
+        assert built.returncode == 0, built.describe()
+        before = support.store_snapshot(project)
+        assert before, "the first rebuild built no store to compare"
+        bad = box.base / "gone" / "rebuild.lock"
+        support.set_settings(project, support.settings_text(bad))
+    
+        run = support.rebuild(project, env, "--no-embeddings")
+    
+>       _assert_refused(run, str(bad))
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.0}}, "session": ""}\n', stderr='', seconds=1.4281844110228121, pid=3320901, started=1793369992.7418334)
+named = ('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_refused_rebuild_leaves_0/w2-76/gone/rebuild.lock',)
+code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...n\', stderr=\'\', seconds=1.4281844110228121, pid=3320901, started=1793369992.7418334).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 1.4 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "3f800b528b46daf920512618c6020a1be167b2663645f2f9fb41a00b40165fc5", "store": {"digest": "3f800b528b46daf920512618c6020a1be167b2663645f2f9fb41a00b40165fc5", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.0}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.0}}, "session": ""}\n', stderr='', seconds=1.4281844110228121, pid=3320901, started=1793369992.7418334).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+_____ test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[lock-empty] ______
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+case = 'lock-empty'
+
+    @pytest.mark.parametrize("case", sorted(INVALID_SETTINGS))
+    def test_an_invalid_rebuild_yaml_refuses_and_builds_nothing(box, lock, env, case):
+        template, keys = INVALID_SETTINGS[case]
+        text = template.replace("{lock}", '"' + str(lock) + '"') if "{lock}" in template else template
+        project = support.make_project(box, "project", lock, settings=text)
+    
+        run = support.rebuild(project, env, "--no-embeddings", timeout=60)
+    
+>       _assert_refused(run, "rebuild.yaml", *keys)
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9764074708800763, pid=3321133, started=1793369994.1863601)
+named = ('rebuild.yaml', 'lock'), code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...n\', stderr=\'\', seconds=1.9764074708800763, pid=3321133, started=1793369994.1863601).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "ed78cb46110d5f9c1049205f12833477456ae541bfa8f12c39e24fbc0332cff7", "store": {"digest": "ed78cb46110d5f9c1049205f12833477456ae541bfa8f12c39e24fbc0332cff7", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9764074708800763, pid=3321133, started=1793369994.1863601).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+____ test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[lock-relative] ____
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r1/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r1/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r1/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+case = 'lock-relative'
+
+    @pytest.mark.parametrize("case", sorted(INVALID_SETTINGS))
+    def test_an_invalid_rebuild_yaml_refuses_and_builds_nothing(box, lock, env, case):
+        template, keys = INVALID_SETTINGS[case]
+        text = template.replace("{lock}", '"' + str(lock) + '"') if "{lock}" in template else template
+        project = support.make_project(box, "project", lock, settings=text)
+    
+        run = support.rebuild(project, env, "--no-embeddings", timeout=60)
+    
+>       _assert_refused(run, "rebuild.yaml", *keys)
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9075543850194663, pid=3321717, started=1793369996.179745)
+named = ('rebuild.yaml', 'lock'), code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...\n\', stderr=\'\', seconds=1.9075543850194663, pid=3321717, started=1793369996.179745).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 1.9 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "ef2119e7cf8949943490e0ba654fe8b0be81ddbba1d6b4cbafe698fd3a8a1b03", "store": {"digest": "ef2119e7cf8949943490e0ba654fe8b0be81ddbba1d6b4cbafe698fd3a8a1b03", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9075543850194663, pid=3321717, started=1793369996.179745).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+______ test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[not-a-map] ______
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r2/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r2/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r2/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+case = 'not-a-map'
+
+    @pytest.mark.parametrize("case", sorted(INVALID_SETTINGS))
+    def test_an_invalid_rebuild_yaml_refuses_and_builds_nothing(box, lock, env, case):
+        template, keys = INVALID_SETTINGS[case]
+        text = template.replace("{lock}", '"' + str(lock) + '"') if "{lock}" in template else template
+        project = support.make_project(box, "project", lock, settings=text)
+    
+        run = support.rebuild(project, env, "--no-embeddings", timeout=60)
+    
+>       _assert_refused(run, "rebuild.yaml", *keys)
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9664195869117975, pid=3322062, started=1793369998.102307)
+named = ('rebuild.yaml',), code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...\n\', stderr=\'\', seconds=1.9664195869117975, pid=3322062, started=1793369998.102307).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "ecb309c1075523fd863936993fc71b7989baca1ca7fec1979d2e75421b367180", "store": {"digest": "ecb309c1075523fd863936993fc71b7989baca1ca7fec1979d2e75421b367180", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9664195869117975, pid=3322062, started=1793369998.102307).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+______ test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[not-yaml] _______
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r3/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r3/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r3/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+case = 'not-yaml'
+
+    @pytest.mark.parametrize("case", sorted(INVALID_SETTINGS))
+    def test_an_invalid_rebuild_yaml_refuses_and_builds_nothing(box, lock, env, case):
+        template, keys = INVALID_SETTINGS[case]
+        text = template.replace("{lock}", '"' + str(lock) + '"') if "{lock}" in template else template
+        project = support.make_project(box, "project", lock, settings=text)
+    
+        run = support.rebuild(project, env, "--no-embeddings", timeout=60)
+    
+>       _assert_refused(run, "rebuild.yaml", *keys)
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9410432730801404, pid=3322701, started=1793370000.0841582)
+named = ('rebuild.yaml',), code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...n\', stderr=\'\', seconds=1.9410432730801404, pid=3322701, started=1793370000.0841582).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 1.9 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "a613ea3b315c8620d0801fac8ae0c453901bb7e4fe2908c40418b4bafc9c4630", "store": {"digest": "a613ea3b315c8620d0801fac8ae0c453901bb7e4fe2908c40418b4bafc9c4630", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9410432730801404, pid=3322701, started=1793370000.0841582).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+_ test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[threshold-not-a-number] _
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r4/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r4/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r4/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+case = 'threshold-not-a-number'
+
+    @pytest.mark.parametrize("case", sorted(INVALID_SETTINGS))
+    def test_an_invalid_rebuild_yaml_refuses_and_builds_nothing(box, lock, env, case):
+        template, keys = INVALID_SETTINGS[case]
+        text = template.replace("{lock}", '"' + str(lock) + '"') if "{lock}" in template else template
+        project = support.make_project(box, "project", lock, settings=text)
+    
+        run = support.rebuild(project, env, "--no-embeddings", timeout=60)
+    
+>       _assert_refused(run, "rebuild.yaml", *keys)
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9029748518951237, pid=3323107, started=1793370002.0453284)
+named = ('rebuild.yaml', 'slow_after_s'), code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...n\', stderr=\'\', seconds=1.9029748518951237, pid=3323107, started=1793370002.0453284).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 1.9 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "1c473bfa70b9761a2380bd666554dfa526c519a02fc496df9f44e85686b9701f", "store": {"digest": "1c473bfa70b9761a2380bd666554dfa526c519a02fc496df9f44e85686b9701f", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.5}}, "session": ""}\n', stderr='', seconds=1.9029748518951237, pid=3323107, started=1793370002.0453284).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+___ test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[threshold-zero] ____
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r5/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r5/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_an_invalid_rebuild_yaml_r5/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+case = 'threshold-zero'
+
+    @pytest.mark.parametrize("case", sorted(INVALID_SETTINGS))
+    def test_an_invalid_rebuild_yaml_refuses_and_builds_nothing(box, lock, env, case):
+        template, keys = INVALID_SETTINGS[case]
+        text = template.replace("{lock}", '"' + str(lock) + '"') if "{lock}" in template else template
+        project = support.make_project(box, "project", lock, settings=text)
+    
+        run = support.rebuild(project, env, "--no-embeddings", timeout=60)
+    
+>       _assert_refused(run, "rebuild.yaml", *keys)
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.6}}, "session": ""}\n', stderr='', seconds=1.9977754009887576, pid=3323681, started=1793370003.9632354)
+named = ('rebuild.yaml', 'slow_after_s'), code = None, text = '{}'
+@py_assert1 = ['0\n{0 = Run(args=(\'/usr/bin/python3\', \'-m\', \'gov.cli.main\', \'rebuild\', \'--json\', \'--no-embeddings\'), ret...n\', stderr=\'\', seconds=1.9977754009887576, pid=3323681, started=1793370003.9632354).returncode\n} not in (0, None)']
+
+    def _assert_refused(run, *named):
+        code, text = support.error_text(run)
+>       assert run.returncode not in (0, None) and run.envelope().get("ok") is False and code == "REBUILD_FAILED", \
+            f"the rebuild was not refused with REBUILD_FAILED\n{run.describe()}"
+E       AssertionError: the rebuild was not refused with REBUILD_FAILED
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "73f70387a8e71399c12a1ce48541f1cb51dd1ef28d639c359ba337cb50f5be71", "store": {"digest": "73f70387a8e71399c12a1ce48541f1cb51dd1ef28d639c359ba337cb50f5be71", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.6}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (0 not in (0, None))
+E        +  where 0 = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...{"lexical_s": 0.6}}, "session": ""}\n', stderr='', seconds=1.9977754009887576, pid=3323681, started=1793370003.9632354).returncode
+
+tests/acceptance/W2-76/test_w2_76_fail_closed.py:25: AssertionError
+______________ test_two_rebuilds_at_once_run_one_after_the_other _______________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_two_rebuilds_at_once_run_0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_two_rebuilds_at_once_run_0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_two_rebuilds_at_once_run_0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_two_rebuilds_at_once_run_one_after_the_other(box, lock, env):
+        """Two rebuilds started at once, in two repositories sharing one lock path: their spans do not overlap, and the
+        second says what it waits for (the first's pid) and records its wait in ``lock.wait_s``, not in ``timing``."""
+        projects = [support.make_project(box, f"project-{n}", lock) for n in (1, 2)]
+        envs = [support.environment(box, support.slow_gitleaks(box, f"tools-{n}", HOLD_S)) for n in (1, 2)]
+    
+        started = [support.Background(projects[n], envs[n], support.rebuild_argv("--no-embeddings"),
+                                      box.base / f"out-{n}") for n in (0, 1)]
+        runs = [one.finish() for one in started]
+    
+        for one in runs:
+            assert one.returncode == 0 and one.envelope().get("ok") is True, f"a rebuild failed\n{one.describe()}"
+>       parts = [_lock_part(one) for one in runs]
+                 ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o... {"lexical_s": 4.6}}, "session": ""}\n', stderr='', seconds=6.372950962977484, pid=3324424, started=1793370005.9883542)
+
+    def _lock_part(run):
+        part = run.result.get("lock")
+>       assert isinstance(part, dict) and all(key in part for key in support.LOCK_KEYS), \
+            f"the result has no full lock part\n{run.describe()}"
+E       AssertionError: the result has no full lock part
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 6.4 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "52ad14629ecbc20558fef4d55d0b091b167d8f0c537d354aa63faa5d242eb693", "store": {"digest": "52ad14629ecbc20558fef4d55d0b091b167d8f0c537d354aa63faa5d242eb693", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 4.6}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (False)
+E        +  where False = isinstance(None, dict)
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:29: AssertionError
+________ test_a_waiting_rebuild_says_before_it_waits_what_it_waits_for _________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_waiting_rebuild_says_be0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_waiting_rebuild_says_be0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_waiting_rebuild_says_be0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_a_waiting_rebuild_says_before_it_waits_what_it_waits_for(box, lock, env):
+        """Another process (not the rebuild's ancestor) holds the lock: the rebuild says, while it still waits, the lock's
+        path and the holder's pid and command line; it waits without a time limit, then runs, and records the wait."""
+        project = support.make_project(box, "project", lock)
+        holder = support.Holder(lock, box.base / "holder")
+        background = None
+        try:
+            background = support.Background(project, env, support.rebuild_argv("--no-embeddings"), box.base / "out")
+            said = support.wait_until(lambda: str(lock) in background.stderr_now(), timeout=20)
+            still_waiting = background.running()
+            early = background.stderr_now()
+            support.wait_until(lambda: not background.running(), timeout=2.5)
+            waited_past = background.running()
+        finally:
+            holder.let_go()
+        run = background.finish()
+    
+>       assert said and still_waiting, f"no line naming the lock {lock} while the rebuild waited\n{run.describe()}"
+E       AssertionError: no line naming the lock /tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_waiting_rebuild_says_be0/w2-76/locks/rebuild.lock while the rebuild waited
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 20.1 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "fca58aa7256f170e13d9a19f2dd7ff868d15597b0d78d2df1b37cc0d4db214bc", "store": {"digest": "fca58aa7256f170e13d9a19f2dd7ff868d15597b0d78d2df1b37cc0d4db214bc", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (False)
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:79: AssertionError
+__________ test_a_rebuild_under_its_callers_hold_runs_at_once[flock] ___________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+through_timeout = False
+
+    @support.needs_flock
+    @pytest.mark.parametrize("through_timeout", [False, True], ids=["flock", "flock-timeout"])
+    def test_a_rebuild_under_its_callers_hold_runs_at_once(box, lock, env, through_timeout):
+        """The interim wrapper: ``flock <lock> [timeout <n>] gov rebuild`` ends within the stated bound, with no deadlock;
+        it takes no second lock and says ``held_by_caller: true``, ``wait_s`` 0.0."""
+        project = support.make_project(box, "project", lock)
+        middle = [support.TIMEOUT, "100"] if through_timeout else []
+        argv = [support.FLOCK, str(lock), *middle, *support.rebuild_argv("--no-embeddings")]
+    
+        run = support.run(project, env, argv, timeout=support.WRAPPED_BOUND_S)
+    
+        assert run.returncode is not None, \
+            f"the wrapped rebuild did not end within {support.WRAPPED_BOUND_S:.0f} s: it waits on its caller's hold"
+        assert run.returncode == 0 and run.envelope().get("ok") is True, run.describe()
+>       part = _lock_part(run)
+               ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/flock', '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle0/w2-76/loc...: {"lexical_s": 0.6}}, "session": ""}\n', stderr='', seconds=2.40339900390245, pid=3331398, started=1793370036.1186807)
+
+    def _lock_part(run):
+        part = run.result.get("lock")
+>       assert isinstance(part, dict) and all(key in part for key in support.LOCK_KEYS), \
+            f"the result has no full lock part\n{run.describe()}"
+E       AssertionError: the result has no full lock part
+E         /usr/bin/flock /tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle0/w2-76/locks/rebuild.lock /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.4 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "aff005318e21970d6878c8803ab8ba62d1d9a3bcb766e855b73d438cd1a85e38", "store": {"digest": "aff005318e21970d6878c8803ab8ba62d1d9a3bcb766e855b73d438cd1a85e38", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.6}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (False)
+E        +  where False = isinstance(None, dict)
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:29: AssertionError
+______ test_a_rebuild_under_its_callers_hold_runs_at_once[flock-timeout] _______
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle1/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle1/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle1/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+through_timeout = True
+
+    @support.needs_flock
+    @pytest.mark.parametrize("through_timeout", [False, True], ids=["flock", "flock-timeout"])
+    def test_a_rebuild_under_its_callers_hold_runs_at_once(box, lock, env, through_timeout):
+        """The interim wrapper: ``flock <lock> [timeout <n>] gov rebuild`` ends within the stated bound, with no deadlock;
+        it takes no second lock and says ``held_by_caller: true``, ``wait_s`` 0.0."""
+        project = support.make_project(box, "project", lock)
+        middle = [support.TIMEOUT, "100"] if through_timeout else []
+        argv = [support.FLOCK, str(lock), *middle, *support.rebuild_argv("--no-embeddings")]
+    
+        run = support.run(project, env, argv, timeout=support.WRAPPED_BOUND_S)
+    
+        assert run.returncode is not None, \
+            f"the wrapped rebuild did not end within {support.WRAPPED_BOUND_S:.0f} s: it waits on its caller's hold"
+        assert run.returncode == 0 and run.envelope().get("ok") is True, run.describe()
+>       part = _lock_part(run)
+               ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/flock', '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle1/w2-76/loc...{"lexical_s": 0.6}}, "session": ""}\n', stderr='', seconds=2.0919371128547937, pid=3331749, started=1793370038.5394185)
+
+    def _lock_part(run):
+        part = run.result.get("lock")
+>       assert isinstance(part, dict) and all(key in part for key in support.LOCK_KEYS), \
+            f"the result has no full lock part\n{run.describe()}"
+E       AssertionError: the result has no full lock part
+E         /usr/bin/flock /tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_rebuild_under_its_calle1/w2-76/locks/rebuild.lock /usr/bin/timeout 100 /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.1 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "deac74196d1297f210a403dfcdedb1e52deea81d732bf90438570861c23fc76f", "store": {"digest": "deac74196d1297f210a403dfcdedb1e52deea81d732bf90438570861c23fc76f", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.6}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (False)
+E        +  where False = isinstance(None, dict)
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:29: AssertionError
+__________ test_a_wrapped_and_an_unwrapped_rebuild_never_run_at_once ___________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_wrapped_and_an_unwrappe0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_wrapped_and_an_unwrappe0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_wrapped_and_an_unwrappe0/w2-76/locks/rebuild.lock')
+
+    @support.needs_flock
+    def test_a_wrapped_and_an_unwrapped_rebuild_never_run_at_once(box, lock):
+        """``flock <lock> gov rebuild`` in one repository and a bare rebuild in another, on the same lock path, started
+        together: their spans do not overlap."""
+        projects = [support.make_project(box, f"project-{n}", lock) for n in (1, 2)]
+        envs = [support.environment(box, support.slow_gitleaks(box, f"tools-{n}", HOLD_S)) for n in (1, 2)]
+        argvs = [[support.FLOCK, str(lock), *support.rebuild_argv("--no-embeddings")],
+                 support.rebuild_argv("--no-embeddings")]
+    
+        started = [support.Background(projects[n], envs[n], argvs[n], box.base / f"out-{n}") for n in (0, 1)]
+        runs = [one.finish(timeout=support.WRAPPED_BOUND_S) for one in started]
+    
+        for one in runs:
+            assert one.returncode == 0, f"a rebuild failed or did not end\n{one.describe()}"
+>       parts = [_lock_part(one) for one in runs]
+                 ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('/usr/bin/flock', '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_wrapped_and_an_unwrappe0/w2-76/loc... {"lexical_s": 4.7}}, "session": ""}\n', stderr='', seconds=7.749394344864413, pid=3332160, started=1793370040.6594532)
+
+    def _lock_part(run):
+        part = run.result.get("lock")
+>       assert isinstance(part, dict) and all(key in part for key in support.LOCK_KEYS), \
+            f"the result has no full lock part\n{run.describe()}"
+E       AssertionError: the result has no full lock part
+E         /usr/bin/flock /tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_wrapped_and_an_unwrappe0/w2-76/locks/rebuild.lock /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 7.7 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "c65e4bd18f6c79ab15d45524fdaef55934e86297cae231f905806f4975c71faa", "store": {"digest": "c65e4bd18f6c79ab15d45524fdaef55934e86297cae231f905806f4975c71faa", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 4.7}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (False)
+E        +  where False = isinstance(None, dict)
+
+tests/acceptance/W2-76/test_w2_76_machine_lock.py:29: AssertionError
+__________ test_every_stage_timed_in_output_and_record[no-embeddings] __________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_every_stage_timed_in_outp0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_every_stage_timed_in_outp0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_every_stage_timed_in_outp0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+form = ('--no-embeddings',)
+
+    @pytest.mark.parametrize("form", [("--no-embeddings",), ()], ids=["no-embeddings", "full"])
+    def test_every_stage_timed_in_output_and_record(box, lock, env, form):
+        project = support.make_project(box, "project", lock)
+    
+        run = support.rebuild(project, env, *form)
+    
+        assert run.returncode == 0 and run.envelope().get("ok") is True, f"the rebuild did not succeed\n{run.describe()}"
+        result = run.result
+        timing = result.get("timing")
+        assert isinstance(timing, dict), f"the result has no timing\n{run.describe()}"
+        missing = [key for key in support.STAGE_KEYS if key not in timing]
+>       assert not missing, f"stage times missing from the output's timing: {missing}\n{run.describe()}"
+E       AssertionError: stage times missing from the output's timing: ['record_s', 'secrets_s', 'semantic_s', 'codeintel_s', 'compaction_s', 'total_s']
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 5.5 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "417e78dbea8701b35e3915ea0111bd66aca741381fe7f1dde50d2e7c95a57810", "store": {"digest": "417e78dbea8701b35e3915ea0111bd66aca741381fe7f1dde50d2e7c95a57810", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 1.4}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['record_s', 'secrets_s', 'semantic_s', 'codeintel_s', 'compaction_s', 'total_s']
+
+tests/acceptance/W2-76/test_w2_76_timings.py:37: AssertionError
+______________ test_every_stage_timed_in_output_and_record[full] _______________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_every_stage_timed_in_outp1/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_every_stage_timed_in_outp1/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_every_stage_timed_in_outp1/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+form = ()
+
+    @pytest.mark.parametrize("form", [("--no-embeddings",), ()], ids=["no-embeddings", "full"])
+    def test_every_stage_timed_in_output_and_record(box, lock, env, form):
+        project = support.make_project(box, "project", lock)
+    
+        run = support.rebuild(project, env, *form)
+    
+        assert run.returncode == 0 and run.envelope().get("ok") is True, f"the rebuild did not succeed\n{run.describe()}"
+        result = run.result
+        timing = result.get("timing")
+        assert isinstance(timing, dict), f"the result has no timing\n{run.describe()}"
+        missing = [key for key in support.STAGE_KEYS if key not in timing]
+>       assert not missing, f"stage times missing from the output's timing: {missing}\n{run.describe()}"
+E       AssertionError: stage times missing from the output's timing: ['record_s', 'secrets_s', 'semantic_s', 'codeintel_s', 'compaction_s', 'total_s']
+E         /usr/bin/python3 -m gov.cli.main rebuild --json
+E         exit code: 0 after 2.6 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "e905546047a29c42a307b6767839a5852a69d8899f2f6f842132ef7dd444b44c", "store": {"digest": "e905546047a29c42a307b6767839a5852a69d8899f2f6f842132ef7dd444b44c", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.6}}, "session": ""}
+E         
+E         stderr:
+E         Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         
+E       assert not ['record_s', 'secrets_s', 'semantic_s', 'codeintel_s', 'compaction_s', 'total_s']
+
+tests/acceptance/W2-76/test_w2_76_timings.py:37: AssertionError
+_______________ test_a_stage_that_did_not_run_still_has_its_time _______________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_stage_that_did_not_run_0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_stage_that_did_not_run_0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_stage_that_did_not_run_0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_a_stage_that_did_not_run_still_has_its_time(box, lock, env):
+        """With ``--no-embeddings`` the semantic stage does not run, and the code index has no tool here: both keep their
+        time (0 for a stage that did not run) and their store entry says why, as today."""
+        project = support.make_project(box, "project", lock)
+    
+        run = support.rebuild(project, env, "--no-embeddings")
+    
+        assert run.returncode == 0, run.describe()
+        timing = run.result.get("timing") or {}
+        stores = run.result.get("stores") or {}
+>       assert timing.get("semantic_s") == 0, f"the semantic stage did not run; its time must be 0: {timing}"
+E       AssertionError: the semantic stage did not run; its time must be 0: {'lexical_s': 0.6}
+E       assert None == 0
+E        +  where None = <built-in method get of dict object at 0x7c93c9076600>('semantic_s')
+E        +    where <built-in method get of dict object at 0x7c93c9076600> = {'lexical_s': 0.6}.get
+
+tests/acceptance/W2-76/test_w2_76_timings.py:73: AssertionError
+__________________ test_lock_part_of_a_rebuild_on_a_free_lock __________________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_lock_part_of_a_rebuild_on0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_lock_part_of_a_rebuild_on0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_lock_part_of_a_rebuild_on0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_lock_part_of_a_rebuild_on_a_free_lock(box, lock, env):
+        """The result and the record carry ``lock`` apart from ``timing``; on a free lock the wait is 0.0 and the lock is
+        free again once the rebuild has ended."""
+        project = support.make_project(box, "project", lock)
+    
+        run = support.rebuild(project, env, "--no-embeddings")
+    
+        assert run.returncode == 0, run.describe()
+        part = run.result.get("lock")
+>       assert isinstance(part, dict), f"the result has no lock part\n{run.describe()}"
+E       AssertionError: the result has no lock part
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.2 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "1b91b9d1bdc388cbcdccbcebe4d5a2749fefbde17fa62ff24ac19ff48b96c0bb", "store": {"digest": "1b91b9d1bdc388cbcdccbcebe4d5a2749fefbde17fa62ff24ac19ff48b96c0bb", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.6}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = isinstance(None, dict)
+
+tests/acceptance/W2-76/test_w2_76_timings.py:89: AssertionError
+___________ test_a_slow_rebuild_records_what_it_waits_on_and_goes_on ___________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_slow_rebuild_records_wh0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_slow_rebuild_records_wh0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_slow_rebuild_records_wh0/w2-76/locks/rebuild.lock')
+
+    def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock):
+        project = support.make_project(box, "project", lock, slow_after_s=THRESHOLD_S)
+        unslowed = support.rebuild(project, support.environment(box), "--no-embeddings")
+        assert unslowed.returncode == 0, f"the unslowed rebuild of the same tree failed\n{unslowed.describe()}"
+        env = support.environment(box, support.slow_gitleaks(box, "slow-tools", SLEEP_S))
+    
+        background = support.Background(project, env, support.rebuild_argv("--no-embeddings"), box.base / "out")
+        live, writes, unreadable = [], set(), 0
+        try:
+            while background.running():
+                record, text = support.read_record(project)
+                if record is not None and background.running():
+                    procs = record.get(support.first_key(record, support.PROCESSES_KEYS) or "") or []
+                    if any(isinstance(p, dict) and p.get("pid") == background.pid for p in procs):
+                        written = record.get(support.first_key(record, support.WRITTEN_KEYS) or "")
+                        live.append((record, text))
+                        writes.add(json.dumps(written))
+                elif text is not None:
+                    unreadable += 1
+                time.sleep(0.25)
+        finally:
+            run = background.finish()
+    
+        assert run.returncode == 0 and run.envelope().get("ok") is True, \
+            f"the slow rebuild did not go on to a successful end\n{run.describe()}"
+>       assert live, f"no record of this rebuild's processes while it ran ({unreadable} reads were not whole JSON)\n" \
+                     f"{run.describe()}"
+E       AssertionError: no record of this rebuild's processes while it ran (0 reads were not whole JSON)
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 11.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "81ed97191b844456d51397e2854700c30f9975000d8affb04a8e03183e810af6", "store": {"digest": "81ed97191b844456d51397e2854700c30f9975000d8affb04a8e03183e810af6", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.0}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert []
+
+tests/acceptance/W2-76/test_w2_76_watchdog.py:118: AssertionError
+_______ test_a_watchdog_fault_is_reported_and_the_rebuild_still_succeeds _______
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_watchdog_fault_is_repor0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_watchdog_fault_is_repor0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_watchdog_fault_is_repor0/w2-76/locks/rebuild.lock')
+env = {'GIT_AUTHOR_EMAIL': 'w2-76@example.invalid', 'GIT_AUTHOR_NAME': 'W2-76 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-76@example.invalid', 'GIT_COMMITTER_NAME': 'W2-76 acceptance', ...}
+
+    def test_a_watchdog_fault_is_reported_and_the_rebuild_still_succeeds(box, lock, env):
+        """``.gov-runtime/rebuild`` is a file, so no record can be written: the fault is reported on standard error and
+        in ``watchdog_faults``, and the rebuild succeeds with the stores and digest of a fault-free rebuild."""
+        project = support.make_project(box, "project", lock)
+        blocker = Path(project) / support.RECORD_DIR_REL
+        blocker.parent.mkdir(parents=True, exist_ok=True)
+        blocker.write_text("not a folder\n", encoding="utf-8")
+    
+        run = support.rebuild(project, env, "--no-embeddings")
+    
+        assert run.returncode == 0 and run.envelope().get("ok") is True, \
+            f"a watchdog fault changed the rebuild's success\n{run.describe()}"
+        faults = run.result.get("watchdog_faults")
+>       assert isinstance(faults, list) and faults, f"the fault is not in watchdog_faults\n{run.describe()}"
+E       AssertionError: the fault is not in watchdog_faults
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 2.2 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "5586ceb7a3c95fe85c9ea62d93f7b1cf044cafbf68259124d6ba3651a284e8d7", "store": {"digest": "5586ceb7a3c95fe85c9ea62d93f7b1cf044cafbf68259124d6ba3651a284e8d7", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 0.6}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (False)
+E        +  where False = isinstance(None, list)
+
+tests/acceptance/W2-76/test_w2_76_watchdog.py:165: AssertionError
+____________ test_a_watchdog_fault_in_a_slow_rebuild_never_stops_it ____________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_watchdog_fault_in_a_slo0/w2-76'), home=Posi...'), pycache=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_watchdog_fault_in_a_slo0/w2-76/pycache'))
+lock = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-0/test_a_watchdog_fault_in_a_slo0/w2-76/locks/rebuild.lock')
+
+    def test_a_watchdog_fault_in_a_slow_rebuild_never_stops_it(box, lock):
+        """The same fault while the rebuild runs past its threshold: it still goes on to a successful end, slow."""
+        project = support.make_project(box, "project", lock, slow_after_s=THRESHOLD_S)
+        blocker = Path(project) / support.RECORD_DIR_REL
+        blocker.parent.mkdir(parents=True, exist_ok=True)
+        blocker.write_text("not a folder\n", encoding="utf-8")
+        env = support.environment(box, support.slow_gitleaks(box, "slow-tools", THRESHOLD_S * 2 + 1))
+    
+        run = support.rebuild(project, env, "--no-embeddings")
+    
+        assert run.returncode == 0 and run.envelope().get("ok") is True, \
+            f"a watchdog fault stopped or failed a slow rebuild\n{run.describe()}"
+>       assert run.result.get("slow") is True, f"the slow rebuild was not flagged slow\n{run.describe()}"
+E       AssertionError: the slow rebuild was not flagged slow
+E         /usr/bin/python3 -m gov.cli.main rebuild --json --no-embeddings
+E         exit code: 0 after 9.0 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "1015c7cbaab0bb80c5ea1cc1cf365270ed5f5b2a31631fded003d51208cdb2d6", "store": {"digest": "1015c7cbaab0bb80c5ea1cc1cf365270ed5f5b2a31631fded003d51208cdb2d6", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "requested": false, "reason": "--no-embeddings was given: the semantic vectors were not asked for"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "timing": {"lexical_s": 6.1}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert None is True
+E        +  where None = <built-in method get of dict object at 0x7c93c923ab40>('slow')
+E        +    where <built-in method get of dict object at 0x7c93c923ab40> = {'compaction': {'.gov-runtime/store.db': 'compacted'}, 'digest': '1015c7cbaab0bb80c5ea1cc1cf365270ed5f5b2a31631fded003...o-embeddings was given: the semantic vectors were not asked for', 'requested': False, 'status': 'not_recreated'}}, ...}.get
+E        +      where {'compaction': {'.gov-runtime/store.db': 'compacted'}, 'digest': '1015c7cbaab0bb80c5ea1cc1cf365270ed5f5b2a31631fded003...o-embeddings was given: the semantic vectors were not asked for', 'requested': False, 'status': 'not_recreated'}}, ...} = Run(args=('/usr/bin/python3', '-m', 'gov.cli.main', 'rebuild', '--json', '--no-embeddings'), returncode=0, stdout='{"o...: {"lexical_s": 6.1}}, "session": ""}\n', stderr='', seconds=8.992924517020583, pid=3339722, started=1793370087.898153).result
+
+tests/acceptance/W2-76/test_w2_76_watchdog.py:188: AssertionError
+21 failed, 1 passed in 99.38s (0:01:39)

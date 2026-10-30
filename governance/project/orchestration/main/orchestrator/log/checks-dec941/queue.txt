@@ -1,0 +1,2 @@
+PASS: refused close -> exit 4, logged, lock removed; passing close goes on
+PASS: gate (d) stops on a crash and on a dirty tree, goes on when clean; stop_after labelled, exit 3

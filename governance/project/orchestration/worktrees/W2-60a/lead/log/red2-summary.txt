@@ -1,0 +1,5 @@
+test_w2_60a_command_skills.py 8 failed, 4 passed in 6.85s
+test_w2_60a_user_permissions.py 14 failed, 5 passed in 11.65s
+test_w2_60a_no_compaction_threshold.py 9 failed, 9 passed in 6.12s
+test_w2_60a_refused_arguments.py 6 failed, 51 passed in 25.64s
+test_w2_60a_kept_out.py 5 passed in 1.83s

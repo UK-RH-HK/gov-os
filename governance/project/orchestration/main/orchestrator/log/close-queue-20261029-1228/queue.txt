@@ -12,3 +12,16 @@
 2026-10-29 14:12:40 records ok: 80 passed in 107.06s (0:01:47)
 2026-10-29 14:12:42 network ok: allowlisted hosts checked: 17; unreachable: 0
 2026-10-29 14:18:04 check ok; close DAEO-pl6k (load 4.63)
+2026-10-29 14:27:15 close DAEO-pl6k exit 0
+2026-10-29 14:27:15 skip guard: 1 skip(s), each on the known list; no silent rulesync skip
+2026-10-29 14:27:15 outputs of DAEO-pl6k committed: e16f93d0
+2026-10-29 14:27:15 rebuild before DAEO-r9ss
+2026-10-29 14:31:52 collect ok: 16751/16753 tests collected (2 deselected) in 6.37s
+2026-10-29 14:33:51 records ok: 80 passed in 107.71s (0:01:47)
+2026-10-29 14:33:53 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-29 14:39:16 check ok; close DAEO-r9ss (load 4.41)
+2026-10-29 14:48:57 close DAEO-r9ss exit 0
+2026-10-29 14:48:57 skip guard: 1 skip(s), each on the known list; no silent rulesync skip
+2026-10-29 14:48:57 outputs of DAEO-r9ss committed: a7376fa6
+2026-10-29 14:48:57 rebuild before DAEO-2gc7
+2026-10-29 15:43:34 DAEO-2gc7 queue stopped by the orchestrator before its gates (DEC-941: record now; load 28); the rebuild left to finish

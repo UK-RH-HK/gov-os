@@ -13,11 +13,11 @@ mkdir -p /tmp/gov-os-lead-W2-57
 export TMPDIR=/tmp/gov-os-lead-W2-57
 # all three conditions in one test, so that a flag that appears while the load is high is still seen
 until [ ! -e "$O/CLOSE-RUNNING" ] && [ ! -e "$O/NIGHTLY-RUNNING" ] && awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
-echo "$part start $(date '+%F %T') load $(cut -d' ' -f1-3 /proc/loadavg) | $(bash "$O/tools/disk_gate.sh")" >> "$V/times.txt"
+echo "$part start $(date '+%F %T') load $(cut -d' ' -f1-3 /proc/loadavg) | $(bash "$O/tools/disk_gate.sh" 2>&1)" >> "$V/times.txt"
 SRC=/home/usain/gov-os-worktrees/W2-57/src
 case "$part" in
   rebuild)
-    PYTHONPATH=$SRC python3 -m gov.cli.main rebuild --json > "$V/rebuild.json" 2>&1; rc=$? ;;
+    PYTHONPATH=$SRC flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json > "$V/rebuild2.json" 2>&1; rc=$? ;;
   check)
     PYTHONPATH=$SRC python3 -m gov.cli.main check --json > "$V/check.json" 2>&1; rc=$? ;;
   parallel)

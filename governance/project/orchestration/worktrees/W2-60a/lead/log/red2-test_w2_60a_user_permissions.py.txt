@@ -1,0 +1,467 @@
+FFFFF.....FFFFFFFFF                                                      [100%]
+=================================== FAILURES ===================================
+_ test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[engineer] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r0/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r0/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f053240>, role = 'engineer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own(sandbox, launch, role):
+        plain_home = _user_file(sandbox).read_text(encoding="utf-8")
+        _user_file(sandbox).unlink()
+        without = launch(role)
+        s.assert_launched(without)
+        s.write(_user_file(sandbox), plain_home)
+        result = launch(role)
+        s.assert_launched(result)
+        permissions = _permissions(result)
+        for key, planted in (("ask", s.USER_ASK), ("deny", s.USER_DENY)):
+            listed = permissions.get(key) or []
+            missing = [rule for rule in planted if rule not in listed]
+>           assert not missing, f"the user settings' {key} rules {missing} are not in the session's permissions.{key}"
+E           AssertionError: the user settings' ask rules ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)'] are not in the session's permissions.ask
+E           assert not ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)']
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:64: AssertionError
+_ test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[independent-test-designer] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r1/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r1/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0c82c0>
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own(sandbox, launch, role):
+        plain_home = _user_file(sandbox).read_text(encoding="utf-8")
+        _user_file(sandbox).unlink()
+        without = launch(role)
+        s.assert_launched(without)
+        s.write(_user_file(sandbox), plain_home)
+        result = launch(role)
+        s.assert_launched(result)
+        permissions = _permissions(result)
+        for key, planted in (("ask", s.USER_ASK), ("deny", s.USER_DENY)):
+            listed = permissions.get(key) or []
+            missing = [rule for rule in planted if rule not in listed]
+>           assert not missing, f"the user settings' {key} rules {missing} are not in the session's permissions.{key}"
+E           AssertionError: the user settings' ask rules ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)'] are not in the session's permissions.ask
+E           assert not ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)']
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:64: AssertionError
+_ test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[independent-auditor] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r2/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r2/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0c8b80>
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own(sandbox, launch, role):
+        plain_home = _user_file(sandbox).read_text(encoding="utf-8")
+        _user_file(sandbox).unlink()
+        without = launch(role)
+        s.assert_launched(without)
+        s.write(_user_file(sandbox), plain_home)
+        result = launch(role)
+        s.assert_launched(result)
+        permissions = _permissions(result)
+        for key, planted in (("ask", s.USER_ASK), ("deny", s.USER_DENY)):
+            listed = permissions.get(key) or []
+            missing = [rule for rule in planted if rule not in listed]
+>           assert not missing, f"the user settings' {key} rules {missing} are not in the session's permissions.{key}"
+E           AssertionError: the user settings' ask rules ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)'] are not in the session's permissions.ask
+E           assert not ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)']
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:64: AssertionError
+_ test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[research] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r3/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r3/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0c9620>, role = 'research'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own(sandbox, launch, role):
+        plain_home = _user_file(sandbox).read_text(encoding="utf-8")
+        _user_file(sandbox).unlink()
+        without = launch(role)
+        s.assert_launched(without)
+        s.write(_user_file(sandbox), plain_home)
+        result = launch(role)
+        s.assert_launched(result)
+        permissions = _permissions(result)
+        for key, planted in (("ask", s.USER_ASK), ("deny", s.USER_DENY)):
+            listed = permissions.get(key) or []
+            missing = [rule for rule in planted if rule not in listed]
+>           assert not missing, f"the user settings' {key} rules {missing} are not in the session's permissions.{key}"
+E           AssertionError: the user settings' ask rules ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)'] are not in the session's permissions.ask
+E           assert not ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)']
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:64: AssertionError
+_ test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[product-spec] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r4/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_the_user_s_ask_and_deny_r4/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0c9080>
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", s.WORKER_ROLES)
+    def test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own(sandbox, launch, role):
+        plain_home = _user_file(sandbox).read_text(encoding="utf-8")
+        _user_file(sandbox).unlink()
+        without = launch(role)
+        s.assert_launched(without)
+        s.write(_user_file(sandbox), plain_home)
+        result = launch(role)
+        s.assert_launched(result)
+        permissions = _permissions(result)
+        for key, planted in (("ask", s.USER_ASK), ("deny", s.USER_DENY)):
+            listed = permissions.get(key) or []
+            missing = [rule for rule in planted if rule not in listed]
+>           assert not missing, f"the user settings' {key} rules {missing} are not in the session's permissions.{key}"
+E           AssertionError: the user settings' ask rules ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)'] are not in the session's permissions.ask
+E           assert not ['Bash(rm:*)', 'Bash(zq60a-user-level-owner-ping:*)']
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:64: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[a-folder] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that0/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that0/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0ca980>, case = 'a-folder'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327237.9105544, ended=1793327238.2361853, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['f7ac5b8d-fc1c-4c7d-aca9-cc89955fd655.json']
+E       records after: ['37831836-c42f-4ec9-b3dd-980b3d0104b3.json', 'f7ac5b8d-fc1c-4c7d-aca9-cc89955fd655.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[ask-holds-a-non-string] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that1/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that1/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0c89a0>
+case = 'ask-holds-a-non-string'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327238.592699, ended=1793327238.9196503, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['911fca24-1073-408b-8e0f-3fe0a67d4161.json']
+E       records after: ['911fca24-1073-408b-8e0f-3fe0a67d4161.json', 'a0d01053-ddee-4712-9f15-42f1e67664b1.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[ask-not-a-list] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that2/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that2/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0ca0c0>
+case = 'ask-not-a-list'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327239.2750955, ended=1793327239.6034532, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['114b4528-5535-435d-b1f8-3f5bdfb7b47d.json']
+E       records after: ['114b4528-5535-435d-b1f8-3f5bdfb7b47d.json', '386ff44c-39d9-4541-bb60-8f9d23d8b998.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[deny-holds-a-non-string] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that3/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that3/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f130ae0>
+case = 'deny-holds-a-non-string'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327239.9622757, ended=1793327240.2779377, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['1ec6ee0e-ff6f-442a-a2a9-9932bd6cef65.json']
+E       records after: ['1ec6ee0e-ff6f-442a-a2a9-9932bd6cef65.json', '954b8e5d-b797-4596-932c-d188e514cdeb.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[deny-not-a-list] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that4/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that4/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f130220>
+case = 'deny-not-a-list'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327240.6362212, ended=1793327240.9678288, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['047e73e8-08a6-4a4d-891a-6ca15c6f22c9.json']
+E       records after: ['047e73e8-08a6-4a4d-891a-6ca15c6f22c9.json', 'c36446a6-5fb1-4e5d-bbdc-968221eb9e14.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[not-an-object] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that5/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that5/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f1316c0>
+case = 'not-an-object'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327241.3246586, ended=1793327241.664995, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['56d84c74-7d33-47ca-b86d-b9a1e66b46c3.json']
+E       records after: ['56d84c74-7d33-47ca-b86d-b9a1e66b46c3.json', '640d7a3b-1846-4dd8-ba4c-fe631f3ccf29.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[not-json] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that6/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that6/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f131ee0>, case = 'not-json'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327242.0411077, ended=1793327242.378755, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['e10f42e3-54db-4e5a-8b31-7cea26a10285.json']
+E       records after: ['78d4940a-8e08-4448-a193-99cff5520ac7.json', 'e10f42e3-54db-4e5a-8b31-7cea26a10285.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[permissions-not-a-map] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that7/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that7/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f0cb600>
+case = 'permissions-not-a-map'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327242.7630908, ended=1793327243.0824044, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['756dc0ce-a9a8-489c-8fd8-c426a23664bb.json']
+E       records after: ['756dc0ce-a9a8-489c-8fd8-c426a23664bb.json', 'b701e468-23e0-4558-bee0-02534720a033.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+_ test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[unreadable] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that8/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-25/test_a_user_settings_file_that8/w2-60a/pycache'))
+launch = <function launch.<locals>._launch at 0x7b133f130680>
+case = 'unreadable'
+
+    @pytest.mark.parametrize("case", sorted(FAULTS))
+    def test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch(sandbox, launch, case):
+        s.assert_launched(launch(s.ENGINEER))
+        path = _user_file(sandbox)
+        FAULTS[case](path)
+        try:
+>           s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", "settings")
+
+tests/acceptance/W2-60a/test_w2_60a_user_permissions.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793327243.4483826, ended=1793327243.7754233, passed=())
+words = ('LAUNCH_REFUSED', 'settings')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+>       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['d6eb38a4-9819-4608-a20c-fa3e3177f037.json']
+E       records after: ['d6eb38a4-9819-4608-a20c-fa3e3177f037.json', 'e471c3f9-fe32-4744-9343-8f3b64e04667.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[engineer]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[independent-test-designer]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[independent-auditor]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[research]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_the_user_s_ask_and_deny_rules_reach_the_session_beside_the_launcher_s_own[product-spec]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[a-folder]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[ask-holds-a-non-string]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[ask-not-a-list]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[deny-holds-a-non-string]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[deny-not-a-list]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[not-an-object]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[not-json]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[permissions-not-a-map]
+FAILED tests/acceptance/W2-60a/test_w2_60a_user_permissions.py::test_a_user_settings_file_that_cannot_be_shown_to_keep_its_rules_refuses_the_launch[unreadable]
+14 failed, 5 passed in 11.65s

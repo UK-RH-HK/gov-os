@@ -1,0 +1,1 @@
+tests.acceptance.W2-66.test_w2_66_lead_verification::test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes

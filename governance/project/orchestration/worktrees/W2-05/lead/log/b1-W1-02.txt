@@ -1,0 +1,364 @@
+FFF...FFFFFFFF.FF...........................F..                          [100%]
+=================================== FAILURES ===================================
+_ test_a_decision_still_running_at_the_deadline_is_refused[a-Bash-call-by-an-engineer-whose-first-program-does-not-end] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'a-Bash-call-by-an-engineer-whose-first-program-does-not-end'
+
+    @pytest.mark.parametrize("label", LABELS_1)
+    def test_a_decision_still_running_at_the_deadline_is_refused(late, label):
+        """Point 1: a call the rules would allow is refused, in a refusal's form, shortly after 20 seconds."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"'{label}'")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='a-Bash-call-by-an-engineer-whose-first-program-does-not-end', project=PosixPath('/tmp/gov-os-lead-W2-05...='', stderr='', seconds=10.38116530701518, cpu_seconds=None), stand_in_starts=1, children=1, left_running=1, before=())
+what = "'a-Bash-call-by-an-engineer-whose-first-program-does-not-end'"
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: 'a-Bash-call-by-an-engineer-whose-first-program-does-not-end' was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 10.4 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_a_decision_still_running_at_the_deadline_is_refused[a-Write-by-the-orchestrator-whose-first-program-does-not-end] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'a-Write-by-the-orchestrator-whose-first-program-does-not-end'
+
+    @pytest.mark.parametrize("label", LABELS_1)
+    def test_a_decision_still_running_at_the_deadline_is_refused(late, label):
+        """Point 1: a call the rules would allow is refused, in a refusal's form, shortly after 20 seconds."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"'{label}'")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='a-Write-by-the-orchestrator-whose-first-program-does-not-end', project=PosixPath('/tmp/gov-os-lead-W2-0...'', stderr='', seconds=0.2143998248502612, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=())
+what = "'a-Write-by-the-orchestrator-whose-first-program-does-not-end'"
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: 'a-Write-by-the-orchestrator-whose-first-program-does-not-end' was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 0.2 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_a_decision_still_running_at_the_deadline_is_refused[a-Read-by-a-session-with-no-role-whose-first-program-does-not-end] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'a-Read-by-a-session-with-no-role-whose-first-program-does-not-end'
+
+    @pytest.mark.parametrize("label", LABELS_1)
+    def test_a_decision_still_running_at_the_deadline_is_refused(late, label):
+        """Point 1: a call the rules would allow is refused, in a refusal's form, shortly after 20 seconds."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"'{label}'")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='a-Read-by-a-session-with-no-role-whose-first-program-does-not-end', project=PosixPath('/tmp/gov-os-lead...'', stderr='', seconds=0.2647451658267528, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=())
+what = "'a-Read-by-a-session-with-no-role-whose-first-program-does-not-end'"
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: 'a-Read-by-a-session-with-no-role-whose-first-program-does-not-end' was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 0.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_a_decision_still_running_at_the_deadline_is_refused[a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow'
+
+    @pytest.mark.parametrize("label", LABELS_1)
+    def test_a_decision_still_running_at_the_deadline_is_refused(late, label):
+        """Point 1: a call the rules would allow is refused, in a refusal's form, shortly after 20 seconds."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"'{label}'")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow', project=PosixPath('...'', stderr='', seconds=12.295411499915645, cpu_seconds=None), stand_in_starts=1, children=0, left_running=0, before=())
+what = "'a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow'"
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: 'a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow' was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 12.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[fields-named-like-a-time-limit-at-the-top-of-the-hook-input] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'fields-named-like-a-time-limit-at-the-top-of-the-hook-input'
+
+    @pytest.mark.parametrize("label", LABELS_4)
+    def test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off(late, label):
+        """Point 4: the deadline's value is the guard's own: the answer is the same refusal, at the same time."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"the call with {label}")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='fields-named-like-a-time-limit-at-the-top-of-the-hook-input', project=PosixPath('/tmp/gov-os-lead-W2-05...'', stderr='', seconds=10.331669709878042, cpu_seconds=None), stand_in_starts=1, children=0, left_running=0, before=())
+what = 'the call with fields-named-like-a-time-limit-at-the-top-of-the-hook-input'
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: the call with fields-named-like-a-time-limit-at-the-top-of-the-hook-input was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 10.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[fields-named-like-a-time-limit-inside-the-tool-input] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'fields-named-like-a-time-limit-inside-the-tool-input'
+
+    @pytest.mark.parametrize("label", LABELS_4)
+    def test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off(late, label):
+        """Point 4: the deadline's value is the guard's own: the answer is the same refusal, at the same time."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"the call with {label}")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='fields-named-like-a-time-limit-inside-the-tool-input', project=PosixPath('/tmp/gov-os-lead-W2-05/pytest...'', stderr='', seconds=10.331436430104077, cpu_seconds=None), stand_in_starts=1, children=0, left_running=0, before=())
+what = 'the call with fields-named-like-a-time-limit-inside-the-tool-input'
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: the call with fields-named-like-a-time-limit-inside-the-tool-input was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 10.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set'
+
+    @pytest.mark.parametrize("label", LABELS_4)
+    def test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off(late, label):
+        """Point 4: the deadline's value is the guard's own: the answer is the same refusal, at the same time."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"the call with {label}")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set', project=PosixPath('/tmp/gov...'', stderr='', seconds=10.331898090895265, cpu_seconds=None), stand_in_starts=1, children=0, left_running=0, before=())
+what = 'the call with variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set'
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: the call with variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 10.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[variables-named-like-a-time-limit-set-to-zero-and-the-switches-set] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'variables-named-like-a-time-limit-set-to-zero-and-the-switches-set'
+
+    @pytest.mark.parametrize("label", LABELS_4)
+    def test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off(late, label):
+        """Point 4: the deadline's value is the guard's own: the answer is the same refusal, at the same time."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"the call with {label}")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='variables-named-like-a-time-limit-set-to-zero-and-the-switches-set', project=PosixPath('/tmp/gov-os-lea...='', stderr='', seconds=10.33197452290915, cpu_seconds=None), stand_in_starts=1, children=0, left_running=0, before=())
+what = 'the call with variables-named-like-a-time-limit-set-to-zero-and-the-switches-set'
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: the call with variables-named-like-a-time-limit-set-to-zero-and-the-switches-set was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 10.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+_ test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off[files-a-worker-may-write-that-name-a-larger-limit] _
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+label = 'files-a-worker-may-write-that-name-a-larger-limit'
+
+    @pytest.mark.parametrize("label", LABELS_4)
+    def test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off(late, label):
+        """Point 4: the deadline's value is the guard's own: the answer is the same refusal, at the same time."""
+        outcome = late[label]
+>       deadline.assert_refused_at_the_deadline(outcome, f"the call with {label}")
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='files-a-worker-may-write-that-name-a-larger-limit', project=PosixPath('/tmp/gov-os-lead-W2-05/pytest-of...'', stderr='', seconds=10.333162286086008, cpu_seconds=None), stand_in_starts=1, children=0, left_running=0, before=())
+what = 'the call with files-a-worker-may-write-that-name-a-larger-limit'
+
+    def assert_refused_at_the_deadline(outcome, what):
+        """A refusal in a rule's form, whose reason says the guard could not decide in time and names DEC-580."""
+        assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+        reason = refusal_of(outcome)
+>       assert reason is not None, (
+               ^^^^^^^^^^^^^^^^^^
+            f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+            f"{outcome.describe()}"
+        )
+E       AssertionError: the call with files-a-worker-may-write-that-name-a-larger-limit was not refused in the form a refusal has (exit code 0, a deny decision with a reason): decision=allow exit=0 after 10.3 s
+
+tests/acceptance/W1-02/w1_02_deadline_support.py:495: AssertionError
+___________ test_the_deadline_s_refusal_carries_nothing_of_the_call ____________
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+
+    def test_the_deadline_s_refusal_carries_nothing_of_the_call(late):
+        """Point 1: the reason names the rule and the decision: no command, no content, no path, neither protected file."""
+        unanswered = [label for label in LABELS_1 + LABELS_4 if deadline.refusal_of(late[label]) is None]
+>       assert not unanswered, f"not refused in a refusal's form: {unanswered}"
+E       AssertionError: not refused in a refusal's form: ['a-Bash-call-by-an-engineer-whose-first-program-does-not-end', 'a-Write-by-the-orchestrator-whose-first-program-does-not-end', 'a-Read-by-a-session-with-no-role-whose-first-program-does-not-end', 'a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow', 'fields-named-like-a-time-limit-at-the-top-of-the-hook-input', 'fields-named-like-a-time-limit-inside-the-tool-input', 'variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set', 'variables-named-like-a-time-limit-set-to-zero-and-the-switches-set', 'files-a-worker-may-write-that-name-a-larger-limit']
+E       assert not ['a-Bash-call-by-an-engineer-whose-first-program-does-not-end', 'a-Write-by-the-orchestrator-whose-first-program-does-...lds-named-like-a-time-limit-at-the-top-of-the-hook-input', 'fields-named-like-a-time-limit-inside-the-tool-input', ...]
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:119: AssertionError
+________ test_nothing_the_hook_started_is_left_running_after_its_answer ________
+
+late = {'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': Outcome(label='a-Bash-call-by-an-engineer-whose-first-...derr='', seconds=20.102949562016875, cpu_seconds=None), stand_in_starts=4, children=0, left_running=0, before=()), ...}
+
+    def test_nothing_the_hook_started_is_left_running_after_its_answer(late):
+        """Point 1: the slow step's process, and a child of that process, are gone shortly after the answer."""
+        unanswered = [label for label in WITH_A_PROGRAM if not late[label].answered]
+        assert not unanswered, f"no answer, the hook was ended by the case: {unanswered}"
+        for label in WITH_A_PROGRAM:
+            outcome = late[label]
+            assert outcome.stand_in_starts >= 1, f"'{label}': the hook did not start the stand-in program"
+>           assert outcome.left_running == 0, (
+                f"'{label}': {outcome.left_running} process(es) the hook started were still running "
+                f"{deadline.GONE_WITHIN_S:.0f} s after its answer ({outcome.describe()})"
+            )
+E           AssertionError: 'a-Bash-call-by-an-engineer-whose-first-program-does-not-end': 1 process(es) the hook started were still running 5 s after its answer (decision=allow exit=0 after 10.4 s)
+E           assert 1 == 0
+E            +  where 1 = Outcome(label='a-Bash-call-by-an-engineer-whose-first-program-does-not-end', project=PosixPath('/tmp/gov-os-lead-W2-05...='', stderr='', seconds=10.38116530701518, cpu_seconds=None), stand_in_starts=1, children=1, left_running=1, before=()).left_running
+
+tests/acceptance/W1-02/test_w1_02_deadline.py:135: AssertionError
+_ test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed[a-Read-by-a-session-with-no-role] _
+
+prompt = {'a-Bash-call-by-an-engineer': Outcome(label='a-Bash-call-by-an-engineer', project=PosixPath('/tmp/gov-os-lead-W2-05/p...derr='', seconds=0.3209797430317849, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=()), ...}
+label = 'a-Read-by-a-session-with-no-role'
+
+    @pytest.mark.parametrize("label", _labels(SLOW_AND_ALLOWED))
+    def test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed(prompt, label):
+        """Point 3: allowed after its four seconds, and the bookkeeping for a Bash call that is let through is done."""
+        outcome = prompt[label]
+>       _assert_answered_in_time(outcome, f"{label} with a slow step", slow=True)
+
+tests/acceptance/W1-02/test_w1_02_deadline_in_time.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='a-Read-by-a-session-with-no-role', project=PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-2/d...'', stderr='', seconds=0.3209797430317849, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=())
+what = 'a-Read-by-a-session-with-no-role with a slow step', slow = True
+
+    def _assert_answered_in_time(outcome, what, slow):
+        assert outcome.answered, f"{what}: {outcome.describe()}"
+        if slow:
+>           assert outcome.stand_in_starts >= 1, f"{what}: the hook did not start the stand-in program"
+E           AssertionError: a-Read-by-a-session-with-no-role with a slow step: the hook did not start the stand-in program
+E           assert 0 >= 1
+E            +  where 0 = Outcome(label='a-Read-by-a-session-with-no-role', project=PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-usain/pytest-2/d...'', stderr='', seconds=0.3209797430317849, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=()).stand_in_starts
+
+tests/acceptance/W1-02/test_w1_02_deadline_in_time.py:100: AssertionError
+_ test_a_step_that_ends_before_the_deadline_leaves_a_refused_call_refused_with_its_own_reason _
+
+prompt = {'a-Bash-call-by-an-engineer': Outcome(label='a-Bash-call-by-an-engineer', project=PosixPath('/tmp/gov-os-lead-W2-05/p...derr='', seconds=0.3209797430317849, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=()), ...}
+
+    def test_a_step_that_ends_before_the_deadline_leaves_a_refused_call_refused_with_its_own_reason(prompt):
+        """Point 3: the reason is the one the same call gets without the slow step."""
+        slow, at_once = prompt[SLOW_AND_REFUSED.label], prompt[REFUSED_AT_ONCE[0].label]
+>       _assert_answered_in_time(slow, "the slow refused call", slow=True)
+
+tests/acceptance/W1-02/test_w1_02_deadline_in_time.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+outcome = Outcome(label='a-slow-Write-by-an-engineer-outside-its-ticket', project=PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-us...}', stderr='', seconds=0.3164232571143657, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=())
+what = 'the slow refused call', slow = True
+
+    def _assert_answered_in_time(outcome, what, slow):
+        assert outcome.answered, f"{what}: {outcome.describe()}"
+        if slow:
+>           assert outcome.stand_in_starts >= 1, f"{what}: the hook did not start the stand-in program"
+E           AssertionError: the slow refused call: the hook did not start the stand-in program
+E           assert 0 >= 1
+E            +  where 0 = Outcome(label='a-slow-Write-by-an-engineer-outside-its-ticket', project=PosixPath('/tmp/gov-os-lead-W2-05/pytest-of-us...}', stderr='', seconds=0.3164232571143657, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=()).stand_in_starts
+
+tests/acceptance/W1-02/test_w1_02_deadline_in_time.py:100: AssertionError
+_ test_a_decision_that_cannot_end_is_a_refusal_for_a_tool_of_the_round[a-MultiEdit-inside-the-ticket-s-paths-by-an-engineer] _
+
+late = {'Monitor-by-the-orchestrator': Outcome(label='Monitor-by-the-orchestrator', project=PosixPath('/tmp/gov-os-lead-W2-05...derr='', seconds=0.2647133800201118, cpu_seconds=None), stand_in_starts=0, children=0, left_running=0, before=()), ...}
+label = 'a-MultiEdit-inside-the-ticket-s-paths-by-an-engineer'
+
+    @pytest.mark.parametrize("label", LABELS)
+    def test_a_decision_that_cannot_end_is_a_refusal_for_a_tool_of_the_round(late, label):
+        """DEC-580 unchanged: refused by the guard's own hand, at once or at its deadline; never let through."""
+        outcome = late[label]
+        assert outcome.answered, f"'{label}': {outcome.describe()}"
+>       assert outcome.result.decision == "deny", f"'{label}' was not refused: {outcome.describe()}"
+E       AssertionError: 'a-MultiEdit-inside-the-ticket-s-paths-by-an-engineer' was not refused: decision=allow exit=0 after 0.3 s
+E       assert 'allow' == 'deny'
+E         
+E         - deny
+E         + allow
+
+tests/acceptance/W1-02/test_w1_02_unknown_tools_failure.py:153: AssertionError
+14 failed, 33 passed in 32.84s

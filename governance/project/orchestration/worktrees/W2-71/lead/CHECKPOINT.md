@@ -1,20 +1,14 @@
-# W2-71 lead checkpoint (DAEO-e8f0, run 2: F1, partial clones) — IN PROGRESS
+# W2-71 lead checkpoint (DAEO-e8f0, run 3: the tests-only repair of the refused close, DEC-946 item 1) — FINAL, returning DONE
 
-- Run 1: DONE at 1598a1c0996c (probe PR-DAEO-e8f0 passed at 700102de5f4d). Run 1's record follows below the line.
-- Run 2 (the last round, DEC-413) started 2026-10-29 12:24, from P1-MORNING-2026-10-29 item 4 (orchestrator's delegated decision, stricter only).
-- The rule: in a partial clone (extensions.partialClone, any remote with promisor true, any partialclonefilter; an unreadable configuration counts as one), the exemption asks git nothing about objects and the finding stays. GIT_NO_LAZY_FETCH=1 on the object lookup as a second guard (git here is 2.43.0, which ignores it; 2.44 honours it).
-- Trailers: Implements: DEC-911 only. This worktree's register stops at DEC-937, so DEC-938 would not resolve in the trailer gate (it reads the worktree's register).
-- Order: td-2 (test designer, xhigh) -> red check -> eng-2 (engineer, high) -> rebuild + full run -> rev-2 (reviewer, max) -> probe record -> return.
-- Loop count: 0 (engineer iterations this run).
-- td-2 DONE (session 3bf09bf5, sandboxed, xhigh): commit c99395875f80, 91 new cases (304 total), 45 red on run 1's code by its own run; tripwire: this worktree only head + acceptance W2-71; other trees' heads moved (main 848f5ab366b9 -> 2f2fb03e5076, W2-00-record 9948338c117f -> 76c175126fbd), not the worker's.
-  - Its P-1 (mode-000 user ~/.gitconfig, git skips it silently): not demanded; residual, recommend (a). P-2: git 1:2.43.0-1ubuntu7.4 honours GIT_NO_LAZY_FETCH (backport) — premise corrected in eng-2. P-3: keep the "asks git about no object" cases (the decision's own words).
-- Red check (lead, file by file during the close queue, log/red2.out): 45 failed / 259 passed, reasons as the README states; gov.__file__ in this worktree; log holds no keyword, no full hash.
-- State: briefs/eng-2.md ready (head c99395875f80). Waiting for CLOSE-RUNNING (close queue, set 12:28) to clear before launching eng-2 (tripwire-before-5).
-
----
-
-# Run 1's final record
-
-- State: done. The probe passed; nothing more committed after 1598a1c0 (the probe record of head 700102de5f4d).
-- Commits since 51a443a47ae8: 8d5a99274dc5 test designer (213 cases); a63e012f6745 engineer (src/gov/secrets/__init__.py); baf2a759a241 engineer (unit tests); 2a58872b, 700102de5f4d checkpoints; 1598a1c0 probe record.
-- Verification: rebuild 0; gov check GREEN except YELLOW core-decision-citations and openspec-validate; parallel 1 failed (DEC-919 known) / 16696 passed / 31 skipped; serial 180 passed; collect-only no error; keyword_warn 0.
+- State: done. Branch w2/W2-71, head 027d4f108bff. Ready to merge, then the re-close. No review this run (tests-only repair, code unchanged); the orchestrator decides on the probe gate's note.
+- Run 3 commits (start head 3b69bbd23775):
+  - e07b5c481efa orchestrator: merge of w2/integrate (f625d103), clean; Task/Implements DEC-911/Role orchestrator. DEC-895: no file of the ticket changed by it, no re-probe.
+  - 46933767f0d5 independent-test-designer (td-3, sandboxed, effort high): tests/acceptance/W2-71/test_w2_71_keywords_in_parts.py + README.md (+79/-19); Rewrite-Reason names the 02:12 close and the empty merge-base diff.
+  - 027d4f108bff orchestrator: CP-DAEO-e8f0-0014.
+- trailer_gate: 18 commits, 18 judged, 0 lacking, 0 not resolving. keyword_warn: 0.
+- Checks: after the merge, before the repair, the premise was red on this branch (list []). After: file 2 passed; clone /tmp/gov-os-lead-W2-71/clone-check (HEAD = merge = w2/integrate, 977251e002e7) premise + sister passed; planted keyword files in two Task: DAEO-e8f0 commits -> sister failed naming exactly them.
+- Verification: rebuild3 0; scoped close form (W2-71 + tests/unit/secrets_check, -n auto, plugin, retention failed) 346 passed in 92 s, exit 0; collect-only 17094/17096 (2 deselected), no error. gov.__file__ in this worktree.
+- Residual / P-1: test_w2_71_nothing_printed_or_written.py's gitleaks-files case also uses merge-base w2/integrate: vacuous once merged (not red).
+- Left: clone /tmp/gov-os-lead-W2-71/clone-check (132M, 4,910 inodes; rm refused by a permission prompt); temp folder /tmp/gov-os-lead-W2-71 573M, 54,746 inodes.
+- Loop count: 1, converged.
+- A resume: nothing to do; the orchestrator merges and re-closes.

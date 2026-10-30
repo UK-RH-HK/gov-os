@@ -1,0 +1,1 @@
+Use no tool. Answer with exactly two lines and nothing else: AGENT=<the agent token your instructions give, or NONE> and ROLEFILE=<the role-file token your instructions give, or NONE>.

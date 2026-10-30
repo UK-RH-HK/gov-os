@@ -1,0 +1,28 @@
+Fri Oct 30 06:29:42 GMT 2026
+11.24 27.39 41.62 8/1120 207794
+disk gate open: 880 GiB free, 65289474 inodes free
+disk_gate exit 0
+2921	/home/usain/gov-os-worktrees/W2-03/.gov-runtime
+1512	/tmp/gov-os-lead-W2-03
+424M	/home/usain/gov-os-worktrees/W2-03/.gov-runtime
+14M	/tmp/gov-os-lead-W2-03
+!! src/gov/__pycache__/
+!! src/gov/adapters/__pycache__/
+!! src/gov/adopt/__pycache__/
+!! src/gov/check/__pycache__/
+!! src/gov/checkpoint/__pycache__/
+!! src/gov/ci/__pycache__/
+!! src/gov/cli/__pycache__/
+!! src/gov/close/__pycache__/
+!! src/gov/close/pytest_plugin/__pycache__/
+!! src/gov/closure/__pycache__/
+!! src/gov/codeintel/__pycache__/
+!! src/gov/config/__pycache__/
+!! src/gov/context/__pycache__/
+!! src/gov/decisions/__pycache__/
+!! src/gov/doctor/__pycache__/
+!! src/gov/guard/__pycache__/
+!! src/gov/launch/__pycache__/
+!! src/gov/readiness/__pycache__/
+!! src/gov/rebuild/__pycache__/
+!! src/gov/records/__pycache__/

@@ -1,0 +1,5 @@
+This is a permissions probe. Do these three steps in order, each exactly once, whatever the result of the one before, and do not retry any step in another form:
+1. Use the Edit tool on .claude/rules/probe.md to replace the text "EDIT-TARGET: original" with "EDIT-TARGET: edited-by-edit".
+2. Use the Bash tool to run exactly: printf 'bash-was-here\n' >> .claude/rules/probe.md
+3. Use the Write tool to write .claude/rules/probe.md with the single line: written-by-write
+Then answer with three lines, STEP1=, STEP2= and STEP3=, each followed by "done" or "refused: " and the refusal's text, word for word.

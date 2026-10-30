@@ -1,0 +1,9 @@
+.....                                                                    [100%]
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-60a/test_w2_60a_live_sessions.py::test_a_launched_session_has_its_role_text_and_named_skill_at_its_start
+PASSED tests/acceptance/W2-60a/test_w2_60a_live_sessions.py::test_the_launch_record_is_keyed_by_the_id_the_session_s_log_gives
+PASSED tests/acceptance/W2-60a/test_w2_60a_live_sessions.py::test_a_launched_session_starts_with_no_connector
+PASSED tests/acceptance/W2-60a/test_w2_60a_live_sessions.py::test_a_launched_session_starts_with_no_user_level_agent_or_skill
+PASSED tests/acceptance/W2-60a/test_w2_60a_live_sessions.py::test_a_launched_session_starts_with_no_model_side_memory
+5 passed in 5.35s

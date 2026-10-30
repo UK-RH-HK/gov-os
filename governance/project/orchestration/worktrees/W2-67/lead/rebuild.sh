@@ -10,5 +10,5 @@ until [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orc
 until awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
 bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/disk_gate.sh > "$LOG/rebuild-$N.gate" 2>&1 || { echo gate-shut > "$LOG/rebuild-$N.exit"; exit 1; }
 date -Is > "$LOG/rebuild-$N.start"
-PYTHONPATH=$W/src python3 -m gov.cli.main rebuild --json > "$LOG/rebuild-$N.json" 2> "$LOG/rebuild-$N.err"
+PYTHONPATH=$W/src flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json > "$LOG/rebuild-$N.json" 2> "$LOG/rebuild-$N.err"
 echo $? > "$LOG/rebuild-$N.exit"
