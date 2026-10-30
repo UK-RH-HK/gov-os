@@ -122,10 +122,18 @@ measure is run again and reported beside its baseline. No test is written for it
 - `test_a_file_that_opens_with_dashes_and_whose_frontmatter_cannot_be_read_is_a_finding[...]` (no closing line, a
   YAML error, not a mapping) — **red**: skipped silently, exit 0.
 
+## Red first
+
+On today's code (this worktree at `894b7278`, nothing of the implementation yet), the run above gives
+`63 failed, 20 passed in 17.46s`: every red case fails for the reason stated above, and the 20 that pass are the
+ones marked "passes today". The fixtures were checked against the installed check-jsonschema 0.38.2 directly: the
+valid ticket and the audit report pass; lens G's planted ticket gives exactly the seven errors expected
+(`$.state_class`, `$.deps[0]`, `$.allowed_paths`, `$.kpis` twice, `$.profile`, `$.est_loc`), and none on `status`.
+
 ## Earlier acceptance tests this change affects (named, never edited)
 
-Revising any of them is outside this folder; the lead returns them as a package. Each passes against the code of
-`w2/integrate`.
+Revising any of them is outside this folder; the lead returns them as a package. Run against today's code by the
+test designer: `tests/acceptance/W2-54/test_w2_54_audit_report.py`, 24 passed; the others were read, not run.
 
 1. **W2-54, `tests/acceptance/W2-54/test_w2_54_audit_report.py`** — every case that calls `w2_54_support.core_schema`
    (`Box.env()` sets `PATH=<workdir>/bin:/usr/bin:/bin` and a throwaway `HOME`; the bin holds `python3`, `git`,
@@ -138,11 +146,12 @@ Revising any of them is outside this folder; the lead returns them as a package.
    `test_an_audit_report_lacking_a_required_field_fails_naming_it[...]`. Not affected:
    `test_w2_02_s_other_types_are_judged_as_an_unknown_type[...]` (it runs the module as an earlier commit left it,
    `core_schema_at`).
-   `test_core_schema_is_green_on_this_repository_with_w1_43_untouched` runs with `worktree_env()` — affected if that
-   environment's `PATH` lacks check-jsonschema (W2-54's `PATH` forms are `<workdir>/bin:/usr/bin:/bin` and
-   `/usr/bin:/bin`).
-2. **W2-54, `tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here`** — `gov
-   check` in this repository under W2-54's environment: RED if that environment's `PATH` lacks check-jsonschema.
+   `test_core_schema_is_green_on_this_repository_with_w1_43_untouched` runs with `worktree_env()` (the suite's own
+   environment, its `PATH` included) and asserts only exit 0: not affected where the suite's `PATH` holds
+   check-jsonschema.
+2. **W2-54, `tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here`** — reads
+   the close's own `gov check` result (W2-75, `GOV_CLOSE_CHECK_RESULT`) or runs `gov check` here: green after the
+   change only if that run's `PATH` holds check-jsonschema. Not run by the test designer.
 3. **W2-02, `tests/acceptance/W2-02/`** (`w2_02_support.env` keeps the suite's `PATH`, so the tool is found where the
    suite's `PATH` holds `~/.local/bin`): the subset's own wording is not pinned (findings are matched by `code`,
    `path`, `field`, or a word of the message; `names_field_or_part` accepts a top-level `field`). Affected only if a
