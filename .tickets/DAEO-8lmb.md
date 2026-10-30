@@ -1,6 +1,6 @@
 ---
 id: DAEO-8lmb
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-30T21:44:47Z
