@@ -30,7 +30,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
   - the close runs the same set on the merged commit in a clean worktree;
   - the nightly runs everything.
   Governance files never widen a selection.
-- DEC-962 (changing DEC-905, DEC-906 item 3, DEC-954): no shared test lock and no closes-first; every full run (a close's, the nightly's, a lead's through `verify_lock.sh`) asks the gate for room for its own peak; `tmp_path_retention_policy=failed` stays. One store rebuild at a time stays until W2-76's lock is measured. One writing worker per worktree holds until the owner approves P-PARALLEL-1.
+- DEC-962 (changing DEC-905, DEC-906 item 3, DEC-954): no shared test lock and no closes-first; every full run (a close's, the nightly's, a lead's through `verify_lock.sh`) asks the gate for room for its own peak; `tmp_path_retention_policy=failed` stays. One store rebuild at a time stays until W2-76's lock is measured. One writing worker per worktree (DEC-963): the test designer works in parallel in its own tests worktree, retrieving only from the integration branch's store (`~/gov-os-worktrees/W2-00-store`); the engineer merges its tests and runs them once.
 - DEC-954 (P-W2-64-1): a test revision the owner names is checked by a scoped run of the corrected tests; the nightly covers the rest.
 - DEC-137, DEC-498, DEC-413, DEC-916: a FULL ticket gets a fresh review before merge, at most two rounds (two per declared round). It is re-reviewed only if a later merge resolved conflicts in reviewed files.
 - DEC-801 to 803, DEC-808, DEC-809: findings are judged by ADR-0001's two questions, each with its two lines. A "no" becomes a row, never a round. Fixes ride the next resume.

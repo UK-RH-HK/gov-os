@@ -12050,7 +12050,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.344 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-961 (capacity alone: no reserved verification peak, full runs check the gate themselves, no close or night holds, the nightly holds nothing; HOLDS-REVIEW-1 for the owner). Next free id: DEC-962. |
 
 ### DEC-962 — The owner's decisions on HOLDS-REVIEW-1: the one-run lock ended, the rebuild lock kept until W2-76 is measured, rules 4 to 17 kept, a proposal for parallel work without two writers in one tree, the nightly's own estimate kept (standing)
-- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-961, DEC-959, DEC-939 item 2 · **Changes:** DEC-905, DEC-906 item 3, DEC-954 (the one-run lock and "closes first") · **Basis:** `packages/HOLDS-REVIEW-1.md`
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-961, DEC-959, DEC-939 item 2 · **Changes:** DEC-905, DEC-906 item 3, DEC-954 (the one-run lock and "closes first") · **Basis:** `packages/HOLDS-REVIEW-1.md` · **Changed by:** DEC-963 (item 4: P-PARALLEL-1 approved as (b), amended)
 - **Decision:**
   1. **Rules 1 and 2 end:** full test runs no longer share one lock and closes no longer go first; each full run asks the gate for room for its own peak (`gate_check.py --full-run`) and runs.
   2. **Rule 3 stays** (one store rebuild at a time) until W2-76's machine-wide lock has been measured; the orchestrator then brings the owner its figures for a decision.
@@ -12064,3 +12064,16 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.345 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-962 (the one-run lock and closes-first ended; the rebuild lock kept until W2-76 is measured; rules 4 to 17 kept; P-PARALLEL-1 for parallel work, rule 6 holding meanwhile; the nightly's own estimate kept). Next free id: DEC-963. |
+
+### DEC-963 — P-PARALLEL-1 (b), amended: the test designer in its own worktree, retrieving only from the integration branch's store; the engineer in the ticket's worktree (standing)
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-959 item 7, DEC-962 item 4, DEC-820 (c), MR-3 · **Basis:** `packages/P-PARALLEL-1.md`
+- **Decision:** option (b), with the owner's amendment.
+  1. The lead adds a tests worktree, `~/gov-os-worktrees/<W2>-tests` (branch `w2/<W2>-tests`, from the ticket branch's head). The test designer works and commits only there. The engineer works in the ticket's own worktree. Each worktree has one writer, and the two start at the same time from the spec and the KPIs.
+  2. **The amendment:** the test designer's retrieval uses the integration branch's store, never the ticket worktree's, so its searches can never surface the engineer's in-progress code.
+  3. When the tests are committed, the lead writes `.gov-runtime/scratch/lead/TESTS-READY`. At its next step, or when it has built, the engineer merges `w2/<W2>-tests` into its tree and runs the acceptance tests once, reading results only (through `gov accept` once W2-96 lands). If the engineer has already ended, the lead merges and a fresh engineer runs them once. The lead removes the tests worktree and branch before returning.
+- **How the amendment is applied (the orchestrator's reading, for the owner to overturn):** the main tree's own store goes stale at every record commit, since its head moves with them; at 23:58 it answered `FACET_UNAVAILABLE` ("stale"). So the integration branch's store lives in its own detached worktree, `~/gov-os-worktrees/W2-00-store`, at `w2/integrate`'s head. The CTO rebuilds it after code merges with `tools/refresh_integration_store.sh` (first build started 23:59). It never holds a ticket's in-progress code, and record commits do not make it stale. Test designers run `cd ~/gov-os-worktrees/W2-00-store && gov retrieve "<question>"`.
+- **Where it goes (DEC-851):** this register (DEC-962 marked); the prompt §0, §3, §6 and briefs A1 and A2 (v3.53); the common lead brief (the loop, rule 6's wording); the decisions-in-force list; the queued briefs (W2-96, W2-95, the nine resumes); W2-33's and W2-83b's tickets (role files and playbooks); RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.346 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-963 (P-PARALLEL-1 (b), amended: the test designer in its own worktree, retrieving only from the integration branch's store; the engineer merges its tests and runs them once). Next free id: DEC-964. |
