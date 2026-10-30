@@ -1,7 +1,10 @@
-"""W1-05 — the interim diff check is retired on record, and the switch-over waits for its dependencies.
+"""W1-05 — the interim diff check is retired on record.
 
 KPI success 2: "The interim operator diff check is retired and recorded as such".
-KPI failure 2: "The switch-over happens before W1-02..04 acceptance tests pass".
+
+KPI failure 2 ("The switch-over happens before W1-02..04 acceptance tests pass") was a one-time order at W1-05's
+close. Its case, which re-ran the three suites in a child test run, is retired by DEC-899 (P-IS-3 (a)): the suites
+run as themselves in every close (the README, "Retired").
 
 The record is ``governance/project/bootstrap.md``, the file W1-01 wrote the
 procedure in and the only record file in W1-05's ``allowed_paths``.
@@ -10,8 +13,6 @@ procedure in and the only record file in W1-05's ``allowed_paths``.
 from __future__ import annotations
 
 import re
-import subprocess
-import sys
 
 import w1_05_support as support
 
@@ -43,26 +44,4 @@ def test_the_operator_diff_check_is_recorded_as_retired():
     )
     assert any("W1-05" in block or "DAEO-m7u4" in block for block in dated), (
         f"{support.BOOTSTRAP_REL} does not tie the retirement to the switch-over ticket (W1-05 or DAEO-m7u4)"
-    )
-
-
-def test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over(switched_over):
-    """With the hooks wired, the acceptance tests of W1-02, W1-03 and W1-04 exist and pass.
-
-    This runs the three suites in a child pytest process, so it takes as long as they do.
-    """
-    directories = []
-    for wbs_id in support.DEPENDENCIES:
-        directory = support.REPO_ROOT / support.ACCEPTANCE_REL / wbs_id
-        assert directory.is_dir() and list(directory.glob("test_*.py")), (
-            f"the hooks are wired, but {support.ACCEPTANCE_REL}/{wbs_id}/ holds no acceptance tests"
-        )
-        directories.append(str(directory))
-    proc = subprocess.run(
-        [sys.executable, "-m", "pytest", *directories, "-q", "-x", "-p", "no:cacheprovider"],
-        cwd=str(support.REPO_ROOT), capture_output=True, text=True, timeout=1800, check=False,
-    )
-    tail = "\n".join(proc.stdout.strip().splitlines()[-15:])
-    assert proc.returncode == 0, (
-        "the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:\n" + tail
     )

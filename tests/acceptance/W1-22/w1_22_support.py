@@ -48,6 +48,8 @@ SEMANTIC = "gov.retrieval.semantic"
 STORE = "gov.store"
 
 CANARY_TEMPLATE_REL = "template/governance/kernel/canaries"
+# An adopted project holds the kernel under governance/kernel/, carried there by the copier template (DEC-579).
+CANARY_ADOPTED_REL = "governance/kernel/canaries"
 PATH_MAP_REL = "governance/project/path-map.yaml"
 CONFIG_REL = ".gitleaks.toml"
 TEMPLATE_CONFIG_REL = "template/.gitleaks.toml"
@@ -191,6 +193,8 @@ class Api:
             "PYTHONPATH": os.pathsep.join([str(SRC), *([str(self.site)] if self.site else [])]),
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
             "OLLAMA_HOST": ollama_host or self.dead_host,
+            # W2-54, DEC-798: the CPU-only embedder's address; the same stand-in (or the same dead port).
+            "GOV_QUERY_OLLAMA_HOST": ollama_host or self.dead_host,
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",
             **extra,
@@ -343,11 +347,24 @@ def adopt(project):
     shutil.copy2(REPO_ROOT / TEMPLATE_CONFIG_REL, Path(project) / CONFIG_REL)
 
 
-def build_fixture(project):
+def carry_kernel_canaries(project):
+    """The kernel's canary declarations, as an adopted project holds them (DEC-579), one named file per index."""
+    for index in INDEXES:
+        target = Path(project) / CANARY_ADOPTED_REL / f"{index}.yaml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / CANARY_TEMPLATE_REL / f"{index}.yaml", target)
+
+
+def build_fixture(project, kernel_canaries=False):
+    # revised after implementation (DEC-864 item 1; Rewrite-Reason: DEC-822 item 3, DEC-835): the canary runner
+    # reads its declarations from the project, never from its install path; ``kernel_canaries`` gives the fixture
+    # the kernel's declarations, as the copier template carries them. Off by default: every other fixture is as it was.
     project = Path(project)
     project.mkdir(parents=True, exist_ok=True)
     git(project, "init", "-q", "-b", "main")
     adopt(project)
+    if kernel_canaries:
+        carry_kernel_canaries(project)
     write(project, ".gitignore", ".gov-runtime/\n")
     write(project, "README.md", "# Test project\n\nA fixture for the W1-22 acceptance tests.\n")
     write(project, CANARY_FILE,
@@ -436,6 +453,9 @@ class OllamaStandIn:
                     reply = {"version": "0.35.0"}
                 elif route == "/api/tags":
                     reply = {"models": [model]}
+                elif route == "/api/ps":
+                    # W2-54, DEC-798: as the CPU-only embedder must, the model loaded wholly on the CPU.
+                    reply = {"models": [{**model, "size": 639150000, "size_vram": 0}]}
                 elif route == "/api/embed":
                     given = asked.get("input", "")
                     texts = [given] if isinstance(given, str) else list(given)

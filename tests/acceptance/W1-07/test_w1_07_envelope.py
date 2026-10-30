@@ -21,7 +21,13 @@ def test_every_command_returns_the_envelope(request, interface, args):
     # case time out.
     gov = request.getfixturevalue("small_gov" if args[0] in support.TREE_SENSITIVE_COMMANDS else "gov")
     run = gov(*args, "--json")
-    support.assert_envelope(run, interface, command=args[0])
+    try:
+        support.assert_envelope(run, interface, command=args[0])
+    except AssertionError as exc:
+        # Rewrite-Reason (W2-L409): the failure text is kept. The message starts with what the command printed,
+        # trimmed, so the cause of a red shows in a close's record; the full check and its record follow, chained.
+        first = (str(exc).splitlines() or ["the envelope check failed"])[0]
+        raise AssertionError(f"{first}\n{run.excerpt()}") from exc
 
 
 @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)

@@ -31,9 +31,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 import w1_27_support as support
+import w2_67b_support
 
 
 def _check_command_text(project):
@@ -74,17 +73,50 @@ def _run_check_command(project, sandbox, code_root=None):
 # The check command must not unconditionally exit 0
 # --------------------------------------------------------------------------- #
 
-def test_recovery_rebuild_command_not_unconditionally_exit_zero(project):
+# Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): the first case
+# read the declaration's text, which never holds 'exit(0)'; the second passed on any non-zero exit, a crash
+# included, with no clean store held green; the third never asserted the unmeasured report. Each case now runs the
+# declared command, with this worktree's code, on W1-27's tiny rebuild project of its own: a clean store (green), a
+# tampered one (red, the mismatch named), and none (unmeasured, not green).
+
+def _rebuilt_project(tmp_path, sandbox):
+    project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    w2_67b_support.rebuild(project, sandbox)
+    assert (project / ".gov-runtime" / "store.db").is_file(), "store.db does not exist after rebuild"
+    return project
+
+
+def _tamper(project):
+    conn = sqlite3.connect(str(project / ".gov-runtime" / "store.db"))
+    conn.execute(
+        "INSERT INTO records VALUES "
+        "('__tampered__.md', 'TAMPERED', 'test', 'active')"
+    )
+    conn.commit()
+    conn.close()
+
+
+def _outcome(result):
+    return f"exit code: {result.returncode}\nstdout: {result.stdout}\nstderr: {result.stderr}"
+
+
+def test_recovery_rebuild_command_not_unconditionally_exit_zero(sandbox, tmp_path):
     """The check command must not unconditionally exit 0 (CAP-38.b).
 
     A command that computes one digest and calls ``exit(0)`` without
     comparing two values is a fail-open: it cannot detect a mismatch
-    between the current store and a clean rebuild.
+    between the current store and a clean rebuild.  Run on the same
+    project, it exits 0 on the clean store and non-zero once it is
+    tampered with.
     """
-    cmd = _check_command_text(project)
-    has_unconditional_zero = "exit(0)" in cmd and "!=" not in cmd and "==" not in cmd and " if " not in cmd
-    assert not has_unconditional_zero, (
-        f"the check command unconditionally exits 0, making it a fail-open:\n{cmd}"
+    project = _rebuilt_project(tmp_path, sandbox)
+    clean = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
+    assert clean.returncode == 0, f"the check is not green on a clean store\n{_outcome(clean)}"
+    _tamper(project)
+    tampered = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
+    assert tampered.returncode != 0, (
+        f"the check command exits 0 on a tampered store as on a clean one, making it a fail-open\n"
+        f"{_outcome(tampered)}"
     )
 
 
@@ -92,7 +124,7 @@ def test_recovery_rebuild_command_not_unconditionally_exit_zero(project):
 # The check must detect a tampered store
 # --------------------------------------------------------------------------- #
 
-def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(cli, rebuild_gov, rebuild_project, sandbox, interface):
+def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(sandbox, tmp_path):
     """After tampering with store.db, the check must exit non-zero.
 
     A correct implementation deletes derived state (in a throwaway copy),
@@ -103,26 +135,19 @@ def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(cli, rebuild_g
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
     """
-    run = rebuild_gov("rebuild", "--json")
-    support.assert_envelope(run, interface, command="rebuild")
-    assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
+    project = _rebuilt_project(tmp_path, sandbox)
+    control = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
+    assert control.returncode == 0, f"the check is not green on the clean store (the control)\n{_outcome(control)}"
+    _tamper(project)
 
-    store_path = rebuild_project / ".gov-runtime" / "store.db"
-    assert store_path.is_file(), "store.db does not exist after rebuild"
-    conn = sqlite3.connect(str(store_path))
-    conn.execute(
-        "INSERT INTO records VALUES "
-        "('__tampered__.md', 'TAMPERED', 'test', 'active')"
-    )
-    conn.commit()
-    conn.close()
-
-    result = _run_check_command(rebuild_project, sandbox, code_root=cli)
+    result = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
 
     assert result.returncode != 0, (
         f"the recovery-rebuild check exits 0 on a tampered store — "
-        f"it does not detect a digest mismatch\n"
-        f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        f"it does not detect a digest mismatch\n{_outcome(result)}"
+    )
+    assert "Traceback" not in result.stderr and "mismatch" in result.stderr, (
+        f"the check does not name the digest mismatch (it crashed or said something else)\n{_outcome(result)}"
     )
 
 
@@ -130,17 +155,16 @@ def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(cli, rebuild_g
 # Unmeasured when no store exists
 # --------------------------------------------------------------------------- #
 
-def test_recovery_rebuild_check_reports_unmeasured_when_no_store(project, sandbox):
+def test_recovery_rebuild_check_reports_unmeasured_when_no_store(sandbox, tmp_path):
     """When no derived state exists, the check must report unmeasured cleanly (DEC-425).
 
     It must not crash with a Python traceback, and it must not exit 0
     (green).
     """
-    store = project / ".gov-runtime" / "store.db"
-    if store.exists():
-        store.unlink()
+    project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    assert not (project / ".gov-runtime" / "store.db").exists()
 
-    result = _run_check_command(project, sandbox)
+    result = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
 
     assert "Traceback" not in result.stderr, (
         f"the recovery-rebuild check crashes instead of reporting "
@@ -148,6 +172,8 @@ def test_recovery_rebuild_check_reports_unmeasured_when_no_store(project, sandbo
     )
     assert result.returncode != 0, (
         f"the check exits 0 (green) when there is no store — "
-        f"should be unmeasured, never green (DEC-425)\n"
-        f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        f"should be unmeasured, never green (DEC-425)\n{_outcome(result)}"
+    )
+    assert "unmeasured" in (result.stdout + result.stderr).lower(), (
+        f"the check does not report unmeasured when there is no store (DEC-425)\n{_outcome(result)}"
     )

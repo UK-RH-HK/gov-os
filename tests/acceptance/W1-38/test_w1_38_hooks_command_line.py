@@ -1,12 +1,22 @@
-"""W1-38 -- the template's rulesync hooks source: the command lines are the kernel template's form (DEC-608).
+"""W1-38 -- the template's rulesync hooks source: the three guard lines are the kernel template's, the four
+lifecycle lines DEC-608's plain form (DEC-608, as changed by DEC-917).
 
 DEC-608: "the seven command lines of the template's rulesync hooks source are the kernel template's form exactly,
 ``python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"``, with no prefix. ... a product's own package
 named ``gov`` under its ``src`` can no longer silence the containment check".
 
-No command line is written in this file. The kernel template's command lines are read from
-``template/governance/kernel/settings.json`` in each case; the form of the four entries that file does not hold is
-what its command line is with the program's file name exchanged (``w1_38_hooks_support.kernel_form``).
+DEC-917 (P-W2-65-4 (b)) changes DEC-608 to two forms, by line: "the three guard lines are held to the kernel
+template's exit-mapping form, and the four lifecycle lines to DEC-608's plain form
+``python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"``, each line exactly."
+
+Revised after implementation (Rewrite-Reason: DEC-917). Before, the form of the four lifecycle entries was read
+from the kernel template's command lines; since DEC-913 item 1 those are the exit-mapping form, which DEC-917
+gives the three guard lines only. Now:
+
+- under a guard event (PreToolUse, PostToolUse, PostToolUseFailure) the expected command line is read from
+  ``template/governance/kernel/settings.json`` in each case, the same string; no such line is written here;
+- under a lifecycle event (SessionStart, Stop, PreCompact, SubagentStop) it is DEC-608's plain form with the
+  entry's own program, the one literal of ``w1_38_hooks_support.PLAIN_FORM``, quoted from DEC-608.
 
 The generated settings are those rulesync 24.0.0 writes from the template's sources in the case's own temporary
 project. No real session is started.
@@ -24,8 +34,10 @@ import w1_38_support as support
 needs_rulesync = pytest.mark.needs_rulesync
 PROGRAMS = hooks.kernel_programs()
 EVENTS = hooks.source_events()
-KERNEL_EVENTS = tuple(event for event in EVENTS if event in hooks.guard_events(hooks.kernel_settings(), PROGRAMS))
-OTHER_EVENTS = tuple(event for event in EVENTS if event not in KERNEL_EVENTS)
+# Revised after implementation (Rewrite-Reason: DEC-917): the two groups are DEC-917's guard and lifecycle lines,
+# named in the support, no longer whatever the kernel template's settings hold and the rest.
+KERNEL_EVENTS = hooks.GUARD_EVENTS
+OTHER_EVENTS = hooks.LIFECYCLE_EVENTS
 
 
 @pytest.fixture()
@@ -50,21 +62,39 @@ def _one_generated(settings, event):
 
 
 # ===================================================================
-# The form, read from the kernel template's settings
+# The two forms: the guard lines' read from the kernel template's settings, the lifecycle lines' DEC-608's
 # ===================================================================
 
 def test_the_kernel_template_s_command_lines_share_one_form():
-    """The form the four other entries are held to is read from the kernel template's three command lines. That
-    reading stands only while the three are one form once the program's file name is taken out, and while the
-    form holds nothing else of a program's name."""
+    """The two forms the seven lines are held to (DEC-917), and what they stand on.
+
+    Revised after implementation (Rewrite-Reason: DEC-917). Before, this case held the kernel template's three
+    command lines to one form because the four other entries were held to it (DEC-608). Now: the kernel
+    template's settings register guard hook entries under the three guard events and no other, and the source
+    holds those three and the four lifecycle events and no other; the three guard lines still share one form
+    once the program's file name is taken out (the exit-mapping form of DEC-880 item 3 and DEC-913 item 1),
+    which holds nothing else of a program's name and is not DEC-608's plain form; the plain form the four
+    lifecycle lines are held to names no program and has one place for it."""
     forms = hooks.kernel_forms(PROGRAMS)
     assert sorted(forms) == sorted(KERNEL_EVENTS) and len(KERNEL_EVENTS) == 3 and len(OTHER_EVENTS) == 4, (
-        f"{hooks.KERNEL_SETTINGS_REL} registers guard hook entries under {sorted(forms)}; of the events of "
-        f"{hooks.SOURCE_REL} it holds {KERNEL_EVENTS} and not {OTHER_EVENTS}"
+        f"{hooks.KERNEL_SETTINGS_REL} registers guard hook entries under {sorted(forms)}; DEC-917's guard lines "
+        f"are {KERNEL_EVENTS}, its lifecycle lines {OTHER_EVENTS}"
+    )
+    assert sorted(EVENTS) == sorted(KERNEL_EVENTS + OTHER_EVENTS), (
+        f"{hooks.SOURCE_REL} holds entries under {sorted(EVENTS)}; DEC-917 names the three guard events "
+        f"{KERNEL_EVENTS} and the four lifecycle events {OTHER_EVENTS}"
     )
     form = hooks.kernel_form(PROGRAMS)
     assert form.count(hooks.PROGRAM_PLACE) == 1 and not hooks.own_programs(form, PROGRAMS), (
         f"the form read from {hooks.KERNEL_SETTINGS_REL} still names a program: `{form}`"
+    )
+    assert form != hooks.PLAIN_FORM, (
+        f"the guard command lines of {hooks.KERNEL_SETTINGS_REL} are DEC-608's plain form `{form}`, not the "
+        f"exit-mapping form DEC-917 holds them to (DEC-880 item 3, DEC-913 item 1)"
+    )
+    plain = hooks.PLAIN_FORM
+    assert plain.count(hooks.PROGRAM_PLACE) == 1 and not hooks.own_programs(plain, PROGRAMS), (
+        f"DEC-608's plain form as the support writes it names a program, or not one place for it: `{plain}`"
     )
     for event in KERNEL_EVENTS:
         command = hooks.kernel_command_line(event, PROGRAMS)
@@ -84,28 +114,28 @@ class TestGeneratedCommandLines:
     @needs_rulesync
     @pytest.mark.parametrize("event", KERNEL_EVENTS)
     def test_the_generated_command_line_is_the_kernel_template_s(self, generated_project, event):
-        """Compared, under one event both hold: the command line of the generated guard hook entry with the command
-        line of the kernel template's settings, as strings."""
+        """Compared, under one of the three guard events: the command line of the generated guard hook entry with
+        the command line of the kernel template's settings, as strings (DEC-917: its exit-mapping form)."""
         kernel = hooks.kernel_command_line(event, PROGRAMS)
         generated = _one_generated(support.load_settings(generated_project), event)
         assert generated == kernel, (
             f"{event}: {hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers the command line "
-            f"`{generated}`; {hooks.KERNEL_SETTINGS_REL} registers `{kernel}` (DEC-608: the kernel template's form "
-            f"exactly, with no prefix)"
+            f"`{generated}`; {hooks.KERNEL_SETTINGS_REL} registers `{kernel}` (DEC-917: a guard line is the kernel "
+            f"template's exit-mapping line exactly)"
         )
 
     @needs_rulesync
     @pytest.mark.parametrize("event", OTHER_EVENTS)
     def test_the_generated_command_line_has_the_kernel_template_s_form(self, generated_project, event):
-        """Compared, under one event the kernel template's settings do not hold: the command line of the generated
-        guard hook entry with the kernel template's command line in which only the program's file name is
-        exchanged for the entry's own program."""
+        """Compared, under one of the four lifecycle events: the command line of the generated guard hook entry
+        with DEC-608's plain form and the entry's own program, as strings. Revised after implementation
+        (Rewrite-Reason: DEC-917): it was compared with the kernel template's form, now the guard lines' only."""
         generated = _one_generated(support.load_settings(generated_project), event)
         expected = hooks.expected_command_line(event, generated, PROGRAMS, f"{hooks.GENERATED_REL}, {event}")
         assert generated == expected, (
             f"{event}: {hooks.GENERATED_REL}, generated from {hooks.SOURCE_REL}, registers the command line "
-            f"`{generated}`; in the form of {hooks.KERNEL_SETTINGS_REL} it is `{expected}` (DEC-608: the kernel "
-            f"template's form exactly, with no prefix)"
+            f"`{generated}`; in DEC-608's plain form it is `{expected}` (DEC-917: a lifecycle line is "
+            f"`{hooks.PLAIN_FORM_AS_WORDED}` exactly)"
         )
 
 
@@ -115,17 +145,20 @@ class TestGeneratedCommandLines:
 
 @pytest.mark.parametrize("event", EVENTS)
 def test_the_source_s_command_line_is_the_kernel_template_s_form(event):
-    """Compared: the command string of the source's entry under one event, as the file holds it, with the kernel
-    template's command line for that event, or for an event it does not hold with its form and the entry's own
-    program."""
+    """Compared: the command string of the source's entry under one event, as the file holds it, under a guard
+    event with the kernel template's command line for that event, under a lifecycle event with DEC-608's plain
+    form and the entry's own program. Revised after implementation (Rewrite-Reason: DEC-917): a lifecycle line
+    was compared with the kernel template's form, now the guard lines' only."""
     commands = hooks.source_command_lines()[event]
     assert len(commands) == 1, f"{hooks.SOURCE_REL} holds {len(commands)} entries under {event}; one is expected"
     expected = hooks.expected_command_line(event, commands[0], PROGRAMS, f"{hooks.SOURCE_REL}, {event}")
-    assert commands[0] == expected, (
-        f"{event}: {hooks.SOURCE_REL} holds the command line `{commands[0]}`; in the form of "
-        f"{hooks.KERNEL_SETTINGS_REL} it is `{expected}` (DEC-608: the kernel template's form exactly, with no "
-        f"prefix)"
-    )
+    if event in KERNEL_EVENTS:
+        rule = (f"in {hooks.KERNEL_SETTINGS_REL} it is `{expected}` (DEC-917: a guard line is the kernel "
+                f"template's exit-mapping line exactly)")
+    else:
+        rule = (f"in DEC-608's plain form it is `{expected}` (DEC-917: a lifecycle line is "
+                f"`{hooks.PLAIN_FORM_AS_WORDED}` exactly)")
+    assert commands[0] == expected, f"{event}: {hooks.SOURCE_REL} holds the command line `{commands[0]}`; {rule}"
 
 
 # ===================================================================

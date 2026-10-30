@@ -84,7 +84,10 @@ def read_merge(root: str, commit: str) -> MergeReading:
     holds every path that two parents both changed against their one merge
     base, whichever side's content the merge commit holds, also when both
     made the same change and the path differs from no parent (DEC-410,
-    DP-24; DEC-421).
+    DP-24; DEC-421).  This reading is unchanged by DEC-918: containment's
+    judgement, not ``read_merge``, leaves out the acceptance tests the
+    merge commit holds exactly as git's own merge of its parents writes
+    them (``containment._git_merged``).
 
     ``brought`` is the complement of ``own`` over every parent (DEC-410,
     DP-22): every path where the merge commit's content differs from

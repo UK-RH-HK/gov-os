@@ -64,8 +64,16 @@ FOLDER = support.EXPERIMENT_REL
 SCRATCH = ".gov-runtime/scratch/w1-46"
 SESSION_TIMEOUT_S = 420.0
 MARK = "w1-46-probe"
-NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET", "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_PROJECT_DIR",
-                 "CLAUDE_CODE_SSE_PORT")
+# Rewritten by DEC-784 (owner, 2026-10-18, P-W2-34 (a)): the sessions launch with no CLAUDE* variable in the
+# environment (CLAUDECODE, CLAUDE_CODE_* and every other name beginning CLAUDE), not only a fixed list of them.
+NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
+NOT_INHERITED_PREFIX = "CLAUDE"
+
+
+def inherited(environ):
+    """The caller's environment less ``GOV_ROLE``, ``GOV_TICKET`` and every name beginning ``CLAUDE`` (DEC-784)."""
+    return {key: value for key, value in environ.items()
+            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
 
 
 @dataclass(frozen=True)
@@ -112,7 +120,7 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
                   .replace("@RESULTS@", results_rel))
     before = {rel: (project / rel).read_text(encoding="utf-8")
               for rel in ("README.md", "experiments/spikes/exp-900/data.txt", *watch)}
-    env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
+    env = inherited(os.environ)
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     run = support.run_gov(project, sandbox, "launch", role, support.TICKET_OF[role], "--",
                           "-p", prompt.replace("@OUTSIDE@", str(outside)).replace("@ROOT@", str(project)),
@@ -280,7 +288,8 @@ uv --no-cache pip install --offline --no-index --target '@OUTSIDE@/site' {FOLDER
 echo "outside_install=$?" >> "$OUT"
 echo "mktemp=$(mktemp)" >> "$OUT"
 for host in {' '.join(RESEARCH_HOSTS)} example.com; do
-  code=$(curl -s -o /dev/null -m 20 -w '%{{http_code}}' "https://$host/"); echo "net_$host=$? $code" >> "$OUT"
+  answer=$(curl -s -o /dev/null -m 20 -w '%{{http_connect}} %{{http_code}}' "https://$host/"); exit=$?
+  echo "net_$host=$exit $answer $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$OUT"
 done
 echo "end=1" >> "$OUT"
 """
@@ -328,10 +337,45 @@ def test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reporte
     )
 
 
+# Rewrite-Reason (W2-57, I1 F-1, DEC-892 item 3): each host is asked through the session's own route (the sandbox's
+# proxy) at the time the case's session runs, and a host the session cannot reach fails the case with a reason that
+# names the network: told apart from the sandbox refusing the host (the rule) and from load (a session that never
+# ran its probe fails every case with that reason, above). Never a skip, never a pass.
+PROXY_REFUSED = "403"   # the sandbox's proxy answers a CONNECT to a domain off its list with 403 (measured 2026-10-27)
+CURL_MEANINGS = {
+    "6": "the host's name could not be resolved",
+    "7": "no connection could be made",
+    "28": "no answer within curl's 20 s",
+    "35": "the TLS handshake failed",
+    "52": "the server answered nothing",
+    "56": "the connection broke while receiving (for a CONNECT: the proxy's answer)",
+}
+
+
+@dataclass(frozen=True)
+class Connection:
+    exit_code: str   # curl's exit code ("" when the probe left no line for the host)
+    connect: str     # the proxy's answer to the CONNECT ("000" when there was none)
+    status: str      # the HTTP status of the host's answer ("000" when there was none)
+    when: str        # when the probe asked, in UTC
+
+
 def _connection(session, host):
-    """What ``curl`` left for ``host``: its exit code and the HTTP status of the answer (000 when there was none)."""
-    exit_code, _, status = session.results.get(f"net_{host}", "").partition(" ")
-    return exit_code, status
+    """What ``curl`` left for ``host``: its exit code, the proxy's CONNECT answer, the HTTP status and the time."""
+    parts = session.results.get(f"net_{host}", "").split()
+    return Connection(*(parts + [""] * 4)[:4])
+
+
+def _why_not_reached(host, found):
+    """The reason a host was not reached, in words: the sandbox's refusal, or the network at that time."""
+    if found.connect == PROXY_REFUSED:
+        return (f"the sandbox's proxy refused {host} (CONNECT {found.connect}): the research allowlist does not "
+                f"accept it; this is the rule, not the network")
+    meaning = CURL_MEANINGS.get(found.exit_code, "curl failed")
+    return (f"the network: through the session's own route (the sandbox's proxy), at {found.when or 'an unknown time'},"
+            f" {host} could not be reached: curl ended with {found.exit_code or 'no line'} ({meaning}), the proxy "
+            f"answered the CONNECT with {found.connect or 'nothing'}, HTTP status {found.status or 'none'}. This is "
+            f"the network at the time the session ran, not load and not the allowlist")
 
 
 @pytest.mark.parametrize("host", RESEARCH_HOSTS)
@@ -343,16 +387,23 @@ def test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_all
     for the failure message. ``docs.readthedocs.io`` stands for the subdomain
     entry of ``readthedocs.io``.
     """
-    exit_code, status = _connection(research, host)
-    assert exit_code == "0", (
-        f"a launched research session got no answer from {host}: curl ended with {exit_code!r}, HTTP status {status!r}"
+    found = _connection(research, host)
+    assert found.exit_code == "0", (
+        f"a launched research session got no answer from {host}: {_why_not_reached(host, found)}"
     )
 
 
 def test_the_research_allowlist_refuses_a_domain_that_is_not_on_it(research):
-    exit_code, status = _connection(research, "example.com")
-    assert exit_code not in ("", "0"), (
-        f"the research session connected to example.com: curl ended with {exit_code!r}, HTTP status {status!r}"
+    found = _connection(research, "example.com")
+    assert found.exit_code not in ("", "0"), (
+        f"the research session connected to example.com: curl ended with {found.exit_code!r}, "
+        f"HTTP status {found.status!r}"
+    )
+    # Rewrite-Reason (W2-57, I1 F-1): the refusal is the sandbox's own; a connection that failed on the network
+    # shows nothing of the rule and no longer passes the case.
+    assert found.connect == PROXY_REFUSED, (
+        "example.com was not reached, but the sandbox's proxy did not refuse it: "
+        + _why_not_reached("example.com", found)
     )
 
 

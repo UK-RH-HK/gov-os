@@ -1,6 +1,11 @@
-"""W1-02 — more spellings of a read of the settings file and of the held-out file (DEC-508, DEC-525).
+"""W1-02 — more spellings of a read of the settings file and of the held-out file: allowed under Policy 2.
 
-The order stands as ``test_w1_02_protected_reads.py`` states it: the guard
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): Policy 2
+(DEC-820) opens reads of both files, so every spelling below that was held as
+refused (DEC-508, DEC-525) is now held as allowed, by the same actor; the cases
+of what keeps working beside the files are unchanged. Before Policy 2:
+
+The order stood as ``test_w1_02_protected_reads.py`` states it: the guard
 refuses any agent tool call that reads either file; a read is a file tool whose
 expanded targets (globs included) take the file in, or a shell command whose
 file targets, once expanded, include the file. A review found spellings of such
@@ -80,27 +85,27 @@ BETWEEN = [(name, depth) for name in FILES
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(SEARCHES))
-def test_a_search_whose_glob_names_the_file_is_refused(guarded, form, name):
+def test_a_search_whose_glob_names_the_file_is_allowed_under_policy_2(guarded, form, name):
     """Form 1 (and form 4 for a tool's glob): a glob with no wildcard is still a glob that takes the file in."""
     result = protected.ask(guarded, "Grep", SEARCHES[form](guarded, name), WIDEST)
-    protected.assert_refused_by_rule(result, f"Grep {form} on the stand-in {name} by the {WIDEST}")
+    protected.assert_allowed(result, f"Grep {form} on the stand-in {name} by the {WIDEST}")
 
 
 @pytest.mark.parametrize("name,depth", BETWEEN, ids=[f"{name}-{depth}-above" for name, depth in BETWEEN])
-def test_a_search_from_a_folder_above_with_the_bare_name_as_its_glob_is_refused(guarded, name, depth):
+def test_a_search_from_a_folder_above_with_the_bare_name_as_its_glob_is_allowed_under_policy_2(guarded, name, depth):
     """Form 1: the same search from a folder between the root and the folder that holds the file."""
     between = "/".join(guarded.folder_rel(name).split("/")[:depth])
     tool_input = {"pattern": ".", "path": str(guarded.project / between), "glob": _base(guarded, name)}
     result = protected.ask(guarded, "Grep", tool_input, WIDEST)
-    protected.assert_refused_by_rule(result, f"Grep from a folder above the stand-in {name} with its bare name")
+    protected.assert_allowed(result, f"Grep from a folder above the stand-in {name} with its bare name")
 
 
 @pytest.mark.parametrize("name", FILES)
-def test_a_listing_glob_with_braces_around_the_name_is_refused(guarded, name):
+def test_a_listing_glob_with_braces_around_the_name_is_allowed_under_policy_2(guarded, name):
     """Form 4 for a file tool: Glob expands braces, so the pattern takes the file in."""
     pattern = guarded.folder_rel(name) + "/{" + _base(guarded, name) + ",w1-02-other.md}"
     result = protected.ask(guarded, "Glob", {"pattern": pattern}, WIDEST)
-    protected.assert_refused_by_rule(result, f"Glob with braces around the name of the stand-in {name}")
+    protected.assert_allowed(result, f"Glob with braces around the name of the stand-in {name}")
 
 
 # --------------------------------------------------------------------------
@@ -149,29 +154,29 @@ FOR_ANOTHER_ROLE = ("redirect-glued-after-a-semicolon", "backticks")
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(COMMANDS))
-def test_a_shell_spelling_of_a_read_is_refused(guarded, form, name):
+def test_a_shell_spelling_of_a_read_is_allowed_under_policy_2(guarded, form, name):
     """Forms 2 to 8: the shell opens the file in each of these, whatever the role may write."""
     result = _ask_bash(guarded, name, COMMANDS[form])
-    protected.assert_refused_by_rule(result, f"Bash {form} on the stand-in {name} by the {WIDEST}")
+    protected.assert_allowed(result, f"Bash {form} on the stand-in {name} by the {WIDEST}")
 
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", FOR_ANOTHER_ROLE)
-def test_a_shell_spelling_of_a_read_is_refused_for_another_role(guarded, form, name):
+def test_a_shell_spelling_of_a_read_is_allowed_for_another_role(guarded, form, name):
     """Every role: the existing cases hold the rule for eleven actors; two of these forms for one more."""
     result = _ask_bash(guarded, name, COMMANDS[form], OTHER_ROLE)
-    protected.assert_refused_by_rule(result, f"Bash {form} on the stand-in {name} by the {OTHER_ROLE}")
+    protected.assert_allowed(result, f"Bash {form} on the stand-in {name} by the {OTHER_ROLE}")
 
 
 @pytest.mark.parametrize("name", FILES)
-def test_a_search_with_no_path_in_a_session_that_stands_in_the_folder_is_refused(guarded, name):
+def test_a_search_with_no_path_in_a_session_that_stands_in_the_folder_is_allowed_under_policy_2(guarded, name):
     """Form 6 without the ``cd``: the hook input says where the command runs (``cwd``)."""
     role, ticket, subagent = protected.ACTORS[WIDEST]
     data = support.payload(guarded.project, "Bash", support.bash_tool_input("grep -r VALUE"), guarded.sandbox,
                            subagent)
     data["cwd"] = str(guarded.folder(name))
     result = support.run_hook_raw(guarded.project, json.dumps(data), guarded.sandbox, role, ticket)
-    protected.assert_refused_by_rule(result, f"`grep -r VALUE` in the folder of the stand-in {name}")
+    protected.assert_allowed(result, f"`grep -r VALUE` in the folder of the stand-in {name}")
 
 
 # --------------------------------------------------------------------------

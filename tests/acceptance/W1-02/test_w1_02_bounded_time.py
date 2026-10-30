@@ -133,12 +133,18 @@ MANY_PAIRS_THAT_TAKE_A_FILE_IN = {
 
 @pytest.mark.parametrize("name", rnd.FILES)
 @pytest.mark.parametrize("shape", sorted(MANY_PAIRS_THAT_TAKE_A_FILE_IN))
-def test_a_glob_of_many_star_pairs_that_takes_a_protected_file_in_is_refused_within_the_bound(world, shape, name):
-    """Point 3: "when the input takes in either file, or the rule cannot tell within its bound, a refusal"."""
+def test_a_glob_of_many_star_pairs_that_takes_a_protected_file_in_is_decided_within_the_bound(world, shape, name):
+    """Point 3, rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3; the lead's reading of P-W2-58-TD-4 (b)).
+
+    These globs lie within the bound: the guard reads them in time, and before Policy 2 refused them as reads of the
+    two files. Under Policy 2 they are decided in time on their merits, and take in only the two files, which are open:
+    allowed within the bound, and the hook's output carries nothing of the files. An input *beyond* the bound stays
+    refused by the bound (the cases below and in ``test_w1_02_brace_bound.py``).
+    """
     tool_name, tool_input, cwd = MANY_PAIRS_THAT_TAKE_A_FILE_IN[shape](world, name)
     result = rnd.ask_timed(world, tool_name, tool_input, cwd=cwd)
     what = f"the glob of {PAIRS} star pairs '{shape}' for the stand-in {name}"
-    rnd.assert_refused_in_time(result, what)
+    rnd.assert_allowed_in_time(result, what)
     rnd.assert_carries_none_of(result, world.secrets("own", name) + (GLUED[:40], SLASHED[:40]), what)
 
 

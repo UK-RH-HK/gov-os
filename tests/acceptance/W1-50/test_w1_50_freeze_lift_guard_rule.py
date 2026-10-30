@@ -196,5 +196,10 @@ def test_the_rule_leaves_ordinary_work_alone(freeze_project, freeze_sandbox, nam
     role, ticket, command = ORDINARY[name]
     (freeze_project / NOTES).write_text("notes\nthe owner lifts with: gov pause --off\n", encoding="utf-8")
     result = support.guard_bash(freeze_project, freeze_sandbox, command, role=role, ticket=ticket)
+    if name == "rg-for-the-phrase":
+        # Rewritten by W2-58 (DEC-821 item 1; Policy 2 (c), DEC-820): the search takes in ``tests/``, which holds the
+        # engineer's own ticket's acceptance tests: refused for (c), not by the freeze-lift rule.
+        assert result.decision == "deny", f"`{command}` by {role} was not refused (Policy 2 (c)): {result.describe()}"
+        return
     assert result.decision == "allow" and result.returncode == 0, \
         f"`{command}` by {role} was not let through: {result.describe()}"

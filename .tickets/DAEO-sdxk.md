@@ -23,6 +23,8 @@ allowed_paths:
 - docs/plan/WAVE_2_WBS.md
 - docs/DECISION_REGISTER.md
 - .gov-runtime/scratch/orchestrator/**
+- governance/project/orchestration/**
+- docs/assessment/**
 kpis:
   success:
   - Every main-session commit in Wave 2 that belongs to no ticket carries W2-00's id; echo "$GOV_TICKET" in the main session names W2-00; W2-00 closes last, with gov close as a coordination ticket after

@@ -68,18 +68,21 @@ class TestCanaryRunner:
             assert "passed" in report, f"the {index} report has no 'passed' field: {report}"
             assert "status" in report, f"the {index} report has no 'status' field: {report}"
 
+    # revised after implementation (DEC-864 item 1; Rewrite-Reason: DEC-822 item 3, DEC-835): the runner reads the
+    # canary declarations from the project, so these two cases index ``adopted_base``, which carries the kernel's
+    # declarations under governance/kernel/canaries/ as an adopted project does (DEC-579).
     @pytest.mark.needs("gitleaks", "sqlite_vec")
-    def test_lexical_canary_hits_after_reindex(self, canary_api, base, ollama, tmp_path):
+    def test_lexical_canary_hits_after_reindex(self, canary_api, adopted_base, ollama, tmp_path):
         """After indexing a project with representative content, lexical canaries pass [CAP-17.c]."""
-        root = _indexed(base, canary_api, ollama, tmp_path)
+        root = _indexed(adopted_base, canary_api, ollama, tmp_path)
         result = canary_api.run_canaries(root, env=canary_api.scratch_env(ollama.host))
         lex = result["lexical"]
         assert lex["passed"] is True, f"lexical canaries failed after reindex: {lex}"
 
     @pytest.mark.needs("gitleaks", "sqlite_vec")
-    def test_semantic_canary_hits_after_reindex(self, canary_api, base, ollama, tmp_path):
+    def test_semantic_canary_hits_after_reindex(self, canary_api, adopted_base, ollama, tmp_path):
         """After indexing a project with representative content, semantic canaries pass [CAP-17.c]."""
-        root = _indexed(base, canary_api, ollama, tmp_path)
+        root = _indexed(adopted_base, canary_api, ollama, tmp_path)
         result = canary_api.run_canaries(root, env=canary_api.scratch_env(ollama.host))
         sem = result["semantic"]
         assert sem["passed"] is True, f"semantic canaries failed after reindex: {sem}"

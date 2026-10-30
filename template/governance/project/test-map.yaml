@@ -1,0 +1,40 @@
+# The test map (DEC-896 item 2): what a scoped close runs for a change (DEC-880 item 2, DEC-889 items 1 and 2).
+# Schema: governance/kernel/schemas/test-map.schema.json. Patterns are read as allowed_paths are:
+# ** matches any characters including /, * any characters except /, the rest literal, the whole path.
+# A changed path under the shared core, a changed path nothing places, and a missing or invalid map run the
+# full regression. The project fills in its own lists; until then every change to the shared core runs everything.
+version: 1
+
+# A change here runs the full regression: the project's widest-reaching code and the two maps.
+shared_core:
+  - "governance/project/path-map.yaml"
+  - "governance/project/test-map.yaml"
+  - "governance/kernel/**"
+
+# Records only (DEC-891's places): a matching path is placed and selects nothing by itself. Name records, never code.
+record_only:
+  - ".tickets/**.md"
+  - "docs/checkpoints/**.md"
+  - "docs/close/**.md"
+  - "docs/close/nightly/*.json"
+  - "docs/probes/**.md"
+  - "docs/DECISION_REGISTER.md"
+  - "governance/project/orchestration/**.md"
+
+# The tests that read a record-only path, directly or by scanning the tree: run on every close.
+record_reading: []
+
+# Targets run on every close, whatever changed.
+every_close: []
+
+# What imports and coverage cannot see: {paths: [patterns], suites: [targets], why: <text>}.
+couplings: []
+
+# Paths that are test inputs, not records.
+test_inputs:
+  - "fixtures/**"
+
+# pytest-timeout's signal method, per test, in seconds.
+per_test_timeout: 900
+# The parallel run's pytest-xdist --dist mode.
+distribution: load

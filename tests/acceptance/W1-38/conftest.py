@@ -20,8 +20,10 @@ def pytest_configure(config):
 
 @pytest.fixture(scope="session")
 def rulesync_bin():
-    """The rulesync binary path, or skip if not installed."""
-    ver = support.rulesync_version()
+    """The rulesync binary path. Skips only when rulesync is truly absent (``RULESYNC_BIN`` names no
+    file). A rulesync that is there and gives no answer within the probe's limit fails every case that
+    needs it, naming the timeout: a timeout is not "not installed" (DEC-892 item 2)."""
+    ver = support.rulesync_version()   # raises, naming the timeout, when rulesync is there and does not answer
     if ver is None:
         pytest.skip("rulesync is not installed")
     return support.RULESYNC_BIN

@@ -7,7 +7,10 @@ DEC-410 (delegated, stricter-only) decides the packages DP-21 to DP-28. Four of 
 - **DP-27.** The same for ``tests/acceptance/**``: a merge commit's own change there is a finding whatever its
   trailers, a test designer's included.
 - **DP-24** (with DP-26). Under ``tests/acceptance/**``, a path that more than one parent changed against the
-  merge base is the merge commit's own, whichever side's content it holds.
+  merge base is the merge commit's own, whichever side's content it holds. *Changed by DEC-918*
+  (Rewrite-Reason: DEC-918): for the check and ``judge_commits`` it is not the merge commit's own change when
+  the merge commit holds exactly git's own merge of it (``git merge-tree --write-tree``, no conflict on it), as
+  ``changed_on_both_sides_in_different_parts`` makes it; ``read_merge``'s reading is unchanged.
 - **DP-22.** ``brought`` is the complement of ``own`` over every parent: each path where the merge commit
   differs from some parent and that is not its own.
 
