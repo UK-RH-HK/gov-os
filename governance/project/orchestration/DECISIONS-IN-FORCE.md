@@ -10,9 +10,11 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
 - DEC-945: no paid notifier and no app install.
 - DEC-105: a finding against a closed specification gets three costed options: apply now, defer or re-baseline.
-- DEC-953 item 10: until the owner approves the updated WBS and plan, only items 2 to 5 and memory's quick wins go ahead.
+- DEC-954: the plan is approved, with amendments. The order ahead (RESUME HERE): ACT 1, the five-rule guard; then the 10 built tickets and the streams; the roles spec first (W2-60b, W2-11, W2-33 and W2-83 wait for its approval); memory for this repository and any adopted repository; the roles; ACT 2, one re-pin; the three layers in new sessions.
+- DEC-954 Q1: EXAMIN's copy starts only when K9's entry criteria are met, never because a date arrived. Dates are weekly estimates.
+- DEC-954 Q13: the master orchestrator is the CTO; each sub-orchestrator is a Senior Engineer for its stream, with a coordination ticket each, and the CTO's watchers track their state.
 - DEC-946 items 6 and 8: nothing else starts (new ideas go to `WAVE_3_PARKING.md`), and lead launches are staggered by 1 to 2 minutes.
-- DEC-953 item 8: three-layer orchestration is planned now. It starts on the owner's approval, once memory and the roles have landed.
+- DEC-953 item 8, DEC-954 Q8: three-layer orchestration starts after ACT 2, once memory, the roles and its foundations have landed.
 
 ## Closes and testing
 - DEC-953 item 1: a ticket closes on the audit's 10 practices (AUDIT-GOV-FEATURES-1 §5), nothing more. No Gov OS feature gates this repo, and nothing is deleted from the product.
@@ -25,7 +27,8 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
   - the close runs the same set on the merged commit in a clean worktree;
   - the nightly runs everything.
   Governance files never widen a selection.
-- DEC-905, DEC-906 item 3: one full or close run at a time, under one mutex (`/tmp/gov-os-verify.lock`), with `tmp_path_retention_policy=failed`.
+- DEC-905, DEC-906 item 3, DEC-954: one full or close run at a time, under one lock (`/tmp/gov-os-verify.lock`; leads through `verify_lock.sh`, closes first), with `tmp_path_retention_policy=failed`.
+- DEC-954 (P-W2-64-1): a test revision the owner names is checked by a scoped run of the corrected tests; the nightly covers the rest.
 - DEC-137, DEC-498, DEC-413, DEC-916: a FULL ticket gets a fresh review before merge, at most two rounds (two per declared round). It is re-reviewed only if a later merge resolved conflicts in reviewed files.
 - DEC-801 to 803, DEC-808, DEC-809: findings are judged by ADR-0001's two questions, each with its two lines. A "no" becomes a row, never a round. Fixes ride the next resume.
 - DEC-221, DEC-951 item 5: tests are proportional to the profile.
@@ -33,9 +36,10 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-944 items 2 and 3: readiness is checked by hand at claim until W2-82. Playbooks per stream.
 
 ## The guard
-- DEC-953 item 2 (narrowing DEC-820): four rules only:
+- DEC-953 item 2, DEC-954 (narrowing DEC-820): five rules only, switched on by ACT 1:
   - an implementer never writes acceptance tests;
-  - no reads of the hidden half of an evaluation set, or of the held-out material;
+  - independent reviewers and auditors write only their own review and audit records;
+  - no reads of the hidden half of an evaluation set (from any worktree), or of the held-out material;
   - no reads of secrets, and secrets are never printed;
   - no installs without the owner.
 - DEC-083, DEC-040: the owner approves and makes every install, and it is recorded in the tool registry.
