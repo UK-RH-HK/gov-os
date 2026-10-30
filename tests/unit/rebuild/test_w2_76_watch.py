@@ -13,6 +13,7 @@ import json
 import os
 import threading
 import time
+from datetime import datetime
 
 import pytest
 
@@ -116,5 +117,8 @@ def test_a_rebuild_s_result_times_every_stage_and_keeps_its_keys(tmp_path, monke
     assert list(result["timing"]) == ["record_s", "lexical_s", "secrets_s", "semantic_s", "codeintel_s",
                                       "compaction_s", "total_s"]
     assert result["timing"]["semantic_s"] == 0.0 and result["slow"] is False and result["watchdog_faults"] == []
-    assert result["lock"]["held_by_caller"] is False and result["lock"]["released_at"] >= result["lock"]["taken_at"]
+    assert result["lock"]["held_by_caller"] is False
+    span = (datetime.fromisoformat(result["lock"]["released_at"])
+            - datetime.fromisoformat(result["lock"]["taken_at"])).total_seconds()
+    assert abs(span - result["timing"]["total_s"]) <= 0.4  # one clock reading and the monotonic time since
     assert (tmp_path / result["record"]).is_file()

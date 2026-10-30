@@ -28,7 +28,7 @@ import sys
 import threading
 import time
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -168,7 +168,7 @@ def take(path: str) -> tuple[int | None, dict]:
             part["holder"] = _holder(holders)
             if _inherited(fd) or set(holders) & _ancestors():
                 os.close(fd)
-                return None, part | {"held_by_caller": True, "taken_at": _now()}
+                return None, part | {"held_by_caller": True}
             holder = part["holder"]
             said = NOT_KNOWN if holder == NOT_KNOWN else f"held by pid {holder['pid']} ({holder['cmdline']})"
             print(f"rebuild: waiting for the rebuild lock {path}, {said}", file=sys.stderr, flush=True)
@@ -179,7 +179,7 @@ def take(path: str) -> tuple[int | None, dict]:
         os.close(fd)
         raise _refused(f"the rebuild lock {path} cannot be taken: {exc.strerror}",
                        {"lock": path, "error": str(exc)}) from None
-    return fd, part | {"taken_at": _now()}
+    return fd, part
 
 
 class _Spans:
@@ -215,7 +215,10 @@ class Watch:
 
     def __init__(self, root: Path, slow_after_s: float, lock: dict) -> None:
         self.root, self.slow_after_s, self.lock = Path(root), slow_after_s, lock
+        # One reading of the clock, with the lock taken: ``released_at`` is it plus the monotonic time since, so the
+        # span is ``total_s`` even where the system clock is stepped during the rebuild.
         self.started, self.started_at = time.monotonic(), datetime.now(timezone.utc)
+        self.lock["taken_at"] = self.started_at.isoformat(timespec="microseconds")
         self.done: dict = {}
         self.running: list = []
         self.secrets, self.untimed = _Spans(), None
@@ -375,7 +378,7 @@ class Watch:
         self.total = time.monotonic() - self.started
         if self.total > self.slow_after_s:
             self._flag()
-        self.lock["released_at"] = _now()
+        self.lock["released_at"] = (self.started_at + timedelta(seconds=self.total)).isoformat(timespec="microseconds")
         self.write()
         return {"timing": self.timing(), "lock": dict(self.lock), "slow": self.slow,
                 "slow_after_s": self.slow_after_s, "record": RECORD_REL, "watchdog_faults": list(self.faults)}
