@@ -6,8 +6,9 @@ profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
 ``GOV_TICKET`` and a per-session temp directory, removed when the session ends
 (DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
 (DEC-392). The session starts as its role: the role file's text and its named
-skills appended, its default model and effort, no compaction threshold, and one
-launch record written before it starts (W2-60a). Nothing fails open: whatever
+skills appended, its default model and effort, no compaction threshold, the user
+settings' ask and deny rules kept, and one launch record written before it starts
+(W2-60a). Nothing fails open: whatever
 cannot be read or is not of the stated shape refuses the launch.
 
 No message of this module carries a held-out path.
@@ -76,9 +77,15 @@ SET_ITSELF = {
     "--append-system-prompt-file": "the launcher appends the role's text itself (DEC-826 Q1)",
     "--session-id": "the launcher gives the session its id and keys the launch record by it",
     "--autocompact": "no launch sets a compaction threshold (DEC-838)",
+    "--fallback-model": "the session runs on the role's model alone, never on another (DEC-839 item 1)",
+    "--chrome": "a launched session loads no connector, and Chrome's runs outside the sandbox (DEC-826 Q5)",
+    "--ide": "a launched session loads no connector, and an IDE's runs outside the sandbox (DEC-826 Q5)",
+    "--system-prompt-snapshot": "the session's prompt is the CLI's default with the role's text appended (DEC-826 Q1)",
 }
 RESUME_RULE = "a launch resumes a session by its id (--resume <session id>), so that the record can name it"
 COMPACT_ENV, COMPACT_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW", "autoCompactWindow"
+# W2-60a: the other names under env by which the CLI takes a compaction threshold.
+COMPACT_ENVS = (COMPACT_ENV, "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS")
 _UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
 
@@ -265,6 +272,14 @@ def _check_repository_settings(root: Path) -> None:
         if not isinstance(env, dict) or COMPACT_ENV in env or COMPACT_KEY in data:
             raise _refuse(f"{rel} sets {COMPACT_KEY} or env.{COMPACT_ENV}, or carries an env that is not a map: no "
                           f"launch sets a compaction threshold (DEC-838)")
+        models = data.get("modelSettings", {})
+        if not isinstance(models, dict) or not all(isinstance(each, dict) for each in models.values()):
+            raise _refuse(f"{rel} carries a modelSettings that is not a map of maps, so it cannot be shown to set no "
+                          f"compaction threshold (DEC-838)")
+        thresholds = [f"env.{key}" for key in COMPACT_ENVS if key in env] + \
+            [f"modelSettings.{model}.{COMPACT_KEY}" for model, each in models.items() if COMPACT_KEY in each]
+        if thresholds:
+            raise _refuse(f"{rel} sets {thresholds[0]}: no launch sets a compaction threshold (DEC-838)")
         wired = wired or (rel == REPO_SETTINGS[0] and _guard_wired(data))
     if not wired:
         raise _refuse(f"{REPO_SETTINGS[0]} does not register the guard ({GUARD_HOOK}) as a PreToolUse hook for "
@@ -377,6 +392,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
         raise _refuse(f"the CLI arguments carry --model {given['model']}, which is not the {role}'s model "
                       f"{loaded['model']} (DEC-839 item 1)")
     model, effort = loaded["model"], given["effort"] or loaded["effort"]
+    user_rules = roles.user_rules(Path.home())  # the ask and deny rules --setting-sources project,local would drop
     ticket_class = (_load_ticket(str(root), ticket_id) or {}).get("class")
     records = record.folder(root)
     settings["permissions"]["deny"] += [rule for rule in record.deny_rules(records)
@@ -415,6 +431,10 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
         settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
         settings["env"]["CLAUDE_CODE_SUBAGENT_MODEL"] = model  # DEC-839 item 3
         settings["autoMemoryEnabled"] = False  # DEC-826 Q5: no model-side memory
+        # The user's ask and deny rules only: never an allow rule or a mode, which would take a protection away.
+        settings["permissions"]["deny"] = list(dict.fromkeys(settings["permissions"]["deny"] + user_rules["deny"]))
+        if user_rules["ask"]:
+            settings["permissions"]["ask"] = list(dict.fromkeys(user_rules["ask"]))
         settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
         env = {**os.environ, **settings["env"]}
         if not state["ended"]:  # a signal that came first: no session is started

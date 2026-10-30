@@ -2,8 +2,10 @@
 
 The role file ``template/governance/kernel/roles/<role>.md`` carries a version
 line and a default line (model and effort, nothing else), and may name its skills.
-The skills the session can load are the project's copies under ``.claude/skills/``;
-each is described from that copy. The text appended to the session's prompt is the
+The skills the session can load are the project's copies under ``.claude/skills/``
+and its command files under ``.claude/commands/``; each is described from that copy.
+The user settings file's ask and deny rules are read here for the launcher to carry
+into the session's settings (``--setting-sources project,local`` drops it). The text appended to the session's prompt is the
 role file's bytes, then each named skill's ``SKILL.md``, in the order named.
 Whatever cannot be read or is not of the stated form refuses the launch.
 """
@@ -11,6 +13,7 @@ Whatever cannot be read or is not of the stated form refuses the launch.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import stat
@@ -23,6 +26,8 @@ from gov.guard.heldout import load_yaml_unique
 
 ROLES_REL = "template/governance/kernel/roles"
 SKILLS_REL = ".claude/skills"
+COMMANDS_REL = ".claude/commands"  # each Markdown file loads as a skill too
+USER_SETTINGS_REL = ".claude/settings.json"  # under the caller's home; --setting-sources project,local drops it
 EFFORTS = ("low", "medium", "high", "xhigh", "max")  # the CLI's --effort values
 NO_VERSION = "no version"  # as gov close writes it
 VERSION_HEAD, DEFAULT_HEAD, SKILLS_HEAD = "- **Version:**", "- **Launch default:**", "- **Skills:**"
@@ -119,6 +124,63 @@ def _skills(root: Path) -> dict[str, dict]:
     return skills
 
 
+def _raise(error: OSError) -> None:
+    raise error
+
+
+def _commands(root: Path) -> list[dict]:
+    """The project's command files, which the session loads as skills: ``.claude/commands/<name>.md`` as ``<name>``,
+    ``<namespace>/<name>.md`` as ``<namespace>:<name>``; each described from that file, as a skill folder is."""
+    base = root / COMMANDS_REL
+    if not os.path.lexists(base):
+        return []
+    if base.is_symlink() or not base.is_dir():
+        raise _refuse(f"{COMMANDS_REL} is a link or not a folder")
+    commands = []
+    try:
+        for here, dirs, files in os.walk(base, onerror=_raise):
+            for name in sorted(dirs + files):
+                path = Path(here, name)
+                rel = f"{COMMANDS_REL}/{path.relative_to(base).as_posix()}"
+                if path.is_symlink():
+                    raise _refuse(f"the command {rel} is a link, so the record could not say what the session may load")
+                if not name.endswith(".md") or not path.is_file():
+                    continue
+                data = path.read_bytes()
+                front = _front_matter(data.decode("utf-8"), rel)
+                version = front.get("version")
+                commands.append({"name": ":".join(path.relative_to(base).with_suffix("").parts), "path": rel,
+                                 "version": str(version) if version else NO_VERSION, "sha256": sha256(data),
+                                 "folder_sha256": sha256(data), "named": False})
+    except (OSError, UnicodeDecodeError):
+        raise _refuse(f"the commands under {COMMANDS_REL} cannot be read, so the record could not say what the "
+                      f"session may load") from None
+    return sorted(commands, key=lambda command: command["path"])
+
+
+def user_rules(home: Path) -> dict[str, list[str]]:
+    """The ``permissions.ask`` and ``permissions.deny`` rules of the user's settings file, which
+    ``--setting-sources project,local`` drops: carried so the session keeps them. Nothing else of the file is read
+    into the session, and an absent file carries nothing."""
+    path = home / USER_SETTINGS_REL
+    if not os.path.lexists(path):
+        return {"ask": [], "deny": []}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, ValueError):
+        raise _refuse(f"~/{USER_SETTINGS_REL} cannot be read, so its ask and deny rules cannot be kept") from None
+    permissions = data.get("permissions", {}) if isinstance(data, dict) else None
+    if not isinstance(permissions, dict):
+        raise _refuse(f"~/{USER_SETTINGS_REL} is not a map, or its permissions is not: its ask and deny rules "
+                      f"cannot be kept")
+    rules = {}
+    for key in ("ask", "deny"):
+        rules[key] = permissions.get(key, [])
+        if not isinstance(rules[key], list) or not all(isinstance(rule, str) for rule in rules[key]):
+            raise _refuse(f"~/{USER_SETTINGS_REL}: permissions.{key} is not a list of rules, so it cannot be kept")
+    return rules
+
+
 def read_role(root: Path, role: str) -> dict:
     """The role file read once: its path, bytes, version, sha256, default model and effort, and the skills.
 
@@ -151,4 +213,4 @@ def read_role(root: Path, role: str) -> dict:
     text = b"".join(part if part.endswith(b"\n") else part + b"\n" for part in appended)
     return {"role_text": {"path": rel, "version": version.group(1), "sha256": sha256(data)},
             "model": default.group(1), "effort": default.group(2), "appended": text,
-            "skills": [{k: v for k, v in skill.items() if k != "text"} for skill in skills.values()]}
+            "skills": [{k: v for k, v in skill.items() if k != "text"} for skill in skills.values()] + _commands(root)}
