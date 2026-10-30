@@ -116,8 +116,8 @@ def collected(*args, cwd=REPO_ROOT):
 # ---------------------------------------------------------------------------
 
 TICKET = "PROJ-w257"
-WBS = "W1-w257"
-OTHER = "tests/acceptance/W1-w257other"
+WBS = "W1-957"   # a wbs id the ticket schema takes (DEC-954)
+OTHER = "tests/acceptance/W1-957other"
 UNIT = "tests/unit"
 
 
