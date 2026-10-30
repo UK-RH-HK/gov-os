@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-6n5k, DAEO-s694, DAEO-xxgp]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 2
+priority: 4
 assignee: engineer
 external-ref: W2-38
-tags: [wave-2, implementation, full]
+tags: [wave-2, implementation, full, wave-3, deferred]
 wbs_id: W2-38
 title: Profile from impact; impact-selected tests at close
 class: implementation
@@ -48,6 +48,8 @@ list_rows:
 - W2-M241
 ---
 # W2-38 Profile from impact; impact-selected tests at close
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** CAP-53.b moved to Wave 3 (DEC-841); W2-66 covers selection.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-38), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
