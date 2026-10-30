@@ -1,7 +1,7 @@
 ---
 id: DAEO-nn1s
 status: open
-deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-k7hz, DAEO-j8gn, DAEO-zqvn, DAEO-7y6v, DAEO-rd0g, DAEO-49o5, DAEO-sdhj, DAEO-057v, DAEO-jzvg, DAEO-r30l, DAEO-1ahb, DAEO-xm6l, DAEO-kmcr, DAEO-0mab, DAEO-btt7, DAEO-xxgp, DAEO-ha8z, DAEO-kl5e, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-swdu, DAEO-b926, DAEO-60rw, DAEO-wbdh, DAEO-0pyc, DAEO-lrre, DAEO-yadm, DAEO-2keg, DAEO-w19l, DAEO-6n5k, DAEO-g23i, DAEO-wudw, DAEO-6ox0, DAEO-s694, DAEO-fau3, DAEO-u5g6, DAEO-zndm, DAEO-neam, DAEO-7rr2]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-swdu, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-0mab, DAEO-btt7, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-b926, DAEO-60rw, DAEO-0pyc, DAEO-lrre, DAEO-6n5k, DAEO-6ox0, DAEO-ha8z, DAEO-kl5e, DAEO-egsy, DAEO-siiz, DAEO-7rr2, DAEO-0rfi, DAEO-arrl, DAEO-wnnz, DAEO-cy5o, DAEO-5j8b, DAEO-kh9l, DAEO-cv58, DAEO-ecac, DAEO-iw1f, DAEO-h2k3, DAEO-juee, DAEO-pl6k, DAEO-0uhh, DAEO-e82f, DAEO-c1uz, DAEO-9nys, DAEO-2gc7, DAEO-rmbe, DAEO-uzme, DAEO-e8f0, DAEO-ye2a, DAEO-qty6, DAEO-2azm, DAEO-ebmh, DAEO-tgk2, DAEO-b6hm, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-mc6n, DAEO-m1u3, DAEO-gdzh, DAEO-s9qc, DAEO-jsg1, DAEO-2bdu, DAEO-8lmb, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-g87r]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -23,48 +23,70 @@ depends_on:
 - DAEO-kia7
 - DAEO-r9ss
 - DAEO-7r5e
-- DAEO-a3m2
-- DAEO-cuao
 - DAEO-k7hz
-- DAEO-j8gn
 - DAEO-zqvn
-- DAEO-7y6v
 - DAEO-rd0g
+- DAEO-swdu
 - DAEO-49o5
-- DAEO-sdhj
-- DAEO-057v
-- DAEO-jzvg
 - DAEO-r30l
 - DAEO-1ahb
-- DAEO-xm6l
 - DAEO-kmcr
 - DAEO-0mab
 - DAEO-btt7
-- DAEO-xxgp
-- DAEO-ha8z
-- DAEO-kl5e
 - DAEO-2ds6
 - DAEO-h4rh
 - DAEO-csj8
-- DAEO-swdu
 - DAEO-b926
 - DAEO-60rw
-- DAEO-wbdh
 - DAEO-0pyc
 - DAEO-lrre
-- DAEO-yadm
-- DAEO-2keg
-- DAEO-w19l
 - DAEO-6n5k
-- DAEO-g23i
-- DAEO-wudw
 - DAEO-6ox0
-- DAEO-s694
-- DAEO-fau3
-- DAEO-u5g6
-- DAEO-zndm
-- DAEO-neam
+- DAEO-ha8z
+- DAEO-kl5e
+- DAEO-egsy
+- DAEO-siiz
 - DAEO-7rr2
+- DAEO-0rfi
+- DAEO-arrl
+- DAEO-wnnz
+- DAEO-cy5o
+- DAEO-5j8b
+- DAEO-kh9l
+- DAEO-cv58
+- DAEO-ecac
+- DAEO-iw1f
+- DAEO-h2k3
+- DAEO-juee
+- DAEO-pl6k
+- DAEO-0uhh
+- DAEO-e82f
+- DAEO-c1uz
+- DAEO-9nys
+- DAEO-2gc7
+- DAEO-rmbe
+- DAEO-uzme
+- DAEO-e8f0
+- DAEO-ye2a
+- DAEO-qty6
+- DAEO-2azm
+- DAEO-ebmh
+- DAEO-tgk2
+- DAEO-b6hm
+- DAEO-l78m
+- DAEO-4k3l
+- DAEO-dy7j
+- DAEO-mc6n
+- DAEO-m1u3
+- DAEO-gdzh
+- DAEO-s9qc
+- DAEO-jsg1
+- DAEO-2bdu
+- DAEO-8lmb
+- DAEO-a3u2
+- DAEO-n0wb
+- DAEO-6y0x
+- DAEO-g87r
 allowed_paths:
 - docs/plan/wave-2-exit/**
 kpis:
@@ -78,6 +100,8 @@ kpis:
 profile: FULL
 sources:
 - DEC-729
+- DEC-953
+- DEC-954
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -90,6 +114,8 @@ list_rows:
 - W2-M343
 ---
 # W2-46 Wave 2 exit run
+
+**DEC-954:** dependencies are the Wave 2 tickets only (Wave 3, withdrawn and parked removed; W2-86, W2-88, W2-90 and W2-91 to W2-94 added). The exit run checks §5 as revision 4 states it: 10-practice close records; a clean gov close on W2-81 and EXAMIN's copy; the governance share on W2-81 and EXAMIN; gov doctor green on EXAMIN's copy. Each stream's coordination ticket is added when filed.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-46), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
