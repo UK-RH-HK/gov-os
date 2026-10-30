@@ -187,3 +187,22 @@ def w1_46_project(base):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
     return project
+
+
+def w1_28_project(base):
+    """W1-28's launch fixture project (W1-46's, with the roster entry DEC-386 asks for), on a generated project.
+
+    The roster entry is written as W1-28's ``make_project`` writes it.
+    """
+    if str(_TESTS / "W1-28") not in sys.path:
+        sys.path.insert(0, str(_TESTS / "W1-28"))
+    import w1_28_launch_support as w28   # noqa: E402
+    import yaml   # noqa: E402
+
+    project = w1_46_project(base)
+    path = project / w28.ROSTER_REL
+    roster = yaml.safe_load(path.read_text(encoding="utf-8"))
+    roster["roles"][w28.PRODUCT_SPEC].update({"session": w28.ROSTER_SESSION, "network_profile": w28.ROSTER_PROFILE})
+    path.write_text(yaml.safe_dump(roster, sort_keys=False), encoding="utf-8")
+    copier_support.commit_all(project, "roster: product-spec is launched (DEC-386)")
+    return project

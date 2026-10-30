@@ -23,12 +23,18 @@ Three parts:
   whether nothing, a placeholder or a real flag is there. These hold today.
 - **One live session** (``local_only``, as W1-46 marks its own; the ticket
   lead runs it): no file appears at the path while a worker's Bash runs.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The live session is launched in W1-46's launch project built
+on a project generated from the template (``kernel_freeze_launch_base``): its ``.claude/settings.json`` is the one
+rulesync generates from the template's sources, so the session's guard is the kernel's, run from
+``governance/kernel/hooks/``, no longer this repository's live wiring (``tests/acceptance/W2-90/README.md``).
 """
 
 from __future__ import annotations
 
 import os
 import shutil
+import sys
 import threading
 import time
 from pathlib import Path
@@ -38,6 +44,19 @@ import pytest
 import w1_50_freeze_support as support
 from w1_50_freeze_support import (  # noqa: F401  fixtures
     freeze_launch, freeze_launch_base, freeze_launch_project, freeze_project, freeze_sandbox)
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
+
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
+
+
+@pytest.fixture(scope="module")
+def kernel_freeze_launch_base(tmp_path_factory):
+    """W1-46's launch fixture project on a project generated from the template, built once (W2-90)."""
+    try:
+        return kernel_wiring.w1_46_project(tmp_path_factory.mktemp("w2-90-w1-50-launcher-kernel"))
+    except kernel_wiring.GenerationFailed as exc:
+        pytest.fail(str(exc), pytrace=False)
 
 launch_support = support.launch_support
 ENGINEER = support.ENGINEER
@@ -207,13 +226,14 @@ def _watch(paths, seen, stop):
 
 
 @pytest.mark.local_only
-def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(freeze_launch_base, tmp_path):
+def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(kernel_freeze_launch_base, tmp_path):
     """A real engineer session, one Bash call of about ten seconds, watched from outside the sandbox.
 
     ``.gov-runtime/s`` is the control: it keeps its by-name rule and does not
     exist, so the sandbox's placeholder is expected there while the command
     runs. It shows that the watcher sees a placeholder when there is one.
     """
+    freeze_launch_base = kernel_freeze_launch_base
     missing = [name for name in ("bwrap", "socat") if shutil.which(name) is None]
     if not (Path.home() / launch_support.CLI_REL).is_file():
         missing.append("~/.local/bin/claude")
