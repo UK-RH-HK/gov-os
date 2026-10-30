@@ -1,0 +1,69 @@
+---
+id: DAEO-jsg1
+status: open
+deps: []
+links: []
+created: 2026-10-30T22:14:02Z
+type: task
+priority: 1
+assignee: engineer
+external-ref: W2-86
+tags: [wave-2, implementation, memory, standard, quick-win]
+wbs_id: W2-86
+title: 'The kernel template is embedded as the path map means it: template/ except vendored code, the vendored parts a namespace of their own'
+class: implementation
+state_class: AUTHORITATIVE
+role: engineer
+depends_on: []
+allowed_paths:
+- governance/project/path-map.yaml
+- tests/unit/retrieval/test_w2_86*
+- docs/research/W2-86-memory-measure.md
+kpis:
+  success:
+  - 'After a rebuild with the embedder, the kernel''s own files under template/ have vectors: every role file (template/governance/kernel/roles/*.md), every hook (template/governance/kernel/hooks/*.py) and every kernel skill (template/governance/kernel/skills/<name>/SKILL.md), and every other tracked file under template/ that is not vendored code or a generated copy; the count of chunks with vectors under each of those three folders is recorded from the clone''s store [DEC-952, DEC-388, DEC-381, CAP-10.a]'
+  - 'Vendored code has no vector: template/governance/kernel/vendor/**, the kernel''s copies of the vendored skills (template/governance/kernel/skills/superpowers/<skill>/**), the vendored tk (template/governance/kernel/bin/**) and the generated adapter copies under template/.rulesync/** (as the root''s .rulesync/** and .claude/** are not embedded) lie in namespaces that say not embedded; vendored.yaml, the kernel''s own record, stays embedded [DEC-952, DEC-388, DEC-381]'
+  - 'The path map states it in its two valid values only: kernel-template says embedded, each new namespace says not embedded, and no namespace states any other value; every tracked path under template/ matches exactly one namespace, as the path map''s own header requires; the indexer''s code is not changed and reads no free-text exception [DEC-694, DEC-388, DEC-952]'
+  - 'Nothing else moves: for every tracked path outside template/ the indexer''s embedding verdict is the same at the head as at the ticket''s base; between the base''s store and the head''s, the chunks with vectors differ only by the newly embedded template files and the ticket''s own new files, and the lexical index only by the files the ticket changes or adds (the record store''s digest covers the record graph only, src/gov/store/loader.py:305, so the vector set is the figure compared) [DEC-952, DEC-381]'
+  - 'W2-61''s measure is re-run after the change on the visible half, on a clone at the branch head with stores built by the pinned gov, and on a clone at the ticket''s base as the control; both figures together (hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 % (DEC-957), full evidence against 99 %) and the in-the-bundle count, per question, beside W2-61''s baseline (8 of 20, 12 of 20, 14 of 20 at 23079f92a6fa), with Q18 and Q19 named, in docs/research/W2-86-memory-measure.md [DEC-952, DEC-941, DEC-833 item 3, DEC-860]'
+  failure:
+  - 'A vendored file, or a generated adapter copy, embedded.'
+  - 'A file outside template/ gains or loses its embedding.'
+  - 'A namespace states a value other than embedded or not embedded, or a tracked path under template/ falls in no namespace or in two.'
+  - 'The indexer changed to honour a free-text exception (DEC-694''s two values stay).'
+  - 'A figure of the measure reported without the other, or the hidden half read or run.'
+profile: STANDARD
+sources:
+- DEC-952
+- DEC-388
+- DEC-381
+- DEC-694
+- DEC-941
+- DEC-833
+- DEC-860
+- DEC-951
+- CAP-10.a
+- DEC-957
+- DEC-954
+est_loc: 25
+acceptance_tests:
+  path: tests/acceptance/W2-86/
+  author: independent-test-designer (MR-3); written before implementation; reads this repository's path map and tracked files, writes nothing in this repository; no embedder needed
+track: B
+list_rows: []
+---
+# W2-86 The kernel template is embedded as the path map means it
+
+Card: from the owner's order of 2026-10-30 (DEC-952): quick wins first, before the longer memory chain, each re-measured with W2-61's measure. This is quick win (a).
+
+- **Why:** W2-61's baseline (`docs/research/W2-61-baseline.md` §4 to §6, visible half): hit@5 8 of 20 (40 %), full evidence 12 of 20 (60 %), in the bundle 14 of 20. Q18 and Q19 miss because their governing sources (`template/governance/kernel/hooks/precompact.py`, the role files) have no vectors (lens B's F6).
+- **The cause:** the indexer honours the path map exactly as decided. `governance/project/path-map.yaml:91` gives `kernel-template` (`template/**`) the value `embedded, except vendored code`. The indexer's selection, `src/gov/retrieval/semantic.py:216`, embeds a file only when every namespace it is in says exactly `embedded` (`EMBEDDED`, line 44). DEC-388 (DP-8) closed the list at two values: any other value is read as not embedded (fail closed). DEC-388 named this repository's value and the fix: "Giving the vendored paths their own namespace, so that the rest of `template/**` can say `embedded`, is a follow-up … a path map edit." Adoption already refuses such a value (`src/gov/adopt/stages.py:30`, `:231-254`, DEC-694); in this repository nothing reports it (`src/gov/rebuild/command.py:30` warns only when no namespace is embedded).
+- **What changes:** the path map's namespace block only. `kernel-template` says `embedded`, with its paths narrowed so that the not-embedded parts fall in new namespaces of their own (each with every field `kernel-template` has, `embedding_policy: not embedded`):
+  - vendored code: `template/governance/kernel/vendor/**`, `template/governance/kernel/skills/superpowers/<skill>/**`, `template/governance/kernel/bin/**` (the vendored tk);
+  - generated adapter copies: `template/.rulesync/**` (byte copies of the kernel skills and the vendored skills; the root's `.rulesync/**` and `.claude/**` are already not embedded). Without this, each kernel skill is embedded twice and its copy takes a first-five place that the measure's gold, which names the kernel path, does not count.
+  - Nothing else in the path map changes. No code changes.
+- **Files:** `governance/project/path-map.yaml` (the `namespaces:` block, lines 84 to 93 and new blocks beside them), new `tests/unit/retrieval/test_w2_86*`, `docs/research/W2-86-memory-measure.md`. The path map is shared core: the close runs in full.
+- **Running beside it (split by file):** W2-78 (`DAEO-v4is`) moves the ratchet lists out of the path map, by the owner's ACT: other lines of the same file; whichever merges second merges back. W2-87 adds one top-level block to the path map: other lines. W2-19 holds `path-map.schema.json` and W2-23 the template's own `template/governance/project/path-map.yaml`: neither is touched. W2-76 holds `src/gov/rebuild/**`, W2-32 and W2-13 `src/gov/retrieval/**` and `tests/unit/retrieval/**` (open): only new `test_w2_86*` files there. W2-61 holds `src/gov/retrieval/measure.py`: read and run, never edited.
+- **Residual named here, not fixed:** a namespace with a value outside the two is still read silently as not embedded outside adoption (DEC-388). A warning in `gov rebuild` and `gov doctor` belongs to W2-76's or W2-22's files; it becomes a list row.
+- **The re-measure:** W2-61's procedure (`docs/research/W2-61-baseline.md` §8): a clone by exact path under `~/gov-os-runs/W2-86/`, stores built there by the pinned gov under the rebuild lock (no code under test is needed: the change is data), the measure's code from W2-61's commit. If W2-61's measure is not merged into `w2/integrate` when the lead reaches that step, the lead returns DONE and the orchestrator re-measures.
+- **Place:** DEC-952's first quick win, ahead of W2-55 in the memory chain (DEC-941, DEC-946).
