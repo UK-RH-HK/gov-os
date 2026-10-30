@@ -1,7 +1,7 @@
 ---
 id: DAEO-s694
 status: open
-deps: [DAEO-g0ip, DAEO-jzvg]
+deps: [DAEO-g0ip, DAEO-jzvg, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 - DAEO-jzvg
+- DAEO-7rr2
 allowed_paths:
 - src/gov/close/**
 - src/gov/tasks/external*

@@ -334,10 +334,12 @@ def test_a_project_with_neither_layout_answers_as_today(scratch, sandbox, interf
                     if (family.get("status"), family.get("reason")) == (support.YELLOW, "no registered check")}
     assert unregistered == {name for name, count in expected.items() if count == 0}, \
         f"the families without a check are not each yellow with that reason\n{run.describe()}"
-    # the schema check, as it is declared: the shared fields are held, a type's own schema cannot be
+    # the schema check, as it is declared: the shared fields are held, a type's own schema cannot be, and a record
+    # of a type with no schema file is reported unmeasured, the task record too (W2-02 KPI line 3; DEC-746, P-B)
     found = probes.run_schema_check(project.root)
-    assert [(each.get("code"), each.get("path")) for each in found] == [("SCHEMA_UNREADABLE", PROBE_REL)], \
-        f"the schema check in a project without a kernel does not answer as today: {found}"
+    assert sorted((each.get("code"), each.get("path")) for each in found) == \
+        sorted([("SCHEMA_UNREADABLE", PROBE_REL), ("SCHEMA_UNREADABLE", TASK_REL)]), \
+        f"the schema check in a project without a kernel does not report both records unmeasured: {found}"
 
 
 # --------------------------------------------------------------------------

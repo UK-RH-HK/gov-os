@@ -1,0 +1,161 @@
+# The test map (DEC-896 item 2): what a scoped close runs for a change (DEC-880 item 2, DEC-889 items 1 and 2).
+# Schema: template/governance/kernel/schemas/test-map.schema.json. Patterns are read as allowed_paths are:
+# ** matches any characters including /, * any characters except /, the rest literal, the whole path.
+# A changed path under the shared core, a changed path nothing places, and a missing or invalid map run the
+# full regression. Owned by W2-66 and W2-68; the path map is named by no ticket.
+version: 1
+
+# P-IS-1 (a), DEC-892 c: a change here runs everything.
+shared_core:
+  - "src/gov/close/**"
+  - "src/gov/guard/**"
+  - "src/gov/check/**"
+  - "src/gov/records/**"
+  # the retrieval core, its eight wide modules (I3 §4.1 item 1)
+  - "src/gov/retrieval/__init__.py"
+  - "src/gov/retrieval/chunking.py"
+  - "src/gov/retrieval/lexical.py"
+  - "src/gov/retrieval/semantic.py"
+  - "src/gov/retrieval/ollama.py"
+  - "src/gov/retrieval/rerank.py"
+  - "src/gov/retrieval/fusion.py"
+  - "src/gov/retrieval/retrieve.py"
+  # both copies of the kernel hooks
+  - "template/governance/kernel/hooks/**"
+  - "src/gov/hooks/**"
+  # the path map and the test map (with its schema)
+  - "governance/project/path-map.yaml"
+  - "governance/project/test-map.yaml"
+  - "template/governance/kernel/schemas/test-map.schema.json"
+  # the three widest-reaching modules (DEC-892 c)
+  - "src/gov/config/loader.py"
+  - "src/gov/tasks/tickets.py"
+  - "src/gov/store/loader.py"
+  # the CLI's entry and the error module, until a planted-fault measurement narrows them (I4 F12)
+  - "src/gov/cli/main.py"
+  - "src/gov/cli/errors.py"
+  # the conftests above every suite folder: every pytest run under tests/, every run of an acceptance suite
+  - "tests/conftest.py"
+  - "tests/acceptance/conftest.py"
+
+# DEC-891's places, records only: no code file of those places matches. A script under docs/plan/ or
+# governance/project/orchestration/ is placed only where a ticket with a suite holds it in its allowed_paths
+# (W1-42's paths hold docs/plan/wave-1-exit/apply_adapter_output.py and write_permissions_source.py); one that
+# only tickets without a suite hold is unplaced (orchestration/sync_context.py, W2-00's), so a change to it runs
+# everything.
+record_only:
+  - ".tickets/**.md"
+  - "docs/checkpoints/**.md"
+  - "docs/close/**.md"
+  - "docs/close/nightly/*.json"
+  - "docs/probes/**.md"
+  - "docs/DECISION_REGISTER.md"
+  - "docs/plan/**.md"
+  - "docs/plan/wave-1-exit/evidence/**.txt"
+  - "docs/plan/wave-1-exit/evidence/**.json"
+  - "governance/project/orchestration/**.md"
+
+# DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
+# every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
+# widened by lens I's four reports (I1 §4.1, I2 F6, I3 F5, I4 F6), filtered by that rule.
+record_reading:
+  # gate (f) and DEC-889 item 2's start
+  - "tests/acceptance/W1-06/test_w1_06_approvals.py"
+  - "tests/acceptance/W1-08/test_w1_08_path_map.py"
+  - "tests/acceptance/W1-27/test_w1_27_path_compliance.py"
+  - "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py"
+  - "tests/acceptance/W1-07/test_w1_07_envelope.py"
+  - "tests/acceptance/W2-54/test_w2_54_green_here.py"
+  - "tests/acceptance/W1-33/test_w1_33_agent_definitions.py"
+  - "tests/acceptance/W1-49/test_w1_49_threshold.py"
+  # area 1 (I1 §4.1): today's ticket files
+  - "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths"
+  # area 2 (I2 F6): the register's approvals, the probe records, the exit record and Wave 1's tickets
+  - "tests/acceptance/W1-48/"
+  - "tests/acceptance/W1-26/test_w1_26_probe_records.py"
+  - "tests/acceptance/W1-42/"
+  - "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"
+  # area 3 (I3 F5): the register, the tickets and the ADRs of this repository
+  - "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails"
+  - "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph"
+  # area 4 (I4 F6): the records under .tickets/ and docs/, the probe records, the register, the whole tree's text
+  - "tests/acceptance/W2-02/test_w2_02_green_here.py"
+  - "tests/acceptance/W1-08/test_w1_08_ticket.py"
+  - "tests/acceptance/W1-08/test_w1_08_probe.py"
+  - "tests/acceptance/W1-06/test_w1_06_install_approvals.py"
+  - "tests/acceptance/W1-07/test_w1_07_config.py"
+  - "tests/acceptance/W1-07/test_w1_07_config_details.py"
+  - "tests/acceptance/W1-27/test_w1_27_doctor.py"
+  - "tests/acceptance/W1-27/test_w1_27_doctor_r5.py"
+  - "tests/acceptance/W1-27/test_w1_27_doctor_r6.py"
+  - "tests/acceptance/W1-27/test_w1_27_doctor_r7.py"
+  - "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py"
+
+# P-IS-1 (a): W1-07's three contract files run every command; they run on every close.
+every_close:
+  - "tests/acceptance/W1-07/test_w1_07_envelope.py"
+  - "tests/acceptance/W1-07/test_w1_07_read_act.py"
+  - "tests/acceptance/W1-07/test_w1_07_registry.py"
+
+# What imports and coverage cannot see (P-IS-1 (a); lens I's synthesis §4, the W2-66 block).
+couplings:
+  - paths: ["src/gov/cli/main.py", "template/governance/kernel/templates/**",
+            "template/governance/kernel/skills/orchestration/**"]
+    suites: ["tests/acceptance/W1-42/"]
+    why: "text read: W1-42 reads src/gov/cli/main.py's command names and the kernel's skill and brief templates (I2 §4.1)"
+  - paths: ["tests/acceptance/serial-only.txt"]
+    suites: ["tests/acceptance/W1-30/test_w1_30_r11_declared_here.py"]
+    why: "text read: W1-30's r11 reads the serial-only list (I2 §4.1)"
+  - paths: ["src/gov/retrieval/rerank_worker.py"]
+    suites: ["tests/acceptance/W1-19/test_w1_19_real_models.py", "tests/acceptance/W1-21/test_w1_21_dev_tier.py",
+             "tests/unit/semantic/test_rerank_process.py"]
+    why: "a separate process: the reranker's worker runs in its own interpreter (I3 §4.1 item 2)"
+  - paths: ["template/governance/kernel/hooks/**", "src/gov/hooks/**"]
+    suites: ["tests/acceptance/W1-29/", "tests/acceptance/W1-49/", "tests/acceptance/W2-62/", "tests/unit/hooks"]
+    why: "the two hook copies, run as separate processes (I3 §4.1 item 5)"
+  - paths: ["template/governance/kernel/hooks/sessionstart.py", "template/governance/kernel/hooks/precompact.py"]
+    suites: ["tests/acceptance/W1-31/", "tests/acceptance/W1-37/", "tests/acceptance/W1-38/", "tests/unit/telemetry"]
+    why: "the session-start and PreCompact hooks are also run by these suites (I3 §4.1 item 5)"
+  - paths: ["governance/project/path-map.yaml", ".gitleaks.toml", "template/.gitleaks.toml"]
+    suites: ["tests/acceptance/W1-16/", "tests/acceptance/W1-17/", "tests/acceptance/W1-19/", "tests/acceptance/W1-20/",
+             "tests/acceptance/W1-21/", "tests/acceptance/W1-22/", "tests/acceptance/W1-24/", "tests/acceptance/W2-54/"]
+    why: "fixture inputs: the live path map and the gitleaks configurations are copied into these suites' fixtures (I3 §4.1 item 6)"
+  - paths: ["**.service", "**.socket", "**.timer"]
+    suites: ["tests/acceptance/W1-18/"]
+    why: "fixture input: W1-18 lists the working tree's service, socket and timer units (I3 §4.1 item 6)"
+  - paths: ["src/gov/adapters/**", "src/gov/secrets/**", "src/gov/retrieval/retrieve_check.py", "src/gov/context/**",
+            "src/gov/rebuild/**", "src/gov/readiness/**", "src/gov/decisions/**", "template/governance/kernel/checks/**"]
+    suites: ["tests/acceptance/W1-26/"]
+    why: "declared checks: every module a declared check runs maps to W1-26 (I2 §4.1)"
+  - paths: ["src/gov/checkpoint/**", "src/gov/decisions/**", "src/gov/closure/**", "src/gov/adapters/**"]
+    suites: ["tests/acceptance/W1-30/"]
+    why: "every close runs the watchdog, the context and the decision checker (I2 §4.1)"
+  - paths: ["src/gov/context/**", "src/gov/checkpoint/**"]
+    suites: ["tests/acceptance/W1-31/"]
+    why: "gov telemetry builds the ticket's context (I2 §4.1)"
+  - paths: ["src/gov/secrets/**", "src/gov/guard/runs.py"]
+    suites: ["tests/acceptance/W1-40/"]
+    why: "the hooks run the staged-secrets scan (I2 §4.1)"
+  - paths: ["src/gov/retrieval/validate.py", "src/gov/retrieval/canary.py"]
+    suites: ["tests/unit/validate"]
+    why: "the folder's name names no package (I2 §4.1)"
+  - paths: ["template/governance/kernel/roles/**", "template/governance/kernel/skills/**"]
+    suites: ["tests/acceptance/W1-38/"]
+    why: "W1-38's fixture copies the kernel's roles and skills into every generated project (I4 §4.1 item 3)"
+  - paths: ["tests/acceptance/**.py"]
+    suites: ["tests/acceptance/W1-28/test_w1_28_fixture_copies.py"]
+    why: "file scan: W1-28's held-out copy check reads every Python source under tests/acceptance/ and runs the copying fixtures it finds (I1 §4.1, DEC-385, DEC-912 item 3)"
+  - paths: ["tests/acceptance/W1-07/conftest.py", "tests/acceptance/W1-25/conftest.py"]
+    suites: ["tests/acceptance/W1-27/test_w2_67_copies.py"]
+    why: "loaded by file path: test_w2_67_copies.py loads these suites' conftests with spec_from_file_location (W1-27's own reaches it through its suite folder)"
+
+# Moved from the path map (DEC-876 item 2, DEC-896 item 2).
+test_inputs:
+  - "fixtures/**"
+  - "template/**"
+  - "schemas/**"
+
+# pytest-timeout's signal method, above the slowest test (900 s held in the trial; DEC-892 b).
+per_test_timeout: 900
+# The parallel run's --dist mode: load, until the nested reruns are gone and worksteal is re-measured (DEC-892 a).
+distribution: load

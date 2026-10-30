@@ -6,17 +6,13 @@ Run as ``python3 -m gov.close.traceability`` (CAP-38.b).
 from __future__ import annotations
 
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
 
 import yaml
 
-# DEC-482: an optional top-level key of the project's path map, a commit id, full or abbreviated. With it,
-# only the commits after that commit are judged.
-BASE_KEY = "trailers_base"
-COMMIT_ID = re.compile(r"[0-9a-fA-F]{4,64}")
+from gov.close.history import BASE_KEY  # DEC-482: with a base, only the commits after it are judged
 
 
 def _frontmatter(path: Path) -> dict | None:
@@ -122,37 +118,12 @@ def _record_ids(root: Path) -> set[str]:
     return ids
 
 
-def _after_base(root: Path) -> tuple[str, set[str]] | None:
-    """The trailers base the project's path map records, as the project holds it now, and the commits after
-    it (DEC-482, DEC-479); None with no base: the whole history is judged. ``ValueError`` where the value is
-    not the id, full or abbreviated, of one commit that ``HEAD`` descends from."""
-    from gov.config.loader import load_config
-
-    path_map = load_config(root).get("path-map.yaml", {})
-    if BASE_KEY not in path_map:
-        return None
-    base = path_map[BASE_KEY]
-
-    def asked(*args: str):
-        return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
-
-    if isinstance(base, str) and COMMIT_ID.fullmatch(base):
-        commit = asked("rev-parse", "--verify", "--quiet", base + "^{commit}").stdout.strip()
-        # The id of the commit, not a branch or a tag named in hex digits.
-        if commit.startswith(base.lower()) and asked("merge-base", "--is-ancestor", commit, "HEAD").returncode == 0:
-            listed = asked("rev-list", f"{commit}..HEAD")
-            if listed.returncode != 0:
-                raise RuntimeError(f"git rev-list failed after {commit[:12]}: {listed.stderr.strip()[:200]}")
-            return commit, set(listed.stdout.split())
-    raise ValueError(f"the base commit {base!r} recorded under '{BASE_KEY}' is not one commit of the project "
-                     "that HEAD descends from: no commit is judged")
-
-
 def main() -> int:
     from gov.cli.errors import GovError
+    from gov.close.history import REGISTER_KEY, adds_nothing, judged_history, register_entries
+    from gov.config.loader import load_config
 
     root = Path.cwd()
-    findings = []
 
     closed = _closed_tickets(root)
 
@@ -160,20 +131,27 @@ def main() -> int:
         print(json.dumps({"not_applicable": True, "reason": "no closed ticket"}))
         return 2
 
+    # The base, the accepted history (DEC-734) and a move of the base are read once, as gov close reads them
     try:
-        after = _after_base(root)
+        path_map = load_config(root).get("path-map.yaml", {})
+        history = judged_history(root, path_map)
     except ValueError as exc:
         print(json.dumps({"findings": [{"code": "TRAILERS_BASE_UNKNOWN", "message": str(exc)}]}))
         return 1
     except (GovError, RuntimeError) as exc:  # the base is not known: nothing is judged, and nothing passes
         print(json.dumps({"unmeasured": True, "reason": getattr(exc, "message", str(exc))}))
         return 1
+    after = history["after"]
+    findings = list(history["refused"])
 
     try:
         known_ids = _record_ids(root)
     except RuntimeError as exc:
         print(json.dumps({"findings": [{"code": "STORE_ERROR", "message": str(exc)}]}))
         return 1
+    register = register_entries(root, path_map.get(REGISTER_KEY))  # W2-L175: a decision resolves without a store too
+    if isinstance(register, dict):
+        known_ids |= set(register)
 
     judged = 0
     for ticket in closed:
@@ -194,8 +172,7 @@ def main() -> int:
                 "message": f"closed ticket {ticket_id} has no commits with Task: trailer",
             })
             continue
-        if after is not None:
-            commits = [c for c in commits if c["sha"] in after[1]]
+        commits = [c for c in commits if (after is None or c["sha"] in after) and c["sha"] not in history["accepted"]]
         judged += len(commits)
 
         for c in commits:
@@ -208,6 +185,13 @@ def main() -> int:
                     "message": f"commit {c['sha'][:12]} of {ticket_id} lacks Task: trailer",
                 })
 
+            try:
+                merge_form = not impl_vals and adds_nothing(root, c["sha"])  # DEC-436: nothing to implement
+            except GovError as exc:
+                findings.append({"code": "GIT_FAILURE", "message": f"commit {c['sha'][:12]}: {exc.message}"})
+                continue
+            if merge_form:
+                continue
             if not impl_vals:
                 findings.append({
                     "code": "MISSING_IMPLEMENTS_TRAILER",
@@ -223,13 +207,16 @@ def main() -> int:
                                 "message": f"commit {c['sha'][:12]} of {ticket_id}: Implements: {item} does not resolve",
                             })
 
+    # Every answer names the base used and the accepted history, and reports a move of the base (W2-M266)
     if findings:
-        print(json.dumps({"findings": findings}))
+        print(json.dumps({"findings": findings, **history["report"]}))
         return 1
     if after is not None and not judged:  # nothing judged is not a clean history (DEC-479)
         print(json.dumps({"unmeasured": True, "reason": f"no commit of a closed ticket after the base commit "
-                          f"{after[0][:12]} ('{BASE_KEY}'): nothing is judged"}))
+                          f"{history['report'][BASE_KEY][:12]} ('{BASE_KEY}'): nothing is judged",
+                          **history["report"]}))
         return 1
+    print(json.dumps({"findings": [], **history["report"]}))  # no finding: green (W1-26's runner)
     return 0
 
 

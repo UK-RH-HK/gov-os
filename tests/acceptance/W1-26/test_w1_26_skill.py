@@ -2,6 +2,11 @@
 
 Fails a skill file whose content changed without a version change and a linked
 decision.
+
+Revised (W2-67, I2 §2.7 R1): the two RED cases change their skill on the green
+base (``green_project``) and assert ``skill-version``'s own entry RED with a
+finding that names the skill file, not that ``gov check`` failed (the base was
+red before any defect).
 """
 
 from __future__ import annotations
@@ -13,24 +18,28 @@ import w1_26_support as support
 # Content changed, version unchanged -> RED
 # --------------------------------------------------------------------------
 
-def test_skill_content_changed_version_unchanged_is_red(project, sandbox, interface):
-    """A skill file with content changed but version unchanged fails."""
-    project.add_skill("my-skill", version=1, content_marker="original content")
+def test_skill_content_changed_version_unchanged_is_red(green_project, sandbox, interface):
+    """A skill file with content changed but version unchanged fails: ``skill-version`` is RED with a finding that
+    names the skill file."""
+    project = green_project
+    rel = project.add_skill("my-skill", version=1, content_marker="original content")
     project.commit("add skill v1")
     project.add_skill("my-skill", version=1, content_marker="changed content")
     project.commit("change skill without version bump")
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "skill-version", rel)
 
 
-def test_skill_content_changed_version_unchanged_no_decision_is_red(project, sandbox, interface):
-    """A skill file with content and version changed but no linked decision fails."""
-    project.add_skill("my-skill", version=1, content_marker="original content")
+def test_skill_content_changed_version_unchanged_no_decision_is_red(green_project, sandbox, interface):
+    """A skill file with content and version changed but no linked decision fails: ``skill-version`` is RED with a
+    finding that names the skill file."""
+    project = green_project
+    rel = project.add_skill("my-skill", version=1, content_marker="original content")
     project.commit("add skill v1")
     project.add_skill("my-skill", version=2, content_marker="changed content")
     project.commit("bump version without decision")
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "skill-version", rel)
 
 
 # --------------------------------------------------------------------------

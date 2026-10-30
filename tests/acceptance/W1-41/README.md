@@ -738,3 +738,20 @@ passed, 18 failed, none skipped, 18 s.
 | P-15 | (the follow-up after W1-41) May an id of the form of a ticket id, or of the kernel's general record id (`FAIL-0001`, `DP-8`, `CP-…`, `RES-…`), be listed as external? Options: (a) left to the list, since outside ids share both forms; (b) refused where the prefix is one a record of the commit uses; (c) a list of prefixes in the kernel. Recommendation (a), confidence medium; (b) costs a read of the store's ids for each entry | left to the list: `test_an_id_of_a_form_outside_sources_share_is_still_accepted` (4). `MR-<digits>` and `L-<digits>` are refused, the stricter reading, though no must rule is a record today |
 | P-13 | A ticket whose declared ids are all external references (none is a record of the store): is its context refused, or built with a packet that says nothing was read? | refused (the stricter reading): `BLOCKED`, the ticket and the external ids named, the message says that all are external and none was read: `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` |
 | P-14 | A ticket whose sources are all external names, by `depends_on`, a record that is no ticket (W1-24 resolves the ids of `depends_on` as mandatory inputs): is it refused as beside a dependency ticket, or built because a record was read? | refused (the stricter reading; DEC-552: "a dependency that was read is not a source that was read"): the third row of `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` |
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only one fixture changes:
+
+- `w1_41_support.environment`: **before**, `OLLAMA_HOST` = a dead loopback port ("no model is ever loaded");
+  **after**, one dead port for `OLLAMA_HOST` and `GOV_QUERY_OLLAMA_HOST`, so no model is loaded at either address.
+  `GOV_OLLAMA_BIN` still names a path where no program is.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change, file by file:
+208 passed, 34 failed. Every one of the 34 stops at "stage A3 did not succeed" with `ADOPT_CODE_GRAPH_UNREADABLE`, the
+code graph's daemon folder `/tmp/gov-cbm-1000` being read-only there ("Where the cases can run"): 7 in `migration`, 7
+in `path_map`, 1 in `unknown`, all 19 of `verdict`. `migration` was also run with the edit undone: the same 7 failed.
+Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only
+embedder on its own port; the fixtures point it at a stand-in and change no expectation`.

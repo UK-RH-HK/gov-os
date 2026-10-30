@@ -64,7 +64,7 @@ def project(tmp_path):
     "### DEC-101-The title", "### DEC-101 — The title\r",
 ])
 def test_an_entry_heading_records_its_id(line):
-    assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+    assert citations._entries(f"# Decisions\n\n{line}\n- **Status:** ACCEPTED\n- body\n".encode("utf-8")) == {"DEC-101"}
 
 
 @pytest.mark.parametrize("line", [
@@ -77,13 +77,14 @@ def test_a_line_that_is_no_entry_heading_records_nothing(line):
 
 
 def test_a_longer_id_is_recorded_as_itself():
-    assert citations._entries(b"### DEC-1010 - Another\n") == {"DEC-1010"}
+    assert citations._entries(b"### DEC-1010 - Another\n- **Status:** ACCEPTED\n") == {"DEC-1010"}
 
 
 def test_a_heading_in_a_fence_does_not_count_and_the_fence_ends_where_it_is_closed():
-    text = ("```\n### DEC-101 - In a fence\n```\n### DEC-102 - After it\n"
-            "~~~~ text\n### DEC-103 - In a fence\n```\n~~~\n### DEC-104 - Still in it\n~~~~\n### DEC-105 - After\n"
-            "```\n### DEC-106 - In a fence that is never closed\n")
+    status = "- **Status:** ACCEPTED\n"
+    text = (f"```\n### DEC-101 - In a fence\n{status}```\n### DEC-102 - After it\n{status}"
+            f"~~~~ text\n### DEC-103 - In a fence\n{status}```\n~~~\n### DEC-104 - Still in it\n{status}~~~~\n"
+            f"### DEC-105 - After\n{status}```\n### DEC-106 - In a fence that is never closed\n{status}")
     assert citations._entries(text.encode("utf-8")) == {"DEC-102", "DEC-105"}
 
 
@@ -129,9 +130,9 @@ def test_a_path_map_that_is_not_yaml_is_the_loaders_error(project):
 
 def test_the_register_is_read_from_the_tree_of_the_citing_commit(project):
     project.configure(decision_register=REGISTER)
-    project.write(REGISTER, "### DEC-101 - First\n")
+    project.write(REGISTER, "### DEC-101 - First\n- **Status:** ACCEPTED\n")
     early = project.commit("Work (DEC-101, DEC-102)")
-    project.write(REGISTER, "### DEC-102 - Second\n")
+    project.write(REGISTER, "### DEC-102 - Second\n- **Status:** ACCEPTED\n")
     late = project.commit("Work (DEC-101, DEC-102)")
     assert project.flagged() == sorted([("DECISION_UNRECORDED", early, "DEC-102"),
                                         ("DECISION_UNRECORDED", late, "DEC-101")])

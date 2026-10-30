@@ -170,8 +170,17 @@ def test_the_guard_denies_a_worker_s_write_to_the_flag_s_path(freeze_project, fr
 
 SCRATCH = ".gov-runtime/scratch/w1-50"
 SESSION_TIMEOUT_S = 420.0
-NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET", "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_PROJECT_DIR",
-                 "CLAUDE_CODE_SSE_PORT")
+# Rewrite-Reason: DEC-784 (W2-57, I1 F-7): the session launches with no CLAUDE* variable in the environment
+# (CLAUDECODE, CLAUDE_CODE_* and every other name beginning CLAUDE), as W1-46's live sessions do, not only a fixed
+# list of them: a run from a Claude session then launches as a run from a plain shell does.
+NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
+NOT_INHERITED_PREFIX = "CLAUDE"
+
+
+def inherited(environ):
+    """The caller's environment less ``GOV_ROLE``, ``GOV_TICKET`` and every name beginning ``CLAUDE`` (DEC-784)."""
+    return {key: value for key, value in environ.items()
+            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
 PROBE = f"""#!/bin/bash
 # W1-50 acceptance probe: what a launched worker's Bash sees at the flag's path, and time for the test to look.
 OUT={SCRATCH}/results.txt
@@ -222,7 +231,7 @@ def test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path(freeze_laun
     seen, stop = {}, threading.Event()
     watcher = threading.Thread(target=_watch, args=({"flag": runtime / FLAG_NAME, "control": runtime / "s"}, seen,
                                                     stop), daemon=True)
-    env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
+    env = inherited(os.environ)
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     watcher.start()
     try:

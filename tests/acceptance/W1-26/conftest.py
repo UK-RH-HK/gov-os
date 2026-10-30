@@ -50,6 +50,18 @@ def project(built, tmp_path):
 
 
 @pytest.fixture()
+def green_project(project):
+    """The base project with the checks a temporary project can measure: green before any defect (W2-67, I2 R1)."""
+    return support.green_base(project)
+
+
+@pytest.fixture()
+def green_project_with_dimensions(project):
+    """The green base whose first commit also holds ``docs/contract/readiness-dimensions.yaml`` (W2-67)."""
+    return support.green_base(project, dimensions=True)
+
+
+@pytest.fixture()
 def full_project(built, tmp_path):
     """A copy of the real working tree, with ``gov check`` built."""
     return support.FullProject(tmp_path / "project")

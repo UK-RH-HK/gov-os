@@ -87,11 +87,20 @@ def test_inputs_hash_length():
 # schema check
 # --------------------------------------------------------------------------
 
+def _copy_kernel_schemas(root, *names):
+    """Copy the named kernel schema files into the project, at the layout core-schema reads."""
+    rel = "template/governance/kernel/schemas"
+    for name in names:
+        _write(root, f"{rel}/{name}", (REPO / rel / name).read_text(encoding="utf-8"))
+
+
 def test_schema_clean_record(tmp_path):
     from gov.check.schema import check
     root = tmp_path / "project"
+    _copy_kernel_schemas(root, "ticket.schema.json", "common.schema.json")
     _write(root, ".tickets/T-001.md",
-           "---\nid: T-001\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\n---\n# T-001\n")
+           "---\nid: T-001\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\nrole: engineer\n"
+           "allowed_paths:\n- src/**\nkpis:\n  success:\n  - it works\n  failure: []\n---\n# T-001\n")
     assert check(root) == []
 
 

@@ -316,8 +316,11 @@ class TestSubagentStop:
 
     def test_block_includes_reason_and_is_once(self, project):
         """The block names the missing fields and fires once, never a loop.
-        [CAP-37.d]"""
-        rc, output, _ = run_w29_hook(
+        The reason is given as Claude Code reads it (code.claude.com/docs/en/
+        hooks): on standard error with exit 2 (standard output is not read
+        with exit 2), or as {"decision": "block", "reason": ...} on standard
+        output with exit 0.  [CAP-37.d; DEC-889 item 8, P-H-7; I3 F4]"""
+        rc, output, stderr = run_w29_hook(
             "subagentstop",
             {"hook_event_name": "SubagentStop", "session_id": "s1",
              "agent_id": "a1", "agent_type": "engineer",
@@ -325,12 +328,26 @@ class TestSubagentStop:
              "last_assistant_message": "no structured return at all"},
             project,
         )
-        assert rc == 2
-        assert output is not None, "block must produce output with a reason"
-        text = json.dumps(output)
-        missing_mentioned = any(f in text for f in TWELVE_FIELDS)
-        assert missing_mentioned, (
-            "the block reason must name at least one missing field"
+        if rc == 2:
+            reason = stderr
+        elif rc == 0 and isinstance(output, dict) \
+                and output.get("decision") == "block":
+            reason = output.get("reason")
+        else:
+            reason = None
+        assert reason is not None, (
+            f"the stop must be blocked as Claude Code reads it (exit 2, or "
+            f"exit 0 with a block decision), got exit {rc}: {output!r}"
+        )
+        assert isinstance(reason, str) and reason.strip(), (
+            f"the block reason must reach the helper: on standard error with "
+            f"exit 2, or as the block decision's reason with exit 0; got exit "
+            f"{rc}, stdout {output!r}, stderr {stderr!r}"
+        )
+        unnamed = [f for f in TWELVE_FIELDS if f not in reason]
+        assert not unnamed, (
+            f"the delivered block reason must name every missing field; it "
+            f"does not name {unnamed}: {reason!r}"
         )
 
     @pytest.mark.parametrize("raw_input,label", [

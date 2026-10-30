@@ -43,6 +43,11 @@ NEW_DIRECTORY_TEST = f"{NEW_DIRECTORY}/test_new.py"
 DESIGNER_AGENT = "agent-w1-03-designer"
 ENGINEER_AGENT = "agent-w1-03-engineer"
 
+# An amend with nothing staged. Its own message makes a commit that differs from
+# the one it replaces whatever the clock: ``--no-edit`` in the same second as that
+# commit wrote it again byte for byte, and ``HEAD`` did not move (DEC-921).
+AMEND = "git commit -q --amend -m amended"
+
 
 def _history(project, acceptance_test_differs):
     """``main`` gets a second revision; a branch ``other`` leaves the first revision with a commit of its own.
@@ -146,7 +151,7 @@ def _assert_restored_from_the_pre_call_head(project, result, pre_call_head, left
 # name: (command, the paths under tests/acceptance it writes)
 SAME_TESTS_IN_BOTH_COMMITS = {
     "amended-commit-then-a-changed-test": (
-        f"git commit -q --amend --no-edit && echo changed >> {ACCEPTANCE_FILE}", [ACCEPTANCE_FILE]),
+        f"{AMEND} && echo changed >> {ACCEPTANCE_FILE}", [ACCEPTANCE_FILE]),
     "amended-commit-of-own-work-then-a-new-test": (
         f"echo changed >> {SOURCE} && git commit -q --amend -am amended && echo new > {NEW_TEST}", [NEW_TEST]),
     "reset-hard-then-a-new-test": (f"git reset -q --hard HEAD~1 && echo new > {NEW_TEST}", [NEW_TEST]),
@@ -206,7 +211,7 @@ def test_the_restore_next_to_a_head_move_holds_for_every_non_designer(project, s
 def test_the_restore_next_to_a_head_move_takes_back_the_acceptance_tests_and_nothing_else(project, sandbox):
     """KPI failure 2, KPI failure 1. The engineer's own change stays; an out-of-scope file stays and is flagged."""
     _history(project, acceptance_test_differs=False)
-    command = (f"git commit -q --amend --no-edit && echo changed >> {ACCEPTANCE_FILE} "
+    command = (f"{AMEND} && echo changed >> {ACCEPTANCE_FILE} "
                f"&& echo changed >> {SOURCE} && echo new > docs/new.md")
     result, pre_call_head, left = _call(project, sandbox, command, ENGINEER, TICKET)
     what = f"`{command}` by the engineer on {TICKET}"
@@ -290,7 +295,7 @@ def test_while_another_actor_s_call_is_open_the_test_is_flagged_and_not_restored
     guard = support.run_guard(project, running, sandbox, role=ORCHESTRATOR, ticket=TICKET, subagent=DESIGNER,
                               agent_id=DESIGNER_AGENT)
     support.assert_let_through(guard, running)
-    command = f"git commit -q --amend --no-edit && echo changed >> {ACCEPTANCE_FILE}"
+    command = f"{AMEND} && echo changed >> {ACCEPTANCE_FILE}"
     result, _, left = _call(project, sandbox, command, ORCHESTRATOR, TICKET, subagent=ENGINEER,
                             agent_id=ENGINEER_AGENT)
     what = f"`{command}` by the engineer subagent while the designer subagent's call is open"
@@ -303,7 +308,7 @@ def test_a_test_changed_before_the_call_is_not_put_back_next_to_a_head_move(proj
     _history(project, acceptance_test_differs=False)
     draft = f"{ACCEPTANCE}/{WBS}/test_draft.py"
     earlier_work(project, f"echo '# designer' > {draft}", changed=[draft])
-    command = f"git commit -q --amend --no-edit && echo '# engineer' >> {draft}"
+    command = f"{AMEND} && echo '# engineer' >> {draft}"
     result, _, left = _call(project, sandbox, command, ENGINEER, TICKET)
     what = f"`{command}` by the engineer on {TICKET}, on the designer's uncommitted test"
     support.assert_caught(result, draft, what=what, action=support.FLAGGED)

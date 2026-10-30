@@ -1,0 +1,19 @@
+# Lens B's Q06 (Table 2): "The ticket's front matter (.tickets/DAEO-0rfi.md 1–61)". My reading: the answer needs two
+# facts of the front matter, its sources and its allowed paths, so each is its own entry.
+id: Q06
+category: ticket
+commit: 23079f92a6fa
+ticket: DAEO-0rfi
+question: What are W2-54's sources and allowed paths?
+gold_answer: >-
+  W2-54 (DAEO-0rfi) cites DEC-768, DEC-626, DEC-441, DEC-565 and CAP-33; its allowed paths are src/gov/context/**,
+  the context-reproducibility check, src/gov/check/schema.py, the audit-report schema, tests/unit/context/**, the
+  schema audit-report unit tests, docs/changes/W2-54-CIT-E.md, src/gov/retrieval/semantic.py,
+  src/gov/retrieval/ollama.py, tests/unit/retrieval/** and tests/unit/semantic/test_semantic.py.
+sources:
+  - path: .tickets/DAEO-0rfi.md
+    heading: "sources:"
+    lines: [47, 52]
+  - path: .tickets/DAEO-0rfi.md
+    heading: "allowed_paths:"
+    lines: [18, 29]

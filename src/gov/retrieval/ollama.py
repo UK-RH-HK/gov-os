@@ -4,6 +4,11 @@
 Ollama's own 5-minute idle unload frees the model's memory. There is no unit and
 no keep-alive override. When the daemon cannot be reached within the deadline,
 the result names the facet state and the warning is written once to standard error.
+
+Two daemons are started so (DEC-261 as DEC-798 amends it): the shared one at
+``OLLAMA_HOST``, which builds the index, and a CPU-only one at
+``GOV_QUERY_OLLAMA_HOST``, which embeds the questions and nothing else. The second
+is started with its own ``OLLAMA_HOST`` and the GPU hidden (``NO_GPU``).
 """
 
 from __future__ import annotations
@@ -21,6 +26,9 @@ DEFAULT_HOST = "127.0.0.1:11434"
 HEALTH_PATH = "/api/version"
 FACET = "semantic"
 WARNING = "Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."
+QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"  # the CPU-only embedder's address, in OLLAMA_HOST's form (DEC-798)
+QUERY_DEFAULT_HOST = "127.0.0.1:11435"
+NO_GPU = {"CUDA_VISIBLE_DEVICES": "-1"}  # an id that names no device: Ollama's documented way to use no GPU
 
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the endpoint is local: no proxy
 
@@ -68,3 +76,16 @@ def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
     print(WARNING, file=sys.stderr)
     return {"available": False, "started": started, "facet": FACET, "state": "FACET_UNAVAILABLE",
             "warning": WARNING}
+
+
+def query_host(env=None) -> str:
+    """The CPU-only embedder's address: ``GOV_QUERY_OLLAMA_HOST``, else ``QUERY_DEFAULT_HOST``."""
+    env = os.environ if env is None else env
+    return env.get(QUERY_HOST_SETTING) or QUERY_DEFAULT_HOST
+
+
+def ensure_query_available(*, timeout_s: float = 20.0, env=None) -> dict:
+    """Make the CPU-only embedder answer at ``query_host``, as ``ensure_available`` does, starting ``ollama serve``
+    with ``OLLAMA_HOST`` set to that address and ``NO_GPU`` in its environment; never stopped."""
+    env = os.environ if env is None else env
+    return ensure_available(timeout_s=timeout_s, env={**env, "OLLAMA_HOST": query_host(env), **NO_GPU})

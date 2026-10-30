@@ -367,7 +367,12 @@ def test_checkpoint_exists_before_ticket_status_changes(project, sandbox, interf
 # --------------------------------------------------------------------------
 
 def test_regression_includes_other_acceptance_folders(project, sandbox, interface):
-    """A2: regression tests include other tickets' acceptance suites."""
+    """A2, as W2-66 reads it (DEC-880 item 2, I2 F9): another ticket's acceptance folder runs, and blocks the close
+    when red, whenever the run includes it. This project has no test map, so its close runs the full regression
+    (W2-66: a missing test map runs everything), and the other folder is in it. The scoped cases (the selection
+    includes the folder, or leaves it out and names it and why) are in ``test_w1_30_regression_scope.py``."""
+    assert not (project.root / "governance" / "project" / "test-map.yaml").exists(), \
+        "the fixture holds a test map: this case is the full run's, which a project without one gets"
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
@@ -381,10 +386,16 @@ def test_regression_includes_other_acceptance_folders(project, sandbox, interfac
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False, \
         "a failing test in another ticket's acceptance folder must block close"
+    assert f"tests/acceptance/{other_wbs}/test_other.py" in json.dumps(envelope.get("error")), \
+        f"the refusal does not name the other ticket's failing test, so something else refused it\n{run.describe()}"
 
 
 def test_regression_runs_to_end_all_failures_collected(project, sandbox, interface):
-    """A2: regression tests run to the end; all failures are collected, not just the first."""
+    """A2: regression tests run to the end; all failures are collected, not just the first.
+
+    Revised for W2-07 (DEC-868 item 3): a ticket without its checkpoint is refused by the pre-close gate before
+    any test, so the ticket is checkpointed, as every ticket is before its close, and the close reaches its
+    regression."""
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
@@ -393,6 +404,8 @@ def test_regression_runs_to_end_all_failures_collected(project, sandbox, interfa
     support.write(project.root, "tests/unit/test_reg_b.py",
                   "def test_reg_b():\n    assert False, 'reg B'\n")
     project.commit("implement with two reg failures", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
@@ -402,20 +415,34 @@ def test_regression_runs_to_end_all_failures_collected(project, sandbox, interfa
         f"the error should name the failing regression tests: {error}"
 
 
-def test_collection_error_refuses_close(project, sandbox, interface):
-    """A2: a collection error (syntax error in test file) refuses the close."""
-    project.add_ticket(TICKET, WBS)
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
+def test_collection_error_refuses_close(project, sandbox, interface, tmp_path):
+    """A2: a collection error (syntax error in test file) refuses the close.
+
+    Revised for W2-07 (DEC-868 item 3): a collection error is a refusal of the pre-close gate inside ``gov
+    close``: it refuses at once, naming its cause, before any test runs, and spends no ratchet attempt. The
+    ticket's acceptance test tells, into a folder outside the project, whenever it runs; the broken regression
+    file is the owner's, outside the ticket's work, so the collection error is the one cause.
+    """
+    told = tmp_path / "told"
+    told.mkdir()
     support.write(project.root, "tests/unit/test_syntax_error.py",
                   "def test_syntax_error(\n    # missing closing paren\n")
-    project.commit("implement with syntax error in tests", who=IMPL, trailers=TRAILERS_GOOD)
+    project.commit("a regression test file with a syntax error", who=support.OWNER)
+    project.add_ticket(TICKET, WBS)
+    support.write(project.root, f"tests/acceptance/{WBS}/test_pass.py", support.telling_test("test_pass", told))
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False, \
         "a collection error (syntax error) in a regression test file must refuse the close"
+    assert "collect" in support.error_text(envelope["error"]).lower(), \
+        f"the refusal does not name the collection error as its cause\n{run.describe()}"
+    assert not list(told.iterdir()), f"a test ran before the collection error refused the close\n{run.describe()}"
+    assert support.iteration_count(project.root, TICKET) == 0, \
+        f"the collection error spent a ratchet attempt\n{run.describe()}"
 
 
 def test_regression_failure_blocks_close(project, sandbox, interface):

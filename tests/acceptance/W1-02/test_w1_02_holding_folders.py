@@ -1,5 +1,11 @@
 """W1-02 — a move or a link of a folder that holds either file or a copy is a second name (DEC-553, DP-8).
 
+Rewritten by W2-58's test designer, by the lead's reading of P-W2-58-TD-2 (i)
+(DEC-821 item 4: no write rule widens): every second name below stays refused,
+for every role, now on the write side. Only the read rule's wording is no
+longer asked (it named DEC-508, DEC-525, DEC-548 or DEC-553): each case asks a
+rule's refusal and a message that carries no path, folder or value of the files.
+
 DEC-553: "A move or a link of a folder that holds either file or a copy is a
 second name and is refused as a read, for every role."
 
@@ -53,6 +59,19 @@ INNERMOST = folders.INNERMOST          # for each file, the folder the file itse
 def world(hook, tmp_path_factory):
     """One project and its copies for the module: the cases only ask the guard for decisions."""
     return folders.make_world(tmp_path_factory.mktemp("holding-folders"))
+
+
+def _refused(world, result, what):
+    """W2-58 (the lead's reading of P-W2-58-TD-2 (i); DEC-548, DEC-553, DEC-778, DEC-821 item 4): a second name stays
+    refused, now on the write side, whichever rule refuses it. Asked: a rule's refusal (exit code 0), and a message
+    that carries no path, folder or value of either file or of a copy. The read rule's wording is no longer asked."""
+    assert result.decision == "deny" and result.returncode == 0, (
+        f"{what} was not refused by a rule: decision={result.decision} exit={result.returncode}")
+    said = protected.output_of(result)
+    values = {value for site in world.sites.values() for name in site.names for value in world.secrets(site.name, name)}
+    shown = [value for value in values if value and str(value) in said]
+    # The values are not put in the message: a failure must not print what a refusal must not print.
+    assert not shown, f"the refusal of {what} carries {len(shown)} path(s), folder(s) or value(s) of the files"
 
 
 # ``{rel}`` is the folder as a relative path from the session's project, ``{abs}`` its absolute path;
@@ -112,7 +131,7 @@ def _ask(world, site, folder, text, who=WIDEST):
 def test_a_second_name_for_a_folder_that_holds_a_protected_file_is_refused_as_a_read(world, form, name, folder):
     """DP-8: each form, relative and absolute, by the orchestrator, which may write the folder today."""
     result = _ask(world, "own", folder, SECOND_NAMES[form])
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on a folder that holds the stand-in {name} by the {WIDEST}")
 
 
@@ -123,7 +142,7 @@ def test_a_second_name_for_a_holding_folder_is_refused_whether_or_not_the_role_m
                                                                                             folder):
     """DP-8: "for every role, a role that may write the folder today included"."""
     result = _ask(world, "own", folder, SECOND_NAMES[form], who)
-    folders.assert_refused_by_the_rule(result, f"Bash {form} on a folder that holds the stand-in {name} by an {who}")
+    _refused(world, result, f"Bash {form} on a folder that holds the stand-in {name} by an {who}")
 
 
 # --------------------------------------------------------------------------
@@ -139,7 +158,7 @@ def test_a_second_name_for_a_folder_that_holds_a_copy_in_another_checkout_is_ref
     The relative spelling goes from the session's project up and into the other checkout.
     """
     result = _ask(world, "sibling", folder, SECOND_NAMES[form])
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on a folder that holds the copy of the stand-in {name} in another checkout")
 
 
@@ -148,7 +167,7 @@ def test_a_second_name_for_a_folder_that_holds_a_copy_in_another_checkout_is_ref
 def test_a_second_name_for_such_a_folder_in_another_checkout_is_refused_for_a_role_that_writes_less(world, form, name,
                                                                                                     folder):
     result = _ask(world, "sibling", folder, SECOND_NAMES[form], NOT_A_WRITER)
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on the folder of the copy of the stand-in {name} in another checkout by an {NOT_A_WRITER}")
 
 
@@ -158,7 +177,7 @@ def test_a_second_name_for_a_folder_that_holds_a_copy_below_the_project_s_root_i
                                                                                                     folder):
     """DP-8 on a copy below the session's root (``template/`` as ``<P>``), by the orchestrator."""
     result = _ask(world, "nested", folder, SECOND_NAMES[form])
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on a folder that holds the copy of the stand-in {name} below the root")
 
 
@@ -169,7 +188,7 @@ def test_a_second_name_for_such_a_folder_below_the_root_is_refused_whether_or_no
         world, form, who, name, folder):
     """The engineer whose ticket names ``template/`` may write the folder today; the other engineer may not."""
     result = _ask(world, "nested", folder, SECOND_NAMES[form], who)
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on the folder of the copy of the stand-in {name} below the root by an {who}")
 
 
@@ -178,7 +197,7 @@ def test_a_second_name_for_such_a_folder_below_the_root_is_refused_whether_or_no
 def test_a_symbolic_second_name_for_a_folder_that_holds_a_copy_below_the_root_is_refused_as_a_read(world, form, name,
                                                                                                    folder):
     result = _ask(world, "nested", folder, SECOND_NAMES[form])
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on the folder of the copy of the stand-in {name} below the root")
 
 
@@ -191,7 +210,7 @@ def test_a_second_name_for_the_folder_that_holds_the_user_level_settings_file_is
     """DP-8 below the stand-in home: ``~`` and ``$HOME`` are the ``HOME`` of the hook's environment."""
     (_, folder), = [pair for pair in folders.INNERMOST if pair[0] == SETTINGS]
     result = _ask(world, "home", folder, FROM_HOME[form])
-    folders.assert_refused_by_the_rule(result, f"Bash {form} on the folder of the stand-in user-level settings file")
+    _refused(world, result, f"Bash {form} on the folder of the stand-in user-level settings file")
 
 
 @pytest.mark.parametrize("who", (WIDEST, NOT_A_WRITER))
@@ -199,7 +218,7 @@ def test_a_second_name_for_the_folder_that_holds_the_user_level_settings_file_is
 def test_a_second_name_for_that_folder_by_its_absolute_path_is_refused_for_every_role(world, form, who):
     (_, folder), = [pair for pair in folders.INNERMOST if pair[0] == SETTINGS]
     result = _ask(world, "home", folder, SECOND_NAMES[form], who)
-    folders.assert_refused_by_the_rule(
+    _refused(world,
         result, f"Bash {form} on the folder of the stand-in user-level settings file by '{who}'")
 
 
@@ -221,7 +240,7 @@ def test_the_refusal_for_a_holding_folder_names_the_rule_and_no_path(world, site
     form = "move-absolute"
     result = _ask(world, site, folder, SECOND_NAMES[form])
     what = f"Bash {form} on the folder of the stand-in {name} at the site '{site}'"
-    folders.assert_refused_by_the_rule(result, what)
+    _refused(world, result, what)
     folders.assert_says_nothing(result, world, site, name, what, more=(world.site(site).root / folder,))
 
 

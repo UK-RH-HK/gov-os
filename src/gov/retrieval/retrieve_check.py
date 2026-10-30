@@ -13,7 +13,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# the gitleaks configuration a tier is adopted with: this repository's template, else an adopted project's own
+GITLEAKS_CONFIGS = ("template/.gitleaks.toml", ".gitleaks.toml")
 
 
 def main():
@@ -42,6 +43,7 @@ def main():
     forbidden_threshold = int(baseline.get("forbidden_citations", 2))
 
     tiers_map = {"A": "a-dev", "B": "b-dev"}
+    project = Path.cwd()  # the project under check (DEC-285), never the install path (DEC-835)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         roots: dict[str, Path] = {}
@@ -54,7 +56,7 @@ def main():
                                     capture_output=True)
             if result.returncode != 0:
                 continue
-            _adopt(dest)
+            _adopt(dest, project)
             git_cmd = ["git", "-C", str(dest), "-c", "user.name=check", "-c", "user.email=check@check"]
             subprocess.run([*git_cmd, "add", "-A"], capture_output=True)
             subprocess.run([*git_cmd, "commit", "-q", "--allow-empty", "-m", "adopted"], capture_output=True)
@@ -116,11 +118,11 @@ def main():
         sys.exit(1)
 
 
-def _adopt(root: Path):
-    """Give the project a path map that classes everything as embedded governance memory."""
+def _adopt(root: Path, project: Path):
+    """Give the tier ``project``'s path map, classing everything as embedded governance memory."""
     import yaml
     from gov.store.loader import REGISTER_KEY
-    path_map_path = REPO_ROOT / "governance/project/path-map.yaml"
+    path_map_path = project / "governance/project/path-map.yaml"
     if not path_map_path.is_file():
         return
     document = yaml.safe_load(path_map_path.read_text(encoding="utf-8"))
@@ -136,9 +138,10 @@ def _adopt(root: Path):
     }}
     (root / "governance/project").mkdir(parents=True, exist_ok=True)
     (root / "governance/project/path-map.yaml").write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
-    config_src = REPO_ROOT / "template/.gitleaks.toml"
-    if config_src.is_file():
-        shutil.copy2(config_src, root / ".gitleaks.toml")
+    for rel in GITLEAKS_CONFIGS:
+        if (project / rel).is_file():
+            shutil.copy2(project / rel, root / ".gitleaks.toml")
+            break
     exclude = root / ".git" / "info" / "exclude"
     exclude.parent.mkdir(parents=True, exist_ok=True)
     text = exclude.read_text(encoding="utf-8") if exclude.is_file() else ""

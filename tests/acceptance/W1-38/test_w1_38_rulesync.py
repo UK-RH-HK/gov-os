@@ -16,7 +16,6 @@ is a stand-in written for the test (the only stand-ins are for the rulesync
 from __future__ import annotations
 
 import json
-import subprocess
 
 import pytest
 
@@ -364,10 +363,19 @@ class TestRegisteredFamilyCheck:
         assert direct.returncode != 0, (
             "the declared command ends clean although CLAUDE.md was edited by hand"
         )
+        # Rewrite-Reason (DEC-892 item 2): a check that could not compare (a rulesync call that gave no
+        # answer in time) is also not green, so the red is held to its reason: the edited file is found.
+        assert "CLAUDE.md" in support.named_files(generated_project, json.dumps(support.printed_findings(direct))), (
+            f"the declared command is not green, but its findings do not name the edited CLAUDE.md: "
+            f"{support.output_of(direct)}"
+        )
         entry, family, run = _gov_check(generated_project, sandbox)
         assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
             f"the check failed, but gov check shows the check as "
             f"{entry.get('status')!r} and the family as {family.get('status')!r}\n{run.describe()}"
+        )
+        assert "CLAUDE.md" in support.named_files(generated_project, json.dumps(entry.get("findings"))), (
+            f"gov check shows the family red, but its findings do not name the edited CLAUDE.md\n{run.describe()}"
         )
 
 
@@ -664,6 +672,12 @@ class TestFindings:
             f"{len(findings) if isinstance(findings, list) else findings!r} findings\n"
             f"{run.describe()}"
         )
+        # Rewrite-Reason (DEC-892 item 2): a check that could not compare reports one finding too (a rulesync
+        # call that gave no answer in time), so the one finding is held to its reason: it names the edited file.
+        assert support.named_files(generated_project, json.dumps(findings)) == {"AGENTS.md"}, (
+            f"the check reports one finding, but it does not name the edited AGENTS.md: {findings}\n"
+            f"{run.describe()}"
+        )
 
     @needs_rulesync
     def test_rulesync_failure_without_a_file_is_reported_with_its_reason(
@@ -790,21 +804,28 @@ class TestToolAbsentOrHanging:
     @needs_rulesync
     def test_timeout_handling(self, generated_project, mock_dir):
         """Measures: a rulesync that never answers ends the check, not green,
-        within the check's own time limit (no traceback, no endless wait)."""
-        mock = support.write_mock_rulesync(mock_dir, "sleep 3600")
-        try:
-            result = support.run_portability_check(
-                generated_project,
-                env_override={"RULESYNC_BIN": str(mock)},
-                timeout=15,
-            )
-        except subprocess.TimeoutExpired:
-            pytest.fail(
-                "portability check did not handle a hanging rulesync binary: "
-                "subprocess.TimeoutExpired raised instead of a graceful error"
-            )
+        within the check's own time limit (no traceback, no endless wait), with a
+        finding that says rulesync gave no answer in time: a timeout is told apart
+        from an absent tool (DEC-425, DEC-892 item 2).
+
+        Rewrite-Reason (DEC-892 item 2): the wait for the check is the suite's
+        wait for a loaded machine (``support.CHECK_TIMEOUT_S``), not the old
+        limit plus 5 s, and the red is held to its reason."""
+        mock = support.write_mock_rulesync(mock_dir, "exec sleep 3600")
+        result = support.run_portability_check(
+            generated_project,
+            env_override={"RULESYNC_BIN": str(mock)},
+        )
         assert result.returncode != 0, (
             "portability check must not be GREEN when rulesync hangs"
+        )
+        findings = support.printed_findings(result)
+        assert support.timeout_findings(findings), (
+            f"rulesync gave no answer, but no finding says so: {findings}"
+        )
+        absent = [f for f in findings if support.READ_AS_ABSENT.search(str(f.get("message", "")))]
+        assert not absent, (
+            f"rulesync is installed and gave no answer, but a finding reads it as absent: {absent}"
         )
 
 

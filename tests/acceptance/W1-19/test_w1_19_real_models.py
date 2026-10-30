@@ -13,9 +13,12 @@ case holds that with the real reranker and no index; it needs neither Ollama nor
 **Run this file alone**, never beside another suite: the ticket is heavy, and the timed case is a latency case
 (DEC-372).
 
-The dev-tier measurement is taken once for the file (DEC-373): per tier, one process builds the index of a clone,
-asks three warm-up questions, then asks each question of the dev query set once, timed, while the peak resident
-memory of that process and of every process it starts (the Ollama daemon left out) is watched.
+The dev-tier measurement is taken once for the file (DEC-373): per tier, a process builds the index of a clone,
+asks three warm-up questions, then asks each question of the dev query set once. Since W2-M332 (I3 O3 (b); DEC-925
+item 3, B3 (a)) the times and the memory come from two such passes, each a process of its own on a clone of its
+own: the timed pass first, with no memory sampler in it, so the sampler's scan of every process every 50 ms is in
+no timed call; then the watched pass, whose peak resident memory of the process and of every process it starts (the
+Ollama daemon left out) is watched over the whole pass, the build included, as before.
 
 Mean hit@5 follows S0b2's own method (DEC-380): the first five distinct paths of each query against its
 ``must_cite``, a percentage per class, and the mean of the ten classes. The pass line is 80 on the dev tiers
@@ -100,34 +103,52 @@ def test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_
             f"a process was started from the workbench, where the S0b2 environment lives (DEC-397): {peak['argv']}"
 
 
+def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
+    """One process on a fresh clone of ``tier``: the index built, the three warm-up questions, then each question
+    of ``asked`` once. ``(answers, seconds per question, peaks)``; the memory sampler runs only when ``watch``."""
+    name = "watched" if watch else "timed"
+    root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}-{name}") / tier)
+    if root is None:
+        pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+    # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
+    search = {"limit": None, "refresh": False}
+    calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
+    calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
+    calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
+    outcome = api.run(calls, env=api.real_env(), watch=watch, timeout=support.MEASURE_TIMEOUT_S)
+    values = outcome.values()
+    assert support.check_facet(values[0], support.SEMANTIC_FACET)["available"] is True, \
+        f"the vectors of {tier} were not built in the {name} pass: {values[0]!r}"
+    skip = 1 + len(support.WARM_UP_QUERIES)
+    answers = [support.check_fused(value) for value in values[skip:]]
+    return answers, [call["seconds"] for call in outcome.calls[skip:]], outcome.peaks
+
+
 @pytest.fixture(scope="module")
 def measured(api, tmp_path_factory):
-    """``tier -> {"queries", "answers", "seconds", "peaks"}`` for the two dev tiers, one after the other."""
+    """``tier -> {"queries", "answers", "seconds", "peaks", "watched_answers"}`` for the two dev tiers, one after
+    the other.
+
+    Rewrite-Reason (W2-M332, I3 O3 (b); DEC-925 item 3, B3 (a)): the memory sampler scans every process of the
+    machine every 50 ms inside the process it watches, so a query timed in that process holds the sampler's work.
+    Per tier, two passes of the same calls (``_one_pass``), each in a process of its own on a clone of its own:
+    - the timed pass first, unwatched: ``seconds`` come from it, and no question was asked before it, as before;
+      ``answers`` (the hit@5 case and the fused-list case) come from it too, the first asking of each question;
+    - the watched pass after it: ``peaks`` come from it, watched over the whole pass, the build included, as before.
+    Nothing a case asserts changes: the same limits, the same queries timed.
+    """
     queries = support.dev_queries()
     if queries is None:
         pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
     results = {}
     for programme, tier in support.TIERS.items():
-        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}") / tier)
-        if root is None:
-            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
         asked = [query for query in queries if query["programme"] == programme]
-        # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
-        search = {"limit": None, "refresh": False}
-        calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
-        calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
-        calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
-        outcome = api.run(calls, env=api.real_env(), watch=True, timeout=support.MEASURE_TIMEOUT_S)
-        values = outcome.values()
-        assert support.check_facet(values[0], support.SEMANTIC_FACET)["available"] is True, \
-            f"the vectors of {tier} were not built: {values[0]!r}"
-        skip = 1 + len(support.WARM_UP_QUERIES)
-        results[tier] = {
-            "queries": asked,
-            "answers": [support.check_fused(value) for value in values[skip:]],
-            "seconds": [call["seconds"] for call in outcome.calls[skip:]],
-            "peaks": outcome.peaks,
-        }
+        answers, seconds, unwatched = _one_pass(api, tmp_path_factory, tier, asked, watch=False)
+        assert unwatched == [], \
+            f"the timed pass of {tier} was watched: the memory sampler ran inside the timed queries ({unwatched!r})"
+        watched_answers, _, peaks = _one_pass(api, tmp_path_factory, tier, asked, watch=True)
+        results[tier] = {"queries": asked, "answers": answers, "seconds": seconds, "peaks": peaks,
+                         "watched_answers": watched_answers}
     return results
 
 
@@ -152,6 +173,7 @@ def _scored(measured):
 
 @FULL
 def test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80(measured, record_property):
+    # The timed pass's answers (W2-M332), the first asking of each question, as before.
     # Success 2 and failure 1 are one line since DEC-414: at or above 80 on the dev tiers passes, below 80 fails.
     # The S0b2 R1 baseline of 85 is not a pass line here; where the mean stands against it is reported, not
     # asserted, for the Wave 1 exit run (W1-42) and for qualification, which re-measure it.
@@ -175,6 +197,7 @@ def test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80(meas
 
 @FULL
 def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+    # The timed pass's times: no memory sampler ran in that process (W2-M332).
     seconds = [value for result in measured.values() for value in result["seconds"]]
     assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
     slowest = sorted(seconds)[-3:]
@@ -185,7 +208,14 @@ def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
 
 @FULL
 def test_the_rerank_process_stays_within_two_and_a_half_gigabytes(measured):
+    # The watched pass's peaks (W2-M332). Its answers are held as the fused-list case holds the timed pass's, so
+    # the peaks are those of a pass that built the vectors and reranked every list, as the one pass of before was.
     for tier, result in measured.items():
+        short = [query["id"] for query, answer in zip(result["queries"], result["watched_answers"])
+                 if answer["facets"][support.SEMANTIC_FACET]["available"] is not True
+                 or answer["reranked"] is not True]
+        assert not short, f"on {tier} the watched pass did not rerank a list with both routes for {short}: its " \
+                          "peaks are not those of the retrieval"
         assert result["peaks"], f"no process was watched on {tier}"
         largest = result["peaks"][0]
         assert largest["hwm_kb"] * 1024 <= support.RERANK_RSS_LIMIT_BYTES, \
@@ -195,6 +225,8 @@ def test_the_rerank_process_stays_within_two_and_a_half_gigabytes(measured):
 
 @FULL
 def test_every_answer_is_one_fused_list_from_both_routes_reranked(measured):
+    # The timed pass's answers, the first asking of each question, as before (the watched pass's are held by the
+    # memory case).
     for tier, result in measured.items():
         for query, answer in zip(result["queries"], result["answers"]):
             assert answer["facets"][support.SEMANTIC_FACET]["available"] is True, \

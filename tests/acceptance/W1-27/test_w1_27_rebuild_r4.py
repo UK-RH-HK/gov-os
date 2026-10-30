@@ -33,6 +33,7 @@ behaviour, made it time out.  Every case now uses a tiny project with
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sqlite3
 from pathlib import Path
@@ -40,6 +41,7 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67b_support
 
 
 # --------------------------------------------------------------------------- #
@@ -240,10 +242,38 @@ def test_rebuild_stores_hold_no_secret(cli, rebuild_gov, rebuild_project, sandbo
 
 
 # --------------------------------------------------------------------------- #
-# Code index: the reason is measured, not a constant sentence (tool absent)
+# Code index: the reason is measured, not a constant sentence (the tool
+# answering, answering with a failure, absent)
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_codeintel_reason_is_measured(cli, rebuild_gov, rebuild_project, interface):
+CODE_INDEX_TOOL = "codebase-memory-mcp"
+# The exit code the failing stand-in ends every tool call with: a reason that carries it was measured.
+CODE_INDEX_TOOL_FAILURE = 37
+# How a reason says that the tool is not there to ask.
+_ABSENT_WORDS = ("no such file", "not found", "not on path", "absent", "missing", "not installed")
+# The MCP envelope of a tool call that succeeded, as the tool's ``cli --json`` prints it.
+_ANSWERED = '{"isError": false, "content": [{"type": "text", "text": "{}"}]}'
+
+
+def _code_index_path(folder, answer, binaries):
+    """A PATH of its own: git and gitleaks (the lexical index's owner needs its secrets filter, DEC-440) and,
+    unless ``answer`` is ``absent``, a stand-in of the code index's tool that writes each call's arguments to
+    ``calls`` beside itself. ``answers``: every call succeeds and a tool call prints a successful envelope.
+    ``fails``: its settings may be changed, and every tool call (``cli``) ends with exit code 37."""
+    folder.mkdir(parents=True)
+    for tool, binary in binaries.items():
+        (folder / tool).symlink_to(binary)
+    calls = folder / "calls"
+    if answer != "absent":
+        reply = {"answers": f"printf '%s\\n' '{_ANSWERED}'",
+                 "fails": f'if [ "$1" = cli ]; then exit {CODE_INDEX_TOOL_FAILURE}; fi'}[answer]
+        stand_in = folder / CODE_INDEX_TOOL
+        stand_in.write_text(f"#!/bin/sh\necho \"$*\" >> '{calls}'\n{reply}\n", encoding="utf-8")
+        stand_in.chmod(0o755)
+    return folder, calls
+
+
+def test_rebuild_codeintel_reason_is_measured(sandbox, tmp_path, monkeypatch):
     """The code index entry in the rebuild result names what was tried and
     what answered, not the constant sentence ``"no code index module exists"``
     — because the module ``src/gov/codeintel/`` does exist (W1-16) and it
@@ -260,30 +290,80 @@ def test_rebuild_codeintel_reason_is_measured(cli, rebuild_gov, rebuild_project,
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.  The codeintel existence check reads ``cli``
     (the session-scope code root).
-    """
-    py_file = rebuild_project / "sample.py"
-    py_file.write_text("x = 1\n", encoding="utf-8")
-    support.commit_all(rebuild_project, "add a tracked file")
 
-    codeintel_init = cli / "src" / "gov" / "codeintel" / "__init__.py"
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): any reason other than one fixed sentence
+    passed, whatever the tool had answered.  The case now gives three tiny
+    projects the same rebuild, each with a PATH of its own whose code index
+    tool is measured by the case: a stand-in that answers (the index must be
+    recreated, the tool asked to index), a stand-in that answers every tool
+    call with exit code 37 (not recreated; the reason names the tool and
+    that exit code, and does not say the tool is absent), and no tool (not
+    recreated; the reason names the tool and says it is not there).  It runs
+    with this worktree's code (DEC-732), not on the session copy.
+    """
+    codeintel_init = support.REPO_ROOT / "src" / "gov" / "codeintel" / "__init__.py"
     assert codeintel_init.is_file(), (
         "src/gov/codeintel/__init__.py does not exist; W1-16's module is missing"
     )
+    binaries = {tool: shutil.which(tool) for tool in ("git", "gitleaks")}
+    assert all(binaries.values()), f"git and gitleaks must be on PATH: {binaries}"
 
-    run = rebuild_gov("rebuild", "--json")
-    envelope = support.assert_envelope(run, interface, command="rebuild")
-    assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
+    seen = {}
+    for answer in ("answers", "fails", "absent"):
+        project = w2_67b_support.rebuild_project(tmp_path / answer / "repo")
+        w2_67b_support.write_committed(project, "sample.py", "x = 1\n", "add a tracked file")
+        folder, calls = _code_index_path(tmp_path / answer / "bin", answer, binaries)
+        monkeypatch.setenv("PATH", str(folder))
+        run, result = w2_67b_support.rebuild(project, sandbox)
+        stores = result.get("stores") or result.get("derived_stores") or {}
+        codeintel = stores.get("codeintel") or stores.get("code_index")
+        assert isinstance(codeintel, dict), (
+            f"rebuild names no code index entry (tool {answer}): {stores}\n{run.describe()}"
+        )
+        reason = str(codeintel.get("reason") or "")
+        assert reason != "no code index module exists", (
+            f"the code index reason is the constant 'no code index module "
+            f"exists' but src/gov/codeintel/ is W1-16's module and it has "
+            f"index(root); the reason should name what was tried and what "
+            f"answered (DEC-440)\ncodeintel entry: {codeintel}\n{run.describe()}"
+        )
+        asked = calls.read_text(encoding="utf-8").splitlines() if calls.exists() else []
+        seen[answer] = (run, codeintel, reason, asked)
 
-    result = envelope.get("result") or {}
-    stores = result.get("stores") or result.get("derived_stores") or {}
-    codeintel = stores.get("codeintel") or stores.get("code_index") or {}
-    reason = codeintel.get("reason", "")
+    run, codeintel, reason, asked = seen["answers"]
+    assert any("index_repository" in call for call in asked), (
+        f"rebuild did not ask the code index's tool to index (its calls: {asked})\n{run.describe()}"
+    )
+    assert codeintel.get("status") == "recreated", (
+        f"the code index's tool answered, yet the code index is not recreated (DEC-440): {codeintel}\n"
+        f"{run.describe()}"
+    )
 
-    assert reason != "no code index module exists", (
-        f"the code index reason is the constant 'no code index module "
-        f"exists' but src/gov/codeintel/ is W1-16's module and it has "
-        f"index(root); the reason should name what was tried and what "
-        f"answered (DEC-440)\ncodeintel entry: {codeintel}\n{run.describe()}"
+    run, codeintel, reason, asked = seen["fails"]
+    assert any("index_repository" in call for call in asked), (
+        f"rebuild did not ask the code index's tool to index (its calls: {asked})\n{run.describe()}"
+    )
+    assert codeintel.get("status") == "not_recreated", (
+        f"the code index's tool ended with exit code {CODE_INDEX_TOOL_FAILURE}, yet the code index is not "
+        f"named as not recreated: {codeintel}\n{run.describe()}"
+    )
+    assert CODE_INDEX_TOOL in reason and re.search(rf"\b{CODE_INDEX_TOOL_FAILURE}\b", reason), (
+        f"the reason does not name the tool and the exit code {CODE_INDEX_TOOL_FAILURE} it answered with "
+        f"(the measured reason, DEC-440): {codeintel}\n{run.describe()}"
+    )
+    assert not any(word in reason.lower() for word in _ABSENT_WORDS), (
+        f"the reason says the tool is not there, but it was asked and answered: {codeintel}\n{run.describe()}"
+    )
+
+    run, codeintel, reason, asked = seen["absent"]
+    assert codeintel.get("status") == "not_recreated", (
+        f"no code index tool is on PATH, yet the code index is not named as not recreated: {codeintel}\n"
+        f"{run.describe()}"
+    )
+    assert CODE_INDEX_TOOL in reason and any(word in reason.lower() for word in _ABSENT_WORDS), (
+        f"no code index tool is on PATH, and the reason does not name the tool as not there "
+        f"(the measured reason, DEC-440): {codeintel}\n{run.describe()}"
     )
 
 

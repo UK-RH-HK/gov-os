@@ -415,8 +415,10 @@ def environment(sandbox, without=()):
     folders = [str(Path(sys.executable).parent), *os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)]
     path = path_without(tuple(without), Path(sandbox.elsewhere) / "path-without") if without \
         else os.pathsep.join(folders)
+    dead = dead_endpoint()
     return {
-        "OLLAMA_HOST": dead_endpoint(),
+        "OLLAMA_HOST": dead,
+        "GOV_QUERY_OLLAMA_HOST": dead,  # W2-54, DEC-798: the CPU-only embedder's address is dead too
         "GOV_OLLAMA_BIN": str(Path(sandbox.elsewhere) / "no-embedding-program" / "ollama"),
         "PATH": path,
         "HOME": str(sandbox.home),

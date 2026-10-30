@@ -10,8 +10,9 @@ seconds and more.
 
 **The bound** is the one the earlier time cases of this revision use,
 unchanged: the hook ends with a decision within
-``w1_02_round_support.BOUND_S`` (5 s) of its own time, start to exit; a case
-ends the process at ``PROCESS_LIMIT_S`` (8 s) and fails. The bound is generous
+``w1_02_round_support.BOUND_S`` (5 s) of its own time, start to exit (its CPU
+time since W2-57); a case ends the process at ``PROCESS_LIMIT_S`` (18 s of wall
+time since W2-57; it was 8 s) and fails. The bound is generous
 for a loaded machine: the engineer is told to answer each of these inputs in
 well under a second of the check's own time.
 

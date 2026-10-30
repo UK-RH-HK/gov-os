@@ -172,9 +172,18 @@ def test_another_file_of_the_same_folder_named_alone_stays_readable(guarded, for
 @pytest.mark.parametrize("who", READERS)
 @pytest.mark.parametrize("form", sorted(ELSEWHERE))
 def test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed(guarded, form, who):
-    """Line 3: a search over ``src/``, a search from the root under a glob that matches neither file."""
+    """Line 3: a search over ``src/``, a search from the root under a glob that matches neither file.
+
+    Rewritten by W2-58 for one cell (DEC-821 item 1, brief item 3, TD-5): the engineer's Grep from the root with the
+    glob ``*.py`` takes in its own ticket's existing acceptance test (``tests/acceptance/W1-90/test_fixture.py``):
+    refused for (c), with a reason. Every other role and form: allowed, as before.
+    """
     tool_name, build = ELSEWHERE[form]
     result = protected.ask(guarded, tool_name, build(guarded), who)
+    if form == "Grep-from-the-root-with-a-glob-that-cannot-match" and who == "engineer":
+        assert result.decision == "deny", f"{form} by {who} was not refused (Policy 2 (c)): {result.describe()}"
+        assert protected.reason_of(result).strip(), f"{form} by {who} was refused without a reason"
+        return
     protected.assert_allowed(result, f"{form} by {who}")
 
 
