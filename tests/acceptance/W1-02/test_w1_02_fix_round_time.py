@@ -169,12 +169,14 @@ SEARCH_THE_ROOT = {
 
 
 @pytest.mark.parametrize("shape", sorted(SEARCH_THE_ROOT))
-def test_a_new_form_at_the_length_bound_that_searches_the_root_is_refused_within_the_bound(world, shape):
-    """Point 5: length buys no search of the root. Red before the change: allowed (in time)."""
+def test_a_new_form_at_the_length_bound_that_searches_the_root_is_decided_within_the_bound(world, shape):
+    """Point 5, rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3; TD-4 (b)): at the length bound the command is read
+    in time; the search of the root it holds, refused before Policy 2, is open: allowed within the bound, by the
+    orchestrator, and the hook's output carries nothing of the command or the root."""
     command = SEARCH_THE_ROOT[shape]()
     result = rnd.ask_timed(world, "Bash", support.bash_tool_input(command))
     what = f"the command '{shape}'"
-    rnd.assert_refused_in_time(result, what)
+    rnd.assert_allowed_in_time(result, what)
     rnd.assert_carries_none_of(result, (world.project, command[:64], command[-64:]), what)
 
 
@@ -188,12 +190,14 @@ READ_A_FILE = {
 
 @pytest.mark.parametrize("name", fix.FILES)
 @pytest.mark.parametrize("shape", sorted(READ_A_FILE))
-def test_a_new_form_at_the_length_bound_that_reads_a_protected_file_is_refused_within_the_bound(world, shape, name):
-    """Point 5: the guard refuses these today, in time (it reads every word); held, green before and after."""
+def test_a_new_form_at_the_length_bound_that_reads_a_protected_file_is_decided_within_the_bound(world, shape, name):
+    """Point 5, rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3; TD-4 (b)): the guard reads every word in time; the
+    read of either file it finds is open under Policy 2: allowed within the bound, and the hook's output carries
+    nothing of the file."""
     command = batch.fill(world, "own", name, READ_A_FILE[shape]())
     result = rnd.ask_timed(world, "Bash", support.bash_tool_input(command))
     what = f"the command '{shape}' on the stand-in {name}"
-    rnd.assert_refused_in_time(result, what)
+    rnd.assert_allowed_in_time(result, what)
     rnd.assert_carries_none_of(result, world.secrets("own", name) + (command[:64],), what)
 
 

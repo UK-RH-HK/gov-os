@@ -1,22 +1,23 @@
 ---
 id: DAEO-r9ss
-status: open
-deps: [DAEO-g0ip, DAEO-zflj]
+status: closed
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
 priority: 1
 assignee: engineer
 external-ref: W2-07
-tags: [wave-2, implementation, standard]
+tags: [wave-2, implementation, standard, close, keystone-1]
 wbs_id: W2-07
-title: gov close by ticket class; complete, tracked repair tickets; a share for every close
+title: gov close by ticket class; the commit gates before any test; complete, tracked repair tickets; a share for every close
 class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - DAEO-g0ip
 - DAEO-zflj
+- DAEO-7rr2
 allowed_paths:
 - src/gov/close/**
 - src/gov/telemetry/**
@@ -24,18 +25,38 @@ allowed_paths:
 - tests/unit/telemetry/**
 kpis:
   success:
-  - 'gov close judges a ticket by its class [W2-H045]: an implementation ticket on its acceptance tests; a specification ticket on its closed readiness record and its acceptance tests; an audit ticket on
-    its report and the audit validator; a research ticket on its evidence record; an integration or coordination ticket on its named evidence files'
+  - 'gov close judges a ticket by its class [W2-H045]: an implementation ticket on its acceptance tests; a specification ticket on its closed readiness record and its acceptance tests; an audit ticket on its report and the audit validator; a research ticket on its evidence record; an integration or coordination ticket on its named evidence files'
+  - 'A test-revision ticket is judged on the acceptance tests its ticket file names in acceptance_tests.path (another ticket''s folder), not on a folder of its own [DEC-892, DEC-896 item 3]'
+  - 'A decision-record commit that changes only governance records (DEC-891''s records: .tickets/, docs/checkpoints/, docs/close/, docs/probes/, the register, the plan files, governance/project/orchestration/; and the prompts, the briefs and the path map) and names an ACCEPTED decision, the owner''s or a delegated one, also when that decision was later superseded or changed, counts as measured for the work-without-a-task gate; a decision-record commit that names no decision ever ACCEPTED, or changes any other path, still counts as unmeasured [DEC-896 item 1, DEC-923 item 2]'
+  - 'Round 2 (DEC-923 item 2): the work-without-a-task gate also counts as measured a commit that the owner-committed lists name, acceptance_exemptions or accepted_history, each under its ACCEPTED owner decision, read as the trailer gate and W1-01 read them; a Role: owner trailer alone measures nothing (DEC-906: a trailer is only text until W2-44) [DEC-923 item 2, DEC-906]'
+  - 'The commit gates run first, before any test: the trailers, work without a task, accepted history, the probe gate (a stale probe named before the run, W2-M403), and the ratchet''s own reading of both lists'' entries (an entry the ratchet would not count is named); when one refuses, the close stops at once, names its cause and spends no ratchet attempt [DEC-868 item 3, DEC-896 item 3, P-IS-4 (a), I2 F13, I4 F14, F17]'
+  - 'The pre-close gate inside gov close: it collects every suite it will run, in one process, as it runs them; it runs gov check with no commit since the rebuild; and it checks that the ticket''s checkpoint is fresh. Any failure refuses at once, before any test runs [DEC-868]'
+  - 'Before its regression, gov close reads the shared disk''s free space and free inodes (W2-20''s reading once it lands; until then the floors 100 GiB and 10,000,000 inodes from the configuration) and refuses below either floor, naming the reading [DEC-898]'
+  - 'The probe gate accepts a failed probe record whose every finding is named, with its row, in an ACCEPTED owner decision that names the record and its probed commit; any finding not so named still refuses [W2-M371, DEC-790]'
   - A refused close writes a complete repair ticket (role, allowed paths, KPIs) that stays tracked in .tickets/ [F-m8, W2-L209, W2-L236, AR-9].
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
+  - 'The cases this ticket turns red are revised by its test designer, each with a Rewrite-Reason: W1-30''s test_w1_30_no_acceptance_tests.py (3 functions, 6 cases) and test_collection_error_refuses_close; its engineer revises the unit test_a_collection_error_is_a_finding [I2 F9]'
   failure:
-  - A research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
+  - A research ticket without an evidence record closes; an audit ticket whose report fails the validator closes.
+  - A collection error, a RED gov check, a stale checkpoint, a stale probe, an unmeasured commit, a ratchet entry the ratchet would not count, or a disk below the floor refused only after the regression.
+  - A decision-record commit outside an ACCEPTED decision counted as measured.
+  - 'A commit counted as measured by its Role: owner trailer alone, or a code, test or kernel commit counted as measured that no owner-committed list names [DEC-923 item 2].'
 profile: STANDARD
 sources:
 - DEC-729
-est_loc: 160
+- DEC-738
+- DEC-790
+- DEC-868
+- DEC-892
+- DEC-896
+- DEC-898
+- DEC-899
+- DEC-903
+- DEC-904
+- DEC-908
+est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-07/
   author: independent-test-designer (MR-3); written before implementation
@@ -66,26 +87,42 @@ list_rows:
 - W2-M248
 - W2-M249
 - W2-M252
+- W2-M263
 - W2-M276
 - W2-M286
 - W2-M348
 - W2-M349
 - W2-M354
+- W2-M403
 ---
-# W2-07 gov close by ticket class; complete, tracked repair tickets; a share for every close
+# W2-07 gov close by ticket class; the commit gates before any test; complete, tracked repair tickets; a share for every close
 
-Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
+Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729), with DEC-868, DEC-892, DEC-896 item 3, DEC-898 and lens I's P-IS-4.
 
-- **Allowed paths:** `src/gov/close/**` (except `src/gov/close/cache*`, W2-48's), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
-- **KPIs, success:**
-  - `gov close` judges a ticket by its class [W2-H045]:
-    - an implementation ticket on its acceptance tests;
-    - a specification ticket on its closed readiness record and its acceptance tests;
-    - an audit ticket on its report and the audit validator;
-    - a research ticket on its evidence record;
-    - an integration or coordination ticket on its named evidence files.
-  - A refused close writes a complete repair ticket (role, allowed paths, KPIs) that stays tracked in `.tickets/` [F-m8, W2-L209, W2-L236, AR-9].
-  - The close record carries the measured governance share [W2-M166, W2-M286].
-  - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
-  - An interrupted close leaves nothing that blocks the next close [W2-M158].
-- **KPIs, failure:** a research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
+- **Place (DEC-896 item 3):** it comes forward to sit with W2-66, before the first re-pin, and rides in it.
+  - It shares `src/gov/close/command.py` with W2-66: W2-66 writes the record's evidence lines, W2-07 the gates.
+  - **The merge order (owner, DEC-899 item 2):** the two are built in parallel, and **W2-07 merges first.** Then W2-66 merges `w2/integrate` back, re-verifies and gets a fresh FULL probe before the re-pin.
+- **Allowed paths:** `src/gov/close/**`, except W2-66's and W2-68's new modules (`select.py`, `nightly.py`, `evidence.py`, `batch.py`, `fingerprint.py`). Also `src/gov/telemetry/**`, `tests/unit/close/**` and `tests/unit/telemetry/**`, and, for its test designer only, the W1-30 cases named above.
+- **It unblocks** the test-revision tickets: W2-63, W2-67's revisions and W2-70 close on its class once it is pinned.
+- **Row W2-M263 (DEC-738 item 4):** RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.
+- **The test designer's batch, widened (owner, DEC-904 item 6):** each revision carries a `Rewrite-Reason:` naming its decision, and no expectation is lowered.
+  - W1-30's shared fixture, `tests/acceptance/W1-30/w1_30_support.py` and `tests/acceptance/W1-30/conftest.py`: its fixture projects green under the in-close `gov check` (`Rewrite-Reason: DEC-868 item 1 (b)`). This clears 175 cases.
+  - The 20 gate-order cases, to DEC-868 item 3's order (`Rewrite-Reason: DEC-868 item 3`):
+    - `test_w1_30_r9_every_finding.py` (8);
+    - `test_w1_30_r13_refused_runs.py` (3);
+    - `test_w1_30_check_blocks.py::test_a_refusal_where_gov_check_blocks_is_counted`;
+    - `test_w1_30_governance_checks.py::test_a_refusal_for_a_red_check_is_counted`;
+    - `test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected`;
+    - `test_w1_30_containment_places.py` (2);
+    - `test_w1_30_iteration.py::test_mixed_causes_reach_escalation`;
+    - `test_w1_30_repair_ticket.py` (2);
+    - `tests/acceptance/W2-53/test_w2_53_load_sensitive.py::test_an_entry_the_owner_did_not_add_is_refused_naming_it_and_its_test_is_not_run_again`.
+  - The repair-ticket case to KPI 8: `test_w1_30_r8_tree.py::test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured` (`Rewrite-Reason: KPI 8, AR-9, W2-L209`).
+  - The superseded expectations are marked under DEC-866: DEC-492, DEC-490 (one part), DEC-493 (one part).
+- **The batch, widened again (DEC-908, delegated):** 14 W1-30 cases the KPIs also change, each with its `Rewrite-Reason:`:
+  - 8 in `test_w1_30_context_failures.py` (DEC-868 item 3);
+  - `test_w1_30_governance_checks.py` ×2, `test_w1_30_r8_commits.py` ×2, `test_w1_30_r13_installed_skills.py` (DEC-868 item 1 (b), KPI 5);
+  - `test_w1_30_iteration.py::test_each_refusal_opens_repair_ticket` (KPI 10, W2-M252).
+- **W1-01's history and merge cases** are a known red until W2-70 merges (DEC-906, DEC-908): report them by name; they do not stop DONE.
+- **The verification run (DEC-904 item 3):** under `flock /tmp/gov-os-verify.lock`, within 6,000,000 files and folders and 60 GB, and before W2-66's (it merges first).
+- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py`, `tests/acceptance/W1-30/test_w1_30_collection*`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.

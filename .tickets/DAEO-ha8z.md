@@ -1,7 +1,7 @@
 ---
 id: DAEO-ha8z
-status: open
-deps: [DAEO-g0ip]
+status: in_progress
+deps: [DAEO-g0ip, DAEO-egsy]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -16,11 +16,14 @@ state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - DAEO-g0ip
+- DAEO-egsy
 allowed_paths:
 - docs/contract/contract.yaml
 - docs/contract/CONTRACT_v4.md
 - docs/changes/W2-49-CIT-P.md
 - docs/changes/W2-49-CIT-E.md
+- docs/contract/capabilities/**
+- docs/contract/SOURCE_MAP.csv
 kpis:
   success:
   - 'The CIT-P names each change, its source (DEC-722) and its impact (W2-02, W2-16, W2-18, W2-27 to W2-30, exit criteria 6 and 7): CAP-44.h, lite: the three verdicts and the conditions a lite verdict checks;
@@ -38,6 +41,9 @@ sources:
 - CAP-44.f
 - CAP-43.b
 - CAP-02.c
+- DEC-741
+- DEC-744
+- DEC-745
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W2-49/
@@ -47,6 +53,7 @@ closes:
 - DEC-722
 list_rows:
 - W2-I017
+- W2-L343
 ---
 # W2-49 Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P)
 
@@ -63,3 +70,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-49), as approved (DEC-729). The list row
   - The plan validator's two-way check covers the moved parts.
   - The CIT-E record matches the CIT-P, or lists the differences.
 - **KPIs, failure:** a Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator.
+- **CIT-P approved (DEC-741, 2026-10-17, `0faa0664`)** with answers A to J. K: `docs/contract/capabilities/**` joins the paths for the version line in every record (and, as the orchestrator reads CIT-P §8, the records of the split and moved items; to be confirmed by the owner). Row W2-L343 (`contract.yaml` PROPOSED, `CONTRACT_v4.md` ACCEPTED) is this ticket's. It closes after W2-51 (DEC-744), whose validator its KPI uses. W2-I017 is carried to Wave 3 at W2-30's close (J).
+- **DEC-745 (2026-10-17):** K confirmed (the eight records CAP-43, 43.b, 43.d, 44, 44.f, 44.h, 44.k, 44.l rewritten from the approved `contract.yaml`, in a commit of their own); `docs/contract/SOURCE_MAP.csv` joins the paths for the CIT-P §8's eight rows only, aligned with v4.2, made in the round that merges `w2/integrate` before the close.

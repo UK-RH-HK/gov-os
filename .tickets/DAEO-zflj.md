@@ -1,6 +1,6 @@
 ---
 id: DAEO-zflj
-status: open
+status: closed
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:10Z
@@ -22,18 +22,24 @@ allowed_paths:
 - template/governance/kernel/templates/decision-record.md
 - src/gov/check/schema.py
 - tests/unit/check/test_schema*
+- tests/unit/check/test_check.py
 kpis:
   success:
   - 'The kernel schemas define these types [AR-1, AR-3, W2-M316, W2-M317, AR-9]: a decision entry: one register entry, with id, status, owner, date and its own span; an audit report in DEC-441''s form;
     an adoption verdict: the three CAP-44.h verdicts and the conditions behind them, in the lite form Contract v4.2 states; the close record type that gov close writes'
   - Core-schema reads docs/audit/wave-1/W1-43-wave-1-exit-audit.md and the exit report as valid, and is green on this repository [F-M13, W2-M301, W2-M309, W2-M310, W2-L243].
   - A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177].
+  - The wbs_id grammar accepts an id with one lower-case letter suffix (W2-15a) and still refuses any other form (W2-15, W2-15ab, W2-15A, W2-1) [DEC-730].
   failure:
   - An audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still SCHEMA_INVALID_TYPE.
 profile: STANDARD
 sources:
 - DEC-441
 - CAP-44.h
+- DEC-730
+- DEC-741
+- DEC-746
+- DEC-749
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-02/
@@ -81,4 +87,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-02), as approved (DEC-729). The list row
     - the `close` record type that `gov close` writes.
   - core-schema reads `docs/audit/wave-1/W1-43-wave-1-exit-audit.md` and the exit report as valid, and is green on this repository [F-M13, W2-M301, W2-M309, W2-M310, W2-L243].
   - A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177].
+  - The `wbs_id` grammar accepts an id with one lower-case letter suffix (`W2-15a`) and still refuses any other form (`W2-15`, `W2-15ab`, `W2-15A`, `W2-1`) [DEC-730]. The grammar's one definition is `template/governance/kernel/schemas/common.schema.json`.
 - **KPIs, failure:** an audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still `SCHEMA_INVALID_TYPE`.
+- **The adoption verdict (DEC-741, I (ii), 2026-10-17):** the three CAP-44.h values, and a list of named conditions, each with its source item and its state (met, not met, accepted by an owner entry). W2-02 closes on its own; W2-52's stage records are read as conditions later.
+- **DEC-746 (delegated, 2026-10-17):** `tests/unit/check/test_check.py` is in the paths for `test_schema_clean_record` only (P-A). W1-26's one assertion is revised by an independent test designer, stricter (P-B). KPI line 4's refused list is read as `W2-15ab`, `W2-15A`, `W2-1`: `W2-15` is accepted (P-1, for the owner to confirm). The verdict's conditions are typed per DEC-741 I (ii) (P-2). P-3 to P-5 as the lead recommended.
+- **DEC-749 (delegated, 2026-10-17):** core-schema's shape check in `src/gov/check/schema.py` measures `array` with `items`, `object` with `properties` and `required`, and one `if`/`then` on a `const`, so that the verdict's required list of conditions can be measured; every other keyword stays a fault. Estimate about 250.

@@ -1,4 +1,4 @@
-"""Support code for the W1-01 acceptance tests (standard library only).
+"""Support code for the W1-01 acceptance tests (standard library, and PyYAML for the path map).
 
 Two things live here:
 
@@ -21,7 +21,8 @@ Two things live here:
      characters; a rule without ``*`` matches the exact command. A compound
      command is denied when any of its parts is denied.
 
-2. Readers for the records the ticket names: git history and ticket frontmatter.
+2. Readers for the records the ticket names: git history and ticket frontmatter,
+   and the path map's ``acceptance_exemptions`` (DEC-906; read with PyYAML).
 """
 
 from __future__ import annotations
@@ -35,6 +36,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 SETTINGS_REL = ".claude/settings.json"
 BOOTSTRAP_REL = "governance/project/bootstrap.md"
 TOOL_REGISTRY_REL = "governance/project/tool-registry.yaml"
+PATH_MAP_REL = "governance/project/path-map.yaml"
+EXEMPTIONS_KEY = "acceptance_exemptions"
 TEST_DESIGNER_ROLE = "independent-test-designer"
 
 FILE_EDIT_TOOLS = ("Edit", "Write", "NotebookEdit")
@@ -233,21 +236,55 @@ def _blobs_under(commit, path, root):
     return blobs
 
 
-def merge_offences(sha, path, root=REPO_ROOT):
-    """Why a merge commit without the test designer's role may not pass (DEC-253); empty when it passes.
+def _git_merge_under(first, other, path, root):
+    """(blobs under ``path``, conflicted paths) of git's own merge of two commits; None when git cannot compute it.
+
+    Git's own merge is the tree ``git merge-tree --write-tree <first> <other>``
+    writes. An error, no merge base or a git without ``--write-tree`` gives None.
+    """
+    proc = subprocess.run(
+        ["git", "-C", str(root), "-c", "core.quotePath=false", "merge-tree", "--write-tree",
+         "--name-only", "-z", "--no-messages", first, other],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode not in (0, 1):
+        return None
+    tree, *conflicted = [part for part in proc.stdout.split("\0") if part] or [""]
+    if not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", tree):
+        return None
+    return _blobs_under(tree, path, root), set(conflicted)
+
+
+def merge_offences(sha, path, root=REPO_ROOT, exempt=None):
+    """Why a merge commit without the test designer's role may not pass (DEC-253, DEC-912 item 1); empty when it passes.
 
     A merge commit passes when every change it brings under ``path`` comes from
     commits on the merged side that carry ``Role: independent-test-designer``:
 
     - every file under ``path`` in which the merge differs from its first parent
       is, in the merge, exactly what one of the other parents holds (the same
-      content, or absent in both). Anything else is a change the merge commit
-      makes itself, beyond what its parents hold;
+      mode and content, or absent in both), or exactly what git's own merge of
+      the merge's two parents holds: the tree ``git merge-tree --write-tree
+      <first parent> <other parent>`` writes (DEC-912 item 1, with DEC-750 and
+      DEC-754). Git's own merge is asked only when a file fails the first test.
+      It gives no allowance to an octopus merge, when git cannot compute it (an
+      error, no merge base, an old git), or to a file on which git reports a
+      conflict; a conflict git reports only on other files does not take the
+      allowance from this one. Anything else (a hand edit, a conflict
+      resolution) is a change the merge commit makes itself, beyond what its
+      parents hold, whatever the merge brings;
     - every non-merge commit that is reachable from another parent, is not
-      reachable from the first parent, and touches ``path``, carries the role.
-      A merge commit on the merged side is judged by this same rule when the
-      history walk reaches it.
+      reachable from the first parent, and touches ``path``, carries the role,
+      or has its full id listed in the path map's ``acceptance_exemptions``
+      (DEC-906 item 2, read through this function by DEC-908 item 3; ``exempt``
+      is that list, read from ``root`` when not given). A ``Role: owner``
+      trailer alone exempts nothing. A merge commit on the merged side is
+      judged by this same rule when the history walk reaches it.
     """
+    if exempt is None:
+        exempt = acceptance_exemptions(root)
     first, *others = commit_parents(sha, root)
     merged = _blobs_under(sha, path, root)
     base = _blobs_under(first, path, root)
@@ -258,12 +295,18 @@ def merge_offences(sha, path, root=REPO_ROOT):
         if merged.get(name) != base.get(name)
         and not any(side.get(name) == merged.get(name) for side in brought)
     )
+    if own and len(others) == 1:
+        by_git = _git_merge_under(first, others[0], path, root)
+        if by_git is not None:
+            blobs, conflicted = by_git
+            own = [name for name in own if name in conflicted or blobs.get(name) != merged.get(name)]
     if own:
         offences.append("the merge commit itself changes " + ", ".join(own))
     for parent in others:
         side = git("rev-list", "--no-merges", "--full-history", f"{first}..{parent}", "--", path,
                    root=root).split()
-        without = [c[:12] for c in side if TEST_DESIGNER_ROLE not in commit_roles(c, root)]
+        without = [c[:12] for c in side
+                   if TEST_DESIGNER_ROLE not in commit_roles(c, root) and c not in exempt]
         if without:
             offences.append(
                 f"it brings commits without `Role: {TEST_DESIGNER_ROLE}`: " + ", ".join(without)
@@ -271,22 +314,52 @@ def merge_offences(sha, path, root=REPO_ROOT):
     return offences
 
 
+def acceptance_exemptions(root=REPO_ROOT):
+    """{full commit id: decision} of the path map's ``acceptance_exemptions`` (DEC-906 item 2).
+
+    The list sits beside ``accepted_history`` and only the owner commits to it.
+    Each entry is ``{commit: <full sha>, decision: <DEC id>}``. No path map, no
+    key, an empty list, and an entry of another shape (no ``DEC-<n>`` decision,
+    a commit that is not a string) exempt nothing. A commit is matched by its
+    whole id only, so an abbreviated id exempts nothing.
+    """
+    path = Path(root) / PATH_MAP_REL
+    if not path.is_file():
+        return {}
+    import yaml
+
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    entries = data.get(EXEMPTIONS_KEY) if isinstance(data, dict) else None
+    exempt = {}
+    for entry in entries if isinstance(entries, list) else []:
+        commit = entry.get("commit") if isinstance(entry, dict) else None
+        decision = entry.get("decision") if isinstance(entry, dict) else None
+        if isinstance(commit, str) and isinstance(decision, str) and re.fullmatch(r"DEC-\d+", decision.strip()):
+            exempt[commit.strip()] = decision.strip()
+    return exempt
+
+
 def acceptance_test_offenders(root=REPO_ROOT, path="tests/acceptance"):
     """One line per commit on HEAD's history that touches ``path`` and may not.
 
     - A commit that carries ``Role: independent-test-designer`` passes.
-    - Any other non-merge commit is an offender.
+    - Any other non-merge commit is an offender, unless its full id is listed in
+      the path map's ``acceptance_exemptions`` (DEC-906 item 2). A ``Role: owner``
+      trailer alone exempts nothing.
     - Any other merge commit is an offender unless ``merge_offences`` is empty
-      (DEC-253: an integration merge of test-designer commits).
+      (DEC-253: an integration merge of test-designer commits, or of commits
+      listed in the same ``acceptance_exemptions``, DEC-908 item 3).
     """
+    exempt = acceptance_exemptions(root)
     offenders = []
     for sha in commits_touching(path, root):
         if TEST_DESIGNER_ROLE in commit_roles(sha, root):
             continue
         if len(commit_parents(sha, root)) < 2:
-            offenders.append(sha[:12])
+            if sha not in exempt:
+                offenders.append(sha[:12])
             continue
-        offences = merge_offences(sha, path, root)
+        offences = merge_offences(sha, path, root, exempt)
         if offences:
             offenders.append(f"{sha[:12]} (merge: {'; '.join(offences)})")
     return offenders

@@ -34,9 +34,12 @@ def _feature_check(family, severity=support.HARD_BLOCK):
                                   family=family)
 
 
-def _ready(project):
-    """The ticket's work with a governance file changed, and the checkpoint: returns ``HEAD``."""
+def _ready(project, told=None):
+    """The ticket's work with a governance file changed, and the checkpoint: returns ``HEAD``. With ``told``
+    the ticket's acceptance test tells into that folder whenever it runs."""
     support.start_ticket(project, TICKET, WBS)
+    if told is not None:
+        project.write(f"tests/acceptance/{WBS}/test_pass.py", support.telling_test("test_pass", told))
     support.engineer_commit(project, TICKET, {"src/example/feature.py": "# feature\n", NOTES: "note: one\n"})
     return support.checkpointed(project, TICKET)
 
@@ -103,16 +106,22 @@ def test_a_close_is_refused_where_gov_check_blocks_and_no_hard_block_check_is_re
     support.assert_not_closed(project, TICKET)
 
 
-def test_a_refusal_where_gov_check_blocks_is_counted(project_with_checks, sandbox, interface):
+def test_a_refusal_where_gov_check_blocks_is_counted(project_with_checks, sandbox, interface, tmp_path):
+    """Revised for W2-07 (DEC-868 item 3): ``gov check`` is the pre-close gate. Where it blocks, the close
+    refuses at once, naming what blocks, before any test runs, and spends no attempt: the count stays 0."""
+    told = tmp_path / "told"
+    told.mkdir()
     project = project_with_checks(README_PRESENT, _feature_check(OTHER_FAMILY))
-    _ready(project)
+    _ready(project, told)
     blocking = _blocks_without_a_red_check(project, sandbox)
 
     run = support.run_close(project, sandbox, TICKET)
 
     _refused_naming_what_blocks(run, interface, blocking)
-    assert support.iteration_count(project.root, TICKET) == 1, \
-        f"the close refused where gov check blocks is not counted as one iteration\n{run.describe()}"
+    assert support.told_by(told) == {}, \
+        f"gov check blocked and a test ran all the same: {support.told_by(told)}\n{run.describe()}"
+    support.assert_nothing_counted(project, TICKET, run)
+    support.assert_not_closed(project, TICKET)
 
 
 def test_a_refusal_where_gov_check_blocks_opens_a_dependent_repair_ticket(project_with_checks, sandbox, interface):

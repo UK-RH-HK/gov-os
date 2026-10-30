@@ -79,7 +79,11 @@ TOOL_REGISTRY_REL = "governance/project/tool-registry.yaml"
 # The installed rulesync, found as the W1-38 suite finds it: ``RULESYNC_BIN``, or the path the registry's install
 # line puts it at.
 RULESYNC_BIN = Path(os.environ.get("RULESYNC_BIN", str(Path.home() / ".local/bin/rulesync")))
-RULESYNC_TIMEOUT_S = 60.0
+# The waits for rulesync are limits a loaded machine meets, as W1-38's suite gives them (DEC-892 item 2, W2-57):
+# under a close's parallel load ``--version`` has passed 10 s and ``generate`` 30 s. A rulesync that is there and
+# gives no answer within them fails the case, naming the timeout: a timeout is not an absent tool.
+RULESYNC_PROBE_TIMEOUT_S = 60.0
+RULESYNC_TIMEOUT_S = 180.0
 RESEARCH_ROSTER_ENTRY = {
     "role_file": "template/governance/kernel/roles/research.md",
     "agent": ".claude/agents/research.md",
@@ -164,15 +168,26 @@ def adapter_source_rel(role):
 
 
 def rulesync_version():
-    """What the installed rulesync answers to ``--version``, or None when it is not installed or does not answer."""
+    """What the installed rulesync answers to ``--version``; None only when rulesync is truly absent (``RULESYNC_BIN``
+    names no file). A rulesync that is there but gives no answer within the probe's limit, cannot be started or fails
+    ``--version`` is a failure that names what happened, never "not installed" (DEC-892 item 2)."""
     if not RULESYNC_BIN.is_file():
         return None
     try:
-        done = subprocess.run([str(RULESYNC_BIN), "--version"], capture_output=True, text=True, timeout=10,
-                              check=False)
-    except (subprocess.TimeoutExpired, OSError):
-        return None
-    return done.stdout.strip() if done.returncode == 0 else None
+        done = subprocess.run([str(RULESYNC_BIN), "--version"], capture_output=True, text=True,
+                              timeout=RULESYNC_PROBE_TIMEOUT_S, check=False, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired:
+        raise AssertionError(f"rulesync at {RULESYNC_BIN} gave no answer to --version within "
+                             f"{RULESYNC_PROBE_TIMEOUT_S:.0f} s: a timeout, not an absent tool "
+                             "(DEC-892 item 2)") from None
+    except OSError as exc:
+        raise AssertionError(f"rulesync at {RULESYNC_BIN} is there but could not be started ({exc}): "
+                             "not an absent tool") from None
+    assert done.returncode == 0, (
+        f"rulesync at {RULESYNC_BIN} is there but --version ended with {done.returncode}: "
+        f"{(done.stderr or done.stdout).strip()[-300:]!r}; not an absent tool"
+    )
+    return done.stdout.strip()
 
 
 def registered_rulesync_version(root=REPO_ROOT):
@@ -208,11 +223,15 @@ def generate_definition(role, work):
     """
     project, home = copy_adapter_source(Path(work) / "project", role), Path(work) / "home"
     home.mkdir()
-    done = subprocess.run(
-        [str(RULESYNC_BIN), "generate", "--targets", "claudecode", "--features", "subagents"],
-        cwd=project, env={**os.environ, "HOME": str(home)}, capture_output=True, text=True,
-        timeout=RULESYNC_TIMEOUT_S, check=False,
-    )
+    try:
+        done = subprocess.run(
+            [str(RULESYNC_BIN), "generate", "--targets", "claudecode", "--features", "subagents"],
+            cwd=project, env={**os.environ, "HOME": str(home)}, capture_output=True, text=True,
+            timeout=RULESYNC_TIMEOUT_S, check=False, stdin=subprocess.DEVNULL,
+        )
+    except subprocess.TimeoutExpired:
+        raise AssertionError(f"rulesync generate gave no answer within {RULESYNC_TIMEOUT_S:.0f} s for "
+                             f"{adapter_source_rel(role)}: a timeout, not an absent tool (DEC-892 item 2)") from None
     assert done.returncode == 0, (
         f"rulesync generate ended with {done.returncode} for {adapter_source_rel(role)}: "
         f"{(done.stderr or done.stdout)[-300:]!r}"

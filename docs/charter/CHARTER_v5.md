@@ -29,7 +29,11 @@ vendor account (DEC-057).
 - The Gov OS is built in three waves: Wave 1 Integrate, Wave 2 Strengthen, Wave 3 Complete. Each wave ends in an exit
   check and an independent audit.
 - It is qualified on two synthetic programmes (DEC-067) and released **once** as Release 1, a signed `v1.0.0` tag.
-- Adoption into product repositories starts only after Release 1 (DEC-064).
+- Adoption into product repositories starts after Release 1 (DEC-064), with one exception: a single pilot adoption in
+  Wave 2 (EXAMIN, DEC-718, DEC-727), allowed only after Track A passes and is audited (W2-25), on a pinned,
+  hash-verified release, with independent verdicts on a copy (W2-28) and on the real repository (W2-30), the owner's
+  go before the real repository is written, and the freeze and rollback in the owner's hands. Every other product
+  repository waits for Release 1.
 
 ## 2. Threat model
 

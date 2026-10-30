@@ -15,44 +15,67 @@ made it time out.  Every case now uses a tiny project (~3 tracked files,
 from __future__ import annotations
 
 import shutil
-from pathlib import Path
-
-import pytest
 
 import w1_27_support as support
+import w2_67_doctor
+import w2_67b_support
 
 
 # --------------------------------------------------------------------------
 # Command identity
 # --------------------------------------------------------------------------
 
-def test_rebuild_is_an_act_command(rebuild_gov, interface):
+def test_rebuild_is_an_act_command(sandbox, tmp_path):
     """``rebuild`` is an act command (DEC-317): it returns an envelope and may change derived state.
 
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): it accepted any envelope, REBUILD_FAILED
+    included.  The rebuild must now succeed, write its store under
+    ``.gov-runtime/``, and change nothing else in the project.
     """
-    run = rebuild_gov("rebuild", "--json")
-    support.assert_envelope(run, interface, command="rebuild")
+    project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    before = support.snapshot(project, skip=(".git", ".gov-runtime"))
+    run, _ = w2_67b_support.rebuild(project, sandbox)
+    assert (project / ".gov-runtime" / "store.db").is_file(), f"rebuild wrote no store\n{run.describe()}"
+    changed = support.snapshot_difference(before, support.snapshot(project, skip=(".git", ".gov-runtime")))
+    assert not changed, "rebuild changed the project outside .gov-runtime:\n" + "\n".join(changed) + \
+        f"\n{run.describe()}"
 
 
 # --------------------------------------------------------------------------
 # KPI success 2: rebuild guarantees
 # --------------------------------------------------------------------------
 
-def test_rebuild_recreates_derived_stores(rebuild_gov, rebuild_project, interface):
+def test_rebuild_recreates_derived_stores(sandbox, tmp_path):
     """After rebuild, the derived stores under ``.gov-runtime/`` exist.
 
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): it checked that ``.gov-runtime`` exists only.
+    The store is now removed after a first rebuild, and the second must
+    recreate it: its lexical index holds the project's document, and the
+    result names the lexical store recreated.
     """
-    run = rebuild_gov("rebuild", "--json")
-    envelope = support.assert_envelope(run, interface, command="rebuild")
-    assert envelope["ok"] is True, f"rebuild did not succeed\n{run.describe()}"
-    runtime = rebuild_project / ".gov-runtime"
-    assert runtime.exists(), f".gov-runtime does not exist after rebuild\n{run.describe()}"
+    project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    w2_67b_support.write_committed(project, "docs/guide.md", "a document the lexical index holds\n")
+    w2_67b_support.rebuild(project, sandbox)
+    shutil.rmtree(project / ".gov-runtime", ignore_errors=True)
+    run, result = w2_67b_support.rebuild(project, sandbox)
+    assert (result.get("stores") or {}).get("lexical", {}).get("status") == "recreated", (
+        f"the result does not name the lexical store recreated\n{run.describe()}"
+    )
+    assert (project / ".gov-runtime" / "store.db").is_file(), f"rebuild did not recreate the store\n{run.describe()}"
+    indexed = {row[0] for row in w2_67b_support.store_rows(project, "SELECT path FROM lexical_file")}
+    assert "docs/guide.md" in indexed, (
+        f"the recreated lexical index does not hold docs/guide.md: {sorted(indexed)}\n{run.describe()}"
+    )
 
 
 def test_two_rebuilds_give_the_same_digest(rebuild_gov, rebuild_project, interface):
@@ -82,7 +105,7 @@ def test_two_rebuilds_give_the_same_digest(rebuild_gov, rebuild_project, interfa
     )
 
 
-def test_fresh_clone_doctor_rebuild(cli, tmp_path, interface):
+def test_fresh_clone_doctor_rebuild(tmp_path):
     """A fresh clone followed by doctor followed by rebuild works (CAP-46.a).
 
     The sequence is: create a tiny project (simulating a fresh clone), run
@@ -91,23 +114,37 @@ def test_fresh_clone_doctor_rebuild(cli, tmp_path, interface):
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): it made no clone and did not read doctor's
+    verdict.  The tiny project is now committed and cloned with git; doctor
+    in the clone reports its sections, with no index yet; rebuild succeeds;
+    and doctor then reports the clone's index fresh.
     """
-    project = support.make_rebuild_project(cli, tmp_path / "fresh" / "repo")
+    origin = w2_67b_support.rebuild_project(tmp_path / "origin")
+    w2_67b_support.write_committed(origin, "docs/guide.md", "a document of the project\n")
+    clone = tmp_path / "clone"
+    support.git(tmp_path, "clone", "-q", str(origin), str(clone))
     sandbox = support.make_sandbox(tmp_path / "sandbox")
 
-    run_doc = support.run_gov_with_code(cli, project, sandbox, "doctor", "--json")
-    env_doc = support.assert_envelope(run_doc, interface, command="doctor")
-
-    run_reb = support.run_gov_with_code(cli, project, sandbox, "rebuild", "--json")
-    env_reb = support.assert_envelope(run_reb, interface, command="rebuild")
-    assert env_reb["ok"] is True, f"rebuild after fresh clone failed\n{run_reb.describe()}"
+    first = w2_67_doctor.doctor(clone, sandbox)
+    freshness = w2_67_doctor.section(first, "index_freshness")
+    assert freshness.get("index_status") != "fresh", (
+        f"doctor in a fresh clone reports an index no rebuild has built: {freshness}\n{first.describe()}"
+    )
+    w2_67b_support.rebuild(clone, sandbox)
+    second = w2_67_doctor.doctor(clone, sandbox)
+    freshness = w2_67_doctor.section(second, "index_freshness")
+    assert (freshness.get("index_status"), freshness.get("status")) == ("fresh", "pass"), (
+        f"doctor does not report the clone's index fresh after the rebuild: {freshness}\n{second.describe()}"
+    )
 
 
 # --------------------------------------------------------------------------
 # Failure KPI 2: rebuild needs anything not in git
 # --------------------------------------------------------------------------
 
-def test_rebuild_needs_only_git(cli, tmp_path, interface):
+def test_rebuild_needs_only_git(sandbox, tmp_path, monkeypatch):
     """Rebuild works with only the content in git, nothing else.
 
     A fresh tiny project (no .gov-runtime, no external state) must
@@ -116,21 +153,33 @@ def test_rebuild_needs_only_git(cli, tmp_path, interface):
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): the folder it deleted never existed, and it ran
+    with every tool of the machine on PATH.  A first rebuild now leaves a
+    ``.gov-runtime``, which is removed, and the second runs with a PATH that
+    holds git and the secrets filter's gitleaks alone (the lexical index's
+    owner runs that filter on every file and fails closed without it,
+    DEC-440); it must succeed and recreate the lexical store.
     """
-    project = support.make_rebuild_project(cli, tmp_path / "gitonly" / "repo")
-    sandbox = support.make_sandbox(tmp_path / "sandbox")
+    project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    w2_67b_support.rebuild(project, sandbox)
+    shutil.rmtree(project / ".gov-runtime")
+    tools_only = tmp_path / "git-only-bin"
+    tools_only.mkdir()
+    for tool in ("git", "gitleaks"):
+        binary = shutil.which(tool)
+        assert binary, f"{tool} is not on PATH"
+        (tools_only / tool).symlink_to(binary)
+    monkeypatch.setenv("PATH", str(tools_only))
+    run, result = w2_67b_support.rebuild(project, sandbox)
+    assert (result.get("stores") or {}).get("lexical", {}).get("status") == "recreated", (
+        f"rebuild with git and gitleaks alone on PATH and no earlier state does not recreate the lexical store\n"
+        f"{run.describe()}"
+    )
 
-    runtime = project / ".gov-runtime"
-    if runtime.exists():
-        shutil.rmtree(runtime)
-    support.commit_all(project, "clean runtime")
 
-    run = support.run_gov_with_code(cli, project, sandbox, "rebuild", "--json")
-    envelope = support.assert_envelope(run, interface, command="rebuild")
-    assert envelope["ok"] is True, f"rebuild fails without pre-existing state\n{run.describe()}"
-
-
-def test_rebuild_digest_matches_store_loader(rebuild_gov, rebuild_project, interface):
+def test_rebuild_digest_matches_store_loader(sandbox, tmp_path):
     """The digest reported by rebuild matches what the store loader computes (CAP-07.a).
 
     After rebuild, running ``gov status --json`` (which loads the store) and comparing its session digest with
@@ -139,20 +188,24 @@ def test_rebuild_digest_matches_store_loader(rebuild_gov, rebuild_project, inter
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+    the case's name claims): the envelope's session is a string, so the
+    digests were never compared.  The rebuild's digest is now compared with
+    the one the store loader computes from the store it left
+    (``gov.store.digest``, this worktree's code).
     """
-    run_reb = rebuild_gov("rebuild", "--json")
-    env_reb = support.assert_envelope(run_reb, interface, command="rebuild")
-    assert env_reb["ok"] is True, f"rebuild failed\n{run_reb.describe()}"
-    rebuild_digest = (env_reb.get("result") or {}).get("digest")
+    project = w2_67b_support.rebuild_project(tmp_path / "repo")
+    run_reb, result = w2_67b_support.rebuild(project, sandbox)
+    rebuild_digest = result.get("digest")
     assert rebuild_digest is not None, f"rebuild has no digest\n{run_reb.describe()}"
 
-    run_st = rebuild_gov("status", "--json")
-    env_st = support.assert_envelope(run_st, interface, command="status")
-    status_session = env_st.get("session")
-    if isinstance(status_session, dict):
-        store_digest = status_session.get("store_digest") or status_session.get("digest")
-        if store_digest is not None:
-            assert rebuild_digest == store_digest, (
-                f"rebuild digest {rebuild_digest} does not match store digest {store_digest}\n"
-                f"rebuild:\n{run_reb.describe()}\nstatus:\n{run_st.describe()}"
-            )
+    loaded = support.run_python_snippet(
+        support.REPO_ROOT, sandbox,
+        f"from pathlib import Path\nfrom gov.store import digest\nprint(digest(Path({str(project)!r})))\n")
+    assert loaded.returncode == 0, f"the store loader failed: {loaded.stderr}"
+    store_digest = loaded.stdout.strip()
+    assert rebuild_digest == store_digest, (
+        f"rebuild digest {rebuild_digest} does not match store digest {store_digest}\n"
+        f"rebuild:\n{run_reb.describe()}"
+    )

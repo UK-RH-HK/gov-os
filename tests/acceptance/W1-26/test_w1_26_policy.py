@@ -78,20 +78,33 @@ def test_every_policy_key_maps_to_a_check_or_is_informational(project, sandbox, 
     assert not reported, f"policy keys a declared check states under enforces are reported: {reported}\n{run.describe()}"
 
 
-def test_a_new_policy_key_with_no_check_and_not_informational_is_red(project, sandbox, interface):
-    """A new hard-block policy key with no associated check fails."""
+def test_a_new_policy_key_with_no_check_and_not_informational_is_red(green_project, sandbox, interface):
+    """A new hard-block policy key with no associated check fails: a check is RED with a finding that names the
+    key, and it is the only key reported.
+
+    Revised (W2-67): the base is the green project with a valid path map (its namespaces a mapping, as the kernel
+    schema has them), whose policies are the keys a declared check of the project states and the informational
+    ones; before, the path map's ``namespaces: []`` was refused (CONFIG_INVALID) before any check ran, on a base
+    that was red anyway (I2 R1)."""
     import yaml
+    project = green_project
+    stated = _stated(_declarations(project))
+    project.add_path_map({"all": ["**/*"]})
     path_map_path = project.root / support.PATH_MAP_REL
-    if path_map_path.is_file():
-        data = yaml.safe_load(path_map_path.read_text(encoding="utf-8"))
-    else:
-        data = {"version": 1, "namespaces": [], "policies": dict(support.POLICIES)}
+    data = yaml.safe_load(path_map_path.read_text(encoding="utf-8"))
+    data["policies"] = {key: strength for key, strength in support.POLICIES.items()
+                        if strength == "informational" or key in stated}
     data["policies"]["brand_new_policy"] = "hard-block"
-    path_map_path.parent.mkdir(parents=True, exist_ok=True)
     path_map_path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
-    project.commit()
-    run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    reported, run = _uncovered(project, sandbox, interface)
+    assert reported == ["brand_new_policy"], (
+        f"the policy keys reported are not exactly the new one: {reported}, stated {sorted(stated)}\n{run.describe()}"
+    )
+    result, envelope = support.result_and_envelope(run, interface)
+    red = [entry.get("id") for entry in support.checks_of(result) if isinstance(entry, dict)
+           and entry.get("status") == support.RED and support.findings_naming(entry, "brand_new_policy")]
+    assert red, f"no check is RED with a finding that names brand_new_policy\n{run.describe()}"
+    assert envelope["ok"] is False and run.returncode == support.EXIT_CHECK_FAILED, run.describe()
 
 
 def test_an_informational_policy_key_with_no_check_passes(project, sandbox, interface):

@@ -336,6 +336,26 @@ acceptEdits`, `--model haiku`, `--max-turns 8`, `--allowedTools Bash,Write`). Th
 variable, so the ticket cannot close on skipped tests. A run in which the model does not execute the stated command
 fails with that reason and is repeated; it is not a finding against the launcher.
 
+**The environment a live session is launched with** (rewritten by DEC-784, owner, 2026-10-18, P-W2-34 (a), in
+W2-54): the caller's environment less `GOV_ROLE`, `GOV_TICKET` and **every variable whose name begins `CLAUDE`**
+(`CLAUDECODE`, `CLAUDE_CODE_*` and any other), so a run from inside a Claude session launches its sessions as a run
+from a plain shell does. Before, the fixture removed a fixed list (`CLAUDECODE`, `CLAUDE_CODE_ENTRYPOINT`,
+`CLAUDE_PROJECT_DIR`, `CLAUDE_CODE_SSE_PORT`). Nothing else of the live cases changes. The other launches of this
+suite (`support.run_gov` with `gov_environment`) build their environment from nothing and carry no `CLAUDE*` name.
+
+**The host cases name the network** (revised by W2-57, 2026-10-27, `Rewrite-Reason: I1 F-1, DEC-892 item 3`). The
+research probe asks each host through the session's own route, the sandbox's proxy, at the time the session runs,
+and keeps for each: curl's exit code, the proxy's answer to the CONNECT (`%{http_connect}`), the HTTP status and the
+time in UTC. A starting host that is not reached fails its case with a reason in words: "the sandbox's proxy refused
+… (CONNECT 403): the research allowlist does not accept it; this is the rule, not the network", or "the network:
+through the session's own route (the sandbox's proxy), at <time>, <host> could not be reached: curl ended with <n>
+(<what it means>) …; this is the network at the time the session ran, not load and not the allowlist". A session that
+never ran its probe still fails every case with that reason (load or setup). `example.com`'s case is stricter: it
+passes only when the sandbox's proxy refused the host (CONNECT 403, as this machine's sandbox proxy answers a domain
+off its list, measured 2026-10-27); a connection that failed on the network shows nothing of the rule and fails the
+case naming the network, where it passed before. The engineer's empty-allowlist case is unchanged (its session may
+have no network path at all). The whole file now runs in the nightly, not in the close (DEC-889 item 5).
+
 | Session | Model work | Needs |
 |---|---|---|
 | engineer | one Bash call (a probe script in scratch) and one Write call | `bwrap`, `socat`; no network (the connection must be refused) |

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "audit-report",
+  "description": "Frontmatter of an audit report in DEC-441's form, as the owner accepted it (DEC-446): `milestone`, `commit` (the audited commit) and `pack_sha256` (the hash of the context pack the auditor received). The form has no `type` key and no shared frontmatter, so the schema stands alone: core-schema gives this type to a record in the audit-report folder, `docs/audit/` (DEC-626), that states no `type`. Whether the commit resolves, the table is well-formed and the hash is the pack's is the audit-report validator's (DEC-441), not this schema's.",
+  "type": "object",
+  "required": ["milestone", "commit", "pack_sha256"],
+  "properties": {
+    "type": { "const": "audit-report" },
+    "milestone": { "$ref": "#/$defs/text" },
+    "commit": { "$ref": "common.schema.json#/$defs/commit_id" },
+    "pack_sha256": { "$ref": "#/$defs/text" }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 }
+  }
+}

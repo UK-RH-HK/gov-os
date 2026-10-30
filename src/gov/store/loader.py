@@ -56,6 +56,11 @@ _TABLES = {
     "commit_paths": "commit_id TEXT, path TEXT, PRIMARY KEY (commit_id, path)",
     REGISTER_TABLE: "id TEXT PRIMARY KEY, heading TEXT NOT NULL, title TEXT NOT NULL",
 }
+# W2-68: the one row of the load that built the store (its head, the head's two fingerprints, the kind of load),
+# kept out of the graph's tables and out of the digest, so the recovery-rebuild check (CAP-38.b) is unchanged.
+FINGERPRINTS_TABLE = "fingerprints"
+_FINGERPRINTS = "head TEXT NOT NULL, code TEXT, records TEXT, kind TEXT NOT NULL"
+REBUILD, RECORDS = "rebuild", "records"
 
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> bytes:
@@ -256,11 +261,16 @@ def connect(root: Path) -> sqlite3.Connection:
     return sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
 
 
-def load(root: Path) -> dict:
-    """Build the store at ``root`` from its git repository, replacing what an earlier load left."""
-    root = Path(root)
+def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict, dict | None]:
+    """Write the record graph of ``HEAD`` and the fingerprints row of the load, in one transaction: the load's
+    result and ``HEAD``'s fingerprints (None where they cannot be computed). Without ``records_fingerprint`` the
+    row states none yet, so the store is not fresh until ``load_records`` writes it after the indexes."""
+    from gov.close.fingerprint import of_commit
+
+    head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
     records, edges, invalid, headings = _read_records(root)
     commits, trailers, paths = _read_commits(root)
+    prints = of_commit(root, head)
     rows = dict(zip(_TABLES, (records, edges, commits, trailers, paths, headings)))
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
@@ -271,10 +281,108 @@ def load(root: Path) -> dict:
             connection.execute(f"CREATE TABLE {table} ({columns})")
             for row in sorted(rows[table]):
                 connection.execute(f"INSERT INTO {table} VALUES ({', '.join('?' * len(row))})", row)
+        connection.execute(f"DROP TABLE IF EXISTS {FINGERPRINTS_TABLE}")
+        connection.execute(f"CREATE TABLE {FINGERPRINTS_TABLE} ({_FINGERPRINTS})")
+        connection.execute(f"INSERT INTO {FINGERPRINTS_TABLE} VALUES (?, ?, ?, ?)",
+                           (head, prints["code"] if prints else None,
+                            prints["records"] if prints and records_fingerprint else None, kind))
         connection.execute("COMMIT")
-        return {"digest": _digest(connection), "invalid": sorted(invalid, key=lambda entry: entry["path"])}
+        return {"digest": _digest(connection), "invalid": sorted(invalid, key=lambda entry: entry["path"])}, prints
     finally:
         connection.close()
+
+
+def load(root: Path) -> dict:
+    """Build the store at ``root`` from its git repository, replacing what an earlier load left. The fingerprints
+    row records ``HEAD``, its two fingerprints and the kind ``rebuild``."""
+    return _load(Path(root), REBUILD)[0]
+
+
+def fingerprints(connection: sqlite3.Connection) -> dict | None:
+    """The store's fingerprints row (``head``, ``code``, ``records``, ``kind``); None where the store has no such
+    table (a store built before W2-68), and a row of nothing where the table holds other than one row, which
+    matches no head. ``sqlite3.Error`` where the store cannot be asked."""
+    if connection.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+                          (FINGERPRINTS_TABLE,)).fetchone() is None:
+        return None
+    rows = connection.execute(f"SELECT head, code, records, kind FROM {FINGERPRINTS_TABLE}").fetchall()
+    return dict(zip(("head", "code", "records", "kind"), rows[0] if len(rows) == 1 else (None,) * 4))
+
+
+def load_records(root: Path) -> dict:
+    """The incremental record load (W2-68): the record graph of ``HEAD`` again, the lexical index and the semantic
+    vectors refreshed through their own refresh functions, the code index left as it is.
+
+    It runs only where the store's row holds a code fingerprint equal to ``HEAD``'s; otherwise ``STORE_CODE_CHANGED``
+    (a full rebuild is needed). It leaves the store digest a full load of ``HEAD`` leaves, and the row ``HEAD``, its
+    fingerprints and the kind ``records``.
+    """
+    from gov.close.fingerprint import of_commit
+
+    root = Path(root)
+    head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
+    prints = of_commit(root, head)
+    try:
+        connection = connect(root)
+    except GovError as e:
+        if e.code != "STORE_MISSING":
+            raise
+        row = None
+    else:
+        try:
+            row = fingerprints(connection)
+        except sqlite3.Error as e:
+            raise GovError("STORE_UNREADABLE", f"the record store {STORE_REL} cannot be read ({e}); run gov rebuild",
+                           {"store": STORE_REL}) from None
+        finally:
+            connection.close()
+    if prints is None or row is None or row["code"] is None or row["code"] != prints["code"]:
+        why = ("HEAD's code fingerprint cannot be computed" if prints is None
+               else "the store records no code fingerprint" if row is None or row["code"] is None
+               else "the store was built on another code fingerprint")
+        raise GovError("STORE_CODE_CHANGED", f"{why}: the records alone cannot be loaded; run gov rebuild",
+                       {"head": head, "code_fingerprint": prints and prints["code"],
+                        "store_code_fingerprint": row and row["code"]})
+    result, prints = _load(root, RECORDS, records_fingerprint=False)
+    if prints is None or prints["code"] != row["code"]:  # HEAD moved to other code during the load
+        raise GovError("STORE_CODE_CHANGED", "HEAD's code changed during the load; run gov rebuild",
+                       {"head": head, "store_code_fingerprint": row["code"]})
+    stores = _refresh_indexes(root)
+    connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
+    try:
+        connection.execute(f"UPDATE {FINGERPRINTS_TABLE} SET records = ?", (prints["records"],))
+    finally:
+        connection.close()
+    return {**result, "head": head, "code_fingerprint": prints["code"], "records_fingerprint": prints["records"],
+            "kind": RECORDS, "stores": stores}
+
+
+def _refresh_indexes(root: Path) -> dict:
+    """The lexical index and the semantic vectors refreshed as ``gov rebuild`` refreshes them; the code index is
+    left as it is."""
+    from gov.config.loader import load_config
+
+    if "path-map.yaml" not in load_config(root):
+        return {"lexical": {"status": "not_refreshed", "reason": "no path map: nothing is classified as indexable"},
+                "semantic": {"status": "not_refreshed", "reason": "no path map"},
+                "codeintel": {"status": "left"}}
+    from gov.retrieval import lexical, semantic
+
+    try:
+        stores = {"lexical": {"status": "refreshed", "indexed": lexical.refresh(root)["indexed"]}}
+    except GovError:
+        raise
+    except Exception as exc:
+        raise GovError("STORE_LOAD_FAILED", f"the lexical index could not be refreshed: {exc}",
+                       {"store": "lexical", "error": str(exc)})
+    try:
+        report = semantic.refresh(root)
+        stores["semantic"] = ({"status": "refreshed"} if report.get("available")
+                              else {"status": "not_refreshed", "reason": report.get("reason", "unknown")})
+    except Exception as exc:  # noqa: BLE001 - the vectors stay stale and the semantic facet says so itself
+        stores["semantic"] = {"status": "not_refreshed", "reason": str(exc)}
+    stores["codeintel"] = {"status": "left"}
+    return stores
 
 
 def digest(root: Path) -> str:

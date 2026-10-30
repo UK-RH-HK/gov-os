@@ -1,0 +1,60 @@
+---
+id: DAEO-arrl
+status: open
+deps: []
+links: []
+created: 2026-10-29T15:55:50Z
+type: task
+priority: 1
+assignee: engineer
+external-ref: W2-55
+tags: [wave-2, implementation, standard, keystone-4]
+wbs_id: W2-55
+title: 'Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see'
+class: implementation
+state_class: AUTHORITATIVE
+role: engineer
+depends_on: [DAEO-ym8a]
+allowed_paths:
+- src/gov/decisions/**
+- src/gov/context/**
+- src/gov/retrieve/**
+- template/governance/kernel/schemas/decision*
+- tests/unit/decisions/**
+- docs/research/W2-55-backfill.md
+kpis:
+  success:
+  - 'Every register entry has a domain from the closed list (guard, close, retrieval, context, adopt, launch, checks, plan, roles, records, release), a status that names what superseded or amended it, and a scope (this repository, or kernel-wide); the decisions validator checks all three [DEC-791 item 1]'
+  - 'Every entry also has a "lands in" tag (the kernel file, the prompt or the project brief that states it), which the decisions validator checks [DEC-825 item 2, DEC-851]'
+  - 'gov context and gov retrieve leave out superseded and done entries, and say how many they left out; lens B''s Q05 (a superseded decision served unmarked) no longer happens [DEC-791 item 1]'
+  - 'The backfill is a proposal in docs/research/W2-55-backfill.md: every entry''s proposed tags with the reason for each, the 120 amends and refines that DEC-825 left for this ticket included, and a sample drawn for the owner''s review; nothing is applied to the register before the owner accepts it [DEC-791 item 1, DEC-825 item 4]'
+  - 'Supersession propagates: a check fails when anything (a test, code, a skill, a brief, a ticket''s KPI, the prompt, the path map) still enforces a superseded or changed decision without a recorded reason; each superseded entry''s status line names the entry that replaced it, and every place that cites or enforces the old one is updated or listed with its reason in the register. Its first fixture is the sweep of 2026-10-20 (governance/project/orchestration/packages/SWEEP-2026-10-20.md): W1-49''s two window cases and W2-59''s three earlier cases are found [DEC-866]'
+  - 'W2-61''s 20-question measure is run again after the merge and reported beside its baseline, both figures together [DEC-941, DEC-833 item 3]'
+  failure:
+  - An entry with no domain, status or scope fails the decisions validator, naming it.
+  - A superseded entry that still reaches an agent's context fails a test.
+  - A test or check that enforces a superseded decision with no recorded reason fails the new check, naming both decisions and the place.
+  - A backfill tag written to the register before the owner accepts it.
+profile: STANDARD
+sources:
+- DEC-791
+- DEC-825
+- DEC-866
+- DEC-786
+- DEC-851
+- DEC-833
+- DEC-941
+est_loc: 150
+acceptance_tests:
+  path: tests/acceptance/W2-55/
+  author: independent-test-designer (MR-3); written before implementation
+track: C
+list_rows: []
+---
+# W2-55 Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see
+
+Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-55), from P-W2-37 (owner, DEC-791 item 1), with DEC-866's KPI (owner, 2026-10-20); placed in the memory chain by the re-plan the owner accepted on 2026-10-29 (DEC-941).
+
+- **Why:** the register is about 244,000 tokens (783 entries when DEC-791 was decided). Superseded and amended entries are not marked as such, and nothing says which decisions are kernel-wide; agents see all of it (the quality-control check, 2026-10-18). Lens B F4: the superseded filter does nothing for register decisions, which fails open for any agent relying on memory.
+- **Place:** keystone 4, block B of the re-plan (DEC-941): W2-61's baseline first, then W2-03 (`DAEO-ym8a`, which owns `src/gov/decisions/**` and `src/gov/records/**`) closes, then W2-55. It shares `src/gov/context/**` with W2-04 and `src/gov/retrieve/**` with W2-13: it runs after them, or stacked under DEC-786.
+- **Paths:** `src/gov/context/**` and `src/gov/retrieve/**` for the decisions filter only. The backfill is a proposal in `docs/research/W2-55-backfill.md`; the register itself (`docs/DECISION_REGISTER.md`) is not in the paths, and the accepted backfill is applied by the orchestrator after the owner's acceptance.

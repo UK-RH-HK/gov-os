@@ -645,3 +645,29 @@ No case of this suite asserts a time: the ticket's KPI lines name none, and no c
 - **W1-27 revised cases (round 5)**: 18 (rebuild/recovery using tiny projects)
 - **W1-07 revised cases**: 6
 - **Total**: 114
+
+## W2-67: test hygiene (DAEO-9nys, round 1)
+
+W2-67's test designer added the KPI tests for per-test copies and temp folders (`test_w2_67_copies.py`,
+`test_w2_67_temp_folders.py`) and revised weak cases of this suite, each with a `Rewrite-Reason` and shown red
+against a planted fault and green on the head. The map, the red reasons and the plants: `README-W2-67.md`.
+
+Batch 3 (the second, fresh designer, DEC-907): the copying fixtures' `gc.auto=0` and the `--basetemp` refusal's
+cases (`test_w2_67_basetemp_refusal.py`): `README-W2-67-fixtures.md`.
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only one fixture changes:
+
+- the `gov` fixture of `test_w1_27_rebuild_r8_no_embeddings.py`: **before**, `OLLAMA_HOST` = the recording
+  `EndpointStandIn`; **after**, `OLLAMA_HOST` and `GOV_QUERY_OLLAMA_HOST` = that stand-in. "Asks the embedding
+  endpoint nothing" and the retrieval on a store rebuilt without embeddings keep one recording endpoint for every
+  address `gov` has; no case reaches the default CPU address of the machine it runs on.
+
+Not changed: the other files of this suite, which name no endpoint (W1-07's environment) and so use the default
+addresses, as they did for `OLLAMA_HOST`. No expectation, assertion, pass line or threshold changes. In the designer's
+sandbox, after the change: `test_w1_27_rebuild_r8_no_embeddings.py` 9 passed. Commit trailer: `Rewrite-Reason:
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own port; the
+fixtures point it at a stand-in and change no expectation`.

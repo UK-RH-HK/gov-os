@@ -404,32 +404,64 @@ def test_containment_refusal_counts_as_iteration(project, sandbox, interface):
         "three consecutive containment refusals must escalate"
 
 
+def _checkpointed_close(project, sandbox):
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    return support.run_close(project, sandbox, TICKET)
+
+
 def test_mixed_causes_reach_escalation(project, sandbox, interface):
-    """DEC-454, S2: a sequence mixing causes (trailers, a failing test, a hard-block
-    check) ends in escalation.
+    """DEC-454, S2: a sequence mixing causes ends in escalation.
+
+    Revised for W2-07 (DEC-868 item 3): a red hard-block check is the pre-close gate's finding and a trailer's
+    a commit gate's: each refuses at once, before any test, and spends no attempt, so neither counts toward
+    the escalation (a trailer's finding stays in the history and refuses every later close at once, so it
+    cannot be a step of the sequence; W2-07's commit-gate cases hold it). The sequence mixes a red check, not
+    counted, with three findings of the work, each of another cause: a failing acceptance test, a failing
+    regression test and a commit outside the ticket's paths. The fourth close is blocked.
     """
     project.add_ticket(TICKET, WBS,
                        allowed_paths=["src/example/**",
                                       "template/governance/kernel/checks/**"])
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement without trailers", who=IMPL,
-                   trailers=("Role: engineer",))
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    support.run_close(project, sandbox, TICKET)
+    project.add_check_declaration("block-close", "schema/invariants",
+                                  severity="hard-block", command="exit 1")
+    project.commit("implement, add hard-block", who=IMPL, trailers=TRAILERS)
+    run = _checkpointed_close(project, sandbox)
+    assert "block-close" in support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED)), \
+        f"the close is not refused for the red check\n{run.describe()}"
+    assert support.iteration_count(project.root, TICKET) == 0, \
+        f"the refusal for a red check is counted\n{run.describe()}"
 
-    project.commit("fix trailers", who=IMPL, trailers=TRAILERS)
+    project.add_check_declaration("block-close", "schema/invariants",
+                                  severity="hard-block", command="true")
     project.add_failing_test(WBS, name="test_break")
-    project.commit("add failing test", who=IMPL, trailers=TRAILERS)
-    support.run_close(project, sandbox, TICKET)
+    project.commit("fix the check, add failing test", who=IMPL, trailers=TRAILERS)
+    run = _checkpointed_close(project, sandbox)
+    assert "test_break" in support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED)), \
+        f"the close is not refused for the failing acceptance test\n{run.describe()}"
+    assert support.iteration_count(project.root, TICKET) == 1, f"not counted once\n{run.describe()}"
 
     support.write(project.root, f"tests/acceptance/{WBS}/test_break.py",
                   "def test_break():\n    assert True\n")
-    project.add_check_declaration("block-close", "schema/invariants",
-                                  severity="hard-block", command="exit 1")
-    project.commit("fix test, add hard-block", who=IMPL, trailers=TRAILERS)
-    support.run_close(project, sandbox, TICKET)
+    project.commit("fix test", who=IMPL, trailers=TRAILERS)
+    project.write("tests/unit/test_reg_break.py", "def test_reg_break():\n    assert False, 'reg'\n")
+    project.commit("a failing regression test", who=support.OWNER)
+    run = _checkpointed_close(project, sandbox)
+    assert "test_reg_break" in support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED)), \
+        f"the close is not refused for the failing regression test\n{run.describe()}"
+    assert support.iteration_count(project.root, TICKET) == 2, f"not counted twice\n{run.describe()}"
+
+    project.write("tests/unit/test_reg_break.py", "def test_reg_break():\n    assert True\n")
+    project.commit("fix the regression test", who=support.OWNER)
+    project.write("src/other/out_of_scope.py", "# out of scope\n")
+    project.commit("implement out of scope", who=IMPL, trailers=TRAILERS)
+    run = _checkpointed_close(project, sandbox)
+    assert "src/other/out_of_scope.py" in support.error_text(
+        support.refused(run, interface, support.EXIT_CHECK_FAILED)), \
+        f"the close is not refused for the commit outside the ticket's paths\n{run.describe()}"
+    assert support.iteration_count(project.root, TICKET) == 3, f"not counted three times\n{run.describe()}"
 
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
@@ -441,6 +473,11 @@ def test_mixed_causes_reach_escalation(project, sandbox, interface):
 def test_each_refusal_opens_repair_ticket(project, sandbox, interface):
     """DEC-454, S2/S6: each of the first two containment refusals opens a repair
     ticket recording the finding and 'unclassed'.
+
+    Revised for W2-07 (KPI 10, W2-M252; DEC-454's "each refusal opens a repair ticket" changed, DEC-908): the
+    first refusal opens a repair ticket and names it; a second refusal with the same finding reuses that repair
+    ticket and names it, and opens none. A fresh checkpoint stands before the second close, so the case does
+    not rest on how the checkpoint gate reads the first refusal's repair-ticket commit (row W2-L416).
     """
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
@@ -450,14 +487,26 @@ def test_each_refusal_opens_repair_ticket(project, sandbox, interface):
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     tickets_before = set((project.root / ".tickets").glob("*.md"))
-    support.run_close(project, sandbox, TICKET)
+    run_1 = support.run_close(project, sandbox, TICKET)
+    text_1 = support.error_text(support.refused(run_1, interface, support.EXIT_CHECK_FAILED))
+    assert "src/other/out_of_scope.py" in text_1, f"the first close is not refused for containment\n{run_1.describe()}"
     tickets_after_1 = set((project.root / ".tickets").glob("*.md"))
     new_1 = tickets_after_1 - tickets_before
-    assert len(new_1) >= 1, "the first refusal must open a repair ticket"
-    support.run_close(project, sandbox, TICKET)
+    assert len(new_1) == 1, f"the first refusal must open a repair ticket: {sorted(p.name for p in new_1)}"
+    repair = next(iter(new_1)).stem
+    assert repair in text_1, f"the first refusal does not name its repair ticket {repair}\n{run_1.describe()}"
+
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run_2 = support.run_close(project, sandbox, TICKET)
+    text_2 = support.error_text(support.refused(run_2, interface, support.EXIT_CHECK_FAILED))
+    assert "src/other/out_of_scope.py" in text_2, f"the second close is not refused for containment\n{run_2.describe()}"
     tickets_after_2 = set((project.root / ".tickets").glob("*.md"))
     new_2 = tickets_after_2 - tickets_after_1
-    assert len(new_2) >= 1, "the second refusal must also open a repair ticket"
+    assert not new_2, \
+        f"the identical second refusal opened another repair ticket: {sorted(p.name for p in new_2)}\n{run_2.describe()}"
+    assert repair in text_2, \
+        f"the identical second refusal does not name the repair ticket it reuses ({repair})\n{run_2.describe()}"
 
 
 def test_unknown_ticket_does_not_count(project, sandbox, interface):
