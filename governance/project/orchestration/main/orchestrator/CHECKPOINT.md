@@ -1,13 +1,97 @@
-# CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
+# CHECKPOINT — W2 orchestrator, the CTO (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-30 evening — DEC-954: THE PLAN AHEAD, IN ORDER. Read prompt §0, then
-## governance/project/orchestration/DECISIONS-IN-FORCE.md, then this. Owner text verbatim: drafts/DEC-954-owner-text.md)
+## RESUME HERE — HANDOVER of 2026-10-30 21:36 GMT, for the fresh session after ACT 1 (DEC-955, DEC-957)
+
+**Read first, in order:** `governance/project/prompts/w2-orchestrator.md` §0 (v3.47: DEC-953, DEC-954, DEC-957's
+work order and escalation rubric); `governance/project/orchestration/DECISIONS-IN-FORCE.md`; this block. Owner texts
+verbatim: `drafts/DEC-953-owner-text.md`, `drafts/DEC-954-owner-text.md`; DEC-955 to DEC-957 in the register.
+**Check first:** `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; that ACT 1 is committed (`git log
+--oneline -5 -- .claude/settings.json` shows the owner's `ACT-1-GUARD` commit) and the hook is wired (`python3
+.gov-runtime/scratch/orchestrator/tools/guard4_check.py --settings /home/usain/Dynamic-Agentic-Engineering-OS` ends
+PASS, 38 cases). If ACT 1 is NOT committed: stop and tell the owner.
+
+**State at the handover (main tree clean at `aafd45c1`, nothing staged):**
+- Closed on the 10 practices: W2-71 (`9f448448`; own suite back-filled 304/304, `26495f56`).
+- Merged, not closed: W2-57, W2-77, W2-03, W2-26 (their batch was STOPPED at 21:19 by the owner, DEC-957 item 1:
+  it tested the head with my register fault), W2-61 (merged `758cd53f`, not yet closed).
+- Leads running: W2-87 only (started 16:29; register defect first, then authority order; re-measure with W2-61's
+  measure). Returns land in `log/<W2>-A5-*.json`; watchers to arm: `tools/lead_return_watch.sh`,
+  `tools/interim_watch.sh` (background). Monitors running detached: mem_sampler, usage_watch, oom_watch.
+- Returned, waiting for after ACT 1: W2-85 (route done, head `d113ff5ea045`: merge + close), W2-64 (run 2 brief
+  `briefs/W2-64-A5-run2.md`: P-W2-64-1 (a) fixture revision, scoped run of the corrected tests only), W2-76 (run 2:
+  DEC-956's two items; write `briefs/W2-76-part-run2.md` from its return `log/W2-76-A5-run1.json`), W2-78 parked.
+- `CLOSE-HEAD` (scratch) pins closes to `aafd45c1` (corrected register, before ACT 1) until W2-90 lands; then delete.
+- The main tree's store was rebuilt 21:20 to 21:34 with the current code (the STORE_MISSING cause: a store built
+  before W2-03's `span` column; log `log/rebuild-main-2026-10-30.json`); `gov retrieve` answers `ok: true` there
+  again (checked 21:35). Its stderr carries the reranker's progress lines: read stdout alone for the JSON.
+
+**The fresh session's order (DEC-954, DEC-955, DEC-957):**
+1. **W2-90 first:** file it (LITE, independent test designer; the owner's named decision under DEC-906, DEC-957):
+   revise the 235 live-wiring tests (`/tmp/gov-os-act1/confirmed.json`, if gone re-derive with `tools/act1_tests.py`
+   + `tools/act1_confirm.py`; 19 files: W1-46 142, W1-05 77, W2-59 5, W1-47 4, W1-49 2, W1-28 2, W1-50 2, W2-65 1)
+   to judge the kernel's wiring, `Rewrite-Reason: DEC-953 item 2`, lowering nothing; claim, worktree, brief, lead.
+2. **The batch re-run:** `python3 tools/close_build.py W2-57 W2-77 W2-03 W2-26` (background; full; on CLOSE-HEAD).
+   Before it: check W2-54's green-here and time-limit cases alone on a rebuilt clone at `aafd45c1` are green (the
+   register re-mark, `6fd19a5f`). Then W2-85's merge and close, W2-61's close.
+3. **Then, in parallel within the gate:** W2-64 run 2, W2-76 run 2, the 10 built tickets (W2-67, W2-51, W2-49,
+   W2-37, W2-16, W2-84, W2-05, W2-20, W2-52, W2-60a) each finished and closed on the 10 practices (merge
+   `w2/integrate` into each kept worktree first, so it carries ACT 1's settings), and the streams S1 memory,
+   S2 roles, S3 sandbox, S4 adoption + proving ground.
+4. **The roles research session (DEC-957 item 8), now:** a research worker (effort high) on a software company's
+   roles and skills from the CTO down (the QA engineer among them; domain engineers as engineer + domain skill),
+   what each skill contains, best practice, who integrates (SE per stream, CTO across) and who may push, benchmarking
+   as a research skill. Reports to the owner as a package with insights. Until the owner decides: Q6 (the CTO the
+   only main-tree writer), the push the owner's.
+5. **Memory (DEC-957):** target 95 % (floor 85 %); all seven gaps of `packages/MEMORY-SPEC-MAP.md` closed before
+   ready; the 48-question measure (W2-61h writes the 28 new; judged on the hidden half, >= 21 of 24); file W2-86,
+   W2-88 (draft `drafts/tickets/W2-88.md`), and tickets for the graph/code-graph routes, embeddings of root files +
+   `governance/**` + `schemas/**`, W2-81's hidden half, EXAMIN's question set; apply
+   `drafts/plan-dec954/TICKET-EDITS.md` one commit per ticket (and W2-78's three rows).
+6. **The roles (ROLES-SPEC-1 approved with DEC-957's answers):** W2-33 r1 (role default lines) before W2-60a's merge;
+   W2-11 r1 versions the skill copies; the combined CIT-P; new W2-89 (`gov streams`), W2-00a/b/c; the domain skill
+   packs in Wave 2; the escalation rubric into the playbooks (W2-83b).
+7. Then ACT 2 (one re-pin), the three layers in new sessions, EXAMIN only when K9's criteria are met.
+- **Housekeeping:** remove `~/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26-20261030-191445/` (the stopped batch's
+  clone; my old guard refused writes there), `/dev/shm/gov-os-W2-76-held.lock`, `/tmp/gov-os-act1/` once W2-90's
+  list is taken; brief gaps from today's returns into `governance/project/orchestration/brief-gaps.md`.
+- **Milestone 2** (pinged when done): the five closes (W2-71 done; the batch of four), selection proven scoped
+  (W2-71: 5,091 tests vs ~16,900 full; ~46 min testing at load 35 after an 83-min lock wait; the batch gives the
+  full time), the gates lifted, the guard at five rules. **Milestone 3:** memory and the roles landed.
+- **Lessons today:** "lifted" is not "superseded" (status lines are read by the context check); a scoped selection
+  must keep the ticket's own suite; nightly-route entries stay out of a close; never `pkill -f`; no backticks or
+  braces in inline commands under the old guard (gone after ACT 1); validate parsers' inputs before comparing runs.
+
+## Earlier notes of 2026-10-30 evening (superseded by the handover above)
 
 **DEC-955 (owner): ACT 1 first.** A close refused before ACT 1 is committed is not repaired until it is. Right
 after ACT 1 is committed: write the handover (checkpoint + RESUME HERE), tell the owner it is ready, and STOP; the
 fresh session starts under the five-rule guard. ACT-1-GUARD: `governance/project/orchestration/packages/ACT-1-GUARD.md`
 (+ `.hooks.patch`); trial clone `/tmp/gov-os-act1/repo`; test sweep `tools/act1_tests.py` -> /tmp/gov-os-act1/.
 ROLES-SPEC-1 sent (`acbd8353`), awaiting approval.
+**19:35 state:** ACT-1-GUARD sent (`bd07b650`, pinged): 235 live-wiring tests (19 files: W1-46 142, W1-05 77, W2-59 5,
+W1-47 4, W1-49 2, W1-28 2, W1-50 2, W2-65 1; `/tmp/gov-os-act1/confirmed.json`) go red -> W2-90 (LITE, test designer,
+owner's named decision asked) first after ACT 1. `CLOSE-HEAD` pins closes to `9f448448` (pre-ACT) until W2-90 lands;
+remove the file then. W2-71 CLOSED `9f448448` (scoped, 5,091 tests, parallel 7,767 s incl. ~83 min lock wait, so
+~46 min testing at load 35; 1 flaky candidate W2-54 green-here). Batch W2-57+W2-77+W2-03+W2-26 running (full, pre-ACT
+clone). Plan+WBS committed `e814289d`; MEMORY-SPEC-MAP in packages; TICKET-EDITS.md and W2-88 draft in
+drafts/plan-dec954 + drafts/tickets for the fresh session (one commit per ticket; file W2-86, W2-88, W2-90; rows of
+W2-78). W2-64 run 2 brief ready (`briefs/W2-64-A5-run2.md`), waits for ACT 1. Leads: W2-87, W2-85 running.
+**20:35:** W2-76 returned PACKAGES (6.85 h, $11.04; rebuild 307 s, secrets filter 275 s of it). DEC-956 (delegated):
+P-W2-76-1 (a) test designer fixes its watchdog case's setup; P-W2-76-3 (a) per-run rebuild-lock override set by the
+root conftest, W2-76 paths + `tests/conftest.py`; run 2 after ACT 1. **DEC-956 is appended to the register but NOT
+committed** (no main-tree commits while the owner runs ACT 1): commit it, then widen DAEO-tgk2's paths (own commit),
+right after ACT 1. Left for removal after ACT 1: `/dev/shm/gov-os-W2-76-held.lock` (guard refused).
+**21:05, W2-85 returned PACKAGES** (2.29 h, $5.47): route done (head `d113ff5ea045`), merge + close after ACT 1. Its
+findings, all MY slips, fixed in the working tree, NOT committed (ACT window):
+- (1) my DEC-866 marks "SUPERSEDED by DEC-953" on 14 status lines (`3f28e09c`) made the context check red on content
+  (11 tickets cite them): re-marked as `<original status> · **Lifted by:** DEC-953 (...)` in docs/DECISION_REGISTER.md
+  (uncommitted, with DEC-956). Verify after ACT 1: W2-54's green-here and time-limit cases alone on a rebuilt clone.
+  The running batch (cloned after `3f28e09c`) will likely be refused on them: DEC-955, ACT 1 first; then re-run the
+  batch with CLOSE-HEAD moved to the fixed head (not a repair of those tickets: the cause is the register).
+- (2) close_build ran nightly-route entries in its serial phase: fixed (`gov.close.serial.phase`).
+- (3) scoped selection ignored the ticket's own acceptance suite: fixed in select_tests.py (own suite kept). W2-71's
+  close lacked its own suite: back-fill run on `a4939b45` in `/tmp/gov-os-w271-own/` -> append the result to
+  `governance/project/orchestration/closes/W2-71-DAEO-e8f0.md` (commit after ACT 1). Tell the owner either way.
 
 **The plan ahead (owner, DEC-954; PLAN-W2-DEC953 approved with amendments). In this order:**
 1. **ACT 1, the five-rule guard** (milestone 2, with its ping): the four of DEC-953 item 2 + rule 5 (independent
