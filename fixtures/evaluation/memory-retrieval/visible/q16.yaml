@@ -1,0 +1,13 @@
+# Lens B's Q16 (Table 2): "DEC-798 item 4: 4 GiB plus 2.4 GB". The W2-20 card's "at least 4 GiB" (DEC-742's base
+# value) is the incomplete naive answer, not gold.
+id: Q16
+category: decision
+commit: 23079f92a6fa
+question: How much free memory must the resource gate see before a heavy run?
+gold_answer: >-
+  MemAvailable of at least 4 GiB plus 2.4 GB while the CPU embedder is not loaded: DEC-798 item 4 counts the CPU
+  embedder's 2.4 GB as standing memory on top of DEC-742's 4 GiB.
+sources:
+  - path: docs/DECISION_REGISTER.md
+    heading: "  4. **The resource gate counts the CPU embedder's 2.4 GB as standing memory.** Until the gate's code does (row W2-M374), the orchestrator's gate by hand asks MemAvailable of at least 4 GiB plus 2.4 GB while the CPU embedder is not loaded."
+    lines: [8737, 8737]
