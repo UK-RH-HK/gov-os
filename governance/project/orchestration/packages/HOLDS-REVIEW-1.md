@@ -1,6 +1,6 @@
 # HOLDS-REVIEW-1: every rule still in force that holds a lead, a close or a test run beyond the gate's capacity check
 
-For the owner's review (DEC-961 item 4), 2026-10-30 23:55 GMT. "The gate" is `tools/gate_check.py` after DEC-961: load (the 1-minute and 15-minute loads both under the processor count) and memory (the floor, each running lead at what it uses, the newcomer). A full run asks the gate for room for its own peak before it starts.
+For the owner's review (DEC-961 item 4), 2026-10-30 23:40 GMT. "The gate" is `tools/gate_check.py` after DEC-961: load (the 1-minute and 15-minute loads both under the processor count) and memory (the floor, each running lead at what it uses, the newcomer). A full run asks the gate for room for its own peak before it starts.
 
 ## A. Holds that make work wait while the machine has room
 
