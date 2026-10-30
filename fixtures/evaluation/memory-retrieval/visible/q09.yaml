@@ -1,0 +1,15 @@
+# Lens B's Q09 (Table 2): "DAEO-u4oz's KPIs". Lens B counted W2-04's WBS card (the same KPIs) as a correct answer but
+# not as the governing source; only the ticket's KPIs are gold here, as lens B's 13 of 20 counted them.
+id: Q09
+category: ticket
+commit: 23079f92a6fa
+ticket: DAEO-u4oz
+question: How large may the context packet be?
+gold_answer: >-
+  Within the packet ceiling of about 6k tokens (the Contract envelope), never dropping the ticket's own text; when the
+  mandatory inputs alone exceed it, gov context refuses with a named error and a non-zero exit, never ok: true over
+  its budget.
+sources:
+  - path: .tickets/DAEO-u4oz.md
+    heading: "kpis:"
+    lines: [24, 36]

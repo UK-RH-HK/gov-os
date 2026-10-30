@@ -18,6 +18,7 @@ depends_on: []
 allowed_paths:
 - src/gov/rebuild/**
 - tests/unit/rebuild/test_w2_76*
+- tests/conftest.py
 kpis:
   success:
   - 'gov rebuild''s output and record give the time of each stage (the lexical, semantic and code-index stores, the secrets filter where it runs, the compaction), not the lexical stage alone [DEC-939 item 2, row W2-L451]'

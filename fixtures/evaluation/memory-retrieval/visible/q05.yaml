@@ -1,0 +1,15 @@
+# Lens B's Q05 (Table 2): "DEC-051 (in force); DEC-038 and DEC-048 superseded". My reading: DEC-051 alone answers
+# both halves (how, and that it is the one in force: it supersedes DEC-048, which superseded DEC-038), so it is the
+# one entry; the superseded entries are the naive answer, not needed evidence.
+id: Q05
+category: decision
+commit: 23079f92a6fa
+question: How is the old repository archived, and which decision is in force?
+gold_answer: >-
+  DEC-051 is in force: the same repository is kept with its full history; an annotated archive tag marks the
+  pre-restructure state, every branch is kept, nothing is deleted and no archive/ folder is created. DEC-048 (an
+  inert git bundle, working copy deleted) and DEC-038 are superseded.
+sources:
+  - path: docs/DECISION_REGISTER.md
+    heading: "### DEC-051 — Same repository; the archive is git history, not a folder"
+    lines: [360, 363]

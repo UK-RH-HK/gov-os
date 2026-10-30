@@ -1,0 +1,17 @@
+# Lens B's Q10 (Table 2): "lexical.py:115; codeintel/__init__.py:185": two callers, each its own entry; each source
+# is the calling line.
+id: Q10
+category: callers
+commit: 23079f92a6fa
+ids: [indexable]
+question: Who calls indexable?
+gold_answer: >-
+  Two indexers: the lexical index (src/gov/retrieval/lexical.py, line 115) and the code index
+  (src/gov/codeintel/__init__.py, line 185), each before it chunks a file.
+sources:
+  - path: src/gov/retrieval/lexical.py
+    heading: "        allowed = set(indexable(root, asked)) if asked else set()"
+    lines: [115, 115]
+  - path: src/gov/codeintel/__init__.py
+    heading: '    allowed = indexable(root, [rel for rel in listed.split("\0") if rel])'
+    lines: [185, 185]

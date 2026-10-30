@@ -1,0 +1,12 @@
+# Lens B's Q12 (Table 2): "retrieve.py 91–104".
+id: Q12
+category: code location
+commit: 23079f92a6fa
+question: CONTINUATION_INVALID
+gold_answer: >-
+  In _decode_continuation in src/gov/retrieval/retrieve.py: when the token is not base64 JSON, when it belongs to a
+  different question or arguments, or when its offset is not a non-negative integer.
+sources:
+  - path: src/gov/retrieval/retrieve.py
+    heading: "def _decode_continuation(token, query, ids, ticket, radius, batch_size, bundle_budget):"
+    lines: [91, 104]

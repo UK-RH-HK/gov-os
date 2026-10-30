@@ -135,6 +135,8 @@ The declared `timeout-seconds` must be a whole number above the runner's 60 (DEC
 - "Fits" is measured, not argued: `test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit`
   runs the declared command here and requires it to end green before the declared limit, and the `gov check` case
   requires context-reproducibility GREEN under `gov check`'s own load, which a run past its limit never is.
+  Both run in the nightly, not in a close, since W2-85 ("W2-85 (DEC-951 item 3)", below; `Rewrite-Reason: DEC-951
+  item 3`).
 
 **The added line.** The card says "the `timeout-seconds` line only": the case requires exactly one added line,
 `timeout-seconds: <seconds>`, and no other line changed. The measurement goes in `docs/changes/W2-54-CIT-E.md`,
@@ -155,6 +157,19 @@ tickets measured (the words `seconds`, `load` and `ticket`).
 
 The whole suite: 5 min 27 s in the red run (26 failed, 24 passed); about 8 to 9 minutes once the declaration
 has its limit and the run-as-declared case runs the check.
+
+### W2-85 (DEC-951 item 3): the two time-limit cases run in the nightly
+
+`Rewrite-Reason: DEC-951 item 3`. `test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit`
+and `test_gov_check_gives_context_reproducibility_green_here` are listed in `tests/acceptance/serial-only.txt` as
+`nightly: real-model` (ticket W2-85, `DAEO-gdzh`). The close collects them and leaves them out of both its phases;
+the nightly runs each alone, outside a close, where each builds every ticket's context of this repository through
+retrieval, which asks this machine's embedder and reranker (`gov.context.context_check.main` → `gov.context.context`
+→ `_try_supplementary` → `gov.retrieval.retrieve.retrieve` → `semantic.search` → `semantic.query_vector`). Why: both
+passed at low load (the nightly of 2026-10-30, W2-57's close at load 4) and missed the limit under the leads' load
+(W2-71's close at loads of 30 to 70; row W2-L429), and closes now run beside leads (DEC-942). What each case asserts,
+the declared 600 s and the other cases of both files are unchanged; the other cases of the green-here file still
+run in the close, by the route of "W2-75", at the end.
 
 ## Risks
 
