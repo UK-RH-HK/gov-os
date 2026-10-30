@@ -36,7 +36,8 @@ it runs writes or fetches. An empty list passes; the check does not fail open.
 - Frontmatter that is not closed, is not valid YAML or writes a key twice
   cannot be read: the file is a finding, whatever kind of file it is. So is a
   head that looks like frontmatter and that the store does not read as such
-  (DEC-387), and a file with ``type: decision`` and no ``id``.
+  (DEC-387), and a file with ``type: decision`` and no ``id`` or an empty one, never followed as ``"None"`` or
+  ``""`` (W2-L069). A decision whose status is not a word in capitals is a finding (W2-M106).
 """
 
 from __future__ import annotations
@@ -54,6 +55,7 @@ from gov.store.loader import TRAILER_RULE_DATE, _frontmatter, _ids
 from gov.tasks.tickets import TICKETS_REL
 
 DECISION_ID = re.compile(r"(ADR|DEC)-[0-9]{3,}")  # the kernel's decision_id grammar (common.schema.json)
+CANONICAL = re.compile(r"[A-Z][A-Z_-]*")  # a status word in capitals, as the sources write it (W2-M106)
 GATE_TYPE = "decision-package"
 GATE_DEAD = ("DECLINED", "REVOKED", "STALE")  # DEC-328
 
@@ -80,6 +82,11 @@ def _git(root: Path, *args: str) -> bytes:
 
 def _finding(code: str, ids, paths, message: str) -> dict:
     return {"code": code, "ids": list(ids), "paths": sorted(set(paths)), "message": message}
+
+
+def _has_id(front: dict) -> bool:
+    """Whether the frontmatter states an id: an empty ``id:`` or ``id: ""`` states none (W2-L069)."""
+    return front.get("id") is not None and str(front["id"]).strip() != ""
 
 
 def _front(text: str) -> dict:
@@ -371,12 +378,12 @@ def _gates(files: list[tuple[str, dict]]) -> list[dict]:
     """Files that cite a gate that does not authorise them, and open tickets that wait on a dead package."""
     found, by_id, tickets = [], {}, {}
     for path, front in files:
-        if "id" in front:
+        if _has_id(front):
             by_id.setdefault(str(front["id"]), []).append(front)
         if posixpath.dirname(path) == TICKETS_REL:  # a ticket is known by its file name, as the READY rule knows it
             tickets[posixpath.basename(path)[:-len(".md")]] = (path, front.get("status"))
     for path, front in files:  # a file that cites a gate is checked with or without an id of its own
-        own, cit = [str(front["id"])] if "id" in front else [], front.get("cit")
+        own, cit = [str(front["id"])] if _has_id(front) else [], front.get("cit")
         for cited in sorted(set(_ids(front.get("approval")))):
             gates = by_id.get(cited, [])
             if not gates or not all(gate.get("type") == GATE_TYPE and gate.get("status") == "ACCEPTED"
@@ -408,10 +415,15 @@ def check(root: Path) -> list[dict]:
     objects = _Objects(root)
     try:
         files, found = _read(root, objects)
-        decisions = [(path, str(front["id"]), front) for path, front in files if "id" in front
+        decisions = [(path, str(front["id"]), front) for path, front in files if _has_id(front)
                      and (front.get("type") == "decision" or DECISION_ID.fullmatch(str(front["id"])))]
         found += [_finding("DECISION_WITHOUT_ID", [], [path], f"{path}: a decision without an id cannot be followed")
-                  for path, front in files if front.get("type") == "decision" and "id" not in front]
+                  for path, front in files if front.get("type") == "decision" and not _has_id(front)]
+        found += [_finding("STATUS_NOT_CANONICAL", [record_id], [path],
+                           f"{record_id}: its status {front['status']!r} is not canonical (a word in capitals, as "
+                           "the sources write it)")
+                  for path, record_id, front in decisions if "status" in front
+                  and not (isinstance(front["status"], str) and CANONICAL.fullmatch(front["status"]))]
         found += _hazards(decisions) + _unapproved(root, objects, decisions) + _gates(files)
     finally:
         objects.close()

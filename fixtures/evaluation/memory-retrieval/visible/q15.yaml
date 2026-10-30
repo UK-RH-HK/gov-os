@@ -1,0 +1,19 @@
+# Lens B's Q15 (Table 2): "DEC-808; briefs/JUDGEMENT.md; briefs/AUDITOR-common.md": the same two lines in three
+# places, alternatives of one entry.
+id: Q15
+category: decision
+commit: 23079f92a6fa
+question: What two lines must every audit finding carry?
+gold_answer: >-
+  "Ordinary work: yes|no, because …" and "Consequence: fails open|loses work|other" (DEC-808 item 4); a finding
+  marked "no" is a row, never a round.
+sources:
+  - - path: docs/DECISION_REGISTER.md
+      heading: "### DEC-808 — The threat model made structural, in four places"
+      lines: [8823, 8830]
+    - path: governance/project/briefs/JUDGEMENT.md
+      heading: "- **Every finding in a probe or audit record carries two lines:** `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808)."
+      lines: [10, 10]
+    - path: governance/project/briefs/AUDITOR-common.md
+      heading: "- **Every finding in a probe or audit record carries two lines:** `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808)."
+      lines: [29, 29]

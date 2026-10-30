@@ -1,0 +1,30 @@
+# Direct calls of gov's own index functions, unmodified, one at a time (labelled: direct calls, beside the CLI run).
+# Traceback frame lines (gov's own source) are dropped; the exception line and the GNU time key lines are kept.
+
+## /tmp/gov-os-W2-26/examin
+$ cd /home/usain/gov-os-worktrees/W2-26 && PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src /usr/bin/time -v python3 -c "from pathlib import Path; from gov.retrieval.lexical import refresh; print(len(refresh(Path('/tmp/gov-os-W2-26/examin'))['indexed']))"
+RuntimeError: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/examin/.gitleaks.toml'
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.14
+	Maximum resident set size (kbytes): 33584
+	Exit status: 1
+
+$ cd /home/usain/gov-os-worktrees/W2-26 && PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src /usr/bin/time -v python3 -c "from pathlib import Path; from gov.retrieval.semantic import refresh; print(refresh(Path('/tmp/gov-os-W2-26/examin')))"
+RuntimeError: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/examin/.gitleaks.toml'
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.16
+	Maximum resident set size (kbytes): 35992
+	Exit status: 1
+
+$ cd /home/usain/gov-os-worktrees/W2-26 && PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src /usr/bin/time -v python3 -c "from pathlib import Path; from gov.codeintel import index; index(Path('/tmp/gov-os-W2-26/examin'))"
+RuntimeError: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/examin/.gitleaks.toml'
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.06
+	Maximum resident set size (kbytes): 32916
+	Exit status: 1
+
+## "/tmp/gov-os-W2-26/EXAMIN APP" (same three lines, the root quoted inside Path('...'))
+lexical:   RuntimeError: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/EXAMIN APP/.gitleaks.toml'   0:00.13  33600 KB  exit 1
+semantic:  RuntimeError: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/EXAMIN APP/.gitleaks.toml'   0:00.15  36068 KB  exit 1
+codeintel: RuntimeError: .gitleaks.toml cannot be read: [Errno 2] No such file or directory: '/tmp/gov-os-W2-26/EXAMIN APP/.gitleaks.toml'   0:00.07  32796 KB  exit 1
+
+# Where each stops (read from src/, not changed): gov.secrets.indexable() calls _rules(root) first, which raises when
+# .gitleaks.toml cannot be read; it would next read load_config(root)["path-map.yaml"]["namespaces"], which an
+# unadopted clone also lacks. Every index (lexical, semantic through its lexical refresh, codeintel) goes through it.
