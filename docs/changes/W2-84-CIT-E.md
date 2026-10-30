@@ -54,13 +54,16 @@ with a revision or `--cached`, or an `archive`, whose pathspecs cover it.
 
 ## 4. Tests
 
-Every run in this worktree with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src` (DEC-732); results in the
-engineer's return and the close.
+Every run in this worktree with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src` (DEC-732), at `3d7560e8f39f`.
 
 | Suite | Result |
 |---|---|
 | `tests/acceptance/W2-84` | 329 passed (209 failed, 120 passed before, `6324b0d76e70`) |
 | `tests/unit/guard/test_w2_84_trees.py` | 34 passed |
+| `tests/unit/guard` | 1103 passed |
+| `tests/acceptance/W2-58` | 803 passed; 2 failed, 3 errors, all in `test_w2_58_launched_sessions.py`: live sessions, `api.anthropic.com` refused by the engineer's sandbox (as W2-58's CIT-E §4 records) |
+| `tests/acceptance/W2-50` (by file, 13 files) | 636 passed |
+| W1-05 `test_a_call_waits_under_100_ms_p95_for_the_hook` | 9 passed (1-minute load 6.81 before, 7.73 after) |
 
 ## 5. Residuals (rows, not rounds; DEC-801)
 
