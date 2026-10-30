@@ -1,0 +1,58 @@
+# EXAMIN's governance suite on the two clones. Tracebacks, captured output and assertion texts are DROPPED from
+# this file: they carry EXAMIN's file contents (source lines and the generated trees' check reports). Kept: the
+# command, the summary line, the GNU time block, error kinds and the failures counted per test file.
+
+## Run 1, on /tmp/gov-os-W2-26/examin
+$ cd /tmp/gov-os-W2-26/examin && env -u PYTHONPATH timeout 1800 /usr/bin/time -v python3 -m pytest governance/scripts/tests -q --no-header -p no:cacheprovider -p no:randomly -n 8 --dist=loadgroup
+15 failed, 828 passed, 165 errors in 67.46s (0:01:07)
+Command exited with non-zero status 1
+	User time (seconds): 254.09
+	System time (seconds): 37.36
+	Percent of CPU this job got: 397%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:13.31
+	Maximum resident set size (kbytes): 61484        (the pytest controller only; xdist workers are its children and are not in this figure)
+	Exit status: 1
+
+Error kinds (lines starting "E " that name an exception):  180 AssertionError; no ModuleNotFoundError, no ImportError.
+Most common assertion: 171 x "assert 1 == 0", 169 of them on a CompletedProcess of
+governance/framework/kit/bootstrap.py ending "1 step(s) FAILED": the tree that bootstrap writes into the test's tmp
+folder fails its own check.py ("X the new tree's check.py exited 1", 337 lines). One more on graph.py check against the
+repository itself ("X 1 hard errors").
+
+Failures and errors per test file (kind, file):
+1 FAILED governance/scripts/tests/test_g22_real_registry.py
+1 FAILED governance/scripts/tests/test_g22_scenario_resolution.py
+1 FAILED governance/scripts/tests/test_g23_register_check_wired_by.py
+45 ERROR governance/scripts/tests/test_g31_bootstrap_seed_tree.py
+11 ERROR governance/scripts/tests/test_g31_check_status_freshness.py
+2 FAILED governance/scripts/tests/test_g31_determinism_and_flags.py
+14 ERROR governance/scripts/tests/test_g31_graph_cit_skills_lessons_gate.py
+13 ERROR governance/scripts/tests/test_g35_sessions.py
+12 ERROR governance/scripts/tests/test_g36_refactor.py
+2 FAILED governance/scripts/tests/test_g46_kit_v34.py
+7 ERROR governance/scripts/tests/test_g48_single_tree_claim.py
+1 FAILED governance/scripts/tests/test_g57_parallel_suite.py
+14 ERROR governance/scripts/tests/test_g59_layout_contract.py
+1 FAILED governance/scripts/tests/test_g59_layout_contract.py
+18 ERROR governance/scripts/tests/test_g60_apply_tooling.py
+4 FAILED governance/scripts/tests/test_g60_apply_tooling.py
+12 ERROR governance/scripts/tests/test_g60b_citation_corpus.py
+1 FAILED governance/scripts/tests/test_g60b_citation_corpus.py
+3 ERROR governance/scripts/tests/test_g61_first_class_artefacts.py
+16 ERROR governance/scripts/tests/test_g62_home_indexes.py
+1 FAILED governance/scripts/tests/test_g62_home_indexes.py
+
+## Run 2, on "/tmp/gov-os-W2-26/EXAMIN APP" (the path with a space)
+$ cd "/tmp/gov-os-W2-26/EXAMIN APP" && env -u PYTHONPATH timeout 1800 /usr/bin/time -v python3 -m pytest governance/scripts/tests -q --no-header -p no:cacheprovider -p no:randomly -n 8 --dist=loadgroup
+15 failed, 828 passed, 165 errors in 69.38s (0:01:09)
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:15.74
+	Maximum resident set size (kbytes): 61340
+	Exit status: 1
+Error kinds: 180 AssertionError.
+
+$ comm -13 / comm -23 over the sorted ERROR/FAILED test ids of the two runs
+only in spaced run:   (none)
+only in first run:    (none)
+
+After both runs, git status --short in each clone shows only "?? .gov-runtime/" (gov's store): the suite left no
+tracked file changed.
