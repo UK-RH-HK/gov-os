@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-u4oz, DAEO-r9ss, DAEO-zqvn, DAEO-kl5e]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 1
+priority: 4
 assignee: orchestrator
 external-ref: W2-14
-tags: [wave-2, integration, full]
+tags: [wave-2, integration, full, wave-3, deferred]
 wbs_id: W2-14
 title: ARGUS's full cycle, a-dev green, the governance share per programme
 class: integration
@@ -54,6 +54,8 @@ list_rows:
 - W2-M182
 ---
 # W2-14 ARGUS's full cycle, a-dev green, the governance share per programme
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** REPLAN §2.2; the governance share is measured on W2-81 and EXAMIN instead (W2-60b's records).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-14), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
