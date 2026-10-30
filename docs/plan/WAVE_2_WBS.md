@@ -1521,6 +1521,14 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
 - **KPIs, failure:** a hidden file of any tree read, listed or searched by a measured session; an unlistable tree taken as empty; a git route left open; (a) to (c) weakened, or a refusal added for an unmeasured session; a test touching the real hidden folder or `~/gov-os-runs/`.
 - **Overlap:** W2-05's sweep may touch `reads.py`'s `_git` (a line overlap: the second to merge merges back).
 
+### DEC-951: W2-54's time limits to the nightly
+
+#### W2-85 W2-54's two time-limit cases routed to the nightly (LITE, independent-test-designer; DEC-951 item 3)
+- **Ticket file:** `DAEO-gdzh`.
+- **Why:** both passed at low load and failed in closes and verifications at loads of 30 to 100; closes run beside leads (DEC-942). Not onto `load_sensitive`, which only shrinks.
+- **Allowed paths:** `tests/acceptance/W2-54/**`, `tests/acceptance/serial-only.txt`.
+- **KPIs:** both routed with a `# nightly:` reason and `Rewrite-Reason: DEC-951 item 3`; expectations unchanged; the close leaves them out, the nightly runs them.
+
 ## 3. Order, layers and critical path
 
 A layer is the earliest a ticket can start once its dependencies have closed. Tickets in flight stay within the ceiling of 6, with no overlapping paths, and under the resource gate.

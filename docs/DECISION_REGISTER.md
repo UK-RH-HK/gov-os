@@ -11420,7 +11420,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-938 — The morning package: investigate after the nightly, one P1-MORNING file, one ping at 07:30 from the orchestrator's session; hold only what an item blocks (standing)
-- **Status:** ACCEPTED (the morning package's scope refined by DEC-949 (overnight only); item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
+- **Status:** ACCEPTED (the hold after a red nightly and the schedule refined by DEC-951 items A and B; the morning package's scope refined by DEC-949 (overnight only); item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
 - **Decision (the owner's six points):**
   1. **Investigate before reporting.** After the nightly ends, for every finding (a red test, a refused close, a missed or failed night, any alert):
      - re-run failing tests alone and in the close's form;
@@ -11802,3 +11802,35 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.333 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-950 (P-W2-H063-1 (a): W2-84, the hidden-set refusal in every tree, priority 3 ahead of W2-61h; P-W2-20-SCOPE (a): W2-20 run 3 aligned with DEC-942 and DEC-947, working sizes from the measured configuration, the GPU only for declared needs plus 10 %). Next free id: DEC-951. |
+
+
+### DEC-951 — The owner's answers to P1-MORNING-2026-10-30 and P-W2-60a-ROUND3; a red nightly the orchestrator has explained and repaired needs no owner; the morning ping on time (items A and B standing)
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; items A and B standing) · **Under:** DEC-938, DEC-949, DEC-413, DEC-757, DEC-915, DEC-941, DEC-946 · **Changes:** DEC-938's hold on closes after a red nightly (item A); DEC-938's schedule (item B) · **Basis:** `packages/P1-MORNING-2026-10-30.md`, `packages/P-W2-60a-ROUND3.md`
+- **Decision:**
+  1. **Release the closes now:** W2-71, W2-77, W2-57, W2-03, W2-26 and the rest that are ready.
+  2. **P-B1-1: yes.** A short test-designer revision of W1-02's deadline support, then W2-05 resumes.
+  3. **W2-54's two time-limit cases do not go onto `load_sensitive`;** the list only shrinks.
+     - They are routed to the nightly instead, as W2-57 did for the live tests: they run every night on a quiet machine and no longer refuse closes under the leads' load.
+     - It is a test-designer change with a `Rewrite-Reason:`.
+  4. **P-W2-60a-ROUND3: (a), the last round under DEC-413's exception,** scoped strictly to the items listed:
+     - the main checkout's local file for worktree launches;
+     - the role-file path for adopted repositories;
+     - the named fixture and nightly-route lines.
+
+     If review 3 finds another fail-open case, a package, not a fourth round. The delegated items alongside are accepted.
+  5. **A note for W2-11's test-design skill:** 2,980 lines of acceptance tests for 713 lines of code is out of proportion; the skill says how much is enough.
+  - **A (standing): a red nightly the orchestrator has explained.** If its cause is found, repaired, merged and verified in the main tree (the repaired tests pass, nothing else red), it does not need the owner: the orchestrator releases the closes and reports it in the package as a delegated decision. The closes are held for the owner only when a red is unexplained, unrepaired, or in the judge's own core.
+  - **B (standing): the morning ping on time.** If the package is ready before 07:30, no long foreground work starts between 07:15 and 07:35, so the 07:30 ping goes on time. A late package is logged with its cause.
+- **How it is applied:**
+  - **Item 1:** the close queue runs W2-71, W2-77, W2-57, W2-03 and W2-26 once this record is committed.
+  - **Item 2:** no ticket widening is needed. The test designer's role writes `tests/acceptance/**` under an in-progress ticket, and its brief names DEC-951 item 2 for W1-02's tests (DEC-906); the mutation check refuses acceptance paths on an implementer ticket. W2-05's run 4 follows.
+  - **Item 3:** ticket W2-85 (LITE, independent test designer) routes the two cases in `tests/acceptance/serial-only.txt`.
+  - **Item 4:** W2-60a's ticket is widened by the three named unit files. Its test designer writes the nightly-route line in `tests/acceptance/serial-only.txt` by its role, its brief naming DEC-951 item 4. Round 3 is its last.
+  - **Item 5:** a KPI line on W2-11's ticket.
+  - **A and B:** in the prompt §7, v3.44.
+- **Where it goes (DEC-851):** this register, with DEC-938's status line; the prompt §7, v3.44; `.tickets/` (W2-05, W2-60a, W2-11, W2-85); RESUME HERE.
+- Next free id: DEC-952.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.334 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-951 (the closes released; W2-05 resumes after a W1-02 revision; W2-54's two time-limit cases routed to the nightly, not onto load_sensitive; W2-60a's last round under DEC-413's exception, strictly scoped; a test-proportion note for W2-11; standing: a red nightly found, repaired, merged and verified needs no owner; the 07:30 ping kept clear of long work). Next free id: DEC-952. |
