@@ -44,7 +44,7 @@ and show the code under test with:
 | S2 past the threshold: a live record, flagged slow, goes on | `test_w2_76_watchdog.py::test_a_slow_rebuild_records_what_it_waits_on_and_goes_on` | F "a slow rebuild with no record" and "a rebuild stopped by the watchdog": the same case; `::test_a_watchdog_fault_is_reported_and_the_rebuild_still_succeeds`; `::test_a_watchdog_fault_in_a_slow_rebuild_never_stops_it` | no record while it runs: "no record of this rebuild's processes while it ran"; "the fault is not in watchdog_faults"; "the slow rebuild was not flagged slow" |
 | S3 one rebuild at a time on the machine; a waiter says what it waits for, its wait apart (W2-M408) | `test_w2_76_machine_lock.py::test_two_rebuilds_at_once_run_one_after_the_other`; `::test_a_waiting_rebuild_says_before_it_waits_what_it_waits_for`; `::test_a_rebuild_under_its_callers_hold_runs_at_once[flock,flock-timeout]` | F "two rebuilds running at once": `::test_two_rebuilds_at_once_run_one_after_the_other`; `::test_a_wrapped_and_an_unwrapped_rebuild_never_run_at_once` | no lock: "the result has no full lock part"; "no line naming the lock … while the rebuild waited" (after its 20 s look) |
 | S4 fail closed (DEC-866) | `test_w2_76_fail_closed.py::test_a_lock_whose_folder_is_missing_refuses_and_builds_nothing`; `::test_a_lock_in_an_unwritable_folder_refuses_and_builds_nothing`; `::test_a_refused_rebuild_leaves_the_existing_stores_unchanged`; `::test_an_invalid_rebuild_yaml_refuses_and_builds_nothing[6 kinds]` | the same cases: a lock never ignored, nothing built | the settings are not read: "the rebuild was not refused with REBUILD_FAILED" |
-| S5 the same stores and digest (DEC-889) | `test_w2_76_unchanged.py::test_two_full_rebuilds_of_the_same_tree_give_the_same_digest`; the slow case compares its digest and stores with an unslowed rebuild of the same tree; the fault case with a fault-free one | the same | **green today by design** (a regression guard: today's rebuild already gives one digest); it must stay green |
+| S5 the same stores and digest (DEC-889) | `test_w2_76_unchanged.py::test_two_full_rebuilds_of_the_same_tree_give_the_same_digest`; the slow case compares its digest and stores' statuses with an unslowed first rebuild of a twin of the same commit, and its digest and stores with an unslowed rebuild of the same tree after it; the fault case with a fault-free one | the same | **green today by design** (a regression guard: today's rebuild already gives one digest); it must stay green |
 
 Red as seen on 2026-10-30 (this worktree at `135ae009`, sandboxed): **21 failed, 1 passed**, each failure for the
 reason in the last column.
@@ -69,13 +69,26 @@ reason in the last column.
 - **The wrapper.** `flock <lock> python -m gov.cli.main rebuild …` and `flock <lock> timeout 100 python -m …` end
   within 120 s, exit 0, `held_by_caller: true`, `wait_s == 0.0`. A wrapped and an unwrapped rebuild on one lock path,
   started together, do not overlap.
-- **The slow rebuild.** Threshold 2 s, the planted gitleaks sleeps 9 s. While the rebuild runs, the case reads the
-  record every 0.25 s and keeps the reads whose process list holds this rebuild's pid: there is at least one, and at
-  least two distinct write times. The last such read holds every part below. Standard error has exactly one line
-  starting `rebuild: slow:` that contains `.gov-runtime/rebuild/record.json`; the result says `slow: true`,
-  `slow_after_s: 2`; `secrets_s` and `lexical_s` are at least 8 s; the digest and `stores` equal an unslowed rebuild
-  of the same tree; a `.gov-runtime/rebuild/slow-*.json` with this rebuild's `lock.taken_at` exists and says
-  `slow: true`; the final record says slow with the result's `timing`; no record read holds 13 or more hex digits.
+- **The slow rebuild.** Threshold 2 s, the planted gitleaks sleeps 9 s. **The slowed rebuild is the first rebuild of
+  its tree** (DEC-956 item 1, revised in run 2): the lexical index is incremental by blob, so a second rebuild of an
+  indexed tree no longer hands the lexical stage's files to the secrets filter, and the sleep would land in the code
+  index's secrets filter instead (run 1: `lexical_s` short, `secrets_s` and `codeintel_s` about 10.5 s). The case
+  builds two projects of the same files in the same commit (fixed author and committer dates, so one hash, asserted;
+  the digest holds the commits), the second in a box of its own (HOME, TMPDIR, tools). While the slowed rebuild runs,
+  the case reads the record every 0.25 s and keeps the reads whose process list holds this rebuild's pid: there is at
+  least one, and at least two distinct write times. Among them, the reads whose stage running names `lexical` or
+  `secrets` (the slow stage) are at least one, with at least two distinct write times; the last of them holds every
+  part below (the sleep is no longer in the last stage, so the record is rewritten after it: the last read of the
+  whole run may be in a later stage). Standard error has exactly one line starting `rebuild: slow:` that contains
+  `.gov-runtime/rebuild/record.json`; the result says `slow: true`, `slow_after_s: 2`; `secrets_s` and `lexical_s`
+  are at least 8 s. The twin's first rebuild, unslowed and after the slowed one, gives the same digest and the same
+  status for every store (two first rebuilds: neither can reuse the other's index; a store's reason may name a folder
+  made from the project's path, the code-graph tool's home, so the twin is compared on status). A
+  `.gov-runtime/rebuild/slow-*.json` with this rebuild's `lock.taken_at` exists and says `slow: true`; the final record
+  says slow with the result's `timing`; no record read holds 13 or more hex digits. Last, an unslowed rebuild of the
+  same tree gives the same digest and the same `stores`, every field (the same path; the record store the digest is
+  taken from is loaded again in full from git on every rebuild, so this rebuild's being incremental leaves the digest
+  comparison whole).
 - **Watchdog faults.** `.gov-runtime/rebuild` is a file: the rebuild exits 0, `ok`, `watchdog_faults` non-empty, a
   standard-error line contains `watchdog` or `.gov-runtime/rebuild`; digest and stores equal a fault-free rebuild. The
   same fault in a slow rebuild: exit 0, `slow: true`, faults listed, the lexical store recreated.

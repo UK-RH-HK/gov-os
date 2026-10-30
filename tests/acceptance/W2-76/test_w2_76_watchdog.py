@@ -10,6 +10,17 @@ on standard error and in ``watchdog_faults`` and never changes the rebuild's suc
 
 The planted slow stage is a ``gitleaks`` first on ``PATH`` that sleeps on its first call, then hands on to the real
 one: the secrets filter, inside the lexical stage, runs long.
+
+The slowed rebuild is the first rebuild of its tree (DEC-956 item 1): the lexical index is incremental by blob, so a
+second rebuild of a tree an earlier rebuild indexed hands the lexical stage's files to the secrets filter no more, and
+the planted sleep would land in another stage. Its unslowed counterpart is the first rebuild of a twin: the same
+files, committed in one commit with fixed dates (so the same commit hash: the digest holds the commits), in a second
+box of its own (its own HOME, TMPDIR and tools), rebuilt after the slowed one. Two first rebuilds are compared, so
+neither side's digest can come from the other's work; their stores are compared store by store on their status,
+since a store's reason may name a folder made from the project's path (the code-graph tool's home). After the
+records are judged, the slowed tree is rebuilt once more unslowed and must give the same digest and the same stores,
+every field (the same tree at the same path, as before the revision; the record store, which the digest is taken
+from, is loaded again in full from git on every rebuild).
 """
 
 from __future__ import annotations
@@ -24,6 +35,7 @@ pytestmark = support.needs_tools
 
 THRESHOLD_S = 2
 SLEEP_S = 9.0
+FIXED_DATE = "2026-10-30T12:00:00+00:00"
 
 
 def _numbers(value):
@@ -36,6 +48,12 @@ def _numbers(value):
     if isinstance(value, dict):
         return bool(value) and all(_numbers(item) for item in value.values())
     return False
+
+
+def _names_slow_stage(record):
+    """Whether the record's stage running names the lexical stage or the secrets filter (the planted slow stage)."""
+    running = record.get(support.first_key(record, support.RUNNING_KEYS) or "")
+    return running is not None and any(name in json.dumps(running) for name in ("lexical", "secrets"))
 
 
 def _check_live_record(record, text, rebuild_pid):
@@ -90,10 +108,20 @@ def _check_live_record(record, text, rebuild_pid):
     return problems
 
 
-def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock):
-    project = support.make_project(box, "project", lock, slow_after_s=THRESHOLD_S)
-    unslowed = support.rebuild(project, support.environment(box), "--no-embeddings")
-    assert unslowed.returncode == 0, f"the unslowed rebuild of the same tree failed\n{unslowed.describe()}"
+def _projects_alike(boxes, lock, monkeypatch):
+    """One project per box, the same files in the same commit (fixed author and committer dates, so one hash)."""
+    monkeypatch.setenv("GIT_AUTHOR_DATE", FIXED_DATE)
+    monkeypatch.setenv("GIT_COMMITTER_DATE", FIXED_DATE)
+    projects = [support.make_project(each, "project", lock, slow_after_s=THRESHOLD_S) for each in boxes]
+    heads = {support.git(project, "rev-parse", "HEAD").strip() for project in projects}
+    assert len(heads) == 1, f"the twin projects are not the same commit: {sorted(heads)}"
+    return projects
+
+
+def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock, monkeypatch):
+    twin_box = support.make_box(box.base / "twin")
+    project, twin = _projects_alike((box, twin_box), lock, monkeypatch)
+    assert not (Path(project) / ".gov-runtime").exists(), "the slowed rebuild is not the first on its tree"
     env = support.environment(box, support.slow_gitleaks(box, "slow-tools", SLEEP_S))
 
     background = support.Background(project, env, support.rebuild_argv("--no-embeddings"), box.base / "out")
@@ -115,10 +143,24 @@ def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock):
 
     assert run.returncode == 0 and run.envelope().get("ok") is True, \
         f"the slow rebuild did not go on to a successful end\n{run.describe()}"
+    assert not (Path(twin) / ".gov-runtime").exists(), "the twin was rebuilt before its own first rebuild"
+    unslowed = support.rebuild(twin, support.environment(twin_box), "--no-embeddings")
+    assert unslowed.returncode == 0, f"the unslowed rebuild of the same content failed\n{unslowed.describe()}"
     assert live, f"no record of this rebuild's processes while it ran ({unreadable} reads were not whole JSON)\n" \
                  f"{run.describe()}"
     assert len(writes) >= 2, f"the record was not rewritten while the rebuild ran (times of the writes: {writes})"
-    problems = _check_live_record(*live[-1], background.pid)
+    # The planted sleep is in the lexical stage, not the last one: the record is rewritten in the stages after it,
+    # so the read judged is the last one taken while the slow stage ran (DEC-956 item 1), and that stage alone must
+    # have seen the record rewritten.
+    during = [(record, text) for record, text in live if _names_slow_stage(record)]
+    stages_seen = sorted({json.dumps(record.get(support.first_key(record, support.RUNNING_KEYS) or ""))
+                          for record, _ in live})
+    assert during, f"no record read while the planted slow secrets filter ran (stages running seen: {stages_seen})"
+    writes_during = {json.dumps(record.get(support.first_key(record, support.WRITTEN_KEYS) or ""))
+                     for record, _ in during}
+    assert len(writes_during) >= 2, \
+        f"the record was not rewritten while the slow stage ran (times of the writes: {writes_during})"
+    problems = _check_live_record(*during[-1], background.pid)
     assert not problems, "the live record lacks what it must hold:\n- " + "\n- ".join(problems)
 
     flagged = [line for line in run.stderr.splitlines() if line.startswith("rebuild: slow:")]
@@ -131,8 +173,11 @@ def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock):
     assert timing.get("secrets_s", 0) >= SLEEP_S - 1 and timing.get("lexical_s", 0) >= SLEEP_S - 1, \
         f"the planted slow secrets filter is not in its stage times: {timing}"
     assert result.get("digest") == unslowed.result.get("digest") and result.get("digest"), \
-        "the slow rebuild built a different digest from an unslowed rebuild of the same tree"
-    assert result.get("stores") == unslowed.result.get("stores"), "the slow rebuild built different stores"
+        "the slow rebuild built a different digest from an unslowed first rebuild of the same content"
+    statuses = [{name: (store or {}).get("status") for name, store in (each.get("stores") or {}).items()}
+                for each in (result, unslowed.result)]
+    assert statuses[0] == statuses[1] and statuses[0], \
+        f"the slow rebuild built different stores from an unslowed first rebuild of the same content: {statuses}"
 
     kept = sorted((Path(project) / support.RECORD_DIR_REL).glob("slow-*.json"))
     matching = [path for path in kept
@@ -147,6 +192,11 @@ def test_a_slow_rebuild_records_what_it_waits_on_and_goes_on(box, lock):
     for text in [final_text, matching[0].read_text(encoding="utf-8")] + [t for _, t in live]:
         found = support.LONG_HEX.search(text)
         assert not found, f"a record holds an uncut run of 13 or more hex digits: {found.group(0)}"
+
+    again = support.rebuild(project, support.environment(box), "--no-embeddings")
+    assert again.returncode == 0, f"the unslowed rebuild of the same tree failed\n{again.describe()}"
+    assert again.result.get("digest") == result.get("digest") and \
+        again.result.get("stores") == result.get("stores"), "the slow rebuild built a different digest or stores from an unslowed rebuild of the same tree"
 
 
 def test_a_watchdog_fault_is_reported_and_the_rebuild_still_succeeds(box, lock, env):
