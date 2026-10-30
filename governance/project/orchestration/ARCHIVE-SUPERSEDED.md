@@ -1,0 +1,163 @@
+# Archive: superseded and spent decisions
+
+Draft of 2026-10-30, for DEC-953 item 7. History is not rewritten: the full register stays and stays the authority. This file only sorts out what no longer guides work.
+
+How the sorting works:
+- `DECISIONS-IN-FORCE.md` lists the decisions that still guide work.
+- `LIFTED-BY-DEC953.md` lists what DEC-953 lifts.
+- This file lists the rest. Each line gives what superseded it, or why it is spent.
+- **Product record** means a decision about how the product behaves, or about the plan. It is still the authority for that behaviour, but it is not a working rule for sessions.
+
+## A. Superseded or changed before DEC-953 (from the register's status lines)
+- DEC-004: settled by DEC-086.
+- DEC-038: SUPERSEDED by DEC-048, itself superseded by DEC-051.
+- DEC-045: amended by DEC-049, itself superseded by DEC-053 Q5.
+- DEC-048: SUPERSEDED by DEC-051.
+- DEC-049: SUPERSEDED by DEC-053 Q5.
+- DEC-053: Q7 reversed by DEC-165, for framework lessons.
+- DEC-062: withdrawn by DEC-842.
+- DEC-120: its settings "second line" withdrawn by DEC-172.
+- DEC-140: withdrawn by DEC-842.
+- DEC-150: its standing paths and commit rule replaced by DEC-156.
+- DEC-151: its settings "second line" withdrawn by DEC-172.
+- DEC-183: superseded by DEC-371 for the launcher's roles.
+- DEC-192: corrected by DEC-202.
+- DEC-208, DEC-237, DEC-248 (c), DEC-451, DEC-665 (W1-49 part): the 300k window and compaction threshold superseded by DEC-838.
+- DEC-253: extended by DEC-912 item 1.
+- DEC-261: amended by DEC-798 (a CPU-only query embedder).
+- DEC-281: kept with a recorded reason by DEC-901.
+- DEC-289: settled by DEC-381.
+- DEC-361: settled by DEC-377.
+- DEC-365, DEC-407: their ancestry rule replaced by DEC-409.
+- DEC-410: changed by DEC-918.
+- DEC-448: its one-off limit superseded by DEC-477.
+- DEC-454, DEC-455, DEC-480, DEC-490, DEC-492: changed by DEC-868, DEC-899, DEC-904 and DEC-908. Their close parts are now lifted (LIFTED §A).
+- DEC-460: its cause corrected by DEC-840, and its model replaced by DEC-839.
+- DEC-466: every close through `gov close` and `gov check` as a blocking gate. SUPERSEDED by DEC-953 item 1 (LIFTED §A).
+- DEC-493: changed by DEC-896 item 2 and DEC-903 (the overlay holds the test map).
+- DEC-501: corrected by DEC-502. DEC-502: corrected by DEC-512.
+- DEC-518: corrected by DEC-533.
+- DEC-526: its last point superseded by DEC-541.
+- DEC-584: the Wave 1 finish line. Spent: Wave 1 passed (DEC-718).
+- DEC-608: changed by DEC-917.
+- DEC-624: corrected by DEC-626.
+- DEC-636: SUPERSEDED by DEC-838.
+- DEC-718: item 11 changed by DEC-900. It is Wave 1's exit, and now history.
+- DEC-724: owner commits replaced by DEC-861.
+- DEC-726: the test cache withdrawn by DEC-880.
+- DEC-737, DEC-776 item 3, DEC-786 item 1: fixed caps replaced by DEC-847, then by DEC-942.
+- DEC-742, DEC-798's gate figures: replaced by DEC-942, then DEC-947. Now lifted (LIFTED §D).
+- DEC-787: its OWNER_ACTION line became the last line of DEC-948's block.
+- DEC-788: the daily owner batch replaced by DEC-861.
+- DEC-792: its 8,000-character limit to be lifted once W2-62 lands (DEC-837). It still applies until then.
+- DEC-813: changed by DEC-899 item 1.
+- DEC-821: its sandbox clause superseded by DEC-873.
+- DEC-823: item 4 changed by DEC-869, then by DEC-880.
+- DEC-828: item 4 settled by DEC-833.
+- DEC-829: item 6 ended by DEC-831; item 4 (iv) settled by DEC-832.
+- DEC-830: item 4 corrected by DEC-848.
+- DEC-831: its slot order replaced by DEC-941, then by DEC-946.
+- DEC-843: items 1 and 2 superseded by DEC-880. Item 3 (the install approval) stands (DEC-882).
+- DEC-847: its ceiling replaced by DEC-942. Its memory figures are lifted (LIFTED §D).
+- DEC-852: items 1 and 2 superseded by DEC-880. Item 3, the nightly, is carried by DEC-933 and now DEC-953 item 3.
+- DEC-856: changed by DEC-887 (`record/w2`).
+- DEC-869, DEC-875, DEC-876: SUPERSEDED by DEC-880.
+- DEC-904: item 3's cap ended by DEC-905. The lock is kept as one mutex (in force).
+- DEC-929: items 1 and 2 SUPERSEDED by DEC-953 item 4a. Item 3 is done.
+- DEC-936: item 1 carried by DEC-938 and DEC-949. Item 2.5 is carried by DEC-949 and DEC-220. Item 2.3 is lifted. The rest is spent.
+- DEC-939 item 7: Pushover, reversed by DEC-945.
+- DEC-947: SUPERSEDED by DEC-953 item 1 (LIFTED §D).
+
+## B. Wave 2 entries (DEC-720 to DEC-951) that are spent or product record
+"Feature lifted" means that the feature the entry served is lifted by DEC-953 (see `LIFTED-BY-DEC953.md`).
+
+- DEC-721: the adoption-readiness block, W2-01 first. Spent.
+- DEC-722: Contract v4.2 brings two Wave 3 items in. Product record.
+- DEC-725: a ranked lexical route; EXP-003 in two passes. Product record.
+- DEC-727: EXAMIN's adoption on the copy, safety-critical subset first. Product record.
+- DEC-728: `~/gov-os-runs` as a durable scratch root. Product record. Its write scope is lifted.
+- DEC-729: the Wave 2 plan approved; W2-00. Spent.
+- DEC-730: the `wbs_id` letter suffix. Product record.
+- DEC-733: probe records under `docs/probes/<ticket>/`. Kept as the review record's place (practice 9).
+- DEC-734: the form of an accepted-history entry. Feature lifted.
+- DEC-735, DEC-736, DEC-745: EXAMIN's measures and tests at adoption. Product record.
+- DEC-738: the delegated choices of 2026-10-16. Spent.
+- DEC-739, DEC-750, DEC-754: W2-01's rounds and split. Spent.
+- DEC-740: one pilot adoption in Wave 2. Product record.
+- DEC-741: Contract v4.2 lite, W2-49's CIT-P. Product record.
+- DEC-743: W2-50's CIT-P (the scratch root). Spent.
+- DEC-744: the W2-51 plan validator. Product record.
+- DEC-746, DEC-747, DEC-748, DEC-749, DEC-753, DEC-755: delegated run packages. Spent; containment's feature lifted.
+- DEC-751, DEC-756, DEC-758, DEC-764, DEC-765, DEC-774, DEC-779, DEC-785: W2-50's rounds. Spent. The guard product stays; its gate is lifted.
+- DEC-752: stacked early starts for W2-03 and W2-16. Spent.
+- DEC-757: W2-01 closed by the owner, with the ratchet. Spent; feature lifted.
+- DEC-759: a guard-hardening pass in Wave 3. Product record (Wave 3).
+- DEC-760, DEC-762, DEC-766: the ratchet lists. Feature lifted.
+- DEC-761, DEC-767, DEC-771: W2-16's rounds and sources. Spent.
+- DEC-763: W2-53's lesser packages become rows. Spent.
+- DEC-768, DEC-773, DEC-775: reds cleared before W2-53's close. Spent.
+- DEC-769: leads sandboxed (W2-21). Product record. Its test-designer write scope is lifted.
+- DEC-770: a guard hole that only an unsandboxed session can reach becomes a row. Standing, but moot while the guard has four rules.
+- DEC-772: `gov release` is the owner's alone, from a plain terminal. Product record (K7).
+- DEC-776, DEC-777: the machine kept busy; W2-05's early start. Spent.
+- DEC-778: one option reader for copy-like commands. Product record. The command forms are lifted.
+- DEC-780: closes in a quiet window. Lifted (ended).
+- DEC-781, DEC-805: `gov check` rows (openspec-validate, drift). Spent.
+- DEC-782, DEC-797: the query-vector cache. Product record.
+- DEC-783, DEC-784: W2-05's settings re-sort; the W1-46 fixture. Spent.
+- DEC-786: stacked starts by rule. Spent, within DEC-942.
+- DEC-789, DEC-799: the worker tripwire; `gov launch` for every worker (W2-56). Product record.
+- DEC-790: W2-50's close through the resume probe. Spent; feature lifted.
+- DEC-791, DEC-825: decision tagging; decisions land by tag. Product record (W2-55).
+- DEC-794: quality control at the Track A gate. Spent.
+- DEC-795, DEC-796, DEC-810: W2-52's readings (A7/A10). Product record.
+- DEC-798: query embeddings on a CPU-only embedder. Product record.
+- DEC-800, DEC-814: W2-52 widened; the adopt skill regenerated. Spent.
+- DEC-804, DEC-807, DEC-811, DEC-812: W2-05, W2-54 and W2-37 rides-along. Spent.
+- DEC-806: closes first. Lifted (ended).
+- DEC-813: W1-46's `load_sensitive` entries. Spent; feature lifted.
+- DEC-815, DEC-816: closure depths; `gov impact` routing. Product record.
+- DEC-817: the owner's exception for DEC-814 to DEC-816. Spent.
+- DEC-821, DEC-857: W2-58's guard changes approved and brought forward. Spent.
+- DEC-822: governed by a pinned release. Product record. The re-pin ladder is lifted.
+- DEC-823, DEC-824, DEC-834, DEC-835, DEC-840, DEC-842, DEC-854: batch, re-plan and set-up acts of 2026-10-19. Spent.
+- DEC-826: what each role loads. Product record. Its Q2 and Q4 are changed (LIFTED §E).
+- DEC-827: research is launchable. Product record.
+- DEC-828, DEC-829, DEC-832, DEC-833, DEC-837, DEC-841: the revised plan, roles, memory targets and Contract re-baseline. Product record.
+- DEC-830: a referee outside the machine. Product record.
+- DEC-844, DEC-845: `docs/imported/` outside the schema check; `experiments/**` and `evaluation_sets` in the path map. Product record.
+- DEC-853: the secrets scan's time limit (W2-50). Spent.
+- DEC-856, DEC-858: the raw record leaves memory; pings confirmed. Spent.
+- DEC-862: ratchet entries as the owner's commits. Lifted (until whole).
+- DEC-863, DEC-864, DEC-865: W2-62, W2-59 and W2-63 packages. Spent.
+- DEC-867, DEC-870, DEC-872, DEC-874, DEC-877, DEC-882, DEC-885, DEC-886, DEC-892, DEC-894, DEC-897, DEC-937: refused closes and their repairs. Spent; feature lifted.
+- DEC-868: the pre-close gate and full record checks. Lifted (LIFTED §A).
+- DEC-871, DEC-912, DEC-918, DEC-921: accepted history, merge rules, containment. Spent; feature lifted. DEC-912 and DEC-918 stay product record.
+- DEC-873: (c) and (d) enforced by the guard. Product record; (c) is lifted.
+- DEC-879, DEC-888, DEC-890, DEC-899, DEC-903, DEC-907, DEC-913, DEC-914, DEC-917, DEC-919, DEC-920: merge orders, splits and review points. Spent.
+- DEC-880, DEC-881, DEC-883, DEC-889: W2-48 withdrawn; lens H; batched and scoped closes (W2-66, W2-68). Product record. Scoped selection is kept (DEC-953 item 4).
+- DEC-884, DEC-922, DEC-931, DEC-932, DEC-935: re-pins and their ACTs. Spent; feature lifted.
+- DEC-891, DEC-895, DEC-896, DEC-900, DEC-923, DEC-924, DEC-926, DEC-927, DEC-928: history entries, readers, work without a task, `Implements:`. Lifted or spent.
+- DEC-901: DEC-281's 0.30 threshold kept with a reason. Product record.
+- DEC-904: the retention trial and its bridge. Spent (DEC-905).
+- DEC-908, DEC-909, DEC-910: W2-07's batch; W2-69's last rounds. Spent.
+- DEC-911: row W2-L423's keyword rule. Changed (LIFTED §A and the report).
+- DEC-915: the interim skip guard. Spent; lifted as a gate.
+- DEC-929: SUPERSEDED (part A).
+- DEC-933: re-pin cadence and the nightly window. Item 1 is lifted. Item 2 becomes DEC-953 item 3's plain run (in force through DEC-934 and DEC-953).
+- DEC-937: W2-58's refused close; W2-75. Spent.
+- DEC-940: the state of the Gov OS, answered by DEC-941. Spent.
+- DEC-947: SUPERSEDED (part A).
+- DEC-950: W2-84 (the hidden-set refusal in every tree) and W2-20's run 3. Product record, in progress.
+
+## C. Waves 0 and 1 (DEC-001 to DEC-719), by range
+- DEC-001 to DEC-037: S0 strategy, tools and retrieval design. Product record.
+- DEC-038 to DEC-063: the Rust archive, the restructure and repository set-up. Spent; part A has the supersessions.
+- DEC-064 to DEC-106: the Charter, the Contract and the Wave 1 operating rules.
+  - In force: DEC-065, DEC-083 (with DEC-040), DEC-093, DEC-096 and DEC-105.
+  - The rest is product record or spent.
+- DEC-107 to DEC-719: Wave 1's KD and DP answers, and its runs, closes and exit.
+  - The KDs and DPs are product record: the guard, containment, the launcher, stores, retrieval, checkpoints, `gov close` and adoption.
+  - The runs, closes and exit are spent.
+  - In force: DEC-137, DEC-156, DEC-182, DEC-220, DEC-221, DEC-236, DEC-371, DEC-413, DEC-420, DEC-462, DEC-463 and DEC-498.
+  - The guard and close KDs among them stay built and tested. Only their use as gates here is lifted (LIFTED §A and §E).

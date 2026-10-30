@@ -18,7 +18,8 @@ decision" gives the source of each point):
   word) in the commit's message: subject, body or trailers. The changed text is
   not read.
 - The register at a commit is the decision files in that commit's own tree
-  (W1-11: frontmatter ``type: decision``, or an ``id`` in the grammar).
+  (W1-11: frontmatter ``type: decision``; an ``id`` in the grammar alone is no
+  record, DEC-755).
 - Every project here records no base and every commit is dated after
   2026-10-07, so each commit is judged under every answer to the open package
   on the range (README, package P-2).
@@ -374,21 +375,27 @@ def test_a_merged_branch_commit_is_judged_by_its_own_tree(declaration, history):
 # What the register is: decision files (W1-11), read by frontmatter
 # ==========================================================================
 
-@pytest.mark.parametrize("form", ["typed-in-docs-adr", "typed-in-another-folder", "no-type-id-in-grammar"])
+@pytest.mark.parametrize("form", ["typed-in-docs-adr", "typed-in-another-folder"])
 def test_a_decision_file_records_its_id(declaration, history, form):
-    """A decision file is a Markdown file whose frontmatter has ``type: decision`` or an ``id`` in the
-    ``decision_id`` grammar, in any folder."""
+    """A decision file is a Markdown file whose frontmatter has ``type: decision``, in any folder."""
     if form == "typed-in-docs-adr":
         history.record("DEC-101")
-    elif form == "typed-in-another-folder":
-        history.record("DEC-101", folder="decisions/2026")
     else:
-        history.write("decisions/DEC-101.md",
-                      "---\nid: DEC-101\nstatus: ACTIVE\ntitle: A legacy decision\n---\n\n# DEC-101\n\nBody.\n")
+        history.record("DEC-101", folder="decisions/2026")
     history.commit("Record a decision", who=OWNER)
     history.commit("Change the parser (DEC-101)")
     witness = history.commit(f"Another change ({WITNESS})")
     assert_flagged(run_declared(declaration, history.root), [(witness, WITNESS)])
+
+
+def test_a_file_with_only_an_id_in_its_frontmatter_does_not_satisfy_a_citation(declaration, history):
+    """A file whose frontmatter has an ``id`` in the ``decision_id`` grammar and no ``type: decision``
+    is no decision record: the commit citing that id is flagged (DEC-755; W2-M267, W2-M145)."""
+    history.write("decisions/DEC-101.md",
+                  "---\nid: DEC-101\nstatus: ACTIVE\ntitle: A legacy decision\n---\n\n# DEC-101\n\nBody.\n")
+    history.commit("Record a decision", who=OWNER)
+    commit = history.commit("Change the parser (DEC-101)")
+    assert_flagged(run_declared(declaration, history.root), [(commit, "DEC-101")])
 
 
 def test_an_id_mentioned_in_prose_or_by_another_record_is_not_recorded(declaration, history):

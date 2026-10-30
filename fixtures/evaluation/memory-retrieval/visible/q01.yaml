@@ -1,0 +1,13 @@
+# Lens B's Q01 (Table 2). Lens B's report is the visible half's origin, never a gold source.
+id: Q01
+category: decision
+commit: 23079f92a6fa
+question: DEC-782
+gold_answer: >-
+  DEC-782 lets a read command (gov retrieve, gov context) write the query-vector cache, and only that one derived file
+  under .gov-runtime/, keyed by model, revision and a hash of the text, written atomically, bounded and rebuildable;
+  DEC-379 is amended for that file only.
+sources:
+  - path: docs/DECISION_REGISTER.md
+    heading: "### DEC-782 — A read command may write the query-vector cache, and only that, under limits (P-W2-32 (a))"
+    lines: [8574, 8592]

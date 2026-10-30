@@ -1,0 +1,29 @@
+# Test runners and their commands at a7cf346 (only the test command lines are quoted)
+
+Files searched by name over git ls-files: pyproject.toml, setup.cfg, setup.py, pytest.ini, tox.ini, noxfile.py,
+conftest.py, package.json, Makefile, requirements*.txt, README*, CI files (.github/, .gitlab-ci*).
+Found: product/pyproject.toml (the only pyproject; no setup.cfg, pytest.ini, tox.ini, noxfile, package.json,
+Makefile or CI workflow is tracked); conftest.py in product/tests/, governance/scripts/tests/ and
+governance/framework/kit/governance/scripts/tests/.
+
+Runner: pytest, in two suites.
+
+1. The product suite: product/tests/ (180 test_*.py files)
+   - product/pyproject.toml, [tool.pytest.ini_options]: testpaths = ["tests"], pythonpath = ["."],
+     addopts = "-m 'not live'", markers live and slow ("boots a throwaway postgres"), asyncio_mode = "auto".
+     dev extras: pytest, pytest-asyncio, respx, ruff, pytest-xdist.
+   - CLAUDE.md (root), test command:
+       .venv/Scripts/python.exe -m pytest product/tests -q -p no:randomly -m "not live"   (one process, alone)
+   - product/app/README.md, test commands:
+       ./.venv/Scripts/python.exe -m pytest -m "not live"      # default: no external calls
+       ./.venv/Scripts/python.exe -m pytest -m live            # live API smoke tests (needs keys)
+
+2. The governance suite: governance/scripts/tests/ (101 .py files)
+   - governance/scripts/run_gov_suite.py (its docstring), test command:
+       <python> -m pytest governance/scripts/tests -q --no-header -p no:cacheprovider -p no:randomly -n <WORKERS> --dist=loadgroup
+     WORKERS = int(os.environ.get("GOV_SUITE_WORKERS", "8")); the runner refuses to start while any other pytest
+     process runs on the machine, and records its result in a file of the repository.
+   - A portable copy, governance/framework/kit/governance/scripts/tests/ (56 .py files), is regenerated from it.
+
+The interpreter EXAMIN's documents name is a Windows virtual environment (.venv/Scripts/python.exe); none is in the
+clone. Both suites here were judged against /usr/bin/python3 3.12.3 (pyproject: requires-python >= 3.12).
