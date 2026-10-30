@@ -138,7 +138,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         closure_gaps += closed["gaps"]
 
-    fused = order.fused(rrf(routes), chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
+    fused = rrf(routes)
+    fused = order.fused(fused, chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
 
     # DEC-424: move failure/lesson records ahead so they're gathered even in small batches
     ahead_paths: set[str] = set()
