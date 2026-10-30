@@ -45,6 +45,7 @@ sources:
 - CAP-43
 - DEC-752
 - DEC-753
+- DEC-954
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-16/
@@ -62,6 +63,8 @@ list_rows:
 - W2-M175
 ---
 # W2-16 Immutable, hash-pinned releases (CAP-43.b lite)
+
+**DEC-954 Q8c:** cuts a numbered, frozen release that W2-81 and EXAMIN's copy install; the owner tags it. Finished after ACT 1.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-16), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
