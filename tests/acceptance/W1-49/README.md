@@ -248,6 +248,33 @@ the variable it fails. The live case, called with stand-in answers: "…: auto" 
 model)" pass; "…: 300k tokens (from CLAUDE_CODE_AUTO_COMPACT_WINDOW) · capped to 200k by model", "…: 300k tokens
 (from settings)", "…: 500k tokens" and an empty answer fail.
 
+### 2.6 Batch 8: the sandbox has a gov, so only tk is missing (DEC-917, DEC-925 item 1)
+
+Since the first re-pin's settings regeneration (DEC-922), the registered PreCompact command is DEC-917's lifecycle
+line: it looks for the pinned gov at `$HOME/.local/bin/gov`, then on `PATH`, and ends with 1 when it finds none. The
+`[not on PATH]` case runs the hook with the sandbox's `HOME` and a `PATH` without the entries that hold `tk`; on this
+machine that entry (`~/.local/bin`) holds gov too, so the hook found no gov and ended with 1 before the hook program
+ran. The case meant "tk is missing", not "gov is missing". The owner decided its revision (DEC-925 item 1, package
+P-REPIN-R1), ticket `DAEO-2azm` (W2-74), by a fresh Independent Test Designer.
+
+**Revised, reason DEC-917 (trailer `Rewrite-Reason: DEC-917`): 1 case. Added: none. Removed: none. Every other case
+keeps its assertions; the `[fails]` case is unchanged.**
+
+| Case | Before | Now |
+|---|---|---|
+| `test_w1_49_precompact.py::test_without_tk_the_block_says_so_and_holds_the_rest[not on PATH]` | the sandbox has neither tk nor gov | the sandbox's `HOME` holds `.local/bin/gov`, a link to the gov the caller's `PATH` gives (the pinned one); the case asserts first that `tk` is not on the hook's `PATH`, then, as before, exit 0 and not blocked, the git head in the block, and the `tickets in progress` line saying `unavailable` |
+
+The link sits under the sandbox's `HOME`, which is not on the hook's `PATH`, so it brings gov and nothing else: tk
+stays absent. A caller with no gov on its `PATH` fails the case with that reason (never a skip).
+
+Red, observed on 2026-10-27 on `w2/W2-74` at `a42e899b`, before the change: `[not on PATH]` failed (the file: 1 failed,
+29 passed); the hook said `gov hook: no pinned gov at <sandbox home>/.local/bin/gov or on PATH` and ended with 1.
+Green after the change: the file 30 passed.
+
+Bite, tried on 2026-10-27 by running the registered command as the case does: without the link it ends with 1 (the
+old red); with the link and tk absent it ends with 0 and the line reads `unavailable (FileNotFound…`; with the
+link and the stand-in tk on the `PATH` the line holds no `unavailable`, so the case fails.
+
 ### 2.3 The earlier red records
 
 - Batch 1, before the implementation, 2026-10-04: 9 failed, 8 passed, 45 errors (the hooks did not exist and were

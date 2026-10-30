@@ -298,10 +298,33 @@ def test_doctor_report_mentions_index_freshness(sandbox, tmp_path):
     )
 
 
+# revised after implementation (DEC-913 item 3; Rewrite-Reason: DEC-835): the canary runner reads its declarations
+# from the project, never from its install path, so the canaries case's project carries the kernel's declarations,
+# one named file per index, under governance/kernel/canaries/ where an adopted project holds them (DEC-579). Only
+# that case calls it: every other case's project is as it was. The files stay untracked: a committed declaration
+# holds its own queries, so the rebuilt index would hold them without the case's docs/canary.md and the case's
+# second half would test nothing.
+KERNEL_CANARIES_TEMPLATE_REL = "template/governance/kernel/canaries"
+KERNEL_CANARIES_ADOPTED_REL = "governance/kernel/canaries"
+
+
+def _carry_kernel_canaries(project):
+    """The kernel's canary declarations in the project, where an adopted project holds them (DEC-579), untracked."""
+    for index in ("lexical", "semantic"):
+        target = project / KERNEL_CANARIES_ADOPTED_REL / f"{index}.yaml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text((support.REPO_ROOT / KERNEL_CANARIES_TEMPLATE_REL / f"{index}.yaml").read_text(
+            encoding="utf-8"), encoding="utf-8")
+
+
 def test_doctor_report_mentions_canaries(sandbox, tmp_path):
     """The doctor result mentions canaries: the lexical canary misses before an index holds its query, and
-    passes once a rebuilt index holds it."""
+    passes once a rebuilt index holds it.
+
+    Revised after implementation (DEC-913 item 3; Rewrite-Reason: DEC-835): the project carries the kernel's
+    canary declarations (``_carry_kernel_canaries``); the assertions are unchanged."""
     project = support.make_rebuild_project(support.REPO_ROOT, tmp_path / "repo")
+    _carry_kernel_canaries(project)
     before_run = w2_67_doctor.doctor(project, sandbox)
     before = w2_67_doctor.section(before_run, "canaries")
     lexical = (before.get("indices") or {}).get("lexical") or {}

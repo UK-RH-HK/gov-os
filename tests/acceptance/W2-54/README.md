@@ -80,9 +80,9 @@ retrieval returns 20 items for each, including same-id items and a chunk of a fi
 | S1 (what the fix keeps) | `test_the_stand_in_reaches_the_retrieval_s_public_entry_with_tied_and_same_id_items`, `test_two_computations_with_the_retrieval_s_own_order_give_one_packet`, `test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once[identity, reverse]`, `test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing`, `test_an_empty_retrieval_result_gives_one_packet`, `test_a_store_whose_index_is_missing_gives_one_packet_under_any_order[SMALL, BIG]` | pass |
 | **S2** a declared limit that fits the measured run, recorded in the change record | `test_w2_54_time_limit.py`: `test_only_the_timeout_line_is_added_to_the_declaration`, `test_the_declared_limit_is_above_the_runner_s_and_bounded`, `test_the_change_record_states_the_limit_and_its_measurement`, `test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit` | **red** |
 | S2 (the other keys unchanged) | `test_the_declaration_s_other_keys_are_unchanged` | pass |
-| **S3** `gov check` gives context-reproducibility green here | `test_w2_54_green_here.py`: `test_gov_check_gives_context_reproducibility_green_here` (and `test_the_suite_runs_this_worktree_s_code`, passes) | **red** |
-| **S4** `audit-report` exactly W2-02's; nothing of W2-02's other types; core-schema green here, W1-43 untouched | `test_w2_54_audit_report.py`: `test_the_schema_file_is_w2_02_s_byte_for_byte`, `test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[2]`, `test_a_record_of_type_audit_report_owes_no_shared_frontmatter[2]`, `test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[3]`, `test_core_schema_is_green_on_this_repository_with_w1_43_untouched`; `test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here` | **red** |
-| S4 (nothing of W2-02's other types; W1-43 untouched) | `test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD, 4ce16df2]`, `test_w2_02_s_other_types_are_judged_as_an_unknown_type[close, adoption-verdict × HEAD, 4ce16df2]` (read through git since run 5: "Run 5 (DEC-874)", at the end), `test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched` | pass |
+| **S3** `gov check` gives context-reproducibility green here (in a close, gate (b)'s `gov check`: "W2-75", at the end) | `test_w2_54_green_here.py`: `test_gov_check_gives_context_reproducibility_green_here` (and `test_the_suite_runs_this_worktree_s_code`, passes) | **red** |
+| **S4** `audit-report` exactly W2-02's; nothing of W2-02's other types; core-schema green here, W1-43 untouched | `test_w2_54_audit_report.py`: `test_the_schema_file_is_w2_02_s_byte_for_byte`, `test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[2]`, `test_a_record_of_type_audit_report_owes_no_shared_frontmatter[2]`, `test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[3]`, `test_core_schema_is_green_on_this_repository_with_w1_43_untouched`; `test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here` (in a close, gate (b)'s `gov check`: "W2-75") | **red** |
+| S4 (nothing of W2-02's other types; W1-43 untouched) | `test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD, 4ce16df2]`, `test_w2_02_s_other_types_are_judged_as_an_unknown_type[close, adoption-verdict × HEAD, 4ce16df2]` (read through git since run 5: "Run 5 (DEC-874)", at the end), `test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched` (in a close, after gate (b)'s `gov check`: "W2-75") | pass |
 | **F1** a context whose items or hash differ still fails the check, naming the ticket | `test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket`, `test_the_check_names_only_the_ticket_whose_context_differs` | pass |
 | **F2** a check past its declared limit still fails; no hard-block check weakened | `test_a_check_past_its_declared_limit_is_red`, `test_the_same_check_within_its_limit_is_green` (its control), `test_no_hard_block_check_is_weakened`, `test_the_two_checks_of_this_ticket_stay_hard_block[2]` | pass |
 | **F3** outside `docs/audit/` with no `type` still fails; an audit report lacking `milestone`, `commit` or `pack_sha256` fails naming the field | `test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/notes, docs/audit-archive, docs/reports/audit]` (pass); `test_an_audit_report_lacking_a_required_field_fails_naming_it[folder, stated × milestone, commit, pack_sha256]` (**red**) | mixed |
@@ -147,6 +147,7 @@ tickets measured (the words `seconds`, `load` and `ticket`).
   minutes** (317 s in the red run, at a 1-minute load of 5 to 16; 5 min 58 s alone at a load of 12 to 21, on 20
   processors). It is the slowest part of the suite. Its other checks are
   read but not judged (here `secrets-indexing` is RED for a reason outside this ticket; see the return).
+  Since W2-75 (DEC-937), inside a close it runs no `gov check` and takes well under a second ("W2-75", at the end).
 - `test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit`: one run of the check here,
   **about 2 to 3 minutes** once a limit is declared (today it stops at once).
 - `test_core_schema_is_green_on_this_repository_with_w1_43_untouched`: about one second.
@@ -795,3 +796,59 @@ fail this self-check ("… misses the own commit that changed it"); the correcte
 No expectation changed: the case's two assertions (no own added line names the type; core-schema as the last own
 commit to the module leaves it judges the record as an unknown type), the file case and every other case stay as they
 were; the ids are the same (24 in the file, 99 in the suite).
+
+# W2-75 (DEC-937, 2026-10-28): the green-here fixture reads the close's own check result
+
+Ticket W2-75 (`DAEO-ebmh`, LITE, test-revision; row W2-L429; DEC-937, delegated under DEC-936; under DEC-889 item 2,
+P-IS-2 (a)). Every change carries `Rewrite-Reason: W2-L429`.
+
+**Why.** W2-58's full close (2026-10-28) ran 15,672 regression cases with 0 failed and 3 errors: the three cases of
+`test_w2_54_green_here.py` that use `gov_check_here` "failed on setup with Timeout (>900.0s) from pytest-timeout". The
+fixture ran `gov check` on this repository, about six minutes alone and over the close's 900 s per-test limit under a
+full close's parallel load (row W2-L429 saw the same at 600 s on 2026-10-24).
+
+**The two routes** (`w2_54_support.green_here_check`; the fixture stays session-scoped, so one route serves the three
+cases):
+
+1. **Inside a close** (`GOV_CLOSE_CHECK_RESULT` set and not empty): the pinned `gov close --check-result <file>` copies
+   the queue's gate (b) output, `gov check --json` run on the same commit in the same tree after the full rebuild,
+   byte for byte under its JUnit folder and names that copy in the variable in every test run's environment. The
+   fixture reads that envelope (`w2_54_support.read_check_result`) and starts **no** `gov check`. The queue stops before
+   the close if gate (b) is not green, so this `gov check` has already been judged once.
+2. **Outside a close** (the variable unset or empty: a lead's run, a plain run, the nightly): one `gov check --json` in
+   this worktree with its `src/` on `PYTHONPATH` and the same 1800 s timeout, exactly as before.
+
+**A bad result fails the cases, naming the file** (the route chosen, on the lead's recommendation under DEC-937's
+delegated ground). A result that is missing, unreadable, not JSON, not gov check's envelope (a JSON object with `ok`
+and `command: "check"`), or that lists no checks (a passing run's `result.checks`, a failing run's
+`error.details.checks`, a non-empty list of objects) is an `AssertionError` naming the file and what is wrong: the
+session fixture fails, and each of the three cases errors on setup with that message. It is never read as green, and
+the fixture does not fall back to running `gov check` itself. Why not the fallback: the close already refuses an
+unreadable `--check-result` before any test runs (`CHECK_RESULT_UNREADABLE`), so a bad file inside a close is a real
+fault to surface; a fallback would hide it behind the same six-minute `gov check` under load, and time out as before.
+
+**What each case still asserts (nothing less).** `test_gov_check_gives_context_reproducibility_green_here`:
+context-reproducibility listed, GREEN, severity hard-block. `test_gov_check_gives_core_schema_green_here`: core-schema
+listed, GREEN, severity hard-block. A check that is RED or missing fails its case naming the check and its status,
+whichever route gave the envelope. `test_the_w1_43_audit_report_is_untouched`: the W1-43 report's sha256 and its bytes
+as at `b644d28a`, read after `gov check` has run in this tree. In a close that `gov check` is gate (b)'s: the queue
+runs it in the same tree on the commit being closed, after the rebuild and before the close starts any test run, and
+the fixture still stands between it and the case, so the report is read after it as it is read after the fixture's
+own run outside a close. `test_the_suite_runs_this_worktree_s_code` is unchanged.
+
+**The route cases (new, deterministic, no network, no real `gov check`):**
+
+| KPI line (W2-75) | case |
+|---|---|
+| 1. in a close, the fixture reads the check result and runs no `gov check` | `test_in_a_close_the_fixture_reads_the_check_result_and_starts_no_gov_check`: a planted envelope (passing and failing forms) with every process start refused (`subprocess.Popen`, `os.system`); the checks come back by id and the result names its file |
+| 2. outside a close, `gov check --json` in this tree as now, same timeout | `test_outside_a_close_the_fixture_runs_gov_check_in_this_worktree`: the variable unset and empty; a spy in place of `w2_54_support.run` sees one `gov check --json` with `_GOV`, cwd this worktree, `PYTHONPATH` its `src/`, timeout 1800 s |
+| 3. a missing or broken result is never green | `test_a_check_result_that_is_missing_or_broken_is_never_read_as_green`: missing, a folder, empty, not JSON, a JSON list, another command's envelope, no `ok`, no checks, checks not a list, an empty list, a check that is no object: each fails naming the file, and no process is started |
+| 4. each case keeps its meaning | `test_a_red_or_missing_check_in_the_close_s_result_still_fails_the_cases`: from a planted result, each check case fails on its check RED (naming it and `RED`), missing (`lists no …`), or advisory; the three cases above, unchanged in what they assert |
+| 5. no other expectation lowered | nothing else in W2-54 changes; the full run in the close's form is the lead's |
+
+**Shown red first.** A throwaway spy on `subprocess.Popen` (outside the tree) ran the green-here file with
+`GOV_CLOSE_CHECK_RESULT` naming a planted green envelope. At `3eef001d` (the old fixture) the fixture started one
+`gov check --json` (the three cases erred on the spy's refusal: 1 passed, 3 errors); with this revision it started
+none (8 passed in 0.05 s). The four route cases fail on the old support module, which has no `green_here_check`.
+
+**Counts.** `test_w2_54_green_here.py`: 8 cases where there were 4; the suite: 103 where there were 99.

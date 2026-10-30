@@ -32,6 +32,7 @@ import os
 import pytest
 
 import w1_02_protected_support as protected
+import w1_02_round_support as rnd
 import w1_02_support as support
 import w1_02_tools_support as tools
 
@@ -348,7 +349,11 @@ def test_multiedit_with_a_path_longer_than_the_guard_resolves_is_refused(world, 
     assert len(path) > LONG[size] - 2, "the fixture path is shorter than asked for"
     edit, multi = tools.ask_both(world, path, who)
     tools.assert_as_edit(edit, multi, "deny", f"with a path {size} by {who}")
-    assert multi.seconds <= BOUND_S, f"MultiEdit with a path {size} was answered after {multi.seconds:.1f} s"
+    # Rewrite-Reason (W2-57, I1 F-14): the bound holds the hook's own time (its CPU time), as the round support's.
+    assert rnd.own_time(multi) <= BOUND_S, (
+        f"MultiEdit with a path {size} was answered after {rnd.own_time(multi):.1f} s of the hook's own time "
+        f"({multi.seconds:.1f} s of wall time)"
+    )
 
 
 # --------------------------------------------------------------------------

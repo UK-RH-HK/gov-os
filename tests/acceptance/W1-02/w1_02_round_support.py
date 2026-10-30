@@ -124,9 +124,15 @@ def assert_says_nothing(result, world, start, name, what, more=()):
 
 # The bound on the hook's own time, start to exit, for one decision. Generous: an ordinary decision takes well under
 # a second on a busy machine; this is not the latency KPI.
+# Rewrite-Reason (W2-57, I1 F-14, DEC-823 (b)): the hook's own time is its CPU time, the work it and its decision
+# process do (``support.children_cpu_seconds``), no longer its wall time: under the parallel phase's load a decision
+# of 0.05 s took 5.5 s of wall time (a load of 41), while its work did not grow. An input that makes the guard work
+# long is still held to 5 s. On a quiet machine the two agree (a first decision: 0.24 s of wall time, 0.22 s of CPU).
 BOUND_S = 5.0
-# The test's own limit on the hook process, so that a run cannot hang. A hook that is still running then has no answer.
-PROCESS_LIMIT_S = 8.0
+# The test's own limit on the hook process's wall time, so that a run cannot hang. A hook that is still running then
+# has no answer. A limit a loaded machine meets (it was 8 s), and below the guard's own deadline of 20 s (DEC-580),
+# so a call the guard answers only at its deadline is still no answer here.
+PROCESS_LIMIT_S = 18.0
 
 
 def ask_timed(world, tool_name, tool_input, who=WIDEST, cwd=None):
@@ -137,25 +143,33 @@ def ask_timed(world, tool_name, tool_input, who=WIDEST, cwd=None):
     if cwd is not None:
         data["cwd"] = str(cwd)
     argv = support._argv(project / support.installed_hook_rel())
+    cpu_before = support.children_cpu_seconds()
     started = time.perf_counter()
     try:
         proc = subprocess.run(argv, input=json.dumps(data), capture_output=True, text=True, cwd=str(project),
                               env=support.hook_environment(project, world.sandbox, role, ticket),
                               timeout=PROCESS_LIMIT_S, check=False)
     except subprocess.TimeoutExpired:
-        return support.HookResult("timeout", None, "", "", time.perf_counter() - started)
+        return support.HookResult("timeout", None, "", "", time.perf_counter() - started,
+                                  support.children_cpu_seconds() - cpu_before)
     seconds = time.perf_counter() - started
     return support.HookResult(support.classify(proc.returncode, proc.stdout), proc.returncode, proc.stdout,
-                              proc.stderr, seconds)
+                              proc.stderr, seconds, support.children_cpu_seconds() - cpu_before)
+
+
+def own_time(result):
+    """The hook's own time for the bound: its CPU time (W2-57), or its wall time where none was measured."""
+    return result.seconds if result.cpu_seconds is None else result.cpu_seconds
 
 
 def assert_answered_in_time(result, what):
     assert result.decision != "timeout", (
         f"{what}: no answer within the bound: the hook was still running after {PROCESS_LIMIT_S:.0f} s "
-        f"(the bound is {BOUND_S:.0f} s)"
+        f"(the bound is {BOUND_S:.0f} s of its own time)"
     )
-    assert result.seconds <= BOUND_S, (
-        f"{what}: no answer within the bound: the hook took {result.seconds:.1f} s (the bound is {BOUND_S:.0f} s)"
+    assert own_time(result) <= BOUND_S, (
+        f"{what}: no answer within the bound: the hook took {own_time(result):.1f} s of its own time "
+        f"({result.seconds:.1f} s of wall time; the bound is {BOUND_S:.0f} s)"
     )
 
 

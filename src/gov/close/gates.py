@@ -3,8 +3,8 @@
 - A ticket is judged by its class (W2-H045): an evidence class on the files its ``acceptance_tests.evidence``
   names, a specification on its closed readiness record; any ticket's acceptance run is the folder its
   ``acceptance_tests.path`` declares (DEC-892, DEC-896 item 3).
-- A decision-record commit of governance records only, under an ACCEPTED owner decision, is measured by that
-  decision (DEC-896 item 1).
+- A decision-record commit of governance records only, under decisions each ever ACCEPTED, is measured by its
+  decision; a commit the owner-committed lists name is measured by the owner's (DEC-896 item 1, DEC-923 item 2).
 - The commit gates and the pre-close gate refuse before any test and spend no attempt (DEC-868): the ratchet's
   reading of its lists, the collection in one process, the disk's free space and inodes (DEC-898).
 - A failed probe record whose every finding an ACCEPTED owner decision names is accepted (DEC-790, W2-M371).
@@ -24,11 +24,15 @@ from gov.close.repo import git as _git, read_commits as _read_commits
 
 EVIDENCE_CLASSES = ("research", "audit", "integration", "coordination")
 SPECIFICATION_CLASS = "specification"
-# The governance records a decision-record commit may change (DEC-896 item 1), beside the register itself.
-RECORD_PREFIXES = ("docs/plan/", "governance/project/prompts/", "governance/project/briefs/",
-                   "governance/project/orchestration/")
+# The governance records a decision-record commit may change (DEC-891's records, DEC-923 item 2), beside the
+# register and the path map themselves.
+RECORD_PREFIXES = (".tickets/", "docs/checkpoints/", "docs/close/", "docs/probes/", "docs/plan/",
+                   "governance/project/prompts/", "governance/project/briefs/", "governance/project/orchestration/")
 DECISION_RECORD_TASK = "decision-record"  # the Task: of the orchestrator's decision-record commits (DEC-896)
 DECISION_ID = re.compile(r"\bDEC-\d+\b")
+EXEMPTIONS_KEY = "acceptance_exemptions"  # DEC-906 item 2: a list of {commit: <full id>, decision}
+# A status the register shows ACCEPTED, also when later changed or superseded (DEC-923 item 2, DEC-866's form)
+EVER_ACCEPTED = re.compile(r"ACCEPTED\b|SUPERSEDED by DEC-\d+ \([^;)]*; it was ACCEPTED\b")
 ROW_ID = re.compile(r"\bW\d+-[A-Z]+\d+\b")
 # DEC-898: the floors of the shared disk until W2-20's reading lands, as top-level keys of the path map.
 GIB_FLOOR_KEY, INODES_FLOOR_KEY = "close_free_gib_floor", "close_free_inodes_floor"
@@ -108,28 +112,55 @@ def check_specification(root: Path, ticket: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Decision records (DEC-896 item 1)
+# Decision records (DEC-896 item 1, DEC-923 item 2)
 # ---------------------------------------------------------------------------
 
+def owner_listed(root: Path, settings: dict) -> set[str]:
+    """The full ids the owner-committed lists name, each under its ACCEPTED owner decision (DEC-923 item 2):
+    ``accepted_history`` as the trailer gate reads it, and ``acceptance_exemptions`` by an exact full id as W1-01
+    reads it, its decision also naming the commit as an accepted-history entry's must. A ``Role: owner`` trailer
+    is no list (DEC-906)."""
+    listed = set(_history.accepted_history(root, settings)[0])
+    entries = settings.get(EXEMPTIONS_KEY)
+    if isinstance(entries, list) and entries:
+        register = _history.register_entries(root, settings.get(_history.REGISTER_KEY))
+        for entry in entries:
+            commit, decision = (entry.get("commit"), entry.get("decision")) if isinstance(entry, dict) else (None, None)
+            if isinstance(commit, str) and isinstance(decision, str) and DECISION_ID.fullmatch(decision.strip()) \
+                    and _history._refused_because(commit.strip(), decision.strip(), register) is None:
+                listed.add(commit.strip())
+    return listed
+
+
+def _ever_accepted(decision: str, entries) -> bool:
+    """Whether ``decision`` is one entry of the register whose own status line shows it ACCEPTED, the owner's or
+    a delegated one, also when later changed or superseded; a decision never ACCEPTED is not."""
+    texts = entries.get(decision, []) if isinstance(entries, dict) else []
+    lines = texts[0].splitlines() if len(texts) == 1 else []
+    status = next((m.group(1).strip() for m in map(_history._STATUS.match, lines) if m), "")
+    return bool(EVER_ACCEPTED.match(status))
+
+
 def decision_records(root: Path, commits: list[dict], settings: dict) -> set[str]:
-    """The commits of ``commits`` that are measured by their decision: decision-record commits (``Task:
-    decision-record``) that change only governance records and name, in their subject or an ``Implements:``
-    trailer, an ACCEPTED owner decision of the register. Any other commit that names no task stays unmeasured."""
+    """The commits of ``commits`` measured by a decision, the set the close's gate (h) subtracts: each the
+    owner-committed lists name (``owner_listed``), whatever it changes; and each decision-record commit (``Task:
+    decision-record``) that changes only governance records and names, in its subject or an ``Implements:``
+    trailer, decisions each ever ACCEPTED (``_ever_accepted``). Any other commit that names no task stays
+    unmeasured."""
     register = settings.get(_history.REGISTER_KEY)
 
     def a_record(path: str) -> bool:
         return path.startswith(RECORD_PREFIXES) or path in (register, _history.PATH_MAP_REL)
 
-    candidates = [c for c in commits if c["trailers"].get("Task") == [DECISION_RECORD_TASK]
-                  and c["paths"] and all(a_record(p) for p in c["paths"])]
-    if not candidates:
-        return set()
-    entries = _history.register_entries(root, register)
-    measured = set()
+    listed = owner_listed(root, settings)
+    measured = {c["sha"] for c in commits if c["sha"] in listed}
+    candidates = [c for c in commits if c["sha"] not in measured and c["trailers"].get("Task") ==
+                  [DECISION_RECORD_TASK] and c["paths"] and all(a_record(p) for p in c["paths"])]
+    entries = _history.register_entries(root, register) if candidates else {}
     for c in candidates:
         subject = _git(root, "log", "-1", "--format=%s", c["sha"])
         named = set(DECISION_ID.findall(subject + " " + " ".join(c["trailers"].get("Implements", []))))
-        if any(_history.owner_decision(dec, entries)[0] is None for dec in named):
+        if named and all(_ever_accepted(dec, entries) for dec in named):  # every one: the stricter reading
             measured.add(c["sha"])
     return measured
 

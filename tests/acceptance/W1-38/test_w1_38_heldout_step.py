@@ -21,8 +21,10 @@ folder. The two locations and the key are read from the generator's own
 constants, never retyped here.
 
 Behaviour is asserted through the declared command's exit code and what it
-prints, and through ``gov check --json``. No finding code, function name or
-module layout is asserted.
+prints, and through ``gov check --json``. No function name or module layout is
+asserted. One finding code is: the held-out step's own, for a broken held-out
+file, because a check that could not compare at all (a rulesync call that gave
+no answer in time) is also not green with a finding (DEC-892 item 2).
 """
 
 from __future__ import annotations
@@ -43,6 +45,7 @@ needs_rulesync = pytest.mark.needs_rulesync
 
 GENERATOR = ("python3", "-m", "gov.guard.heldout")   # the owner's apply procedure, second step
 SRC = support.REPO_ROOT / "src"
+HELD_OUT_STEP_FAILED = "HELD_OUT_STEP_FAILED"   # the check's finding: the held-out step could not be applied
 
 
 # ---------------------------------------------------------------------------
@@ -384,6 +387,13 @@ class TestBrokenHeldOutFile:
         )
         assert _findings(result), (
             f"the held-out file is broken ({form}): the check is not green but reports no finding"
+        )
+        # Rewrite-Reason (DEC-892 item 2): a check whose rulesync call gave no answer in time is not green with
+        # a finding too, without comparing; the red is held to its reason, the held-out step's own finding.
+        codes = [finding.get("code") for finding in _findings(result) if isinstance(finding, dict)]
+        assert HELD_OUT_STEP_FAILED in codes, (
+            f"the held-out file is broken ({form}), but no finding says the held-out step could not be applied; "
+            f"the findings are {codes}"
         )
 
 

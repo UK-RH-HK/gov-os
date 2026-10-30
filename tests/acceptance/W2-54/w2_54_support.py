@@ -711,6 +711,64 @@ def worktree_env():
 
 
 # --------------------------------------------------------------------------
+# W2-75 (DEC-937): the green-here cases read the close's own check result (README, "W2-75")
+# --------------------------------------------------------------------------
+#
+# Rewrite-Reason: W2-L429. Inside a close the pinned ``gov close`` sets GOV_CLOSE_CHECK_RESULT to its byte-for-byte
+# copy of gate (b)'s ``gov check --json`` output (the same commit, after the rebuild; DEC-889 item 2, P-IS-2 (a)): the
+# cases read that envelope and start no ``gov check``. Outside a close (the variable unset or empty) they run ``gov
+# check --json`` here as before. A result that cannot be read, or is not gov check's envelope with its checks, fails
+# the cases naming the file; it is never read as green, and no ``gov check`` is started in its place.
+
+CHECK_RESULT_VARIABLE = "GOV_CLOSE_CHECK_RESULT"
+
+
+class CheckResult:
+    """Gate (b)'s ``gov check --json`` output as the close hands it: ``describe`` names the file, as ``Run`` does
+    the process."""
+
+    def __init__(self, path, text):
+        self.path, self.stdout = Path(path), text
+
+    def describe(self, tail=4000):
+        return f"the close's check result {self.path} ({CHECK_RESULT_VARIABLE})\n{self.stdout[-tail:]}"
+
+
+def read_check_result(path):
+    """``(CheckResult, checks by id)`` from the ``gov check --json`` envelope at ``path``; an AssertionError naming
+    the file and what is wrong with it when it is missing, unreadable, not JSON, or not gov check's envelope with
+    its list of checks."""
+    named = f"the close's check result {path} ({CHECK_RESULT_VARIABLE})"
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        raise AssertionError(f"{named} cannot be read: {e}") from None
+    try:
+        envelope = json.loads(text)
+    except ValueError as e:
+        raise AssertionError(f"{named} is not JSON ({e}): {text[:500]!r}") from None
+    if not (isinstance(envelope, dict) and "ok" in envelope and envelope.get("command") == "check"):
+        raise AssertionError(f"{named} is not gov check's JSON envelope: {text[:500]!r}")
+    where = envelope.get("result") if envelope.get("ok") else (envelope.get("error") or {}).get("details")
+    checks = where.get("checks") if isinstance(where, dict) else None
+    if not (isinstance(checks, list) and checks and all(isinstance(check, dict) for check in checks)):
+        raise AssertionError(f"{named} lists no checks: {text[:1500]!r}")
+    return CheckResult(path, text), checks_of(envelope)
+
+
+def green_here_check(environ=None):
+    """What the green-here cases judge: ``(the run or the result, checks by id)``. With GOV_CLOSE_CHECK_RESULT set
+    (a close), the envelope it names, and no process is started; unset or empty, one ``gov check --json`` in this
+    worktree with its ``src/``, as before (about six minutes)."""
+    given = (os.environ if environ is None else environ).get(CHECK_RESULT_VARIABLE) or ""
+    if given:
+        return read_check_result(given)
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+               timeout=GOV_CHECK_TIMEOUT_S)
+    return done, checks_of(done.envelope())
+
+
+# --------------------------------------------------------------------------
 # Round 2: the query vector (owner, 2026-10-18, P-W2-30 (a))
 # --------------------------------------------------------------------------
 #
