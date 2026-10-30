@@ -19,11 +19,11 @@
     "W2-64"
   ],
   "closes_next": "W2-71 scoped run testing since 18:04 (lock wait 73 min, rebuild 24 min); then one full batch W2-57, W2-77, W2-03, W2-26",
-  "examin": "at risk: memory at 40% hit@5 / 60% full evidence against 85 / 99; memory is not cut (DEC-952); the re-estimate, with cuts elsewhere (W2-83b, the tools-review auditor, parked work) or a later date, follows the quick wins first re-measure",
-  "owner_action": "P1 PLAN-W2-DEC953 (milestone 1) - review and approve; with it P-W2-78-PARK (park W2-78) and P-W2-64-1 (a test-designer revision of 203 earlier fixtures, your named decision under DEC-906)",
-  "last_report": "2026-10-30 18:06:36",
-  "chain_spec": "chain-2026-10-30d.txt",
-  "chain_log": "chain-2026-10-30d.log",
+  "examin": "gated by K9's entry criteria, not a date (DEC-954 Q1); estimate 2026-11-12, re-estimated weekly; memory at 40 % hit@5 / 60 % full evidence against 85 / 99",
+  "owner_action": "P1 ROLES-SPEC-1 - approve the roles and briefs spec (12 questions in its \u00a78); ACT-1-GUARD follows within the hour (its test sweep is running)",
+  "last_report": "2026-10-30 18:33:18",
+  "chain_spec": "chain-2026-10-30f.txt",
+  "chain_log": "chain-2026-10-30f.log",
   "parked": [],
   "memory_notes": {
     "W2-61h": "held for W2-84",
@@ -36,6 +36,6 @@
     "W2-04": "brief ready; claim after the queue",
     "W2-84": "fix in; serial phase and review to resume first",
     "W2-03": "merged; closing now in the build-phase batch (DEC-953)",
-    "W2-64": "returned 18:05: built, own 83/83 green; 203 earlier fixtures red under the real validator; P-W2-64-1 (a) to the owner"
+    "W2-64": "P-W2-64-1 (a) decided; run 2 waits for ACT 1 (owner, 2026-10-30), with the 10 built tickets"
   }
 }

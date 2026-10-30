@@ -1,0 +1,10 @@
+2026-10-30 18:26:34 W2-85 waits: SHUT leads=2 load=38.7/36.3 nproc=20 have=15839632kB need=16970928kB: load 38.7/36.3 >= nproc 20; memory: available 13472092 kB + leads' 2367540 kB < floor 3145728 + verification 7404492 + 3 x working 2140236 kB
+2026-10-30 18:27:41 W2-85 waits: SHUT leads=2 load=35.7/36.2 nproc=20 have=16178948kB need=16970928kB: load 35.7/36.2 >= nproc 20; memory: available 13684928 kB + leads' 2494020 kB < floor 3145728 + verification 7404492 + 3 x working 2140236 kB
+2026-10-30 18:28:45 W2-85 waits: SHUT leads=2 load=30.0/35.6 nproc=20 have=16602480kB need=16970928kB: load 30.0/35.6 >= nproc 20; memory: available 13827420 kB + leads' 2775060 kB < floor 3145728 + verification 7404492 + 3 x working 2140236 kB
+2026-10-30 18:29:52 W2-85 waits: SHUT leads=2 load=35.0/35.7 nproc=20 have=17637316kB need=16970928kB: load 35.0/35.7 >= nproc 20
+2026-10-30 18:31:00 W2-85 waits: SHUT leads=2 load=34.1/35.7 nproc=20 have=18019780kB need=16970928kB: load 34.1/35.7 >= nproc 20
+2026-10-30 18:32:07 W2-85 waits: SHUT leads=2 load=27.7/35.0 nproc=20 have=17914588kB need=16970928kB: load 27.7/35.0 >= nproc 20
+2026-10-30 18:33:14 W2-85 waits: SHUT leads=2 load=24.1/34.2 nproc=20 have=18064380kB need=16970928kB: load 24.1/34.2 >= nproc 20
+2026-10-30 18:34:21 W2-85 waits: SHUT leads=2 load=28.6/34.1 nproc=20 have=18415624kB need=16970928kB: load 28.6/34.1 >= nproc 20
+2026-10-30 18:35:29 starting W2-85 (DAEO-gdzh), 2 lead(s) running
+2026-10-30 18:37:39 chain done

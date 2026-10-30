@@ -7,7 +7,12 @@ import subprocess
 import sys
 
 ROOT = "/home/usain/Dynamic-Agentic-Engineering-OS"
-HOOK = sys.argv[1] if len(sys.argv) > 1 else ROOT + "/.claude/hooks/pretooluse.py"
+HOOK = ROOT + "/.claude/hooks/pretooluse.py"
+LINE, PROJECT = None, ROOT
+if len(sys.argv) > 2 and sys.argv[1] == "--settings":  # python3 guard4_check.py --settings <project root>
+    PROJECT = sys.argv[2]
+    LINE = json.load(open(PROJECT + "/.claude/settings.json"))["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    ROOT = PROJECT  # the planted paths are the tested tree's own
 PY = open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()
 HELD = ROOT + "/governance/project/held-out.yaml"
 
@@ -37,6 +42,34 @@ CASES = [
     ("rule2 measured role reads hidden", measured, "Read", {"file_path": ROOT + "/" + hidden_file}, "deny"),
     ("rule2 held-out named", "orchestrator", "Bash", {"command": "ls " + (held_path or "/nonexistent-held")},
      "deny" if held_path else "allow"),
+    ("rule2 measured role reads hidden in another worktree", measured, "Read",
+     {"file_path": "/home/usain/gov-os-worktrees/W2-87/" + hidden_file}, "deny"),
+    ("rule2 measured role reads hidden in a run clone", measured, "Bash",
+     {"command": "cat /home/usain/gov-os-runs/W2-61/repo/" + hidden_file}, "deny"),
+    ("rule2 measured role reads hidden in the main tree", measured, "Read",
+     {"file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/" + hidden_file}, "deny"),
+    ("rule5 auditor writes its probe record", "independent-auditor", "Write",
+     {"file_path": ROOT + "/docs/probes/DAEO-x/PR-x.md", "content": "x"}, "allow"),
+    ("rule5 auditor writes its audit report", "independent-auditor", "Write",
+     {"file_path": ROOT + "/docs/audit/wave-2/report.md", "content": "x"}, "allow"),
+    ("rule5 auditor bash writes its record", "independent-auditor", "Bash",
+     {"command": "echo x > docs/probes/DAEO-x/PR-x.md"}, "allow"),
+    ("rule5 auditor writes /tmp", "independent-auditor", "Write", {"file_path": "/tmp/gov-guard4-a.txt", "content": "x"},
+     "allow"),
+    ("rule5 auditor edits code", "independent-auditor", "Edit",
+     {"file_path": ROOT + "/src/gov/close/command.py", "old_string": "a", "new_string": "b"}, "deny"),
+    ("rule5 auditor writes a test", "independent-auditor", "Write",
+     {"file_path": ROOT + "/tests/unit/test_x.py", "content": "x"}, "deny"),
+    ("rule5 auditor edits a ticket", "independent-auditor", "Edit",
+     {"file_path": ROOT + "/.tickets/DAEO-sdxk.md", "old_string": "a", "new_string": "b"}, "deny"),
+    ("rule5 auditor edits the register", "independent-auditor", "Edit",
+     {"file_path": ROOT + "/docs/DECISION_REGISTER.md", "old_string": "a", "new_string": "b"}, "deny"),
+    ("rule5 auditor edits a lead handover", "independent-auditor", "Write",
+     {"file_path": ROOT + "/.gov-runtime/scratch/lead/CHECKPOINT.md", "content": "x"}, "deny"),
+    ("rule5 auditor bash writes code", "independent-auditor", "Bash", {"command": "echo x > src/gov/x.py"}, "deny"),
+    ("rule5 auditor unreadable bash", "independent-auditor", "Bash", {"command": "mkdir -p $D/t"}, "deny"),
+    ("rule5 auditor reads code", "independent-auditor", "Read", {"file_path": ROOT + "/src/gov/close/command.py"},
+     "allow"),
     ("rule3 read .env", "engineer", "Read", {"file_path": ROOT + "/.env"}, "deny"),
     ("rule3 cat ssh key", "orchestrator", "Bash", {"command": "cat ~/.ssh/id_ed25519"}, "deny"),
     ("rule4 engineer pip install", "engineer", "Bash", {"command": "pip install requests"}, "deny"),
@@ -60,8 +93,13 @@ for name, role, tool, tin, want in CASES:
     event = {"tool_name": tool, "tool_input": tin, "cwd": ROOT, "session_id": "guard4-check",
              "agent_type": "general-purpose" if "subagent" in name else None}
     env = dict(os.environ, GOV_ROLE=role, GOV_TICKET="DAEO-sdxk", CLAUDE_PROJECT_DIR=ROOT)
-    p = subprocess.run([PY, "-E", HOOK], input=json.dumps(event), capture_output=True, text=True, env=env,
-                       timeout=60)
+    if LINE:  # the registered hook line itself, as Claude Code runs it, from a settings file
+        env["CLAUDE_PROJECT_DIR"] = PROJECT
+        p = subprocess.run(["sh", "-c", LINE], input=json.dumps(event), capture_output=True, text=True, env=env,
+                           timeout=60)
+    else:
+        p = subprocess.run([PY, "-E", HOOK], input=json.dumps(event), capture_output=True, text=True, env=env,
+                           timeout=60)
     got = "allow"
     if p.returncode == 2:
         got = "deny(exit 2)"

@@ -1,5 +1,12 @@
 # W2-76 lead checkpoint (DAEO-tgk2), run 1
 
+- Update (18:30): full parallel phase 15:57:47 (verify lock from ~16:45) to 18:03:31: `10 failed, 16541 passed, 31
+  skipped, 2 errors in 4082.34s`. 10 failures + 2 errors = `gov rebuild` / `gov adopt` "did not end within 180 s" in
+  W1-07, W1-27, W1-41 temp-repo cases: each printed `rebuild: waiting for the rebuild lock /tmp/gov-os-rebuild.lock,
+  held by pid 1713011 (flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json)` (another session's
+  real rebuild): P-W2-76-3, blocks DONE. 1 failure = W2-66 DEC-919 known red (tests/acceptance/W2-76/conftest.py).
+  Serial phase (`full.sh serial`) queued on the load gate since 18:04 (load ~35); DEC-943 limit 19:34. Then
+  `alone.sh` (the ten, alone), gov check again, return PACKAGES (P-W2-76-1, P-W2-76-3).
 - Update (16:10): v1 rebuild done (exit 0, 307 s, held_by_caller true, wait 0.0, all stores recreated, secrets_s
   274.8 of codeintel_s 287.1). keyword_warn 0. gov check: exit 3, secrets indexing RED (truncated traceback; the
   secrets module alone exits 0), product traceability YELLOW (openspec absent; DEC-942 unrecorded citations).
