@@ -1,0 +1,46 @@
+# W2-26 environment, 2026-10-16 (UTC session 17:26:56 to about 17:55)
+
+$ uname -a
+Linux Usain 6.18.33.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+
+$ nproc
+20
+
+$ free -g
+               total        used        free      shared  buff/cache   available
+Mem:              23           2          19           0           1          20
+Swap:              8           2           5
+
+$ git --version
+git version 2.43.0
+
+$ python3 --version ; which python3
+Python 3.12.3
+/usr/bin/python3
+
+$ codebase-memory-mcp --version          (/home/usain/.local/bin/codebase-memory-mcp)
+codebase-memory-mcp 0.11.0
+
+$ gitleaks version                        (/home/usain/.local/bin/gitleaks)
+8.30.1
+
+$ ollama --version
+/bin/bash: line 1: ollama: command not found        (no ollama binary on this PATH)
+
+$ curl -sS -m 5 http://127.0.0.1:11434/api/version
+{"version":"0.35.0"}                                 (the endpoint answers; OLLAMA_HOST unset)
+
+$ curl -sS -m 5 http://127.0.0.1:11434/api/tags      (names and digest prefixes only)
+[('qwen3-embedding:0.6b', 'ac6da0dfba84')]
+
+$ /usr/bin/time --version
+time (GNU Time) UNKNOWN
+
+$ git rev-parse HEAD                      (this worktree, branch w2/W2-26)
+af445b6f3562249c7a766af2f5333ab9f111c383
+
+$ git -C /tmp/gov-os-W2-26/examin rev-parse HEAD
+a7cf346c28d7ba7b9edf8a18e1bb6e20ab1b19ca
+
+$ PYTHONPATH=/home/usain/gov-os-worktrees/W2-26/src python3 -c "import gov; print(gov.__file__)"
+/home/usain/gov-os-worktrees/W2-26/src/gov/__init__.py

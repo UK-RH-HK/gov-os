@@ -21,6 +21,9 @@ allowed_paths:
 - src/gov/launch/record.py
 - tests/unit/launch/test_role*
 - tests/unit/launch/test_launch_record*
+- tests/unit/launch/test_runs.py
+- tests/unit/launch/test_w1_28.py
+- tests/unit/launch/test_w1_32.py
 - docs/changes/W2-60a-CIT-E.md
 - docs/research/W2-60-rules-probe.md
 kpis:
