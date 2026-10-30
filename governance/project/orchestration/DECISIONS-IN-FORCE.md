@@ -30,7 +30,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
   - the close runs the same set on the merged commit in a clean worktree;
   - the nightly runs everything.
   Governance files never widen a selection.
-- DEC-905, DEC-906 item 3, DEC-954: one full or close run at a time, under one lock (`/tmp/gov-os-verify.lock`; leads through `verify_lock.sh`, closes first), with `tmp_path_retention_policy=failed`.
+- DEC-905, DEC-906 item 3, DEC-954: one full run at a time among closes and leads, under one lock (`/tmp/gov-os-verify.lock`; leads through `verify_lock.sh`, closes first), with `tmp_path_retention_policy=failed`; the nightly takes no lock (DEC-961). Listed for the owner's review (DEC-961 item 4).
 - DEC-954 (P-W2-64-1): a test revision the owner names is checked by a scoped run of the corrected tests; the nightly covers the rest.
 - DEC-137, DEC-498, DEC-413, DEC-916: a FULL ticket gets a fresh review before merge, at most two rounds (two per declared round). It is re-reviewed only if a later merge resolved conflicts in reviewed files.
 - DEC-801 to 803, DEC-808, DEC-809: findings are judged by ADR-0001's two questions, each with its two lines. A "no" becomes a row, never a round. Fixes ride the next resume.
@@ -83,6 +83,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 ## Machine and disk
 - DEC-898, DEC-902: no launch or full run below 100 GiB or 10M inodes free. Each session has a scratch budget. A sweep runs weekly.
 - DEC-942 items 1 and 3: there is no fixed number of leads. A lead launches while the load is below nproc, and a running lead is never stopped.
+- DEC-961 (with DEC-947's floor and trip-wire): the machine is shared by capacity alone. The gate counts the memory floor, each running lead at what it uses (at least its working size) and the newcomer; nothing is set aside for a full run that has not started. A full run (a close's, the nightly's, a lead's) checks the gate itself and waits for room. No hold for a waiting close and no night window: closes, scoped runs and leads run side by side as capacity and paths allow. The nightly starts at 02:00, takes no lock and holds nothing.
 - DEC-939 item 1: long commands run in the background. A watchdog fires at 07:45 if the package is late.
 
 ## Reporting
