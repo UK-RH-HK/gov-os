@@ -3,6 +3,12 @@
 ## RESUME HERE (2026-10-30 evening — DEC-954: THE PLAN AHEAD, IN ORDER. Read prompt §0, then
 ## governance/project/orchestration/DECISIONS-IN-FORCE.md, then this. Owner text verbatim: drafts/DEC-954-owner-text.md)
 
+**DEC-955 (owner): ACT 1 first.** A close refused before ACT 1 is committed is not repaired until it is. Right
+after ACT 1 is committed: write the handover (checkpoint + RESUME HERE), tell the owner it is ready, and STOP; the
+fresh session starts under the five-rule guard. ACT-1-GUARD: `governance/project/orchestration/packages/ACT-1-GUARD.md`
+(+ `.hooks.patch`); trial clone `/tmp/gov-os-act1/repo`; test sweep `tools/act1_tests.py` -> /tmp/gov-os-act1/.
+ROLES-SPEC-1 sent (`acbd8353`), awaiting approval.
+
 **The plan ahead (owner, DEC-954; PLAN-W2-DEC953 approved with amendments). In this order:**
 1. **ACT 1, the five-rule guard** (milestone 2, with its ping): the four of DEC-953 item 2 + rule 5 (independent
    reviewers and auditors write only their own review and audit records in their allowed paths; nothing else),

@@ -11908,3 +11908,14 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.337 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-954 (PLAN-W2-DEC953 approved with amendments: EXAMIN's copy gated by K9's criteria, not a date; ACT 1 the five-rule guard at milestone 2, then the 10 built tickets and the streams; the roles spec first; memory's measure enlarged and judged on the combined spec, memory for any repository in Wave 2's minimum; ACT 2 one re-pin; the CTO and Senior Engineers; P-W2-64-1 (a); closes ahead of leads on the test lock; a fifth guard rule for reviewers and auditors; section 6 and the 19 deferrals approved). Next free id: DEC-955. |
+
+### DEC-955 — ACT 1 first: a close refused before ACT 1 waits for it; a fresh session right after ACT 1
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`) · **Under:** DEC-954 (Q8 a), DEC-952 item 6 · **Basis:** the owner's chat message of 2026-10-30, after ACT 1 was asked for ahead of milestone 2
+- **Decision:**
+  1. **ACT 1 comes first:** if any close is refused before ACT 1 is committed, its ticket is not repaired until ACT 1 is committed.
+  2. **A fresh session right after ACT 1:** once ACT 1 is committed, the orchestrator writes the handover (the checkpoint and RESUME HERE), tells the owner it is ready, and stops. The fresh session starts under the five-rule guard.
+- **Where it goes (DEC-851):** this register; RESUME HERE; the decisions-in-force list.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.338 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-955 (a close refused before ACT 1 waits for it; a fresh session, under the five-rule guard, right after ACT 1 is committed). Next free id: DEC-956. |
