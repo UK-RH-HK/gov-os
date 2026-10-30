@@ -3,6 +3,10 @@
 - **The settings:** ``governance/project/rebuild.yaml`` in the tree rebuilt, optional: ``slow_after_s`` (a positive
   number of seconds, 1800 by default) and ``lock`` (an absolute path, the machine's rebuild lock by default). A file
   that is not valid YAML, not a map, or holds a value of the wrong kind refuses the rebuild.
+- **The lock's override:** ``GOV_REBUILD_LOCK``, where set, replaces the machine's default lock (the test harness gives
+  each process of a test run one of its own, DEC-956 item 2); a tree's ``lock`` still wins over it. A value that is
+  not an absolute path refuses the rebuild: never a fall-back to another lock. The lock's part of the result and the
+  record names the path used and its ``source``: ``rebuild.yaml``, ``GOV_REBUILD_LOCK`` or ``default``.
 - **The lock:** an advisory whole-file ``flock`` on that path, taken before anything is read or written and held to
   the end; the process ending releases it. A rebuild under its caller's hold (``flock <lock> gov rebuild``) runs at
   once under that hold. One held by another process is waited for, without a time limit, after saying what it waits
@@ -36,6 +40,8 @@ from gov.cli.errors import GovError
 SETTINGS_REL = "governance/project/rebuild.yaml"
 SLOW_AFTER_S = 1800
 LOCK = "/tmp/gov-os-rebuild.lock"  # the interim wrapper's own path: shared across the launcher's sandbox (W2-76)
+ENV_LOCK = "GOV_REBUILD_LOCK"
+FROM_SETTINGS, FROM_ENV, FROM_DEFAULT = "rebuild.yaml", ENV_LOCK, "default"  # the lock's ``source``
 RECORD_REL = ".gov-runtime/rebuild/record.json"
 EVERY_S = 30.0  # the longest gap between two writes of a slow rebuild's record
 NOT_KNOWN = "holder not known"
@@ -52,13 +58,27 @@ def _refused(message: str, details: dict) -> GovError:
     return GovError("REBUILD_FAILED", f"{message}: nothing is rebuilt", details)
 
 
-def settings(root: Path) -> tuple[float, str]:
-    """The threshold in seconds and the lock's path, from the tree's ``rebuild.yaml`` or the defaults."""
+def _default_lock() -> tuple[str, str]:
+    """The lock a tree without its own uses: ``GOV_REBUILD_LOCK`` where set, else the machine's. A value that is not
+    an absolute path refuses (DEC-866)."""
+    value = os.environ.get(ENV_LOCK)
+    if value is None:
+        return LOCK, FROM_DEFAULT
+    if not os.path.isabs(value):
+        reason = "is empty" if not value else f"is not an absolute path: {value!r}"
+        raise _refused(f"the environment variable {ENV_LOCK} {reason}", {"variable": ENV_LOCK, "value": value})
+    return value, FROM_ENV
+
+
+def settings(root: Path) -> tuple[float, str, str]:
+    """The threshold in seconds, the lock's path and its source: the tree's ``rebuild.yaml``, else
+    ``GOV_REBUILD_LOCK``, else the defaults. A wrong ``GOV_REBUILD_LOCK`` refuses even where the tree names a lock."""
     from gov.config.loader import read_yaml
 
+    default = _default_lock()
     path = Path(root) / SETTINGS_REL
     if not path.is_file():
-        return SLOW_AFTER_S, LOCK
+        return SLOW_AFTER_S, *default
     document = read_yaml(path, "REBUILD_FAILED", SETTINGS_REL)
     if not isinstance(document, dict):
         raise _refused(f"{SETTINGS_REL}: not a map", {"file": SETTINGS_REL, "key": None})
@@ -66,11 +86,13 @@ def settings(root: Path) -> tuple[float, str]:
     if isinstance(slow, bool) or not isinstance(slow, (int, float)) or not slow > 0:
         raise _refused(f"{SETTINGS_REL}: key 'slow_after_s': must be a positive number of seconds, not {slow!r}",
                        {"file": SETTINGS_REL, "key": "slow_after_s"})
-    lock = document.get("lock", LOCK)
+    if "lock" not in document:
+        return slow, *default
+    lock = document["lock"]
     if not isinstance(lock, str) or not os.path.isabs(lock):
         raise _refused(f"{SETTINGS_REL}: key 'lock': must be an absolute path, not {lock!r}",
                        {"file": SETTINGS_REL, "key": "lock"})
-    return slow, lock
+    return slow, lock, FROM_SETTINGS
 
 
 def cut(line: str) -> str:
@@ -148,9 +170,10 @@ def _inherited(fd: int) -> bool:
     return False
 
 
-def take(path: str) -> tuple[int | None, dict]:
+def take(path: str, source: str) -> tuple[int | None, dict]:
     """The machine's rebuild lock at ``path``: the descriptor that holds it (None under the caller's hold) and the
-    lock's part of the result. Refuses where it cannot be opened or taken; never returns unlocked."""
+    lock's part of the result, ``source`` naming where the path came from. Refuses where it cannot be opened or taken;
+    never returns unlocked."""
     try:
         fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_CLOEXEC, 0o666)
     except OSError as exc:
@@ -159,7 +182,7 @@ def take(path: str) -> tuple[int | None, dict]:
         except OSError:
             raise _refused(f"the rebuild lock {path} cannot be opened or created: {exc.strerror}",
                            {"lock": path, "error": str(exc)}) from None
-    part = {"path": path, "wait_s": 0.0, "holder": None, "held_by_caller": False}
+    part = {"path": path, "source": source, "wait_s": 0.0, "holder": None, "held_by_caller": False}
     try:
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)

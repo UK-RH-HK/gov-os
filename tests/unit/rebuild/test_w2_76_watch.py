@@ -28,8 +28,9 @@ def _settings(root, text):
     path.write_text(text, encoding="utf-8")
 
 
-def test_the_defaults_hold_without_a_settings_file(tmp_path):
-    assert watch.settings(tmp_path) == (1800, "/tmp/gov-os-rebuild.lock")
+def test_the_defaults_hold_without_a_settings_file(tmp_path, monkeypatch):
+    monkeypatch.delenv(watch.ENV_LOCK, raising=False)
+    assert watch.settings(tmp_path) == (1800, "/tmp/gov-os-rebuild.lock", "default")
 
 
 @pytest.mark.parametrize("text, key", [("slow_after_s: true\n", "slow_after_s"), ("slow_after_s: -1\n", "slow_after_s"),
@@ -48,14 +49,14 @@ def test_a_command_line_keeps_12_hex_digits_of_a_run_and_200_characters():
 
 def test_a_free_lock_is_taken_and_a_hold_of_this_process_is_used_without_waiting(tmp_path):
     path = str(tmp_path / "rebuild.lock")
-    fd, part = watch.take(path)
+    fd, part = watch.take(path, "rebuild.yaml")
     assert fd is not None and part["wait_s"] == 0.0 and part["held_by_caller"] is False and part["holder"] is None
     os.close(fd)
     held = os.open(path, os.O_RDONLY)  # as `flock <lock> gov rebuild` leaves a descriptor to its child
     try:
         fcntl.flock(held, fcntl.LOCK_EX)
         started = time.monotonic()
-        fd, part = watch.take(path)
+        fd, part = watch.take(path, "rebuild.yaml")
         assert fd is None and part["held_by_caller"] is True and time.monotonic() - started < 5
         assert part["holder"]["pid"] == os.getpid()
     finally:
@@ -65,7 +66,7 @@ def test_a_free_lock_is_taken_and_a_hold_of_this_process_is_used_without_waiting
 def test_a_lock_that_cannot_be_opened_refuses_naming_it(tmp_path):
     path = str(tmp_path / "missing" / "rebuild.lock")
     with pytest.raises(GovError) as raised:
-        watch.take(path)
+        watch.take(path, "rebuild.yaml")
     assert raised.value.code == "REBUILD_FAILED" and path in raised.value.message
 
 

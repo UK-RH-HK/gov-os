@@ -81,8 +81,8 @@ def run(root: Path, args, config: dict) -> dict:
 
     from gov.rebuild.watch import Watch, settings, take
 
-    slow_after_s, lock_path = settings(root)
-    fd, lock = take(lock_path)
+    slow_after_s, lock_path, source = settings(root)
+    fd, lock = take(lock_path, source)
     try:
         watch = Watch(root, slow_after_s, lock)
         try:
