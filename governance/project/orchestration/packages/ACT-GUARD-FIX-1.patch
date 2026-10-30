@@ -1,0 +1,59 @@
+diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
+index 7578265c..ac04b2ae 100644
+--- a/.claude/hooks/pretooluse.py
++++ b/.claude/hooks/pretooluse.py
+@@ -24,6 +24,7 @@ import signal
+ import sys
+ 
+ import glob
++import re
+ import subprocess
+ 
+ ACCEPTANCE = "tests/acceptance/"
+@@ -34,6 +35,8 @@ REVIEW_PATHS = ("docs/probes/", "docs/audit/", "docs/assessment/", ".gov-runtime
+                 ".gov-runtime/scratch/audit/")
+ RUNS = os.path.expanduser("~/gov-os-runs")
+ CTO_WBS = "W2-00"  # the coordination ticket whose orchestrator session is the CTO
++# Inline interpreter code, which the write parser cannot see into (python -c, perl -e/-i, node -e, ruby -e).
++INLINE_CODE = re.compile(r"\b(python3?|perl|node|ruby)\s+(-\w*\s+)*-[cei]\b")
+ 
+ 
+ def tree_roots(root):
+@@ -128,9 +131,11 @@ def main():
+         if tool in WRITE_TOOLS:
+             targets = [tin.get("file_path") or tin.get("notebook_path")]
+         elif tool == "Bash":
+-            from gov.guard.decide import _extract_bash_write_targets
++            from gov.guard.decide import _UNRESOLVABLE, _extract_bash_write_targets
++            # The parser answers None for a read-only command, and a list of targets (the sentinel among them
++            # for a write it cannot resolve) otherwise (DEC-958 fix: None was read as "cannot read").
+             targets = _extract_bash_write_targets(tin.get("command") or "", cwd)
+-            if targets is None:
++            if targets and _UNRESOLVABLE in targets:
+                 answer("deny", "a reviewer or auditor runs only commands whose writes can be read, and writes only "
+                                "its own review or audit record")
+         if targets and not all(review_may_write(t, root, cwd) for t in targets):
+@@ -143,15 +148,16 @@ def main():
+         if tool in WRITE_TOOLS:
+             targets = [tin.get("file_path") or tin.get("notebook_path")]
+         elif tool == "Bash":
+-            from gov.guard.decide import _extract_bash_write_targets
++            from gov.guard.decide import _UNRESOLVABLE, _extract_bash_write_targets
+             command = tin.get("command") or ""
+             found = _extract_bash_write_targets(command, cwd)
+-            if found is None:  # a command it cannot read: refuse only when it names the acceptance tests
+-                if ACCEPTANCE in command:
+-                    answer("deny", "a command that may write the acceptance tests, which only the "
+-                                   "independent test designer writes")
+-            else:
+-                targets = found
++            # None is a read-only command (running or reading the tests is open, DEC-820); a write the parser
++            # cannot resolve, or inline interpreter code, is refused only when it names the acceptance tests.
++            unreadable = (found is not None and _UNRESOLVABLE in found) or INLINE_CODE.search(command)
++            if unreadable and ACCEPTANCE in command:
++                answer("deny", "a command that may write the acceptance tests, which only the "
++                               "independent test designer writes")
++            targets = [t for t in (found or []) if t != _UNRESOLVABLE]
+         if any(under_acceptance(t, root, cwd) for t in targets):
+             answer("deny", "only the independent test designer writes the acceptance tests (MR-3)")
+ 
