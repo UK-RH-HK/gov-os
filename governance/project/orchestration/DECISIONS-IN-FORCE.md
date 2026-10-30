@@ -22,7 +22,8 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-953 item 1: a ticket closes on the audit's 10 practices (AUDIT-GOV-FEATURES-1 §5), nothing more. No Gov OS feature gates this repo, and nothing is deleted from the product.
 - DEC-953 item 5: close W2-71, W2-77, W2-57, W2-03 and W2-26 now, then each ticket as its practices pass.
 - DEC-953 item 6: the proof of `gov close` happens on the proving ground (W2-81) and EXAMIN's copy, not by re-closing this repo's tickets.
-- DEC-906 item 1, DEC-462: a fresh independent test designer writes the acceptance tests first, from behaviour and sources. Only it commits under `tests/acceptance/`.
+- DEC-906 item 1, DEC-462, DEC-959 item 7: a fresh independent test designer writes the acceptance tests from behaviour and sources, in parallel with the engineer, both from the spec; the engineer runs them once they are ready. Only the designer commits under `tests/acceptance/`.
+- DEC-959: the local merge queue (Senior Engineers approve, the CTO's tool tests the candidate merge, advances only on green); tests run once per level (lead scoped once; QA re-runs nothing; the queue once per batch, skipped on identical code; full only nightly and for core); the QA engineer per stream (core one by one, others in batches of about five); the opaque acceptance runner now; one skill template with three scenarios; domain skills after ACT 2; everything before EXAMIN.
 - DEC-953 item 4, DEC-952: one selection tool at every level:
   - workers run their own unit tests;
   - a lead runs its acceptance tests plus the affected set (full only when core code changed);
