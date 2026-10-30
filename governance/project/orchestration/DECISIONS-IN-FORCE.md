@@ -1,0 +1,84 @@
+# Decisions in force (after DEC-952 and DEC-953)
+
+Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 lifts: `LIFTED-BY-DEC953.md`. Superseded and spent decisions: `ARCHIVE-SUPERSEDED.md`.
+
+## Working with the owner
+- DEC-065: master rules MR-1 to MR-6. The owner decides (MR-6), the builder never writes its own acceptance tests (MR-3), review and audit stay independent (MR-4).
+- DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
+- DEC-949, DEC-850, DEC-855: P1s and owner-only decisions are sent as they arise: a package file, then `owner-ping` as the last act, 07:30 to midnight. Only the orchestrator asks the owner.
+- DEC-818: a P1 package stands alone, in six parts.
+- DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
+- DEC-945: no paid notifier and no app install.
+- DEC-105: a finding against a closed specification gets three costed options: apply now, defer or re-baseline.
+- DEC-953 item 10: until the owner approves the updated WBS and plan, only items 2 to 5 and memory's quick wins go ahead.
+- DEC-946 items 6 and 8: nothing else starts (new ideas go to `WAVE_3_PARKING.md`), and lead launches are staggered by 1 to 2 minutes.
+- DEC-953 item 8: three-layer orchestration is planned now. It starts on the owner's approval, once memory and the roles have landed.
+
+## Closes and testing
+- DEC-953 item 1: a ticket closes on the audit's 10 practices (AUDIT-GOV-FEATURES-1 §5), nothing more. No Gov OS feature gates this repo, and nothing is deleted from the product.
+- DEC-953 item 5: close W2-71, W2-77, W2-57, W2-03 and W2-26 now, then each ticket as its practices pass.
+- DEC-953 item 6: the proof of `gov close` happens on the proving ground (W2-81) and EXAMIN's copy, not by re-closing this repo's tickets.
+- DEC-906 item 1, DEC-462: a fresh independent test designer writes the acceptance tests first, from behaviour and sources. Only it commits under `tests/acceptance/`.
+- DEC-953 item 4, DEC-952: one selection tool at every level:
+  - workers run their own unit tests;
+  - a lead runs its acceptance tests plus the affected set (full only when core code changed);
+  - the close runs the same set on the merged commit in a clean worktree;
+  - the nightly runs everything.
+  Governance files never widen a selection.
+- DEC-905, DEC-906 item 3: one full or close run at a time, under one mutex (`/tmp/gov-os-verify.lock`), with `tmp_path_retention_policy=failed`.
+- DEC-137, DEC-498, DEC-413, DEC-916: a FULL ticket gets a fresh review before merge, at most two rounds (two per declared round). It is re-reviewed only if a later merge resolved conflicts in reviewed files.
+- DEC-801 to 803, DEC-808, DEC-809: findings are judged by ADR-0001's two questions, each with its two lines. A "no" becomes a row, never a round. Fixes ride the next resume.
+- DEC-221, DEC-951 item 5: tests are proportional to the profile.
+- DEC-096: a loop that has not converged after three iterations goes to the owner as a package. The count is never disclosed.
+- DEC-944 items 2 and 3: readiness is checked by hand at claim until W2-82. Playbooks per stream.
+
+## The guard
+- DEC-953 item 2 (narrowing DEC-820): four rules only:
+  - an implementer never writes acceptance tests;
+  - no reads of the hidden half of an evaluation set, or of the held-out material;
+  - no reads of secrets, and secrets are never printed;
+  - no installs without the owner.
+- DEC-083, DEC-040: the owner approves and makes every install, and it is recorded in the tool registry.
+- DEC-849: a refusal is taken, never routed round, and it is recorded.
+- DEC-723: agents never write in, list or search `~/gov-os-workbench`. Writing work runs on clones under `~/gov-os-runs/<ticket>/`.
+
+## The nightly
+- DEC-953 item 3, DEC-934: a plain full run on the integration head from 02:00, by cron, on committed code. No `gov close` and no gates at night. A missed night goes in the morning package.
+- DEC-953 item 3, DEC-938 item 1: a red is investigated at once (re-run alone, traced to its change and cause):
+  - a small, clear fix is made on the spot and reported;
+  - otherwise it goes to the owner as a P1 with a recommendation.
+  A red holds nothing.
+- DEC-946 item 9: the nightly is frozen. No new features unless it breaks.
+
+## Memory and briefs
+- DEC-953 item 6a, DEC-952: memory first: W2-86, W2-87, the register-as-one-record defect, then W2-55, W2-04, W2-05, W2-06, W2-13 and W2-15a. W2-61 measures after each fix. Memory is never cut.
+- DEC-836, DEC-943 item 2: once memory measurably helps, the orchestrator uses it at every resume and before every decision, and the leads use it through their briefs.
+- DEC-953 item 6b: W2-60a, W2-60b and W2-11 (roles, skills, briefs) run in parallel with memory.
+- DEC-860, DEC-859: never one giant query or context: retrieval is batched, ranked and stacked. The code graph is traversed in pages.
+- DEC-838, DEC-839: every session uses its model's full window, on claude-opus-5-5, with its effort set per launch.
+- DEC-236, DEC-371, DEC-731, DEC-732: a lead runs one ticket in its worktree, never merges into `w2/integrate`, and never edits tickets or the register.
+  - It launches workers with `gov launch` in a background run.
+  - Tests use the worktree's own `src/`.
+- DEC-793, DEC-943: every return carries the twelve fields and `brief_gaps`. Gaps are fixed the same week.
+- DEC-420: an authentication error stops all launches with `AUTH_REQUIRED`.
+
+## Records and commits
+- DEC-851, DEC-866: each owner rule is written where sessions read it. A superseding decision marks the old entry at once and sweeps whatever cites it.
+- DEC-861: the orchestrator commits the owner's decisions (`Decided-by: owner`) and never pushes. The owner's push is the acceptance.
+- DEC-463: the record comes before the change it authorises.
+- DEC-819, DEC-887: context is committed, with the raw record on `record/w2`. Secrets, held-out material and derived stores are never committed.
+- DEC-953 §5 practices 6 and 10, DEC-893: gitleaks runs on staged content and on close outputs. A seconds-long check (YAML, schema, placeholders) runs before record commits.
+- DEC-720, DEC-848: `w2/integrate` is never rewritten, and merges use `--no-ff`. The owner pushes daily.
+- DEC-182: commits keep their `Task:`, `Implements:` and `Role:` trailers. Nothing refuses on them.
+- DEC-952, DEC-792: RESUME HERE (under 8,000 characters) names this list first. The handover each morning goes to a fresh session.
+
+## Machine and disk
+- DEC-898, DEC-902: no launch or full run below 100 GiB or 10M inodes free. Each session has a scratch budget. A sweep runs weekly.
+- DEC-942 items 1 and 3: there is no fixed number of leads. A lead launches while the load is below nproc, and a running lead is never stopped.
+- DEC-939 item 1: long commands run in the background. A watchdog fires at 07:45 if the package is late.
+
+## Reporting
+- DEC-948, DEC-878, DEC-952: every report ends with the five-line block, plus the memory-chain line and the leads' interim results.
+- DEC-938, DEC-951 B: one P1-MORNING file and one ping at 07:30. No long foreground work runs from 07:15 to 07:35.
+- DEC-941 item 4.3, DEC-930 item 2: one daily document, and the weekly numbers (with ticket growth and drift).
+- DEC-953: three milestone reports, each pinged. Between them, the block plus at most five lines.
