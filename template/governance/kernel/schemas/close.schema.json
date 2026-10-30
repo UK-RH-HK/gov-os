@@ -1,12 +1,84 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "close",
-  "description": "Frontmatter of a close record, as `gov close` writes it at `docs/close/<ticket>/CL-<ticket>.md`: the shared frontmatter and `task`, the ticket closed. The close packet's other fields (created, outputs, inputs, tests, commits, the governance share) follow it and are not constrained here.",
+  "description": "Frontmatter of a close record, as `gov close` writes it at `docs/close/<ticket>/CL-<ticket>.md`: the shared frontmatter, `task`, the ticket closed, and the evidence block of W2-66's close (DEC-890 item 1). The close packet's other fields (created, outputs, inputs, tests, commits, the governance share) follow it and are not constrained here.",
   "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
   "required": ["task"],
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/record_id" },
     "type": { "const": "close" },
-    "task": { "$ref": "common.schema.json#/$defs/ticket_id" }
+    "task": { "$ref": "common.schema.json#/$defs/ticket_id" },
+    "evidence": {
+      "description": "The evidence block of the close (W2-66, `gov.close.evidence`): null for a close judged on its evidence with no test run; absent from a close record written before W2-66.",
+      "type": ["object", "null"],
+      "$ref": "#/$defs/evidence"
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "paths": { "type": "array", "items": { "$ref": "#/$defs/text" } },
+    "reason": {
+      "description": "One reason, as the selection names it (OWN, NOT_REACHED, SHARED_CORE, BASE_UNKNOWN …), with the paths it is about where it has them.",
+      "type": "object",
+      "required": ["reason"],
+      "properties": {
+        "reason": { "$ref": "#/$defs/text" },
+        "paths": { "$ref": "#/$defs/paths" }
+      }
+    },
+    "target": {
+      "description": "A target the close ran or left out, and why.",
+      "type": "object",
+      "required": ["target", "why"],
+      "properties": {
+        "target": { "$ref": "#/$defs/text" },
+        "why": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/reason" } }
+      }
+    },
+    "evidence": {
+      "description": "What the close ran and why: the scope (and why full), the base, the head and the tree, the changed paths, what ran and what was left out and why, every skip and their count, every failure with its text, and each run's JUnit XML file. The fields the close writes beside them are typed and not required; other keys are allowed. Its keywords bind a map only, so that the `evidence` property, which states the type, takes null too.",
+      "required": ["scope", "why_full", "base", "head", "tree", "changed", "selected", "left_out", "skips",
+                   "skip_count", "failures", "junit_xml"],
+      "properties": {
+        "scope": { "enum": ["scoped", "full"] },
+        "why_full": { "type": "array", "items": { "$ref": "#/$defs/reason" } },
+        "base": {
+          "description": "The commit the change is measured from, in the grammar of common.schema.json's commit_id (repeated here, since that definition takes no null); null when it is unknown (why_full BASE_UNKNOWN).",
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-fA-F]{4,64}$"
+        },
+        "head": { "$ref": "common.schema.json#/$defs/full_commit_id" },
+        "tree": { "$ref": "common.schema.json#/$defs/full_commit_id" },
+        "changed": { "$ref": "#/$defs/paths" },
+        "selected": { "type": "array", "items": { "$ref": "#/$defs/target" } },
+        "left_out": { "type": "array", "items": { "$ref": "#/$defs/target" } },
+        "skips": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["test", "reason"],
+            "properties": { "test": { "$ref": "#/$defs/text" }, "reason": { "$ref": "#/$defs/text" } }
+          }
+        },
+        "skip_count": { "type": "integer", "minimum": 0 },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["test", "text"],
+            "properties": { "test": { "$ref": "#/$defs/text" }, "text": { "$ref": "#/$defs/text" } }
+          }
+        },
+        "junit_xml": { "$ref": "#/$defs/paths" },
+        "per_test_timeout": { "type": "integer" },
+        "distribution": { "type": "string" },
+        "tmp_path_retention_policy": { "type": "string" },
+        "code_fingerprint": { "type": ["string", "null"] },
+        "records_fingerprint": { "type": ["string", "null"] },
+        "reused": { "type": "object" }
+      },
+      "if": { "properties": { "scope": { "const": "full" } }, "required": ["scope"] },
+      "then": { "properties": { "why_full": { "minItems": 1 } } }
+    }
   }
 }
