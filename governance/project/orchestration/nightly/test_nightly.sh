@@ -128,6 +128,37 @@ gate env NIGHTLY_NOW_HM=0730 NIGHTLY_IDLE_S=99999 timeout 5 bash "$HERE/ping_gat
 grep -q "^G3 asleep (held from " "$work/pings.txt" && grep -q "^G4 unreadable (held from " "$work/pings.txt" || fail "G6: not flushed at 07:30"
 [ ! -s "$P" ] || fail "G6: the held file was not emptied"
 
+# ---- nightly_estimate.py: the lock wait recorded apart, and never setup ---------------------------------------------
+X=$work/est; mkdir -p "$X/orch/log/nightly"
+sed -e "s#^ORCH = .*#ORCH = __import__('pathlib').Path('$X/orch')#" "$HERE/nightly_estimate.py" > "$X/est.py"
+printf '<testsuite time="1000"><testcase time="6000"/><testcase time="2000"/></testsuite>' > "$X/p.xml"
+printf '<testsuite time="300"><testcase time="300"/></testsuite>' > "$X/s.xml"
+python3 "$X/est.py" record "$X/p.xml" "$X/s.xml" 1500 4000 5000 > /dev/null
+python3 "$X/est.py" record "$X/p.xml" "$X/s.xml" 600 3000 5000 900 > /dev/null
+grep -q '"lock_wait_s": 900.0' "$X/orch/log/nightly/history.jsonl" || fail "E1: the lock wait was not recorded"
+python3 "$X/est.py" estimate | grep -q '"setup_s": 600' || fail "E2: the estimate's setup is not the smallest recorded ($(python3 "$X/est.py" estimate))"
+
+# ---- runs_sweep.sh: only old, unheld run clones by their stamp; a red night's kept a week; nothing else ------------
+W=$work/sweep; mkdir -p "$W/runs/nightly" "$W/runs/act-runs" "$W/orch/log/nightly" "$W/runs/other"
+mk() { mkdir -p "$1" && echo x > "$1/f" && touch -d "$2" "$1/f" "$1"; }
+mk "$W/runs/nightly/20261020-0200" "3 days ago"           # old, green night: removed
+mk "$W/runs/nightly/20261025-0200" "3 days ago"           # old, red night under 7 days: kept
+mkdir -p "$W/orch/log/nightly/20261025-0200"; printf 'verdict: red 1\n' > "$W/orch/log/nightly/20261025-0200/run.txt"
+mk "$W/runs/nightly/20261010-0200" "10 days ago"          # red night over 7 days: removed
+mkdir -p "$W/orch/log/nightly/20261010-0200"; printf 'verdict: red 2\n' > "$W/orch/log/nightly/20261010-0200/run.txt"
+mk "$W/runs/nightly/20261029-0200" "1 hour ago"           # young: kept
+mk "$W/runs/act-runs/ACT-X-20261020-0052" "3 days ago"    # old ACT clone: removed
+mk "$W/runs/nightly/notastamp" "3 days ago"                # not a stamp: never touched
+mk "$W/runs/other/20261020-0200" "3 days ago"              # another folder: never touched
+SWEEP_RUNS=$W/runs SWEEP_ORCH=$W/orch bash "$HERE/runs_sweep.sh"
+[ ! -e "$W/runs/nightly/20261020-0200" ] || fail "S1: an old green night's clone was kept"
+[ -e "$W/runs/nightly/20261025-0200" ] || fail "S2: a red night's clone under 7 days was removed"
+[ ! -e "$W/runs/nightly/20261010-0200" ] || fail "S3: a red night's clone over 7 days was kept"
+[ -e "$W/runs/nightly/20261029-0200" ] || fail "S4: a clone under 24 h was removed"
+[ ! -e "$W/runs/act-runs/ACT-X-20261020-0052" ] || fail "S5: an old ACT clone was kept"
+[ -e "$W/runs/nightly/notastamp" ] && [ -e "$W/runs/other/20261020-0200" ] || fail "S6: a folder outside the stamps was touched"
+grep -q "removed nightly 20261020-0200" "$W/orch/log/nightly/cron/"runs-sweep-*.log || fail "S7: a removal was not logged"
+
 # ---- rotate.sh: the newest kept, the budget held -----------------------------------------------------------------
 rm -rf "$work/orch/log/nightly"; mkdir -p "$work/orch/log/nightly/cron" "$work/junit"
 for i in $(seq -w 1 35); do touch -d "2026-10-01 +$i days" "$work/orch/log/nightly/cron/2026-x-$i.log"; done
@@ -142,5 +173,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
 exit "$fails"

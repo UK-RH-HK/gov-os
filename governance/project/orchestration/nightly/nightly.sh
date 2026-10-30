@@ -85,7 +85,12 @@ else
   date '+%F %T nightly day: quiet' > "$OUT/run.txt"
 fi
 # DEC-898: free disk space and free inodes above the floor, or no run.
-disk=$(bash "$HERE/disk_gate.sh" 2>&1) || { date "+%F %T nightly NOT STARTED: $disk" >> "$OUT/run.txt"; exit 2; }
+# Below the floor is an emergency (DEC-938 item 6): it goes first in the 07:30 morning package, from the
+# orchestrator's own session (DEC-945: no push service).
+disk=$(bash "$HERE/disk_gate.sh" 2>&1) || {
+  date "+%F %T nightly NOT STARTED: $disk" >> "$OUT/run.txt"
+  exit 2
+}
 date '+%F %T nightly: lock set' > "$ORCH/NIGHTLY-RUNNING"
 OWN_FLAG=1
 t0=$(date +%s)
@@ -97,22 +102,28 @@ cd "$CLONE" || exit 2
 PLUG=$CLONE/src/gov/close/pytest_plugin
 # The tests that read the repository's own state (W2-54's green-here and time-limit cases) need its stores, as a
 # close has them after its rebuild: a fresh clone has none (the first rehearsal's two reds, 2026-10-21 19:00).
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" python3 -m gov.cli.main rebuild --json \
+# One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 builds it into gov rebuild).
+env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")
 [ -n "$ENTRIES" ] || { echo "no serial-only entry read" >> "$OUT/run.txt"; exit 2; }
 # The verification lock, for both test phases. At night it is held on descriptor 9 by this script alone: each test
 # command runs with 9 closed, so no process a test leaves behind can keep the lock. By day each phase takes it.
+# The time spent waiting for the lock is recorded apart from the setup, and kept out of the estimate (DEC-939
+# item 6): a lead's run holding the lock must not make the next nights' setup look longer.
+lock_wait=0
 if [ "$MODE" = night ]; then
   exec 9> "$LOCKFILE"
   wait_s=$(( latest - $(date +%s) )); [ "$wait_s" -gt 0 ] || wait_s=1
+  lw0=$(date +%s)
   flock -w "$wait_s" 9 || { date "+%F %T nightly NOT STARTED: the verification lock was held past the latest start" >> "$OUT/run.txt"; exit 2; }
+  lock_wait=$(( $(date +%s) - lw0 ))
   WITH_LOCK=""
 else
   WITH_LOCK="flock $LOCKFILE"
 fi
-setup=$(( $(date +%s) - t0 ))
+setup=$(( $(date +%s) - t0 - lock_wait ))
 start=$(date +%s)
 # shellcheck disable=SC2086
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
@@ -135,8 +146,8 @@ actual=$(( $(date +%s) - t0 ))
 # The run is over: the lock and the flag go at once, so closes resume whatever the time (DEC-933 item 2.5).
 if [ "$MODE" = night ]; then flock -u 9; exec 9>&-; fi
 rm -f "$ORCH/NIGHTLY-RUNNING"; OWN_FLAG=0
-echo "duration: estimate ${EST:-none} s, actual $actual s (setup $setup s)" >> "$OUT/run.txt"
-python3 "$HERE/nightly_estimate.py" record "$JUNIT/parallel.xml" "$JUNIT/serial.xml" "$setup" "$actual" "$EST" >> "$OUT/run.txt" 2>&1
+echo "duration: estimate ${EST:-none} s, actual $actual s (setup $setup s, lock wait $lock_wait s)" >> "$OUT/run.txt"
+python3 "$HERE/nightly_estimate.py" record "$JUNIT/parallel.xml" "$JUNIT/serial.xml" "$setup" "$actual" "$EST" "$lock_wait" >> "$OUT/run.txt" 2>&1
 verdict=$(grep -E '^verdict:' "$OUT/run.txt" | tail -1)
 # A night's clone goes once its run is green or flaky; a red night's clone stays for the diagnosis (DEC-934).
 if [ "$MODE" = night ]; then

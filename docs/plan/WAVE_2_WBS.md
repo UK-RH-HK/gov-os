@@ -710,6 +710,14 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 
 ### Track B — the EXAMIN pilot
 
+**K9's entry criteria (owner, DEC-941 items 3, 6 and 7):**
+- **For EXAMIN's copy:**
+  - memory measured: W2-61's standing measure at DEC-833's floor on the pinned stores;
+  - the adoption proving ground passed (W2-81);
+  - Wave 2-grade evidence (a clean close, the memory measure, or the proving ground) for every capability the copy relies on, not only Wave 1's record.
+  - a Definition of Ready checked at claim (W2-82, `DAEO-4k3l`) and a playbook per stream in the kernel template (W2-83a, `DAEO-dy7j`) (owner, DEC-944 items 2 and 3).
+- **For EXAMIN's real repository:** the same, and a release path (K7: W2-16 closed and a release cut and hash-verified).
+
 EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W2-28's verdict is in, and the owner gives the go (DEC-727). Before that, every EXAMIN step works on clones under `~/gov-os-runs/`, made from the owner's copy by its exact path (DEC-723). The one exception is W2-26's throwaway `/tmp` clone, before W2-50 (DEC-728).
 
 #### W2-26 EXAMIN profile on the owner's copy: EXP-003's EXAMIN leg (STANDARD, research)
@@ -1292,6 +1300,226 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - A fresh, read-only auditor gives a finding row to every Wave 2 covers item, every Contract v4.2 lite item, every AR line and every MR clause, against Contract v4.2 and the decisions.
   - The audit→repair loop runs on its findings under DEC-096.
   - The report commits through the hook.
+
+### The re-plan of 2026-10-29 (DEC-941): new cards
+
+W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are filed on 2026-10-29.
+
+#### W2-60 The role at launch: role, skills, model and effort loaded by `gov launch`, no compaction threshold; one record per session (split into W2-60a and W2-60b; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
+- **Why:** a launched session loads none of its role's text (lens E F2); no launch sets effort, and the compaction threshold was a user-level value (lens F F1); the model a subagent runs on is not the one recorded (lens E F14); the loaded skill copy has no version (lens E F15). The accepted plan (§4.3, §2 rows 5, CAP-35.c lite and CAP-36.a lite) adds W2-60 under the admission rule (iii): exit criterion 5. Until it lands, the prompt's launch forms carry the values by hand (prompt v3, §6; DEC-839 item 5).
+- **Split** so that each part fits one lead run: **W2-60a** (the role at launch and the launch record; FULL, engineer) and **W2-60b** (the per-session record; STANDARD, engineer, after W2-60a).
+- **Starts** as soon as filed, beside the memory work (DEC-941), stacked on `w2/integrate` (DEC-786): W2-58's launcher is merged there (`af5d1a25`). W2-60a runs beside W2-56 on `launcher.py`, each in modules of its own. W2-60b starts after W2-60a merges and after W2-07 (`DAEO-r9ss`) closes, since W2-07 holds `src/gov/telemetry/**`. W2-21 follows both on the launcher, and builds on W2-60a's launch record.
+- **Needs before W2-60a merges:** each role file's default line (model and effort, no compaction threshold), which W2-11's widening writes through CIT-P (DEC-839 item 5); W2-60a is built and tested against fixture role files meanwhile.
+
+#### W2-60a The role, its skills and its model and effort loaded at launch; the launch record (FULL, engineer; DEC-826 Q1 and Q5, DEC-838, DEC-839, DEC-832; keystone 3)
+- **Ticket file:** `DAEO-cv58`.
+- **Allowed paths:** `src/gov/launch/launcher.py` (the CLI line, the settings' env lines it sets, its argument checks, and the calls to the new modules only), `src/gov/launch/role.py` (new), `src/gov/launch/record.py` (new), `tests/unit/launch/test_role*`, `tests/unit/launch/test_launch_record*`, `docs/changes/W2-60a-CIT-E.md`, `docs/research/W2-60-rules-probe.md` (the lead's probe record).
+- **KPIs, success:**
+  - `gov launch <role> <ticket>` starts the session as its role: the role's text (its generated agent, or the role file's text appended) is in the session's context at its start, shown by a launched session's log; the launch record holds the role file's path, version and content hash [DEC-826 Q1, lens E F2].
+  - The skills the session can load are in the launch record, each with its name, version and content hash, taken from the copy the session loads; a role file that names its skills gets those, so the engineer's skill packs load with no code change once W2-33 writes them; a named skill that is missing refuses the launch [DEC-826 Q1, DEC-832 item 1, lens E F15].
+  - The role's default model and effort, read from its role file's default line, are applied on the launch line (`--model`, `--effort`) and recorded; a missing or malformed default line refuses the launch; an effort given after `--` is applied and recorded as the launch's own [DEC-839 items 1, 2 and 5; CAP-35.c lite; lens F R1].
+  - A model given after `--` that is not the role's is refused, naming both; the subagent model is set to the session's model (`CLAUDE_CODE_SUBAGENT_MODEL` in the settings' env) and recorded [DEC-839 items 1 and 3; lens E F14].
+  - No launch sets a compaction threshold: no `--autocompact` on the line, no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` in the settings or the session's environment, one given after `--` refused; the launch record states the threshold as none [DEC-838 items 1 and 2].
+  - A launched session loads no connectors, no user-level agents or skills and no model-side memory: a test home planted with one of each shows none in the session's start; what the CLI gives no switch for is a package naming it, never passed silently [DEC-826 Q5; lens E R6].
+  - The arguments the launcher now sets itself are refused after `--`: `--agent`, `--append-system-prompt` and its file form, `--session-id` [lens E R6].
+  - Every launch writes one launch record, keyed by the session id the launcher gives with `--session-id`, before the session starts: role, ticket, the ticket's class, model, effort, subagent model, threshold none, the role text's and each skill's version and hash, the CLI's version and the start time; in one folder every worktree of the repository shares, stated in the CIT-E; a record that cannot be written refuses the launch [DEC-826 Q1; CAP-36.a lite; lens F R6].
+  - **Research first,** by the lead before the engineer starts: whether a `paths:`-scoped `.claude/rules/` file loads in a headless worker started by `gov launch`, its token cost, and whether the worker can change it; recorded in `docs/research/W2-60-rules-probe.md` [lens G Q4].
+- **KPIs, failure:** a launch that starts with no role text, an unrecorded skill, a model not the role's, a compaction threshold, a user-level agent, skill or connector, or model-side memory; a role file without its default line that still launches; a launch with no record, or a record naming another session; a refusal the launcher makes today that no longer refuses.
+
+#### W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents (STANDARD, engineer; DEC-838 item 3, CAP-36.a lite; keystone 3)
+- **Ticket file:** `DAEO-ecac`.
+- **Allowed paths:** `src/gov/launch/session_record.py` (new), `src/gov/launch/launcher.py` (the one call after the session ends only), `src/gov/telemetry/sessionlog.py` (new readings only: turns, compactions, rate-limit events, cost), `tests/unit/launch/test_session_record*`, `tests/unit/telemetry/test_sessionlog*`, `docs/changes/W2-60b-CIT-E.md`.
+- **KPIs, success:**
+  - When a launched session ends, whatever its exit (DEC-392's signals included), the launcher writes one record keyed by its session id: model (the main session's and each subagent's), effort, window, tokens (input, output, cache creation, cache read), cost, minutes, turns, subagents (count and model) and every rate-limit event; role, ticket and task class come from W2-60a's launch record [CAP-36.a lite; DEC-838 item 3; lens F R6].
+  - Each value comes from the harness's own record of that session (its session log, through W1-31's reader, and the result line when the session ran with `--output-format json`), with its source named; a value those forms do not give is "not measured", with the reason, never zero or a guess [DEC-655, DEC-495].
+  - Counts only, never content: no text of the session's log reaches the record, the Claude Code version excepted [DEC-495].
+  - The window recorded is the one the session ran with, as its log states it (1M for Opus 5.5), and each compaction is counted [DEC-838 items 1 and 2].
+  - A record that cannot be written leaves the session's exit code as it is, with one line on stderr naming it; a record is written whole or not at all [DEC-392].
+  - W2-07's close can join it: the record's path and keys are stated in the CIT-E, and a test reads a record back by ticket and session id; pass or fail and the repair count stay the close's [CAP-36.a lite; lens F R6].
+- **KPIs, failure:** a value the log does not hold reported as measured; a zero for "not measured"; log text in a record; a changed exit code; a session that started with no record.
+
+#### W2-76 gov rebuild: per-stage timings, a 30-minute watchdog, one rebuild at a time on the machine (STANDARD, engineer; DEC-939 item 2; rows W2-M408, W2-L451)
+- **Ticket file:** `DAEO-tgk2`.
+- **Why:** a main-tree rebuild took 6 h 39 min on 2026-10-29, against 271 s alone, while a lead rebuilt its own stores. Its output timed only the lexical stage, so the cause could not be found (P1-MORNING-2026-10-29 item 2).
+- **Starts:** in block A (DEC-941). Until it lands, every rebuild runs under `flock /tmp/gov-os-rebuild.lock`.
+- **Allowed paths:** `src/gov/rebuild/**`, `tests/unit/rebuild/test_w2_76*`; acceptance tests in `tests/acceptance/W2-76/`.
+- **KPIs, success:**
+  - every stage timed in the output and the record;
+  - past 30 minutes, a record of the stages done and of each process's state and wait channel, the rebuild flagged slow and going on;
+  - one store rebuild at a time across every session on the machine, a waiting rebuild saying what it waits for;
+  - a lock that cannot be taken never ignored;
+  - the stores and digest unchanged.
+- **KPIs, failure:**
+  - two rebuilds at once;
+  - a rebuild stopped by the watchdog;
+  - a slow rebuild without a record.
+
+#### W2-77 The nightly's clean-up removes only its own clone, by its exact path (FULL, engineer; DEC-939 item 5; row W2-M406)
+- **Ticket file:** `DAEO-b6hm`.
+- **Why:** `gov.close.nightly` ends with a repo-wide `git worktree prune`, so a worktree its process cannot see loses its registration and index (row W2-M406; W2-68's reviewer's F1, reproduced on a fixture). W2-68's batch reaches the nightly, so the batch stays off until this lands and is pinned (P-W2-68-PRUNE (b), DEC-939 item 5).
+- **Starts:** first in block A (DEC-941). About 20 lines; FULL because a fault here loses work.
+- **Allowed paths:** `src/gov/close/nightly.py` (the clean-up only), `tests/unit/close/test_nightly_cleanup*`; acceptance tests in `tests/acceptance/W2-77/`.
+- **KPIs, success:**
+  - only its own clone removed, by its exact path, with no repo-wide prune;
+  - a hidden or unreadable worktree keeps its registration and index;
+  - a failed removal touches only its own entry, or is reported;
+  - everything else in the nightly unchanged.
+- **KPIs, failure:**
+  - any repo-wide prune left;
+  - another worktree's registration or index lost.
+- **After it:** the next re-pin carries it; the queue then switches to the batch, and the batch's gain is measured on this repository.
+
+#### W2-78 Governance edits stop widening closes: the path map's lists in record files of their own; prompts and briefs record-only (STANDARD, engineer; DEC-941 item 5, P-SCOPE-RECORDS-1 (a))
+- **Ticket file:** `DAEO-v4is`.
+- **Why:** a governance edit between closes turns the next close into a full run. W2-66's close of 10-27 ran full on records alone: 4,186 s of tests against about 300 s for the scoped closes after it (P-SCOPE-RECORDS-1 §2).
+- **Starts:** in block A, after W2-77.
+- **Allowed paths:** the judge's list readers (`src/gov/close/ratchet.py`, `history.py`, `gates.py`, `traceability.py`, `select.py`), `governance/project/records/**`, `governance/project/test-map.yaml` (its `record_only` and `record_reading` lists only), `template/governance/kernel/schemas/**`, `tests/unit/close/test_w2_78*`; acceptance tests in `tests/acceptance/W2-78/`.
+- **KPIs, success:**
+  - the four lists in record files of their own, unchanged entry for entry, read by the judge there;
+  - their edits are record-only for the close, with every reader in the record-reading set;
+  - prompts and briefs record-only, with their readers in the record-reading set;
+  - the ratchet's rules unchanged;
+  - the path map's configuration still shared core.
+- **KPIs, failure:**
+  - an entry lost in the move;
+  - a reader missed;
+  - a growing entry accepted without the owner's commit.
+- **The migration** of entries the owner committed is the owner's commit (an ACT), validated with the pinned readers.
+
+#### W2-79 Acceptance tests for the orchestrator's lead brief builder (LITE, independent-test-designer; DEC-941; P-TOOLS-REVIEW-1 §4 (a) item 2)
+- **Why:** `build_lead_brief.py` fills every lead's brief and every worker's `Implements:` trailer. It caused T7 (a role in IMPL: 41 commits, DEC-927). A check against the role's refusals would have caught P2, and a required guard-forms block would have caught S10. It is untested. Ticket file `DAEO-av72`.
+- **Starts** once the orchestrator has committed the tool under `governance/project/orchestration/tools/` (P-TOOLS-REVIEW-1 §4 (a) item 1; not this ticket's). **Closes** after the orchestrator's change to the tool turns its red cases green.
+- **Allowed paths:** `tests/acceptance/W2-79/**`.
+- **KPIs, success:**
+  - a non-id IMPL refused (a role, a free word, an empty value, a mixed list, an id the register or Contract does not hold), with no brief written;
+  - a read the guard refuses to the role it is directed at is flagged by path, role and reason, from the guard's own decision; the committed common brief is not flagged;
+  - the guard-forms block required, and each form it names refused by the guard;
+  - every slot filled: missing, empty, unknown or repeated keys refused;
+  - no placeholder left, in the ticket's part as well as the common part (`{SLOT}` and DEC-893's forms);
+  - a refusal leaves no partial output; hermetic, under 30 s, never skipped.
+- **KPIs, failure:**
+  - a brief written with a role in IMPL, an unfilled slot or a placeholder;
+  - a refused read unflagged;
+  - no guard-forms block;
+  - a partial output.
+
+#### W2-80 Acceptance tests for the close queue's gates (a) to (h) and its refusal path (STANDARD, independent-test-designer; DEC-941; DEC-929 item 3; P-TOOLS-REVIEW-1 §4 (a) item 2)
+- **Why:** the queue decides whether a close starts and what reaches the commit. Its faults T8, S1, S2 and T9 cost closes this fortnight. Only the refusal path is tested, by a cut-out line range. Ticket file `DAEO-03dg`.
+- **Starts** once the orchestrator has committed the queue and its gate tools under `governance/project/orchestration/tools/` (not this ticket's). **Closes** after the orchestrator's change to the queue turns its red cases green: the settable interface, gate (d)'s fail-closed read, the wording of a stop after the close, and the self-check.
+- **Allowed paths:** `tests/acceptance/W2-80/**`.
+- **KPIs, success:**
+  - hermetic: a temporary repository and stand-ins through a settable interface; never this repository, its lock or the real pin; never skipped;
+  - a planted fault per gate (the disk floor, (c), the rebuild, row W2-L423's warning, (a), (f), (b), (e), (h), (d)) stops the queue before the close with exit 2 and its reason; (g) retries six times, then stops;
+  - each gate fails closed when its tool cannot run (gate (d) does not today);
+  - a refused close exits 4, logs it, removes the lock, commits nothing and stops the queue;
+  - outputs committed only after a clean close and the skip guard (exit 3 otherwise), with their trailers; a scanner finding commits nothing;
+  - the close gets gate (b)'s result and the item's owner decision;
+  - no close under load or with the nightly running;
+  - the queue refuses to run on a tool that differs from its commit;
+  - one mutant per gate's condition, each killed and listed.
+- **KPIs, failure:**
+  - a fault that reaches the close;
+  - a gate passing when its tool cannot run;
+  - a refused close exiting 0;
+  - outputs committed after a refusal or a failed guard;
+  - a run against this repository.
+
+#### W2-81 The adoption proving ground: five synthetic repositories with planted problems, a judge, and question sets per repository (FULL, independent-test-designer; DEC-941, DEC-936 item 3.6, DEC-930; entry criterion for EXAMIN's copy)
+- **Why:** passing the proving ground becomes an entry criterion for EXAMIN's copy, beside the memory measure (DEC-936 item 3.6; re-plan §7.6). A planted problem that passes unnoticed means adoption is not ready. Ticket file `DAEO-l78m`.
+- **Starts** now, in a free slot: it is test code only, in block E of the re-plan, and shares no path with a ticket in flight. **Its first real run** is the orchestrator's, after blocks B and C. What it finds missed scopes W2-26, W2-52 and W2-27 to W2-30.
+- **Allowed paths:** `tests/acceptance/W2-81/**`: builders, manifest, judge, scorer, runner, the visible question half and the README. Only the judge's self-tests are `test_*.py`. The repositories are built at test time in temporary folders, or under `~/gov-os-runs/W2-81/` for the real run (DEC-728). Nothing is cloned from this repository or the dev tiers.
+- **KPIs, success:**
+  - five shapes: a Python app with drifted specs and plans, a Rust workspace, a TypeScript monorepo, legacy documents with large files, and a secret in history;
+  - planted problems (a stale spec that looks current, a superseded plan, a misleading file name, a secret, an orphaned test), each kind in at least two shapes, seeded per run, with the manifest kept outside the built repository;
+  - each kind's correct handling and the record that shows it, in the README;
+  - the secret generated at test time from parts, found in history, reported without its value, behind a human gate;
+  - controls that must not be flagged;
+  - a fail-closed judge: FOUND_AND_HANDLED, MISSED or MISHANDLED per problem, and READY only when all are handled, no control is flagged and both question figures (hit@5 against 85, the stacked share against 99 %) meet their floors;
+  - one killed mutant per planted problem;
+  - one command for the real run, writing nothing in this repository;
+  - the self-tests hermetic, under 120 s, never skipped.
+- **KPIs, failure:**
+  - a miss judged handled;
+  - READY with a control flagged, a stage unmeasured or a figure short;
+  - the secret's value anywhere whole;
+  - a hidden question or answer printed;
+  - a write in this repository.
+
+#### W2-81's held-out half (proposed companion; STANDARD, independent-auditor; DEC-941, DEC-820 (d), DEC-845, DEC-873; id the orchestrator's)
+- **Why:** the hidden half of each repository's question set must be written by a session independent of the sessions it measures, as W2-61 splits lens B's set. An independent auditor writes only its own ticket's paths, so it needs a ticket of its own.
+- **Starts** once W2-81's README states the hidden half's form and the builders exist. The auditor reads the builders and the README.
+- **Allowed paths:** `fixtures/evaluation/adoption-proving-ground/hidden/**`. This lies in the `fixtures` namespace, which the indexer never reads, like the memory-retrieval set.
+- **Before it starts, the orchestrator adds an `evaluation_sets` entry** to the path map, in a gap between queues (DEC-929 item 2):
+  - `adoption-proving-ground`, with `visible: tests/acceptance/W2-81/questions/**` and `hidden: fixtures/evaluation/adoption-proving-ground/hidden/**`;
+  - `measures` by tickets: the tickets that build adoption or retrieval, the tickets whose sessions run the adoption under test, and W2-81 itself;
+  - the writer's own ticket is not measured.
+- **KPIs, success:**
+  - at least 10 hidden questions per repository, with gold sources and forbidden citations, in W2-81's stated form;
+  - at least one hidden planted-problem variant per kind, which the visible builders do not produce, so that an adoption tuned to the visible generator is caught;
+  - nothing hidden written outside the hidden folder;
+  - the measured sessions are refused its reads by the guard.
+- **KPIs, failure:**
+  - a hidden question or answer readable by a measured session by any route an honest agent takes;
+  - a question whose gold answer the built repository does not hold.
+
+#### W2-61h W2-61's held-out half: 20 hidden memory questions with their gold sources (STANDARD, independent-auditor; DEC-941, DEC-828 item 3, DEC-820 (d), DEC-845)
+- **Ticket file:** `DAEO-h2k3`.
+- **Why:** W2-61's engineer is a measured role, so the hidden half of the standing measure is written by an independent auditor in a ticket of its own, started by the orchestrator, never by a retrieval ticket's lead.
+- **Starts:** beside W2-61, on 2026-10-29. No path map change: the hidden folder and its refusal are already there (`evaluation_sets.memory-retrieval`, W2-58).
+- **Allowed paths:** `fixtures/evaluation/memory-retrieval/hidden/**`.
+- **KPIs, success:**
+  - 20 hidden questions with gold answers and governing sources, in the visible half's form and spread, none paraphrasing lens B's 20;
+  - every gold source holds its answer at the commit read;
+  - nothing hidden written or quoted outside the hidden folder.
+- **KPIs, failure:**
+  - a hidden question or answer readable by a measured role by an honest route;
+  - a gold source that does not hold its answer.
+
+### DEC-944: the Definition of Ready and the stream playbooks (EXAMIN minimum)
+
+#### W2-82 A Definition of Ready: gov claim checks it, and gov launch refuses a lead on a ticket that is not ready (STANDARD, engineer; DEC-944 item 2; EXAMIN minimum)
+- **Ticket file:** `DAEO-4k3l`.
+- **Why:** a ticket can be claimed and launched today with any file at all. Adopted products need the check from their first ticket.
+- **Starts:** priority 5 (DEC-946), after W2-60a and W2-56 merge (both hold `src/gov/launch/launcher.py`).
+- **Allowed paths:** `src/gov/tasks/dor.py`, `src/gov/claim/**`, `src/gov/launch/launcher.py` (the ticket check only), the kernel's `templates/ticket.md` and `schemas/ticket.schema.json` (CIT-P for these two only), their unit tests, the CIT-P and CIT-E; acceptance tests in `tests/acceptance/W2-82/`.
+- **KPIs, success:**
+  - `gov claim` sets `in_progress` only when the six conditions hold (sources resolving; allowed paths; KPIs with at least one success line citing an id; profile; acceptance-test path; dependencies met), and otherwise names every failing condition and writes nothing;
+  - `gov launch` refuses a lead on a ticket that is not ready;
+  - fail closed; the kernel carries the rule.
+- **KPIs, failure:** a not-ready ticket claimed or launched; a condition that cannot be judged treated as met; any ticket-file rewrite by the guard (Wave 3).
+
+#### W2-83a A playbook per stream: the form in the kernel template, its schema in gov check, and the adopt step (STANDARD, product-spec; DEC-944 item 3; EXAMIN minimum)
+- **Ticket file:** `DAEO-dy7j`.
+- **Why:** an adopted product should start with the form for its streams: purpose, standing practices, usual ticket classes, roles and the skills they load.
+- **Starts:** priority 5 (DEC-946), after W2-64 (which holds `src/gov/check/schema.py`).
+- **Allowed paths:** the kernel's `templates/playbook.md` and `schemas/playbook.schema.json`, the schema map's one line in `src/gov/check/schema.py`, the adopt skill and its copies, unit tests, the CIT-P and CIT-E; acceptance tests in `tests/acceptance/W2-83a/`.
+- **KPIs, success:** the form and its schema in the kernel; `gov check` refuses a playbook missing any part; adoption writes the form into a product, which passes `gov check`; nothing project-specific in the kernel.
+- **KPIs, failure:** an incomplete playbook passes; a rule of this repository in the kernel; a kernel file changed without its CIT-P.
+
+#### W2-83b This project's nine keystone playbooks, placing annex D's standing practices (STANDARD, product-spec; DEC-944 item 3; spare capacity only)
+- **Ticket file:** `DAEO-mc6n`.
+- **Why:** 39 of annex D's 80 standing practices live only in the orchestrator's prompt, briefs and tools.
+- **Starts:** after W2-83a, in spare capacity only, never ahead of the standing priorities (DEC-946).
+- **Allowed paths:** `docs/playbooks/**`; acceptance tests in `tests/acceptance/W2-83b/`.
+- **KPIs, success:** nine playbooks in W2-83a's form; every annex D practice placed, or marked retired or project-only with its reason; every class and skill named exists.
+- **KPIs, failure:** a practice dropped; a skill or class named that does not exist.
+- **Kept current:** updated with each new standing rule of its stream (DEC-944 item 3).
+
+### DEC-950: the hidden-set refusal in every tree
+
+#### W2-84 The guard refuses an evaluation set's hidden part under every tree: the main tree, every worktree and the run clones (FULL, engineer; DEC-950 item 1; memory's critical path; row W2-H063)
+- **Ticket file:** `DAEO-m1u3`.
+- **Why:** the hidden-part refusal (DEC-820 (d)) is rooted at the session's own tree. A measured session is refused its own tree's hidden file, but allowed the main tree's, another worktree's and a run clone's copies. The worktrees' shared object store is a route too. Once W2-61h's questions merge, W2-61's measure would lose its hidden half.
+- **Starts:** priority 3 (DEC-946), ahead of W2-61h, as soon as the gate allows. W2-61h waits until it is merged and pinned.
+- **Allowed paths:** `src/gov/guard/reads.py` (the hidden part, a tree lister and the git route only), new `tests/unit/guard/test_w2_84*` (W2-67 holds the glob), the CIT-E; acceptance tests in `tests/acceptance/W2-84/`.
+- **KPIs, success:**
+  - a measured session is refused the hidden part under every tree (the main tree, every worktree, the run clones), wherever it runs and by every route the guard judges today;
+  - matched by real path, so links are refused as their targets are;
+  - no git route shows it from another tree or the shared object store;
+  - fail closed when a tree cannot be listed or walked;
+  - nothing else changes, the hook's latency bound included.
+- **KPIs, failure:** a hidden file of any tree read, listed or searched by a measured session; an unlistable tree taken as empty; a git route left open; (a) to (c) weakened, or a refusal added for an unmeasured session; a test touching the real hidden folder or `~/gov-os-runs/`.
+- **Overlap:** W2-05's sweep may touch `reads.py`'s `_git` (a line overlap: the second to merge merges back).
 
 ## 3. Order, layers and critical path
 

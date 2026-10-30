@@ -31,8 +31,9 @@ Every night between 02:00 and 05:00, a full uncached regression of `w2/integrate
 
 ## Tests and review (2026-10-28)
 
-`bash governance/project/orchestration/nightly/test_nightly.sh` passes 28 of 28:
-- `nightly.sh`: a held lock, a start after 05:00, a close running past the latest start, a merge in progress, a dirty tree and a head under 5 minutes old each stop it with a P1. An estimate over the window pings P2 and goes on. By day it waits and never pings.
+`bash governance/project/orchestration/nightly/test_nightly.sh` passes all its cases (2026-10-29, after DEC-945):
+- `nightly.sh`: a held lock, a start after 05:00, a close running past the latest start, a merge in progress, a dirty tree and a head under 5 minutes old each stop it with a P1. An estimate over the window pings P2 and goes on; the disk gate shut at night stops it, for the morning package (DEC-945). By day it waits and never pings. It takes the machine's rebuild lock (`/tmp/gov-os-rebuild.lock`) for its clone's rebuild, and records the time spent waiting for the verification lock apart from its setup (DEC-939 items 2 and 6).
+- `nightly_estimate.py`: the lock wait recorded apart; the estimate's setup is the smallest recorded.
 - `nightly_cron.sh`: committed code runs with a session's PATH after a rotation. A changed or untracked file in this folder refuses the run with a P1.
 - `nightly_check.sh`: nothing before 05:00; `MISSED` with a P1; checked once a night; `FAILED`; `ran` with the verdict and the estimate against the actual; a day run is not a night's. With the owner inactive at 05:30, the line is written at once, the P1 is held, and it goes at 08:00 marked held.
 - `ping_gate.sh`: by day at once; at night at once when the owner is active; held when inactive or unreadable; `--wait-flush` waits at 04:00 and flushes at 07:30.
@@ -40,7 +41,8 @@ Every night between 02:00 and 05:00, a full uncached regression of `w2/integrate
 
 Two mutation checks:
 - with the committed-code check removed from a copy of `nightly_cron.sh`, cases C2 and C3 fail;
-- with `ping_gate.sh` made to ping always, cases K7, K8 and G3 to G6 fail.
+- with `ping_gate.sh` made to ping always, cases K7, K8 and G3 to G6 fail;
+- with its message filter removed, cases P4 and P5 fail.
 
 The idle read was checked live on 2026-10-28: at a simulated 03:00, with the owner active (37 s idle), the ping went at once.
 

@@ -1,6 +1,6 @@
 ---
 id: DAEO-pl6k
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-20T07:13:30Z
