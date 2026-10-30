@@ -28,6 +28,8 @@ kpis:
   - 'Machine-readable defaults per role (model, effort, skills) in each role file, read by W2-60a''s launcher; effort high for the CTO and the Senior Engineers [DEC-954, DEC-839 item 5, DEC-957]'
   - 'A typed handoff record, from which a fresh agent states the task, inputs, open questions and next step identically; the twelve-field return is one [CAP-22.b (lite), AR-6]'
   - 'Any role the roles spec finds undefined is scoped and drafted here [DEC-954 Q13a]'
+  - 'The QA engineer replaces the planned independent reviewer: `qa-engineer.md` (not `independent-reviewer.md`) is the per-stream checking role, which reads the spec, the KPIs, the tests and the code, changes neither, writes only its findings report, and works per stream: tickets that touch the core (the guard, the close, memory''s retrieval, anything that could fail open) one by one before they merge, the others in batches of up to about five (more when they batch well and the machine and context allow), a large stream''s QA split; the independent auditor keeps the milestone audits [DEC-959 item 3, ROLES-RESEARCH-1 §2.9]'
+  - 'Every role file states the work order in one line: product-spec writes the spec and KPIs; the test designer and the engineer work in parallel from it, never reading each other''s work; the engineer runs the acceptance tests once ready (through gov accept); the QA engineer alone reads both [DEC-959 item 7, DEC-957]'
   failure:
   - 'A role built other than as the approved roles spec states it; a role file placed by hand rather than generated; a role without its machine-readable defaults.'
 profile: STANDARD
@@ -37,6 +39,7 @@ sources:
 - DEC-094
 - DEC-954
 - DEC-957
+- DEC-959
 est_loc: 260
 acceptance_tests:
   path: tests/acceptance/W2-33/
@@ -53,6 +56,8 @@ list_rows:
 - W2-M321
 ---
 # W2-33 Wave 2 roles and typed handoff records
+
+**DEC-959 (2026-10-30):** the QA engineer replaces `independent-reviewer.md` (item 3), and every role file states the work order in parallel (item 7).
 
 **Re-scoped by DEC-954 (Q6, Q13).** The earlier KPIs (test-execution, integration and UX roles) and CAP-22.c become Wave 3 rows unless the roles spec places them; CAP-22.b is carried lite (DEC-841 had moved CAP-22.b/c to Wave 3). **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7).
 
