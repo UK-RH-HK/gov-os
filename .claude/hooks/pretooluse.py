@@ -37,10 +37,24 @@ RUNS = os.path.expanduser("~/gov-os-runs")
 def tree_roots(root):
     """This tree, every worktree of its repository, and the run clones under ~/gov-os-runs (W2-84's every tree)."""
     roots = [os.path.realpath(root)]
+
+    def worktrees(repo):
+        try:
+            out = subprocess.run(["git", "-C", repo, "worktree", "list", "--porcelain"], capture_output=True,
+                                 text=True, timeout=5).stdout
+            return [os.path.realpath(line[9:]) for line in out.splitlines() if line.startswith("worktree ")]
+        except Exception:
+            return []
+
+    roots += worktrees(root)
+    # a run clone's origin, when it is a local repository, and that repository's worktrees
     try:
-        out = subprocess.run(["git", "-C", root, "worktree", "list", "--porcelain"], capture_output=True, text=True,
-                             timeout=5).stdout
-        roots += [os.path.realpath(line[9:]) for line in out.splitlines() if line.startswith("worktree ")]
+        origin = subprocess.run(["git", "-C", root, "remote", "get-url", "origin"], capture_output=True, text=True,
+                                timeout=5).stdout.strip()
+        if origin.startswith("file://"):
+            origin = origin[7:]
+        if origin.startswith("/") and os.path.isdir(origin):
+            roots += [os.path.realpath(origin)] + worktrees(origin)
     except Exception:
         pass
     for pattern in ("*/.git", "*/*/.git", "*/*/*/.git", "*/*/*/*/.git"):
@@ -53,10 +67,11 @@ def review_may_write(path, root, cwd):
     if not isinstance(path, str) or not path:
         return False
     full = os.path.realpath(os.path.join(cwd, os.path.expanduser(path)))
-    if full == "/tmp" or full.startswith("/tmp/"):
-        return True
-    rel = os.path.relpath(full, os.path.realpath(root))
-    return not rel.startswith("..") and any(rel.startswith(p) for p in REVIEW_PATHS)
+    for tree in tree_roots(root):  # inside any tree of this repository: only the record paths
+        rel = os.path.relpath(full, tree)
+        if rel == "." or not rel.startswith(".."):
+            return any(rel.startswith(p) for p in REVIEW_PATHS)
+    return full == "/tmp" or full.startswith("/tmp/")
 
 
 def answer(decision, reason):
