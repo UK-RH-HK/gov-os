@@ -58,10 +58,10 @@ in the section below.
 | Success 4, failure 2 — guard rule `[CAP-49.c]`, DEC-215, DEC-218 | `test_w1_47_oracle_guard.py`: 31 plain calls (Read, Grep, Glob, 16 Bash forms, Write, Edit, NotebookEdit, four MCP shapes, an unknown tool) by the five roles and a session with no role; a second place for the stand-in; subagents; every permission mode; while frozen; the path follows the configuration; every path of the list; through the committed settings; other paths stay open. `test_w1_47_oracle_naming.py`: 17 calls that hold the path in free text or code, 25 that reach it through a relative path, `..`, `~`, `$HOME` or a symbolic link, each by the orchestrator, the engineer and a session with no role; the same forms on a directory that is not held out stay open; the exception for the two files that hold the path. `test_w1_47_oracle_config.py`: a missing file means no rule; a file with no key or not of the stated shape stops every call | `… on the stand-in oracle path by <who> was not denied by a rule: decision=allow`; `…, with the stand-in held-out path in its input, by <who> was not denied by a rule: decision=allow`; `…, which reaches the stand-in held-out path, by <who> was not denied by a rule: decision=allow`; `… with a governance/project/held-out.yaml that is broken (<kind>) was let through: decision=allow` |
 | Failure 4 — a test names the oracle | `test_no_acceptance_test_of_this_ticket_names_a_configured_path`, `test_the_stand_in_configuration_is_built_without_the_committed_file` | None: green already |
 | Failure 7 — an implementation file names the oracle | `test_no_implementation_file_names_a_configured_path`, `test_the_settings_file_names_a_configured_path_in_its_read_deny_rule_only` | None: green already; they keep the implementation from repeating a path |
-| Success 5, failure 5 — no ask rule `[CAP-25.f]` | `test_w1_47_settings_rules.py`: one case for each of the eleven rules; no rule on a longer command that begins with one; not moved to `deny` or `allow`; `Bash(sudo:*)` and the six other deny rules in place; the kernel template carries none | `permissions.ask of .claude/settings.json still carries ['Bash(pip:*)']` and ten more; kernel template: `template/governance/kernel/settings.json does not exist` |
+| Success 5, failure 5 — no ask rule `[CAP-25.f]` | `test_w1_47_settings_rules.py`: one case for each of the eleven rules; no rule on a longer command that begins with one; not moved to `deny` or `allow`; `Bash(sudo:*)` and the other deny rules in place (six until DEC-925 item 1, four since: `test_the_other_deny_rules_are_in_place[Read(./docs/source/**)]` and `[Edit(./docs/source/**)]` are **retired** by DEC-925 item 1, because `docs/source` left the tree on 2026-10-01 and DEC-922's regeneration dropped both rules, P-I1-2; see "Retired cases"); the kernel template carries none | `permissions.ask of .claude/settings.json still carries ['Bash(pip:*)']` and ten more; kernel template: `template/governance/kernel/settings.json does not exist` |
 | Success 6, failure 6 — four `uv` forms `[CAP-25.g]`, DEC-216 | `test_w1_47_uv_installs.py`: 41 commands ask for the orchestrator (23 of the first batch, 18 with a value option or `-w`); the four plain forms and the two forms DEC-216 words ask in all six permission modes; the 41 are denied for engineer, test designer and auditor; sixteen other `uv` commands stay unclassified, five of them with a value option in front; W1-04's three `uv` installs still ask | `` `uv --directory sub add requests` by the orchestrator did not ask: decision=allow `` and `` `…` by engineer was not denied by a rule: decision=allow `` |
 | Success 6, the research role's exception | None here: carried by W1-46's test design (DEC-219) | — |
-| Success 7 — no session role, no wide scope | `test_w1_47_session_role.py`: an orchestrator subagent has no wide scope when `GOV_ROLE` is unset, empty or blank, or names another role; the orchestrator's own session keeps it; `tests/unit/guard` passes | None: green already (reading 19) |
+| Success 7 — no session role, no wide scope | `test_w1_47_session_role.py`: an orchestrator subagent has no wide scope when `GOV_ROLE` is unset, empty or blank, or names another role; the orchestrator's own session keeps it. The builder suite `tests/unit/guard` runs as itself in every close; the nested rerun of it (`test_the_builder_tests_of_the_guard_pass`) is retired by DEC-899 (P-IS-3 (a), W2-70) | None: green already (reading 19) |
 | "The acceptance tests of W1-04 still pass" (success 5 and 6) | `tests/acceptance/W1-04`, run as it stands | Green today: 336 passed |
 
 ## Green before implementation (247 of 970)
@@ -131,7 +131,8 @@ were rewritten for the owner's answers; 22 to 27 are new.
 11. **"Decides install commands alone"** means the rules were removed, not moved: none of them in `deny` (which would
     stop the orchestrator's prompt, DEC-083) or in `allow`. A rule counts when its command prefix is one of the
     eleven, with `:*`, ` *` or `*` as its wildcard, or is a longer command that begins with one.
-12. **"The other deny rules"** are the six that sit beside `Bash(sudo:*)` today.
+12. **"The other deny rules"** are the six that sat beside `Bash(sudo:*)` when the suite was written; the two
+    `docs/source` ones are retired by DEC-925 item 1 (see "Retired cases"), and the four others stay checked.
 13. **The kernel template's settings file** is `template/governance/kernel/settings.json` (DEC-217), a JSON object in
     the shape of a Claude Code settings file. "PreToolUse for every tool": a command that names `pretooluse` is
     registered for each write tool, each read-only tool, the other tools of W1-05's list and a tool name not known
@@ -155,8 +156,9 @@ were rewritten for the owner's answers; 22 to 27 are new.
     "The other commands on the list stay without a prompt").
 18. **Product-spec** is not named by the `uv` KPI and is not asserted there.
 19. **Success 7.** The function is internal and its one caller always passes the argument, so no public interface
-    can leave it out. The tests show the hook's behaviour around a missing session role, and that `tests/unit/guard`
-    passes. Whether a builder test calls the function without the argument is for the reviewer to read.
+    can leave it out. The tests show the hook's behaviour around a missing session role; `tests/unit/guard` runs as
+    itself in every close, and the case that re-ran it here is retired (DEC-899). Whether a builder test calls the
+    function without the argument is for the reviewer to read.
 20. **Failure 4 and failure 7 are checked by comparing text.** The committed list is read once more than for the
     deny rule itself: to check that the settings file names a path in that rule only, and that no implementation
     file and no file of this suite repeats one. Nothing is opened under a path and only file names are shown. See
@@ -268,6 +270,19 @@ and the containment check's behaviour through the file's commands), the template
 `test_this_repositorys_settings_carry_no_sandbox_block`. No case, manifest, lock or fixture under
 `tests/acceptance` pins the file's content or a hash of it, so no case was rewritten. W1-39's manifest cases
 compute the installed file's hash at run time.
+
+## Retired cases (DEC-925 item 1, 2026-10-27)
+
+Retired by a fresh Independent Test Designer on ticket `DAEO-2azm` (W2-74), `Rewrite-Reason: DEC-925 item 1, P-I1-2`.
+
+- **Retired:** `test_w1_47_settings_rules.py::test_the_other_deny_rules_are_in_place[Read(./docs/source/**)]` and
+  `[Edit(./docs/source/**)]`.
+- **Why:** the `docs/source` folder left the tree on 2026-10-01. P-I1-2 (DEC-899) dropped those two deny rules in the
+  settings regeneration of DEC-922 (Part B), and the owner retired the cases (DEC-925 item 1).
+- **How:** `w1_47_support.KEPT_DENY_RULES` is outside the ticket's paths, so the test file names the two retired
+  rules (`RETIRED_DENY_RULES`) and parametrizes over the support's list without exactly those two. Every other entry
+  (`Edit(**/.env*)`, `Edit(**/*.pem)`, `Edit(**/*.key)`, `Edit(config/secrets*)`, `Bash(sudo:*)`) stays a case,
+  with the same assertion, and `test_the_sudo_deny_rule_is_in_place` is unchanged.
 
 ## Earlier tests
 

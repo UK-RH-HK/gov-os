@@ -514,3 +514,101 @@ def satisfy(rows, numbers):
 
 def complete_rows(profile="FULL"):
     return readiness_support.complete_rows(profile)
+
+
+# --------------------------------------------------------------------------
+# W2-67 (KPI 5; I2 §2.7 R1, F3): a base project green before any defect, and
+# the named check's own entry
+# --------------------------------------------------------------------------
+
+# The kernel declarations whose checks need what a temporary project does not hold. With them, the base project
+# was red before any defect was planted (I2 R1), so a case that judged its defect by "gov check failed" could not
+# fail. No planted-defect case of this suite names one of these checks or its family; the green base leaves them
+# out, and their families are then YELLOW (unmeasured, never GREEN: DEC-425).
+NOT_MEASURABLE_HERE = {
+    "adapter-portability": "no governance/project/tool-registry.yaml and no rulesync source",
+    "context-reproducibility": "no store",
+    "index-freshness": "no lexical index",
+    "recovery-rebuild": "no store (unmeasured)",
+    "retrieval-regression": "GOV_DEV_TIERS is not configured: the environment",
+    "secrets-indexing": "no .gitleaks.toml",
+}
+
+# The checks the revised planted-defect cases judge, each GREEN with no finding on the green base.
+JUDGED_CHECKS = ("core-schema", "core-graph", "core-authority", "core-mutation", "core-claims", "skill-version",
+                 "readiness")
+
+
+def green_base(project, dimensions=False):
+    """The base project with the checks a temporary project can measure, as its first commit.
+
+    ``dimensions`` puts ``docs/contract/readiness-dimensions.yaml`` in that commit too, as a project built from
+    the template holds it, so that only a later change of it is a change.
+    """
+    for check_id in NOT_MEASURABLE_HERE:
+        project.remove_check_declaration(check_id)
+    if dimensions:
+        project.add_readiness_dimensions()
+    git(project.root, "add", "-A", who=OWNER)
+    git(project.root, "commit", "-q", "--amend", "--no-edit", who=OWNER)
+    return project
+
+
+def result_and_envelope(run, interface):
+    """``(result, envelope)``: the result, or the error's details when gov check failed."""
+    envelope = envelope_of(run, interface)
+    result = envelope.get("result") or (envelope.get("error") or {}).get("details") or {}
+    return result, envelope
+
+
+def check_entry(result, check_id):
+    """The one entry of ``check_id`` in the result's checks."""
+    entries = [entry for entry in checks_of(result)
+               if isinstance(entry, dict) and check_id in (entry.get("id"), entry.get("check_id"))]
+    assert len(entries) == 1, (
+        f"the result holds {len(entries)} entries of the check {check_id!r}: "
+        f"{sorted(str(entry.get('id')) for entry in checks_of(result) if isinstance(entry, dict))}"
+    )
+    return entries[0]
+
+
+def names(finding, value):
+    """The finding names ``value`` (a string, or a tuple of which any one will do) in one of its own fields."""
+    text = json.dumps(finding, sort_keys=True, default=str)
+    values = value if isinstance(value, tuple) else (value,)
+    return any(item in text for item in values)
+
+
+def findings_naming(entry, *values):
+    """The entry's findings that name every one of ``values``."""
+    return [finding for finding in entry.get("findings") or []
+            if isinstance(finding, dict) and all(names(finding, value) for value in values)]
+
+
+def assert_check_red_naming(run, interface, check_id, *values):
+    """The named check's own entry is RED with a finding that names the planted defect (``values``).
+
+    Not "gov check failed": the base project is green before the defect (``green_base``), and the case judges the
+    check it names. Returns ``(result, entry, findings)``.
+    """
+    result, envelope = result_and_envelope(run, interface)
+    entry = check_entry(result, check_id)
+    assert entry.get("status") == RED, (
+        f"{check_id} is {entry.get('status')!r} on the planted defect, expected RED: {entry}\n{run.describe()}"
+    )
+    found = findings_naming(entry, *values)
+    assert found, (
+        f"no finding of {check_id} names the planted defect {values}: {entry.get('findings')}\n{run.describe()}"
+    )
+    assert envelope["ok"] is False and run.returncode == EXIT_CHECK_FAILED, \
+        f"a hard-block check is RED but gov check did not fail with exit {EXIT_CHECK_FAILED}\n{run.describe()}"
+    return result, entry, found
+
+
+def assert_check_green(run, interface, check_id):
+    """The named check's own entry is GREEN with no finding."""
+    result, _ = result_and_envelope(run, interface)
+    entry = check_entry(result, check_id)
+    assert entry.get("status") == GREEN and not entry.get("findings"), \
+        f"{check_id} is not GREEN with no finding: {entry}\n{run.describe()}"
+    return result, entry

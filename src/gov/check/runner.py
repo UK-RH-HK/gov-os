@@ -5,8 +5,10 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -73,13 +75,24 @@ def _provenance(check_id: str, commit: str, version: str = VERSION) -> dict:
     }
 
 
+def _judged(command: str) -> str:
+    """``command`` with a leading ``python3`` or ``gov`` run by this judge's own interpreter and package (DEC-822 item 3).
+
+    The project under check supplies only data: nothing first on PATH runs, and ``-P`` keeps the project's root, the
+    working folder, off the import path."""
+    head, _, rest = command.strip().partition(" ")
+    python = shlex.quote(sys.executable)
+    if head == "python3":
+        return f"{python} -P {rest}"
+    if head == "gov":
+        return f"{python} -P -m gov.cli.main {rest}"
+    return command
+
+
 def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[int | None, str, str]:
     """The exit code, output and error output of ``command``. The exit code is None when it passed ``timeout`` seconds."""
+    command = _judged(command)
     env = dict(os.environ)
-    pythonpath = env.get("PYTHONPATH", "")
-    src = str(root / "src")
-    if src not in pythonpath:
-        env["PYTHONPATH"] = src + (":" + pythonpath if pythonpath else "")
     xdg_tmp = tempfile.mkdtemp(prefix="gov-check-")
     env.setdefault("XDG_CONFIG_HOME", xdg_tmp)
     env.setdefault("XDG_DATA_HOME", xdg_tmp)

@@ -1,0 +1,28 @@
+# The two clones (GNU time -v, key lines kept; the rest of each block is page-fault and context-switch counts)
+
+$ /usr/bin/time -v git clone --no-hardlinks /home/usain/gov-os-workbench/examin /tmp/gov-os-W2-26/examin
+Cloning into '/tmp/gov-os-W2-26/examin'...
+done.
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.12
+	Maximum resident set size (kbytes): 17912
+	Exit status: 0
+
+$ git -C /tmp/gov-os-W2-26/examin rev-parse --short HEAD
+a7cf346
+
+$ /usr/bin/time -v git clone --no-hardlinks /tmp/gov-os-W2-26/examin "/tmp/gov-os-W2-26/EXAMIN APP"
+Cloning into '/tmp/gov-os-W2-26/EXAMIN APP'...
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.12
+	Maximum resident set size (kbytes): 18080
+	Exit status: 0
+
+$ git -C "/tmp/gov-os-W2-26/EXAMIN APP" rev-parse --short HEAD
+a7cf346
+
+# Sizes at the session's end (after the suite runs and the rebuilds)
+$ du -sh /tmp/gov-os-W2-26/examin "/tmp/gov-os-W2-26/EXAMIN APP" /tmp/gov-os-W2-26/runs
+47M	/tmp/gov-os-W2-26/examin              (41M straight after the clone, .git 14M)
+47M	/tmp/gov-os-W2-26/EXAMIN APP
+1.1M	/tmp/gov-os-W2-26/runs
+$ du -sh /tmp/gov-os-W2-26
+94M	/tmp/gov-os-W2-26

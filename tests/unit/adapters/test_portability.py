@@ -133,6 +133,12 @@ class TestVersionFinding:
         finding = portability._version_finding(tmp_path, str(script))
         assert finding["code"] == "RULESYNC_FAILED" and "no answer" in finding["message"]
 
+    def test_both_calls_at_their_limit_end_inside_the_runners_limit(self):
+        """W2-57: a check whose two calls both reach their limit still ends by itself, with its own finding, before
+        gov check cuts a declaration that states no limit; 10 s are left for the check's own work."""
+        from gov.check import runner
+        assert 2 * portability.TIME_LIMIT + 10 <= runner.TIMEOUT_S
+
 
 class TestFindRulesync:
     def test_named_binary(self, tmp_path, monkeypatch):

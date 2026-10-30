@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_doctor
 
 
 # --------------------------------------------------------------------------
@@ -22,10 +23,17 @@ import w1_27_support as support
 def test_doctor_report_mentions_adoption_level(gov, project, interface):
     """The doctor result mentions an adoption level."""
     run = gov("doctor", "--json")
-    envelope = support.assert_envelope(run, interface, command="doctor")
-    text = json.dumps(envelope).lower()
-    assert "adopt" in text or "level" in text, \
-        f"doctor report does not mention adoption level\n{run.describe()}"
+    support.assert_envelope(run, interface, command="doctor")
+    # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name that doctor always emits): the
+    # level's value is read; it is a defined level, and not ADOPTED_HEALTHY while another section is unmeasured.
+    found = w2_67_doctor.sections(run)
+    level = w2_67_doctor.section(run, "adoption_level").get("level")
+    assert level in w2_67_doctor.LEVELS, f"the adoption level {level!r} is not a defined level\n{run.describe()}"
+    unmeasured = sorted(name for name, value in found.items()
+                        if name != "adoption_level" and isinstance(value, dict) and value.get("status") == "unmeasured")
+    assert not (unmeasured and level == "ADOPTED_HEALTHY"), (
+        f"ADOPTED_HEALTHY although {unmeasured} are unmeasured (DEC-425)\n{run.describe()}"
+    )
 
 
 def test_minimal_kernel_passes_at_minimal_level(tmp_path, interface):
@@ -51,11 +59,13 @@ def test_minimal_kernel_passes_at_minimal_level(tmp_path, interface):
     support.write_path_map(project, support.minimal_valid_path_map())
 
     run = support.run_gov(project, sandbox, "doctor", "--json")
-    envelope = support.assert_envelope(run, interface, command="doctor")
-    result = envelope.get("result", {})
-    text = json.dumps(result).lower()
-    assert "minimal" in text or "kernel" in text or "level" in text, \
-        f"minimal kernel project does not report a minimal adoption level\n{run.describe()}"
+    support.assert_envelope(run, interface, command="doctor")
+    # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name that doctor always emits): the
+    # adoption section, wherever doctor put it, passes at the lowest defined level.
+    adoption = w2_67_doctor.section(run, "adoption_level")
+    assert adoption.get("level") == w2_67_doctor.LEVELS[0], \
+        f"minimal kernel project does not report the minimal adoption level\n{run.describe()}"
+    assert adoption.get("status") == "pass", f"the minimal level does not pass\n{run.describe()}"
 
 
 def test_completed_stages_raise_adoption_level(gov, project, interface, tmp_path):
@@ -77,18 +87,18 @@ def test_completed_stages_raise_adoption_level(gov, project, interface, tmp_path
     support.write_tool_registry(project, registry)
 
     run = gov("doctor", "--json")
-    envelope = support.assert_envelope(run, interface, command="doctor")
-    if envelope.get("ok"):
-        result = envelope.get("result", {})
-    else:
-        result = envelope.get("error", {}).get("details", {})
-    text = json.dumps(result).lower()
-    found_level = False
-    for keyword in ("adopted", "healthy", "full", "advanced", "intermediate"):
-        if keyword in text:
-            found_level = True
-            break
-    if not found_level:
-        for keyword in ("minimal",):
-            if keyword in text:
-                pytest.fail(f"the Gov OS repository itself reports only minimal adoption\n{run.describe()}")
+    support.assert_envelope(run, interface, command="doctor")
+    # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name that doctor always emits): the
+    # levels before and after the stages are compared. After: this repository's own path map. Before: the same
+    # project with the stages taken out (a minimal path map, no system implemented, no capability enabled).
+    after = w2_67_doctor.section(run, "adoption_level").get("level")
+    support.write_path_map(project, support.minimal_valid_path_map())
+    before_run = gov("doctor", "--json")
+    support.assert_envelope(before_run, interface, command="doctor")
+    before = w2_67_doctor.section(before_run, "adoption_level").get("level")
+    assert after in w2_67_doctor.LEVELS and before in w2_67_doctor.LEVELS, \
+        f"undefined levels: before {before!r}, after {after!r}\n{run.describe()}\n{before_run.describe()}"
+    assert w2_67_doctor.LEVELS.index(after) > w2_67_doctor.LEVELS.index(before), (
+        f"the completed stages do not raise the adoption level: before {before}, after {after}\n"
+        f"{run.describe()}\n{before_run.describe()}"
+    )

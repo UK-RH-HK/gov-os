@@ -571,14 +571,31 @@ def bash_call_in(project, settings, sandbox, folder, command, literal=False, rol
 
 
 # --------------------------------------------------------------------------
-# The command line of an entry, against the kernel template's (DEC-608)
+# The command line of an entry: the guard lines against the kernel template's, the lifecycle lines against
+# DEC-608's plain form (DEC-917)
 # --------------------------------------------------------------------------
 #
-# DEC-608: the seven command lines of the source are the kernel template's form exactly. Nothing of that form
-# is written here: the kernel template's command lines are read from its settings file, and the form is what
-# such a command line is with the file name of its program taken out.
+# Revised after implementation (Rewrite-Reason: DEC-917). DEC-608 held the seven command lines of the source to
+# one form, read from the kernel template's settings. DEC-917 (P-W2-65-4 (b)) changes DEC-608 to two forms, by
+# line:
+# - the three guard lines (``GUARD_EVENTS``) are held to the kernel template's exit-mapping form (DEC-880 item 3,
+#   DEC-913 item 1): under each of those events the line is the kernel template's command line for that event,
+#   the same string, read from its settings file in each case; nothing of that form is written here;
+# - the four lifecycle lines (``LIFECYCLE_EVENTS``), which the kernel template's settings do not register, are
+#   held to DEC-608's plain form (``PLAIN_FORM``) with the entry's own program, each line exactly.
+# An event of the source that is neither is a failure: DEC-917 names no form for it.
 
 PROGRAM_PLACE = "<the program's file name>"
+
+# DEC-917: the events of the three guard lines, and of the four lifecycle lines, as the harness names them.
+GUARD_EVENTS = ("PreToolUse", "PostToolUse", FAILED_CALL_EVENT)
+LIFECYCLE_EVENTS = ("SessionStart", "Stop", "PreCompact", "SubagentStop")
+
+# DEC-608's plain form, quoted from its entry in docs/DECISION_REGISTER.md ("the kernel template's form exactly,
+# `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"`, with no prefix"), which DEC-917 keeps for the
+# four lifecycle lines. Written as a literal here because the kernel template's settings no longer hold it.
+PLAIN_FORM_AS_WORDED = 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"'
+PLAIN_FORM = PLAIN_FORM_AS_WORDED.replace("<program>", PROGRAM_PLACE)
 
 
 def own_programs(command, programs):
@@ -631,8 +648,9 @@ def kernel_forms(programs):
 
 
 def kernel_form(programs):
-    """The one form the kernel template's command lines share. A failure when they do not share one: the form
-    of the entries the kernel template does not hold could then not be read from it."""
+    """The one form the kernel template's three guard command lines share: its exit-mapping form (DEC-880 item 3,
+    DEC-913 item 1). A failure when they do not share one. Revised after implementation (Rewrite-Reason:
+    DEC-917): the lifecycle lines are no longer put into this form; it is held for the three guard lines only."""
     forms = kernel_forms(programs)
     distinct = sorted(set(forms.values()))
     assert len(distinct) == 1, (
@@ -643,15 +661,23 @@ def kernel_form(programs):
 
 
 def expected_command_line(event, command, programs, where):
-    """What DEC-608 makes the command line of the entry under ``event``, whose present command line is ``command``.
+    """What DEC-917 makes the command line of the entry under ``event``, whose present command line is ``command``.
 
-    Under an event the kernel template's settings hold: the kernel template's command line for that event, the
-    same string. Under another event: the kernel template's form with the entry's own program in the place of
-    the program's file name; the entry's own program is the one its present command line names.
+    Under a guard event (``GUARD_EVENTS``): the kernel template's command line for that event, the same string
+    (its exit-mapping form). Under a lifecycle event (``LIFECYCLE_EVENTS``): DEC-608's plain form with the
+    entry's own program in the place of the program's file name; the entry's own program is the one its present
+    command line names by its whole file name. Under any other event: a failure.
+
+    Revised after implementation (Rewrite-Reason: DEC-917): the lifecycle lines were put into the kernel
+    template's one form (DEC-608), which is now the guard lines' exit-mapping form.
     """
-    if event in guard_events(kernel_settings(), programs):
+    if event in GUARD_EVENTS:
         return kernel_command_line(event, programs)
-    return kernel_form(programs).replace(PROGRAM_PLACE, own_program(command, programs, where))
+    assert event in LIFECYCLE_EVENTS, (
+        f"{where}: {event} is neither a guard event {GUARD_EVENTS} nor a lifecycle event {LIFECYCLE_EVENTS}; "
+        f"DEC-917 names no form for its command line"
+    )
+    return PLAIN_FORM.replace(PROGRAM_PLACE, own_program(command, programs, where))
 
 
 def source_command_lines(source=None):

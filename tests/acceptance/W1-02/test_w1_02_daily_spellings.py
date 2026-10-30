@@ -49,9 +49,19 @@ def world(hook, tmp_path_factory):
     return fix.make_world(tmp_path_factory.mktemp("daily-spellings"))
 
 
-def _refused(world, forms, form, start=ROOT, who=fix.WIDEST, f=""):
-    result = fix.ask_command(world, forms[form], start, who, f)
-    fix.assert_refused_command(result, world, forms[form], start, f"'{form}' from '{start}' by '{who}'", f)
+def _policy_2(world, forms, form, start=ROOT, who=fix.WIDEST, f=""):
+    """Rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3): each search below was refused before W2-58; it is still
+    judged as the search it is, and under Policy 2 that search is allowed. The engineer's content search from the root
+    takes in its ticket's acceptance folder (``tests/acceptance/W1-90/``) and stays refused, for (c) (DEC-821 item 1);
+    a listing from above (``ls``) is not aimed inside that folder and is allowed."""
+    command = forms[form]
+    result = fix.ask_command(world, command, start, who, f)
+    what = f"'{form}' from '{start}' by '{who}'"
+    listing = " ls " in f" {command} "
+    if who == fix.folders.NOT_A_WRITER and start == ROOT and not listing:
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+    else:
+        fix.assert_allowed(result, what)
 
 
 def _allowed(world, forms, form, start=ROOT, who=fix.WIDEST):
@@ -75,9 +85,9 @@ COMMENTED_AT += [("the-other-program-with-a-word-and-a-comment", start) for star
 
 
 @pytest.mark.parametrize("form,start", COMMENTED_AT, ids=fix.ids(COMMENTED_AT))
-def test_a_search_with_no_path_and_a_comment_is_refused(world, form, start):
+def test_a_search_with_no_path_and_a_comment_is_judged_as_the_search_it_is_under_policy_2(world, form, start):
     """Group 1: the words of a comment are not paths of the search. Red before the change: allowed."""
-    _refused(world, COMMENTED, form, start)
+    _policy_2(world, COMMENTED, form, start)
 
 
 COMMENT_DAILY = {
@@ -115,9 +125,9 @@ DIGITS_AT += [("grep-context-and-recursive-with-no-path", start) for start in so
 
 
 @pytest.mark.parametrize("form,start", DIGITS_AT, ids=fix.ids(DIGITS_AT))
-def test_a_recursive_option_group_that_holds_a_digit_is_refused_as_the_search_it_is(world, form, start):
+def test_a_recursive_option_group_that_holds_a_digit_is_judged_as_the_search_it_is_under_policy_2(world, form, start):
     """Group 2: a digit in the group does not undo the recursive letter. Red before the change: allowed."""
-    _refused(world, DIGIT_GROUPS, form, start)
+    _policy_2(world, DIGIT_GROUPS, form, start)
 
 
 DIGIT_DAILY = {
@@ -152,10 +162,10 @@ GREPS_AT += [(program, "a-recursive-option-and-no-path", start)
 
 
 @pytest.mark.parametrize("program,form,start", GREPS_AT, ids=fix.ids(GREPS_AT))
-def test_the_other_names_of_grep_are_refused_as_grep_is(world, program, form, start):
+def test_the_other_names_of_grep_are_judged_as_grep_is_under_policy_2(world, program, form, start):
     """Group 3: the same search under another name of the program. Red before the change: allowed."""
     forms = {form: AS_GREP[form].format(g=program)}
-    _refused(world, forms, form, start)
+    _policy_2(world, forms, form, start)
 
 
 GREP_FILTERED = {
@@ -170,11 +180,11 @@ GREPS_WITH_A_FILTER = [(program, form, fix.FILES[(row + column) % 2], _FILTER_NA
 
 
 @pytest.mark.parametrize("program,form,name,filter_", GREPS_WITH_A_FILTER, ids=fix.ids(GREPS_WITH_A_FILTER))
-def test_the_other_names_of_grep_with_a_name_filter_that_takes_a_protected_file_in_are_refused(
+def test_the_other_names_of_grep_with_a_name_filter_that_takes_a_protected_file_in_are_allowed_under_policy_2(
         world, program, form, name, filter_):
     """Group 3 on the fifth batch's name filters: the file's own name, a glob over its extension."""
     forms = {form: GREP_FILTERED[form].format(g=program)}
-    _refused(world, forms, form, f=fix.FILTERS[filter_](name))
+    _policy_2(world, forms, form, f=fix.FILTERS[filter_](name))
 
 
 GREP_DAILY = {
@@ -232,9 +242,9 @@ BEHIND_A_PREFIX.update({
 
 
 @pytest.mark.parametrize("form", sorted(BEHIND_A_PREFIX))
-def test_a_search_of_the_root_behind_a_prefix_command_is_refused(world, form):
+def test_a_search_of_the_root_behind_a_prefix_command_is_judged_as_the_search_it_is_under_policy_2(world, form):
     """Group 4: the prefix is not the command. Red before the change: allowed."""
-    _refused(world, BEHIND_A_PREFIX, form)
+    _policy_2(world, BEHIND_A_PREFIX, form)
 
 
 PREFIX_ELSEWHERE = {
@@ -246,10 +256,10 @@ PREFIX_AT += [("timeout-then-the-other-program-with-no-path", start) for start i
 
 
 @pytest.mark.parametrize("form,start", PREFIX_AT, ids=fix.ids(PREFIX_AT))
-def test_a_search_behind_a_prefix_command_is_refused_from_a_copy_s_folder_and_beside_a_protected_file(
+def test_a_search_behind_a_prefix_command_is_allowed_from_a_copy_s_folder_and_beside_a_protected_file(
         world, form, start):
     """Group 4 from ``<P>`` and in a folder that holds a file (the earlier rule's refusal, got through today)."""
-    _refused(world, PREFIX_ELSEWHERE, form, start)
+    _policy_2(world, PREFIX_ELSEWHERE, form, start)
 
 
 PREFIX_DAILY = {
@@ -287,9 +297,9 @@ BY_ROLE = fix.share(REFUSED_FOR_ROLES)
 
 
 @pytest.mark.parametrize("who,form", BY_ROLE, ids=fix.ids(BY_ROLE))
-def test_a_daily_spelling_of_a_root_search_is_refused_for_every_role(world, who, form):
+def test_a_daily_spelling_of_a_root_search_is_decided_by_policy_2_for_every_role(world, who, form):
     """An engineer, the test designer and a session with no role (the orchestrator asks every form above)."""
-    _refused(world, REFUSED_FOR_ROLES, form, ROOT, who)
+    _policy_2(world, REFUSED_FOR_ROLES, form, ROOT, who)
 
 
 ALLOWED_FOR_ROLES = {

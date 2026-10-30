@@ -18,8 +18,9 @@ alternative, so it doubles with every group:
   reads it, in the Glob tool's ``pattern``, in the Grep tool's ``glob`` and in
   the other search program's glob option; with a protected file among the
   expansions, and with none (the rule cannot judge a word it does not expand);
-- **refused, before and after**: the word at the bound with a protected file
-  among its expansions;
+- **allowed under Policy 2** (refused before W2-58; rewritten, DEC-821 item 3,
+  DEC-857 item 3): the word at the bound with a protected file among its
+  expansions: it is judged, and a read of either file is open;
 - **stays allowed**: a brace word of a few alternatives that names source
   files, one that expands to 64 words, the Glob tool and the Grep tool with a
   brace of two extensions.
@@ -145,12 +146,16 @@ AT_THE_BOUND = [(place, fix.FILES[row % 2]) for row, place in enumerate(sorted(P
 
 
 @pytest.mark.parametrize("place,name", AT_THE_BOUND, ids=fix.ids(AT_THE_BOUND))
-def test_a_brace_word_at_the_bound_whose_expansions_take_a_protected_file_in_stays_refused(world, place, name):
-    """The measurement of the bound, held: 256 words are expanded and judged (green before and after)."""
+def test_a_brace_word_at_the_bound_whose_expansions_take_a_protected_file_in_is_allowed_under_policy_2(world, place,
+                                                                                                       name):
+    """The measurement of the bound, held: 256 words are expanded and judged, not refused by the bound.
+
+    Rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3): judged, the word is a read of the settings file or the
+    held-out list, which Policy 2 opens; the words past the bound above stay refused (DEC-570).
+    """
     word = brace_word(protected.PROTECTED[name], BOUND)
     result = _ask(world, place, word)
-    fix.assert_refused(result, world, ROOT, f"a brace word at the bound that takes the stand-in {name} in, in {place}",
-                       (word,))
+    fix.assert_allowed(result, f"a brace word at the bound that takes the stand-in {name} in, in {place}")
 
 
 # --------------------------------------------------------------------------

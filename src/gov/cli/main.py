@@ -187,8 +187,35 @@ def _emit(args, ok: bool, result: dict, error: GovError | None) -> None:
         print(json.dumps(result, indent=2))
 
 
+def _version() -> str:
+    """``gov <version> (commit <sha>)``: the code's own version and commit, never those of the working folder's repository.
+
+    Run from a source tree, the version is its ``pyproject.toml``'s and the commit the ``HEAD`` of the repository
+    whose top is that tree. An installed package names the version it was built with, and its commit as unknown."""
+    import subprocess
+    tree = PACKAGE.parents[1]
+    if PACKAGE.parent.name == "src" and (tree / "pyproject.toml").is_file():
+        import tomllib
+        version = tomllib.loads((tree / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+        git = ["git", "-C", str(tree), "rev-parse", "--show-toplevel", "HEAD"]
+        done = subprocess.run(git, capture_output=True, text=True)
+        lines = done.stdout.splitlines() if done.returncode == 0 else []
+        commit = lines[1] if len(lines) == 2 and Path(lines[0]).resolve() == tree else "unknown"
+    else:
+        from importlib.metadata import PackageNotFoundError, version as installed
+        try:
+            version = installed("gov")
+        except PackageNotFoundError:
+            version = "unknown"
+        commit = "unknown"
+    return f"gov {version} (commit {commit})"
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
+    if argv == ["--version"]:  # no command, no project and no configuration
+        print(_version())
+        return EXIT_OK
     passed = None  # what follows "--" goes to a command that takes it, unparsed
     if "--" in argv:
         argv, passed = argv[:argv.index("--")], argv[argv.index("--") + 1:]

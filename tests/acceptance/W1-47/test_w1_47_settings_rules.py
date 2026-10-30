@@ -21,6 +21,11 @@ import pytest
 
 import w1_47_support as support
 
+# Retired by DEC-925 item 1: docs/source left the tree on 2026-10-01, and DEC-922's settings regeneration dropped
+# its two deny rules (P-I1-2, DEC-899). Every other rule of the support's list stays checked (README, "Retired cases").
+RETIRED_DENY_RULES = ("Read(./docs/source/**)", "Edit(./docs/source/**)")
+KEPT_DENY_RULES = tuple(rule for rule in support.KEPT_DENY_RULES if rule not in RETIRED_DENY_RULES)
+
 
 @pytest.mark.parametrize("prefix", support.WITHDRAWN_ASK_PREFIXES)
 def test_the_committed_settings_carry_no_ask_rule_for(settings, prefix):
@@ -53,7 +58,7 @@ def test_the_sudo_deny_rule_is_in_place(settings):
     )
 
 
-@pytest.mark.parametrize("rule", support.KEPT_DENY_RULES)
+@pytest.mark.parametrize("rule", KEPT_DENY_RULES)
 def test_the_other_deny_rules_are_in_place(settings, rule):
     """KPI success 5: "leaves the Bash(sudo:*) deny rule and the other deny rules in place"."""
     assert rule in support.permission_rules(settings, "deny"), (

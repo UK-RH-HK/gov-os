@@ -12,9 +12,11 @@ commit gives the same store wherever and whenever it is loaded.
   from the successor. A dangling edge is stored like any other.
 - Each entry of the register file that the path map of ``HEAD`` names under ``decision_register`` is a record of
   type ``decision`` (DEC-521, DEC-473, DEC-479): its id is the heading's, its status the word after
-  ``**Status:**`` on its first line that is not blank, its path the register file. Its heading and title are kept
-  in ``register_entries``. A named register that ``HEAD`` does not hold as a file of text refuses the load
-  (DEC-579: one that is not in the commit too).
+  ``**Status:**`` on its first line that is not blank, its path the register file. Its heading, title, span and
+  ``content_hash`` are kept in ``register_entries`` (AR-1): the span is its own text, the hash the sha256 of it.
+  A heading alone, one inside an HTML comment, an id outside the ``decision_id`` grammar, a status word not in
+  capitals and an id under two headings make no record (W2-L221, W2-M145, W2-M106). A named register that
+  ``HEAD`` does not hold as a file of text refuses the load (DEC-579: one that is not in the commit too).
 - ``Task:`` and ``Implements:`` trailers are read from the final trailer block;
   a commit made before 2026-10-03 is read from the whole message (DEC-182).
 """
@@ -39,10 +41,14 @@ PATH_MAP_REL = "governance/project/path-map.yaml"
 REGISTER_KEY = "decision_register"  # DEC-479
 REGISTER_TABLE = "register_entries"
 
-# DEC-473: a level-3 heading at the start of a line, the id, a space, a colon or a dash, and the title
-_ENTRY = re.compile(r"### (DEC-[0-9]+)(?=[ :\-–—])[ \t:\-–—]*([^\s:\-–—].*)")
+# DEC-473 read through the kernel's decision_id grammar (common.schema.json): a level-3 heading at the start of a
+# line, the id of three digits or more, a space, a colon or a dash, and the title
+_ENTRY = re.compile(r"### (DEC-[0-9]{3,})(?=[ :\-–—])[ \t:\-–—]*([^\s:\-–—].*)")
+_NOT_AN_ID = re.compile(r"### ((?i:dec)-[0-9]+)(?=[ :\-–—])")  # the heading's form, with an id outside the grammar
+_HEADING = re.compile(r"#{1,6}(?:\s|$)")
 _FENCE = re.compile(r" {0,3}(`{3,}|~{3,})")
 _STATUS = re.compile(r"\s*(?:[-*+]\s+)?\*\*Status:\*\*\s*([A-Za-z][A-Za-z_-]*)")
+_CANONICAL = re.compile(r"[A-Z][A-Z_-]*")  # a status word in capitals, as the sources write it (W2-M106)
 _SUPERSEDES = re.compile(r"\*\*Supersedes:\*\*([^·]*)")
 _IDS_ALONE = re.compile(r"DEC-[0-9]+(?:(?:\s*,\s*|\s+and\s+)DEC-[0-9]+)*")
 
@@ -54,8 +60,14 @@ _TABLES = {
     "commits": "id TEXT PRIMARY KEY",
     "trailers": "commit_id TEXT, key TEXT, value TEXT, PRIMARY KEY (commit_id, key, value)",
     "commit_paths": "commit_id TEXT, path TEXT, PRIMARY KEY (commit_id, path)",
-    REGISTER_TABLE: "id TEXT PRIMARY KEY, heading TEXT NOT NULL, title TEXT NOT NULL",
+    REGISTER_TABLE: "id TEXT PRIMARY KEY, heading TEXT NOT NULL, title TEXT NOT NULL, span TEXT NOT NULL,"
+                    " content_hash TEXT NOT NULL",
 }
+# W2-68: the one row of the load that built the store (its head, the head's two fingerprints, the kind of load),
+# kept out of the graph's tables and out of the digest, so the recovery-rebuild check (CAP-38.b) is unchanged.
+FINGERPRINTS_TABLE = "fingerprints"
+_FINGERPRINTS = "head TEXT NOT NULL, code TEXT, records TEXT, kind TEXT NOT NULL"
+REBUILD, RECORDS = "rebuild", "records"
 
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> bytes:
@@ -116,40 +128,90 @@ def _register(root: Path, tree: dict) -> tuple[str, str] | None:
     return path, text
 
 
+def register_entries(text: str) -> tuple[list[dict], list[str]]:
+    """The live entries of a register's ``text``, and the reason each heading of the entry form is no entry.
+
+    A live entry is a heading of DEC-473's grammar outside fenced code blocks and HTML comments, whose first line
+    that is not blank is a status line with a word in capitals (W2-L221, W2-M145, W2-M106). Its ``span`` is its own
+    text, from its heading to the line before the next heading, without the blank lines that end it; its
+    ``content_hash`` is the sha256 of the span (AR-1). An id under two headings is no entry, named with both lines.
+    The store and the decision-citations check count entries by this one rule.
+    """
+    lines, ends, heads, fence, comment = text.split("\n"), [], [], None, False
+    for number, line in enumerate(lines):
+        mark = _FENCE.match(line)
+        if fence is not None:
+            if mark and mark.group(1).startswith(fence) and not line[mark.end():].strip():
+                fence = None  # closed by a fence of the same mark, at least as long, with nothing after it
+        elif comment:
+            comment = "-->" not in line
+            if _HEADING.match(line):
+                ends.append(number)
+        elif mark:
+            fence = mark.group(1)
+        else:
+            if _HEADING.match(line):
+                ends.append(number)
+                heads.append(number)
+            if "<!--" in line:
+                comment = "-->" not in line.rpartition("<!--")[2]
+    ends.append(len(lines))
+    found, refused = {}, []
+    for number in heads:
+        entry = _ENTRY.match(lines[number])
+        if not entry:
+            outside = _NOT_AN_ID.match(lines[number])
+            if outside:
+                refused.append(f"{outside.group(1)} at line {number + 1} is no id of the decision_id grammar "
+                               "((ADR|DEC)-[0-9]{3,}): the heading is no record")
+            continue
+        own = lines[number:next(at for at in ends if at > number)]
+        while not own[-1].strip():
+            own.pop()
+        span = "\n".join(own)
+        found.setdefault(entry.group(1), []).append({
+            "id": entry.group(1), "line": number + 1, "heading": lines[number].rstrip(),
+            "title": entry.group(2).strip(), "first": next((line for line in own[1:] if line.strip()), ""),
+            "span": span, "content_hash": hashlib.sha256(span.encode("utf-8")).hexdigest()})
+    live = []
+    for record_id, entries in found.items():
+        status = _STATUS.match(entries[0]["first"])
+        if len(entries) > 1:
+            *some, last = [str(entry["line"]) for entry in entries]
+            refused.append(f"{record_id} stands under {len(entries)} headings of the register, at lines "
+                           f"{', '.join(some)} and {last}: none of them is a record")
+        elif not status:
+            refused.append(f"{record_id} at line {entries[0]['line']} has no status line (`**Status:**` and a word, "
+                           "first under its heading)")
+        elif not _CANONICAL.fullmatch(status.group(1)):
+            refused.append(f"{record_id} at line {entries[0]['line']}: its status word {status.group(1)!r} is not "
+                           "canonical (a word in capitals, as the sources write it): the entry is no record")
+        else:
+            live.append({**entries[0], "status": status.group(1)})
+    return live, refused
+
+
 def _read_register(path: str, text: str, recorded: dict[str, str]):
     """The decision records, the SUPERSEDES edges, the headings and the entries that are no records of a register.
 
     ``recorded`` is ``id -> path`` of the records of the files: an id a file records is the file's, never two.
     """
-    entries, fence, lines = {}, None, text.split("\n")
-    for number, line in enumerate(lines):
-        mark, entry = _FENCE.match(line), _ENTRY.match(line)
-        if fence is None:
-            if mark:
-                fence = mark.group(1)
-            elif entry:
-                first = next((lines[at] for at in range(number + 1, len(lines)) if lines[at].strip()), "")
-                entries.setdefault(entry.group(1), []).append((line.rstrip(), entry.group(2).strip(), first))
-        elif mark and mark.group(1).startswith(fence) and not line[mark.end():].strip():
-            fence = None  # closed by a fence of the same mark, at least as long, with nothing after it
-    records, edges, headings, invalid = [], set(), [], []
-    for record_id, found in entries.items():
-        (heading, title, first), status = found[0], _STATUS.match(found[0][2])
-        if len(found) > 1:
-            reason = f"{record_id} stands under {len(found)} headings of the register: none of them is a record"
-        elif record_id in recorded:
-            reason = f"{record_id} is recorded by the decision file {recorded[record_id]}: the entry is no record"
-        elif not status:
-            reason = f"{record_id} has no status line (`**Status:**` and a word, first under its heading)"
-        else:
-            records.append((path, record_id, "decision", status.group(1)))
-            headings.append((record_id, heading, title))
-            superseded = _SUPERSEDES.search(first)
-            if superseded and _IDS_ALONE.fullmatch(superseded.group(1).strip()):  # a part of a decision gives none
-                edges.update(("SUPERSEDES", record_id, target)
-                             for target in re.findall(r"DEC-[0-9]+", superseded.group(1)))
+    entries, refused = register_entries(text)
+    records, edges, headings = [], set(), []
+    invalid = [{"path": path, "reason": reason} for reason in refused]
+    for entry in entries:
+        record_id = entry["id"]
+        if record_id in recorded:
+            invalid.append({"path": path, "reason": f"{record_id} is recorded by the decision file "
+                                                    f"{recorded[record_id]} and by the heading at line "
+                                                    f"{entry['line']} of the register: the entry is no record"})
             continue
-        invalid.append({"path": path, "reason": reason})
+        records.append((path, record_id, "decision", entry["status"]))
+        headings.append((record_id, entry["heading"], entry["title"], entry["span"], entry["content_hash"]))
+        superseded = _SUPERSEDES.search(entry["first"])
+        if superseded and _IDS_ALONE.fullmatch(superseded.group(1).strip()):  # a part of a decision gives none
+            edges.update(("SUPERSEDES", record_id, target)
+                         for target in re.findall(r"DEC-[0-9]+", superseded.group(1)))
     return records, edges, headings, invalid
 
 
@@ -256,11 +318,16 @@ def connect(root: Path) -> sqlite3.Connection:
     return sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
 
 
-def load(root: Path) -> dict:
-    """Build the store at ``root`` from its git repository, replacing what an earlier load left."""
-    root = Path(root)
+def _load(root: Path, kind: str, records_fingerprint: bool = True) -> tuple[dict, dict | None]:
+    """Write the record graph of ``HEAD`` and the fingerprints row of the load, in one transaction: the load's
+    result and ``HEAD``'s fingerprints (None where they cannot be computed). Without ``records_fingerprint`` the
+    row states none yet, so the store is not fresh until ``load_records`` writes it after the indexes."""
+    from gov.close.fingerprint import of_commit
+
+    head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
     records, edges, invalid, headings = _read_records(root)
     commits, trailers, paths = _read_commits(root)
+    prints = of_commit(root, head)
     rows = dict(zip(_TABLES, (records, edges, commits, trailers, paths, headings)))
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
@@ -271,10 +338,108 @@ def load(root: Path) -> dict:
             connection.execute(f"CREATE TABLE {table} ({columns})")
             for row in sorted(rows[table]):
                 connection.execute(f"INSERT INTO {table} VALUES ({', '.join('?' * len(row))})", row)
+        connection.execute(f"DROP TABLE IF EXISTS {FINGERPRINTS_TABLE}")
+        connection.execute(f"CREATE TABLE {FINGERPRINTS_TABLE} ({_FINGERPRINTS})")
+        connection.execute(f"INSERT INTO {FINGERPRINTS_TABLE} VALUES (?, ?, ?, ?)",
+                           (head, prints["code"] if prints else None,
+                            prints["records"] if prints and records_fingerprint else None, kind))
         connection.execute("COMMIT")
-        return {"digest": _digest(connection), "invalid": sorted(invalid, key=lambda entry: entry["path"])}
+        return {"digest": _digest(connection), "invalid": sorted(invalid, key=lambda entry: entry["path"])}, prints
     finally:
         connection.close()
+
+
+def load(root: Path) -> dict:
+    """Build the store at ``root`` from its git repository, replacing what an earlier load left. The fingerprints
+    row records ``HEAD``, its two fingerprints and the kind ``rebuild``."""
+    return _load(Path(root), REBUILD)[0]
+
+
+def fingerprints(connection: sqlite3.Connection) -> dict | None:
+    """The store's fingerprints row (``head``, ``code``, ``records``, ``kind``); None where the store has no such
+    table (a store built before W2-68), and a row of nothing where the table holds other than one row, which
+    matches no head. ``sqlite3.Error`` where the store cannot be asked."""
+    if connection.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+                          (FINGERPRINTS_TABLE,)).fetchone() is None:
+        return None
+    rows = connection.execute(f"SELECT head, code, records, kind FROM {FINGERPRINTS_TABLE}").fetchall()
+    return dict(zip(("head", "code", "records", "kind"), rows[0] if len(rows) == 1 else (None,) * 4))
+
+
+def load_records(root: Path) -> dict:
+    """The incremental record load (W2-68): the record graph of ``HEAD`` again, the lexical index and the semantic
+    vectors refreshed through their own refresh functions, the code index left as it is.
+
+    It runs only where the store's row holds a code fingerprint equal to ``HEAD``'s; otherwise ``STORE_CODE_CHANGED``
+    (a full rebuild is needed). It leaves the store digest a full load of ``HEAD`` leaves, and the row ``HEAD``, its
+    fingerprints and the kind ``records``.
+    """
+    from gov.close.fingerprint import of_commit
+
+    root = Path(root)
+    head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8").strip()
+    prints = of_commit(root, head)
+    try:
+        connection = connect(root)
+    except GovError as e:
+        if e.code != "STORE_MISSING":
+            raise
+        row = None
+    else:
+        try:
+            row = fingerprints(connection)
+        except sqlite3.Error as e:
+            raise GovError("STORE_UNREADABLE", f"the record store {STORE_REL} cannot be read ({e}); run gov rebuild",
+                           {"store": STORE_REL}) from None
+        finally:
+            connection.close()
+    if prints is None or row is None or row["code"] is None or row["code"] != prints["code"]:
+        why = ("HEAD's code fingerprint cannot be computed" if prints is None
+               else "the store records no code fingerprint" if row is None or row["code"] is None
+               else "the store was built on another code fingerprint")
+        raise GovError("STORE_CODE_CHANGED", f"{why}: the records alone cannot be loaded; run gov rebuild",
+                       {"head": head, "code_fingerprint": prints and prints["code"],
+                        "store_code_fingerprint": row and row["code"]})
+    result, prints = _load(root, RECORDS, records_fingerprint=False)
+    if prints is None or prints["code"] != row["code"]:  # HEAD moved to other code during the load
+        raise GovError("STORE_CODE_CHANGED", "HEAD's code changed during the load; run gov rebuild",
+                       {"head": head, "store_code_fingerprint": row["code"]})
+    stores = _refresh_indexes(root)
+    connection = sqlite3.connect(root / STORE_REL, isolation_level=None)
+    try:
+        connection.execute(f"UPDATE {FINGERPRINTS_TABLE} SET records = ?", (prints["records"],))
+    finally:
+        connection.close()
+    return {**result, "head": head, "code_fingerprint": prints["code"], "records_fingerprint": prints["records"],
+            "kind": RECORDS, "stores": stores}
+
+
+def _refresh_indexes(root: Path) -> dict:
+    """The lexical index and the semantic vectors refreshed as ``gov rebuild`` refreshes them; the code index is
+    left as it is."""
+    from gov.config.loader import load_config
+
+    if "path-map.yaml" not in load_config(root):
+        return {"lexical": {"status": "not_refreshed", "reason": "no path map: nothing is classified as indexable"},
+                "semantic": {"status": "not_refreshed", "reason": "no path map"},
+                "codeintel": {"status": "left"}}
+    from gov.retrieval import lexical, semantic
+
+    try:
+        stores = {"lexical": {"status": "refreshed", "indexed": lexical.refresh(root)["indexed"]}}
+    except GovError:
+        raise
+    except Exception as exc:
+        raise GovError("STORE_LOAD_FAILED", f"the lexical index could not be refreshed: {exc}",
+                       {"store": "lexical", "error": str(exc)})
+    try:
+        report = semantic.refresh(root)
+        stores["semantic"] = ({"status": "refreshed"} if report.get("available")
+                              else {"status": "not_refreshed", "reason": report.get("reason", "unknown")})
+    except Exception as exc:  # noqa: BLE001 - the vectors stay stale and the semantic facet says so itself
+        stores["semantic"] = {"status": "not_refreshed", "reason": str(exc)}
+    stores["codeintel"] = {"status": "left"}
+    return stores
 
 
 def digest(root: Path) -> str:

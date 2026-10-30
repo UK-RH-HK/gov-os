@@ -36,6 +36,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import resource
 import shutil
 import stat
 import subprocess
@@ -336,7 +337,8 @@ class HookResult:
     returncode: int | None
     stdout: str
     stderr: str
-    seconds: float
+    seconds: float         # wall time of the hook process, start to exit, as the harness waits for it
+    cpu_seconds: float | None = None   # the CPU time of the hook and of the processes it waited for (W2-57)
 
     def describe(self):
         return (
@@ -417,9 +419,18 @@ def _installed_entry(project):
     return Path(project) / PRODUCT_HOOK_DIR_REL / hook_entry().name
 
 
+def children_cpu_seconds():
+    """The CPU time (user and system) of every child this process has waited for, and of the processes they waited
+    for in turn: read before and after one hook process, the difference is that hook's own work, its forked
+    decision process included (the hook waits for it). Load does not stretch it as it stretches wall time (W2-57)."""
+    used = resource.getrusage(resource.RUSAGE_CHILDREN)
+    return used.ru_utime + used.ru_stime
+
+
 def run_hook_raw(project, stdin_text, sandbox, role=None, ticket=None, extra_env=None):
     """Run the installed hook once with ``stdin_text`` exactly as given."""
     project = Path(project)
+    cpu_before = children_cpu_seconds()
     started = time.perf_counter()
     try:
         proc = subprocess.run(
@@ -434,9 +445,10 @@ def run_hook_raw(project, stdin_text, sandbox, role=None, ticket=None, extra_env
         )
     except subprocess.TimeoutExpired as exc:
         return HookResult("timeout", None, str(exc.stdout or ""), str(exc.stderr or ""),
-                          time.perf_counter() - started)
+                          time.perf_counter() - started, children_cpu_seconds() - cpu_before)
     seconds = time.perf_counter() - started
-    return HookResult(classify(proc.returncode, proc.stdout), proc.returncode, proc.stdout, proc.stderr, seconds)
+    return HookResult(classify(proc.returncode, proc.stdout), proc.returncode, proc.stdout, proc.stderr, seconds,
+                      children_cpu_seconds() - cpu_before)
 
 
 def run_hook(project, tool_name, tool_input, sandbox, role=None, ticket=None, subagent=None, extra_env=None):

@@ -662,7 +662,7 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732), 
 | W2-L204 | Extra unjudged path field of Edit or MultiEdit ignored | low | W2-42 | Fits W2-42's paths and KPIs (guard holes); its builder takes it. |
 | W2-L205 | A3 does not pin the path map's hash | low | W2-23 | Named in W2-23's KPIs (adoption safety). |
 | W2-L206 | Doctor's 'no namespace embedded' words only under the semantic canary's answer | low | W2-22 | Named in W2-22's KPIs (gov doctor green). |
-| W2-L207 | Merge queue with batch testing and automatic culprit split | low | Wave 3 | Merge queue with batch testing is a scale feature; the close bottleneck is met in Wave 2 by W2-38. |
+| W2-L207 | Merge queue with batch testing and automatic culprit split | low | Wave 3 | Merge queue with batch testing is a scale feature; the close bottleneck is met in Wave 2 by W2-66 (path-scoped closes) and W2-68 (batched closes with the red batch's bisect), DEC-880, DEC-883, DEC-890; W2-38 itself is Wave 3. |
 | W2-L208 | Each session's own Claude Code version in the telemetry record | low | W2-07 | Fits W2-07's paths and KPIs (close by ticket class, repair tickets, share); its builder takes it. |
 | W2-L209 | gov close leaves its repair ticket untracked, and without role in b-dev | low | W2-07 | Named in W2-07's KPIs (close by ticket class, repair tickets, share). |
 | W2-L210 | gov close residuals: overwritten close record, undeclared escalation folder, unresolved Implements ids | low | W2-07 | Named in W2-07's KPIs (close by ticket class, repair tickets, share). |

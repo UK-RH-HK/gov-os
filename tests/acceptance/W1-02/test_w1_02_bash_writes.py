@@ -103,8 +103,13 @@ def test_engineer_bash_write_under_acceptance_tests_is_denied(project, bash, for
 
 @pytest.mark.parametrize("form", sorted(READS), ids=sorted(READS))
 def test_engineer_bash_read_is_let_through(project, bash, form):
+    """Rewritten by W2-58 for one form (DEC-821 item 1; Policy 2 (c), DEC-820): ``cat`` of the engineer's own ticket's
+    acceptance test is refused; the other reads stay let through."""
     result = bash(project, READS[form], ENGINEER, TICKET)
-    support.assert_allowed(result, f"Bash `{READS[form]}` by the engineer on {TICKET}")
+    if form == "cat-acceptance-test":
+        support.assert_denied(result, f"Bash `{READS[form]}` by the engineer on {TICKET} (its own ticket's tests)")
+    else:
+        support.assert_allowed(result, f"Bash `{READS[form]}` by the engineer on {TICKET}")
 
 
 def test_bash_decisions_change_nothing_on_disk(project, bash):

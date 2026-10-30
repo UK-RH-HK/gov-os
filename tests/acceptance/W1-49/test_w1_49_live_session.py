@@ -5,8 +5,8 @@ next action shows it knows the active tickets, the open owner decisions and the
 loop counts, without the owner restating them (DEC-248)".
 KPI failure 3: "After a compaction the session needs the owner to restate the
 active tickets, the open owner decisions or the loop counts".
-KPI success 3: the proof that the pinned CLI takes the auto-compact window from
-the ``env`` key of a project's settings.
+KPI success 3, under DEC-838 (DEC-865): the session reports its model's own
+window, the default for that model, and no threshold taken from a setting.
 
 **One session, four short calls**, once per test run, in a temporary project
 that holds this repository's two hooks, their registration and the ``env`` key
@@ -27,8 +27,8 @@ settings file), a stand-in prompt and, from step 2 on, a stand-in checkpoint:
    names no ticket, no decision and no count. ``Read`` is the only tool the
    call has (``--tools Read``), so the session can open the two files it is
    told to read and cannot start the next action instead of stating it.
-4. ``claude -p "/autocompact" --resume <id>`` prints the window and its origin.
-   It calls no model.
+4. ``claude -p "/autocompact" --resume <id>`` prints the window and, when a
+   setting gives it, its origin. It calls no model.
 
 **Cost and needs.** The real CLI at ``~/.local/bin/claude`` (2.1.288) with the
 caller's own credentials and the network; the cheapest model (``haiku``), a turn
@@ -200,8 +200,20 @@ def test_after_the_compaction_the_session_names_the_loop_counts(live, count):
     assert count in _reply(live), f"the session does not name the loop count {count}: {live.reply[:600]!r}"
 
 
-def test_the_session_takes_the_auto_compact_window_from_the_settings_env_key(live):
-    """Success 3: ``/autocompact`` reports "300k tokens (from CLAUDE_CODE_AUTO_COMPACT_WINDOW)"."""
-    assert support.WINDOW_KEY in live.window and "300k" in live.window, (
-        f"the session does not report a 300k window from {support.WINDOW_KEY}: {live.window[:300]!r}"
+def test_the_session_reports_its_models_own_window(live):
+    """Success 3, rewritten after implementation (DEC-838, DEC-865). ``/autocompact`` reports the model's own window,
+    the default for that model ("…: auto" or "…: 1m tokens (default for this model)"), and no threshold taken from a
+    setting.
+
+    Before: ``test_the_session_takes_the_auto_compact_window_from_the_settings_env_key`` ("300k tokens (from
+    CLAUDE_CODE_AUTO_COMPACT_WINDOW)", DEC-636).
+    """
+    answer = live.window.lower()
+    assert support.WINDOW_REPORT in answer, f"the session gave no auto-compact window report: {live.window[:300]!r}"
+    assert support.WINDOW_KEY.lower() not in answer and support.WINDOW_ORIGIN not in answer, (
+        f"the session reports a threshold taken from a setting, not its model's own window (DEC-838): "
+        f"{live.window[:300]!r}"
+    )
+    assert any(form in answer for form in support.WINDOW_DEFAULT_FORMS), (
+        f"the session does not report its model's default window (DEC-838): {live.window[:300]!r}"
     )
