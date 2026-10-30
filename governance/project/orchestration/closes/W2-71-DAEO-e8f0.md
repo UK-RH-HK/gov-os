@@ -11,3 +11,5 @@
 - gitleaks on the merge's change: clean
 - Times: rebuild 1455 s, tests 8649 s, wall 10666 s
 - Closed: 2026-10-30 19:14:45 GMT, by the orchestrator under DEC-953 items 1 and 5
+- Back-fill, 2026-10-30 21:10 GMT: the scoped run above left out the ticket's own acceptance suite, a fault in the close script that W2-85's lead found and that is now fixed. The suite was then run alone on the same head `a4939b458d2d`, in a clean clone: `tests/acceptance/W2-71`, 304 passed in 163.84 s. With this run, practice 2 is met.
+- Timing note: the parallel phase's 7,767 s includes about 83 minutes waiting for the test lock (16:41 to 18:04), so its test time was about 46 minutes, at a load near 35.
