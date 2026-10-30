@@ -11211,7 +11211,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - **Where it goes (DEC-851):** this register; the prompt §15 (the pre-close gate), v3.32; RESUME HERE; the daily digest.
 
 ### DEC-930 — A re-plan package for the rest of Wave 2 after this queue and the second re-pin; four numbers reported weekly from now (standing)
-- **Status:** ACCEPTED (a fifth weekly number, the orchestrator's drift (DEC-943 item 2); owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-855, DEC-878, DEC-851, DEC-861
+- **Status:** ACCEPTED (item 2's weekly numbers gain the ticket total and its growth (DEC-949); a fifth weekly number, the orchestrator's drift (DEC-943 item 2); owner, 2026-10-27, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-27)`; item 2 standing) · **Under:** DEC-855, DEC-878, DEC-851, DEC-861
 - **Decision:**
   1. **The re-plan package**, in the six-part form, once this queue and the second re-pin are done:
      - the minimum needed to start EXAMIN's copy: fast closes, memory proven (K4, W2-61's measure included), agents loading role, skills and model at launch (K3), and the leads' sandbox; everything else proposed for Wave 3, with what each deferral costs;
@@ -11420,7 +11420,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-938 — The morning package: investigate after the nightly, one P1-MORNING file, one ping at 07:30 from the orchestrator's session; hold only what an item blocks (standing)
-- **Status:** ACCEPTED (item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
+- **Status:** ACCEPTED (the hold after a red nightly and the schedule refined by DEC-951 items A and B; the morning package's scope refined by DEC-949 (overnight only); item 3's schedule applied with background waits and a 07:45 watchdog (DEC-939 item 1); its digest folded into the morning package (DEC-941 item 4c); owner, 2026-10-28, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-28)`; standing; the rule about rules, DEC-851) · **Under:** DEC-855, DEC-936, DEC-934, DEC-933, DEC-852 item 3, DEC-851, DEC-861 · **Changes:** DEC-855 (how the owner is notified, for anything found from the end of the owner's day to 07:30), DEC-936 item 1 (separate night-time P1 pings are replaced: until a push notifier is in, the morning package replaces the nightly's own pings).
 - **Decision (the owner's six points):**
   1. **Investigate before reporting.** After the nightly ends, for every finding (a red test, a refused close, a missed or failed night, any alert):
      - re-run failing tests alone and in the close's form;
@@ -11563,7 +11563,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-942 — No fixed number of leads; the resource gate measured on WSL as it is; closes first (standing)
-- **Status:** ACCEPTED (item 1's launch order within DEC-946's priorities; owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-847, DEC-880, DEC-798, DEC-898, DEC-904, DEC-933, DEC-939, DEC-941, DEC-938 · **Changes:** DEC-941 item 1d (the interim ceiling of 4 leads, removed), DEC-847's hard ceiling of 10 leads (removed), DEC-798's fixed gate figures (load below 20, MemAvailable at least 6,710,886 kB: replaced by item 2) · **Basis:** the owner's message of 2026-10-29, which supersedes the same day's message on a `.wslconfig` change and a WSL restart (neither happens: WSL keeps its 20 threads and its memory).
+- **Status:** ACCEPTED (item 2's memory rule changed by DEC-947; item 1's launch order within DEC-946's priorities; owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-847, DEC-880, DEC-798, DEC-898, DEC-904, DEC-933, DEC-939, DEC-941, DEC-938 · **Changes:** DEC-941 item 1d (the interim ceiling of 4 leads, removed), DEC-847's hard ceiling of 10 leads (removed), DEC-798's fixed gate figures (load below 20, MemAvailable at least 6,710,886 kB: replaced by item 2) · **Basis:** the owner's message of 2026-10-29, which supersedes the same day's message on a `.wslconfig` change and a WSL restart (neither happens: WSL keeps its 20 threads and its memory).
 - **Decision:**
   1. **No fixed number of leads.** Every ready ticket that dependencies and paths allow is launched (no overlapping running ticket, or the overlap split by file), critical path first (memory), then K3, K6 and the held merge-backs, until the machine's capacity is reached.
   2. **Capacity is measured at each launch by the resource gate, on WSL as it is:**
@@ -11714,3 +11714,123 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.328 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-946 (standing priorities until EXAMIN's copy: finish before you start; speed, memory, K3 and K6, the rest of EXAMIN's minimum; nothing else starts; a Wave 3 parking list; cuts, not a later date, if 18 November is at risk; staggered launches; the nightly frozen; ACT-RUNS-SWEEP-1 by the owner's operator). Next free id: DEC-947. |
+
+
+### DEC-947 — The memory gate: one verification run's peak reserved once, a working size per lead; re-measured weekly (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-942, DEC-946, DEC-904 · **Changes:** DEC-942 item 2's memory rule (each running lead's measured reservation) and its "how it is applied" (the highest peak charged per lead)
+- **Decision:**
+  1. The verification lock lets only one full test run happen at a time, so its peak (7.4 GiB measured on 2026-10-29) is reserved once, not per lead.
+  2. **The reserve:** the floor, plus one verification run's measured peak, plus each running lead's measured working size outside verification (about 2.1 GiB, measured on 2026-10-29).
+  3. **Both figures are re-measured weekly.**
+  4. **Applied at once,** not held for the morning package; the staggered launches stay (DEC-946 item 8).
+  5. **The floor goes from 6.4 GiB to 3 GiB** (the owner's amendment the same day, not at the weekly re-measure): the verification run's peak is now reserved separately, and seven leads ran without memory trouble. If available memory ever falls below 2 GiB, or the kernel journal shows any out-of-memory kill, the floor goes back to 6.4 GiB at once and the next package reports it. The load gate stays as it is.
+- **How it is applied:**
+  - `tools/gate_check.py` opens memory when MemAvailable plus what the running leads already hold is at least the floor (3,145,728 kB from item 5; 6,710,886 kB before), plus the verification peak (7,404,492 kB), plus the working size (2,140,236 kB) for each running lead and for the new one.
+  - The figures live in `tools/gate-config.json` with their date and source.
+  - The weekly numbers carry the re-measure, from `log/lead-mem.jsonl` (`tools/lead_mem.py --summary`), old and new side by side.
+- **Effect, measured at 20:35 on 2026-10-29:**
+  - WSL holds 23.5 GiB; available plus the leads' memory came to 20.6 GiB;
+  - the rule then admits about three leads at once (20.6 − 6.4 − 7.1 = 7.1 GiB, at 2.04 GiB each);
+  - the seven leads already running continue (DEC-942 item 3); none starts until they are down to two.
+  - **Item 5's trip-wire:** `tools/oom_watch.sh`, every 30 seconds: MemAvailable below 2,097,152 kB, or an out-of-memory line in `journalctl -k` since the watch began, puts the floor back to 6,710,886 kB in `gate-config.json` and logs it to `log/oom-watch.txt`. With item 5 the rule admits about five leads at once (21.1 − 3.0 − 7.1 = 11.0 GiB, at 2.04 GiB each; 20:47 on 2026-10-29).
+- **Where it goes (DEC-851):** this register, with DEC-942's status line; the prompt §3 (the gate) and §7 (the weekly re-measure), v3.41; RESUME HERE.
+- Next free id: DEC-948.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.329 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-947 (the memory gate: the floor, plus one verification run's measured peak reserved once, plus a measured working size per running lead and the new one; both figures re-measured weekly; applied at once, launches still staggered). Next free id: DEC-948. |
+| 0.330 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-947 item 5 (the floor from 6.4 GiB to 3 GiB, put back at once if available memory falls below 2 GiB or an out-of-memory kill appears). Next free id: DEC-948. |
+
+
+### DEC-948 — Every report to the owner ends with the same five-line block (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-787, DEC-788, DEC-878, DEC-930, DEC-946 · **Changes:** DEC-787/788's ending (the `OWNER_ACTION:` line becomes the block's last line)
+- **Decision:** every report to the owner, however short, ends with the same block, so the owner can follow from a phone:
+  - **Progress:** closed / merged-not-closed / built-and-held / in flight / not started, of the total;
+  - **Leads:** running (which), queued next (which), and what the gate is waiting on;
+  - **Closes:** running or next, and any refused since the last report;
+  - **Toward EXAMIN's copy:** on track for 18 November, or at risk (one line, with why);
+  - **OWNER_ACTION:** none, or what is needed.
+  It is in the prompt's reporting section, so it survives a compaction.
+- **How it is applied:**
+  - `tools/status_block.py` prints the block. It reads live from `.tickets/`, the running leads, the lead queue's list and log, the gate and the close-queue logs.
+  - The facts kept by hand (merged-not-closed, built-and-held, the next closes, the EXAMIN line, owner actions) live in `log/report-state.json`, which the orchestrator updates at each merge, hold and close.
+  - `--mark` records the report's time, so refusals are counted since the last report.
+- **Where it goes (DEC-851):** this register; the prompt's reporting section (§15, "Reports"), v3.42; RESUME HERE.
+- Next free id: DEC-949.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.331 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-948 (every report ends with the five-line block: progress, leads, closes, toward EXAMIN's copy, OWNER_ACTION). Next free id: DEC-949. |
+
+
+### DEC-949 — The morning package carries only the night; daytime decisions reach the owner as they arise; scope growth in the weekly numbers (standing)
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-938, DEC-936, DEC-930, DEC-941, DEC-946 · **Changes:** DEC-938 (refined: the morning package's scope) and DEC-930 item 2 (the weekly numbers)
+- **Decision:**
+  1. **The 07:30 morning package is only for what happens overnight:** the nightly's findings, night-time alerts, and anything that arose between the end of the owner's day and 07:30.
+  2. **Decisions that arise during the day** (from leads, closes, reviews, merges, the orchestrator's own findings) come to the owner as they arise:
+     - a P1, or a decision only the owner can take, is sent at once as a package with a ping, between 07:30 and midnight;
+     - P2s the orchestrator may decide as delegated stay listed in the daily document, for the owner to overturn.
+  3. **P-W2-20-SCOPE and the W2-H063 guard fix are sent now,** not in the next morning package. W2-H063 goes first: it blocks the hidden half of W2-61's memory measure, on the critical path.
+  4. **The weekly numbers add the ticket total and how much it grew that week,** with the new tickets named, so scope growth is visible.
+- **How it is applied:**
+  - The prompt §7: the morning package's scope, a daytime-decisions rule beside "Only P1s and ACTs ping", and the weekly numbers.
+  - `packages/P-W2-H063-1.md` and `packages/P-W2-20-SCOPE.md`, committed and pinged on 2026-10-29, W2-H063 first.
+- **Where it goes (DEC-851):** this register, with DEC-938's and DEC-930's status lines; the prompt §7, v3.43; RESUME HERE.
+- Next free id: DEC-950.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.332 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-949 (the morning package carries only the night; daytime P1s and owner-only decisions are sent as they arise with a ping between 07:30 and midnight; delegated P2s stay in the daily document; P-W2-H063-1 and P-W2-20-SCOPE sent at once; the weekly numbers add the ticket total and its growth). Next free id: DEC-950. |
+
+
+### DEC-950 — The owner's answers to P-W2-H063-1 and P-W2-20-SCOPE: W2-84 makes the hidden-set refusal cover every tree; W2-20 gets one more run aligned with DEC-942 and DEC-947
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`) · **Under:** DEC-820, DEC-845, DEC-873, DEC-942, DEC-946, DEC-947, DEC-817, DEC-949 · **Basis:** `packages/P-W2-H063-1.md`, `packages/P-W2-20-SCOPE.md` (sent 2026-10-29 21:52)
+- **Decision:**
+  1. **P-W2-H063-1: (a).**
+     - W2-84 (FULL, about 120 lines) makes the hidden-set refusal cover every tree: the main tree, all worktrees and the run clones.
+     - It is on memory's critical path: priority 3 (DEC-946), ahead of the hidden half of W2-61 (W2-61h). It starts as soon as the gate allows.
+     - Not (b) or (c).
+  2. **P-W2-20-SCOPE: (a),** one more run for W2-20, aligned with DEC-942 and DEC-947: no fixed cap; the floor, the verification peak, and the disk and inode floors as decided. The two design points:
+     1. each session's working size comes from the measured figures in the configuration file, re-measured weekly, with the gate reading the running sessions' live usage;
+     2. the GPU is checked only for jobs that declare a GPU need, against that declared need plus a 10 % margin. Nothing in the Gov OS needs the GPU today, so that part stays minimal.
+- **How it is applied:**
+  - **W2-84** is filed (row W2-H063). It goes first in the lead queue as soon as the gate allows. W2-61h starts after W2-84 is merged and pinned.
+  - **W2-20's ticket** is amended to these KPIs before its run 3, which takes priority 4's place (DEC-946).
+- **Where it goes (DEC-851):** this register; `.tickets/` (W2-84 filed, W2-20 amended); `docs/plan/WAVE_2_WBS.md` (W2-84's card); RESUME HERE.
+- Next free id: DEC-951.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.333 | 2026-10-29 | Owner (recorded by the orchestrator, DEC-861): DEC-950 (P-W2-H063-1 (a): W2-84, the hidden-set refusal in every tree, priority 3 ahead of W2-61h; P-W2-20-SCOPE (a): W2-20 run 3 aligned with DEC-942 and DEC-947, working sizes from the measured configuration, the GPU only for declared needs plus 10 %). Next free id: DEC-951. |
+
+
+### DEC-951 — The owner's answers to P1-MORNING-2026-10-30 and P-W2-60a-ROUND3; a red nightly the orchestrator has explained and repaired needs no owner; the morning ping on time (items A and B standing)
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; items A and B standing) · **Under:** DEC-938, DEC-949, DEC-413, DEC-757, DEC-915, DEC-941, DEC-946 · **Changes:** DEC-938's hold on closes after a red nightly (item A); DEC-938's schedule (item B) · **Basis:** `packages/P1-MORNING-2026-10-30.md`, `packages/P-W2-60a-ROUND3.md`
+- **Decision:**
+  1. **Release the closes now:** W2-71, W2-77, W2-57, W2-03, W2-26 and the rest that are ready.
+  2. **P-B1-1: yes.** A short test-designer revision of W1-02's deadline support, then W2-05 resumes.
+  3. **W2-54's two time-limit cases do not go onto `load_sensitive`;** the list only shrinks.
+     - They are routed to the nightly instead, as W2-57 did for the live tests: they run every night on a quiet machine and no longer refuse closes under the leads' load.
+     - It is a test-designer change with a `Rewrite-Reason:`.
+  4. **P-W2-60a-ROUND3: (a), the last round under DEC-413's exception,** scoped strictly to the items listed:
+     - the main checkout's local file for worktree launches;
+     - the role-file path for adopted repositories;
+     - the named fixture and nightly-route lines.
+
+     If review 3 finds another fail-open case, a package, not a fourth round. The delegated items alongside are accepted.
+  5. **A note for W2-11's test-design skill:** 2,980 lines of acceptance tests for 713 lines of code is out of proportion; the skill says how much is enough.
+  - **A (standing): a red nightly the orchestrator has explained.** If its cause is found, repaired, merged and verified in the main tree (the repaired tests pass, nothing else red), it does not need the owner: the orchestrator releases the closes and reports it in the package as a delegated decision. The closes are held for the owner only when a red is unexplained, unrepaired, or in the judge's own core.
+  - **B (standing): the morning ping on time.** If the package is ready before 07:30, no long foreground work starts between 07:15 and 07:35, so the 07:30 ping goes on time. A late package is logged with its cause.
+- **How it is applied:**
+  - **Item 1:** the close queue runs W2-71, W2-77, W2-57, W2-03 and W2-26 once this record is committed.
+  - **Item 2:** no ticket widening is needed. The test designer's role writes `tests/acceptance/**` under an in-progress ticket, and its brief names DEC-951 item 2 for W1-02's tests (DEC-906); the mutation check refuses acceptance paths on an implementer ticket. W2-05's run 4 follows.
+  - **Item 3:** ticket W2-85 (LITE, independent test designer) routes the two cases in `tests/acceptance/serial-only.txt`.
+  - **Item 4:** W2-60a's ticket is widened by the three named unit files. Its test designer writes the nightly-route line in `tests/acceptance/serial-only.txt` by its role, its brief naming DEC-951 item 4. Round 3 is its last.
+  - **Item 5:** a KPI line on W2-11's ticket.
+  - **A and B:** in the prompt §7, v3.44.
+- **Where it goes (DEC-851):** this register, with DEC-938's status line; the prompt §7, v3.44; `.tickets/` (W2-05, W2-60a, W2-11, W2-85); RESUME HERE.
+- Next free id: DEC-952.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.334 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-951 (the closes released; W2-05 resumes after a W1-02 revision; W2-54's two time-limit cases routed to the nightly, not onto load_sensitive; W2-60a's last round under DEC-413's exception, strictly scoped; a test-proportion note for W2-11; standing: a red nightly found, repaired, merged and verified needs no owner; the 07:30 ping kept clear of long work). Next free id: DEC-952. |

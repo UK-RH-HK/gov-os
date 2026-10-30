@@ -1505,6 +1505,30 @@ W2-55, W2-56, W2-61 and W2-64 keep their cards above; their ticket files are fil
 - **KPIs, failure:** a practice dropped; a skill or class named that does not exist.
 - **Kept current:** updated with each new standing rule of its stream (DEC-944 item 3).
 
+### DEC-950: the hidden-set refusal in every tree
+
+#### W2-84 The guard refuses an evaluation set's hidden part under every tree: the main tree, every worktree and the run clones (FULL, engineer; DEC-950 item 1; memory's critical path; row W2-H063)
+- **Ticket file:** `DAEO-m1u3`.
+- **Why:** the hidden-part refusal (DEC-820 (d)) is rooted at the session's own tree. A measured session is refused its own tree's hidden file, but allowed the main tree's, another worktree's and a run clone's copies. The worktrees' shared object store is a route too. Once W2-61h's questions merge, W2-61's measure would lose its hidden half.
+- **Starts:** priority 3 (DEC-946), ahead of W2-61h, as soon as the gate allows. W2-61h waits until it is merged and pinned.
+- **Allowed paths:** `src/gov/guard/reads.py` (the hidden part, a tree lister and the git route only), new `tests/unit/guard/test_w2_84*` (W2-67 holds the glob), the CIT-E; acceptance tests in `tests/acceptance/W2-84/`.
+- **KPIs, success:**
+  - a measured session is refused the hidden part under every tree (the main tree, every worktree, the run clones), wherever it runs and by every route the guard judges today;
+  - matched by real path, so links are refused as their targets are;
+  - no git route shows it from another tree or the shared object store;
+  - fail closed when a tree cannot be listed or walked;
+  - nothing else changes, the hook's latency bound included.
+- **KPIs, failure:** a hidden file of any tree read, listed or searched by a measured session; an unlistable tree taken as empty; a git route left open; (a) to (c) weakened, or a refusal added for an unmeasured session; a test touching the real hidden folder or `~/gov-os-runs/`.
+- **Overlap:** W2-05's sweep may touch `reads.py`'s `_git` (a line overlap: the second to merge merges back).
+
+### DEC-951: W2-54's time limits to the nightly
+
+#### W2-85 W2-54's two time-limit cases routed to the nightly (LITE, independent-test-designer; DEC-951 item 3)
+- **Ticket file:** `DAEO-gdzh`.
+- **Why:** both passed at low load and failed in closes and verifications at loads of 30 to 100; closes run beside leads (DEC-942). Not onto `load_sensitive`, which only shrinks.
+- **Allowed paths:** `tests/acceptance/W2-54/**`, `tests/acceptance/serial-only.txt`.
+- **KPIs:** both routed with a `# nightly:` reason and `Rewrite-Reason: DEC-951 item 3`; expectations unchanged; the close leaves them out, the nightly runs them.
+
 ## 3. Order, layers and critical path
 
 A layer is the earliest a ticket can start once its dependencies have closed. Tickets in flight stay within the ceiling of 6, with no overlapping paths, and under the resource gate.
