@@ -32,6 +32,7 @@ kpis:
   - 'At most the three gaps that W2-15a named, from these: ranked-lexical tuning: field weights, tokenizer, and the exact-identifier boost'
   - 'At most the three gaps that W2-15a named, from these: chunking: span size, overlap and parent expansion, with a re-embed'
   - 'At most the three gaps that W2-15a named, from these: the hit@5 85 row on the dev queryset [W2-M341]: Each gets one round plus its probe; its effect is measured by W2-15b. What remains is a named residual.'
+  - 'If memory is below 85 % after two improvement rounds, the orchestrator escalates to the owner with the reasons; at the third the owner decides: a discovery and research ticket benchmarking market tools in a separate worktree, accepting the level reached, or another course. At 85 % or above but under the owner''s target of 95 %, with room for improvement found, memory is not closed: an escalation to the owner [DEC-954 Q9e, DEC-957]'
   failure:
   - An improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted.
 profile: STANDARD
@@ -40,6 +41,8 @@ sources:
 - CAP-19.a
 - CAP-19.c
 - DEC-725
+- DEC-954
+- DEC-957
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-32/

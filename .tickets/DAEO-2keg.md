@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-lrre, DAEO-yadm]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 2
+priority: 4
 assignee: engineer
 external-ref: W2-35
-tags: [wave-2, implementation, standard]
+tags: [wave-2, implementation, standard, wave-3, deferred]
 wbs_id: W2-35
 title: 'The UX readiness row: approved wireframes, visual checks'
 class: implementation
@@ -44,6 +44,8 @@ list_rows:
 - W2-M322
 ---
 # W2-35 The UX readiness row: approved wireframes, visual checks
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** CAP-30.g moved to Wave 3 (DEC-841).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-35), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

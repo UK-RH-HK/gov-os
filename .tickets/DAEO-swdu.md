@@ -1,7 +1,7 @@
 ---
 id: DAEO-swdu
 status: open
-deps: [DAEO-g0ip, DAEO-rd0g, DAEO-0pyc, DAEO-2ds6]
+deps: [DAEO-g0ip, DAEO-rd0g, DAEO-0pyc, DAEO-2ds6, DAEO-2bdu]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -18,6 +18,7 @@ depends_on:
 - DAEO-rd0g
 - DAEO-0pyc
 - DAEO-2ds6
+- DAEO-2bdu
 allowed_paths:
 - docs/research/EXP-003/**
 - experiments/EXP-003/**
@@ -32,6 +33,8 @@ kpis:
   - 'Batched, ranked, stacked retrieval: a question whose evidence exceeds one batch is answered in batches, ranked and stacked within the agent''s budget, never by one giant query or context; the
     measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner''s target of 99 % [DEC-860]'
   - 'Both figures in every report: hit@5 against CAP-10''s floor of 85, and the complete-stacked-evidence share against 99 % [DEC-833]'
+  - 'Memory is judged on the combined memory spec (semantic and lexical search, full indexing, full embeddings, the knowledge and code graph, the SQLite and vector-store structure); EXAMIN''s clone and ~/workspace are indexed with W2-88''s tools [DEC-954 Q9c, Q9f]'
+  - 'hit@5 is judged against the owner''s target of 95 %, CAP-10''s 85 the floor; at 85 or above with room for improvement found, memory is not closed: an escalation to the owner [DEC-957]'
   failure: []
 profile: FULL
 sources:
@@ -41,6 +44,8 @@ sources:
 - DEC-727
 - DEC-833
 - DEC-860
+- DEC-954
+- DEC-957
 est_loc: 60
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'

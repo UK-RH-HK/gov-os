@@ -1,6 +1,6 @@
 ---
 id: DAEO-av72
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-10-29T15:55:51Z
@@ -8,7 +8,7 @@ type: task
 priority: 2
 assignee: independent-test-designer
 external-ref: W2-79
-tags: [wave-2, tests, orchestration, tools, lite]
+tags: [wave-2, tests, orchestration, tools, lite, withdrawn]
 wbs_id: W2-79
 title: 'Acceptance tests for the orchestrator''s lead brief builder'
 class: test-design
@@ -50,6 +50,8 @@ track: C
 list_rows: []
 ---
 # W2-79 Acceptance tests for the orchestrator's lead brief builder
+
+**WITHDRAWN by the owner (DEC-953 item 10c, approved by DEC-954, 2026-10-30), unbuilt.** The brief builder changes with W2-11 and W2-60a. This ticket's KPI that every fixed brief gap stays fixed (brief-gaps.md's "Fixed by" column) passes to W2-11 (DAEO-k7hz). It ends by that decision, not by a 10-practice close.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-79), from package P-TOOLS-REVIEW-1 §4 (a) item 2, accepted by the owner (DEC-941; DEC-936 item 2.4).
 

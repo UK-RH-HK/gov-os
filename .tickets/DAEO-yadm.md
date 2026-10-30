@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 2
+priority: 4
 assignee: engineer
 external-ref: W2-34
-tags: [wave-2, implementation, standard]
+tags: [wave-2, implementation, standard, wave-3, deferred]
 wbs_id: W2-34
 title: gov readiness --generate
 class: implementation
@@ -71,6 +71,8 @@ list_rows:
 - W2-M305
 ---
 # W2-34 gov readiness --generate
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** CAP-30.c moved to Wave 3 (DEC-841).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-34), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

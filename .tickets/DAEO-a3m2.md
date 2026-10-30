@@ -5,10 +5,10 @@ deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 1
+priority: 4
 assignee: engineer
 external-ref: W2-09
-tags: [wave-2, implementation, full]
+tags: [wave-2, implementation, full, wave-3, deferred]
 wbs_id: W2-09
 title: SubagentHandback on the guard's list; the list checked against the CLI
 class: implementation
@@ -51,6 +51,8 @@ list_rows:
 - W2-M236
 ---
 # W2-09 SubagentHandback on the guard's list; the list checked against the CLI
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** The guard keeps only its four, then five, rules (DEC-953 item 2); DEC-946 already held it.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-09), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

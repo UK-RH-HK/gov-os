@@ -49,6 +49,7 @@ sources:
 - DEC-942
 - DEC-947
 - DEC-950
+- DEC-954
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-20/
@@ -63,6 +64,8 @@ list_rows:
 - W2-M262
 ---
 # W2-20 Machine-wide resource gate
+
+**DEC-954 Q12:** in Wave 2, built on the owner's measured rule for this machine (DEC-950). Machine-agnostic in Wave 3: a parking-list row (W3-P12).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-20), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

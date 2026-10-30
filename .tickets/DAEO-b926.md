@@ -1,7 +1,7 @@
 ---
 id: DAEO-b926
 status: open
-deps: [DAEO-g0ip, DAEO-csj8, DAEO-btt7, DAEO-swdu]
+deps: [DAEO-g0ip, DAEO-csj8, DAEO-btt7, DAEO-swdu, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -19,6 +19,7 @@ depends_on:
 - DAEO-csj8
 - DAEO-btt7
 - DAEO-swdu
+- DAEO-49o5
 allowed_paths:
 - docs/plan/wave-2/examin-real/**
 kpis:

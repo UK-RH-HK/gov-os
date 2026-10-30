@@ -46,6 +46,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
   - no installs without the owner.
 - DEC-083, DEC-040: the owner approves and makes every install, and it is recorded in the tool registry.
 - DEC-849: a refusal is taken, never routed round, and it is recorded.
+- DEC-958: every false refusal by the five-rule hook is recorded (time, form, rule, cost), counted in the daily document, and worked round only by an equivalent form. Three of one pattern, five in a week, or one that stops a lead or a close brings the owner a P1 package with a hook fix.
 - DEC-723: agents never write in, list or search `~/gov-os-workbench`. Writing work runs on clones under `~/gov-os-runs/<ticket>/`.
 
 ## The nightly

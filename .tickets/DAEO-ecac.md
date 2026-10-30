@@ -47,6 +47,8 @@ sources:
 - DEC-392
 - DEC-786
 - DEC-941
+- DEC-954
+- DEC-957
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/
@@ -55,6 +57,8 @@ track: A
 list_rows: []
 ---
 # W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents
+
+**DEC-954, DEC-957:** **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7).
 
 Card: the draft card `W2-60` (W2-60b part), from the accepted plan (`docs/plan/WAVE_2_REVISED_PLAN.md` §4.3 and the CAP-36.a lite row of §2; DEC-838 item 3); keystone 3. Filed with W2-60a under the re-plan the owner accepted on 2026-10-29 (DEC-941).
 
