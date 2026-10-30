@@ -1,7 +1,7 @@
 ---
 id: DAEO-k7hz
 status: open
-deps: [DAEO-g0ip, DAEO-cuao]
+deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - DAEO-g0ip
-- DAEO-cuao
 allowed_paths:
 - template/governance/kernel/templates/brief-*.md
 - template/governance/kernel/skills/orchestration/**
@@ -48,6 +47,7 @@ kpis:
     "at about <context limit> tokens" (DEC-838, DEC-837); no listing or search refusal over the governance folder or .claude/, the held-out list''s names readable (DEC-820); no fixed ceiling of
     tickets in flight (DEC-847); the owner''s decisions recorded by decision-record commits (DEC-861). W1-35''s cases that require the old sentences are revised by the test designer with Rewrite-Reason'
   - 'The test-design skill states the test kinds (unit, acceptance, live or harness, dev-tier, load-sensitive, repository-state), the run-time cost a test may take and how it is measured, that a test never copies the whole working tree where a minimal fixture will do, and that a test asserting the live repository''s own state is declared as such [DEC-889 item 11 c; lens H finding 10]'
+  - 'Every gap the orchestrator fixed in the common brief or the brief builder (governance/project/orchestration/brief-gaps.md, its "Fixed by" column) has a case that builds a brief today and shows the fix is still in it; taken from the withdrawn W2-79 (DEC-954, PLAN-W2-DEC953 §4.2) [DEC-943 item 1]'
   failure:
   - The skill validator refuses a brief without the twelve-field rule.
   - A template, skill or role file that still teaches LEAD_CHECKPOINT, a listing refusal or a fixed ceiling fails a test [DEC-866].
@@ -62,6 +62,9 @@ sources:
 - DEC-866
 - DEC-430
 - DEC-889
+- DEC-954
+- DEC-943
+- DEC-957
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-11/
@@ -83,6 +86,8 @@ list_rows:
 - W2-M356
 ---
 # W2-11 Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430
+
+**DEC-954 (2026-10-30):** W2-10 (Wave 3) dropped from the dependencies; it takes W2-79's KPI. **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7). A second edit follows if the roles work widens these KPIs.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-11), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
