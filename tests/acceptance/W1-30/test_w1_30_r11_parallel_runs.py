@@ -23,8 +23,8 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-para"
-WBS = "W1-para"
-OTHER_WBS = "W1-other"
+WBS = "W1-926"
+OTHER_WBS = "W1-923"
 ACCEPTANCE = f"tests/acceptance/{WBS}"
 OTHER = f"tests/acceptance/{OTHER_WBS}"
 UNIT = "tests/unit"

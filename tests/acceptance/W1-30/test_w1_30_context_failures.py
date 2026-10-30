@@ -41,7 +41,7 @@ import subprocess
 import w1_30_support as support
 
 TICKET = "PROJ-ctxf"
-WBS = "W1-ctxf"
+WBS = "W1-905"
 BASE = support.BASE_SOURCE
 SHA256 = re.compile(r"\b[0-9a-f]{64}\b")
 
@@ -98,9 +98,9 @@ def test_a_missing_mandatory_input_refuses_the_close(project, sandbox, interface
     told = tmp_path / "told"
     told.mkdir()
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=["DEC-gone"])
+    support.build_ticket(project, TICKET, WBS, sources=["DEC-9011"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-gone")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-9011")
 
 
 def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface, tmp_path):
@@ -108,45 +108,45 @@ def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface, 
     told = tmp_path / "told"
     told.mkdir()
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, depends_on=["W1-gone"])
+    support.build_ticket(project, TICKET, WBS, depends_on=["W1-910"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "W1-gone")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "W1-910")
 
 
 def test_a_superseded_source_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: the ticket's source is superseded; the error names it."""
     told = tmp_path / "told"
     told.mkdir()
-    _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
-               DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _decisions(project, DEC_9014=("SUPERSEDED", {"superseded_by": "DEC-9012"}),
+               DEC_9012=("ACTIVE", {"supersedes": ["DEC-9014"]}))
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
+    support.build_ticket(project, TICKET, WBS, sources=["DEC-9014"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-old")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-9014")
 
 
 def test_a_source_superseded_by_several_records_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: more than one record supersedes the ticket's source."""
     told = tmp_path / "told"
     told.mkdir()
-    _decisions(project, DEC_old=("SUPERSEDED", {}),
-               DEC_new1=("ACTIVE", {"supersedes": ["DEC-old"]}),
-               DEC_new2=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _decisions(project, DEC_9014=("SUPERSEDED", {}),
+               DEC_90122=("ACTIVE", {"supersedes": ["DEC-9014"]}),
+               DEC_90123=("ACTIVE", {"supersedes": ["DEC-9014"]}))
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
+    support.build_ticket(project, TICKET, WBS, sources=["DEC-9014"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-old")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-9014")
 
 
 def test_two_contradicting_sources_refuse_the_close(project, sandbox, interface, tmp_path):
     """CONTRADICTION: two active decisions among the ticket's sources, neither superseding the other."""
     told = tmp_path / "told"
     told.mkdir()
-    _decisions(project, DEC_other=("ACTIVE", {}))
+    _decisions(project, DEC_9016=("ACTIVE", {}))
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=[BASE, "DEC-other"])
+    support.build_ticket(project, TICKET, WBS, sources=[BASE, "DEC-9016"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "CONTRADICTION", BASE, "DEC-other")
+    _refused_for_the_context(project, sandbox, interface, told, "CONTRADICTION", BASE, "DEC-9016")
 
 
 def test_a_decision_checker_that_cannot_run_refuses_the_close(project, sandbox, interface, tmp_path):
@@ -248,11 +248,11 @@ def test_the_same_project_closes_once_it_has_a_record_store(project, sandbox, in
 
 def _failing_close_with_a_class_and_no_context(project, sandbox, interface, told=None):
     """With ``told`` the ticket also has a failing acceptance test that tells into that folder whenever it runs."""
-    _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
-               DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _decisions(project, DEC_9014=("SUPERSEDED", {"superseded_by": "DEC-9012"}),
+               DEC_9012=("ACTIVE", {"supersedes": ["DEC-9014"]}))
     if told is not None:
         _telling(project, told, body="assert False, 'planted failure'")
-    support.build_ticket(project, TICKET, WBS, failing=True, sources=["DEC-old"])
+    support.build_ticket(project, TICKET, WBS, failing=True, sources=["DEC-9014"])
     support.load_store(project, sandbox)
     assert support.context_error(project, sandbox, TICKET)["code"] == "BLOCKED"
     run = support.run_close(project, sandbox, TICKET, "--disposition", "repair", store=False)
@@ -270,8 +270,8 @@ def test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed(proj
     told.mkdir()
     run, error = _failing_close_with_a_class_and_no_context(project, sandbox, interface, told)
     text = support.error_text(error)
-    assert "context" in text.lower() and "DEC-old" in text, \
-        f"the answer does not say the context failed for DEC-old\n{run.describe()}"
+    assert "context" in text.lower() and "DEC-9014" in text, \
+        f"the answer does not say the context failed for DEC-9014\n{run.describe()}"
     _refused_at_once_for_the_context(run, error, told)
     support.assert_nothing_counted(project, TICKET, run)
     assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
@@ -283,6 +283,6 @@ def test_the_repair_ticket_of_a_failing_close_with_a_class_says_the_context_fail
     repairs = support.other_tickets(project.root, TICKET)
     assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
     text = repairs[0].read_text(encoding="utf-8")
-    assert "context" in text.lower() and "DEC-old" in text, \
-        f"the repair ticket does not say the context failed for DEC-old:\n{text}"
+    assert "context" in text.lower() and "DEC-9014" in text, \
+        f"the repair ticket does not say the context failed for DEC-9014:\n{text}"
     assert not SHA256.search(text), f"the repair ticket carries a hash although no context was built:\n{text}"

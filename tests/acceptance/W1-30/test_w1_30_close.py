@@ -31,7 +31,7 @@ cli_support = support.cli_support
 # --------------------------------------------------------------------------
 
 TICKET = "PROJ-aaaa"
-WBS = "W1-test"
+WBS = "W1-946"
 IMPL = support.IMPLEMENTER
 TRAILERS_GOOD = ("Task: PROJ-aaaa", "Role: engineer", "Implements: CAP-01")
 
@@ -291,21 +291,22 @@ def test_containment_blocks_close_for_out_of_scope_commit(project, sandbox, inte
 
 def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
     """KPI S1, CAP-38.c: Task: AB must not count as a commit of ticket A."""
-    ticket_a = "PROJ-a"
-    ticket_ab = "PROJ-ab"
-    wbs_a = "W1-tka"
-    wbs_ab = "W1-tkab"
+    # ids the ticket schema takes (DEC-954): a valid id is never another's prefix, so AB holds A inside it
+    ticket_a = "PROJ-tkaa"
+    ticket_ab = "XPROJ-tkaa"
+    wbs_a = "W1-947"
+    wbs_ab = "W1-9471"
     project.add_ticket(ticket_a, wbs_a)
     project.add_ticket(ticket_ab, wbs_ab)
     project.add_passing_test(wbs_a)
     project.add_passing_test(wbs_ab)
     project.write("src/example/feature_ab.py", "# feature for AB\n")
     project.commit("implement AB only", who=IMPL,
-                   trailers=("Task: PROJ-ab", "Role: engineer", "Implements: CAP-01"))
+                   trailers=("Task: XPROJ-tkaa", "Role: engineer", "Implements: CAP-01"))
     run = support.run_close(project, sandbox, ticket_a)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False, \
-        "a commit with Task: PROJ-ab must not match ticket PROJ-a (substring match bug)"
+        "a commit with Task: XPROJ-tkaa must not match ticket PROJ-tkaa (substring match bug)"
 
 
 # --------------------------------------------------------------------------
@@ -376,7 +377,7 @@ def test_regression_includes_other_acceptance_folders(project, sandbox, interfac
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    other_wbs = "W1-other"
+    other_wbs = "W1-923"
     support.write(project.root, f"tests/acceptance/{other_wbs}/test_other.py",
                   "def test_other():\n    assert False, 'other ticket fails'\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
@@ -564,7 +565,7 @@ def test_containment_refuses_ticket_changing_acceptance_tests(project, sandbox, 
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
-    project.write("tests/acceptance/W1-other/test_planted.py",
+    project.write("tests/acceptance/W1-923/test_planted.py",
                   "def test_planted():\n    assert True\n")
     project.commit("implement touching another ticket's acceptance tests", who=IMPL,
                    trailers=TRAILERS_GOOD, exact=True)

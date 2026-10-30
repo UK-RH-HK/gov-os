@@ -22,7 +22,7 @@ them has no finding, so the co-author lines are the only thing the case is about
 import w1_30_support as support
 
 TICKET = "PROJ-mdls"
-WBS = "W1-mdls"
+WBS = "W1-918"
 NOT_MEASURED = "not measured"
 DESIGNER = "independent-test-designer"
 ENGINEER = "engineer"

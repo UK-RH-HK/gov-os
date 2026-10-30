@@ -23,7 +23,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-rcpt"
-WBS = "W1-rcpt"
+WBS = "W1-935"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-rcpt", "Role: engineer", "Implements: CAP-01")
 
@@ -44,7 +44,7 @@ def _close_and_find_record(project, sandbox):
 
 
 def _green_project(project):
-    project.add_decision("DEC-test", "ACTIVE")
+    project.add_decision("DEC-9021", "ACTIVE")
     project.commit("a decision", who=support.OWNER)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
@@ -159,8 +159,8 @@ def test_close_refuses_when_context_cannot_be_built(project, sandbox, interface)
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    project.add_decision("DEC-cyc1", "ACTIVE", supersedes="DEC-cyc2")
-    project.add_decision("DEC-cyc2", "ACTIVE", supersedes="DEC-cyc1")
+    project.add_decision("DEC-9003", "ACTIVE", supersedes="DEC-9004")
+    project.add_decision("DEC-9004", "ACTIVE", supersedes="DEC-9003")
     project.commit("create contradiction for context failure", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
@@ -176,8 +176,8 @@ def test_no_fallback_hash_when_context_fails(project, sandbox, interface):
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    project.add_decision("DEC-cyc3", "ACTIVE", supersedes="DEC-cyc4")
-    project.add_decision("DEC-cyc4", "ACTIVE", supersedes="DEC-cyc3")
+    project.add_decision("DEC-9005", "ACTIVE", supersedes="DEC-9006")
+    project.add_decision("DEC-9006", "ACTIVE", supersedes="DEC-9005")
     project.commit("contradiction", who=support.OWNER)
     before = cli_support.snapshot(project.root)
     run = support.run_close(project, sandbox, TICKET)
@@ -321,11 +321,11 @@ def test_context_failure_non_cycle_refuses_close(project, sandbox, interface):
 
     The cause: the ticket sources a superseded decision (W1-24 README: BLOCKED).
     """
-    project.add_ticket(TICKET, WBS, sources=["DEC-base"])
+    project.add_ticket(TICKET, WBS, sources=["DEC-9001"])
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.add_decision("DEC-base", "ACTIVE", title="Base")
-    project.add_decision("DEC-new", "ACTIVE", title="Replacement", supersedes="DEC-base")
+    project.add_decision("DEC-9001", "ACTIVE", title="Base")
+    project.add_decision("DEC-9012", "ACTIVE", title="Replacement", supersedes="DEC-9001")
     project.commit("implement with superseded source", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
@@ -362,7 +362,7 @@ def test_tests_produced_lists_ticket_own_tests(project, sandbox, interface):
     support.write(project.root, "tests/unit/preexisting/test_other.py",
                   "def test_other():\n    assert True\n")
     project.commit("set up pre-existing tests", who=support.ORCHESTRATOR)
-    project.write("tests/acceptance/W1-rcpt/test_mine.py",
+    project.write("tests/acceptance/W1-935/test_mine.py",
                   "def test_mine():\n    assert True\n")
     project.commit("implement and add own test", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)

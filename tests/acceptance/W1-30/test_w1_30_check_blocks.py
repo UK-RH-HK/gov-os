@@ -16,7 +16,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-gvb1"
-WBS = "W1-checkblocks"
+WBS = "W1-902"
 
 NOTES = "governance/project/notes.yaml"
 

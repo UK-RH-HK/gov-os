@@ -12,7 +12,7 @@ pytest). This case takes pytest away and nothing else: ``support.interpreter_wit
 import w1_30_support as support
 
 TICKET = "PROJ-norn"
-WBS = "W1-norunner"
+WBS = "W1-921"
 
 
 def test_without_a_test_runner_nothing_is_closed(project, sandbox, interface, tmp_path):

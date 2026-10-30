@@ -29,8 +29,8 @@ CHECK = "product-traceability-trailers"
 BASE_KEY = "trailers_base"
 CITATIONS_BASE_KEY = "decision_citations_base"
 BASE_UNKNOWN = "TRAILERS_BASE_UNKNOWN"
-OLD, OLD_WBS = "PROJ-olda", "W1-olda"
-NEW, NEW_WBS = "PROJ-newa", "W1-newa"
+OLD, OLD_WBS = "PROJ-olda", "W1-922"
+NEW, NEW_WBS = "PROJ-newa", "W1-919"
 CAPABILITY = "CAP-01"
 GOOD = (f"Task: {NEW}", "Role: engineer", f"Implements: {CAPABILITY}")
 NO_IMPLEMENTS = (f"Task: {NEW}", "Role: engineer")
@@ -233,7 +233,7 @@ def test_a_closed_ticket_without_any_commit_stays_a_finding_with_a_base(project,
     commit of the history names. The old ticket, whose commits lie before the base, is no such finding."""
     _, base = _old_work(project)
     _closed_ticket(project, NEW, NEW_WBS, GOOD, "src/example/new.py")
-    project.add_ticket("PROJ-bare", "W1-bare")
+    project.add_ticket("PROJ-bare", "W1-901")
     path = project.root / support.ticket_path("PROJ-bare")
     path.write_text(path.read_text(encoding="utf-8").replace("status: in_progress", "status: closed"),
                     encoding="utf-8")
