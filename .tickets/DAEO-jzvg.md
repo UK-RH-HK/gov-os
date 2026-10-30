@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-r9ss, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 1
+priority: 4
 assignee: engineer
 external-ref: W2-19
-tags: [wave-2, implementation, full]
+tags: [wave-2, implementation, full, wave-3, deferred]
 wbs_id: W2-19
 title: Language-agnostic test commands
 class: implementation
@@ -75,6 +75,8 @@ list_rows:
 - W2-M253
 ---
 # W2-19 Language-agnostic test commands
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** EXAMIN's tests are pytest (W2-26's README, finding 1), so DEC-727's condition is not met.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-19), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

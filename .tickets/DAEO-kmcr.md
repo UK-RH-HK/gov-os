@@ -1,7 +1,7 @@
 ---
 id: DAEO-kmcr
 status: open
-deps: [DAEO-g0ip, DAEO-057v]
+deps: [DAEO-g0ip, DAEO-49o5]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -16,7 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - DAEO-g0ip
-- DAEO-057v
+- DAEO-49o5
 allowed_paths:
 - src/gov/adopt/**
 - src/gov/adapters/**
@@ -41,6 +41,7 @@ kpis:
 profile: FULL
 sources:
 - DEC-729
+- DEC-954
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-23/
@@ -90,6 +91,8 @@ list_rows:
 - W2-M319
 ---
 # W2-23 Adoption safety on a real repository
+
+**DEC-954:** depends on W2-16 (DAEO-49o5), not W2-18 (Wave 3). It shares src/gov/adopt/ with W2-52 and W2-88, split by file; whichever merges second merges back.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-23), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

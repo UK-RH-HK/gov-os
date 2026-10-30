@@ -15,5 +15,6 @@ Every new idea, the owner's or the orchestrator's, comes here unless it blocks E
 | W3-P08 | A containment rule that puts back a claim on a ticket that is not ready (W2-82's lighter form checks at claim and launch only) | the owner's review of W2-82 (DEC-944 item 2) | 2026-10-29 |
 | W3-P10 | W2-04's context packet scoped to a set of tickets or a stream (for W3-P09's stream orchestrators): `gov context` builds one ticket's packet under a 6k-token ceiling that never drops the ticket's own text, so a set or stream packet needs its own ceiling and query rules; not a small addition to W2-04 | the owner's W3-P09 check | 2026-10-29 |
 | W3-P11 | The same tree-rooting gap for a ticket's own acceptance tests and changed files (Policy 2 (a), (c)): `parts()` refuses them only in the session's own tree, so a copy in the main tree or another worktree is readable; low risk, since a ticket's tests reach the main tree only after it is built (found while drafting W2-84) | the W2-84 drafting helper | 2026-10-29 |
+| W3-P12 | W2-20 machine-agnostic: on any machine the Gov OS reads its resources (CPU, memory, disk, GPU) and plans the execution to that capacity | the owner (DEC-954 Q12) | 2026-10-30 |
 
 Not parked: the mutation-testing trial after W2-11 is already decided (DEC-941 item 6) and stays in Wave 2.

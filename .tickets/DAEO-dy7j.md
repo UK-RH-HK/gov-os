@@ -48,6 +48,8 @@ sources:
 - CAP-44.a
 - CAP-33.a
 - CAP-24.a
+- DEC-954
+- DEC-957
 est_loc: 350
 acceptance_tests:
   path: tests/acceptance/W2-83a/
@@ -56,6 +58,8 @@ track: B
 list_rows: []
 ---
 # W2-83a A playbook per stream: the form in the kernel template, its schema in gov check, and the adopt step
+
+**DEC-954, DEC-957:** **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-83a), from the owner's decision of 2026-10-29 (DEC-944 item 3, the split the owner set on review). In the minimum for EXAMIN's copy (K9's entry criteria); W2-83b, this project's nine playbooks, follows in spare capacity.
 

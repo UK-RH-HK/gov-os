@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-ym8a]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
-priority: 1
+priority: 4
 assignee: engineer
 external-ref: W2-12
-tags: [wave-2, implementation, full]
+tags: [wave-2, implementation, full, wave-3, deferred]
 wbs_id: W2-12
 title: Owner approval facts and gov approve
 class: implementation
@@ -84,6 +84,8 @@ list_rows:
 - W2-M258
 ---
 # W2-12 Owner approval facts and gov approve
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** K5, `gov approve` (DEC-941 item 3).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-12), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

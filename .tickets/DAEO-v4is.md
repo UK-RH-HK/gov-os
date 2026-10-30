@@ -1,14 +1,14 @@
 ---
 id: DAEO-v4is
-status: in_progress
+status: open
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
 type: task
-priority: 1
+priority: 4
 assignee: engineer
 external-ref: W2-78
-tags: [wave-2, close, records, standard]
+tags: [wave-2, close, records, standard, parked, wave-3]
 wbs_id: W2-78
 title: 'Governance edits stop widening closes: the path map''s lists in record files of their own; prompts and briefs record-only'
 class: implementation
@@ -51,6 +51,8 @@ track: A
 list_rows: []
 ---
 # W2-78 Governance edits stop widening closes: the path map's lists in record files of their own; prompts and briefs record-only
+
+**Parked by the owner (DEC-954 Q5; P-W2-78-PARK (a), 2026-10-30).** The branch w2/W2-78 and its worktree's commits are kept unmerged for Wave 3's hardening or for when the lifted gates come back. Nothing on w2/integrate changes. DEC-953 item 4a gets the effect: the selection leaves governance files out. Its discoveries are filed as Wave 2 list rows (W2-H064, W2-L453, W2-L454). For whoever resumes it: (1) src/gov/close/command.py:233-234 decides from the path map's own accepted_reds and load_sensitive keys whether runs report each test's result, so a move of the lists must move that reading too; (2) W1-01's support (w1_01_support.acceptance_exemptions) reads the path map itself; (3) W2-66's live case test_the_record_only_paths_are_dec_891_s_places_and_nothing_else enforces DEC-891's place list; (4) the merge needed about half a day of test revisions in 79 earlier-suite cases, two path-map ACTs, a re-pin and the outside readers' updates (P-W2-78-PARK §2).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-78), from package P-SCOPE-RECORDS-1 (a) (owner, DEC-941 item 5).
 

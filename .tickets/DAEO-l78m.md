@@ -29,6 +29,8 @@ kpis:
   - 'Mutation testing of the judge, as adoption''s own mutation check: a stand-in adoption output that handles every planted problem and flags no control is READY; for every planted problem in every repository, a stand-in that misses exactly that one is NOT_READY naming it (one killed mutant per planted problem, listed in the README); stand-ins that mishandle (the secret found but its value in a record; the misleading file moved, not proposed; the superseded plan deleted; the orphaned test deleted) and one that flags a control are NOT_READY; a scorer stand-in at 84 on hit@5, or one reporting a single figure, is NOT_READY [DEC-936 item 3.6, DEC-833]'
   - 'One command for the real run, not collected as a test: it builds the five repositories under a folder given by literal path (a temporary folder, or ~/gov-os-runs/W2-81/ by DEC-728), runs the built adoption stages and gov retrieve on each, or reads the outputs of an adoption a launched session ran there, and writes the report (per repository, per planted problem, the controls, both figures, the seed, the verdict) as JSON and markdown in that folder. It writes nothing in this repository; its first real run is the orchestrator''s, after blocks B and C [DEC-728, DEC-941]'
   - 'Hermetic and bounded: the suite''s cases use stand-ins and need no network, no model and no adoption that works; they write only in their temporary folders and remove them; they run under 120 s alone and under the close''s parallel load; none is skipped (the skip guard''s count is unchanged), and a missing tool (git, the secrets scanner) fails naming it. Nothing in the workbench is listed or read; GOV_DEV_TIERS is not used [DEC-898, DEC-899 item 7, DEC-906]'
+  - 'In each synthetic repository, a ticket closes with gov close at exit 0 on a pinned release (W2-16''s numbered, frozen release): the clean gov close of exit criterion 1; its real run is the orchestrator''s [DEC-953, DEC-954 Q8c]'
+  - 'The builders and the per-repository question sets serve W2-88''s proof of memory for any repository, read-only; the hidden half is W2-93''s [DEC-954 Q9f, DEC-957]'
   failure:
   - A planted problem judged FOUND_AND_HANDLED when the adoption missed or mishandled it, or a missing or unreadable record read as handled.
   - A READY verdict with a control flagged, a stage unmeasured, or a figure below its floor or reported alone.
@@ -47,6 +49,9 @@ sources:
 - DEC-911
 - DEC-728
 - DEC-899
+- DEC-953
+- DEC-954
+- DEC-957
 est_loc: 1200
 acceptance_tests:
   path: tests/acceptance/W2-81/
