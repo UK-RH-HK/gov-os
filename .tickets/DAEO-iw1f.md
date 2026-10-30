@@ -43,6 +43,7 @@ sources:
 - DEC-845
 - DEC-825
 - DEC-941
+- DEC-957
 est_loc: 180
 acceptance_tests:
   path: tests/acceptance/W2-61/
@@ -51,6 +52,8 @@ track: A
 list_rows: []
 ---
 # W2-61 The standing 20-question measure, split under Policy 2 (d)
+
+**DEC-957 (2026-10-30):** KPI 6 (EXAMIN's set, the same split) moves to W2-94 (DAEO-g87r), filed for MEMORY-SPEC-MAP gap 7; this ticket's close record names it as moved.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-61), from the accepted plan's §4.4, order 6 (DEC-828 item 4, DEC-831); ticket file at its start (DEC-825 item 7). Starts first in the memory chain, today, as its baseline (the re-plan the owner accepted on 2026-10-29, DEC-941).
 
