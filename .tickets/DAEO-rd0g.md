@@ -1,7 +1,7 @@
 ---
 id: DAEO-rd0g
 status: open
-deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-r9ss, DAEO-zqvn, DAEO-kl5e]
+deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-r9ss, DAEO-zqvn, DAEO-kl5e, DAEO-h2k3]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -20,13 +20,13 @@ depends_on:
 - DAEO-r9ss
 - DAEO-zqvn
 - DAEO-kl5e
+- DAEO-h2k3
 allowed_paths:
 - docs/research/EXP-003/**
 - experiments/EXP-003/**
 kpis:
   success:
-  - 'The metric is defined and recorded before the first run [AR-10]: what counts as a hit; how the needed evidence for each question is labelled (by whom, blind to the system''s answers); per-question
-    recall of needed evidence in the stacked context; the corpus mean, against the owner''s goal of 99 %'
+  - 'The metric is defined and recorded before the first run [AR-10]: what counts as a hit; how the needed evidence for each question is labelled (by whom, blind to the system''s answers); per-question recall of needed evidence in the stacked context; the corpus mean, against the owner''s goal of 99 % Answered by DEC-954 Q9 and DEC-957: the metric is W2-61''s measure, both figures, on the enlarged set of 48 questions (24 visible, 24 hidden), the hidden half used only once the five-rule hook and W2-84 refuse it from every worktree; hit@5 is judged against the owner''s target of 95 % with CAP-10''s 85 the floor, memory proven on the hidden half at least 21 of 24, judged on the combined memory spec (Q9c) [DEC-954 Q9, DEC-957]'
   - 'Corpora: the dev tiers; ~/workspace read-only; EXAMIN through this ticket''s own clone of the owner''s copy. W2-26''s clone sits under /tmp and may be gone.'
   - 'Five modes compared: lexical only (now ranked), semantic only, fused, fused plus reranker, and the lighter-reranker spike (DEC-074 Q3) [W2-L329].'
   - Indexing time, peak RSS and incremental update per corpus, against DEC-078's envelope [W2-L102, W2-L321].
@@ -39,6 +39,8 @@ profile: FULL
 sources:
 - DEC-074
 - DEC-078
+- DEC-954
+- DEC-957
 est_loc: 100
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its evidence record'
