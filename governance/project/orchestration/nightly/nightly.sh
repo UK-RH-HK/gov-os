@@ -85,10 +85,10 @@ else
   date '+%F %T nightly day: quiet' > "$OUT/run.txt"
 fi
 # DEC-898: free disk space and free inodes above the floor, or no run.
-# Below the floor is an emergency (DEC-938 item 6): at night it is pushed at once (DEC-939 item 7).
+# Below the floor is an emergency (DEC-938 item 6): it goes first in the 07:30 morning package, from the
+# orchestrator's own session (DEC-945: no push service).
 disk=$(bash "$HERE/disk_gate.sh" 2>&1) || {
   date "+%F %T nightly NOT STARTED: $disk" >> "$OUT/run.txt"
-  [ "$MODE" = night ] && "$HERE/push_emergency.sh" "Gov OS emergency: the disk is below its floor; the nightly did not start"
   exit 2
 }
 date '+%F %T nightly: lock set' > "$ORCH/NIGHTLY-RUNNING"

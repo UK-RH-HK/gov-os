@@ -26,12 +26,14 @@ kpis:
   - 'No placeholder is left: no {SLOT} anywhere in the built brief, the ticket''s own part included (today only the common part is checked), and none of the placeholders DEC-893''s scan refuses (its own list: the to-be-decided and to-do markers, a triple X, an unfilled time or date, three question marks), read from the scan rather than copied; the angle slots the common brief keeps for the lead''s own worker launches (<role>, <name>, <effort>) are not placeholders [DEC-893, DEC-941]'
   - 'A refusal leaves no partial output: no file is written at the output path, and a file already there is unchanged. A brief built from the committed common brief and an ordinary part passes every check above [DEC-868, DEC-941]'
   - 'Hermetic: the cases run the committed tool (governance/project/orchestration/tools/build_lead_brief.py) as a process, with its common brief and its guard decision given through the interface the README states (settable, defaulting to the committed brief and the pinned guard). They write only in their temporary folders, need no network, run under 30 s alone, and are never skipped. Red first: the cases of the checks the tool lacks today (the refused read, the guard-forms block, the part''s own slots, the empty value, the unresolved id) are red for their own reasons until the orchestrator''s change to the tool [DEC-906, DEC-899 item 7, DEC-941]'
+  - 'Each gap the orchestrator fixed in the common brief or the brief builder (governance/project/orchestration/brief-gaps.md, its "Fixed by" column) has a case that builds a brief today and shows the fix is still in it [DEC-943 item 1]'
   failure:
   - A brief written with a role or an unresolved id in IMPL, a slot unfilled or empty, or a placeholder left.
   - A brief written that directs a role to a read the guard refuses it, or that lacks the guard-forms block.
   - A refusal that leaves a partial or changed output file; a case that writes in this repository or is skipped.
 profile: LITE
 sources:
+- DEC-943
 - DEC-941
 - DEC-936
 - DEC-927

@@ -1,6 +1,6 @@
 ---
 id: DAEO-0uhh
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -16,7 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: [DAEO-zflj]
 allowed_paths:
-- template/governance/kernel/schemas/**
+- template/governance/kernel/schemas/close.schema.json
 - src/gov/check/schema.py
 - tests/unit/check/test_schema*
 kpis:

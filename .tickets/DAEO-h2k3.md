@@ -14,7 +14,7 @@ title: 'W2-61''s held-out half: 20 hidden memory questions with their gold sourc
 class: audit
 state_class: AUTHORITATIVE
 role: independent-auditor
-depends_on: []
+depends_on: [DAEO-m1u3]
 allowed_paths:
 - fixtures/evaluation/memory-retrieval/hidden/**
 kpis:

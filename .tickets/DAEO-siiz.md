@@ -18,6 +18,7 @@ depends_on:
 - DAEO-g0ip
 - DAEO-ha8z
 allowed_paths:
+- .claude/skills/adopt/SKILL.md
 - src/gov/adopt/lite_gates.py
 - src/gov/adopt/stages.py
 - template/governance/kernel/skills/adopt/**
