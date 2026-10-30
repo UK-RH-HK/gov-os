@@ -15,7 +15,11 @@ from scratch, once per test run, and every case below reads its log (the CLI's
   and no model-side memory path; the project's own agent and skill are there,
   so the lists were read;
 - KPI success 8: the record of the session is keyed by the id the session's
-  own log gives.
+  own log gives;
+- KPI success 2 and failure 1, round 2 (review 1, F1): the fixture project's
+  command file ``.claude/commands/w260a-live/probe.md`` shows in the start as
+  ``w260a-live:probe``, and every ``w260a-`` skill the start shows is in the
+  record.
 
 **Which home.** A session needs the caller's own sign-in, which lives in the
 real home and which no test may read or copy (DEC-820 (a)). So the session runs
@@ -55,6 +59,7 @@ pytestmark = pytest.mark.local_only
 ROLE_CODE = "larch-meridian-sixty"
 SKILL_CODE = "cobalt-tundra-sixty"
 PACK = s.Skill("w260a-live-pack", "w260a-live-pack", "1.0.0")
+LIVE_COMMAND = s.Command("w260a-live/probe.md", "1.0.0", title="W260A: Probe")
 PROMPT = ("Answer from your instructions only and use no tool. Your instructions give a role code word and a skill "
           "code word. Reply with exactly those two code words, separated by one space, and nothing else.")
 SESSION_TIMEOUT_S = 420.0
@@ -114,7 +119,8 @@ def _events(stdout):
 def session(tmp_path_factory):
     _prerequisites()
     sandbox = s.make_sandbox(tmp_path_factory.mktemp("w2-60a-live"))
-    project = s.make_project(sandbox, skills=(*s.SKILLS, PACK))
+    project = s.make_project(sandbox, skills=(*s.SKILLS, PACK),
+                             extra={f"{s.COMMANDS_REL}/{LIVE_COMMAND.rel}": LIVE_COMMAND.text()})
     role = s.role_text(s.ENGINEER, skills=(PACK.folder,))
     s.write(s.role_path(project, s.ENGINEER), role + f"\nWhen asked for your role code word, it is {ROLE_CODE}.\n")
     s.write(project / s.SKILLS_REL / PACK.folder / "SKILL.md",
@@ -201,3 +207,18 @@ def test_a_launched_session_starts_with_no_user_level_agent_or_skill(session):
 def test_a_launched_session_starts_with_no_model_side_memory(session):
     assert not session.init.get("memory_paths"), (
         f"the session's start shows model-side memory: {session.init.get('memory_paths')}")
+
+
+def test_every_project_skill_in_the_session_s_start_is_in_its_record(session):
+    """Round 2 (review 1, F1): the project's command file is a skill the session can load, and its record names it,
+    as does every other ``w260a-`` skill (the fixture's own) the start shows."""
+    loaded = set(_names(session.init.get("skills"))) | set(_names(session.init.get("slash_commands")))
+    assert LIVE_COMMAND.recorded_name in loaded, (
+        f"the session's start does not show the command file {LIVE_COMMAND.rel} as {LIVE_COMMAND.recorded_name}, "
+        f"so it cannot be judged: {sorted(loaded)}")
+    assert session.record is not None, f"no launch record\n{session.describe()}"
+    recorded = {entry.get("name"): entry for entry in session.record.get("skills") or [] if isinstance(entry, dict)}
+    unrecorded = sorted(name for name in loaded if name.startswith("w260a-") and name not in recorded)
+    assert not unrecorded, f"the session's start shows project skills its record does not name: {unrecorded}"
+    entry = recorded[LIVE_COMMAND.recorded_name]
+    assert (entry.get("version"), entry.get("named")) == ("1.0.0", False), f"the command's entry: {entry!r}"

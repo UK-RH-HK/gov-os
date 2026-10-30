@@ -31,7 +31,12 @@ The live file runs only when chosen: `-m local_only` (see "Live cases").
   repository's own role files carrying a default line (W2-11 writes them).
 - **A test home planted** (`plant_home`) with a connector in `~/.claude.json`, a user-level agent and skill, a
   model-side memory file, a user-level `CLAUDE.md` and rule, and a user settings file setting a model, an effort,
-  a subagent model and a compaction threshold; the project has a connector in `.mcp.json`.
+  a subagent model, a compaction threshold, an `env` variable, a hook, and `permissions` with `allow`, `ask` and
+  `deny` rules and a `defaultMode` (`user_settings`; round 2); the project has a connector in `.mcp.json`.
+- **Fixture command files** (round 2, `add_commands`), added by the cases that need them, not by `make_project`:
+  `.claude/commands/w260a-top.md` (version quoted, a front matter `name` of another form, as `opsx`'s files have),
+  `w260a-ns/unquoted.md` (version unquoted), `w260a-ns/unversioned.md` (none), `w260a-ns/plain.md` (no front matter)
+  and `w260a-ns/notes.txt` (not Markdown).
 - **A stand-in CLI** at `<test home>/.local/bin/claude` that starts no session: it records its arguments, its
   environment, its `--settings` value, the bytes of the `--append-system-prompt-file` it is handed (the file goes
   with the session's temp folder), and what the record folder held **when it started**.
@@ -47,13 +52,17 @@ The live file runs only when chosen: `-m local_only` (see "Live cases").
 | **S3** default model and effort applied and recorded; missing or malformed line refused; an effort after `--` is the launch's own | `test_w2_60a_model_and_effort.py`: the role's model and effort on the line once and recorded `role default`, per role; `--effort xhigh` / `--effort=xhigh` applied once and recorded `after --`; the role's own model after `--` passed once and recorded `after --`; refused: no default line; nine malformed lines (alias, not `claude-`, upper case, unknown effort, a third field, no space after the comma, text after the effort, indented, two lines) | no `--model`/`--effort` on the line; no record; the refusals do not refuse |
 | **S4** a model not the role's refused, naming both; the subagent model set and recorded | same file: five models not the role's (aliases, another model, `=` form, research given Opus) refused naming both; `--model`/`--effort` without a value, empty, twice, or an unknown effort refused; `CLAUDE_CODE_SUBAGENT_MODEL` in the settings' env is the session's model and recorded (engineer, research); the caller's own value does not reach the settings | today's launcher passes any model; the settings carry no subagent model |
 | **S5** no compaction threshold | `test_w2_60a_no_compaction_threshold.py` (8): no `--autocompact`, no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` and no `autoCompactWindow` in the settings, the record says `none`; `--autocompact` refused in both spellings; the variable in either repository settings file refused; **the caller's process environment** (green only once W2-56 has merged, see below); **`autoCompactWindow` in the repository's settings** (beyond the design, see below) | no record; the refusals do not refuse; the caller's variable reaches the session today |
-| **S6** no connectors, no user-level agents or skills, no model-side memory; a package for what has no switch | `test_w2_60a_kept_out.py` (5, stand-in, planted home): `--strict-mcp-config` once and no `--mcp-config`; `--setting-sources project,local`; `autoMemoryEnabled: false`; the record's `kept_out`; nothing of the test home in the appended text, the settings or the recorded skills; the model, effort and subagent model are the role's, not the user settings'. `test_w2_60a_documents.py::test_the_cit_e_states_the_shared_record_folder_and_names_the_packages` (P-W2-60a-1, P-W2-60a-2 named). Live: no connector, no `mcp__` tool, no user-level agent or skill, no memory path in a real session's start | the switches are not on the line or in the settings; no record |
+| **S6** no connectors, no user-level agents or skills, no model-side memory; a package for what has no switch | `test_w2_60a_kept_out.py` (5, stand-in, planted home): `--strict-mcp-config` once and no `--mcp-config`; `--setting-sources project,local`; `autoMemoryEnabled: false`; the record's `kept_out`; nothing of the test home in the appended text, the settings (but the user's ask and deny rules, round 2) or the recorded skills; the model, effort and subagent model are the role's, not the user settings'. `test_w2_60a_documents.py::test_the_cit_e_states_the_shared_record_folder_and_names_the_packages` (P-W2-60a-1, P-W2-60a-2 named). Live: no connector, no `mcp__` tool, no user-level agent or skill, no memory path in a real session's start | the switches are not on the line or in the settings; no record |
 | **S7** `--agent`, `--append-system-prompt` and its file form, `--session-id` refused after `--` | `test_w2_60a_refused_arguments.py` (16 + 1 + 1): each in its spaced and `=` form, and `--fork-session`, `--continue`, `-c`, `-pc`, `--resume` without a UUID or not a UUID, `-r<id>`, `-pr <id>`, each refused with `LAUNCH_REFUSED`, "the CLI arguments carry" and the argument's name; a prompt that names them as words launches; the session id is a new random UUID | today's launcher passes them |
 | **S8** one record per launch, keyed by the launcher's `--session-id`, written before the start, in one folder every worktree shares; an unwritable record refuses | `test_w2_60a_launch_record.py` (25): one record `<session id>.json`, there when the session started; every key and value of Behaviour 9; the ticket's class or null; two launches, two ids, two records; the CLI's version from its link's target, never by running it, else "not measured"; a worktree's record in the main checkout's folder, the folder denied by two literal `Edit` rules once each and not on the write list; the folder made when missing; refused: `launches` a file, a link, `.gov-runtime` a link, `launches` read-only; a CLI that cannot start leaves no record; a `.git` naming no directory refused; a tree with no `.git` is its own main checkout; nothing new on stdout or stderr. **Resume:** forks under a new id (three spellings) with a record of its own holding the original's role text and skills, the original's record untouched; refused with no record of the original, for another role or ticket, and for what a fresh launch refuses. Live: the record is keyed by the id the session's own log gives | no `--session-id`, no record, no folder, no deny rules; the refusals do not refuse |
 | **S9** the lead's research record | `test_w2_60a_documents.py::test_the_rules_probe_record_answers_its_three_questions`: the record exists and states the `paths:`-scoped `.claude/rules/` file, whether it loads, a token cost, and the worker's Edit, Write and Bash | green: the lead committed the record before these tests (KPI 9 is the lead's; one case is enough) |
 | **F1** no role text, an unrecorded skill, a model not the role's, a threshold, a user-level agent, skill or connector, model-side memory | S1, S2, S4, S5, S6 above | as above |
 | **F2** a role file without its default line that launches; a launch with no record; a record naming another session | S3's refusals; S8's record cases; S7's `--session-id`, `--continue` and `--resume` forms; every refusal in this suite also asserts that **no record was left** (`assert_refused`) | as above |
 | **F3** a refusal of today's that no longer refuses | `test_w2_60a_refused_arguments.py::test_every_refusal_the_launcher_makes_today_still_refuses` (26: DEC-313's bypass flags and modes and `--add-dir` in both spellings, `--settings`, `--bare`, `--setting-sources` (also the launcher's own value), DEC-233's sandbox key in both files, `disableAllHooks`, DEC-313's settings keys, the guard not wired, settings not JSON, DEC-218's malformed held-out list, DEC-242's research folder, the orchestrator and an unknown role, an unknown ticket, a ticket not in progress, another role's ticket, no CLI), each after a control launch in a tree whose role files are well formed; `test_today_s_checks_come_first_with_today_s_message` (5) in a tree with no role file (Behaviour 10's order) | green today: they must stay green |
+| **S2, F1** (round 2, F1) the project's command files are skills the session can load; the record names each | `test_w2_60a_command_skills.py` (12): every Markdown file under `.claude/commands/` recorded as `<name>` or `<namespace>:<name>` (never its front matter's `name`), with its path, its version as written or `no version` (quoted, unquoted, none, no front matter), its sha256 and `named: false`; a `.txt` there not recorded; the entry follows the file as it stands at the launch; the `.claude/skills/` entries unchanged beside them; commands with no `.claude/skills/` recorded; refused (after a control launch, naming the file or folder): a command file that is a link (top level, in a namespace), a namespace folder that is a link, a front matter that is not YAML. Green guards: no `.claude/commands/` or an empty one adds nothing; a command's name in a role's skills line refuses. Live: `test_every_project_skill_in_the_session_s_start_is_in_its_record` | the record holds no command entry; the refusals do not refuse |
+| **F3** (round 2, F2) no protection a launched worker has today is lost: the user's ask and deny rules | `test_w2_60a_user_permissions.py` (19): every `permissions.ask` and `permissions.deny` string of the test home's `~/.claude/settings.json` in the `--settings` value's `permissions.ask` / `permissions.deny`, per worker role, the launcher's own deny rules kept (those of a launch with no user file all still there); refused (after a control launch, with "settings"): the file unreadable, a folder, not JSON, not an object, `permissions` not a map, `ask` / `deny` not a list or holding a non-string. Green guards: no allow rule, `defaultMode`, `env`, model, `effortLevel` or hook of the file carried; an absent file, or one with no `permissions`, only `allow`, or empty lists, launches carrying no ask rule. **Revised:** `test_w2_60a_kept_out.py::test_nothing_of_the_test_home_but_the_user_s_ask_and_deny_rules_reaches_the_session_s_start` | the settings carry no ask rule and none of the user's deny rules; the refusals do not refuse |
+| **S5** (round 2) more spellings of a threshold | `test_w2_60a_no_compaction_threshold.py::test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused` (8): `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, `env.CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS`, `modelSettings.<the role's model>.autoCompactWindow` and `modelSettings.<another model>.autoCompactWindow`, each in `.claude/settings.json` and `.claude/settings.local.json`, refused with `LAUNCH_REFUSED`, "no launch sets a compaction threshold (DEC-838)" and the key's name. Green guard: a `modelSettings` entry without the key launches (2) | the refusals do not refuse |
+| **S4, S6, S7** (round 2) more arguments refused after `--` | `test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash` (6): `--fallback-model` spaced and `=`, `--chrome`, `--ide`, `--system-prompt-snapshot` spaced and `=`, each with `LAUNCH_REFUSED`, "the CLI arguments carry" and its name. Green guards: `--no-chrome` launches, passed unchanged; a prompt naming the four as words launches | today's launcher passes them |
 
 ### Counts
 
@@ -70,11 +79,54 @@ The live file runs only when chosen: `-m local_only` (see "Live cases").
 | **not live** | **152** | **117** | **35** |
 | `test_w2_60a_live_sessions.py` (`local_only`) | 5 | not run here | |
 
+Round 2's counts are in "Round 2 (review 1)" below.
+
 The red run (not live), at the base, in this worktree: `117 failed, 35 passed, 5 deselected`. The failures, by the
 first assertion each meets: 65 "gov launch did not refuse (exit code 0)"; 31 "the session's line carries
 --session-id 0 times" (so no record); 10 "0 --append-system-prompt-file values"; 7 "--model 0 times"; and one each
 for the subagent model, `autoMemoryEnabled`, `--strict-mcp-config`, the record folder at the start, its deny rule
 and the caller's `CLAUDE_CODE_AUTO_COMPACT_WINDOW`.
+
+## Round 2 (review 1)
+
+Review 1 of the implementation failed. Its findings were given to the test designer as described behaviours (DEC-136,
+DEC-802), with no reading of the implementation, the design note or the research record (DEC-820 (c)); the cases
+were written and shown red against the head `3b32a107` (W2-60a's own `src/`, DEC-732) on 2026-10-30:
+
+1. **F1, the command files** (KPI 2, failure 1 "an unrecorded skill"): the CLI loads every Markdown file under
+   `.claude/commands/` as a skill (`<name>`, `<namespace>:<name>`; this repository's six `opsx:` files). New file
+   `test_w2_60a_command_skills.py`; one live case in `test_w2_60a_live_sessions.py`.
+2. **F2, the user's permission rules** (failure 3): `--setting-sources project,local` drops `~/.claude/settings.json`
+   whole, and with it the owner's `ask` and `deny` rules a launched worker has today. New file
+   `test_w2_60a_user_permissions.py`; the planted home's user settings gain those rules (`w2_60a_support.user_settings`)
+   and the kept-out case is revised to allow exactly the two lists (`Rewrite-Reason:` review 1's F2, DEC-136).
+3. **More threshold spellings** (KPI 5): new cases in `test_w2_60a_no_compaction_threshold.py`.
+4. **More arguments after `--`** (KPI 4, 6, and the resumed session's prompt): new cases in
+   `test_w2_60a_refused_arguments.py`.
+
+Every refusal also asserts that no launch record is left (`assert_refused`). Refusals the brief gives no words for
+are held to `LAUNCH_REFUSED` and the file's name (command files) or "settings" (the user file), each after a control
+launch in the same tree or home, so that the fault is the only change.
+
+| File | Cases now | Added | Red at the head | Green (guards, must stay green) |
+|---|---|---|---|---|
+| `test_w2_60a_command_skills.py` (new) | 12 | 12 | 8 | 4 (no or an empty `.claude/commands/`; a command named in a skills line refuses, top level and namespaced) |
+| `test_w2_60a_user_permissions.py` (new) | 19 | 19 | 14 | 5 (nothing else carried; an absent file; no `permissions`, only `allow`, empty lists) |
+| `test_w2_60a_no_compaction_threshold.py` | 18 | 10 | 8 | 2 (a `modelSettings` entry without the key, both files) |
+| `test_w2_60a_refused_arguments.py` | 57 | 8 | 6 | 2 (`--no-chrome`; the prompt naming them) |
+| `test_w2_60a_kept_out.py` | 5 | 0 (1 revised) | 0 | 5 |
+| **not live** | **201** | **49** | **36** new | |
+| `test_w2_60a_live_sessions.py` (`local_only`) | 6 | 1 | not run here (the lead's) | |
+
+The run at the head, one file at a time (the nightly was running): `test_w2_60a_command_skills.py` 8 failed,
+4 passed; `test_w2_60a_user_permissions.py` 14 failed, 5 passed; `test_w2_60a_no_compaction_threshold.py` 9 failed
+(8 new, and the W2-56 case below), 9 passed; `test_w2_60a_refused_arguments.py` 6 failed, 51 passed;
+`test_w2_60a_kept_out.py` 5 passed; the other files as before (`role_text` 15, `skills` 13, `model_and_effort` 35,
+`launch_record` 25, `documents` 2 passed). So the head stands at 37 failed, 164 passed: 36 red for round 2 and the
+W2-56 case. The 36, by the first assertion each meets: 27 "gov launch did not refuse (exit code 0)" (4 command
+files, 9 user settings files, 8 threshold spellings, 6 arguments); 5 "the user settings' ask rules ... are not in the
+session's permissions.ask" (one per worker role); 4 "the record's skills are not ... the .claude/commands/ Markdown
+files" or "the command ... is not recorded" (the record holds no command entry).
 
 ## Beyond the design, and what waits on another ticket
 

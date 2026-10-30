@@ -15,6 +15,12 @@ resume spelled otherwise (``-r<id>``, a short-option word holding ``r``). Each
 message begins as today's: ``LAUNCH_REFUSED``, "the CLI arguments carry ...".
 ``--model``, ``--effort`` and ``--autocompact`` are in their own files.
 
+Round 2 (review 1, as behaviours, DEC-136): also refused, word by word, with
+``LAUNCH_REFUSED``, "the CLI arguments carry" and the argument's name:
+``--fallback-model <m>`` and ``--fallback-model=<m>`` (KPI 4), ``--chrome``
+and ``--ide`` (KPI 6), ``--system-prompt-snapshot <v>`` and
+``--system-prompt-snapshot=<v>``. ``--no-chrome`` is not refused.
+
 From the design (Behaviour 10): today's checks run first, in today's order and
 with today's messages; this ticket's run after them. So each refusal of today's
 is shown twice: in a tree whose role files are all well formed (the launch
@@ -76,6 +82,43 @@ def test_an_argument_the_launcher_sets_itself_is_refused_after_the_double_dash(l
 def test_a_prompt_that_names_them_as_words_is_launched(launch):
     prompt = ("Do not pass --agent, --append-system-prompt, --append-system-prompt-file, --session-id, "
               "--fork-session, --continue or --resume here.")
+    result = launch(s.ENGINEER, None, "-p", prompt)
+    s.assert_launched(result)
+    assert result.args[-2:] == ["-p", prompt], "the prompt did not reach the CLI unchanged"
+
+
+# --------------------------------------------------------------------------
+# Round 2 (review 1): more arguments refused after --
+# --------------------------------------------------------------------------
+
+# --fallback-model: turns could run on a model that is not the role's (KPI 4); --chrome and --ide attach connectors
+# (KPI 6); --system-prompt-snapshot: a resumed session's prompt must stay the one its record names.
+ROUND_2 = {
+    "fallback-model-spaced": (("--fallback-model", s.SONNET), "--fallback-model"),
+    "fallback-model-joined": ((f"--fallback-model={s.SONNET}",), "--fallback-model"),
+    "chrome": (("--chrome",), "--chrome"),
+    "ide": (("--ide",), "--ide"),
+    "system-prompt-snapshot-spaced": (("--system-prompt-snapshot", "w260a-snapshot"), "--system-prompt-snapshot"),
+    "system-prompt-snapshot-joined": (("--system-prompt-snapshot=w260a-snapshot",), "--system-prompt-snapshot"),
+}
+
+
+@pytest.mark.parametrize("case", sorted(ROUND_2))
+def test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash(launch, case):
+    passed, name = ROUND_2[case]
+    s.assert_refused(launch(s.ENGINEER, None, *passed, "-p", "Do the work."),
+                     "LAUNCH_REFUSED", "the CLI arguments carry", name)
+
+
+def test_no_chrome_is_not_refused(launch):
+    arguments = ("--no-chrome", "-p", "Do the work.")
+    result = launch(s.ENGINEER, None, *arguments)
+    s.assert_launched(result)
+    assert tuple(result.args[-len(arguments):]) == arguments, "the arguments after -- did not reach the CLI unchanged"
+
+
+def test_a_prompt_that_names_the_round_2_arguments_as_words_is_launched(launch):
+    prompt = "Do not pass --fallback-model, --chrome, --ide or --system-prompt-snapshot here."
     result = launch(s.ENGINEER, None, "-p", prompt)
     s.assert_launched(result)
     assert result.args[-2:] == ["-p", prompt], "the prompt did not reach the CLI unchanged"

@@ -22,6 +22,14 @@ Two cases go past the design's Behaviour 6 (README, "Beyond the design"):
   as a route that sets the window) is not in the design: KPI failure 1's "a
   compaction threshold" covers it, so it is written, and its red is the
   lead's to decide (package P-TD-W2-60a-1).
+
+Round 2 (review 1, as behaviours, DEC-136): more spellings of a threshold in
+``.claude/settings.json`` or ``.claude/settings.local.json`` refuse the launch
+with "no launch sets a compaction threshold (DEC-838)" in the message: an
+``env`` holding ``CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`` or
+``CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS``, and a
+``modelSettings.<any model>.autoCompactWindow``. A ``modelSettings`` entry
+without that key launches.
 """
 
 from __future__ import annotations
@@ -69,3 +77,43 @@ def test_an_auto_compact_window_key_in_the_repository_s_settings_is_refused(proj
     """Beyond the design's Behaviour 6 (P-TD-W2-60a-1): the settings key sets the window as the variable does."""
     s.rewrite_settings(project, lambda data: data.update({"autoCompactWindow": 300000}), rel)
     s.assert_refused(launch(s.ENGINEER), "autoCompactWindow")
+
+
+# --------------------------------------------------------------------------
+# Round 2 (review 1): more spellings of a threshold in the repository's settings
+# --------------------------------------------------------------------------
+
+THRESHOLD_MESSAGE = "no launch sets a compaction threshold (DEC-838)"
+
+
+def _variable(name, value):
+    return lambda data: data.setdefault("env", {}).update({name: value})
+
+
+def _model_window(model):
+    return lambda data: data.setdefault("modelSettings", {}).setdefault(model, {}).update(
+        {"autoCompactWindow": 300000})
+
+
+SPELLINGS = {
+    "pct-override": (_variable("CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "50"), "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE"),
+    "idle-compact-min-tokens": (_variable("CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS", "100000"),
+                                "CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS"),
+    "model-settings-the-role-s-model": (_model_window(s.OPUS), "autoCompactWindow"),
+    "model-settings-another-model": (_model_window(s.HAIKU), "autoCompactWindow"),
+}
+
+
+@pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+@pytest.mark.parametrize("spelling", sorted(SPELLINGS))
+def test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused(project, launch, spelling, rel):
+    change, name = SPELLINGS[spelling]
+    s.rewrite_settings(project, change, rel)
+    s.assert_refused(launch(s.ENGINEER), "LAUNCH_REFUSED", THRESHOLD_MESSAGE, name)
+
+
+@pytest.mark.parametrize("rel", (s.SETTINGS_REL, s.LOCAL_SETTINGS_REL), ids=("committed", "local"))
+def test_a_model_settings_entry_without_a_window_launches(project, launch, rel):
+    s.rewrite_settings(project, lambda data: data.setdefault("modelSettings", {}).update(
+        {s.OPUS: {"w260aOtherSetting": True}}), rel)
+    s.assert_launched(launch(s.ENGINEER))

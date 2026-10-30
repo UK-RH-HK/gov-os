@@ -273,6 +273,60 @@ def kernel_skill_text(folder, version):
             f"The kernel copy of {folder}, marker {KERNEL_WORD}.\n")
 
 
+COMMANDS_REL = ".claude/commands"
+
+
+@dataclass(frozen=True)
+class Command:
+    """A project command file, which the CLI loads as a skill (review 1, F1): ``.claude/commands/<name>.md`` as
+    ``<name>``, ``.claude/commands/<namespace>/<name>.md`` as ``<namespace>:<name>``."""
+    rel: str                   # the file's path under .claude/commands/
+    version: str | None        # as written in the front matter; None for none (the record says "no version")
+    version_yaml: str = ""     # how the version is written, when not ``"<version>"``
+    title: str | None = None   # a front matter ``name``, which is not the skill's name (``name: 'OPSX: Apply'``)
+    front_matter: bool = True
+
+    @property
+    def recorded_name(self):
+        return self.rel[:-len(".md")].replace("/", ":")
+
+    @property
+    def recorded_version(self):
+        return self.version if self.version is not None else "no version"
+
+    @property
+    def word(self):
+        return "zq60a-command-" + self.recorded_name.replace(":", "-")
+
+    def text(self):
+        body = [f"# {self.recorded_name}", "", f"This command's text carries the marker {self.word}.", ""]
+        if not self.front_matter:
+            return "\n".join(body)
+        head = ["---", f"description: The W2-60a fixture command {self.recorded_name}."]
+        if self.title is not None:
+            head.append(f"name: '{self.title}'")
+        if self.version is not None:
+            head.append(f"version: {self.version_yaml or json.dumps(self.version)}")
+        head += ["allowed-tools: Bash(true:*)", "---"]
+        return "\n".join(head + body)
+
+
+TOP_COMMAND = Command("w260a-top.md", "1.2.0", title="W260A: Top")
+UNQUOTED_COMMAND = Command("w260a-ns/unquoted.md", "2.3.4", version_yaml="2.3.4")
+UNVERSIONED_COMMAND = Command("w260a-ns/unversioned.md", None, title="W260A: Unversioned")
+PLAIN_COMMAND = Command("w260a-ns/plain.md", None, front_matter=False)
+COMMANDS = (TOP_COMMAND, UNQUOTED_COMMAND, UNVERSIONED_COMMAND, PLAIN_COMMAND)
+NOT_A_COMMAND = "w260a-ns/notes.txt"  # not Markdown: the CLI does not load it
+
+
+def add_commands(project, commands=COMMANDS):
+    """The fixture command files under ``.claude/commands/``, and one file there that is not Markdown."""
+    for command in commands:
+        write(Path(project) / COMMANDS_REL / command.rel, command.text())
+    write(Path(project) / COMMANDS_REL / NOT_A_COMMAND, "Not a command: zq60a-not-a-command.\n")
+    return Path(project) / COMMANDS_REL
+
+
 # --------------------------------------------------------------------------
 # The sandbox: home, temp folder and elsewhere, disjoint
 # --------------------------------------------------------------------------
@@ -308,10 +362,31 @@ USER_AGENT = "w260a-user-agent"
 USER_SKILL = "w260a-user-skill"
 USER_CONNECTOR = "w260a-user-connector"
 PROJECT_CONNECTOR = "w260a-project-connector"
+USER_SETTINGS_REL = ".claude/settings.json"  # under the home
+
+# The user settings' permission rules a launched worker keeps (review 1, F2): every ``ask`` and ``deny`` string
+# reaches the session's settings, and nothing else of the file does (no allow rule, mode, env, model, effort, hook).
+USER_ASK = ("Bash(rm:*)", f"Bash({USER_WORD}-owner-ping:*)")
+USER_DENY = (f"Bash({USER_WORD}-forbidden:*)", f"Read(//w260a/{USER_WORD}-denied/**)")
+USER_ALLOW = (f"Bash({USER_WORD}-allowed:*)",)
+USER_MODE = "acceptEdits"
+USER_VARIABLE = "W260A_USER_VARIABLE"
 
 
 def _sanitized(path):
     return re.sub(r"[^A-Za-z0-9]", "-", str(path))
+
+
+def user_settings():
+    """The planted user settings file: what a session must not take from it, and the two lists it must."""
+    return {
+        "model": HAIKU, "effortLevel": "low", "autoCompactWindow": 300000,
+        "env": {"CLAUDE_CODE_SUBAGENT_MODEL": HAIKU, "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "300000",
+                USER_VARIABLE: USER_WORD},
+        "permissions": {"allow": list(USER_ALLOW), "ask": list(USER_ASK), "deny": list(USER_DENY),
+                        "defaultMode": USER_MODE},
+        "hooks": {"PreToolUse": [{"matcher": "*", "hooks": [{"type": "command", "command": f"echo {USER_WORD}"}]}]},
+    }
 
 
 def plant_home(box):
@@ -319,10 +394,7 @@ def plant_home(box):
     claude = box.home / ".claude"
     write(box.home / ".claude.json", json.dumps({"mcpServers": {USER_CONNECTOR: {
         "type": "stdio", "command": "true", "args": [USER_WORD]}}}, indent=2) + "\n")
-    write(claude / "settings.json", json.dumps({
-        "model": HAIKU, "effortLevel": "low", "autoCompactWindow": 300000,
-        "env": {"CLAUDE_CODE_SUBAGENT_MODEL": HAIKU, "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "300000"},
-    }, indent=2) + "\n")
+    write(box.home / USER_SETTINGS_REL, json.dumps(user_settings(), indent=2) + "\n")
     write(claude / "agents" / f"{USER_AGENT}.md",
           f"---\nname: {USER_AGENT}\ndescription: a user-level agent {USER_WORD}\n---\n\n{USER_WORD}\n")
     write(claude / "skills" / USER_SKILL / "SKILL.md",
