@@ -1,0 +1,687 @@
+== 19:50:01 tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_not_unconditionally_exit_zero; lock holders: 4
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_recovery_rebuild_command_not_unconditionally_exit_zero __________
+
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0')
+
+    def test_recovery_rebuild_command_not_unconditionally_exit_zero(sandbox, tmp_path):
+        """The check command must not unconditionally exit 0 (CAP-38.b).
+    
+        A command that computes one digest and calls ``exit(0)`` without
+        comparing two values is a fail-open: it cannot detect a mismatch
+        between the current store and a clean rebuild.  Run on the same
+        project, it exits 0 on the clean store and non-zero once it is
+        tampered with.
+        """
+>       project = _rebuilt_project(tmp_path, sandbox)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:84: in _rebuilt_project
+    w2_67b_support.rebuild(project, sandbox)
+tests/acceptance/W1-27/w2_67b_support.py:54: in rebuild
+    run = gov(project, sandbox, "rebuild", "--json")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-27/w2_67b_support.py:49: in gov
+    return support.run_gov_with_code(support.REPO_ROOT, project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/home/usain/gov-os-worktrees/W2-76')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-27/test_recovery_rebuild_command_0/sandbox/home', 'LC_ALL': 'C....local/bin:/home/usain/.local/bin:/home/usain/.local/bin', 'PYTHONPATH': '/home/usain/gov-os-worktrees/W2-76/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``: W1-07's
+        ``run_gov_with_code`` (the same launcher, the same environment, the same ``Run``), with this suite's
+        wait."""
+        launcher = base.write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+E           AssertionError: gov rebuild --json did not end within 180 s
+
+tests/acceptance/W1-27/w1_27_support.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_not_unconditionally_exit_zero
+1 failed in 180.21s (0:03:00)
+exit 1
+== 19:53:08 tests/acceptance/W1-07/test_w1_07_config.py::test_a_missing_path_map_is_not_an_error[rebuild]; lock holders: 4
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_a_missing_path_map_is_not_an_error[rebuild] _______________
+
+gov = <function gov.<locals>._gov at 0x7263d933f420>
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/repo')
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+args = ('rebuild',)
+
+    @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)
+    def test_a_missing_path_map_is_not_an_error(gov, project, interface, args):
+        _remove_path_map(project)
+>       run = gov(*args, "--json")
+              ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-07/test_w1_07_config.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-07/conftest.py:70: in _gov
+    return support.run_gov(project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:436: in run_gov
+    return run_gov_with_code(code_root, project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/repo')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/sandbox/home', 'LC_ALL': 'C...l/bin', 'PYTHONPATH': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-28/test_a_missing_path_map_is_not0/repo/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``."""
+        launcher = write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired as exc:
+            # Row W2-L409: what the command printed before the wait ended is kept, so its cause shows.
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s; "
+                                 f"what it printed before then:\n{output_excerpt(exc.stdout, exc.stderr)}") from None
+E           AssertionError: gov rebuild --json did not end within 180 s; what it printed before then:
+E           stdout (trimmed):
+E           (nothing)
+E           stderr (trimmed):
+E           rebuild: waiting for the rebuild lock /tmp/gov-os-rebuild.lock, held by pid 4175451 (flock /tmp/gov-os-rebuild.lock /usr/bin/python3 -m gov.cli.main rebuild --json)
+
+tests/acceptance/W1-07/w1_07_support.py:456: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_config.py::test_a_missing_path_map_is_not_an_error[rebuild]
+1 failed in 182.82s (0:03:02)
+exit 1
+== 19:56:12 tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_exits_nonzero_on_tampered_store; lock holders: 4
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_recovery_rebuild_command_exits_nonzero_on_tampered_store _________
+
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0')
+
+    def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(sandbox, tmp_path):
+        """After tampering with store.db, the check must exit non-zero.
+    
+        A correct implementation deletes derived state (in a throwaway copy),
+        rebuilds, and compares digests.  A tampered store has a different
+        digest from a clean rebuild.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+        """
+>       project = _rebuilt_project(tmp_path, sandbox)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:84: in _rebuilt_project
+    w2_67b_support.rebuild(project, sandbox)
+tests/acceptance/W1-27/w2_67b_support.py:54: in rebuild
+    run = gov(project, sandbox, "rebuild", "--json")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-27/w2_67b_support.py:49: in gov
+    return support.run_gov_with_code(support.REPO_ROOT, project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/home/usain/gov-os-worktrees/W2-76')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-29/test_recovery_rebuild_command_0/sandbox/home', 'LC_ALL': 'C....local/bin:/home/usain/.local/bin:/home/usain/.local/bin', 'PYTHONPATH': '/home/usain/gov-os-worktrees/W2-76/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``: W1-07's
+        ``run_gov_with_code`` (the same launcher, the same environment, the same ``Run``), with this suite's
+        wait."""
+        launcher = base.write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+E           AssertionError: gov rebuild --json did not end within 180 s
+
+tests/acceptance/W1-27/w1_27_support.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py::test_recovery_rebuild_command_exits_nonzero_on_tampered_store
+1 failed in 180.36s (0:03:00)
+exit 1
+== 19:59:14 tests/acceptance/W1-07/test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths[rebuild]; lock holders: 4
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_no_command_writes_outside_its_act_paths[rebuild] _____________
+
+request = <FixtureRequest for <Function test_no_command_writes_outside_its_act_paths[rebuild]>>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+args = ('rebuild',)
+
+    @pytest.mark.parametrize("args", support.EVERY_INVOCATION + (("--help",),), ids=support.label)
+    def test_no_command_writes_outside_its_act_paths(request, sandbox, interface, args):
+        """Failure 1. No command built at W1-07 declares an act path, and a command not yet built does nothing."""
+        # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+        # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+        # case time out.
+        if args[0] in support.TREE_SENSITIVE_COMMANDS:
+            gov = request.getfixturevalue("small_gov")
+            project = request.getfixturevalue("small_project")
+        else:
+            gov = request.getfixturevalue("gov")
+            project = request.getfixturevalue("project")
+        before = _state(project, sandbox)
+>       run = gov(*args) if args == ("--help",) else gov(*args, "--json")
+                                                     ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-07/test_w1_07_read_act.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-07/conftest.py:88: in _gov
+    return support.run_gov_with_code(cli, small_project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/w1-07-live0/repo')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/small-repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/test_no_command_writes_outside0/sandbox/home', 'LC_ALL': 'C...in:/home/usain/.local/bin', 'PYTHONPATH': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-30/w1-07-live0/repo/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``."""
+        launcher = write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired as exc:
+            # Row W2-L409: what the command printed before the wait ended is kept, so its cause shows.
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s; "
+                                 f"what it printed before then:\n{output_excerpt(exc.stdout, exc.stderr)}") from None
+E           AssertionError: gov rebuild --json did not end within 180 s; what it printed before then:
+E           stdout (trimmed):
+E           (nothing)
+E           stderr (trimmed):
+E           rebuild: waiting for the rebuild lock /tmp/gov-os-rebuild.lock, held by pid 4175451 (flock /tmp/gov-os-rebuild.lock /usr/bin/python3 -m gov.cli.main rebuild --json)
+
+tests/acceptance/W1-07/w1_07_support.py:456: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths[rebuild]
+1 failed in 183.12s (0:03:03)
+exit 1
+== 20:02:18 tests/acceptance/W1-41/test_w1_41_migration.py::test_the_index_refresh_follows_the_moves; lock holders: 3
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ test_the_index_refresh_follows_the_moves ___________________
+
+adoption = Adoption(project=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/harbour')...th('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/sandbox/elsewhere/proposal.yaml'))
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/harbour')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/sandbox/elsewhere'))
+
+    def test_the_index_refresh_follows_the_moves(adoption, project, sandbox):
+        """"Moves precede gov rebuild": no index of the old layout is built on the way, and after the moves the index
+        is fresh at the new layout (measured by ``gov doctor`` in the temporary project)."""
+        adoption.through("A5", support.moves_proposal())
+        before = support.doctor_section(project, sandbox, "index_freshness")
+        assert before.get("index_status") != "fresh", \
+            f"an index was built before any move (index_status: {before.get('index_status')!r})"
+>       adoption.ok("A6")
+
+tests/acceptance/W1-41/test_w1_41_migration.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-41/w1_41_support.py:553: in ok
+    run = self.run(stage, *extra, without=without)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-41/w1_41_support.py:548: in run
+    return run_gov(self.project, self.sandbox, "adopt", "--lite", "--stage", stage, *extra, "--json",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/harbour')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/sandbox/elsewhere'))
+without = ()
+args = ('adopt', '--lite', '--stage', 'A6', '--json', '--session', ...)
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-31/test_the_index_refresh_follows0/sandbox/bin/gov')
+started = 1185704.451499818
+
+    def run_gov(project, sandbox, *args, without=()):
+        """``gov <args>`` with this worktree's code, in ``project`` (never this repository)."""
+        assert_own_project(project)
+        launcher = base.write_launcher(REPO_ROOT, sandbox)
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(project),
+                                  env=environment(sandbox, without), capture_output=True, text=True,
+                                  timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+E           AssertionError: gov adopt --lite --stage A6 --json --session adopter-001 did not end within 180 s
+
+tests/acceptance/W1-41/w1_41_support.py:445: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-41/test_w1_41_migration.py::test_the_index_refresh_follows_the_moves
+1 failed in 224.54s (0:03:44)
+exit 1
+== 20:06:04 tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_index_freshness; lock holders: 3
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_doctor_report_mentions_index_freshness __________________
+
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0')
+
+    def test_doctor_report_mentions_index_freshness(sandbox, tmp_path):
+        """The doctor result mentions index freshness: missing before a rebuild, fresh after it, stale after a change."""
+        project = support.make_rebuild_project(support.REPO_ROOT, tmp_path / "repo")
+        w2_67b_support.write_committed(project, "docs/kept.md", "a document that does not change\n")
+        w2_67b_support.write_committed(project, "docs/changed.md", "a document that changes\n")
+        before_run = w2_67_doctor.doctor(project, sandbox)
+        before = w2_67_doctor.section(before_run, "index_freshness")
+        assert before.get("index_status") != "fresh" and before.get("status") != "pass", (
+            f"doctor reports a fresh index before any index was built: {before}\n{before_run.describe()}"
+        )
+>       rebuild = support.run_gov_with_code(support.REPO_ROOT, project, sandbox, "rebuild", "--json")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-27/test_w1_27_doctor.py:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/home/usain/gov-os-worktrees/W2-76')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-32/test_doctor_report_mentions_in0/sandbox/home', 'LC_ALL': 'C....local/bin:/home/usain/.local/bin:/home/usain/.local/bin', 'PYTHONPATH': '/home/usain/gov-os-worktrees/W2-76/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``: W1-07's
+        ``run_gov_with_code`` (the same launcher, the same environment, the same ``Run``), with this suite's
+        wait."""
+        launcher = base.write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+E           AssertionError: gov rebuild --json did not end within 180 s
+
+tests/acceptance/W1-27/w1_27_support.py:92: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_index_freshness
+1 failed in 183.09s (0:03:03)
+exit 1
+== 20:09:08 tests/acceptance/W1-07/test_w1_07_config_details.py::test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[rebuild]; lock holders: 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[rebuild] ___
+
+request = <FixtureRequest for <Function test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[rebuild]>>
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+args = ('rebuild',)
+
+    @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)
+    def test_a_valid_path_map_is_not_reported_as_invalid_by_any_command(request, interface, args):
+        # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+        # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+        # case time out.
+        if args[0] in support.TREE_SENSITIVE_COMMANDS:
+            gov = request.getfixturevalue("small_gov")
+            project = request.getfixturevalue("small_project")
+        else:
+            gov = request.getfixturevalue("gov")
+            project = request.getfixturevalue("project")
+        _write_path_map(project, VALID_PATH_MAP)
+>       run = gov(*args, "--json")
+              ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-07/test_w1_07_config_details.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-07/conftest.py:88: in _gov
+    return support.run_gov_with_code(cli, small_project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/w1-07-live0/repo')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/test_a_valid_path_map_is_not_r0/small-repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/test_a_valid_path_map_is_not_r0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/test_a_valid_path_map_is_not_r0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/test_a_valid_path_map_is_not_r0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/test_a_valid_path_map_is_not_r0/sandbox/home', 'LC_ALL': 'C...in:/home/usain/.local/bin', 'PYTHONPATH': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-33/w1-07-live0/repo/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``."""
+        launcher = write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired as exc:
+            # Row W2-L409: what the command printed before the wait ended is kept, so its cause shows.
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s; "
+                                 f"what it printed before then:\n{output_excerpt(exc.stdout, exc.stderr)}") from None
+E           AssertionError: gov rebuild --json did not end within 180 s; what it printed before then:
+E           stdout (trimmed):
+E           (nothing)
+E           stderr (trimmed):
+E           rebuild: waiting for the rebuild lock /tmp/gov-os-rebuild.lock, held by pid 469302 (flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json)
+
+tests/acceptance/W1-07/w1_07_support.py:456: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_config_details.py::test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[rebuild]
+1 failed in 183.70s (0:03:03)
+exit 1
+== 20:12:14 tests/acceptance/W1-07/test_w1_07_registry.py::test_each_wave_1_operation_is_a_gov_command[rebuild]; lock holders: 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_each_wave_1_operation_is_a_gov_command[rebuild] _____________
+
+request = <FixtureRequest for <Function test_each_wave_1_operation_is_a_gov_command[rebuild]>>
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+name = 'rebuild'
+
+    @pytest.mark.parametrize("name", support.RESERVED_COMMANDS)
+    def test_each_wave_1_operation_is_a_gov_command(request, interface, name):
+        """The name is known: no usage error, and the envelope names the command."""
+        # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+        # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+        # case time out.
+        gov = request.getfixturevalue("small_gov" if name in support.TREE_SENSITIVE_COMMANDS else "gov")
+>       run = gov(*support.invocation(name), "--json")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-07/test_w1_07_registry.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-07/conftest.py:88: in _gov
+    return support.run_gov_with_code(cli, small_project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/w1-07-live0/repo')
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/test_each_wave_1_operation_is_0/small-repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/test_each_wave_1_operation_is_0/sandbox/home'...ewhere=PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/test_each_wave_1_operation_is_0/sandbox/elsewhere'))
+cwd = None, args = ('rebuild', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/test_each_wave_1_operation_is_0/sandbox/bin/gov')
+env = {'HOME': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/test_each_wave_1_operation_is_0/sandbox/home', 'LC_ALL': 'C...in:/home/usain/.local/bin', 'PYTHONPATH': '/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-34/w1-07-live0/repo/src', ...}
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``."""
+        launcher = write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired as exc:
+            # Row W2-L409: what the command printed before the wait ended is kept, so its cause shows.
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s; "
+                                 f"what it printed before then:\n{output_excerpt(exc.stdout, exc.stderr)}") from None
+E           AssertionError: gov rebuild --json did not end within 180 s; what it printed before then:
+E           stdout (trimmed):
+E           (nothing)
+E           stderr (trimmed):
+E           rebuild: waiting for the rebuild lock /tmp/gov-os-rebuild.lock, held by pid 469302 (flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json)
+
+tests/acceptance/W1-07/w1_07_support.py:456: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_registry.py::test_each_wave_1_operation_is_a_gov_command[rebuild]
+1 failed in 182.30s (0:03:02)
+exit 1
+== 20:15:18 tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_canaries; lock holders: 1
+.                                                                        [100%]
+1 passed in 176.43s (0:02:56)
+exit 0
+== 20:18:15 tests/acceptance/W1-41/test_w1_41_dev_tier.py; lock holders: 0
+..                                                                       [100%]
+2 passed in 98.97s (0:01:38)
+exit 0
+== 20:19:55 tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms; lock holders: 0
+FF.FF                                                                    [100%]
+=================================== FAILURES ===================================
+__ test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter] ___
+
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-35/test_decision_p95_is_under_1000/project')
+write = <function write.<locals>._write at 0x7264d1735800>
+name = 'engineer-allow-from-ticket-frontmatter'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 249.3, 164.5, 115.5; the bound is 100 ms
+E       assert 0.1154901769477874 < 0.1
+E        +  where 0.1154901769477874 = min([0.24932312709279358, 0.16445010411553085, 0.1154901769477874])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+_____ test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket] ______
+
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-35/test_decision_p95_is_under_1001/project')
+write = <function write.<locals>._write at 0x7264d1736980>
+name = 'engineer-deny-outside-the-ticket'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 295.1, 250.8, 250.2; the bound is 100 ms
+E       assert 0.2501765009947121 < 0.1
+E        +  where 0.2501765009947121 = min([0.29514149809256196, 0.250808103941381, 0.2501765009947121])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+_______________ test_decision_p95_is_under_100_ms[no-role-deny] ________________
+
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-35/test_decision_p95_is_under_1002/project')
+write = <function write.<locals>._write at 0x7264d1736340>
+name = 'no-role-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 127.3, 276.5, 278.3; the bound is 100 ms
+E       assert 0.12732953298836946 < 0.1
+E        +  where 0.12732953298836946 = min([0.12732953298836946, 0.2764635009225458, 0.2782818670384586])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+____________ test_decision_p95_is_under_100_ms[test-designer-allow] ____________
+
+project = PosixPath('/tmp/gov-os-lead-W2-76/pytest-of-usain/pytest-35/test_decision_p95_is_under_1003/project')
+write = <function write.<locals>._write at 0x7264d1737060>
+name = 'test-designer-allow'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 135.3, 190.5, 361.2; the bound is 100 ms
+E       assert 0.13531665410846472 < 0.1
+E        +  where 0.13531665410846472 = min([0.13531665410846472, 0.19049304095096886, 0.3612406011670828])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[test-designer-allow]
+4 failed, 1 passed in 64.72s (0:01:04)
+exit 1
+== 20:21:01 tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py::test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild; lock holders: 0
+.                                                                        [100%]
+1 passed in 56.93s
+exit 0
+== 20:22:01 tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store; lock holders: 0
+..                                                                       [100%]
+2 passed in 125.60s (0:02:05)
+exit 0

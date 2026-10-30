@@ -1,0 +1,53 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "governance/project/path-map.yaml",
+    "src/gov/retrieval/retrieve.py"
+   ]
+  }
+ ],
+ "base": "df0782fa4c4e77f7ababb1c1da392fab60838bcd",
+ "head": "060e03ef57eade8207b0fb42e1972185892e91ab",
+ "governance_left_out": [],
+ "changed": [
+  "governance/project/path-map.yaml",
+  "src/gov/retrieval/authority.py",
+  "src/gov/retrieval/retrieve.py",
+  "tests/acceptance/W2-87/README.md",
+  "tests/acceptance/W2-87/conftest.py",
+  "tests/acceptance/W2-87/test_w2_87_authority.py",
+  "tests/acceptance/W2-87/test_w2_87_register.py",
+  "tests/acceptance/W2-87/w2_87_support.py",
+  "tests/unit/retrieval/test_w2_87_authority.py",
+  "tests/unit/retrieval/test_w2_87_register.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-87/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-worktrees/W2-87/tests/acceptance/W2-87"
+ ],
+ "ignore": [
+  "tests/acceptance/W2-87/"
+ ],
+ "deselect": [],
+ "per_test_timeout": 900
+}

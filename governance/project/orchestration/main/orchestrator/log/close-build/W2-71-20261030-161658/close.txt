@@ -2,3 +2,9 @@
 2026-10-30 16:41:15 clone rebuilt in 1455 s
 2026-10-30 16:41:17 W2-71 selection: scoped []; 37 targets; governance left out 7
 2026-10-30 16:41:17 run scope scoped
+2026-10-30 19:05:26 parallel exit 1 in 7767 s {'exit': 1, 's': 7767, 'tests': 5091, 'failures': 1, 'errors': 0, 'skipped': 2}; serial exit 0 in 881 s {'exit': 0, 's': 881, 'entries': 37, 'tests': 71, 'failures': 0, 'errors': 0, 'skipped': 0}
+2026-10-30 19:14:44 passes alone (flaky candidate): tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+2026-10-30 19:14:45 tk close DAEO-e8f0: Updated DAEO-e8f0 -> closed
+2026-10-30 19:14:45 commit: 9f448448 W2-71 (DAEO-e8f0): closed on the 10 practices (DEC-953)
+2026-10-30 19:14:45 CLOSED W2-71
+2026-10-30 19:14:45 done; wall 10666 s

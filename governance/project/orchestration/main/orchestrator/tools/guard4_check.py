@@ -73,7 +73,13 @@ CASES = [
     ("rule3 read .env", "engineer", "Read", {"file_path": ROOT + "/.env"}, "deny"),
     ("rule3 cat ssh key", "orchestrator", "Bash", {"command": "cat ~/.ssh/id_ed25519"}, "deny"),
     ("rule4 engineer pip install", "engineer", "Bash", {"command": "pip install requests"}, "deny"),
-    ("rule4 orchestrator pip install", "orchestrator", "Bash", {"command": "pip install requests"}, "ask"),
+    ("rule4 CTO (orchestrator on W2-00) pip install", "orchestrator", "Bash", {"command": "pip install requests"},
+     "ask"),
+    ("rule4 lead (orchestrator on W2-87) pip install", "orchestrator@DAEO-s9qc", "Bash",
+     {"command": "pip install requests"}, "deny"),
+    ("rule4 lead (orchestrator on W2-64) npm install", "orchestrator@DAEO-0uhh", "Bash",
+     {"command": "npm install left-pad"}, "deny"),
+    ("rule4 CTO's engineer subagent pip install", "orchestrator", "Bash", {"command": "pip install requests"}, "deny"),
     ("rule4 sudo", "orchestrator", "Bash", {"command": "sudo ls"}, "deny"),
     ("lifted heredoc to tmp", "engineer", "Bash", {"command": "cat > /tmp/gov-guard4-x.txt <<EOF\nif a > 1:\nEOF"}, "allow"),
     ("lifted engineer writes src", "engineer", "Write", {"file_path": ROOT + "/src/gov/other.py", "content": "x"}, "allow"),
@@ -90,9 +96,12 @@ CASES = [
 
 ok = True
 for name, role, tool, tin, want in CASES:
-    event = {"tool_name": tool, "tool_input": tin, "cwd": ROOT, "session_id": "guard4-check",
-             "agent_type": "general-purpose" if "subagent" in name else None}
-    env = dict(os.environ, GOV_ROLE=role, GOV_TICKET="DAEO-sdxk", CLAUDE_PROJECT_DIR=ROOT)
+    agent = None
+    if "subagent" in name:
+        agent = "engineer" if "engineer subagent" in name else "general-purpose"
+    event = {"tool_name": tool, "tool_input": tin, "cwd": ROOT, "session_id": "guard4-check", "agent_type": agent}
+    role, _, ticket = role.partition("@")
+    env = dict(os.environ, GOV_ROLE=role, GOV_TICKET=ticket or "DAEO-sdxk", CLAUDE_PROJECT_DIR=ROOT)
     if LINE:  # the registered hook line itself, as Claude Code runs it, from a settings file
         env["CLAUDE_PROJECT_DIR"] = PROJECT
         p = subprocess.run(["sh", "-c", LINE], input=json.dumps(event), capture_output=True, text=True, env=env,

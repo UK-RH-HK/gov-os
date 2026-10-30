@@ -8,3 +8,6 @@ tests/acceptance/W1-07/test_w1_07_config_details.py::test_a_valid_path_map_is_no
 tests/acceptance/W1-07/test_w1_07_registry.py::test_each_wave_1_operation_is_a_gov_command[rebuild]
 tests/acceptance/W1-27/test_w1_27_doctor.py::test_doctor_report_mentions_canaries
 tests/acceptance/W1-41/test_w1_41_dev_tier.py
+tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms
+tests/acceptance/W2-69/test_w2_69_deleted_text_after_rebuild.py::test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store

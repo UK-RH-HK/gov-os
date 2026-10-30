@@ -4,3 +4,4 @@
 2026-10-30 06:41 slip: the morning package's commit was chained after record_checks.sh with ';' instead of '&&' (the rule: commits only after green checks, never chained after ';'); checked the result afterwards.
 2026-10-30 09:02 slip: the 07:30 morning package ping went at 09:02; my 07:30 and 07:45 background waits reached the session late (it was idle). The package itself was committed at 06:49 (05009374).
 2026-10-30 12:27 slip: wrote RULES-IN-FORCE.md (untracked) into the main tree while the close queue ran; caught before the next close's gate (d) and moved to scratch. Lesson: generated files go to scratch until the queue ends.
+2026-10-30 18:41 slip: pkill -f matched its own command (the checkpoint's Never list); the ACT 1 sweep stopped and was restarted outside the lock; nothing else affected

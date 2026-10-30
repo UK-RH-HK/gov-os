@@ -1,0 +1,55 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "src/gov/close/nightly.py"
+   ]
+  }
+ ],
+ "base": "1eae249cba33d4ca300c56e05cdad0fc70e75d83",
+ "head": "9f4484488ed5a977cd3377038991122f77072e9a",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-b6hm/CP-DAEO-b6hm-0003.md",
+  "docs/probes/DAEO-b6hm/PR-DAEO-b6hm.md"
+ ],
+ "changed": [
+  "src/gov/close/nightly.py",
+  "tests/acceptance/W2-77/README.md",
+  "tests/acceptance/W2-77/test_w2_77_batch.py",
+  "tests/acceptance/W2-77/test_w2_77_failed_removal.py",
+  "tests/acceptance/W2-77/test_w2_77_failure_line.py",
+  "tests/acceptance/W2-77/test_w2_77_hidden_worktree.py",
+  "tests/acceptance/W2-77/test_w2_77_own_clone_only.py",
+  "tests/acceptance/W2-77/test_w2_77_unchanged.py",
+  "tests/acceptance/W2-77/w2_77_support.py",
+  "tests/unit/close/test_nightly_cleanup.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-77/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26-20261030-191445/tests/acceptance/W2-77"
+ ],
+ "ignore": [
+  "tests/acceptance/W2-77/"
+ ],
+ "deselect": [],
+ "per_test_timeout": 900
+}

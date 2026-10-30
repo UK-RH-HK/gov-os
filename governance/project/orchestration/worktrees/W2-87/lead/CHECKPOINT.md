@@ -1,10 +1,24 @@
 # W2-87 lead checkpoint
 
-- **State:** run 1. Base `df0782fa4c4e`, clean. DEC-952 present in the register. Schema allows the top-level block (no top-level additionalProperties; loader refuses no unknown key).
+- **State:** run 1. Base `df0782fa4c4e`. DEC-952 present. Schema allows the top-level block.
 - **Measure gate:** `w2/integrate` holds W2-61's measure (`289b9314`): the re-measure runs in the lead's session.
-- **Design:** `.gov-runtime/scratch/lead/design.md` (part 1 register, part 2 authority). Reranker scale probed: logits about −10..+5 (rerank lift 1.0).
-- **Decided:** one test designer writes both parts in two commits; engineer batch 1 (register), then engineer batch 2 (authority), then a record batch. One head clone at the final commit, one store; launchers gov-base (df0782fa4c4e), gov-reg (batch-1 commit), gov-head (final): figures per step on the same store.
+- **Design:** `.gov-runtime/scratch/lead/design.md`. Reranker scale probed: logits about −10..+5 (rerank lift 1.0).
+- **Commits:** `57ff98b0bd30` TD part 1, `bc95da4d7382` TD part 2 (21 tests; red check by the lead: 16 failed, 5 passed as guards); `006ad0bb36ce` engineer batch 1 (register; authority.register_entries_of; trailers ok).
+- **Store:** worktree rebuild-0 digest `45228ca49eb2…` (exit 0).
+- **Clones:** `/home/usain/gov-os-runs/W2-87/base` at df0782fa4c4e (made). The guard refuses Write/mkdir under `~/gov-os-runs` for the orchestrator role: launchers go under `.gov-runtime/scratch/lead/bin/` instead (brief gap).
+- **Decided:** one head clone at the final commit, one store; launchers gov-base (df0782fa4c4e), gov-reg (006ad0bb36ce, clone `/home/usain/gov-os-runs/W2-87/register`), gov-head (final): figures per step on the same store.
 - **Reading of the drops:** a register chunk is never dropped for another entry's status (case R2); nothing newly dropped; per-entry leaving-out is W2-55's.
-- **Next:** rebuild-0 (this worktree's code, log/rebuild-0.json) → launch TD (briefs/td-1.md) with tripwire 1.
+- **Engineer batch 2:** `060e03ef57ea` (authority.Order, read_block; path map +15 lines, the one block; trailers ok; 7.5 min).
+- **Own check vs base (check_today.py):** block absent, register last entry current: 6 of 6 bundles identical base vs head; last entry superseded: head keeps the register entries the base dropped (the defect fix), 3 of 6 identical.
+- **Clones:** base df0782fa4c4e, register 006ad0bb36ce, head 060e03ef57ea, measure e814289d58c4 (w2/integrate; measure and visible set unchanged since base). Launchers in the session scratchpad `bin/` (gov-base, gov-reg, gov-head).
+- **Running:** head rebuild by the pinned gov (scratchpad head-rebuild.json/.exit), then worktree rebuild-1 (log/rebuild-1.*), both queued on the rebuild lock behind W2-85's.
+- **Head rebuild 1 (pinned gov):** exit 0, digest `522296ef1709…`; but the pinned gov (5c40122014da) writes `register_entries` without a `span` column, so W2-03's queries (base, batch 1 and head code alike) refuse with STORE_MISSING. **Deviation:** head rebuild 2 with the base's code (`gov-base rebuild --json`, store code identical at base, batch 1 and head), scratchpad head-rebuild-2.*; the three measures run on that store (measure_all.py).
+- **First verification (code 060e03ef57ea), parallel:** 17,089 passed, 3 failed, 3 errors in 1:17:31. Reds: W2-61 visible-half (q11 anchors the line `    fused = rrf(routes)`, which batch 2 rewrote: OURS); W2-66 lead_verification (DEC-919 known: our conftest); W2-54 green_here ×3 errors and time_limit ×1 (load timeouts, re-run alone). Serial phase stopped (superseded). gov check (060e03ef): retrieval regression GREEN (GOV_DEV_TIERS set); RED context reproducibility (600 s timeout under load), secrets indexing (crash under load; passes alone, exit 0), product traceability (DEC-891 accepted-history entry refused, DEC-891 superseded by DEC-953; not ours); YELLOW authority/role limits, openspec-validate.
+- **First control measure (060e03ef tree, base code):** 7/20 hit@5, 11/20 full, 13/20 in bundle (record ...20261030T204744666636Z.json; superseded by the final tree's).
+- **Fix (loop iteration 1, converged):** `cffef92c8534` (fresh engineer, sandboxed): the line kept, the lift on the next line; W2-61 visible + W2-87 + unit retrieval 118 passed.
+- **Now:** head clone at cffef92c8534; head-rebuild-3 (gov-base) then worktree rebuild-2, on the lock. Then: measures one per background call (`measure_all.py control`, then `register <rec>`, `head <rec>`), and verify.py parallel/serial/own; re-run W2-54 cases and context reproducibility alone.
+- **Selection:** select-1.json: scope full (SHARED_CORE: path-map.yaml, retrieve.py); options `--ignore=tests/acceptance/W2-87`; per_test_timeout 900.
+- **Next:** after rebuild-1: start verify.py (parallel, serial, own) in the background; after the head rebuild: three measures (base control, reg --compare, head --compare); then the record batch (engineer); select_tests again; gov check; collect-only; trailer_gate; return.
+- **Workers:** TD sandboxed, used gov retrieve once; eng1 sandboxed, 74 min, gov retrieve once (FACET_UNAVAILABLE: index stale), 4 refusals (git diff ×2, ls naming tests/acceptance, Monitor).
 - **Loop count:** 0.
-- **Brief gaps (running):** the brief's "leave the drops as they stand" vs case 5's second half (last entry superseded keeps the others) — needed a reading (est. 10 min).
+- **Brief gaps (running):** drops reading vs case 5 (10 min est.); guard refuses orchestrator writes under ~/gov-os-runs (git clone allowed) (10 min est.); guard refuses workers' scripts under .gov-runtime/scratch/lead/ (TD, est. 5 min); sandboxed workers cannot reach the embedder: W1-19 real-model and W1-21 dev-tier cases hang (eng1, ~30 min measured); worker's gov retrieve FACET_UNAVAILABLE after the TD's commits (store older than head) (est. 5 min); git diff refused for the engineer (acceptance-test refusal) (est. 5 min).

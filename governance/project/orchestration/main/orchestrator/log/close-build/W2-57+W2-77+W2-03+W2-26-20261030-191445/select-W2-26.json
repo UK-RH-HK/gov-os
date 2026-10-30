@@ -1,0 +1,58 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "UNPLACED",
+   "paths": [
+    "docs/research/EXP-003/examin/README.md",
+    "docs/research/EXP-003/examin/raw/clone.txt",
+    "docs/research/EXP-003/examin/raw/direct-calls.txt",
+    "docs/research/EXP-003/examin/raw/environment.txt",
+    "docs/research/EXP-003/examin/raw/gov-rebuild.txt",
+    "docs/research/EXP-003/examin/raw/governance-suite.txt",
+    "docs/research/EXP-003/examin/raw/languages.tsv",
+    "docs/research/EXP-003/examin/raw/product-suite-needs.txt",
+    "docs/research/EXP-003/examin/raw/rss-samples.txt",
+    "docs/research/EXP-003/examin/raw/size.txt",
+    "docs/research/EXP-003/examin/raw/test-runners.txt"
+   ]
+  }
+ ],
+ "base": "a8eaf26e84f556745071812c4d94beba8953975c",
+ "head": "9f4484488ed5a977cd3377038991122f77072e9a",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-2ds6/CP-DAEO-2ds6-0003.md",
+  "docs/checkpoints/DAEO-2ds6/CP-DAEO-2ds6-0005.md"
+ ],
+ "changed": [
+  "docs/research/EXP-003/examin/README.md",
+  "docs/research/EXP-003/examin/raw/clone.txt",
+  "docs/research/EXP-003/examin/raw/direct-calls.txt",
+  "docs/research/EXP-003/examin/raw/environment.txt",
+  "docs/research/EXP-003/examin/raw/gov-rebuild.txt",
+  "docs/research/EXP-003/examin/raw/governance-suite.txt",
+  "docs/research/EXP-003/examin/raw/languages.tsv",
+  "docs/research/EXP-003/examin/raw/product-suite-needs.txt",
+  "docs/research/EXP-003/examin/raw/rss-samples.txt",
+  "docs/research/EXP-003/examin/raw/size.txt",
+  "docs/research/EXP-003/examin/raw/test-runners.txt"
+ ],
+ "selected": [
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26-20261030-191445/tests/acceptance/W2-26"
+ ],
+ "ignore": [
+  "tests/acceptance/W2-26/"
+ ],
+ "deselect": [],
+ "per_test_timeout": 900
+}

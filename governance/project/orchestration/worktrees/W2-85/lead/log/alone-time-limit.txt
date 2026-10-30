@@ -1,0 +1,43 @@
+load at start 12.75, at end 13.07, 79 s
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-85/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds < limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+>       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (71.4 s)
+E         stdout:
+E         ERROR: DAEO-03dg: mandatory input 'DEC-929' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-2gc7: mandatory input 'DEC-884' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-av72: mandatory input 'DEC-929' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-c1uz: mandatory input 'DEC-884' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-e82f: mandatory input 'DEC-884' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-j8gn: mandatory input 'DEC-862' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-jzvg: mandatory input 'DEC-762' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-r30l: mandatory input 'DEC-947' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-r9ss: mandatory input 'DEC-868' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-rmbe: mandatory input 'DEC-868' is superseded and cannot satisfy a current requirement
+E         ERROR: DAEO-v4is: mandatory input 'DEC-929' is superseded and cannot satisfy a current requirement
+E         context-reproducibility: 0 ticket(s) failed, 11 error(s)
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x79d97e9f8a70>.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError
+1 failed in 71.50s (0:01:11)
+
+--- stderr

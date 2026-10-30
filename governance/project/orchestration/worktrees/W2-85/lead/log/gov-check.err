@@ -1,0 +1,17 @@
+  adapter/model portability: GREEN
+  audit reproducibility: GREEN
+  authority/role limits: YELLOW
+  command-contract consistency: GREEN
+  concurrency/claims: GREEN
+  context reproducibility: RED
+  fresh-agent reconstruction: GREEN
+  graph integrity: GREEN
+  index freshness: RED
+  mutation scope: GREEN
+  path-map compliance: GREEN
+  product traceability: RED
+  recovery/rebuild: RED
+  retrieval regression: GREEN
+  schema/invariants: GREEN
+  secrets indexing: GREEN
+  skill regression: GREEN

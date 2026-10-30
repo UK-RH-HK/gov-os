@@ -1,0 +1,804 @@
+{
+ "scope": "scoped",
+ "why_full": [],
+ "base": "403d70b396ffa48063c719f1b64513137ed48f38",
+ "head": "d113ff5ea0454b3990c6a1ff284312050585b3d8",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-gdzh/CP-DAEO-gdzh-0002.md"
+ ],
+ "changed": [
+  "tests/acceptance/W2-54/README.md",
+  "tests/acceptance/W2-54/test_w2_54_green_here.py",
+  "tests/acceptance/serial-only.txt"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-54/",
+   "why": [
+    {
+     "reason": "OWN"
+    },
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-ebmh",
+     "paths": [
+      "tests/acceptance/W2-54/README.md",
+      "tests/acceptance/W2-54/test_w2_54_green_here.py"
+     ]
+    },
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-gdzh",
+     "paths": [
+      "tests/acceptance/W2-54/README.md",
+      "tests/acceptance/W2-54/test_w2_54_green_here.py",
+      "tests/acceptance/serial-only.txt"
+     ]
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W2-54/README.md",
+      "tests/acceptance/W2-54/test_w2_54_green_here.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/unit",
+   "why": [
+    {
+     "reason": "UNIT"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-05/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-uzme",
+     "paths": [
+      "tests/acceptance/serial-only.txt"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "why": [
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "tests/acceptance/serial-only.txt"
+     ],
+     "coupling": "text read: W1-30's r11 reads the serial-only list (I2 \u00a74.1)"
+    },
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
+   "why": [
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "tests/acceptance/W2-54/test_w2_54_green_here.py"
+     ],
+     "coupling": "file scan: W1-28's held-out copy check reads every Python source under tests/acceptance/ and runs the copying fixtures it finds (I1 \u00a74.1, DEC-385, DEC-912 item 3)"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_envelope.py",
+   "why": [
+    {
+     "reason": "EVERY_CLOSE"
+    },
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_read_act.py",
+   "why": [
+    {
+     "reason": "EVERY_CLOSE"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_registry.py",
+   "why": [
+    {
+     "reason": "EVERY_CLOSE"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-06/test_w1_06_approvals.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-08/test_w1_08_path_map.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_path_compliance.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-54/test_w2_54_green_here.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-49/test_w1_49_threshold.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-48/",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_probe_records.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-42/",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-02/test_w2_02_green_here.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-08/test_w1_08_ticket.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-08/test_w1_08_probe.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-06/test_w1_06_install_approvals.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_config.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_config_details.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_r5.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_r6.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_r7.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-54",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-01/test_w1_01_bootstrap_record.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-01/test_w1_01_integration_merges.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-01/test_w1_01_settings_deny.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-02",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-03",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-04",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-06/test_w1_06_ccusage.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-06/test_w1_06_digests.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-06/test_w1_06_pins.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-06/test_w1_06_registry.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-06/test_w1_06_vendor.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-06/test_w1_06_vendor_digest.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-07/test_w1_07_check_declarations.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-07/test_w1_07_help.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_floor.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_frontmatter.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_id_grammar.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_lesson.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_schemas_exist.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-08/test_w1_08_templates.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-09",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-10/test_w1_10_determinism.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-10/test_w1_10_dev_tier.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-10/test_w1_10_edges.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-10/test_w1_10_load.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-10/test_w1_10_queries.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-11",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-12",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-13",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-14",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-15",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-16",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-17",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-18",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-19",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-20",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-21",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-22",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-23",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-24",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-25",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_audit_validator.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_authority.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_command.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_dec436.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_dec438.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_decisions.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_derived.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_gap_tickets.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_green_base.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_installed_kernel.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_not_applicable.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_openspec.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_planted_defects.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_policy.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_provenance.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_readiness.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_recorded_commands.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_registry.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_skill.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_skill_validator.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-26/test_w1_26_taxonomy.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_adoption.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_drift.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_held_out.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_isolation_r2.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_rebuild.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_rebuild_r2.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_rebuild_r3.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_rebuild_r4.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_rebuild_r5.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_recovery_check.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_schema.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w2_67_copies.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-27/test_w2_67_temp_folders.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_cancel.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_command.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_freeze.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_launch_product_spec.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_repeat.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_roles.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-28/test_w1_28_rollback.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-29",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_close.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_commit_models.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_containment_places.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_context_failures.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_disposition.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_iteration.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_probe.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r10_git.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_receipt.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_stale.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_test_runner.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_time_limit.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_traceability.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-30/test_w1_30_watchdog.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-31",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-32",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-33/test_w1_33_kernel_role_files.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-33/test_w1_33_roster.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-34",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-35",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-36",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-37",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-38",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-39",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-40",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-41",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-44",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-45",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-46",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-47",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-49/test_w1_49_live_session.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-49/test_w1_49_precompact.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-49/test_w1_49_registration.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-49/test_w1_49_sessionstart.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-49/test_w1_49_written_part.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W1-50",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-01",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-02/test_w2_02_code_under_test.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-02/test_w2_02_failure.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-02/test_w2_02_record_types.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-02/test_w2_02_unmeasured.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-02/test_w2_02_verdict_conditions.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-02/test_w2_02_wbs_grammar.py",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-03",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-07",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-50",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-53",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-57",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-58",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-59",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-61",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-62",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-65",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-66",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-68",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-69",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-71",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-72",
+  "--ignore=/home/usain/gov-os-worktrees/W2-85/tests/acceptance/W2-77",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_a_listed_owner_commit_is_not_an_offender",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_a_listed_owner_commit_is_not_an_offender",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_an_unlisted_owner_commit_stays_an_offender",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_an_unlisted_owner_commit_stays_an_offender",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_exact_listed_commit_is_exempt",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_only_the_exact_listed_commit_is_exempt",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_a_dependency_is_read_in_either_form_of_the_id",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_a_dependency_is_read_in_either_form_of_the_id",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_no_install_is_recorded_before_w1_05",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_no_install_is_recorded_before_w1_05",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_record_of_the_fixture_is_in_the_graph",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_every_record_of_the_fixture_is_in_the_graph",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_committed_later_is_in_the_graph_after_a_load",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_record_committed_later_is_in_the_graph_after_a_load",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_changed_status_is_in_the_graph_after_a_load",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_changed_status_is_in_the_graph_after_a_load",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_removed_from_git_leaves_the_graph",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_record_removed_from_git_leaves_the_graph",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_in_any_folder_is_in_the_graph",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_record_in_any_folder_is_in_the_graph",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_file_without_record_frontmatter_is_not_a_record",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_file_without_record_frontmatter_is_not_a_record",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_with_broken_frontmatter_is_reported_and_stops_no_other_record",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_record_with_broken_frontmatter_is_reported_and_stops_no_other_record",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_without_a_required_key_is_reported_by_its_path",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_record_without_a_required_key_is_reported_by_its_path",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_without_state_class_is_loaded",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_record_without_state_class_is_loaded",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_file_git_does_not_track_is_not_in_the_graph",
+  "--deselect=acceptance/W1-10/test_w1_10_completeness.py::test_a_file_git_does_not_track_is_not_in_the_graph",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_without_a_named_register_the_store_is_what_it_is_today",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_without_a_named_register_the_store_is_what_it_is_today",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_each_entry_of_the_named_register_is_a_decision_record",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_each_entry_of_the_named_register_is_a_decision_record",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_record_answers_the_filters_of_the_record_query",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_a_register_record_answers_the_filters_of_the_record_query",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_a_heading_that_is_no_entry_is_no_record",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_a_heading_that_is_no_entry_is_no_record",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_the_named_register_changes_the_digest_and_loads_to_the_same_digest_twice",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_the_named_register_changes_the_digest_and_loads_to_the_same_digest_twice",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_the_register_is_read_from_the_commit",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_the_register_is_read_from_the_commit",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_named_only_in_the_working_tree_is_not_loaded",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_a_register_named_only_in_the_working_tree_is_not_loaded",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_that_supersedes_decisions_gives_the_edge",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_an_entry_that_supersedes_decisions_gives_the_edge",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_a_partial_supersession_and_the_other_relations_give_no_edge",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_a_partial_supersession_and_the_other_relations_give_no_edge",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_with_no_readable_status_is_no_record_and_is_named",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_an_entry_with_no_readable_status_is_no_record_and_is_named",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_recorded_as_a_decision_file_and_as_an_entry_is_the_file_and_is_named",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_an_id_recorded_as_a_decision_file_and_as_an_entry_is_the_file_and_is_named",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_under_two_headings_of_the_register_is_no_record_and_is_named",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_an_id_under_two_headings_of_the_register_is_no_record_and_is_named",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_a_named_register_that_cannot_be_read_refuses_the_load",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_a_named_register_that_cannot_be_read_refuses_the_load",
+  "--deselect=tests/acceptance/W1-10/test_w1_10_register.py::test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves",
+  "--deselect=acceptance/W1-10/test_w1_10_register.py::test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves"
+ ],
+ "ignore": [
+  "tests/acceptance/W2-54/",
+  "tests/acceptance/W1-01/test_w1_01_bootstrap_record.py",
+  "tests/acceptance/W1-01/test_w1_01_integration_merges.py",
+  "tests/acceptance/W1-01/test_w1_01_settings_deny.py",
+  "tests/acceptance/W1-02/",
+  "tests/acceptance/W1-03/",
+  "tests/acceptance/W1-04/",
+  "tests/acceptance/W1-06/test_w1_06_ccusage.py",
+  "tests/acceptance/W1-06/test_w1_06_digests.py",
+  "tests/acceptance/W1-06/test_w1_06_pins.py",
+  "tests/acceptance/W1-06/test_w1_06_registry.py",
+  "tests/acceptance/W1-06/test_w1_06_vendor.py",
+  "tests/acceptance/W1-06/test_w1_06_vendor_digest.py",
+  "tests/acceptance/W1-07/test_w1_07_check_declarations.py",
+  "tests/acceptance/W1-07/test_w1_07_help.py",
+  "tests/acceptance/W1-07/test_w1_07_recorded_commands.py",
+  "tests/acceptance/W1-08/test_w1_08_floor.py",
+  "tests/acceptance/W1-08/test_w1_08_frontmatter.py",
+  "tests/acceptance/W1-08/test_w1_08_id_grammar.py",
+  "tests/acceptance/W1-08/test_w1_08_lesson.py",
+  "tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py",
+  "tests/acceptance/W1-08/test_w1_08_schemas_exist.py",
+  "tests/acceptance/W1-08/test_w1_08_templates.py",
+  "tests/acceptance/W1-09/",
+  "tests/acceptance/W1-10/test_w1_10_determinism.py",
+  "tests/acceptance/W1-10/test_w1_10_dev_tier.py",
+  "tests/acceptance/W1-10/test_w1_10_edges.py",
+  "tests/acceptance/W1-10/test_w1_10_load.py",
+  "tests/acceptance/W1-10/test_w1_10_queries.py",
+  "tests/acceptance/W1-11/",
+  "tests/acceptance/W1-12/",
+  "tests/acceptance/W1-13/",
+  "tests/acceptance/W1-14/",
+  "tests/acceptance/W1-15/",
+  "tests/acceptance/W1-16/",
+  "tests/acceptance/W1-17/",
+  "tests/acceptance/W1-18/",
+  "tests/acceptance/W1-19/",
+  "tests/acceptance/W1-20/",
+  "tests/acceptance/W1-21/",
+  "tests/acceptance/W1-22/",
+  "tests/acceptance/W1-23/",
+  "tests/acceptance/W1-24/",
+  "tests/acceptance/W1-25/",
+  "tests/acceptance/W1-26/test_w1_26_audit_validator.py",
+  "tests/acceptance/W1-26/test_w1_26_authority.py",
+  "tests/acceptance/W1-26/test_w1_26_command.py",
+  "tests/acceptance/W1-26/test_w1_26_dec436.py",
+  "tests/acceptance/W1-26/test_w1_26_dec438.py",
+  "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+  "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+  "tests/acceptance/W1-26/test_w1_26_decisions.py",
+  "tests/acceptance/W1-26/test_w1_26_derived.py",
+  "tests/acceptance/W1-26/test_w1_26_gap_tickets.py",
+  "tests/acceptance/W1-26/test_w1_26_green_base.py",
+  "tests/acceptance/W1-26/test_w1_26_installed_kernel.py",
+  "tests/acceptance/W1-26/test_w1_26_not_applicable.py",
+  "tests/acceptance/W1-26/test_w1_26_openspec.py",
+  "tests/acceptance/W1-26/test_w1_26_planted_defects.py",
+  "tests/acceptance/W1-26/test_w1_26_policy.py",
+  "tests/acceptance/W1-26/test_w1_26_provenance.py",
+  "tests/acceptance/W1-26/test_w1_26_readiness.py",
+  "tests/acceptance/W1-26/test_w1_26_recorded_commands.py",
+  "tests/acceptance/W1-26/test_w1_26_registry.py",
+  "tests/acceptance/W1-26/test_w1_26_skill.py",
+  "tests/acceptance/W1-26/test_w1_26_skill_checks_layouts.py",
+  "tests/acceptance/W1-26/test_w1_26_skill_validator.py",
+  "tests/acceptance/W1-26/test_w1_26_taxonomy.py",
+  "tests/acceptance/W1-27/test_w1_27_adoption.py",
+  "tests/acceptance/W1-27/test_w1_27_drift.py",
+  "tests/acceptance/W1-27/test_w1_27_held_out.py",
+  "tests/acceptance/W1-27/test_w1_27_isolation_r2.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild_r2.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild_r3.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild_r4.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild_r5.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
+  "tests/acceptance/W1-27/test_w1_27_recovery_check.py",
+  "tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py",
+  "tests/acceptance/W1-27/test_w1_27_schema.py",
+  "tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py",
+  "tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py",
+  "tests/acceptance/W1-27/test_w2_67_copies.py",
+  "tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py",
+  "tests/acceptance/W1-27/test_w2_67_temp_folders.py",
+  "tests/acceptance/W1-28/test_w1_28_cancel.py",
+  "tests/acceptance/W1-28/test_w1_28_command.py",
+  "tests/acceptance/W1-28/test_w1_28_freeze.py",
+  "tests/acceptance/W1-28/test_w1_28_launch_product_spec.py",
+  "tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py",
+  "tests/acceptance/W1-28/test_w1_28_repeat.py",
+  "tests/acceptance/W1-28/test_w1_28_roles.py",
+  "tests/acceptance/W1-28/test_w1_28_rollback.py",
+  "tests/acceptance/W1-29/",
+  "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+  "tests/acceptance/W1-30/test_w1_30_close.py",
+  "tests/acceptance/W1-30/test_w1_30_commit_models.py",
+  "tests/acceptance/W1-30/test_w1_30_containment_places.py",
+  "tests/acceptance/W1-30/test_w1_30_context_failures.py",
+  "tests/acceptance/W1-30/test_w1_30_disposition.py",
+  "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+  "tests/acceptance/W1-30/test_w1_30_iteration.py",
+  "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+  "tests/acceptance/W1-30/test_w1_30_probe.py",
+  "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_git.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
+  "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+  "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+  "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_command_success.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_depends_on_forms.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_enforces.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_own_sources.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_record_types.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_retrieval_limit.py",
+  "tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py",
+  "tests/acceptance/W1-30/test_w1_30_r16_human_gate.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+  "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+  "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+  "tests/acceptance/W1-30/test_w1_30_receipt.py",
+  "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+  "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+  "tests/acceptance/W1-30/test_w1_30_stale.py",
+  "tests/acceptance/W1-30/test_w1_30_test_runner.py",
+  "tests/acceptance/W1-30/test_w1_30_time_limit.py",
+  "tests/acceptance/W1-30/test_w1_30_traceability.py",
+  "tests/acceptance/W1-30/test_w1_30_watchdog.py",
+  "tests/acceptance/W1-31/",
+  "tests/acceptance/W1-32/",
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
+  "tests/acceptance/W1-33/test_w1_33_kernel_role_files.py",
+  "tests/acceptance/W1-33/test_w1_33_roster.py",
+  "tests/acceptance/W1-34/",
+  "tests/acceptance/W1-35/",
+  "tests/acceptance/W1-36/",
+  "tests/acceptance/W1-37/",
+  "tests/acceptance/W1-38/",
+  "tests/acceptance/W1-39/",
+  "tests/acceptance/W1-40/",
+  "tests/acceptance/W1-41/",
+  "tests/acceptance/W1-44/",
+  "tests/acceptance/W1-45/",
+  "tests/acceptance/W1-46/",
+  "tests/acceptance/W1-47/",
+  "tests/acceptance/W1-49/test_w1_49_live_session.py",
+  "tests/acceptance/W1-49/test_w1_49_precompact.py",
+  "tests/acceptance/W1-49/test_w1_49_registration.py",
+  "tests/acceptance/W1-49/test_w1_49_sessionstart.py",
+  "tests/acceptance/W1-49/test_w1_49_written_part.py",
+  "tests/acceptance/W1-50/",
+  "tests/acceptance/W2-01/",
+  "tests/acceptance/W2-02/test_w2_02_code_under_test.py",
+  "tests/acceptance/W2-02/test_w2_02_failure.py",
+  "tests/acceptance/W2-02/test_w2_02_record_types.py",
+  "tests/acceptance/W2-02/test_w2_02_unmeasured.py",
+  "tests/acceptance/W2-02/test_w2_02_verdict_conditions.py",
+  "tests/acceptance/W2-02/test_w2_02_wbs_grammar.py",
+  "tests/acceptance/W2-03/",
+  "tests/acceptance/W2-07/",
+  "tests/acceptance/W2-50/",
+  "tests/acceptance/W2-53/",
+  "tests/acceptance/W2-57/",
+  "tests/acceptance/W2-58/",
+  "tests/acceptance/W2-59/",
+  "tests/acceptance/W2-61/",
+  "tests/acceptance/W2-62/",
+  "tests/acceptance/W2-65/",
+  "tests/acceptance/W2-66/",
+  "tests/acceptance/W2-68/",
+  "tests/acceptance/W2-69/",
+  "tests/acceptance/W2-71/",
+  "tests/acceptance/W2-72/",
+  "tests/acceptance/W2-77/"
+ ],
+ "deselect": [
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_a_listed_owner_commit_is_not_an_offender",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_an_unlisted_owner_commit_stays_an_offender",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_exact_listed_commit_is_exempt",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_a_dependency_is_read_in_either_form_of_the_id",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_no_install_is_recorded_before_w1_05",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_record_of_the_fixture_is_in_the_graph",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_committed_later_is_in_the_graph_after_a_load",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_changed_status_is_in_the_graph_after_a_load",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_removed_from_git_leaves_the_graph",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_in_any_folder_is_in_the_graph",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_file_without_record_frontmatter_is_not_a_record",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_with_broken_frontmatter_is_reported_and_stops_no_other_record",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_without_a_required_key_is_reported_by_its_path",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_record_without_state_class_is_loaded",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_a_file_git_does_not_track_is_not_in_the_graph",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_without_a_named_register_the_store_is_what_it_is_today",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_each_entry_of_the_named_register_is_a_decision_record",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_record_answers_the_filters_of_the_record_query",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_a_heading_that_is_no_entry_is_no_record",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_the_named_register_changes_the_digest_and_loads_to_the_same_digest_twice",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_the_register_is_read_from_the_commit",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_named_only_in_the_working_tree_is_not_loaded",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_that_supersedes_decisions_gives_the_edge",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_a_partial_supersession_and_the_other_relations_give_no_edge",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_with_no_readable_status_is_no_record_and_is_named",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_recorded_as_a_decision_file_and_as_an_entry_is_the_file_and_is_named",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_under_two_headings_of_the_register_is_no_record_and_is_named",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_a_named_register_that_cannot_be_read_refuses_the_load",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves"
+ ],
+ "per_test_timeout": 900
+}

@@ -124,6 +124,14 @@ def main():
     clone.parent.mkdir(parents=True, exist_ok=True)
     if sh(["git", "clone", "-q", "--no-hardlinks", "--branch", "w2/integrate", str(ROOT), str(clone)]).returncode:
         stop(4, "clone failed")
+    # A pinned head (CLOSE-HEAD, one commit id): until the live-guard tests are revised after ACT 1, closes test on
+    # the head before ACT 1, which holds every merge they close (DEC-955); the merges are checked against it below.
+    pin = ORCH / "CLOSE-HEAD"
+    if pin.is_file():
+        want = pin.read_text().strip()
+        if sh(["git", "-C", str(clone), "checkout", "-q", want]).returncode:
+            stop(4, f"the pinned head {want[:12]} cannot be checked out")
+        note(f"head pinned by CLOSE-HEAD to {want[:12]}")
     head = git("rev-parse", "HEAD", cwd=clone)
     run["head"] = head[:12]
     for i in items:
@@ -169,7 +177,8 @@ def main():
     sys.path.insert(0, str(clone / "src"))
     from gov.close import select as gsel  # noqa: E402
     from gov.close.pytest_plugin.gov_close_serial_only import entries  # noqa: E402
-    serial = entries(clone)
+    from gov.close.serial import phase  # noqa: E402
+    serial = phase(clone, entries(clone))  # the nightly's entries are left to the nightly (W2-57's route)
     if scope != "full":
         serial = [e for e in serial if gsel.runs(e, s["ignore"], s["deselect"])]
     penv = dict(env, PYTHONPATH=f"{clone}/src:{clone}/src/gov/close/pytest_plugin",

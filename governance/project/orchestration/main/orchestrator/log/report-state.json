@@ -2,7 +2,6 @@
   "merged_not_closed": [
     "W2-57",
     "W2-67",
-    "W2-71",
     "W2-77",
     "W2-03",
     "W2-26"
@@ -18,10 +17,10 @@
     "W2-78",
     "W2-64"
   ],
-  "closes_next": "W2-71 scoped run testing since 18:04 (lock wait 73 min, rebuild 24 min); then one full batch W2-57, W2-77, W2-03, W2-26",
+  "closes_next": "W2-71 CLOSED 19:14 (scoped); batch W2-57, W2-77, W2-03, W2-26 running (full, on the head before ACT 1)",
   "examin": "gated by K9's entry criteria, not a date (DEC-954 Q1); estimate 2026-11-12, re-estimated weekly; memory at 40 % hit@5 / 60 % full evidence against 85 / 99",
-  "owner_action": "P1 ROLES-SPEC-1 - approve the roles and briefs spec (12 questions in its \u00a78); ACT-1-GUARD follows within the hour (its test sweep is running)",
-  "last_report": "2026-10-30 18:33:18",
+  "owner_action": "ACT ACT-1-GUARD - switch on the five-rule guard (packages/ACT-1-GUARD.md), with your named decision on the 235 live-wiring tests (a); P1 ROLES-SPEC-1 still open",
+  "last_report": "2026-10-30 19:32:33",
   "chain_spec": "chain-2026-10-30f.txt",
   "chain_log": "chain-2026-10-30f.log",
   "parked": [],

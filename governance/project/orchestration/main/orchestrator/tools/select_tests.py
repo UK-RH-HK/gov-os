@@ -76,6 +76,12 @@ def main():
     select.base = lambda root_: since
     scope = select.plan(root, a.wbs, ticket=a.ticket)
 
+    # The product's plan leaves the ticket's own acceptance suite out (gov close runs it in a phase of its own); one
+    # run at every level must include it, so it is not ignored here (W2-85's finding, 2026-10-30).
+    own = next((s["target"] for s in scope.get("selected", []) if any(w.get("reason") == "OWN" for w in s["why"])),
+               None)
+    keep = {own.rstrip("/")} if own else set()
+    scope["ignore"] = [rel for rel in scope.get("ignore", []) if rel.rstrip("/") not in keep]
     opts = [f"--ignore={root / rel}" for rel in scope.get("ignore", []) if rel != "tests"]
     for node in scope.get("deselect", []):
         opts.append(f"--deselect={node}")

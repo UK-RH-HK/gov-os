@@ -1,0 +1,90 @@
+{
+ "tickets": [
+  "W2-71"
+ ],
+ "started": "2026-10-30 16:16:58",
+ "head": "a4939b458d2d",
+ "rebuild_s": 1455,
+ "scope": "scoped",
+ "why_full": [],
+ "selected": [
+  "tests/acceptance/W2-71/",
+  "tests/unit",
+  "tests/acceptance/W1-15/",
+  "tests/acceptance/W2-50/",
+  "tests/acceptance/W1-16/",
+  "tests/acceptance/W2-69/",
+  "tests/acceptance/W1-26/",
+  "tests/acceptance/W1-40/",
+  "tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
+  "tests/acceptance/W1-07/test_w1_07_envelope.py",
+  "tests/acceptance/W1-07/test_w1_07_read_act.py",
+  "tests/acceptance/W1-07/test_w1_07_registry.py",
+  "tests/acceptance/W1-06/test_w1_06_approvals.py",
+  "tests/acceptance/W1-08/test_w1_08_path_map.py",
+  "tests/acceptance/W1-27/test_w1_27_path_compliance.py",
+  "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py",
+  "tests/acceptance/W2-54/test_w2_54_green_here.py",
+  "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+  "tests/acceptance/W1-49/test_w1_49_threshold.py",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths",
+  "tests/acceptance/W1-48/",
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py",
+  "tests/acceptance/W1-42/",
+  "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph",
+  "tests/acceptance/W2-02/test_w2_02_green_here.py",
+  "tests/acceptance/W1-08/test_w1_08_ticket.py",
+  "tests/acceptance/W1-08/test_w1_08_probe.py",
+  "tests/acceptance/W1-06/test_w1_06_install_approvals.py",
+  "tests/acceptance/W1-07/test_w1_07_config.py",
+  "tests/acceptance/W1-07/test_w1_07_config_details.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_r5.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_r6.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_r7.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py"
+ ],
+ "parallel": {
+  "exit": 1,
+  "s": 7767,
+  "tests": 5091,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 2
+ },
+ "serial": {
+  "exit": 0,
+  "s": 881,
+  "entries": 37,
+  "tests": 71,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0
+ },
+ "reds": [],
+ "flaky_candidates": [
+  "tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here"
+ ],
+ "tests_s": 8649,
+ "wall_s": 10666,
+ "verdict": "CLOSED (build-phase close, DEC-953)",
+ "items": [
+  {
+   "w2": "W2-71",
+   "ticket": "DAEO-e8f0",
+   "profile": "FULL",
+   "merge": "e9c40bb2a19d,cd2566415936",
+   "merges": [
+    "e9c40bb2a19d4194d5a2bf68b209708ce4b0c2ae",
+    "cd25664159362ffce7c180ea2c80b36c5df6adee"
+   ],
+   "review": [
+    "docs/probes/DAEO-e8f0/PR-DAEO-e8f0-review-2.md",
+    "docs/probes/DAEO-e8f0/PR-DAEO-e8f0.md"
+   ],
+   "gitleaks": "clean"
+  }
+ ]
+}

@@ -1421,3 +1421,176 @@
 {"t": "2026-10-30T18:35:18", "nproc": 20, "load": [18.87, 28.25, 32.91], "mem_total_kb": 24607384, "mem_available_kb": 16026164, "leads_kb": {"DAEO-s9qc": 2494996, "DAEO-tgk2": 286892}}
 {"t": "2026-10-30T18:36:25", "nproc": 20, "load": [24.39, 28.01, 32.53], "mem_total_kb": 24607384, "mem_available_kb": 15044952, "leads_kb": {"DAEO-s9qc": 2224108, "DAEO-tgk2": 287028, "DAEO-gdzh": 287492}}
 {"t": "2026-10-30T18:37:32", "nproc": 20, "load": [45.52, 33.19, 34.01], "mem_total_kb": 24607384, "mem_available_kb": 14721864, "leads_kb": {"DAEO-s9qc": 2225124, "DAEO-tgk2": 292728, "DAEO-gdzh": 1463868}}
+{"t": "2026-10-30T18:38:40", "nproc": 20, "load": [57.77, 38.93, 35.93], "mem_total_kb": 24607384, "mem_available_kb": 14872100, "leads_kb": {"DAEO-s9qc": 2225168, "DAEO-tgk2": 290216, "DAEO-gdzh": 1411504}}
+{"t": "2026-10-30T18:39:47", "nproc": 20, "load": [59.83, 42.82, 37.45], "mem_total_kb": 24607384, "mem_available_kb": 15997848, "leads_kb": {"DAEO-s9qc": 564640, "DAEO-tgk2": 290456, "DAEO-gdzh": 1462884}}
+{"t": "2026-10-30T18:40:54", "nproc": 20, "load": [57.56, 44.99, 38.52], "mem_total_kb": 24607384, "mem_available_kb": 17137496, "leads_kb": {"DAEO-s9qc": 561508, "DAEO-tgk2": 292640, "DAEO-gdzh": 456900}}
+{"t": "2026-10-30T18:42:01", "nproc": 20, "load": [39.28, 42.01, 37.89], "mem_total_kb": 24607384, "mem_available_kb": 16208652, "leads_kb": {"DAEO-s9qc": 271720, "DAEO-tgk2": 292680, "DAEO-gdzh": 466668}}
+{"t": "2026-10-30T18:43:05", "nproc": 20, "load": [33.66, 40.01, 37.47], "mem_total_kb": 24607384, "mem_available_kb": 14571032, "leads_kb": {"DAEO-s9qc": 595960, "DAEO-tgk2": 291952, "DAEO-gdzh": 436556}}
+{"t": "2026-10-30T18:44:12", "nproc": 20, "load": [34.98, 38.95, 37.25], "mem_total_kb": 24607384, "mem_available_kb": 14502372, "leads_kb": {"DAEO-s9qc": 1582208, "DAEO-tgk2": 292388, "DAEO-gdzh": 436372}}
+{"t": "2026-10-30T18:45:20", "nproc": 20, "load": [36.1, 38.64, 37.25], "mem_total_kb": 24607384, "mem_available_kb": 14572252, "leads_kb": {"DAEO-s9qc": 576768, "DAEO-tgk2": 292208, "DAEO-gdzh": 436732}}
+{"t": "2026-10-30T18:46:27", "nproc": 20, "load": [39.49, 39.16, 37.52], "mem_total_kb": 24607384, "mem_available_kb": 14367252, "leads_kb": {"DAEO-s9qc": 830028, "DAEO-tgk2": 292440, "DAEO-gdzh": 433592}}
+{"t": "2026-10-30T18:47:34", "nproc": 20, "load": [39.7, 39.43, 37.73], "mem_total_kb": 24607384, "mem_available_kb": 14641676, "leads_kb": {"DAEO-s9qc": 596592, "DAEO-tgk2": 293832, "DAEO-gdzh": 436312}}
+{"t": "2026-10-30T18:48:41", "nproc": 20, "load": [46.71, 41.06, 38.37], "mem_total_kb": 24607384, "mem_available_kb": 13697188, "leads_kb": {"DAEO-s9qc": 2871620, "DAEO-tgk2": 298492, "DAEO-gdzh": 450144}}
+{"t": "2026-10-30T18:49:49", "nproc": 20, "load": [55.01, 44.67, 39.79], "mem_total_kb": 24607384, "mem_available_kb": 14185528, "leads_kb": {"DAEO-s9qc": 1526460, "DAEO-tgk2": 298488, "DAEO-gdzh": 455644}}
+{"t": "2026-10-30T18:50:52", "nproc": 20, "load": [40.29, 42.44, 39.34], "mem_total_kb": 24607384, "mem_available_kb": 15484656, "leads_kb": {"DAEO-s9qc": 258076, "DAEO-tgk2": 298604, "DAEO-gdzh": 455224}}
+{"t": "2026-10-30T18:52:00", "nproc": 20, "load": [33.76, 40.09, 38.72], "mem_total_kb": 24607384, "mem_available_kb": 16277800, "leads_kb": {"DAEO-s9qc": 322332, "DAEO-tgk2": 298624, "DAEO-gdzh": 443480}}
+{"t": "2026-10-30T18:53:07", "nproc": 20, "load": [23.23, 36.03, 37.42], "mem_total_kb": 24607384, "mem_available_kb": 16602016, "leads_kb": {"DAEO-s9qc": 288144, "DAEO-tgk2": 298660, "DAEO-gdzh": 442768}}
+{"t": "2026-10-30T18:54:16", "nproc": 20, "load": [30.93, 35.86, 37.27], "mem_total_kb": 24607384, "mem_available_kb": 17140188, "leads_kb": {"DAEO-s9qc": 294700, "DAEO-tgk2": 301088, "DAEO-gdzh": 444952}}
+{"t": "2026-10-30T18:55:19", "nproc": 20, "load": [30.73, 34.77, 36.8], "mem_total_kb": 24607384, "mem_available_kb": 16290236, "leads_kb": {"DAEO-s9qc": 289932, "DAEO-tgk2": 298956, "DAEO-gdzh": 445192}}
+{"t": "2026-10-30T18:56:26", "nproc": 20, "load": [21.98, 31.84, 35.69], "mem_total_kb": 24607384, "mem_available_kb": 17295880, "leads_kb": {"DAEO-s9qc": 284200, "DAEO-tgk2": 299020, "DAEO-gdzh": 445188}}
+{"t": "2026-10-30T18:57:34", "nproc": 20, "load": [16.79, 28.52, 34.3], "mem_total_kb": 24607384, "mem_available_kb": 17200740, "leads_kb": {"DAEO-s9qc": 283628, "DAEO-tgk2": 287928, "DAEO-gdzh": 443868}}
+{"t": "2026-10-30T18:58:41", "nproc": 20, "load": [13.93, 25.62, 32.94], "mem_total_kb": 24607384, "mem_available_kb": 16264728, "leads_kb": {"DAEO-s9qc": 283348, "DAEO-tgk2": 292720, "DAEO-gdzh": 447640}}
+{"t": "2026-10-30T18:59:48", "nproc": 20, "load": [18.04, 24.48, 32.08], "mem_total_kb": 24607384, "mem_available_kb": 15402708, "leads_kb": {"DAEO-s9qc": 283868, "DAEO-tgk2": 292308, "DAEO-gdzh": 1470160}}
+{"t": "2026-10-30T19:00:55", "nproc": 20, "load": [31.6, 27.14, 32.52], "mem_total_kb": 24607384, "mem_available_kb": 15476532, "leads_kb": {"DAEO-s9qc": 283656, "DAEO-tgk2": 292600, "DAEO-gdzh": 1404136}}
+{"t": "2026-10-30T19:02:03", "nproc": 20, "load": [34.32, 28.74, 32.73], "mem_total_kb": 24607384, "mem_available_kb": 15494940, "leads_kb": {"DAEO-s9qc": 284796, "DAEO-tgk2": 293484, "DAEO-gdzh": 1381996}}
+{"t": "2026-10-30T19:03:06", "nproc": 20, "load": [34.99, 29.99, 32.92], "mem_total_kb": 24607384, "mem_available_kb": 15267004, "leads_kb": {"DAEO-s9qc": 285632, "DAEO-tgk2": 293436, "DAEO-gdzh": 1415700}}
+{"t": "2026-10-30T19:04:13", "nproc": 20, "load": [33.75, 30.57, 32.93], "mem_total_kb": 24607384, "mem_available_kb": 15198960, "leads_kb": {"DAEO-s9qc": 298192, "DAEO-tgk2": 293192, "DAEO-gdzh": 1371504}}
+{"t": "2026-10-30T19:05:21", "nproc": 20, "load": [26.88, 29.02, 32.25], "mem_total_kb": 24607384, "mem_available_kb": 15607460, "leads_kb": {"DAEO-s9qc": 1405404, "DAEO-tgk2": 293804, "DAEO-gdzh": 860624}}
+{"t": "2026-10-30T19:06:28", "nproc": 20, "load": [42.82, 32.96, 33.38], "mem_total_kb": 24607384, "mem_available_kb": 12245516, "leads_kb": {"DAEO-s9qc": 1321484, "DAEO-tgk2": 346940, "DAEO-gdzh": 3149908}}
+{"t": "2026-10-30T19:07:35", "nproc": 20, "load": [45.64, 35.84, 34.37], "mem_total_kb": 24607384, "mem_available_kb": 12414992, "leads_kb": {"DAEO-s9qc": 1310048, "DAEO-tgk2": 359084, "DAEO-gdzh": 3564696}}
+{"t": "2026-10-30T19:08:42", "nproc": 20, "load": [33.94, 34.29, 33.93], "mem_total_kb": 24607384, "mem_available_kb": 14408232, "leads_kb": {"DAEO-s9qc": 414640, "DAEO-tgk2": 368176, "DAEO-gdzh": 630868}}
+{"t": "2026-10-30T19:09:50", "nproc": 20, "load": [19.46, 30.11, 32.52], "mem_total_kb": 24607384, "mem_available_kb": 14932736, "leads_kb": {"DAEO-s9qc": 414620, "DAEO-tgk2": 389708, "DAEO-gdzh": 649708}}
+{"t": "2026-10-30T19:10:57", "nproc": 20, "load": [13.06, 26.26, 31.04], "mem_total_kb": 24607384, "mem_available_kb": 15493156, "leads_kb": {"DAEO-s9qc": 416340, "DAEO-tgk2": 390588, "DAEO-gdzh": 658368}}
+{"t": "2026-10-30T19:12:00", "nproc": 20, "load": [11.29, 23.51, 29.8], "mem_total_kb": 24607384, "mem_available_kb": 15949612, "leads_kb": {"DAEO-s9qc": 415964, "DAEO-tgk2": 375184, "DAEO-gdzh": 316352}}
+{"t": "2026-10-30T19:13:08", "nproc": 20, "load": [12.05, 21.28, 28.63], "mem_total_kb": 24607384, "mem_available_kb": 16087956, "leads_kb": {"DAEO-s9qc": 416044, "DAEO-tgk2": 375304, "DAEO-gdzh": 324172}}
+{"t": "2026-10-30T19:14:15", "nproc": 20, "load": [13.95, 20.32, 27.85], "mem_total_kb": 24607384, "mem_available_kb": 15369648, "leads_kb": {"DAEO-s9qc": 416320, "DAEO-tgk2": 375336, "DAEO-gdzh": 433880}}
+{"t": "2026-10-30T19:15:22", "nproc": 20, "load": [10.22, 18.22, 26.66], "mem_total_kb": 24607384, "mem_available_kb": 17130388, "leads_kb": {"DAEO-s9qc": 425776, "DAEO-tgk2": 375508, "DAEO-gdzh": 448908}}
+{"t": "2026-10-30T19:16:29", "nproc": 20, "load": [6.86, 15.82, 25.31], "mem_total_kb": 24607384, "mem_available_kb": 16723700, "leads_kb": {"DAEO-s9qc": 423676, "DAEO-tgk2": 367556, "DAEO-gdzh": 557244}}
+{"t": "2026-10-30T19:17:37", "nproc": 20, "load": [13.4, 15.84, 24.7], "mem_total_kb": 24607384, "mem_available_kb": 16596316, "leads_kb": {"DAEO-s9qc": 423340, "DAEO-tgk2": 365436, "DAEO-gdzh": 459632}}
+{"t": "2026-10-30T19:18:44", "nproc": 20, "load": [21.28, 17.22, 24.6], "mem_total_kb": 24607384, "mem_available_kb": 14259084, "leads_kb": {"DAEO-s9qc": 423532, "DAEO-tgk2": 365768, "DAEO-gdzh": 2605960}}
+{"t": "2026-10-30T19:19:47", "nproc": 20, "load": [30.23, 20.41, 25.23], "mem_total_kb": 24607384, "mem_available_kb": 15032408, "leads_kb": {"DAEO-s9qc": 424884, "DAEO-tgk2": 369680, "DAEO-gdzh": 1843384}}
+{"t": "2026-10-30T19:20:55", "nproc": 20, "load": [33.3, 23.06, 25.84], "mem_total_kb": 24607384, "mem_available_kb": 15947240, "leads_kb": {"DAEO-s9qc": 424048, "DAEO-tgk2": 370512, "DAEO-gdzh": 653768}}
+{"t": "2026-10-30T19:22:02", "nproc": 20, "load": [39.17, 27.64, 27.29], "mem_total_kb": 24607384, "mem_available_kb": 16037144, "leads_kb": {"DAEO-s9qc": 426652, "DAEO-tgk2": 370480, "DAEO-gdzh": 1020340}}
+{"t": "2026-10-30T19:23:08", "nproc": 20, "load": [20.07, 24.24, 26.15], "mem_total_kb": 24607384, "mem_available_kb": 16477948, "leads_kb": {"DAEO-s9qc": 424124, "DAEO-tgk2": 370544, "DAEO-gdzh": 1146700}}
+{"t": "2026-10-30T19:24:12", "nproc": 20, "load": [37.18, 27.18, 26.97], "mem_total_kb": 24607384, "mem_available_kb": 15913928, "leads_kb": {"DAEO-s9qc": 1327764, "DAEO-tgk2": 370500, "DAEO-gdzh": 2023640}}
+{"t": "2026-10-30T19:25:14", "nproc": 20, "load": [47.66, 31.69, 28.52], "mem_total_kb": 24607384, "mem_available_kb": 15487044, "leads_kb": {"DAEO-s9qc": 1427652, "DAEO-tgk2": 370788, "DAEO-gdzh": 2988068}}
+{"t": "2026-10-30T19:26:17", "nproc": 20, "load": [50.47, 36.02, 30.25], "mem_total_kb": 24607384, "mem_available_kb": 15458164, "leads_kb": {"DAEO-s9qc": 1383764, "DAEO-tgk2": 371428, "DAEO-gdzh": 1039316}}
+{"t": "2026-10-30T19:27:18", "nproc": 20, "load": [44.75, 36.95, 30.93], "mem_total_kb": 24607384, "mem_available_kb": 13329980, "leads_kb": {"DAEO-s9qc": 1246544, "DAEO-tgk2": 371440, "DAEO-gdzh": 4553880}}
+{"t": "2026-10-30T19:28:20", "nproc": 20, "load": [43.4, 37.95, 31.65], "mem_total_kb": 24607384, "mem_available_kb": 13296232, "leads_kb": {"DAEO-s9qc": 1402776, "DAEO-tgk2": 374096, "DAEO-gdzh": 4559460}}
+{"t": "2026-10-30T19:29:23", "nproc": 20, "load": [42.6, 38.7, 32.3], "mem_total_kb": 24607384, "mem_available_kb": 13238956, "leads_kb": {"DAEO-s9qc": 1383316, "DAEO-tgk2": 374108, "DAEO-gdzh": 4566676}}
+{"t": "2026-10-30T19:30:25", "nproc": 20, "load": [35.33, 37.04, 32.12], "mem_total_kb": 24607384, "mem_available_kb": 15755796, "leads_kb": {"DAEO-s9qc": 1345020, "DAEO-tgk2": 371976, "DAEO-gdzh": 387024}}
+{"t": "2026-10-30T19:31:27", "nproc": 20, "load": [34.86, 36.68, 32.31], "mem_total_kb": 24607384, "mem_available_kb": 16313812, "leads_kb": {"DAEO-s9qc": 1376412, "DAEO-tgk2": 372176, "DAEO-gdzh": 951784}}
+{"t": "2026-10-30T19:32:29", "nproc": 20, "load": [41.9, 38.34, 33.17], "mem_total_kb": 24607384, "mem_available_kb": 15301288, "leads_kb": {"DAEO-s9qc": 1368268, "DAEO-tgk2": 373208, "DAEO-gdzh": 2141644}}
+{"t": "2026-10-30T19:33:32", "nproc": 20, "load": [42.76, 38.86, 33.66], "mem_total_kb": 24607384, "mem_available_kb": 14890304, "leads_kb": {"DAEO-s9qc": 1348972, "DAEO-tgk2": 373252, "DAEO-gdzh": 3009152}}
+{"t": "2026-10-30T19:34:34", "nproc": 20, "load": [40.25, 38.88, 33.99], "mem_total_kb": 24607384, "mem_available_kb": 15058836, "leads_kb": {"DAEO-s9qc": 1390696, "DAEO-tgk2": 373280, "DAEO-gdzh": 1891688}}
+{"t": "2026-10-30T19:35:35", "nproc": 20, "load": [36.11, 37.93, 33.97], "mem_total_kb": 24607384, "mem_available_kb": 16286488, "leads_kb": {"DAEO-s9qc": 1092640, "DAEO-tgk2": 375204, "DAEO-gdzh": 1889256}}
+{"t": "2026-10-30T19:36:37", "nproc": 20, "load": [35.95, 37.56, 34.09], "mem_total_kb": 24607384, "mem_available_kb": 16083796, "leads_kb": {"DAEO-s9qc": 1389992, "DAEO-tgk2": 374024, "DAEO-gdzh": 1951568}}
+{"t": "2026-10-30T19:37:40", "nproc": 20, "load": [34.17, 36.73, 34.02], "mem_total_kb": 24607384, "mem_available_kb": 16399568, "leads_kb": {"DAEO-s9qc": 1352956, "DAEO-tgk2": 373876, "DAEO-gdzh": 1741316}}
+{"t": "2026-10-30T19:38:41", "nproc": 20, "load": [28.74, 34.47, 33.4], "mem_total_kb": 24607384, "mem_available_kb": 16924100, "leads_kb": {"DAEO-s9qc": 300636, "DAEO-tgk2": 373952, "DAEO-gdzh": 1733944}}
+{"t": "2026-10-30T19:39:41", "nproc": 20, "load": [31.82, 34.26, 33.39], "mem_total_kb": 24607384, "mem_available_kb": 16728064, "leads_kb": {"DAEO-s9qc": 317116, "DAEO-tgk2": 379596, "DAEO-gdzh": 1822532}}
+{"t": "2026-10-30T19:40:41", "nproc": 20, "load": [24.72, 32.21, 32.77], "mem_total_kb": 24607384, "mem_available_kb": 17168868, "leads_kb": {"DAEO-s9qc": 309492, "DAEO-tgk2": 379152, "DAEO-gdzh": 1719196}}
+{"t": "2026-10-30T19:41:41", "nproc": 20, "load": [15.01, 28.04, 31.3], "mem_total_kb": 24607384, "mem_available_kb": 17149920, "leads_kb": {"DAEO-s9qc": 309132, "DAEO-tgk2": 379220, "DAEO-gdzh": 1752220}}
+{"t": "2026-10-30T19:42:41", "nproc": 20, "load": [10.17, 24.34, 29.82], "mem_total_kb": 24607384, "mem_available_kb": 18543744, "leads_kb": {"DAEO-s9qc": 309364, "DAEO-tgk2": 379512, "DAEO-gdzh": 402912}}
+{"t": "2026-10-30T19:43:41", "nproc": 20, "load": [7.68, 21.09, 28.36], "mem_total_kb": 24607384, "mem_available_kb": 18600020, "leads_kb": {"DAEO-s9qc": 309884, "DAEO-tgk2": 379776, "DAEO-gdzh": 395440}}
+{"t": "2026-10-30T19:44:41", "nproc": 20, "load": [11.49, 19.62, 27.39], "mem_total_kb": 24607384, "mem_available_kb": 18274484, "leads_kb": {"DAEO-s9qc": 309928, "DAEO-tgk2": 379680, "DAEO-gdzh": 389916}}
+{"t": "2026-10-30T19:45:41", "nproc": 20, "load": [12.93, 18.64, 26.57], "mem_total_kb": 24607384, "mem_available_kb": 16064596, "leads_kb": {"DAEO-s9qc": 310112, "DAEO-tgk2": 379772, "DAEO-gdzh": 339320}}
+{"t": "2026-10-30T19:46:41", "nproc": 20, "load": [8.79, 16.37, 25.29], "mem_total_kb": 24607384, "mem_available_kb": 17341236, "leads_kb": {"DAEO-s9qc": 310724, "DAEO-tgk2": 379808, "DAEO-gdzh": 342572}}
+{"t": "2026-10-30T19:47:41", "nproc": 20, "load": [6.01, 14.22, 23.99], "mem_total_kb": 24607384, "mem_available_kb": 17367780, "leads_kb": {"DAEO-s9qc": 310692, "DAEO-tgk2": 373512, "DAEO-gdzh": 338164}}
+{"t": "2026-10-30T19:48:41", "nproc": 20, "load": [4.93, 12.38, 22.74], "mem_total_kb": 24607384, "mem_available_kb": 17391592, "leads_kb": {"DAEO-s9qc": 311732, "DAEO-tgk2": 373232, "DAEO-gdzh": 332200}}
+{"t": "2026-10-30T19:49:41", "nproc": 20, "load": [7.37, 11.51, 21.78], "mem_total_kb": 24607384, "mem_available_kb": 16290464, "leads_kb": {"DAEO-s9qc": 1541132, "DAEO-tgk2": 300068, "DAEO-gdzh": 318016}}
+{"t": "2026-10-30T19:50:41", "nproc": 20, "load": [12.89, 12.44, 21.46], "mem_total_kb": 24607384, "mem_available_kb": 15555736, "leads_kb": {"DAEO-s9qc": 3396932, "DAEO-tgk2": 370368, "DAEO-gdzh": 317640}}
+{"t": "2026-10-30T19:51:41", "nproc": 20, "load": [23.51, 15.1, 21.78], "mem_total_kb": 24607384, "mem_available_kb": 14974328, "leads_kb": {"DAEO-s9qc": 3883352, "DAEO-tgk2": 368052, "DAEO-gdzh": 322252}}
+{"t": "2026-10-30T19:52:41", "nproc": 20, "load": [27.04, 18.04, 22.4], "mem_total_kb": 24607384, "mem_available_kb": 15745820, "leads_kb": {"DAEO-s9qc": 2867888, "DAEO-tgk2": 362892, "DAEO-gdzh": 318628}}
+{"t": "2026-10-30T19:53:41", "nproc": 20, "load": [37.05, 21.92, 23.42], "mem_total_kb": 24607384, "mem_available_kb": 14893100, "leads_kb": {"DAEO-s9qc": 3369276, "DAEO-tgk2": 364624, "DAEO-gdzh": 316928}}
+{"t": "2026-10-30T19:54:42", "nproc": 20, "load": [51.15, 28.4, 25.54], "mem_total_kb": 24607384, "mem_available_kb": 14373660, "leads_kb": {"DAEO-s9qc": 4107788, "DAEO-tgk2": 364224, "DAEO-gdzh": 317508}}
+{"t": "2026-10-30T19:55:42", "nproc": 20, "load": [57.47, 34.45, 27.81], "mem_total_kb": 24607384, "mem_available_kb": 14334864, "leads_kb": {"DAEO-s9qc": 4193936, "DAEO-tgk2": 364276, "DAEO-gdzh": 317132}}
+{"t": "2026-10-30T19:56:42", "nproc": 20, "load": [57.53, 38.75, 29.71], "mem_total_kb": 24607384, "mem_available_kb": 15429376, "leads_kb": {"DAEO-s9qc": 2766916, "DAEO-tgk2": 363908, "DAEO-gdzh": 368760}}
+{"t": "2026-10-30T19:57:42", "nproc": 20, "load": [51.65, 40.64, 30.94], "mem_total_kb": 24607384, "mem_available_kb": 14532124, "leads_kb": {"DAEO-s9qc": 3646892, "DAEO-tgk2": 362364, "DAEO-gdzh": 336436}}
+{"t": "2026-10-30T19:58:42", "nproc": 20, "load": [57.72, 44.04, 32.7], "mem_total_kb": 24607384, "mem_available_kb": 14999408, "leads_kb": {"DAEO-s9qc": 4064720, "DAEO-tgk2": 363036, "DAEO-gdzh": 334484}}
+{"t": "2026-10-30T19:59:42", "nproc": 20, "load": [51.94, 45.09, 33.78], "mem_total_kb": 24607384, "mem_available_kb": 15561672, "leads_kb": {"DAEO-s9qc": 3158904, "DAEO-tgk2": 362452, "DAEO-gdzh": 334452}}
+{"t": "2026-10-30T20:00:42", "nproc": 20, "load": [46.52, 44.84, 34.41], "mem_total_kb": 24607384, "mem_available_kb": 15508412, "leads_kb": {"DAEO-s9qc": 3112788, "DAEO-tgk2": 369000, "DAEO-gdzh": 334608}}
+{"t": "2026-10-30T20:01:42", "nproc": 20, "load": [37.15, 42.46, 34.25], "mem_total_kb": 24607384, "mem_available_kb": 15505124, "leads_kb": {"DAEO-s9qc": 3929376, "DAEO-tgk2": 373736, "DAEO-gdzh": 336028}}
+{"t": "2026-10-30T20:02:43", "nproc": 20, "load": [42.12, 42.85, 34.9], "mem_total_kb": 24607384, "mem_available_kb": 15574900, "leads_kb": {"DAEO-s9qc": 4300560, "DAEO-tgk2": 400828, "DAEO-gdzh": 333752}}
+{"t": "2026-10-30T20:03:43", "nproc": 20, "load": [42.55, 42.87, 35.41], "mem_total_kb": 24607384, "mem_available_kb": 15472128, "leads_kb": {"DAEO-s9qc": 4119440, "DAEO-tgk2": 384156, "DAEO-gdzh": 334152}}
+{"t": "2026-10-30T20:04:43", "nproc": 20, "load": [42.62, 42.88, 35.88], "mem_total_kb": 24607384, "mem_available_kb": 15565112, "leads_kb": {"DAEO-s9qc": 4171276, "DAEO-tgk2": 383692, "DAEO-gdzh": 334240}}
+{"t": "2026-10-30T20:05:43", "nproc": 20, "load": [42.44, 42.66, 36.24], "mem_total_kb": 24607384, "mem_available_kb": 15604132, "leads_kb": {"DAEO-s9qc": 4033368, "DAEO-tgk2": 383948, "DAEO-gdzh": 334448}}
+{"t": "2026-10-30T20:06:43", "nproc": 20, "load": [43.58, 42.95, 36.74], "mem_total_kb": 24607384, "mem_available_kb": 15697388, "leads_kb": {"DAEO-s9qc": 3907368, "DAEO-tgk2": 370128, "DAEO-gdzh": 329696}}
+{"t": "2026-10-30T20:07:43", "nproc": 20, "load": [43.68, 43.32, 37.28], "mem_total_kb": 24607384, "mem_available_kb": 16012352, "leads_kb": {"DAEO-s9qc": 4173712, "DAEO-tgk2": 370228, "DAEO-gdzh": 342680}}
+{"t": "2026-10-30T20:08:43", "nproc": 20, "load": [35.75, 41.47, 37.04], "mem_total_kb": 24607384, "mem_available_kb": 15890340, "leads_kb": {"DAEO-s9qc": 3101752, "DAEO-tgk2": 360596, "DAEO-gdzh": 444600}}
+{"t": "2026-10-30T20:09:43", "nproc": 20, "load": [49.7, 44.38, 38.32], "mem_total_kb": 24607384, "mem_available_kb": 12805248, "leads_kb": {"DAEO-s9qc": 5006252, "DAEO-tgk2": 364288, "DAEO-gdzh": 1485040}}
+{"t": "2026-10-30T20:10:43", "nproc": 20, "load": [52.95, 46.34, 39.38], "mem_total_kb": 24607384, "mem_available_kb": 13022504, "leads_kb": {"DAEO-s9qc": 4079116, "DAEO-tgk2": 369920, "DAEO-gdzh": 1415124}}
+{"t": "2026-10-30T20:11:43", "nproc": 20, "load": [55.2, 48.43, 40.55], "mem_total_kb": 24607384, "mem_available_kb": 11882296, "leads_kb": {"DAEO-s9qc": 6120312, "DAEO-tgk2": 369088, "DAEO-gdzh": 1436672}}
+{"t": "2026-10-30T20:12:44", "nproc": 20, "load": [60.91, 51.34, 42.05], "mem_total_kb": 24607384, "mem_available_kb": 10888952, "leads_kb": {"DAEO-s9qc": 6948248, "DAEO-tgk2": 345028, "DAEO-gdzh": 1350776}}
+{"t": "2026-10-30T20:13:44", "nproc": 20, "load": [55.79, 51.59, 42.72], "mem_total_kb": 24607384, "mem_available_kb": 11807624, "leads_kb": {"DAEO-s9qc": 6738088, "DAEO-tgk2": 346884, "DAEO-gdzh": 1423976}}
+{"t": "2026-10-30T20:14:44", "nproc": 20, "load": [68.16, 56.37, 44.94], "mem_total_kb": 24607384, "mem_available_kb": 13513956, "leads_kb": {"DAEO-s9qc": 4985580, "DAEO-tgk2": 346952, "DAEO-gdzh": 1459656}}
+{"t": "2026-10-30T20:15:44", "nproc": 20, "load": [67.66, 58.66, 46.46], "mem_total_kb": 24607384, "mem_available_kb": 13029432, "leads_kb": {"DAEO-s9qc": 5003924, "DAEO-tgk2": 343444, "DAEO-gdzh": 1363456}}
+{"t": "2026-10-30T20:16:44", "nproc": 20, "load": [61.25, 58.6, 47.22], "mem_total_kb": 24607384, "mem_available_kb": 12756112, "leads_kb": {"DAEO-s9qc": 5631824, "DAEO-tgk2": 343752, "DAEO-gdzh": 1377900}}
+{"t": "2026-10-30T20:17:44", "nproc": 20, "load": [48.0, 55.78, 46.99], "mem_total_kb": 24607384, "mem_available_kb": 11650292, "leads_kb": {"DAEO-s9qc": 6212000, "DAEO-tgk2": 344180, "DAEO-gdzh": 484776}}
+{"t": "2026-10-30T20:18:45", "nproc": 20, "load": [49.1, 54.18, 46.96], "mem_total_kb": 24607384, "mem_available_kb": 10872044, "leads_kb": {"DAEO-s9qc": 5791372, "DAEO-tgk2": 1342248, "DAEO-gdzh": 2169196}}
+{"t": "2026-10-30T20:19:45", "nproc": 20, "load": [48.91, 53.11, 47.04], "mem_total_kb": 24607384, "mem_available_kb": 11481496, "leads_kb": {"DAEO-s9qc": 6093292, "DAEO-tgk2": 377664, "DAEO-gdzh": 2195328}}
+{"t": "2026-10-30T20:20:45", "nproc": 20, "load": [42.34, 50.34, 46.46], "mem_total_kb": 24607384, "mem_available_kb": 11813484, "leads_kb": {"DAEO-s9qc": 3349020, "DAEO-tgk2": 369176, "DAEO-gdzh": 2206608}}
+{"t": "2026-10-30T20:21:45", "nproc": 20, "load": [45.76, 49.85, 46.53], "mem_total_kb": 24607384, "mem_available_kb": 12115568, "leads_kb": {"DAEO-s9qc": 5314812, "DAEO-tgk2": 413224, "DAEO-gdzh": 2217520}}
+{"t": "2026-10-30T20:22:45", "nproc": 20, "load": [55.0, 50.98, 47.08], "mem_total_kb": 24607384, "mem_available_kb": 12213300, "leads_kb": {"DAEO-s9qc": 3360280, "DAEO-tgk2": 628284, "DAEO-gdzh": 2214240}}
+{"t": "2026-10-30T20:23:45", "nproc": 20, "load": [55.03, 51.41, 47.45], "mem_total_kb": 24607384, "mem_available_kb": 11706564, "leads_kb": {"DAEO-s9qc": 3439884, "DAEO-tgk2": 399992, "DAEO-gdzh": 2215544}}
+{"t": "2026-10-30T20:24:45", "nproc": 20, "load": [45.21, 49.75, 47.16], "mem_total_kb": 24607384, "mem_available_kb": 7568416, "leads_kb": {"DAEO-s9qc": 8836396, "DAEO-tgk2": 292252, "DAEO-gdzh": 2184412}}
+{"t": "2026-10-30T20:25:45", "nproc": 20, "load": [41.6, 47.91, 46.69], "mem_total_kb": 24607384, "mem_available_kb": 8665216, "leads_kb": {"DAEO-s9qc": 7790872, "DAEO-tgk2": 274204, "DAEO-gdzh": 2160800}}
+{"t": "2026-10-30T20:26:45", "nproc": 20, "load": [42.81, 46.81, 46.37], "mem_total_kb": 24607384, "mem_available_kb": 7766808, "leads_kb": {"DAEO-s9qc": 8568248, "DAEO-gdzh": 2159380}}
+{"t": "2026-10-30T20:27:45", "nproc": 20, "load": [57.04, 49.88, 47.43], "mem_total_kb": 24607384, "mem_available_kb": 7892004, "leads_kb": {"DAEO-s9qc": 7941412, "DAEO-gdzh": 2109620}}
+{"t": "2026-10-30T20:28:45", "nproc": 20, "load": [66.92, 53.81, 48.92], "mem_total_kb": 24607384, "mem_available_kb": 8576724, "leads_kb": {"DAEO-s9qc": 7718976, "DAEO-gdzh": 350688}}
+{"t": "2026-10-30T20:29:46", "nproc": 20, "load": [66.63, 56.11, 50.02], "mem_total_kb": 24607384, "mem_available_kb": 9309928, "leads_kb": {"DAEO-s9qc": 7355116, "DAEO-gdzh": 408180}}
+{"t": "2026-10-30T20:30:46", "nproc": 20, "load": [74.14, 59.93, 51.7], "mem_total_kb": 24607384, "mem_available_kb": 9146980, "leads_kb": {"DAEO-s9qc": 6967448, "DAEO-gdzh": 330356}}
+{"t": "2026-10-30T20:31:46", "nproc": 20, "load": [70.2, 61.26, 52.66], "mem_total_kb": 24607384, "mem_available_kb": 8497692, "leads_kb": {"DAEO-s9qc": 7227636, "DAEO-gdzh": 1234280}}
+{"t": "2026-10-30T20:32:46", "nproc": 20, "load": [57.51, 59.62, 52.67], "mem_total_kb": 24607384, "mem_available_kb": 7799824, "leads_kb": {"DAEO-s9qc": 7272104, "DAEO-gdzh": 1453748}}
+{"t": "2026-10-30T20:33:46", "nproc": 20, "load": [58.18, 59.29, 52.98], "mem_total_kb": 24607384, "mem_available_kb": 7467464, "leads_kb": {"DAEO-s9qc": 8238556, "DAEO-gdzh": 341040}}
+{"t": "2026-10-30T20:34:46", "nproc": 20, "load": [55.3, 58.2, 53.0], "mem_total_kb": 24607384, "mem_available_kb": 6063240, "leads_kb": {"DAEO-s9qc": 6599432, "DAEO-gdzh": 2009044}}
+{"t": "2026-10-30T20:35:47", "nproc": 20, "load": [70.17, 61.99, 54.63], "mem_total_kb": 24607384, "mem_available_kb": 6264536, "leads_kb": {"DAEO-s9qc": 7348936, "DAEO-gdzh": 1749156}}
+{"t": "2026-10-30T20:36:47", "nproc": 20, "load": [78.02, 65.76, 56.39], "mem_total_kb": 24607384, "mem_available_kb": 6276904, "leads_kb": {"DAEO-s9qc": 7354824, "DAEO-gdzh": 1689984}}
+{"t": "2026-10-30T20:37:47", "nproc": 20, "load": [77.62, 67.86, 57.7], "mem_total_kb": 24607384, "mem_available_kb": 8662104, "leads_kb": {"DAEO-s9qc": 5872180, "DAEO-gdzh": 1734024}}
+{"t": "2026-10-30T20:38:47", "nproc": 20, "load": [87.8, 72.39, 59.88], "mem_total_kb": 24607384, "mem_available_kb": 8087612, "leads_kb": {"DAEO-s9qc": 6857148, "DAEO-gdzh": 1734864}}
+{"t": "2026-10-30T20:39:48", "nproc": 20, "load": [97.01, 77.72, 62.49], "mem_total_kb": 24607384, "mem_available_kb": 9622236, "leads_kb": {"DAEO-s9qc": 4792452, "DAEO-gdzh": 1735604}}
+{"t": "2026-10-30T20:40:48", "nproc": 20, "load": [86.86, 78.66, 63.79], "mem_total_kb": 24607384, "mem_available_kb": 7819360, "leads_kb": {"DAEO-s9qc": 7624884, "DAEO-gdzh": 1735444}}
+{"t": "2026-10-30T20:41:48", "nproc": 20, "load": [82.71, 79.46, 65.03], "mem_total_kb": 24607384, "mem_available_kb": 8813908, "leads_kb": {"DAEO-s9qc": 5674808, "DAEO-gdzh": 1309120}}
+{"t": "2026-10-30T20:42:48", "nproc": 20, "load": [76.53, 78.58, 65.65], "mem_total_kb": 24607384, "mem_available_kb": 7321148, "leads_kb": {"DAEO-s9qc": 7009308, "DAEO-gdzh": 1769348}}
+{"t": "2026-10-30T20:43:48", "nproc": 20, "load": [75.56, 78.1, 66.31], "mem_total_kb": 24607384, "mem_available_kb": 10146172, "leads_kb": {"DAEO-s9qc": 4203436, "DAEO-gdzh": 1736988}}
+{"t": "2026-10-30T20:44:49", "nproc": 20, "load": [81.3, 79.53, 67.61], "mem_total_kb": 24607384, "mem_available_kb": 10097120, "leads_kb": {"DAEO-s9qc": 6622960, "DAEO-gdzh": 310532}}
+{"t": "2026-10-30T20:45:49", "nproc": 20, "load": [83.98, 80.69, 68.76], "mem_total_kb": 24607384, "mem_available_kb": 10919768, "leads_kb": {"DAEO-s9qc": 5394256, "DAEO-gdzh": 2159256}}
+{"t": "2026-10-30T20:46:49", "nproc": 20, "load": [76.36, 79.22, 69.02], "mem_total_kb": 24607384, "mem_available_kb": 9045232, "leads_kb": {"DAEO-s9qc": 7179052, "DAEO-gdzh": 2181176}}
+{"t": "2026-10-30T20:47:49", "nproc": 20, "load": [71.42, 77.93, 69.25], "mem_total_kb": 24607384, "mem_available_kb": 9860588, "leads_kb": {"DAEO-s9qc": 6001520, "DAEO-gdzh": 2190692}}
+{"t": "2026-10-30T20:48:50", "nproc": 20, "load": [54.87, 72.16, 67.82], "mem_total_kb": 24607384, "mem_available_kb": 7965112, "leads_kb": {"DAEO-s9qc": 8656492, "DAEO-gdzh": 2192600}}
+{"t": "2026-10-30T20:49:50", "nproc": 20, "load": [35.87, 63.61, 65.15], "mem_total_kb": 24607384, "mem_available_kb": 12398384, "leads_kb": {"DAEO-s9qc": 6492464, "DAEO-gdzh": 2197644}}
+{"t": "2026-10-30T20:50:50", "nproc": 20, "load": [47.75, 61.84, 64.44], "mem_total_kb": 24607384, "mem_available_kb": 9260788, "leads_kb": {"DAEO-s9qc": 7831576, "DAEO-gdzh": 2200764}}
+{"t": "2026-10-30T20:51:50", "nproc": 20, "load": [39.06, 56.99, 62.62], "mem_total_kb": 24607384, "mem_available_kb": 11246600, "leads_kb": {"DAEO-s9qc": 6997220, "DAEO-gdzh": 2203728}}
+{"t": "2026-10-30T20:52:50", "nproc": 20, "load": [46.17, 55.65, 61.8], "mem_total_kb": 24607384, "mem_available_kb": 11060696, "leads_kb": {"DAEO-s9qc": 7763876, "DAEO-gdzh": 2207924}}
+{"t": "2026-10-30T20:53:50", "nproc": 20, "load": [41.61, 52.43, 60.29], "mem_total_kb": 24607384, "mem_available_kb": 10072976, "leads_kb": {"DAEO-s9qc": 8623372, "DAEO-gdzh": 2211200}}
+{"t": "2026-10-30T20:54:50", "nproc": 20, "load": [47.47, 51.92, 59.61], "mem_total_kb": 24607384, "mem_available_kb": 12094564, "leads_kb": {"DAEO-s9qc": 8149948, "DAEO-gdzh": 2213708}}
+{"t": "2026-10-30T20:55:50", "nproc": 20, "load": [47.67, 51.31, 58.93], "mem_total_kb": 24607384, "mem_available_kb": 11594960, "leads_kb": {"DAEO-s9qc": 7570568, "DAEO-gdzh": 294700}}
+{"t": "2026-10-30T20:56:50", "nproc": 20, "load": [49.17, 50.94, 58.31], "mem_total_kb": 24607384, "mem_available_kb": 13588320, "leads_kb": {"DAEO-s9qc": 5935600, "DAEO-gdzh": 284844}}
+{"t": "2026-10-30T20:57:51", "nproc": 20, "load": [52.12, 51.3, 57.96], "mem_total_kb": 24607384, "mem_available_kb": 12616304, "leads_kb": {"DAEO-s9qc": 7609196, "DAEO-gdzh": 289920}}
+{"t": "2026-10-30T20:58:51", "nproc": 20, "load": [46.75, 50.0, 57.1], "mem_total_kb": 24607384, "mem_available_kb": 15083376, "leads_kb": {"DAEO-s9qc": 6878020}}
+{"t": "2026-10-30T20:59:51", "nproc": 20, "load": [52.58, 51.3, 57.11], "mem_total_kb": 24607384, "mem_available_kb": 14319624, "leads_kb": {"DAEO-s9qc": 6822604}}
+{"t": "2026-10-30T21:00:51", "nproc": 20, "load": [61.74, 54.63, 57.92], "mem_total_kb": 24607384, "mem_available_kb": 14003468, "leads_kb": {"DAEO-s9qc": 6453564}}
+{"t": "2026-10-30T21:01:51", "nproc": 20, "load": [61.41, 55.65, 58.05], "mem_total_kb": 24607384, "mem_available_kb": 12884076, "leads_kb": {"DAEO-s9qc": 7483152}}
+{"t": "2026-10-30T21:02:51", "nproc": 20, "load": [51.29, 53.95, 57.33], "mem_total_kb": 24607384, "mem_available_kb": 14337900, "leads_kb": {"DAEO-s9qc": 6376976}}
+{"t": "2026-10-30T21:03:52", "nproc": 20, "load": [50.7, 52.97, 56.76], "mem_total_kb": 24607384, "mem_available_kb": 14528408, "leads_kb": {"DAEO-s9qc": 6171592}}
+{"t": "2026-10-30T21:04:52", "nproc": 20, "load": [39.77, 49.79, 55.44], "mem_total_kb": 24607384, "mem_available_kb": 14720796, "leads_kb": {"DAEO-s9qc": 6113432}}
+{"t": "2026-10-30T21:05:52", "nproc": 20, "load": [22.6, 43.33, 52.89], "mem_total_kb": 24607384, "mem_available_kb": 15575844, "leads_kb": {"DAEO-s9qc": 4815108}}
+{"t": "2026-10-30T21:06:52", "nproc": 20, "load": [16.09, 37.54, 50.28], "mem_total_kb": 24607384, "mem_available_kb": 15425072, "leads_kb": {"DAEO-s9qc": 5500900}}
+{"t": "2026-10-30T21:07:52", "nproc": 20, "load": [15.33, 33.25, 48.0], "mem_total_kb": 24607384, "mem_available_kb": 16117432, "leads_kb": {"DAEO-s9qc": 2151412}}
+{"t": "2026-10-30T21:08:52", "nproc": 20, "load": [13.45, 29.47, 45.78], "mem_total_kb": 24607384, "mem_available_kb": 17041756, "leads_kb": {"DAEO-s9qc": 556020}}
+{"t": "2026-10-30T21:09:52", "nproc": 20, "load": [36.33, 32.99, 45.95], "mem_total_kb": 24607384, "mem_available_kb": 17052324, "leads_kb": {"DAEO-s9qc": 686284}}
+{"t": "2026-10-30T21:10:52", "nproc": 20, "load": [40.78, 34.36, 45.59], "mem_total_kb": 24607384, "mem_available_kb": 16208608, "leads_kb": {"DAEO-s9qc": 1444844}}
+{"t": "2026-10-30T21:11:53", "nproc": 20, "load": [37.45, 34.61, 44.97], "mem_total_kb": 24607384, "mem_available_kb": 16602072, "leads_kb": {"DAEO-s9qc": 265456}}
+{"t": "2026-10-30T21:12:53", "nproc": 20, "load": [38.89, 35.17, 44.49], "mem_total_kb": 24607384, "mem_available_kb": 16026212, "leads_kb": {"DAEO-s9qc": 1423620}}
+{"t": "2026-10-30T21:13:54", "nproc": 20, "load": [50.23, 39.17, 45.29], "mem_total_kb": 24607384, "mem_available_kb": 15369668, "leads_kb": {"DAEO-s9qc": 1486768}}
+{"t": "2026-10-30T21:14:55", "nproc": 20, "load": [59.02, 43.42, 46.35], "mem_total_kb": 24607384, "mem_available_kb": 15215140, "leads_kb": {"DAEO-s9qc": 1257212}}
+{"t": "2026-10-30T21:15:56", "nproc": 20, "load": [59.26, 46.83, 47.37], "mem_total_kb": 24607384, "mem_available_kb": 15955124, "leads_kb": {"DAEO-s9qc": 1336880}}
+{"t": "2026-10-30T21:16:57", "nproc": 20, "load": [57.04, 48.19, 47.79], "mem_total_kb": 24607384, "mem_available_kb": 15390280, "leads_kb": {"DAEO-s9qc": 1431408}}
+{"t": "2026-10-30T21:17:59", "nproc": 20, "load": [50.03, 47.8, 47.68], "mem_total_kb": 24607384, "mem_available_kb": 16438132, "leads_kb": {"DAEO-s9qc": 1385208}}
+{"t": "2026-10-30T21:18:59", "nproc": 20, "load": [49.99, 48.36, 47.89], "mem_total_kb": 24607384, "mem_available_kb": 16263784, "leads_kb": {"DAEO-s9qc": 1283228}}
+{"t": "2026-10-30T21:20:00", "nproc": 20, "load": [40.96, 46.5, 47.31], "mem_total_kb": 24607384, "mem_available_kb": 19214856, "leads_kb": {"DAEO-s9qc": 416388}}
+{"t": "2026-10-30T21:21:02", "nproc": 20, "load": [32.27, 42.47, 45.84], "mem_total_kb": 24607384, "mem_available_kb": 17936808, "leads_kb": {"DAEO-s9qc": 1882560}}
+{"t": "2026-10-30T21:22:03", "nproc": 20, "load": [32.76, 40.81, 45.06], "mem_total_kb": 24607384, "mem_available_kb": 17522436, "leads_kb": {"DAEO-s9qc": 2144132}}
+{"t": "2026-10-30T21:23:04", "nproc": 20, "load": [33.85, 39.64, 44.38], "mem_total_kb": 24607384, "mem_available_kb": 17391512, "leads_kb": {"DAEO-s9qc": 3581724}}
+{"t": "2026-10-30T21:24:05", "nproc": 20, "load": [33.19, 38.41, 43.66], "mem_total_kb": 24607384, "mem_available_kb": 18106416, "leads_kb": {"DAEO-s9qc": 1266920}}
+{"t": "2026-10-30T21:25:06", "nproc": 20, "load": [31.66, 37.11, 42.89], "mem_total_kb": 24607384, "mem_available_kb": 17613232, "leads_kb": {"DAEO-s9qc": 2002480}}
+{"t": "2026-10-30T21:26:07", "nproc": 20, "load": [21.41, 32.91, 41.07], "mem_total_kb": 24607384, "mem_available_kb": 16708460, "leads_kb": {"DAEO-s9qc": 3404524}}
+{"t": "2026-10-30T21:27:08", "nproc": 20, "load": [31.96, 33.47, 40.73], "mem_total_kb": 24607384, "mem_available_kb": 14679688, "leads_kb": {"DAEO-s9qc": 2811996}}
+{"t": "2026-10-30T21:28:09", "nproc": 20, "load": [39.44, 35.25, 40.88], "mem_total_kb": 24607384, "mem_available_kb": 15712508, "leads_kb": {"DAEO-s9qc": 3415676}}
+{"t": "2026-10-30T21:29:10", "nproc": 20, "load": [51.17, 39.11, 41.84], "mem_total_kb": 24607384, "mem_available_kb": 15188300, "leads_kb": {"DAEO-s9qc": 4147372}}
+{"t": "2026-10-30T21:30:11", "nproc": 20, "load": [53.09, 42.17, 42.74], "mem_total_kb": 24607384, "mem_available_kb": 15846800, "leads_kb": {"DAEO-s9qc": 2975084}}
+{"t": "2026-10-30T21:31:12", "nproc": 20, "load": [53.06, 43.98, 43.31], "mem_total_kb": 24607384, "mem_available_kb": 15822396, "leads_kb": {"DAEO-s9qc": 2836920}}
+{"t": "2026-10-30T21:32:14", "nproc": 20, "load": [50.76, 45.06, 43.74], "mem_total_kb": 24607384, "mem_available_kb": 15065900, "leads_kb": {"DAEO-s9qc": 4855160}}
+{"t": "2026-10-30T21:33:15", "nproc": 20, "load": [54.34, 46.84, 44.41], "mem_total_kb": 24607384, "mem_available_kb": 14915116, "leads_kb": {"DAEO-s9qc": 5061484}}
+{"t": "2026-10-30T21:34:16", "nproc": 20, "load": [62.51, 51.1, 46.06], "mem_total_kb": 24607384, "mem_available_kb": 15988804, "leads_kb": {"DAEO-s9qc": 3183388}}
+{"t": "2026-10-30T21:35:17", "nproc": 20, "load": [50.71, 50.36, 46.16], "mem_total_kb": 24607384, "mem_available_kb": 15572676, "leads_kb": {"DAEO-s9qc": 3649016}}
+{"t": "2026-10-30T21:36:18", "nproc": 20, "load": [40.97, 47.47, 45.42], "mem_total_kb": 24607384, "mem_available_kb": 15339276, "leads_kb": {"DAEO-s9qc": 3424284}}

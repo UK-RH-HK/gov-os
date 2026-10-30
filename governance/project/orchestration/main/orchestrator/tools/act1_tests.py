@@ -21,7 +21,8 @@ os.makedirs(env["TMPDIR"], exist_ok=True)
 
 
 def run(args, xml):
-    p = subprocess.run(["bash", VL, sys.executable, "-m", "pytest", *args, "-q", "-p", "no:cacheprovider",
+    # outside the test lock (DEC-955: ACT 1 first), at most 6 workers so the running close is not starved
+    p = subprocess.run([sys.executable, "-m", "pytest", *args, "-q", "-p", "no:cacheprovider",
                         "--no-header", "-o", "tmp_path_retention_policy=failed", f"--junitxml={xml}"],
                        cwd=clone, env=env, capture_output=True, text=True)
     failed = []
@@ -33,7 +34,7 @@ def run(args, xml):
     return p.returncode, p.stdout.strip().splitlines()[-1:] if p.stdout else [], failed
 
 
-rc, last, failed = run([*folders, "-n", "auto"], out + "/new.xml")
+rc, last, failed = run([*folders, "-n", "6"], out + "/new.xml")
 print("with ACT 1:", last, "failed", len(failed))
 subprocess.run(["git", "-C", clone, "checkout", "-q", "HEAD^", "--", ".claude", ".rulesync"], check=True)
 try:

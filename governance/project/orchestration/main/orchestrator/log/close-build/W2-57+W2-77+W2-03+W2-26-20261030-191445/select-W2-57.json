@@ -1,0 +1,95 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "src/gov/close/command.py",
+    "src/gov/close/serial.py"
+   ]
+  }
+ ],
+ "base": "76fb5f183dd73c66f38586f177ccf8f4cfa34b99",
+ "head": "9f4484488ed5a977cd3377038991122f77072e9a",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-cy5o/CP-DAEO-cy5o-0004.md",
+  "docs/checkpoints/DAEO-cy5o/CP-DAEO-cy5o-0009.md",
+  "docs/checkpoints/DAEO-cy5o/CP-DAEO-cy5o-0012.md",
+  "docs/checkpoints/DAEO-cy5o/CP-DAEO-cy5o-0015.md",
+  "docs/probes/DAEO-cy5o/PR-DAEO-cy5o-reprobe-1.md",
+  "docs/probes/DAEO-cy5o/PR-DAEO-cy5o-reprobe-2.md",
+  "docs/probes/DAEO-cy5o/PR-DAEO-cy5o-review-2.md",
+  "docs/probes/DAEO-cy5o/PR-DAEO-cy5o.md"
+ ],
+ "changed": [
+  "docs/changes/W2-57-CIT-E.md",
+  "src/gov/adapters/portability.py",
+  "src/gov/close/command.py",
+  "src/gov/close/serial.py",
+  "src/gov/doctor/command.py",
+  "tests/acceptance/W1-02/README.md",
+  "tests/acceptance/W1-02/test_w1_02_multiedit.py",
+  "tests/acceptance/W1-02/test_w1_02_path_limit_time.py",
+  "tests/acceptance/W1-02/w1_02_limit_support.py",
+  "tests/acceptance/W1-02/w1_02_round_support.py",
+  "tests/acceptance/W1-02/w1_02_support.py",
+  "tests/acceptance/W1-07/README.md",
+  "tests/acceptance/W1-07/test_w1_07_envelope.py",
+  "tests/acceptance/W1-07/w1_07_support.py",
+  "tests/acceptance/W1-19/test_w1_19_real_models.py",
+  "tests/acceptance/W1-30/README.md",
+  "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py",
+  "tests/acceptance/W1-33/w1_33_support.py",
+  "tests/acceptance/W1-38/README.md",
+  "tests/acceptance/W1-38/conftest.py",
+  "tests/acceptance/W1-38/test_w1_38_heldout_step.py",
+  "tests/acceptance/W1-38/test_w1_38_rulesync.py",
+  "tests/acceptance/W1-38/w1_38_support.py",
+  "tests/acceptance/W1-46/README.md",
+  "tests/acceptance/W1-46/test_w1_46_live_sessions.py",
+  "tests/acceptance/W1-50/test_w1_50_freeze_launcher.py",
+  "tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py",
+  "tests/acceptance/W1-50/w1_50_freeze_README.md",
+  "tests/acceptance/W2-57/README.md",
+  "tests/acceptance/W2-57/conftest.py",
+  "tests/acceptance/W2-57/test_w2_57_designer_read_p95.py",
+  "tests/acceptance/W2-57/test_w2_57_doctor_claude_code_unread.py",
+  "tests/acceptance/W2-57/test_w2_57_doctor_probes.py",
+  "tests/acceptance/W2-57/test_w2_57_nightly_route.py",
+  "tests/acceptance/W2-57/test_w2_57_rulesync_probe.py",
+  "tests/acceptance/W2-57/test_w2_57_serial_list.py",
+  "tests/acceptance/W2-57/w2_57_list_support.py",
+  "tests/acceptance/W2-57/w2_57_support.py",
+  "tests/acceptance/serial-only.txt",
+  "tests/unit/adapters/test_portability.py",
+  "tests/unit/close/test_serial.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-57/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26-20261030-191445/tests/acceptance/W2-57"
+ ],
+ "ignore": [
+  "tests/acceptance/W2-57/"
+ ],
+ "deselect": [],
+ "per_test_timeout": 900
+}
