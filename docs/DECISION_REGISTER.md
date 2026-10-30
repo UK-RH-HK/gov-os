@@ -11717,7 +11717,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 
 
 ### DEC-947 — The memory gate: one verification run's peak reserved once, a working size per lead; re-measured weekly (standing)
-- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-942, DEC-946, DEC-904 · **Changes:** DEC-942 item 2's memory rule (each running lead's measured reservation) and its "how it is applied" (the highest peak charged per lead) · **Lifted by:** DEC-953 (item 1) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product
+- **Status:** ACCEPTED (owner, 2026-10-29, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-29)`; standing) · **Under:** DEC-942, DEC-946, DEC-904 · **Changes:** DEC-942 item 2's memory rule (each running lead's measured reservation) and its "how it is applied" (the highest peak charged per lead) · **Lifted by:** DEC-953 (item 1) as a gate on this repository's own development, until the Gov OS is whole; it stays in force for the product · **Changed by:** DEC-960 (while a verification run holds the lock, its peak is not reserved again)
 - **Decision:**
   1. The verification lock lets only one full test run happen at a time, so its peak (7.4 GiB measured on 2026-10-29) is reserved once, not per lead.
   2. **The reserve:** the floor, plus one verification run's measured peak, plus each running lead's measured working size outside verification (about 2.1 GiB, measured on 2026-10-29).
@@ -12021,3 +12021,14 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.342 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-959 (the merge queue, the push the owner's, the QA engineer per stream in batches, domain skills after ACT 2, one skill template with imports, the opaque runner now, the work order in parallel, §5.3's tickets approved with test data in the spec skill, P-W2-H064 (a), ACT-GUARD-FIX-1 applied). Next free id: DEC-960. |
+
+### DEC-960 — The memory gate counts a running verification once (standing)
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat: "check the memory gate for double counting … if that's what happens, fix it"; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-947, DEC-942 item 2, DEC-954 · **Changes:** DEC-947 (the reservation of one verification run's peak)
+- **What was found:** the gate (`tools/gate_check.py`) reserved one verification run's measured peak (7,404,492 kB) whether or not a run was going. While a close's or the nightly's full run held the verification lock, that run's memory was already out of MemAvailable and the peak was reserved again on top: a full double count. While a lead's own full run held it, that lead's tree was added back and reserved at both its working size and the peak, which was itself measured on a whole lead tree: a double count of one working size (2,140,236 kB).
+- **Decision:** the gate reads who holds `/tmp/gov-os-verify.lock`. No holder: the peak is reserved once, as before. A close or the nightly: only what that run may still grow to is reserved (the peak less its measured process-tree memory). A lead's run: that lead is reserved at the peak alone, not the peak plus its working size. The gate's line names the case (`verify=none|other|lead`).
+- **Effect:** during a close's or the nightly's run near its peak, up to 3 more leads (7.4 GB freed at 2.1 GB each); during a lead's own full run, 1 more lead; with no run, no change.
+- **Where it goes (DEC-851):** this register; the prompt §3 (the resource gate); `tools/gate_check.py`; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.343 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-960 (the memory gate counts a running verification once). Next free id: DEC-961. |
