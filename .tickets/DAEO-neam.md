@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-7r5e]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
-priority: 2
+priority: 4
 assignee: engineer
 external-ref: W2-45
-tags: [wave-2, implementation, standard]
+tags: [wave-2, implementation, standard, wave-3, deferred]
 wbs_id: W2-45
 title: gov check runner semantics and scale
 class: implementation
@@ -69,6 +69,8 @@ list_rows:
 - W2-M315
 ---
 # W2-45 gov check runner semantics and scale
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** K8 (DEC-941); W2-26 found no trigger (indexing about 30 % of the envelope).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-45), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

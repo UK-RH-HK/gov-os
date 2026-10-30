@@ -5,10 +5,10 @@ deps: [DAEO-g0ip, DAEO-1ahb]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
-priority: 2
+priority: 4
 assignee: engineer
 external-ref: W2-44
-tags: [wave-2, implementation, full]
+tags: [wave-2, implementation, full, wave-3, deferred]
 wbs_id: W2-44
 title: Trailers bound to the launch identity
 class: implementation
@@ -59,6 +59,8 @@ list_rows:
 - W2-M278
 ---
 # W2-44 Trailers bound to the launch identity
+
+**Deferred to Wave 3 (DEC-953 item 10b, approved by DEC-954, 2026-10-30).** Trailers are lifted as a gate (audit §4.3).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-44), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
