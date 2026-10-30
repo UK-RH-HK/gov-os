@@ -492,3 +492,18 @@ evaluation_sets:
     hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
     measures:
       roles: [engineer, research]
+# The retrieval authority order (DEC-952 item 1, W2-87): for the same match a governing source comes before a test or
+# a report; the tiers in order, highest first, and the lift per tier step before the cut and after the rerank.
+retrieval_authority:
+  lift:
+    fused: 0.004
+    rerank: 1.0
+  default: middle
+  tiers:
+    - name: governing
+      records: [{type: decision, status: [ACCEPTED]}, {type: capability}]
+      paths: ["docs/contract/**", "docs/charter/**", "docs/spec/**", "docs/adr/**",
+              "template/governance/kernel/roles/**", "template/governance/kernel/skills/**"]
+    - name: middle
+    - name: reports
+      paths: ["tests/**", "docs/assessment/**", "docs/audit/**", "docs/probes/**"]

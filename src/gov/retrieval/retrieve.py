@@ -118,9 +118,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     root = Path(root)
     record_of, not_current, record_types = _graph(root)
     # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
-    known = records.records(root)
-    register, entry_of = authority.register_path(known), authority.register_entries_of(
-        known, records.edges(root, type=authority.SUPERSEDES), root)
+    known, edges = records.records(root), records.edges(root, type=authority.SUPERSEDES)
+    register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)
+    order = authority.order(root, known, edges, entry_of)  # DEC-952 item 1: the path map's retrieval_authority
     answers = {lexical.FACET: lexical.search(root, query, refresh=False),
                semantic.FACET: semantic.search(root, query, refresh=False)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
@@ -138,7 +138,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         closure_gaps += closed["gaps"]
 
-    fused = rrf(routes)
+    fused = order.fused(rrf(routes), chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
 
     # DEC-424: move failure/lesson records ahead so they're gathered even in small batches
     ahead_paths: set[str] = set()
@@ -218,6 +218,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         ranked = rerank(query, candidates, reranker)
     except (OSError, RuntimeError, ValueError):
         ranked = candidates
+    ranked = order.reranked(ranked)  # W2-87: the rerank does not undo the authority order (DEC-952)
 
     # DEC-424: sort failure/lesson records ahead of other evidence after reranking
     if ahead_paths:
