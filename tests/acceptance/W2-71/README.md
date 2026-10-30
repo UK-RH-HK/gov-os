@@ -189,10 +189,14 @@ need not run.
 
 ### K5 — "The rule's id and keywords are written only in parts in every tracked file this ticket writes (code, tests, records) …; under .gov-runtime/, commit hashes in its records and returns are 12 digits"
 
-`test_w2_71_keywords_in_parts.py`: every file the branch adds or changes under `src/gov/secrets/`,
-`tests/unit/secrets_check/` and `tests/acceptance/W2-71/` (against the merge base with `w2/integrate`, the working tree
-and untracked files included; every file of the three folders when that branch is absent) holds neither keyword whole,
-in any case, in its content or its path. A premise checks that the list holds this suite's own files.
+`test_w2_71_keywords_in_parts.py`: every file the ticket writes under `src/gov/secrets/`,
+`tests/unit/secrets_check/` and `tests/acceptance/W2-71/` holds neither keyword whole, in any case, in its content or
+its path. The ticket's files are the paths changed there by every commit reachable from HEAD whose `Task:` trailer
+names DAEO-e8f0 (merges left out: they bring other tickets' work), plus the working tree's changed and untracked files;
+nothing depends on `w2/integrate` or a merge base, so the list is the same on the branch and in the main tree after the
+merge. When git cannot list them, every file of the three folders on disk is read. A premise checks that the list holds
+this suite's own file and a file under `src/gov/secrets/`. Rewrite-Reason: the close of 2026-10-30 02:12 was refused
+because the merge-base diff was empty once the ticket was merged.
 
 | Test | Red today because |
 |---|---|
