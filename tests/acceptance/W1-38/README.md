@@ -568,6 +568,13 @@ that also stops the test designer").
 line removed; nothing of the template was changed): the generated deny list is the four other rules, `rulesync
 generate --check` ends with 0 and the declared command of the adapter check ends with 0.
 
+**Revised by DEC-966 item 1 (W2-105, `Rewrite-Reason: DEC-966 item 1`, DEC-866).** The two install rules
+(`npm install*`, `pip install*`) are taken out of the template's source too, so an adopted product's CTO session
+reaches the guard's install rule (DEC-172). The two cases of behaviour 2 that listed the other rules now pin the two
+that stay, the ticket-folder edit rule and the sudo rule (`Bash(sudo *)`, `Edit(.tickets/**)` generated), and still
+nothing else. Their ids ("four other") are kept from this round. They are red on the template before W2-105's change
+(the source still gives the two install rules) and green after it.
+
 ### How a case is built
 
 - **The project** is the suite's stand-in project (`generated_project`), as everywhere in the suite; rulesync is
@@ -599,8 +606,8 @@ generate --check` ends with 0 and the declared command of the adapter check ends
 | 1. the rule is gone from the source | `TestTheRuleIsGone::test_the_templates_source_holds_no_edit_rule_on_the_acceptance_test_folder` | no rule under `permission.edit` of the template's source, whatever its value, covers a path of the folder | **red**: the source holds `tests/acceptance/**` as an edit deny rule |
 | 1. and from the generated settings | `…::test_the_generated_settings_hold_no_deny_rule_on_the_acceptance_test_folder` | no `Edit` deny rule of the settings generated from the template covers a path of the folder | **red**: `Edit(tests/acceptance/**)` is generated |
 | | `…::test_the_generated_settings_hold_no_rule_of_a_write_tool_on_the_folder_in_any_list` | no rule of `Edit`, `Write`, `MultiEdit` or `NotebookEdit` in the deny, ask or allow list covers it | **red**: the same rule |
-| 2. the removal takes one rule | `TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else` | the source's rules that are not on the folder are exactly the ticket-folder edit rule and the two install rules and the sudo rule, each `deny` | green before implementation; it must stay green |
-| | `…::test_the_four_other_deny_rules_are_still_generated_and_nothing_else` | the generated permission rules that are not on the folder are exactly the four deny rules, each once; no other list holds a rule | green before implementation; it must stay green |
+| 2. the removal takes one rule | `TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else` | the source's rules that are not on the folder are exactly the ticket-folder edit rule and the sudo rule, each `deny` (since DEC-966 item 1; before it, the two install rules too) | green before DEC-664's implementation; red before W2-105's (the two install rules), green after |
+| | `…::test_the_four_other_deny_rules_are_still_generated_and_nothing_else` | the generated permission rules that are not on the folder are exactly `Bash(sudo *)` and `Edit(.tickets/**)`, each once (since DEC-966 item 1); no other list holds a rule | green before DEC-664's implementation; red before W2-105's (the two install deny rules), green after |
 | | `…::test_the_generated_settings_still_close_the_ticket_folder` | an `Edit` deny rule covers a ticket file that exists and a new one | green before implementation; it must stay green |
 | 3. the guard, the test designer | `TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder` | Write and Edit on an existing and a new file under the folder, and a Bash redirect: every registered command allows | green before implementation; it must stay green |
 | | `…::test_the_test_designer_is_still_refused_outside_the_folder` | Write and Edit on a file of the ticket's own paths, a unit test, the ticket file: the program's own refusal | green before implementation; it must stay green (the allowance is a decision, not a guard that lets everything through) |

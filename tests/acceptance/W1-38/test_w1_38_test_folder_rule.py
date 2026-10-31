@@ -19,6 +19,11 @@ template's sources, the kernel, the tool registry, the real ``rulesync generate`
 it: ``support.RULESYNC_BIN``, skipped when it is not installed). No tool call is ever made: the guard is
 asked, and ``gov launch`` starts a stand-in program that records what a session would be started with
 (W1-46's stand-in). Nothing of this repository but the template's files and the named tool registry is read.
+
+Rewrite-Reason: DEC-966 item 1 (W2-105, DEC-866). The template's ``npm install*`` and ``pip install*`` deny rules
+are taken out of its permission source, so an adopted product's CTO session reaches the guard's install rule
+(DEC-172). The cases of behaviour 2 pinned them among the other rules; they now pin the ticket-folder edit rule and
+the sudo rule, and nothing else. The two cases keep their ids ("four other") from DEC-664's round.
 """
 
 from __future__ import annotations
@@ -53,15 +58,14 @@ FOLDER_PATHS = (FOLDER, EXISTING_TEST, NEW_TEST, f"{FOLDER}/conftest.py", f"{FOL
 WRITE_TOOLS = ("Edit", "Write", "MultiEdit", "NotebookEdit")
 RULE_LISTS = ("deny", "ask", "allow")
 
-# What the template's source gives beside the rule DEC-664 takes out, and what rulesync makes of each.
+# What the template's source gives beside the rule DEC-664 takes out, and what rulesync makes of each. The two
+# install rules (``npm install*``, ``pip install*``) are taken out too, by DEC-966 item 1.
 OTHER_SOURCE_RULES = {
     ("edit", ".tickets/**", "deny"),
-    ("bash", "npm install*", "deny"),
-    ("bash", "pip install*", "deny"),
     ("bash", "sudo *", "deny"),
 }
 OTHER_GENERATED_RULES = {
-    "deny": ["Bash(npm install*)", "Bash(pip install*)", "Bash(sudo *)", "Edit(.tickets/**)"],
+    "deny": ["Bash(sudo *)", "Edit(.tickets/**)"],
 }
 
 ENGINEER = hooks.ENGINEER
@@ -285,15 +289,19 @@ class TestEveryOtherRuleStays:
     """Green before implementation; it must stay green."""
 
     def test_the_templates_source_gives_the_four_other_rules_and_nothing_else(self, tmp_path):
+        """Since DEC-966 item 1 the other rules are two: the ticket-folder edit rule and the sudo rule (the id is
+        DEC-664's round's)."""
         others = {rule for rule in _source_rules() if not _on_the_folder(rule, tmp_path)}
         assert others == OTHER_SOURCE_RULES, (
-            f"beside the test-folder rule, {SOURCE_REL} must give the ticket-folder edit rule and the install "
-            f"and sudo rules, and no other; missing: {sorted(OTHER_SOURCE_RULES - others)}, "
+            f"beside the test-folder rule, {SOURCE_REL} must give the ticket-folder edit rule and the sudo rule, "
+            f"and no other (DEC-966 item 1: no install rule); missing: {sorted(OTHER_SOURCE_RULES - others)}, "
             f"not expected: {sorted(others - OTHER_SOURCE_RULES)}"
         )
 
     @needs_rulesync
     def test_the_four_other_deny_rules_are_still_generated_and_nothing_else(self, generated_project, tmp_path):
+        """Since DEC-966 item 1 the other deny rules are two: ``Bash(sudo *)`` and ``Edit(.tickets/**)`` (the id is
+        DEC-664's round's)."""
         settings = support.load_settings(generated_project)
         permissions = settings.get("permissions")
         assert isinstance(permissions, dict), f"{GENERATED_REL} holds no `permissions` map"
@@ -304,8 +312,8 @@ class TestEveryOtherRuleStays:
         others = {kind: rules for kind, rules in others.items() if rules}
         assert others == OTHER_GENERATED_RULES, (
             f"beside a rule on the acceptance-test folder, {GENERATED_REL} generated from the template's sources "
-            f"must hold the ticket-folder Edit rule and the install and sudo rules as deny rules, each once, and "
-            f"no other permission rule; it holds {others}"
+            f"must hold the ticket-folder Edit rule and the sudo rule as deny rules, each once, and no other "
+            f"permission rule (DEC-966 item 1: no install rule); it holds {others}"
         )
 
     @needs_rulesync
