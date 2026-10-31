@@ -80,6 +80,20 @@ def _make_project(tmp_path):
     return project
 
 
+def _make_cto_project(tmp_path, coordination_ticket="T-01"):
+    """A project whose roster names the coordination ticket, so the
+    orchestrator on it is the CTO, whose install is asked (DEC-957,
+    DEC-971 item 4, DEC-980)."""
+    project = _make_project(tmp_path)
+    roster = project / "governance" / "project" / "roster.yaml"
+    roster.parent.mkdir(parents=True)
+    roster.write_text(f"coordination_ticket: {coordination_ticket}\n",
+                      encoding="utf-8")
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "roster")
+    return project
+
+
 def _run_hook(project, command, role=None, ticket=None, subagent=None,
               tmp_path=None):
     sandbox_home = tmp_path / "home"
@@ -312,7 +326,7 @@ def test_acting_role_subagent_in_session_without_role():
 # ===================================================================
 
 def test_orchestrator_install_gets_ask(tmp_path):
-    project = _make_project(tmp_path)
+    project = _make_cto_project(tmp_path)
     proc = _run_hook(project, "pip install requests",
                      role="orchestrator", ticket="T-01", tmp_path=tmp_path)
     assert _decision(proc) == "ask"
@@ -358,7 +372,7 @@ def test_guard_deny_stays_deny_for_orchestrator_install(tmp_path):
 # ===================================================================
 
 def test_ask_leaves_snapshot(tmp_path):
-    project = _make_project(tmp_path)
+    project = _make_cto_project(tmp_path)
     snap_dir = project / ".gov-runtime" / "snapshots"
     proc = _run_hook(project, "pip install requests",
                      role="orchestrator", ticket="T-01", tmp_path=tmp_path)
@@ -384,7 +398,7 @@ def test_deny_leaves_no_snapshot(tmp_path):
 # ===================================================================
 
 def test_ask_output_has_three_keys(tmp_path):
-    project = _make_project(tmp_path)
+    project = _make_cto_project(tmp_path)
     proc = _run_hook(project, "npm install -g ccusage",
                      role="orchestrator", ticket="T-01", tmp_path=tmp_path)
     assert proc.returncode == 0
@@ -524,7 +538,7 @@ def test_frozen_repo_denies_install_for_orchestrator(tmp_path):
 
 def test_unfrozen_repo_asks_install_for_orchestrator(tmp_path):
     """Without freeze, orchestrator gets ask (control for frozen test)."""
-    project = _make_project(tmp_path)
+    project = _make_cto_project(tmp_path)
     proc = _run_hook(project, "pip install requests",
                      role="orchestrator", ticket="T-01", tmp_path=tmp_path)
     assert _decision(proc) == "ask"
@@ -535,7 +549,7 @@ def test_unfrozen_repo_asks_install_for_orchestrator(tmp_path):
 # ===================================================================
 
 def test_curl_combined_option_ask_for_orchestrator(tmp_path):
-    project = _make_project(tmp_path)
+    project = _make_cto_project(tmp_path)
     proc = _run_hook(
         project,
         "curl -fsSLo ~/.local/bin/tool https://example.invalid/t",
