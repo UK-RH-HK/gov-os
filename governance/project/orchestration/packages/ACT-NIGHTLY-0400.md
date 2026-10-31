@@ -1,6 +1,6 @@
 # ACT-NIGHTLY-0400: the nightly at 04:00, its check at 08:00, the Windows wake at 03:50 (DEC-973)
 
-For the owner. **Run it only after the CTO says the nightly folder's change is committed** (its times moved to 04:00 to 08:00; the commit will be named here). Before that commit, the crontab's new lines would start a nightly whose window still ends at 05:00.
+For the owner. **The nightly folder's change is committed: `e8c36347`** (its window 04:00 to 08:00, the check at 08:00 with re-checks at 08:30 and 09:00, the quiet hours 02:00 to 07:30; independently reviewed, PASS; `test_nightly.sh` PASS). You may run this ACT now; before 02:00 tonight, so the 02:00 line does not start a nightly a second time. If the ACT is not in by 02:00, tonight's nightly starts at 02:00 under the new window (04:00 to 08:00 latest start), which also works; the crontab change moves it to 04:00 from tomorrow.
 
 ## Part A: you, in WSL (a plain terminal or your operator)
 ```
