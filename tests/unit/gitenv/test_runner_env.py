@@ -160,7 +160,11 @@ def test_the_bisect_runs_in_a_test_run_s_environment(home, tmp_path, monkeypatch
     monkeypatch.setattr(nightly, "_git", lambda *args, **kwargs: "")
     assert nightly._bisect(root, "a" * 40, "b" * 40, "tests/t.py::t", [], env) is None
     assert [step for step, _env, _keys in seen] == ["start", "run", "reset"]
-    for _step, given, keys in seen:
+    for step, given, keys in seen:
+        handed = given.pop(nightly._STEP_ENV, None)
+        # Only ``bisect run`` hands the step the run's environment for its tests (R4-1): that same environment.
+        assert (handed is not None) == (step == "run")
+        assert handed is None or json.loads(handed) == given
         assert keys == KEYS
         assert {k: v for k, v in given.items() if k != "GIT_CONFIG_GLOBAL"} == \
             {k: v for k, v in run.items() if k != "GIT_CONFIG_GLOBAL"}

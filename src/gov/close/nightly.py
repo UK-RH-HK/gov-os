@@ -90,9 +90,19 @@ def _alone(tree: Path, test: str, limit: list[str], run_limit: float, env: dict)
     return PASSED if done.returncode == 0 else FAILED
 
 
-_BISECT_STEP = """
-import subprocess, sys
-code = subprocess.run([sys.executable, "-m", "pytest", *sys.argv[1:]]).returncode
+# ``git bisect run`` exports ``GIT_DIR``, ``GIT_EXEC_PATH`` and ``GIT_PREFIX`` to the step and puts its own folder
+# first on ``PATH``: the step's tests get the run's environment as handed to it, never the step's own (R4-1). A
+# step that cannot read it judges nothing: 125, the commit untestable, never good (DEC-580).
+_STEP_ENV = "GOV_NIGHTLY_STEP_ENV"
+_BISECT_STEP = f"""
+import json, os, subprocess, sys
+try:
+    env = json.loads(os.environ["{_STEP_ENV}"])
+except (KeyError, ValueError):
+    sys.exit(125)
+if not isinstance(env, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in env.items()):
+    sys.exit(125)
+code = subprocess.run([sys.executable, "-m", "pytest", *sys.argv[1:]], env=env).returncode
 sys.exit(0 if code == 0 else 125 if code == 5 else 1)
 """
 
@@ -103,13 +113,14 @@ def _bisect(tree: Path, good: str, bad: str, test: str, limit: list[str], env: d
     step = [sys.executable, "-c", _BISECT_STEP, path + sep + rest, "-q", "-p", "no:cacheprovider", "--no-header",
             "--rootdir", str(tree)] + limit
     # The clone is another folder and the step starts the tests, which start git in folders of their own (P-1).
-    # Each commit is judged in the environment of the run that found the red (``_started``'s, DEC-970).
+    # Each commit is judged in the environment of the run that found the red (``_started``'s, DEC-970), handed to
+    # the step whole: what git adds for the step reaches no test (R4-1).
     with runner_env(base={key: value for key, value in env.items() if not key.startswith("GIT_")}) as bisect_env:
         try:
             subprocess.run(["git", "-C", str(tree), "bisect", "start", bad, good], capture_output=True, text=True,
                            env=bisect_env, check=True)
             done = subprocess.run(["git", "-C", str(tree), "bisect", "run", *step], capture_output=True, text=True,
-                                  env=bisect_env, cwd=str(tree))
+                                  env={**bisect_env, _STEP_ENV: json.dumps(bisect_env)}, cwd=str(tree))
             for line in done.stdout.splitlines():
                 word = line.split(" ", 1)[0]
                 if line.endswith("is the first bad commit") and len(word) == 40:
