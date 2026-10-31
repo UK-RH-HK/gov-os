@@ -14,6 +14,10 @@ the last run are in "Round 8".
 env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs
 ```
 
+W2-67 (DAEO-9nys) revised the 13 first-round cases lens I2 found weak, and brought row W2-L420's docstrings to
+DEC-868 and DEC-908: each case's planted fault, its red and green runs and its Rewrite-Reason are in
+`README-W2-67.md`.
+
 ## How the tests run
 
 - Through public interfaces only: the `gov close` command line (W1-07's console-script
