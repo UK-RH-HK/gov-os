@@ -1,0 +1,253 @@
+"""The opaque acceptance runner behind ``gov accept`` (W2-96, DEC-959 item 6, DEC-820 (c)).
+
+It runs a ticket's acceptance folder with pytest in a child process whose output goes to the null device, reads
+only each case's file, function name and outcome from the child's JUnit file, and reports pass or fail per KPI
+line of the folder's README map, with counts. Nothing of the tests' content (a name, a message, a traceback, a
+captured output, a path inside the folder) reaches the caller: a run that goes wrong is reported by its kind
+alone, and any exception of the runner's own is a ``crash`` with no message. It fails closed: a line no test
+proves fails, and a README with no map refuses rather than falling back to raw output.
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import NamedTuple
+
+from gov.cli.errors import GovError
+
+NAME = re.compile(r"(success|failure|kpi|s|f|k)[ \t-]*(\d+)(?!\w)", re.I)
+JOIN = re.compile(r"\s*(?:/|,|;|\band\b)\s*", re.I)
+ITEM = re.compile(r"`([^`]+)`")
+WORD = re.compile(r"\w+")
+SEPARATOR = re.compile(r":?-+:?")
+SAFE_TICKET = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+OUTCOMES = ("passed", "failed", "skipped")
+EXIT_FAIL, EXIT_ERROR = 3, 4
+
+
+class Case(NamedTuple):
+    file: str     # relative to the project root, as pytest names it
+    name: str     # the function name, with any parameter id
+    outcome: str  # passed, failed or skipped
+
+
+# --- the README map -------------------------------------------------------------------------------------------------
+
+def line_names(text: str) -> list[str]:
+    """The KPI lines named at the start of ``text``, in the normal form ``success-N`` / ``failure-N``."""
+    text = text.replace("*", "").strip()
+    names, found = [], NAME.match(text)
+    while found:
+        kind = "failure" if found.group(1).lower() in ("failure", "f") else "success"
+        names.append(f"{kind}-{int(found.group(2))}")
+        joined = JOIN.match(text, found.end())
+        found = NAME.match(text, joined.end()) if joined else None
+    return names
+
+
+def _cells(row: str) -> list[str]:
+    return [cell.strip() for cell in row.strip().strip("|").split("|")]
+
+
+def parse_map(text: str) -> dict[str, list[str]]:
+    """``{line: [item, ...]}`` from the README's tables, in row form (a KPI column) or heading form."""
+    mapping: dict[str, list[str]] = {}
+    heading: list[str] = []
+    fenced, table = False, None  # table: None before a header row, False when ignored, else (kpi, test, names)
+    for raw in text.splitlines():
+        line = raw.strip()
+        if line.startswith(("```", "~~~")):
+            fenced, table = not fenced, None
+            continue
+        if fenced:
+            continue
+        if not line.startswith("|"):
+            table = None
+            if line.startswith("#"):
+                heading = line_names(line.lstrip("#"))
+            continue
+        cells = _cells(line)
+        if table is None:
+            titles = [cell.lower() for cell in cells]
+            kpi = next((i for i, title in enumerate(titles) if title.startswith("kpi")), None)
+            test = next((i for i, title in enumerate(titles) if title.startswith(("test", "file"))), None)
+            table = False if test is None else (kpi, test, heading)
+            continue
+        if not table or all(SEPARATOR.fullmatch(cell) for cell in cells):
+            continue
+        kpi, test, names = table
+        if kpi is not None:
+            names = line_names(cells[kpi]) if kpi < len(cells) else []
+        items = ITEM.findall(cells[test]) if test < len(cells) else []
+        for name in names if items else []:
+            mapping.setdefault(name, []).extend(items)
+    return mapping
+
+
+def ordered(mapping: dict) -> list[str]:
+    """The lines in order: ``success-1…``, then ``failure-1…``."""
+    return sorted(mapping, key=lambda name: (name.startswith("failure"), int(name.split("-")[1])))
+
+
+def _same_file(item: str, file: str) -> bool:
+    item, file = item.removeprefix("./"), file.removeprefix("./")
+    return item == file or file.endswith("/" + item) or item.endswith("/" + file)
+
+
+def matches(item: str, case: Case) -> bool:
+    """Whether the README item (``name.py``, ``name.py::test_x`` or a bare word) names the case."""
+    item, function = item.strip(), case.name.split("[")[0]
+    if "::" in item:
+        path, *rest = item.split("::")
+        test = rest[-1]
+        return path.endswith(".py") and _same_file(path, case.file) and (
+            case.name == test if "[" in test else function == test)
+    if item.endswith(".py"):
+        return _same_file(item, case.file)
+    return bool(WORD.fullmatch(item)) and function in (item, "test_" + item)
+
+
+# --- the child run --------------------------------------------------------------------------------------------------
+
+def read_cases(report: Path) -> tuple[list[Case], bool]:
+    """Each case's file, name and outcome, and whether any is a collection error; no element's text is read."""
+    from xml.etree import ElementTree
+
+    cases, collection = [], False
+    for element in ElementTree.parse(report).iter("testcase"):
+        tags = {child.tag for child in element}
+        collection = collection or ("error" in tags and element.get("line") is None)
+        outcome = "failed" if tags & {"failure", "error"} else "skipped" if "skipped" in tags else "passed"
+        cases.append(Case(element.get("file") or "", element.get("name") or "", outcome))
+    return cases, collection
+
+
+def _kill(process: subprocess.Popen) -> None:
+    try:
+        os.killpg(process.pid, signal.SIGKILL)  # the whole group: the child and whatever it started
+    except OSError:
+        pass
+    process.wait()
+
+
+def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Case]]:
+    """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after."""
+    private = Path(tempfile.mkdtemp(prefix="gov-accept-"))
+    process = None
+    try:
+        report, temp = private / "report.xml", private / "tmp"
+        temp.mkdir()
+        env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "PYTHON"))}
+        env.update(PYTHONPATH=str(root / "src"), PYTHONDONTWRITEBYTECODE="1", TMPDIR=str(temp))
+        command = [sys.executable, "-B", "-m", "pytest", str(folder), f"--rootdir={root}", "-p", "no:cacheprovider",
+                   f"--basetemp={private / 'basetemp'}", f"--junitxml={report}", "-o", "junit_family=xunit1",
+                   "-o", "junit_logging=no", "-o", "junit_log_passing_tests=false"]
+        process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL, start_new_session=True)
+        try:
+            code = process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            return "timeout", []
+        if code in (2, 5):
+            return "collection", []
+        if code not in (0, 1):  # 3, 4, killed by a signal, anything else
+            return "crash", []
+        cases, collection = read_cases(report)
+        return ("collection", []) if collection else (None, cases)
+    finally:
+        if process is not None:
+            _kill(process)
+        shutil.rmtree(private, ignore_errors=True)
+
+
+# --- the command ----------------------------------------------------------------------------------------------------
+
+def _ticket(root: Path, ticket: str) -> tuple[str, dict]:
+    """The ticket's id and front matter, by its file name or its WBS id."""
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
+
+    folder = root / TICKETS_REL
+    if SAFE_TICKET.fullmatch(ticket or ""):
+        front = frontmatter(folder / f"{ticket}.md")
+        if front is not None:
+            return ticket, front
+        for path in sorted(folder.glob("*.md")):
+            try:
+                if ticket not in path.read_text(encoding="utf-8", errors="replace"):
+                    continue
+            except OSError:
+                continue
+            front = frontmatter(path)
+            if front is not None and str(front.get("wbs_id")) == ticket:
+                return path.stem, front
+    raise GovError("ACCEPT_UNKNOWN_TICKET", f"no ticket {ticket}", {"ticket": ticket})
+
+
+def _folder(root: Path, ticket: str, front: dict) -> tuple[Path, str]:
+    """The ticket's acceptance folder, a folder strictly inside the root, and its declared path."""
+    tests = front.get("acceptance_tests")
+    declared = tests.get("path") if isinstance(tests, dict) else None
+    if isinstance(declared, str) and declared.strip():
+        try:
+            folder = (root / declared).resolve()
+            if folder != root and folder.is_relative_to(root) and folder.is_dir():
+                return folder, declared
+        except (OSError, ValueError):
+            pass
+    raise GovError("ACCEPT_NO_TESTS", f"ticket {ticket} has no acceptance folder inside the project "
+                   f"(declared: {declared})", {"ticket": ticket, "path": declared})
+
+
+def _zero() -> dict:
+    return dict.fromkeys(OUTCOMES, 0)
+
+
+def _result(ticket: str, outcome: str, kind: str | None, lines: list, unmapped: dict, totals: dict) -> dict:
+    return {"ticket": ticket, "outcome": outcome, "error_kind": kind, "lines": lines, "unmapped": unmapped,
+            "totals": totals}
+
+
+def _report(ticket: str, mapping: dict, cases: list[Case]) -> tuple[dict, int]:
+    counts, unmapped, totals = {name: _zero() for name in mapping}, _zero(), _zero()
+    for case in cases:
+        totals[case.outcome] += 1
+        hits = [name for name, items in mapping.items() if any(matches(item, case) for item in items)]
+        for name in hits:
+            counts[name][case.outcome] += 1
+        if not hits:
+            unmapped[case.outcome] += 1
+    lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"] else "fail",
+              **counts[name]} for name in ordered(mapping)]
+    passed = all(line["outcome"] == "pass" for line in lines)
+    return _result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals), 0 if passed else EXIT_FAIL
+
+
+def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
+    """``gov accept``'s result and exit code; a refusal is a ``GovError`` naming only the ticket and its path."""
+    root = Path(root).resolve()
+    ticket, front = _ticket(root, ticket)
+    folder, declared = _folder(root, ticket, front)
+    error = _result(ticket, "error", "crash", [], _zero(), _zero()), EXIT_ERROR
+    try:
+        readme = folder / "README.md"
+        mapping = parse_map(readme.read_text(encoding="utf-8")) if readme.is_file() else {}
+    except Exception:  # a README it cannot read or decode: never its message
+        return error
+    if not mapping:
+        raise GovError("ACCEPT_NO_MAP", f"ticket {ticket}: the README of {declared} maps no KPI line",
+                       {"ticket": ticket, "path": declared})
+    try:
+        kind, cases = _run(root, folder, timeout)
+        if kind is None:
+            return _report(ticket, mapping, cases)
+        error[0]["error_kind"] = kind
+    except Exception:  # any exception of the runner's own is a crash, with no message
+        pass
+    return error
