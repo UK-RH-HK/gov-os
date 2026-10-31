@@ -12333,3 +12333,18 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.365 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-982 (W2-112, W2-113, W2-114 filed; the smart way of working into the product, mapped in SMART-WORK-1). Next free id: DEC-983. |
+
+### DEC-983 — SMART-WORK-1's five decisions: W2-115 to W2-119 filed, ten tickets' KPIs changed; the heavy-job slots in force (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-982 item 2, DEC-979, DEC-974, DEC-968 · **Basis:** `packages/SMART-WORK-1.md` (`c36ec89d`)
+- **Decision:**
+  1. **W2-115, the smart close,** filed before EXAMIN's copy, FULL: the scoped close the default, the strict close kept built and switched off; a close refused only by its own change's failures; no lists; culprit batches; the close record; the nightly's full secrets scan. **W2-55 runs before it.**
+  2. **W2-116 (the designers' store) and W2-119 (the guard's refusals counted)** filed, before EXAMIN's copy.
+  3. **W2-117 (the merge queue in the product) and W2-118 (interim results and the brief-gaps check)** filed now, ordered after EXAMIN's copy.
+  4. **The ten KPI changes as written,** applied tonight: W2-20 (no reserved peak; heavy-job slots; the out-of-memory trip-wire), W2-97 (the full suite never; a slot), W2-38, W2-82 and W2-83a (the full suite only in the nightly), W2-12 (lists only in the strict close), W2-11 round 2 (brief gaps, the anti-drift kit, scope control, self-timed timing tests), W2-55 (`gov context --in-force`), W2-33 and W2-60b (one writer per worktree; the tests worktree). W2-97's lead was already running (since 22:14): it takes its change at its return (a running headless lead reads its brief only at its start).
+  5. **What stays this repository's own,** as SMART-WORK-1 lists it.
+  6. **The heavy-job slots (DEC-979 D1) in force from 2026-10-31 23:50,** in the lighter lane: `tools/heavy_slot.sh` (3 slots, each capping pytest-xdist's `-n auto` at 6 workers: about 18 of 20 processors; sizes in `tools/heavy_slots.conf`, re-sized from the re-measure), taken by every lead's suite run through `verify_lock.sh` and by the close tool's parallel run; tests `tools/test_heavy_slot.sh` H1-H5. The common lead brief's load wait is replaced. Rebuilds keep their one-at-a-time lock. The nightly (DEC-961: it holds nothing) takes no slot tonight; whether it should is the owner's.
+- **Where it goes (DEC-851):** this register; the five tickets and their WBS rows; the ten tickets; the prompt §0 (v3.63); the common lead brief; the decisions-in-force list; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.366 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-983 (SMART-WORK-1: W2-115 to W2-119, ten tickets' KPIs; the heavy-job slots in force 23:50). Next free id: DEC-984. |
