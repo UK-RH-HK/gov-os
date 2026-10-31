@@ -16,7 +16,7 @@ fetch behind the reader's back.
 
 ## The helper
 
-`src/gov/util/gitenv.py` (module `gov.util.gitenv`). It has four forms.
+`src/gov/util/gitenv.py` (module `gov.util.gitenv`). It has five forms.
 
 **`git_env(root=None, *, pinned=False, base=None) -> dict`**, for a git call in the repository at `root`:
 
@@ -50,6 +50,27 @@ fetch behind the reader's back.
 (P-1): `git_env`'s, with no index kept whatever `base` holds. Its git in a folder of its own acts on that folder's
 repository only. Its git in the root finds the root's own index by itself (F-A, DEC-807 item 2).
 
+**`runner_env(*, base=None)`**, a context manager (package I (b), DEC-970), for a process that runs the tests:
+`program_env(pinned=True, base=base)`, with `GIT_CONFIG_GLOBAL` naming a file generated for the run instead of
+`/dev/null`; `GIT_CONFIG_NOSYSTEM=1` stays.
+
+- The file holds the person's `user.name`, `user.email` and `init.defaultBranch`, each only when set, and nothing
+  else: no `trace2.*`, no `core.*`, no include, no alias, no hook path. With none set it is empty, which is what
+  `/dev/null` was; no identity is invented.
+- The values come from the person's global files as `base`'s `HOME` and `XDG_CONFIG_HOME` name them, in git's
+  order: `$XDG_CONFIG_HOME/git/config` (or `$HOME/.config/git/config`), then `~/.gitconfig`, the later winning.
+  Each is read as data, `git config --file <path> --null --get-regexp`, by git from `GIT_DIRS`, under the pinned
+  environment, in the generated file's own folder with `GIT_CEILING_DIRECTORIES` above it (no repository read): no include is followed and no
+  setting of the file acts (a `trace2.eventTarget` there writes nothing while it is read).
+- The file is at git's global level, so a test's own `git config user.name` in its repository wins.
+- It lives in a folder of this process's temporary folder (`gov-gitconfig-*`), made on entering the `with` and
+  removed on leaving it: one file per run, never in the project.
+
+Why: the pinning of batch 2 hid the person's identity and default branch from the tests too. A test that commits
+in a repository of its own without naming an identity, or relies on `init.defaultBranch`, failed under `gov
+close` and the nightly for no fault of the change judged (three cases of `tests/unit/containment/
+test_dec_572_lift.py`).
+
 **`foreign_index(root, *, base=None) -> str | None`** answers from the same rule: the inherited `GIT_INDEX_FILE` as
 given when `git_env(root)` would not keep it, else None. The staged-secrets gate asks it and refuses on such an
 index, naming it: the index being committed is never replaced by the default one (review F1, row 13).
@@ -69,8 +90,8 @@ the project root, and stays as it is if it starts git only in the root.
 | 9 | a declared check (`sh -c`) | anywhere: a check may clone into a temporary folder (DEC-710) | `program_env()`: no index (batch 1) |
 | 13 | `gitleaks git --pre-commit --staged` | only the root (`git diff --staged`) | stays: git's own index of the commit is kept |
 | 30, 38 | the vendored `tk` | only the root (`git config user.name`) | stays: `git_env(root)` with `TICKETS_DIR` |
-| 36, 51 | the close's test runs and probes (`_started`) | anywhere: the tests start git in folders of their own | `program_env(pinned=True)` from a base without any `GIT_*` variable: no index, nothing of the caller's, configuration pinned (batch 2) |
-| 55 | `git bisect run <step>` in the nightly's clone | the clone (another folder), and the tests the step starts | `program_env` from a base without any `GIT_*` variable: no index, nothing of the caller's (batch 2) |
+| 36, 51 | the close's test runs and probes (`_started`) | anywhere: the tests start git in folders of their own | `runner_env` from a base without any `GIT_*` variable: no index, nothing of the caller's, configuration pinned, the person's three settings only (batch 2; package I (b), DEC-970) |
+| 55 | `git bisect run <step>` in the nightly's clone | the clone (another folder), and the tests the step starts | `runner_env` from a base without any `GIT_*` variable, as row 36 (package I (b), DEC-970; batch 2 had `program_env` unpinned) |
 | 43 to 45 | `codebase-memory-mcp` | only the root (it indexes the project) | stays; W2-56 holds the file: recorded only |
 
 ## The calls
@@ -116,7 +137,7 @@ before this ticket. "Change" says what W2-05 did. A call in a file another ticke
 | 33 | `src/gov/close/history.py` | through row 32 (`rev-parse`, `merge-base`, `rev-list`, `merge-tree --write-tree`, `commit-tree`, `diff-tree`, `log`, `show`) | the project root | as row 32 | through row 32, pinned. `commit-tree` carries its identity explicitly (`-c user.name=gov -c user.email=gov@localhost`), so pinning changes no author; its merges are objects for a comparison |
 | 34 | `src/gov/close/traceability.py` | `_read_trailers`: `git log -1 --format=%(trailers)` | the project root | yes | batch 2: `env=git_env(root, pinned=True)` |
 | 35 | `src/gov/close/traceability.py` | `_commits_for_ticket`: `git log HEAD --format=%H ...` | the project root | yes | batch 2: `env=git_env(root, pinned=True)` |
-| 36 | `src/gov/close/command.py` | `_started`: the ticket's acceptance tests, the parallel-runner probe and the timeout-plugin probe (the **test helper**: the tests start git) | the project root; the tests' git acts in their own temporary repositories | yes (W2-M161) | batch 2: `program_env(pinned=True)` from `env` without any `GIT_*` variable. No `GIT_*` variable of the caller reaches a test run, the location, index, trace and identity variables among them (P-1, DEC-500); `GIT_NO_LAZY_FETCH=1` is the helper's. The configuration is pinned (W2-M161): a test's git reads neither the system's nor the person's configuration, so a test that commits names its own identity. The close's own `PYTHONPATH`, plugin variables and check result are kept |
+| 36 | `src/gov/close/command.py` | `_started`: the ticket's acceptance tests, the parallel-runner probe and the timeout-plugin probe (the **test helper**: the tests start git) | the project root; the tests' git acts in their own temporary repositories | yes (W2-M161) | batch 2: `program_env(pinned=True)` from `env` without any `GIT_*` variable. No `GIT_*` variable of the caller reaches a test run, the location, index, trace and identity variables among them (P-1, DEC-500); `GIT_NO_LAZY_FETCH=1` is the helper's. The configuration is pinned (W2-M161): a test's git reads neither the system's nor the person's configuration. Package I (b) (DEC-970): `runner_env` instead of `program_env(pinned=True)`, so `GIT_CONFIG_GLOBAL` names the file made for the run with the person's `user.name`, `user.email` and `init.defaultBranch` only, removed when the run ends: a test that commits without naming an identity commits as the person, and nothing else of the person's configuration (trace, `core.*`, include, alias, hook path) reaches it. The close's own `PYTHONPATH`, plugin variables and check result are kept |
 | 37 | `src/gov/close/command.py` | `judge_commits` (through row 19); the close's reads through row 32 (`rev-parse`, `merge-base`, `ls-tree` and the others) | the project root | as rows 19 and 32 | through rows 19 and 32; the file's one change is row 36 |
 | 38 | `src/gov/close/tool.py` | `tk`: the ticket tool (it runs `git config user.name`) | the project root | yes | batch 2: `env=git_env(root)` with `TICKETS_DIR`, as row 30 |
 | 39 | `src/gov/decisions/checker.py` | `_git`: `git --no-replace-objects ... -C <root> <args>` | the project root | no: it cleared every `GIT_*` variable and set `GIT_NO_LAZY_FETCH`; configuration not pinned | batch 2: `_environment(root)` is `git_env(root, pinned=True)` from a base without any `GIT_*` variable, with the graft and shallow files off. What the clearing protected is kept: no inherited variable names another repository |
@@ -131,11 +152,11 @@ before this ticket. "Change" says what W2-05 did. A call in a file another ticke
 | 48 | `src/gov/close/select.py` | through row 32: `merge-base --is-ancestor`, `rev-parse`, `rev-list --count`, `diff`, `ls-tree`, `show` | the project root | as row 32 | through row 32, pinned |
 | 49 | `src/gov/close/fingerprint.py` | through row 32: `ls-tree -r --full-tree`, `cat-file blob` | the project root | as row 32 | through row 32, pinned |
 | 50 | `src/gov/close/state.py`, `src/gov/close/ratchet.py` | through row 32: `ls-tree`, `cat-file blob`, `merge-base --is-ancestor`, `show`, `rev-list`, `log` | the project root | as row 32 | through row 32, pinned |
-| 51 | `src/gov/close/gates.py` | the collection run (`pytest --collect-only`) through `_started`; `ls-tree`, `log -1`, `ls-files --others` through row 32 | the project root; the collected tests may start git anywhere | as rows 32 and 36 | through rows 32 (pinned) and 36 (`program_env`) |
-| 52 | `src/gov/close/nightly.py` | the run alone of a red (`_alone`) through `_started` | the nightly's clone (**another folder**) | yes (as row 36) | through row 36: `program_env` |
+| 51 | `src/gov/close/gates.py` | the collection run (`pytest --collect-only`) through `_started`; `ls-tree`, `log -1`, `ls-files --others` through row 32 | the project root; the collected tests may start git anywhere | as rows 32 and 36 | through rows 32 (pinned) and 36 (`runner_env`) |
+| 52 | `src/gov/close/nightly.py` | the run alone of a red (`_alone`) through `_started` | the nightly's clone (**another folder**) | yes (as row 36) | through row 36: `runner_env` |
 | 53 | `src/gov/close/nightly.py` | through row 32: `rev-parse --git-common-dir`, `rev-parse --verify`, `rev-parse <head>^{tree}`, `rev-parse refs/bisect/bad` | the project root, or the nightly's clone | as row 32 | through row 32, pinned |
 | 54 | `src/gov/close/nightly.py` | `night`: `git worktree add --detach --force <clone> <head>` through row 32 | the project root (it writes the clone) | as row 32 | batch 2: `pinned=False` (a write, not a read). Arguments, paths and order as W2-77 left them |
-| 55 | `src/gov/close/nightly.py` | `_bisect`: `git bisect start`, `git bisect run <step>` (the step starts pytest, whose tests start git), `git bisect reset` | the nightly's clone (**another folder**) | no: it cleared every `GIT_*` variable of the run's environment | batch 2: `program_env` from the run's environment without any `GIT_*` variable, as it cleared them; `GIT_NO_LAZY_FETCH=1` added. Not pinned: `bisect start`, `run` and `reset` check out commits in the clone, a write, as rows 54 and 56 |
+| 55 | `src/gov/close/nightly.py` | `_bisect`: `git bisect start`, `git bisect run <step>` (the step starts pytest, whose tests start git), `git bisect reset` | the nightly's clone (**another folder**) | no: it cleared every `GIT_*` variable of the run's environment | batch 2: `program_env` from the run's environment without any `GIT_*` variable, as it cleared them; `GIT_NO_LAZY_FETCH=1` added; not pinned. Package I (b) (DEC-970): `runner_env` from the same base, as row 36, for `bisect start`, `run` and `reset` alike: each commit is judged in the environment of the run that found the red, the file made for the run included and removed when the bisect ends. Arguments, paths and order unchanged |
 | 56 | `src/gov/close/nightly.py` | `_remove_clone`: `git worktree remove --force <clone>` (never a prune, DEC-939 item 5) | the project root | yes | batch 2: `env=git_env(root)` (a write: unpinned) |
 | 57 | `src/gov/cli/main.py` | `_version`: `git -C <tree> rev-parse --show-toplevel HEAD` (`gov --version`) | the source tree of the running code | yes | batch 2: `env=git_env(tree, pinned=True)` |
 | 58 | `src/gov/check/citations.py` | through rows 39 and 40 (`checker._git`, `checker._Objects`) | the project root | as row 39 | through rows 39 and 40 |
@@ -167,9 +188,10 @@ Files that name git or start a program and start no git:
 batch 2: rows 2 to 8, 10 to 12, 15, 29 and 31 (pinned: reads a close reaches), 19 to 21, 32 to 42 and 46 to 58. Rows 16, 17 and 43 to 45 (W2-56's file now) and 24 and 28 (W2-87's)
 were changed in the first runs and are recorded only since. 5 marked "after <W2 id> merges": rows 61 (W2-84), 62
 (W2-107), 63 (W2-87), 64 (W2-76) and 65 (W2-60a). No row is open for W2-50, W2-53 or W2-03: those have merged.
+Package I (b) (DEC-970) changed rows 36 and 55, and through row 36 rows 51 and 52; it adds no row.
 
 The test helpers outside `src/` (`tests/**/*support*.py`) build their own environments and are not Gov OS calls.
-The test runs the Gov OS starts are rows 36, 51, 52 and 55.
+The test runs the Gov OS starts are rows 36, 51, 52 and 55, all in `runner_env`.
 
 ## Not settled here
 

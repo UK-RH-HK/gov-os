@@ -141,7 +141,8 @@ def test_the_close_s_started_programs_get_no_git_variable_of_the_caller(project,
     seen = json.loads(_started(root, show, env).stdout)
     assert sorted(name for name in seen if name.startswith("GIT_")) == [
         "GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM", "GIT_NO_LAZY_FETCH"]
-    assert seen["GIT_CONFIG_GLOBAL"] == os.devnull
+    # The file made for the run (package I (b), DEC-970): the person's three settings at most; removed at its end.
+    assert seen["GIT_CONFIG_GLOBAL"] != os.devnull and not os.path.exists(seen["GIT_CONFIG_GLOBAL"])
     assert seen["PYTHONPATH"] == str(root / "src") and seen["GOV_SOME_CHECK_RESULT"] == "x"
     assert seen["GIT_NO_LAZY_FETCH"] == "1"
 

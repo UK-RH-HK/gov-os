@@ -31,7 +31,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.close import command as _close, evidence as _evidence, select as _select
 from gov.close.repo import git as _git
-from gov.util.gitenv import git_env, program_env
+from gov.util.gitenv import git_env, runner_env
 
 COMMAND = "nightly"
 EXIT_RED = 3
@@ -103,22 +103,23 @@ def _bisect(tree: Path, good: str, bad: str, test: str, limit: list[str], env: d
     step = [sys.executable, "-c", _BISECT_STEP, path + sep + rest, "-q", "-p", "no:cacheprovider", "--no-header",
             "--rootdir", str(tree)] + limit
     # The clone is another folder and the step starts the tests, which start git in folders of their own (P-1).
-    bisect_env = program_env(base={key: value for key, value in env.items() if not key.startswith("GIT_")})
-    try:
-        subprocess.run(["git", "-C", str(tree), "bisect", "start", bad, good], capture_output=True, text=True,
-                       env=bisect_env, check=True)
-        done = subprocess.run(["git", "-C", str(tree), "bisect", "run", *step], capture_output=True, text=True,
-                              env=bisect_env, cwd=str(tree))
-        for line in done.stdout.splitlines():
-            word = line.split(" ", 1)[0]
-            if line.endswith("is the first bad commit") and len(word) == 40:
-                return word
-        found = _git(tree, "rev-parse", "--verify", "--quiet", "refs/bisect/bad", ok=(0, 1)).strip()
-        return found or None
-    except (OSError, subprocess.CalledProcessError, GovError):
-        return None
-    finally:
-        subprocess.run(["git", "-C", str(tree), "bisect", "reset"], capture_output=True, env=bisect_env)
+    # Each commit is judged in the environment of the run that found the red (``_started``'s, DEC-970).
+    with runner_env(base={key: value for key, value in env.items() if not key.startswith("GIT_")}) as bisect_env:
+        try:
+            subprocess.run(["git", "-C", str(tree), "bisect", "start", bad, good], capture_output=True, text=True,
+                           env=bisect_env, check=True)
+            done = subprocess.run(["git", "-C", str(tree), "bisect", "run", *step], capture_output=True, text=True,
+                                  env=bisect_env, cwd=str(tree))
+            for line in done.stdout.splitlines():
+                word = line.split(" ", 1)[0]
+                if line.endswith("is the first bad commit") and len(word) == 40:
+                    return word
+            found = _git(tree, "rev-parse", "--verify", "--quiet", "refs/bisect/bad", ok=(0, 1)).strip()
+            return found or None
+        except (OSError, subprocess.CalledProcessError, GovError):
+            return None
+        finally:
+            subprocess.run(["git", "-C", str(tree), "bisect", "reset"], capture_output=True, env=bisect_env)
 
 
 def _scoped_closes(root: Path, tree: Path, since: str | None, head: str) -> list[dict]:

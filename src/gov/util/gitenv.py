@@ -20,6 +20,12 @@ for a caller that must refuse rather than act on the default index in its place 
 ``pinned`` also leaves the system and the person's own configuration unread (``~/.gitconfig``, the XDG file):
 for the calls that only read, where a setting there (``trace2.eventTarget``) could write or change an answer.
 
+``runner_env`` is the environment of a process that runs the tests (package I (b), DEC-970): ``program_env``'s,
+pinned, with ``GIT_CONFIG_GLOBAL`` naming a file generated for the run that holds only the person's
+``user.name``, ``user.email`` and ``init.defaultBranch``. A test that commits in a repository of its own without
+naming an identity, or that relies on the default branch, works as it does for the person; nothing else of the
+person's configuration reaches it.
+
 ``git_binary`` is git by absolute path from the system's own folders, never whatever comes first on the inherited
 ``PATH`` (W2-L160): for the guard's hooks, the freeze look-up and the containment check.
 """
@@ -29,7 +35,10 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 _PREFIX = "GIT_"
 _OWN = "GIT_INDEX_FILE"
@@ -40,6 +49,9 @@ _PERSON = frozenset({
     "GIT_COMMITTER_DATE", "GIT_SSH", "GIT_SSH_COMMAND", "GIT_SSH_VARIANT", "GIT_ASKPASS", "GIT_TERMINAL_PROMPT"})
 _TIMEOUT_S = 10
 _PINNED = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+# The person's settings a test run gets (DEC-970), as git names them in its output.
+_RUNNER_KEYS = {"user.name": ("user", "name"), "user.email": ("user", "email"),
+                "init.defaultbranch": ("init", "defaultBranch")}
 # The system's own folders git is taken from, in this order (W2-L160).
 GIT_DIRS = ("/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin")
 
@@ -77,6 +89,66 @@ def program_env(*, pinned: bool = False, base: dict | None = None) -> dict[str, 
     ``GIT_WORK_TREE``, ``GIT_COMMON_DIR`` or index reaches it, so its git in a folder of its own acts on that
     folder's repository only, and its git in the root finds the root's own index by itself."""
     return git_env(None, pinned=pinned, base=base)
+
+
+@contextmanager
+def runner_env(*, base: dict | None = None) -> Iterator[dict[str, str]]:
+    """The environment of a process that runs the tests, for the time of the ``with`` (DEC-970).
+
+    ``program_env(pinned=True, base=base)`` with ``GIT_CONFIG_GLOBAL`` naming a file in a folder of this process's
+    temporary folder, made on entry and removed on exit. It holds the person's ``user.name``, ``user.email`` and
+    ``init.defaultBranch``, each only when set, taken from the person's global files as ``base``'s ``HOME`` and
+    ``XDG_CONFIG_HOME`` name them (the XDG file, then ``~/.gitconfig``, the later winning). Each file is read as
+    data under the pinned environment (``git config --file``: no include followed, no setting of it acting)."""
+    source = os.environ if base is None else base
+    env = program_env(pinned=True, base=source)
+    with tempfile.TemporaryDirectory(prefix="gov-gitconfig-") as folder:
+        found = {}
+        for path in _global_files(source):
+            found.update(_read_keys(path, folder))
+        sections: dict[str, list[str]] = {}
+        for key, (section, name) in _RUNNER_KEYS.items():
+            if key in found:
+                sections.setdefault(section, []).append(f"\t{name} = {_quoted(found[key])}\n")
+        env["GIT_CONFIG_GLOBAL"] = os.path.join(folder, "config")
+        Path(env["GIT_CONFIG_GLOBAL"]).write_text(
+            "".join(f"[{section}]\n" + "".join(lines) for section, lines in sections.items()), encoding="utf-8")
+        yield env
+
+
+def _global_files(source: dict) -> list[str]:
+    """The person's global configuration files in the order git reads them."""
+    home, xdg = source.get("HOME"), source.get("XDG_CONFIG_HOME")
+    xdg = xdg or (os.path.join(home, ".config") if home else None)
+    return [path for path in (xdg and os.path.join(xdg, "git", "config"), home and os.path.join(home, ".gitconfig"))
+            if path and os.path.isfile(path)]
+
+
+def _read_keys(path: str, folder: str) -> dict[str, str]:
+    """The runner's keys set in the file at ``path``, read with no configuration of git's own and in ``folder``
+    (no repository around it); nothing when git cannot read it."""
+    git = git_binary()
+    env = {"PATH": os.pathsep.join(GIT_DIRS), "GIT_CEILING_DIRECTORIES": os.path.dirname(folder), **_PINNED}
+    try:
+        done = subprocess.run([git, "config", "--file", path, "--null", "--get-regexp",
+                               r"^(user\.(name|email)|init\.defaultbranch)$"], capture_output=True, text=True,
+                              stdin=subprocess.DEVNULL, timeout=_TIMEOUT_S, env=env, cwd=folder) if git else None
+    except (OSError, subprocess.TimeoutExpired):
+        return {}
+    if done is None or done.returncode != 0:
+        return {}
+    found = {}
+    for item in filter(None, done.stdout.split("\0")):
+        key, _sep, value = item.partition("\n")
+        found[key] = value
+    return found
+
+
+def _quoted(value: str) -> str:
+    """``value`` as a git configuration value in double quotes."""
+    for plain, escaped in (("\\", "\\\\"), ('"', '\\"'), ("\n", "\\n"), ("\t", "\\t")):
+        value = value.replace(plain, escaped)
+    return f'"{value}"'
 
 
 def foreign_index(root: str | Path, *, base: dict | None = None) -> str | None:
