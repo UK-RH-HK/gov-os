@@ -16,14 +16,17 @@ The temporary project has this repository's shape: W1-38's adopted project (the 
 hooks, the template's rulesync sources, the registered rulesync version and the check's declaration, copied one
 named file at a time by W1-38's own support), with its kernel moved to ``template/governance/kernel``. Its
 ``.rulesync/hooks.jsonc`` (the repository's source) and ``template/.rulesync/hooks.jsonc`` (the template's) are
-written by the case from this repository's two files, read in place as single named files; rulesync then generates
+written by the case: the not-drift cases and the last from this repository's two files, read in place as single
+named files; the drift cases from the one source below. rulesync then generates
 the adapters from ``.rulesync/`` and the project is committed, so every other comparison of the check is green.
 The check runs through its declared command, as ``gov check`` runs it (W1-38's ``run_portability_check``), with
 this worktree's ``src/``, and the installed rulesync; without rulesync the cases skip, as the S3 case does.
 
-The base pair of the drift cases is this repository's two sources, the template's with the ``sessionStart`` matcher
-DEC-805 item 2 adds: they differ in paths, in the order of the events and in the wrapper, never in events or
-matchers. Each drift is planted in the template's source of that pair.
+The base pair of the drift cases is built from one source, written in the case (``BASE_HOOKS``: the template's events
+and matchers as DEC-805 item 2 leaves them), whatever the live sources hold: the repository's side in its path form
+with the pinned interpreter around each hook, the template's in its own path form with ``python3``. The two differ
+in paths and in the wrapper, never in events or matchers, and each case first requires the check green over that
+pair alone. Each drift is then planted in the template's source of that pair.
 """
 
 from __future__ import annotations
@@ -180,14 +183,61 @@ DRIFTS = {
 }
 
 
+# Rewrite-Reason: DEC-970 (P-W2-05-DRIFT-BASE); DEC-953 item 2 (ACT 1): the base pair was this repository's two live
+# sources, which since ACT 1 differ in two events (``postToolUse`` and ``postToolUseFailure``, in the template's only),
+# so each drift case went red before its plant and ``[an event whose matcher differs]`` passed with nothing planted.
+# The pair is now built from one source written here, whatever the live sources hold; the expectation is unchanged.
+BASE_HOOKS = (   # (event, matcher or None, the kernel's hook): every event and matcher a plant needs
+    ("preToolUse", None, "pretooluse.py"),
+    ("postToolUse", "Bash", "posttooluse.py"),
+    ("postToolUseFailure", "Bash", "posttooluse.py"),
+    ("sessionStart", SESSION_START_MATCHER, "sessionstart.py"),
+    ("stop", None, "stop.py"),
+    ("preCompact", None, "precompact.py"),
+    ("subagentStop", None, "subagentstop.py"),
+)
+
+
+def _repository_command(hook):
+    """The repository's form: its path, with the pinned interpreter around the hook (DEC-822)."""
+    return (f"g=\"$HOME/.local/bin/gov\"; read -r p < \"$g\"; p=\"${{p#'#!'}}\"; "
+            f"exec \"$p\" -E \"{REPO_HOOKS_PATH}{hook}\"")
+
+
+def _template_command(hook):
+    """The template's form: its path, with ``python3`` around the hook."""
+    return f"python3 \"{TEMPLATE_HOOKS_PATH}{hook}\""
+
+
+def _from_base(command):
+    hooks = {}
+    for event, matcher, hook in BASE_HOOKS:
+        entry = {"type": "command", "command": command(hook), "timeout": 60}
+        hooks[event] = [entry if matcher is None else _with_matcher(entry, matcher)]
+    return {"version": 1, "hooks": hooks}
+
+
+def _base_pair():
+    """The drift cases' two sources, both from ``BASE_HOOKS``: the same events, matchers and order; only the paths
+    and the wrapper differ, neither of which is drift (DEC-805)."""
+    return _from_base(_repository_command), _from_base(_template_command)
+
+
 @pytest.mark.parametrize("drift", tuple(DRIFTS))
 def test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event(
         tmp_path, drift):
+    """Rewrite-Reason: DEC-970 (P-W2-05-DRIFT-BASE); DEC-953 item 2 (ACT 1): the base pair is built from one source
+    (``_base_pair``), not from the two live sources, and the check must first be green over it alone (the control),
+    so the red comes from the drift planted and nothing else. The expectation is unchanged."""
     w138 = _w138()
     event, plant = DRIFTS[drift]
-    repository, template = _repository(), _template_with_the_matcher()
-    plant(template)
+    repository, template = _base_pair()
     project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    done, findings = _check(w138, project)
+    assert_green(w138, done, findings, "the drift cases' base pair, before any drift is planted (the control)")
+    plant(template)
+    support.write(project, support.TEMPLATE_HOOKS_SOURCE_REL, _dump(template))
+    w138.commit_all(project, f"{drift}, planted in the template's hooks source")
 
     done, findings = _check(w138, project)
 
