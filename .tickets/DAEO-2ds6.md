@@ -1,6 +1,6 @@
 ---
 id: DAEO-2ds6
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-16T16:35:11Z

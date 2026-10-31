@@ -19,14 +19,6 @@ allowed_paths:
 - src/gov/rebuild/**
 - tests/unit/rebuild/test_w2_76*
 - tests/conftest.py
-- tests/acceptance/W1-07/w1_07_support.py
-- tests/acceptance/W1-27/w1_27_support.py
-- tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py
-- tests/acceptance/W1-30/w1_30_support.py
-- tests/acceptance/W1-41/w1_41_support.py
-- tests/acceptance/W2-50/w2_50_support.py
-- tests/acceptance/W2-54/w2_54_support.py
-- tests/acceptance/W2-69/w2_69_support.py
 kpis:
   success:
   - 'gov rebuild''s output and record give the time of each stage (the lexical, semantic and code-index stores, the secrets filter where it runs, the compaction), not the lexical stage alone [DEC-939 item 2, row W2-L451]'
@@ -50,6 +42,8 @@ track: A
 list_rows: [W2-M408, W2-L451]
 ---
 # W2-76 gov rebuild: per-stage timings, a 30-minute watchdog, one rebuild at a time on the machine
+
+**DEC-964's eight helpers (2026-10-31):** they are the independent test designer's files, so they are not in this ticket's allowed_paths (an implementer's paths under the acceptance tests turn `gov check`'s core-mutation red, IMPLEMENTER_COVERS_ACCEPTANCE); the test designer wrote them under DEC-964 and the guard's rule 1.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-76), from P1-MORNING-2026-10-29 item 2 (owner, DEC-939 item 2).
 

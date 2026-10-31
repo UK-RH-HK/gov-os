@@ -1,7 +1,7 @@
 ---
 id: CAP-13.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Episodic execution memory: checkpoints and close records per ticket'
 depends_on:
@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-13.b: Episodic execution memory: checkpoints and close records per ticket
 
-A covers item of CAP-13 (Temporal and episodic memory). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-13 (Temporal and episodic memory). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Episodic execution memory: checkpoints and close records per ticket
 - **Wave:** W1
