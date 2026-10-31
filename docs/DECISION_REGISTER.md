@@ -12213,3 +12213,15 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.356 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-973 (quiet hours 02:00-07:30; the nightly at 04:00, its check at 08:00, the morning package at 09:00, the handover after it; ACT-NIGHTLY-0400). Next free id: DEC-974. |
+
+### DEC-974 — The memory-chain line back in every status block; a new ticket in the WBS is a P1; a lighter lane for the CTO's own tools, to be proposed (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; items 1 and 2 standing; item 3 a proposal to come) · **Under:** DEC-952 item 4, DEC-948, DEC-949, DEC-818, DEC-954 · **Changes:** the CTO's filing of tickets under delegation (DEC-220, DEC-936 item 2.5: no longer a P2 or P3 for a WBS ticket)
+- **Decision:**
+  1. **The memory-chain line (DEC-952 item 4, reaffirmed):** every status block carries it again. It had dropped out of the CTO's blocks on 2026-10-31 (the CTO's slip). The 20:00 CAPACITY-1 brief gives memory's state: what has merged, what is running, what has not started, and when the next measure is due.
+  2. **A new ticket in the WBS is a P1 (standing):** adding a ticket changes the WBS and the plan, so it goes to the owner as a P1 package (six parts, DEC-818) with the CTO's recommendation, before it is filed. This covers follow-ups, splits (an "a/b" ticket) and tickets for a red found by a close or the nightly; a red fixed on the spot inside an existing ticket's scope needs no new ticket. A lead never files one: it names the need in its return. The 20:00 brief lists every ticket added since the plan's approval (DEC-954), each with the decision that added it and who decided it (the owner, or the CTO under delegation).
+  3. **The CTO's own tools and scripts** (the close tool, the nightly folder, the gate, the watchers) are not Gov OS product work. The owner asks for a lighter lane for them: their own tests, an independent review only when a change could fail open or lose work, logged in the daily document, and out of the WBS ticket count, so the WBS shows the product's progress. The CTO proposes it in the 20:00 brief with what it would change; until the owner decides, the current practice holds.
+- **Where it goes (DEC-851):** this register; the prompt §0 (v3.59); the common lead brief (a lead names a needed ticket in its return, never files one); the decisions-in-force list; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.357 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-974 (the memory-chain line back in every block; a new WBS ticket is a P1 before it is filed; a lighter lane for the CTO's tools to be proposed). Next free id: DEC-975. |

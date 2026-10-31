@@ -7,6 +7,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
 - DEC-949, DEC-850, DEC-855, DEC-972: P1s and owner-only decisions are sent as they arise, 07:30 to midnight: a package file, then the line logged (`tools/ping_log.sh`, no ask) and sent by `PushNotification` (it does not stop the CTO); a daytime P1 needed that day that shows "not sent" falls back to the blocking `owner-ping`. None from 02:00 to 07:30 (the morning package, DEC-973). Only the orchestrator asks the owner.
 - DEC-818: a P1 package stands alone, in six parts.
+- DEC-974: a new ticket in the WBS (follow-up, split, a red's ticket) is a P1 to the owner with the CTO's recommendation before it is filed; never delegated. Leads name a needed ticket in their return.
 - DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
 - DEC-945: no paid notifier and no app install.
 - DEC-105: a finding against a closed specification gets three costed options: apply now, defer or re-baseline.
@@ -87,7 +88,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-939 item 1: long commands run in the background. A watchdog fires at 07:45 if the package is late.
 
 ## Reporting
-- DEC-948, DEC-878, DEC-952: every report ends with the five-line block, plus the memory-chain line and the leads' interim results.
+- DEC-948, DEC-878, DEC-952, DEC-974: every report ends with the five-line block, plus the memory-chain line (never left out) and the leads' interim results.
 - DEC-938, DEC-951 B: one P1-MORNING file and one ping at 07:30. No long foreground work runs from 07:15 to 07:35.
 - DEC-941 item 4.3, DEC-930 item 2: one daily document, and the weekly numbers (with ticket growth and drift).
 - DEC-953: three milestone reports, each pinged. Between them, the block plus at most five lines.
