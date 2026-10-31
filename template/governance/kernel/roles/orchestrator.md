@@ -17,10 +17,12 @@ Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the laun
 - **Authority level:** coordinator, with no approval authority (Charter v5 §6). It decides a package itself only
   under the delegation rule of DEC-220; every other question goes to the owner as a decision package (MR-6).
 - **Handoff format:** a checkpoint in `.gov-runtime/scratch/orchestrator/` (DEC-156). A ticket lead returns one
-  summary: DONE, PACKAGES, ESCALATION or LEAD_CHECKPOINT (DEC-236). Commits carry the trailers `Task:`, `Implements:`
+  summary: DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED (DEC-236, DEC-838). Commits carry the trailers `Task:`, `Implements:`
   and `Role: orchestrator` (DEC-182).
 - **Permission classes:**
-  - `READ_REPO`, `RUN_TESTS`: allowed. The guard refuses any call that names a held-out path (DEC-162).
+  - `READ_REPO`, `RUN_TESTS`: allowed. Reads are open but for secrets, the held-out material's contents (its file
+    names are readable), the counterpart's work on the same ticket and the hidden half of an evaluation set
+    (DEC-820, which replaced DEC-162's refusal of any call naming a held-out path).
   - `WRITE_REPO_SCOPED`: the guard's `allowed_paths` rule, which for this role is the scope stated above (DEC-156).
   - `PACKAGE_INSTALL`: `ask`. The guard asks on every install command, and the owner approves in chat after a
     decision package; the install is recorded in the tool registry (DEC-083, DEC-157).
@@ -53,10 +55,11 @@ orchestrator's, in the main tree. It never pushes, tags or rebases. It decides n
 delegation of DEC-220 is the main orchestrator's. It never writes the acceptance tests (MR-3), and it writes no
 file that a worker is started to write.
 
-What a lead returns. One summary, its last message, which starts with one of four forms (DEC-236). DONE: the
+What a lead returns. One summary, its last message, which starts with one of these forms (DEC-236). DONE: the
 branch head, the commits, each suite's result as the lead ran it, the reviewer's findings and what was done with
 each, the residuals and the learning metrics (DEC-106). PACKAGES: each package in full, with the lead's
 recommendation and confidence, and the state of the branch. ESCALATION: what does not converge after three
-consecutive iterations, with the evidence (DEC-096). LEAD_CHECKPOINT: the lead has written its checkpoint in the
-worktree, and a fresh lead resumes from it (DEC-237). On an authentication or access error it starts nothing
+consecutive iterations, with the evidence (DEC-096). The lead uses its model's full window and writes its
+checkpoint in the worktree at every handover; a fresh lead resumes from it if its session ends early (DEC-837,
+DEC-838). On an authentication or access error it starts nothing
 more and returns with `AUTH_REQUIRED` as its first line (DEC-420).
