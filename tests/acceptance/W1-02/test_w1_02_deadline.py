@@ -38,6 +38,18 @@ switches the limit off, changes nothing of this.
 step to its end (the case ends the process at ``PROCESS_LIMIT_S``: no answer),
 or it allows the call when the steps have ended (after about 22 s and 28 s).
 
+**Since W2-L160** (``Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160``):
+the first program a decision starts is the freeze look-up, which runs git by
+absolute path with a limit of its own of 15 s (DEC-783 item 2), so a stand-in
+first on the search path no longer reaches it. The three calls whose first
+program does not end now make the look-up's real git wait for ever, on the
+repository's configuration as a named pipe; each is held to a refusal in a
+rule's form at the look-up's limit (``LOOK_UP_LOWER_S`` to ``LOOK_UP_UPPER_S``).
+Every other call keeps the deadline of DEC-580, its reason and its window, by a
+slow step the look-up does not cover: a named pipe of the bookkeeping (point 4,
+and the late input, whose pipe the case lets go 19.5 s after the input). The
+labels are kept, so that a case is the same case before and after.
+
 No id and no failure message carries a path or a command.
 """
 
@@ -48,47 +60,60 @@ import pytest
 import w1_02_deadline_support as deadline
 
 Call = deadline.Call
-NEVER = (deadline.STAND_IN_ENDS_S,)      # the first program the hook starts does not end before the case does
 A_FEW_SECONDS = 5.5                      # four such steps pass the deadline; no single one comes near it
 LATE_INPUT_S = 2.0                       # inside the program's bound on reading its input
 ALMOST_THE_DEADLINE_S = 19.5             # alone under the deadline; with the late input over it
 
 POINT_1 = (
+    # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160. The first program is the freeze look-up's real git,
+    # which waits for ever on the repository's configuration: the look-up's limit refuses (was: a stand-in first on
+    # the search path, with a child of its own for the first call).
     Call("a-Bash-call-by-an-engineer-whose-first-program-does-not-end", "Bash", deadline.bash(),
-         deadline.ENGINEER, sleeps=NEVER, child=True),
+         deadline.ENGINEER, config_after=deadline.NEVER),
     Call("a-Write-by-the-orchestrator-whose-first-program-does-not-end", "Write",
-         deadline.write_to(deadline.OUTSIDE_TICKET_REL), deadline.ORCHESTRATOR, sleeps=NEVER),
+         deadline.write_to(deadline.OUTSIDE_TICKET_REL), deadline.ORCHESTRATOR, config_after=deadline.NEVER),
     Call("a-Read-by-a-session-with-no-role-whose-first-program-does-not-end", "Read",
-         deadline.read_of(deadline.OUTSIDE_TICKET_REL), deadline.NO_ROLE, sleeps=NEVER),
+         deadline.read_of(deadline.OUTSIDE_TICKET_REL), deadline.NO_ROLE, config_after=deadline.NEVER),
     Call("a-Bash-call-by-an-engineer-with-a-pipe-in-the-bookkeeping-before-the-decision", "Bash", deadline.bash(),
          deadline.ENGINEER, prepare=deadline.a_pipe_among_the_pending_calls),
     Call("a-Write-by-an-engineer-with-a-pipe-in-the-bookkeeping-after-the-rules-allowed-it", "Write",
          deadline.write_to(deadline.IN_TICKET_REL), deadline.ENGINEER, prepare=deadline.a_pipe_at_the_counter),
     Call("a-Bash-call-by-the-orchestrator-whose-every-program-takes-a-few-seconds", "Bash", deadline.bash(),
          deadline.ORCHESTRATOR, every=A_FEW_SECONDS),
+    # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160. The slow step is the bookkeeping before the
+    # decision, a named pipe the case lets go 19.5 s after the input (was: the first program, now the look-up).
     Call("a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow", "Bash",
-         deadline.bash(), deadline.ENGINEER, sleeps=(ALMOST_THE_DEADLINE_S,), send_after=LATE_INPUT_S),
+         deadline.bash(), deadline.ENGINEER, prepare=deadline.a_pipe_among_the_pending_calls,
+         release_after=ALMOST_THE_DEADLINE_S, send_after=LATE_INPUT_S),
 )
 
-# Each: a Bash call by an engineer that the rules allow, whose first program does not end.
+# Each: a Bash call by an engineer that the rules allow, whose bookkeeping before the decision waits on a named pipe.
+# Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160 (was: whose first program does not end, now the look-up,
+# whose own limit would answer before the deadline).
+PIPE = deadline.a_pipe_among_the_pending_calls
 POINT_4 = (
     Call("fields-named-like-a-time-limit-at-the-top-of-the-hook-input", "Bash", deadline.bash(),
-         sleeps=NEVER, top=deadline.limit_fields(deadline.LARGE)),
+         prepare=PIPE, top=deadline.limit_fields(deadline.LARGE)),
     Call("fields-named-like-a-time-limit-inside-the-tool-input", "Bash",
-         {**deadline.bash(), **deadline.limit_fields(deadline.LARGE)}, sleeps=NEVER),
+         {**deadline.bash(), **deadline.limit_fields(deadline.LARGE)}, prepare=PIPE),
     Call("variables-named-like-a-time-limit-with-a-large-value-and-the-switches-set", "Bash", deadline.bash(),
-         sleeps=NEVER, env=deadline.limit_environment(deadline.LARGE)),
+         prepare=PIPE, env=deadline.limit_environment(deadline.LARGE)),
     Call("variables-named-like-a-time-limit-set-to-zero-and-the-switches-set", "Bash", deadline.bash(),
-         sleeps=NEVER, env=deadline.limit_environment(0, "true")),
+         prepare=PIPE, env=deadline.limit_environment(0, "true")),
     Call("files-a-worker-may-write-that-name-a-larger-limit", "Bash", deadline.bash(),
-         sleeps=NEVER, prepare=deadline.files_that_name_a_limit(deadline.LARGE)),
+         prepare=deadline.each_of(deadline.files_that_name_a_limit(deadline.LARGE), PIPE)),
 )
 
 LABELS_1 = [call.label for call in POINT_1]
 LABELS_4 = [call.label for call in POINT_4]
-# The calls whose slow step is a program: the stand-in's process id is known to the case.
-WITH_A_PROGRAM = [call.label for call in POINT_1 + POINT_4 if call.sleeps or call.every]
+# The calls whose slow step is a program: the stand-in's process id is known to the case, or the real git's is seen in
+# the project (Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160).
+WITH_A_STAND_IN = [call.label for call in POINT_1 + POINT_4 if call.stand_in]
+WITH_A_REAL_GIT = [call.label for call in POINT_1 + POINT_4 if call.config_after is not None]
+WITH_A_PROGRAM = WITH_A_STAND_IN + WITH_A_REAL_GIT
 WITH_A_CHILD = [call.label for call in POINT_1 + POINT_4 if call.child]
+# The calls whose slow step is the freeze look-up: its own limit answers (DEC-783 item 2).
+AT_THE_LOOK_UP = [call.label for call in POINT_1 + POINT_4 if call.config_after == deadline.NEVER]
 
 
 @pytest.fixture(scope="module")
@@ -99,8 +124,15 @@ def late(hook, tmp_path_factory):
 
 @pytest.mark.parametrize("label", LABELS_1)
 def test_a_decision_still_running_at_the_deadline_is_refused(late, label):
-    """Point 1: a call the rules would allow is refused, in a refusal's form, shortly after 20 seconds."""
+    """Point 1: a call the rules would allow is refused, in a refusal's form, shortly after 20 seconds.
+
+    Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160. A call whose first program does not end is refused at
+    the freeze look-up's own limit of 15 s, in a refusal's form; every other call at the deadline, as before.
+    """
     outcome = late[label]
+    if label in AT_THE_LOOK_UP:
+        deadline.assert_refused_by_the_look_up_s_limit(outcome, f"'{label}'")
+        return
     deadline.assert_refused_at_the_deadline(outcome, f"'{label}'")
     deadline.assert_within_the_deadline_s_window(outcome, f"'{label}'")
 
@@ -131,7 +163,11 @@ def test_nothing_the_hook_started_is_left_running_after_its_answer(late):
     assert not unanswered, f"no answer, the hook was ended by the case: {unanswered}"
     for label in WITH_A_PROGRAM:
         outcome = late[label]
-        assert outcome.stand_in_starts >= 1, f"'{label}': the hook did not start the stand-in program"
+        # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160: the real git is seen in the project.
+        if label in WITH_A_REAL_GIT:
+            assert outcome.seen >= 1, f"'{label}': no process the hook started was seen in the project"
+        else:
+            assert outcome.stand_in_starts >= 1, f"'{label}': the hook did not start the stand-in program"
         assert outcome.left_running == 0, (
             f"'{label}': {outcome.left_running} process(es) the hook started were still running "
             f"{deadline.GONE_WITHIN_S:.0f} s after its answer ({outcome.describe()})"

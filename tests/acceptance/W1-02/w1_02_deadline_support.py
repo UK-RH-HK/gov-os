@@ -27,6 +27,25 @@ temporary project):
 - **an input that arrives late** on the hook's stdin, inside the bound the
   program has on reading its input.
 
+**Since W2-L160 (DEC-951 item 2, P-B1-1 (a); DEC-783 item 2).** The guard's freeze
+look-up, the first program a decision starts, runs git by absolute path from the
+system folders with a pinned environment and a limit of its own of 15 s: a
+stand-in first on the search path no longer reaches it. The stand-in stays only
+for the cases whose slow program is one the hook still starts from the search
+path (the bookkeeping of a Bash call); it is put on the search path only for a
+call that names ``sleeps`` or ``every``. Two further stand-ins, again through the
+temporary project and the input only:
+
+- **the repository's own configuration file as a named pipe** (``config_after``):
+  every git that opens the project's repository, the look-up's real git among
+  them, waits on it until the case serves the real content, ``config_after``
+  seconds after the hook's start, and then runs as it would; never served
+  (``NEVER``), the look-up does not end. The processes the hook starts are seen
+  in the project (their working folder or their arguments), not by a stand-in;
+- **a pipe of the bookkeeping let go late** (``release_after``): the named pipe
+  among the pending calls, opened and closed by the case that many seconds after
+  the input was sent, so that the bookkeeping step ends.
+
 **Side by side.** A case that waits for the deadline is slow. All hook
 processes of one module are started together by ``run_side_by_side``, each in
 its own project with its own stand-in, and each case asserts on one outcome
@@ -39,7 +58,9 @@ would end the test run.
 
 from __future__ import annotations
 
+import errno
 import json
+import math
 import os
 import re
 import shutil
@@ -84,6 +105,18 @@ INPUT_LOWER_S = 2.5
 INPUT_UPPER_S = 8.0
 # A decision reached in time is answered well before the deadline.
 IN_TIME_UPPER_S = 15.0
+
+# Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160.
+# The freeze look-up's own limit (DEC-783 item 2). A look-up that does not end is refused not before LOOK_UP_LOWER_S
+# (the limit, less half a second for a clock's grain) and by LOOK_UP_UPPER_S (the limit and the same 6 s for a loaded
+# machine that UPPER_S gives the deadline), on the test's clock from the start of the hook's process to its end.
+LOOK_UP_LIMIT_S = 15.0
+LOOK_UP_LOWER_S = 14.5
+LOOK_UP_UPPER_S = 21.0
+# ``config_after`` for a configuration that is never served: the look-up does not end before the case does.
+NEVER = math.inf
+# How often the case looks for the processes the hook started in the project.
+WATCH_EVERY_S = 0.25
 
 REAL_GIT = shutil.which("git")
 
@@ -146,7 +179,10 @@ class Call:
     of the hook input; ``env`` further variables of the hook's environment.
     ``send_after`` delays the input; ``send`` is ``whole``, ``half`` (half of
     the object, the input left open) or ``nothing`` (the input left open);
-    ``raw`` is an input sent as it is.
+    ``raw`` is an input sent as it is. ``config_after`` makes the repository's
+    configuration a named pipe served that many seconds after the hook's start
+    (``NEVER``: not served). ``release_after`` lets the bookkeeping's pipes go
+    that many seconds after the input was sent.
     """
     label: str
     tool_name: str
@@ -161,6 +197,13 @@ class Call:
     send_after: float = 0.0
     send: str = "whole"
     raw: object = None
+    config_after: float = None
+    release_after: float = None
+
+    @property
+    def stand_in(self):
+        """Whether the stand-in goes first on the hook's search path: only for a slow program it names."""
+        return bool(self.sleeps or self.every)
 
 
 @dataclass
@@ -172,6 +215,8 @@ class Outcome:
     children: int = 0            # how many of those stand-ins started a child of their own
     left_running: int = 0        # processes the hook started that were still there GONE_WITHIN_S after its answer
     before: tuple = ()           # the findings file's lines before the hook ran
+    config_served: int = 0       # how often the case served the repository's configuration to a waiting program
+    seen: int = 0                # processes other than the hook seen in the project while it ran
 
     @property
     def answered(self):
@@ -240,6 +285,116 @@ def _make_stand_in(bin_dir, call):
     program.chmod(0o755)
 
 
+class _ConfigPipe:
+    """The repository's configuration file of a project as a named pipe, served by the case after a while.
+
+    Every program that opens it waits until the case writes the file's real
+    content into it; from ``after`` seconds past ``start`` on, each one that
+    opens it is served at once. ``stop`` lets go whoever still waits and puts
+    the real file back.
+    """
+
+    def __init__(self, project, after):
+        self.path = Path(project) / ".git" / "config"
+        self.content = self.path.read_bytes()
+        self.after = after
+        self.served = 0
+        self._stop = threading.Event()
+        self._thread = None
+        self.path.unlink()
+        os.mkfifo(self.path)
+
+    def start(self, started):
+        self._thread = threading.Thread(target=self._serve, args=(started,), daemon=True)
+        self._thread.start()
+
+    def _serve(self, started):
+        while not self._stop.is_set():
+            if time.perf_counter() - started < self.after:
+                self._stop.wait(0.05)
+                continue
+            try:
+                fd = os.open(self.path, os.O_WRONLY | os.O_NONBLOCK)
+            except OSError as exc:
+                if exc.errno != errno.ENXIO:       # ENXIO: no program waits on it yet
+                    return
+                self._stop.wait(0.02)
+                continue
+            try:
+                os.write(fd, self.content)
+                self.served += 1
+            except OSError:
+                pass
+            finally:
+                os.close(fd)
+            self._stop.wait(0.05)
+
+    def stop(self):
+        self._stop.set()
+        if self._thread is not None:
+            self._thread.join()
+        try:
+            fd = os.open(self.path, os.O_RDWR | os.O_NONBLOCK)
+            time.sleep(0.1)
+            os.close(fd)
+        except OSError:
+            pass
+        try:
+            self.path.unlink()
+        except OSError:
+            pass
+        self.path.write_bytes(self.content)
+
+
+def _processes_in(project, hook_pid):
+    """The processes other than the hook (and this test) whose working folder or an argument lies in the project."""
+    root = os.path.realpath(project)
+    prefix = root + os.sep
+    me = os.getpid()
+    found = []
+    try:
+        names = os.listdir("/proc")
+    except OSError:
+        return found
+    for name in names:
+        if not name.isdigit() or int(name) in (me, hook_pid):
+            continue
+        try:
+            cwd = os.readlink(f"/proc/{name}/cwd")
+        except OSError:
+            cwd = ""
+        if cwd == root or cwd.startswith(prefix):
+            found.append(int(name))
+            continue
+        try:
+            with open(f"/proc/{name}/cmdline", "rb") as handle:
+                words = handle.read().decode("utf-8", errors="replace").split("\0")
+        except OSError:
+            continue
+        if any(word == root or prefix in word for word in words):
+            found.append(int(name))
+    return found
+
+
+def _release_pipes(project, when, proc):
+    """From ``when`` on, open and close each pipe of the bookkeeping once a reader waits on it; stop at the hook's end."""
+    while time.perf_counter() < when:
+        if proc.poll() is not None:
+            return
+        time.sleep(0.05)
+    while proc.poll() is None:
+        let_go = False
+        for path in pipes_in(project):
+            try:
+                os.close(os.open(path, os.O_WRONLY | os.O_NONBLOCK))
+                let_go = True
+            except OSError:
+                pass
+        if let_go:
+            return
+        time.sleep(0.05)
+
+
 def _stdin_text(call, project, sandbox):
     if call.raw is not None:
         return call.raw
@@ -252,7 +407,7 @@ def _stdin_text(call, project, sandbox):
     return text[:len(text) // 2] if call.send == "half" else text
 
 
-def _attend(call, proc, started, text, bin_dir, limit_s, slot):
+def _attend(call, proc, started, text, bin_dir, project, limit_s, slot):
     """Send the input, wait for the hook's end, then watch what it started."""
     try:
         if call.send_after:
@@ -264,28 +419,50 @@ def _attend(call, proc, started, text, bin_dir, limit_s, slot):
             proc.stdin.close()
     except OSError:
         pass
-    try:
-        returncode = proc.wait(timeout=max(0.1, limit_s - (time.perf_counter() - started)))
-    except subprocess.TimeoutExpired:
-        returncode = None
-        proc.kill()
-        proc.wait()
+    if call.release_after is not None:
+        threading.Thread(target=_release_pipes, args=(project, time.perf_counter() + call.release_after, proc),
+                         daemon=True).start()
+    seen = set()
+    watch = call.config_after is not None
+    while True:
+        if watch:
+            seen.update(_processes_in(project, proc.pid))
+        left = limit_s - (time.perf_counter() - started)
+        try:
+            returncode = proc.wait(timeout=max(0.05, min(left, WATCH_EVERY_S) if watch else left))
+            break
+        except subprocess.TimeoutExpired:
+            if left > 0:
+                continue
+            returncode = None
+            proc.kill()
+            proc.wait()
+            break
     slot["seconds"] = time.perf_counter() - started
     slot["returncode"] = returncode
+
+    def still_there():
+        return ([pid for pid in _pids(bin_dir) if _alive(pid)]
+                + [pid for pid in seen if _alive(pid) and pid in _processes_in(project, proc.pid)])
+
     until = time.monotonic() + GONE_WITHIN_S
-    alive = [pid for pid in _pids(bin_dir) if _alive(pid)]
+    alive = still_there()
     while alive and returncode is not None and time.monotonic() < until:
         time.sleep(0.1)
-        alive = [pid for pid in _pids(bin_dir) if _alive(pid)]
+        alive = still_there()
     slot["left"] = len(alive)
+    slot["seen"] = sorted(seen)
     slot["starts"] = _starts(bin_dir, "started.log")
     slot["children"] = _starts(bin_dir, "children.log")
 
 
-def _end_everything(bin_dir, project):
-    """Leave nothing behind: end every stand-in process, and let go whatever waits on a named pipe."""
+def _end_everything(bin_dir, project, seen=(), config=None):
+    """Leave nothing behind: end every stand-in process and every process seen in the project, let go whatever waits
+    on a named pipe, and put the repository's configuration back."""
     for _ in range(3):
-        for pid in _pids(bin_dir):
+        # A process seen earlier is ended only while it is still in the project: its number may have been reused.
+        in_project = set(_processes_in(project, -1)) if seen else set()
+        for pid in _pids(bin_dir) + [pid for pid in seen if pid in in_project]:
             if _alive(pid):
                 try:
                     os.kill(pid, signal.SIGKILL)
@@ -299,6 +476,8 @@ def _end_everything(bin_dir, project):
             continue
         time.sleep(0.1)
         os.close(fd)
+    if config is not None:
+        config.stop()
 
 
 def run_side_by_side(base, calls, limit_s=PROCESS_LIMIT_S):
@@ -320,36 +499,42 @@ def run_side_by_side(base, calls, limit_s=PROCESS_LIMIT_S):
             call.prepare(project)
         role, ticket = ACTORS[call.who]
         env = support.hook_environment(project, sandbox, role, ticket, call.env)
-        env["PATH"] = str(bin_dir) + os.pathsep + env["PATH"]
+        if call.stand_in:
+            env["PATH"] = str(bin_dir) + os.pathsep + env["PATH"]
         text = _stdin_text(call, project, sandbox)
         before = tuple(support.findings(project))
+        # Last of the preparation: from here on every git in the project's repository waits for the case.
+        config = _ConfigPipe(project, call.config_after) if call.config_after is not None else None
         out, err = home / "stdout.txt", home / "stderr.txt"
         # The hook's output goes to files: a process the hook leaves behind cannot hold the case on a pipe.
         with open(out, "wb") as out_handle, open(err, "wb") as err_handle:
             started = time.perf_counter()
             proc = subprocess.Popen(support._argv(project / support.installed_hook_rel()), stdin=subprocess.PIPE,
                                     stdout=out_handle, stderr=err_handle, cwd=str(project), env=env)
+        if config is not None:
+            config.start(started)
         slot = {}
-        thread = threading.Thread(target=_attend, args=(call, proc, started, text, bin_dir, limit_s, slot),
+        thread = threading.Thread(target=_attend, args=(call, proc, started, text, bin_dir, project, limit_s, slot),
                                   daemon=True)
         thread.start()
-        running.append((call, project, bin_dir, proc, thread, slot, out, err, before))
+        running.append((call, project, bin_dir, proc, thread, slot, out, err, before, config))
 
     outcomes = {}
-    for call, project, bin_dir, proc, thread, slot, out, err, before in running:
+    for call, project, bin_dir, proc, thread, slot, out, err, before, config in running:
         thread.join()
         try:
             proc.stdin.close()
         except OSError:
             pass
-        _end_everything(bin_dir, project)
+        _end_everything(bin_dir, project, slot["seen"], config)
         stdout = out.read_text(encoding="utf-8", errors="replace")
         stderr = err.read_text(encoding="utf-8", errors="replace")
         returncode = slot["returncode"]
         decision = "timeout" if returncode is None else support.classify(returncode, stdout)
         result = support.HookResult(decision, returncode, stdout, stderr, slot["seconds"])
         outcomes[call.label] = Outcome(call.label, project, result, slot["starts"], slot["children"],
-                                       slot["left"], before)
+                                       slot["left"], before, config.served if config is not None else 0,
+                                       len(slot["seen"]))
     return outcomes
 
 
@@ -377,6 +562,16 @@ def a_pipe_at_the_counter(project):
     folder = Path(project) / SNAPSHOT_DIR_REL
     folder.mkdir(parents=True, exist_ok=True)
     os.mkfifo(folder / SEQ_FILE)
+
+
+def each_of(*prepares):
+    """``prepare``: each of ``prepares``, in turn."""
+
+    def prepare(project):
+        for one in prepares:
+            one(project)
+
+    return prepare
 
 
 def pending_entries(project):
@@ -512,6 +707,29 @@ def assert_within_the_deadline_s_window(outcome, what):
     assert seconds <= UPPER_S, (
         f"{what} was answered after {seconds:.1f} s: the deadline is {DEADLINE_S:.0f} s and the answer is due by "
         f"{UPPER_S:.0f} s"
+    )
+
+
+def assert_refused_by_the_look_up_s_limit(outcome, what):
+    """Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160.
+
+    A decision whose first program, the freeze look-up, does not end: a refusal in a rule's form, not before
+    ``LOOK_UP_LOWER_S`` and by ``LOOK_UP_UPPER_S``. The reason's words are not held: DEC-783 item 2 gives the limit,
+    not a text; the deadline's reason (DEC-580) is held by the cases whose slow step the look-up does not cover.
+    """
+    assert outcome.answered, f"{what}: {outcome.describe()}; the guard keeps no deadline of its own"
+    assert refusal_of(outcome) is not None, (
+        f"{what} was not refused in the form a refusal has (exit code 0, a deny decision with a reason): "
+        f"{outcome.describe()}; the guard keeps no deadline of its own"
+    )
+    seconds = outcome.result.seconds
+    assert seconds >= LOOK_UP_LOWER_S, (
+        f"{what} was answered after {seconds:.1f} s: before the look-up's limit of {LOOK_UP_LIMIT_S:.0f} s (not before "
+        f"{LOOK_UP_LOWER_S} s)"
+    )
+    assert seconds <= LOOK_UP_UPPER_S, (
+        f"{what} was answered after {seconds:.1f} s: the look-up's limit is {LOOK_UP_LIMIT_S:.0f} s and the answer is "
+        f"due by {LOOK_UP_UPPER_S:.0f} s"
     )
 
 
