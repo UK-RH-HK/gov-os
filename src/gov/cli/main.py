@@ -193,12 +193,14 @@ def _version() -> str:
     Run from a source tree, the version is its ``pyproject.toml``'s and the commit the ``HEAD`` of the repository
     whose top is that tree. An installed package names the version it was built with, and its commit as unknown."""
     import subprocess
+
+    from gov.util.gitenv import git_env
     tree = PACKAGE.parents[1]
     if PACKAGE.parent.name == "src" and (tree / "pyproject.toml").is_file():
         import tomllib
         version = tomllib.loads((tree / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
         git = ["git", "-C", str(tree), "rev-parse", "--show-toplevel", "HEAD"]
-        done = subprocess.run(git, capture_output=True, text=True)
+        done = subprocess.run(git, capture_output=True, text=True, env=git_env(tree, pinned=True))
         lines = done.stdout.splitlines() if done.returncode == 0 else []
         commit = lines[1] if len(lines) == 2 and Path(lines[0]).resolve() == tree else "unknown"
     else:

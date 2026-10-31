@@ -21,7 +21,7 @@ import subprocess
 import time
 from typing import NamedTuple
 
-from gov.util.gitenv import git_env
+from gov.util.gitenv import git_binary, git_env
 
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
 RECORDS_REL = ".gov-runtime/records.jsonl"
@@ -74,8 +74,19 @@ class ContainmentError(Exception):
 # Every git call reads the real objects of the repository at its root,
 # whatever refs/replace/, .git/info/grafts, .git/shallow or a commit-graph
 # file holds, whatever repository an inherited variable names, and whatever
-# the person's git configuration sets (W2-M105, W2-M113).
-_GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false")
+# the person's git configuration sets (W2-M105, W2-M113); and the git run
+# is the system's, by absolute path, never the first on PATH (W2-L160).
+_GIT_OPTIONS = ("--no-replace-objects", "-c", "core.commitGraph=false")
+
+
+def _git_command(root: str, *args: str) -> list:
+    """The command line of a git call in *root*.  ``_GitError`` when no git
+    is resolved by absolute path: the check is not passed for want of one
+    (DEC-580)."""
+    git = git_binary()
+    if git is None:
+        raise _GitError("no git resolved by absolute path")
+    return [git, *_GIT_OPTIONS, "-C", root, *args]
 
 
 def _git_env(root: str) -> dict:
@@ -89,7 +100,7 @@ def _git(root: str, *args: str, ok: tuple = (0,)) -> str:
     code that is not among *ok*."""
     try:
         p = subprocess.run(
-            [*_GIT, "-C", root, *args],
+            _git_command(root, *args),
             capture_output=True, text=True,
             timeout=_GIT_TIMEOUT, check=False, env=_git_env(root),
         )
@@ -737,7 +748,7 @@ def _is_ancestor(root: str, old: str, new: str) -> bool:
     """True when *old* is an ancestor of *new*.  Raises on failure."""
     try:
         p = subprocess.run(
-            [*_GIT, "-C", root, "merge-base", "--is-ancestor", old, new],
+            _git_command(root, "merge-base", "--is-ancestor", old, new),
             capture_output=True, timeout=_GIT_TIMEOUT, check=False,
             env=_git_env(root),
         )

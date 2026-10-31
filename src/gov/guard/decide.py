@@ -11,6 +11,7 @@ import tempfile
 from pathlib import Path
 
 from gov.guard import runs
+from gov.util.gitenv import GIT_DIRS, git_binary
 
 KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
@@ -809,8 +810,8 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
 # -- the freeze mirror (DEC-429) -----------------------------------------------
 
 # W2-L160: git from the system's own folders, never whatever comes first on
-# the inherited PATH.
-_GIT_DIRS = ("/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin")
+# the inherited PATH; the helper's folders and resolver, one for the guard.
+_GIT_DIRS = GIT_DIRS
 # DEC-783 item 2: the look-up's own limit, inside the hook's 20 s deadline.
 _LOOKUP_S = 15
 
@@ -821,8 +822,7 @@ class FreezeLookupUnavailable(Exception):
 
 
 def _git_binary() -> str | None:
-    import shutil
-    return shutil.which("git", path=os.pathsep.join(_GIT_DIRS))
+    return git_binary(_GIT_DIRS)
 
 
 def _mirror_path(project_root: str) -> Path:

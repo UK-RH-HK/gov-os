@@ -983,12 +983,18 @@ def _started(root: Path, cmd: list[str], env: dict, timeout: int | None = None):
     """``cmd`` run to its end in the project's folder, in a process group of its own: its exit code and what it
     printed. At the time limit the whole group is ended before ``subprocess.TimeoutExpired`` is raised, so no
     worker of a parallel run lives on to write into the project (DEC-555); so it is when this command is
-    itself ended."""
+    itself ended.
+
+    ``env`` as the helper gives a program that may start git elsewhere (P-1, W2-M161): the tests start git in
+    folders of their own, so no ``GIT_*`` variable of the caller reaches them, no index and no trace among them;
+    everything else of ``env`` is kept."""
     import os
     import signal
 
+    from gov.util.gitenv import program_env
+
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=str(root),
-                               env=env, start_new_session=True)
+                               env=program_env(base=env), start_new_session=True)
     try:
         stdout, stderr = process.communicate(timeout=timeout)
     except BaseException:

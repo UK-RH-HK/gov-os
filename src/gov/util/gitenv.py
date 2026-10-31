@@ -19,11 +19,15 @@ for a caller that must refuse rather than act on the default index in its place 
 
 ``pinned`` also leaves the system and the person's own configuration unread (``~/.gitconfig``, the XDG file):
 for the calls that only read, where a setting there (``trace2.eventTarget``) could write or change an answer.
+
+``git_binary`` is git by absolute path from the system's own folders, never whatever comes first on the inherited
+``PATH`` (W2-L160): for the guard's hooks, the freeze look-up and the containment check.
 """
 
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -36,6 +40,14 @@ _PERSON = frozenset({
     "GIT_COMMITTER_DATE", "GIT_SSH", "GIT_SSH_COMMAND", "GIT_SSH_VARIANT", "GIT_ASKPASS", "GIT_TERMINAL_PROMPT"})
 _TIMEOUT_S = 10
 _PINNED = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+# The system's own folders git is taken from, in this order (W2-L160).
+GIT_DIRS = ("/usr/bin", "/bin", "/usr/local/bin", "/opt/homebrew/bin")
+
+
+def git_binary(dirs: tuple[str, ...] | None = None) -> str | None:
+    """git by absolute path from ``dirs`` (default ``GIT_DIRS``), never from the inherited ``PATH``; None when
+    none of them holds it. A caller refuses on None rather than run another git (DEC-580)."""
+    return shutil.which("git", path=os.pathsep.join(GIT_DIRS if dirs is None else dirs))
 
 
 def git_env(root: str | Path | None = None, *, pinned: bool = False, base: dict | None = None) -> dict[str, str]:

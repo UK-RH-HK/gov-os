@@ -12,6 +12,7 @@ import subprocess
 from pathlib import Path
 
 from gov.cli.errors import GovError
+from gov.util.gitenv import git_env
 
 _ENTRY, _FIELD = "\x1e", "\x1f"
 # One process for any number of commits. Paths come NUL-separated and unquoted, without rename detection; a
@@ -24,14 +25,18 @@ _GIT_VARIABLES = "GIT_"
 IGNORE_FILE = ".gitignore"
 
 
-def git(root: Path, *args: str, ok: tuple = (0,), code: bool = False, given: str | None = None):
+def git(root: Path, *args: str, ok: tuple = (0,), code: bool = False, given: str | None = None,
+        pinned: bool = True):
     """The output of a git command, or its exit code with ``code``; ``GIT_FAILURE`` outside ``ok``. ``given``
     is its standard input.
 
     The git asked is not the caller's to bend (DEC-500): no variable of the caller's environment that speaks
-    to git is passed on, and replacement refs are not followed.
+    to git is passed on, and replacement refs are not followed. Its environment is the helper's for ``root``
+    (W2-M161), with the system and the person's configuration unread; a commit of the close passes
+    ``pinned=False``, so that the identity it carries is still the configured one.
     """
-    env = {key: value for key, value in os.environ.items() if not key.startswith(_GIT_VARIABLES)}
+    env = git_env(root, pinned=pinned,
+                  base={key: value for key, value in os.environ.items() if not key.startswith(_GIT_VARIABLES)})
     try:
         done = subprocess.run(["git", "-C", str(root), "--no-replace-objects", *args],
                               capture_output=True, text=True, env=env, input=given,
