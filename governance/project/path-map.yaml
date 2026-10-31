@@ -107,7 +107,7 @@ namespaces:
     retention: kept in git history
     export_policy: allowed; copied into adopting products
     embedding_policy: embedded
-    provenance: written under a ticket; git history
+    provenance: written under a ticket; vendored parts are pinned in the tool registry
     deletion_rebuild: authoritative; restored from git only
   # DEC-952 item 1, DEC-388: vendored code, unchanged upstream copies, is not embedded.
   kernel-vendored:
