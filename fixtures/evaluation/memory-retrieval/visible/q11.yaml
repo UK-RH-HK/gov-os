@@ -1,0 +1,17 @@
+# Lens B's Q11 (Table 2): "fusion.py 53–70 (search); retrieve.py 130–140": two callers, each its own entry. My
+# reading: the source is the calling line in each (fusion.py 62, inside search; retrieve.py 135, inside retrieve).
+id: Q11
+category: callers
+commit: 23079f92a6fa
+ids: [rrf]
+question: Who calls rrf?
+gold_answer: >-
+  Two callers: search in src/gov/retrieval/fusion.py (line 62) and retrieve in src/gov/retrieval/retrieve.py
+  (line 135), which fuses the lexical, semantic and closure routes.
+sources:
+  - path: src/gov/retrieval/fusion.py
+    heading: '    fused = rrf({name: answer["hits"] for name, answer in answers.items()})'
+    lines: [62, 62]
+  - path: src/gov/retrieval/retrieve.py
+    heading: "    fused = rrf(routes)"
+    lines: [135, 135]

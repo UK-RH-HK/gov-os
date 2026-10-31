@@ -1,12 +1,14 @@
-"""The governance checks of a close (KPI S4, CAP-38.d; DEC-454; DEC-455; DEC-476; DEC-480).
+"""The governance checks of a close (KPI S4, CAP-38.d; DEC-454; DEC-476; DEC-480; DEC-868).
 
-A ticket whose commits change a governance file closes only on checks run at the commit being closed
-(DEC-454: "re-runs the checks at HEAD through W1-26's runner and refuses on any hard-block red. It trusts no
-recorded result"). ``gov close`` holds no baseline and is strict for every project (DEC-476): any red
-hard-block check refuses, whoever declared it and whatever made it red. The refusal is a finding about the
-ticket's work (DEC-455 names "the governance checks"): exit code 3, counted, a dependent repair ticket.
-The status of a check is the runner's (DEC-480): ``gov close`` refuses on exactly the checks the runner
-reports red at hard-block, and holds no rule of its own about checks.
+Every close runs the checks at the commit being closed, whatever files the ticket changed (DEC-868 item 1 (b),
+W2-07's KPI 5; DEC-480's "when a ticket's commits change a governance file" changed, DEC-908), through W1-26's
+runner (DEC-454: "re-runs the checks at HEAD through W1-26's runner and refuses on any hard-block red. It trusts no
+recorded result"), and the close record states each check's status there. ``gov close`` holds no baseline and is
+strict for every project (DEC-476): any red hard-block check refuses, whoever declared it and whatever made it red.
+The checks are the pre-close gate (DEC-868 item 3; DEC-455's counting of "the governance checks" changed, DEC-908):
+a red hard-block check refuses at once, exit code 3, naming the check, before any test runs, and spends no attempt;
+it still opens a dependent repair ticket. The status of a check is the runner's (DEC-480): ``gov close`` refuses
+on exactly the checks the runner reports red at hard-block, and holds no rule of its own about checks.
 
 Every project here declares its own checks (``project_with_checks``; README, "Round 6"): the kernel's
 declarations are not copied, so no check is red for a reason of the test project. Each check's command
@@ -19,7 +21,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-gvc1"
-WBS = "W1-govchecks"
+WBS = "W1-911"
 
 SETTINGS = "governance/project/settings.yaml"
 NOTES = "governance/project/notes.yaml"

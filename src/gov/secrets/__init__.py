@@ -15,6 +15,11 @@ reads at 1 MB/s or faster (DEC-853). A store whose bytes were scanned clean befo
 and the same gitleaks, is not scanned again: the check's record of clean results says so, and the reuse
 is labelled on standard error with the store's path and digest. A finding is never recorded.
 
+The filter remembers too (W2-107, DEC-966 item 4): a file's content or a path's names judged clean, with no finding at
+all by any rule set, is kept by its digest in the machine-wide record of ``cache``, so the same bytes judged again by
+the same gitleaks and rules are answered without a scan. A finding, an exempt commit hash included, is scanned every
+time. ``scan_counts()`` says how many texts of each kind were scanned and how many answered from the record.
+
 What gitleaks reads (DEC-897, docs/research/W2-69-secrets-scan.md): a SQLite store is judged by each value it
 holds and by each region of its freed space, each on its own; any other file, or a store that cannot be read, by
 its bytes. Each is given in overlapping pieces that begin and end at a true boundary, a blank line after each, so
@@ -41,6 +46,7 @@ from pathlib import Path
 
 from gov.config.loader import load_config
 from gov.guard.runs import root as runs_root
+from gov.secrets import cache
 
 CONFIG_REL = ".gitleaks.toml"
 RUNTIME_REL = ".gov-runtime"
@@ -49,7 +55,7 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 4  # the form of the record and of what a scan reads; another form is never trusted
+_FORM = 4  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
@@ -71,7 +77,23 @@ _SQLITE = b"SQLite format 3\0"
 _BUSY_S = 10.0  # how long a store's lock held by another process is waited out before the store is judged by its bytes
 _FTS5 = re.compile(rb"\s*CREATE\s+VIRTUAL\s+TABLE\b.*?\bUSING\s+fts5\b", re.IGNORECASE | re.DOTALL)
 
-__all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
+__all__ = ["indexable", "path_holds_secret", "scan_counts", "stores_with_secrets"]
+
+_KINDS = ("content", "path")  # what the filter judges: a file's content, a path's names
+_counts = {kind: {"scanned": 0, "remembered": 0} for kind in _KINDS}
+_counting = threading.Lock()
+
+
+def scan_counts() -> dict[str, dict[str, int]]:
+    """The texts of each kind this process gave to gitleaks (``scanned``) and answered from the record
+    (``remembered``), as a fresh dict: a caller takes the difference around its own work."""
+    with _counting:
+        return {kind: dict(each) for kind, each in _counts.items()}
+
+
+def _count(kind: str, what: str) -> None:
+    with _counting:
+        _counts[kind][what] += 1
 
 
 def _toml(value) -> str:
@@ -148,15 +170,98 @@ def _forms(content: bytes) -> list[bytes]:
     return [content, content.replace(b"\0", b"")] if b"\0" in content else [content]
 
 
-def _holds_secret(rules: tuple[str, ...], content: bytes) -> bool:
-    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``."""
-    return _scan(rules, _forms(content))
+def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = None, kind: str | None = None) -> bool:
+    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``.
+
+    With ``kind``, bytes judged clean before by the same engine (the rules, the gitleaks and the form of what a scan
+    reads, taken once before the scan) are answered from the record, and a scan that finds nothing at all is kept
+    there; a scan with any finding, exempt or not, is never kept.
+    """
+    if kind is None:
+        return _scan(rules, _forms(content), root)
+    digest, engine = hashlib.sha256(content).hexdigest(), cache.engine(rules, _FORM)
+    if cache.remembered(kind, digest, engine):
+        _count(kind, "remembered")
+        return False
+    _count(kind, "scanned")
+    found = []
+    secret = _scan(rules, _forms(content), root, found)
+    if not (secret or found):
+        cache.remember(kind, digest, engine)
+    return secret
 
 
-def _scan(rules: tuple[str, ...], chunks) -> bool:
+# Row W2-L423's rule (DEC-911 item 4): its id is written only in parts, so no file holds it whole.
+_COMMIT_RULE = "".join(("source", "graph", "-access-token"))
+_HASH = re.compile("[0-9a-fA-F]{40}")
+_GIT_S = 10  # how long git may take to say which matches name a commit of the project
+_GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false")
+_FALSE = ("false", "no", "off", "0")  # git's spellings of a false boolean; any other value of promisor counts as true
+
+
+def _partial(root: Path, env: dict[str, str]) -> bool:
+    """Whether the repository at ``root`` may fetch an object it lacks from a remote: a partial clone, or unsure.
+
+    Only the configuration git would use is read (its own, a worktree's, the user's, the system's and their includes),
+    never the object store. A read that fails or does not answer in time counts as a partial clone.
+    """
+    try:
+        done = subprocess.run([*_GIT, "-C", str(root), "config", "--list", "-z"], capture_output=True, text=True,
+                              errors="replace", timeout=_GIT_S, env=env)
+    except (OSError, subprocess.SubprocessError):
+        return True
+    if done.returncode != 0:
+        return True
+    for entry in done.stdout.split("\0"):
+        key, _, value = entry.partition("\n")
+        key = key.lower()
+        if key == "extensions.partialclone" or key.startswith("remote.") and (
+                key.endswith(".partialclonefilter") or key.endswith(".promisor") and value.strip().lower() not in _FALSE):
+            return True
+    return False
+
+
+def _commits(root: Path, names: set[str]) -> set[str]:
+    """Those of ``names`` that are commit objects themselves of the repository at ``root``, by one bounded git call.
+
+    Git reads only that repository: no inherited variable can point it elsewhere, no replace object stands in, and a
+    root that is not itself a repository is not answered by one above it. Whatever git does not answer clearly is no
+    commit, so its match stays a finding. A partial clone is asked about no object at all, since a lookup there could
+    fetch the match from its remote; the lookup itself runs with lazy fetching off too.
+    """
+    root = Path(root).resolve()
+    env = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+    env |= {"GIT_CEILING_DIRECTORIES": str(root.parent), "GIT_NO_REPLACE_OBJECTS": "1", "GIT_NO_LAZY_FETCH": "1"}
+    if _partial(root, env):
+        return set()
+    asked = sorted(names)
+    try:
+        done = subprocess.run([*_GIT, "-C", str(root), "cat-file", "--batch-check=%(objectname) %(objecttype)"],
+                              input="".join(f"{name}\n" for name in asked), capture_output=True, text=True,
+                              timeout=_GIT_S, env=env)
+    except (OSError, subprocess.SubprocessError):  # no git, or no answer in time
+        return set()
+    answers = done.stdout.splitlines()
+    if done.returncode != 0 or len(answers) != len(asked):
+        return set()
+    return {name for name, answer in zip(asked, answers) if answer == f"{name.lower()} commit"}
+
+
+def _exempt(finding, root: Path | None) -> str | None:
+    """The commit hash a finding of row W2-L423's rule may be, else None: the finding stands as it is."""
+    if root is None or not isinstance(finding, dict) or finding.get("RuleID") != _COMMIT_RULE:
+        return None
+    secret = finding.get("Secret")
+    return secret if isinstance(secret, str) and _HASH.fullmatch(secret) else None
+
+
+def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list | None = None) -> bool:
     """Whether gitleaks finds a secret in any of ``chunks`` by any of ``rules``. Raises when gitleaks cannot run or does not decide.
 
-    Each chunk is a text of its own: its pieces are never joined to another chunk's but by a blank line.
+    Each chunk is a text of its own: its pieces are never joined to another chunk's but by a blank line. With ``root``,
+    a match of row W2-L423's rule that is exactly a commit of the repository at ``root`` is no finding (DEC-911 item 4);
+    the matches are read from gitleaks' report on its standard output and held in memory only. A rule set that reports
+    anything at all, exempt or not, is added to ``found``.
     """
     # The leading newline keeps gitleaks from skipping content it would take for a binary file.
     parts = [b"\n"]
@@ -166,9 +271,10 @@ def _scan(rules: tuple[str, ...], chunks) -> bool:
     data = b"".join(parts)  # one copy, read by every scan
     # The rules go by the environment, so no file of them is written; a configuration path there would win over them.
     env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
-    for each in rules:  # clean only when every scan ran and found nothing
+    hashes = set()  # the matches that may be commit hashes, asked of git once every scan has run
+    for each in rules:  # clean only when every scan ran and found nothing but such hashes
         done = subprocess.run(
-            ["gitleaks", "stdin", "--no-banner", "--redact",
+            ["gitleaks", "stdin", "--no-banner", "--report-format", "json", "--report-path", "-",
              "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
              "--exit-code", str(_LEAKS)],
             input=data, capture_output=True, timeout=_TIMEOUT_S + len(data) / _FLOOR,
@@ -176,8 +282,17 @@ def _scan(rules: tuple[str, ...], chunks) -> bool:
         if done.returncode not in (0, _LEAKS):
             raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
         if done.returncode == _LEAKS:
-            return True
-    return False
+            if found is not None:
+                found.append(each)
+            try:
+                findings = json.loads(done.stdout)
+            except ValueError:
+                return True
+            found = [_exempt(finding, root) for finding in findings] if isinstance(findings, list) else [None]
+            if not found or None in found:
+                return True
+            hashes.update(found)
+    return bool(hashes) and _commits(root, hashes) != hashes
 
 
 def _matches(rel: str, pattern: str) -> bool:
@@ -208,7 +323,7 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
             return False
         if not (_governance(namespaces, rel) and _governance(namespaces, target)):
             return False
-        return not _holds_secret(rules, content)
+        return not _holds_secret(rules, content, root, "content")
 
     with ThreadPoolExecutor() as pool:
         verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
@@ -217,7 +332,7 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
 
 def path_holds_secret(root: Path, path: str) -> bool:
     """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is."""
-    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])))
+    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])), root, "path")
 
 
 def _number(content: bytes, at: int, size: int) -> int:
@@ -471,7 +586,7 @@ def stores_with_secrets(root: Path) -> list[str]:
             digest = hashlib.sha256(content).hexdigest()
             if digest in trusted:
                 reused[path] = digest
-            elif _scan(rules, chunks):
+            elif _scan(rules, chunks, root):
                 return True  # a finding is never recorded
             if kept or digest in trusted:
                 clean.add(digest)

@@ -78,10 +78,11 @@ def declaration_text(check_id, command="true", family=A_FAMILY, severity=HARD_BL
 
 
 def policies_text(policies):
-    """A path map that holds the ``policies`` block given and no namespace; without a key, no block."""
+    """A path map that holds the ``policies`` block given and one catch-all namespace (``**``, every tracked
+    path in it once; DEC-970, DEC-959 item 9); without a key, no block."""
     if not policies:
-        return "namespaces: {}\n"
-    return "namespaces: {}\npolicies:\n" + "".join(f"  {key}: {strength}\n" for key, strength in policies.items())
+        return "namespaces: {all: {paths: ['**']}}\n"
+    return "namespaces: {all: {paths: ['**']}}\npolicies:\n" + "".join(f"  {key}: {strength}\n" for key, strength in policies.items())
 
 
 def ticket_text(ticket_id, wbs, **keys):

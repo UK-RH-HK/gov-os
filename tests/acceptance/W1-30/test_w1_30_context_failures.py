@@ -1,5 +1,7 @@
 """A ticket whose context cannot be built does not close (KPI S5 "packet hash", S6 "with whole-system context
-from gov context"; DEC-454 "A context that cannot be built refuses the close"; DEC-455: it is one iteration).
+from gov context"; DEC-454 "A context that cannot be built refuses the close"). Since DEC-868 item 3 (DEC-455's
+"counted iteration" for a context failure changed, DEC-908) the refusal is the pre-close gate's: at once, before
+any test, and not counted.
 
 ``tests/acceptance/W1-24/README.md`` gives the errors ``gov context`` has for a ticket (its S5 line and its
 command section):
@@ -11,28 +13,34 @@ command section):
 
 One case each. Each first runs ``gov context`` in its project and holds that it gives that error, so the case
 cannot pass on a project whose context builds. Then ``gov close`` on the ticket, which is otherwise green and
-clean: refused with exit code 3, the answer says the context failed and names the record, no close record, the
-ticket in progress, and the refusal counted as one iteration.
+clean: refused with exit code 3 by the pre-close ``gov check`` (its ``context-reproducibility`` check RED), the
+answer says the context failed and names the record, no test runs, no close record, the ticket in progress, and
+no attempt is spent.
 
 The decision checker (W1-11) being unable to run is the fifth reason. ``tests/acceptance/W1-11/README.md``: a
 history the checker cannot read raises ``GovError`` (a shallow clone, DEC-387). The case holds first that the
-checker raises in its project.
+checker raises in its project. There ``gov context`` builds and ``gov check`` is green, so the pre-close gate does
+not see it: the close runs the tests and refuses at its own context step, counted. Which refusal DEC-868 item 3
+gives a checker that cannot run is not settled (W2-67 run 3, batch 6, package P-W2-67-TD6-1); until it is, the
+case holds the counted refusal it held before.
 
 No record store is the sixth (DEC-470): ``gov context`` answers ``STORE_MISSING`` in a project whose store was
-never loaded. The close is refused with that reason and counted, and it does not build the store itself:
-after the refusal ``gov context`` still answers ``STORE_MISSING``. So every other project of this suite is
+never loaded. The close is refused with that reason, at once and not counted, and it does not build the store
+itself: after the refusal ``gov context`` still answers ``STORE_MISSING``. So every other project of this suite is
 given its store by its fixture (``support.run_close`` loads it before the close, or the case does and passes
 ``store=False``); the cases here are the only ones that close without one.
 
 Last, a failing close that is given a class (DEC-454: "with it, the context is built first and its hash is
-recorded"): when that context cannot be built, the answer and the repair ticket say so and carry no hash.
+recorded"): when that context cannot be built, the pre-close gate refuses at once, before the failing tests run,
+and the answer and the repair ticket say so and carry no hash.
 
 **Revised for W2-07 (DEC-868 item 3; DEC-455's "counted iteration" for a context failure changed, DEC-908).** A
 context that cannot be built turns the kernel's ``context-reproducibility`` check RED, and ``gov check`` runs on
 every close as the pre-close gate. So the close refuses at once, naming that check, before any test runs (the
 ticket's acceptance test tells into a folder outside the project whenever it runs, and does not), states no test
 run, and spends no attempt (``counted: false``, the count stays 0). The refusal still names the record and the
-context's reason where the check carries them.
+context's reason where the check carries them. This docstring was brought to the same rules by W2-67 (row
+W2-L420).
 """
 
 import re
@@ -41,7 +49,7 @@ import subprocess
 import w1_30_support as support
 
 TICKET = "PROJ-ctxf"
-WBS = "W1-ctxf"
+WBS = "W1-905"
 BASE = support.BASE_SOURCE
 SHA256 = re.compile(r"\b[0-9a-f]{64}\b")
 
@@ -98,9 +106,9 @@ def test_a_missing_mandatory_input_refuses_the_close(project, sandbox, interface
     told = tmp_path / "told"
     told.mkdir()
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=["DEC-gone"])
+    support.build_ticket(project, TICKET, WBS, sources=["DEC-9011"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-gone")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-9011")
 
 
 def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface, tmp_path):
@@ -108,45 +116,45 @@ def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface, 
     told = tmp_path / "told"
     told.mkdir()
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, depends_on=["W1-gone"])
+    support.build_ticket(project, TICKET, WBS, depends_on=["W1-910"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "W1-gone")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "W1-910")
 
 
 def test_a_superseded_source_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: the ticket's source is superseded; the error names it."""
     told = tmp_path / "told"
     told.mkdir()
-    _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
-               DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _decisions(project, DEC_9014=("SUPERSEDED", {"superseded_by": "DEC-9012"}),
+               DEC_9012=("ACTIVE", {"supersedes": ["DEC-9014"]}))
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
+    support.build_ticket(project, TICKET, WBS, sources=["DEC-9014"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-old")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-9014")
 
 
 def test_a_source_superseded_by_several_records_refuses_the_close(project, sandbox, interface, tmp_path):
     """BLOCKED: more than one record supersedes the ticket's source."""
     told = tmp_path / "told"
     told.mkdir()
-    _decisions(project, DEC_old=("SUPERSEDED", {}),
-               DEC_new1=("ACTIVE", {"supersedes": ["DEC-old"]}),
-               DEC_new2=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _decisions(project, DEC_9014=("SUPERSEDED", {}),
+               DEC_90122=("ACTIVE", {"supersedes": ["DEC-9014"]}),
+               DEC_90123=("ACTIVE", {"supersedes": ["DEC-9014"]}))
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
+    support.build_ticket(project, TICKET, WBS, sources=["DEC-9014"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-old")
+    _refused_for_the_context(project, sandbox, interface, told, "BLOCKED", "DEC-9014")
 
 
 def test_two_contradicting_sources_refuse_the_close(project, sandbox, interface, tmp_path):
     """CONTRADICTION: two active decisions among the ticket's sources, neither superseding the other."""
     told = tmp_path / "told"
     told.mkdir()
-    _decisions(project, DEC_other=("ACTIVE", {}))
+    _decisions(project, DEC_9016=("ACTIVE", {}))
     _telling(project, told)
-    support.build_ticket(project, TICKET, WBS, sources=[BASE, "DEC-other"])
+    support.build_ticket(project, TICKET, WBS, sources=[BASE, "DEC-9016"])
     support.load_store(project, sandbox)
-    _refused_for_the_context(project, sandbox, interface, told, "CONTRADICTION", BASE, "DEC-other")
+    _refused_for_the_context(project, sandbox, interface, told, "CONTRADICTION", BASE, "DEC-9016")
 
 
 def test_a_decision_checker_that_cannot_run_refuses_the_close(project, sandbox, interface, tmp_path):
@@ -248,11 +256,11 @@ def test_the_same_project_closes_once_it_has_a_record_store(project, sandbox, in
 
 def _failing_close_with_a_class_and_no_context(project, sandbox, interface, told=None):
     """With ``told`` the ticket also has a failing acceptance test that tells into that folder whenever it runs."""
-    _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
-               DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+    _decisions(project, DEC_9014=("SUPERSEDED", {"superseded_by": "DEC-9012"}),
+               DEC_9012=("ACTIVE", {"supersedes": ["DEC-9014"]}))
     if told is not None:
         _telling(project, told, body="assert False, 'planted failure'")
-    support.build_ticket(project, TICKET, WBS, failing=True, sources=["DEC-old"])
+    support.build_ticket(project, TICKET, WBS, failing=True, sources=["DEC-9014"])
     support.load_store(project, sandbox)
     assert support.context_error(project, sandbox, TICKET)["code"] == "BLOCKED"
     run = support.run_close(project, sandbox, TICKET, "--disposition", "repair", store=False)
@@ -270,8 +278,8 @@ def test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed(proj
     told.mkdir()
     run, error = _failing_close_with_a_class_and_no_context(project, sandbox, interface, told)
     text = support.error_text(error)
-    assert "context" in text.lower() and "DEC-old" in text, \
-        f"the answer does not say the context failed for DEC-old\n{run.describe()}"
+    assert "context" in text.lower() and "DEC-9014" in text, \
+        f"the answer does not say the context failed for DEC-9014\n{run.describe()}"
     _refused_at_once_for_the_context(run, error, told)
     support.assert_nothing_counted(project, TICKET, run)
     assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
@@ -283,6 +291,6 @@ def test_the_repair_ticket_of_a_failing_close_with_a_class_says_the_context_fail
     repairs = support.other_tickets(project.root, TICKET)
     assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
     text = repairs[0].read_text(encoding="utf-8")
-    assert "context" in text.lower() and "DEC-old" in text, \
-        f"the repair ticket does not say the context failed for DEC-old:\n{text}"
+    assert "context" in text.lower() and "DEC-9014" in text, \
+        f"the repair ticket does not say the context failed for DEC-9014:\n{text}"
     assert not SHA256.search(text), f"the repair ticket carries a hash although no context was built:\n{text}"

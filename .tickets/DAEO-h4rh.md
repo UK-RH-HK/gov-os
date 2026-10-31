@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-49o5, DAEO-057v, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-jzvg, DAEO-siiz]
+deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-lxzn, DAEO-uw5h, DAEO-6icv, DAEO-rpfv, DAEO-hgv3, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-6b2q, DAEO-3r1j, DAEO-nqa2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -20,19 +20,47 @@ depends_on:
 - DAEO-u4oz
 - DAEO-0z8c
 - DAEO-kia7
-- DAEO-7r5e
-- DAEO-a3m2
-- DAEO-cuao
 - DAEO-49o5
-- DAEO-057v
 - DAEO-r30l
 - DAEO-1ahb
 - DAEO-kmcr
 - DAEO-2ds6
 - DAEO-ha8z
 - DAEO-kl5e
-- DAEO-jzvg
 - DAEO-siiz
+- DAEO-wnnz
+- DAEO-0pyc
+- DAEO-cv58
+- DAEO-ecac
+- DAEO-k7hz
+- DAEO-lrre
+- DAEO-l78m
+- DAEO-4k3l
+- DAEO-dy7j
+- DAEO-2bdu
+- DAEO-g87r
+- DAEO-h2k3
+- DAEO-jsg1
+- DAEO-a3u2
+- DAEO-n0wb
+- DAEO-6y0x
+- DAEO-57hm
+- DAEO-ouet
+- DAEO-wq2b
+- DAEO-wi46
+- DAEO-lxzn
+- DAEO-uw5h
+- DAEO-6icv
+- DAEO-rpfv
+- DAEO-hgv3
+- DAEO-drhj
+- DAEO-zpdj
+- DAEO-0mtg
+- DAEO-kiar
+- DAEO-zoex
+- DAEO-6b2q
+- DAEO-3r1j
+- DAEO-nqa2
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**
 kpis:
@@ -53,6 +81,9 @@ kpis:
     matter with no change of content, as an adoption commit. If the store cannot leave paths unread, all 18 files get the fix [DEC-736].
   - EXAMIN's own CLAUDE.md, AGENTS.md and .claude/commands/ are never silently overwritten. Their content is migrated into EXAMIN's rulesync sources or kept in place, and the A5 review checks that nothing
     of the owner's was lost [DEC-736].
+  - 'W2-16''s numbered, frozen release is the one installed, never this repository''s branch [DEC-954 Q8c]'
+  - 'A clean gov close of the LITE ticket on the copy, at exit 0, on that release, is exit criterion 1''s proof; gov doctor green on the copy is exit criterion 3''s [DEC-953, DEC-954]'
+  - 'W2-88''s tools run on the copy at adoption (the assessment, the refactoring plan as proposals, the full index and embeddings), and EXAMIN''s question set (W2-94) is measured with both figures, hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 % [DEC-954 Q9f, DEC-957]'
   failure: []
 profile: FULL
 sources:
@@ -62,6 +93,9 @@ sources:
 - DEC-736
 - DEC-741
 - DEC-745
+- DEC-953
+- DEC-954
+- DEC-957
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -71,6 +105,10 @@ closes:
 list_rows: []
 ---
 # W2-27 EXAMIN adoption on a copy
+
+**Dependencies widened (PLAN-GROWTH-1 §2 gap 5):** the tickets DEC-959, DEC-966, DEC-969 and DEC-971 put before EXAMIN's copy (W2-61h, W2-86, W2-91 to W2-110, W2-90b).
+
+**DEC-954 Q1:** this ticket starts only when K9's entry criteria are met: memory proven, the roles, skills and briefs landed, the proving ground passed, the rest of the minimum closed. Never because a date arrived.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-27), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

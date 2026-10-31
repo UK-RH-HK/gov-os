@@ -3,11 +3,13 @@
 Two rebuilds from the same commit give the same digest. Needs only git.
 
 ``--no-embeddings`` (DEC-530) builds everything but the semantic vectors; a full rebuild is the default.
+
+Every rebuild takes the machine's rebuild lock, times each stage and is watched past its threshold (W2-76,
+``gov.rebuild.watch``).
 """
 
 from __future__ import annotations
 
-import time
 from pathlib import Path
 
 ACT_PATHS = (".gov-runtime/**",)
@@ -73,41 +75,66 @@ def add_arguments(parser) -> None:
 
 
 def run(root: Path, args, config: dict) -> dict:
+    """The rebuild under the machine's rebuild lock, each stage timed and watched (W2-76): the lock is taken before
+    anything is read or written, and released after the last record is written."""
+    import os
+
+    from gov.rebuild.watch import Watch, settings, take
+
+    slow_after_s, lock_path, source = settings(root)
+    fd, lock = take(lock_path, source)
+    try:
+        watch = Watch(root, slow_after_s, lock)
+        try:
+            result = _build(root, args, config, watch)
+        finally:
+            ending = watch.end()
+    finally:
+        if fd is not None:
+            os.close(fd)
+    return result | ending
+
+
+def _build(root: Path, args, config: dict, watch) -> dict:
     from gov.cli.errors import GovError
+    from gov.retrieval import lexical
     from gov.retrieval.lexical import refresh as lexical_refresh
+    from gov.secrets import scan_counts
     from gov.store import load as store_load
 
     has_path_map = "path-map.yaml" in config
 
-    try:
-        store_result = store_load(root)
-    except GovError:
-        raise
-    except Exception as exc:
-        raise GovError(
-            "REBUILD_FAILED",
-            f"rebuild failed on the record store: {exc}",
-            {"store": "record", "error": str(exc)},
-        )
-
-    stores: dict = {}
-
-    if has_path_map:
+    with watch.stage("record"):
         try:
-            t0 = time.monotonic()
-            lexical_refresh(root)
-            lex_s = round(time.monotonic() - t0, 1)
-            stores["lexical"] = {"status": "recreated"}
+            store_result = store_load(root)
         except GovError:
             raise
         except Exception as exc:
             raise GovError(
                 "REBUILD_FAILED",
-                f"rebuild failed on the lexical index: {exc}",
-                {"store": "lexical", "error": str(exc)},
+                f"rebuild failed on the record store: {exc}",
+                {"store": "record", "error": str(exc)},
             )
+
+    stores: dict = {}
+    # The secrets filter's counts around the stages that run it, all in this process (W2-107, DEC-970 P-W2-107-3).
+    counted = scan_counts()
+
+    if has_path_map:
+        with watch.stage("lexical"), watch.filtered(lexical, "indexable"):
+            try:
+                lexical_refresh(root)
+                stores["lexical"] = {"status": "recreated"}
+            except GovError:
+                raise
+            except Exception as exc:
+                raise GovError(
+                    "REBUILD_FAILED",
+                    f"rebuild failed on the lexical index: {exc}",
+                    {"store": "lexical", "error": str(exc)},
+                )
     else:
-        lex_s = 0.0
+        watch.skip("lexical")
         stores["lexical"] = {
             "status": "not_recreated",
             "reason": "no path map: nothing is classified as indexable",
@@ -115,58 +142,71 @@ def run(root: Path, args, config: dict) -> dict:
 
     if getattr(args, "no_embeddings", False):
         # Not asked for (DEC-530): the embedding endpoint is not asked and its program is not started.
+        watch.skip("semantic")
         stores["semantic"] = {
             "status": "not_recreated",
             "requested": False,
             "reason": f"{NO_EMBEDDINGS} was given: the semantic vectors were not asked for",
         }
     else:
-        try:
-            from gov.retrieval.semantic import refresh as semantic_refresh
+        with watch.stage("semantic"):
+            try:
+                from gov.retrieval.semantic import refresh as semantic_refresh
 
-            sem = semantic_refresh(root)
-            if sem.get("available"):
-                stores["semantic"] = {"status": "recreated"}
-            else:
-                stores["semantic"] = {
-                    "status": "not_recreated",
-                    "reason": sem.get("reason", "unknown"),
-                }
-        except Exception as exc:
-            stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
+                sem = semantic_refresh(root)
+                if sem.get("available"):
+                    stores["semantic"] = {"status": "recreated"}
+                else:
+                    stores["semantic"] = {
+                        "status": "not_recreated",
+                        "reason": sem.get("reason", "unknown"),
+                    }
+            except Exception as exc:
+                stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
     note = none_embedded(config)
     if note:
         stores["semantic"]["embedding"] = note
     from gov.retrieval.semantic import QUERY_VECTORS_REL
     from gov.store.loader import STORE_REL
 
-    compaction = _compact(root, (STORE_REL, QUERY_VECTORS_REL))
-
-    try:
-        from gov.codeintel import home as codeintel_home, index as codeintel_index
-
+    tool_home = None
+    with watch.stage("codeintel"):
         try:
-            codeintel_index(root)
-            stores["codeintel"] = {"status": "recreated"}
-        except Exception as exc:
+            from gov import codeintel
+            from gov.codeintel import home as codeintel_home, index as codeintel_index
+
+            with watch.filtered(codeintel, "indexable", "path_holds_secret"):
+                try:
+                    codeintel_index(root)
+                    stores["codeintel"] = {"status": "recreated"}
+                except Exception as exc:
+                    stores["codeintel"] = {
+                        "status": "not_recreated",
+                        "reason": str(exc),
+                    }
+        except ImportError as exc:
             stores["codeintel"] = {
                 "status": "not_recreated",
                 "reason": str(exc),
             }
-    except ImportError as exc:
-        stores["codeintel"] = {
-            "status": "not_recreated",
-            "reason": str(exc),
-        }
-    else:
-        tool_home, project = codeintel_home(root), Path(root).resolve()  # the tool's home is a resolved path
-        compaction |= _compact(project, sorted(path.relative_to(project).as_posix() for path in tool_home.rglob("*")
-                                                if path.is_file()) if tool_home.is_dir() else ())
+        else:
+            tool_home = codeintel_home(root)
+    secrets_counts = {kind: {what: number - counted[kind][what] for what, number in each.items()}
+                      for kind, each in scan_counts().items()}
+
+    # The compaction: both calls together, after the code index (the record store and query vectors, then its home).
+    with watch.stage("compaction"):
+        compaction = _compact(root, (STORE_REL, QUERY_VECTORS_REL))
+        if tool_home is not None:
+            project = Path(root).resolve()  # the tool's home is a resolved path
+            compaction |= _compact(project, sorted(path.relative_to(project).as_posix()
+                                                    for path in tool_home.rglob("*") if path.is_file())
+                                   if tool_home.is_dir() else ())
 
     return {
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
         "compaction": compaction,
-        "timing": {"lexical_s": lex_s},
+        "secrets_counts": secrets_counts,
     }

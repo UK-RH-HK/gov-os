@@ -26,7 +26,7 @@ cli_support = support.cli_support
 # --------------------------------------------------------------------------
 
 TICKET = "PROJ-iter"
-WBS = "W1-iter"
+WBS = "W1-914"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-iter", "Role: engineer", "Implements: CAP-01")
 ITERATION_FIELDS = ("iteration_count", "iterations_remaining", "loop_count",
@@ -115,7 +115,7 @@ def test_different_failures_still_increment_count(project, sandbox, interface):
 def test_successful_close_resets_count(project, sandbox, interface):
     """A6: a successful close resets the iteration count."""
     ticket_a = "PROJ-rst1"
-    wbs_a = "W1-rst1"
+    wbs_a = "W1-938"
     trailers_a = ("Task: PROJ-rst1", "Role: engineer", "Implements: CAP-01")
     project.add_ticket(ticket_a, wbs_a)
     project.add_failing_test(wbs_a)
@@ -238,7 +238,7 @@ def test_owner_decision_resets_count(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-owner1"
+    dec_id = "DEC-9019"
     project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
     project.commit("owner decision", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -263,7 +263,7 @@ def test_owner_decision_must_be_active(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-draft1"
+    dec_id = "DEC-9007"
     project.add_decision(dec_id, "DRAFT", title="Not yet active")
     project.commit("add draft decision", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -545,7 +545,7 @@ def test_owner_decision_unapproved_refused(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-noapproval"
+    dec_id = "DEC-9013"
     project.add_decision(dec_id, "ACTIVE", title="Unapproved decision")
     project.commit("add decision without owner approval", who=support.AGENT)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -557,20 +557,30 @@ def test_owner_decision_unapproved_refused(project, sandbox, interface):
 
 
 def test_owner_decision_checker_failing_refuses(project, sandbox, interface):
-    """DEC-454: the decision checker failing (corrupted decision file) refuses."""
+    """DEC-454: the decision checker failing (corrupted decision file) refuses.
+
+    Revised for W2-67 (I2 F2, PF10): the decision file had no readable frontmatter, so the lift was refused before
+    the checker was asked. The decision is now one the close reads (an ACTIVE decision record of that id, committed
+    by the owner after the escalation began), and W1-11's checker has one finding about it: a later active decision
+    supersedes it, a register the checker finds corrupted around it. The escalation stays in force (exit code 4,
+    DEC-490), and the answer names the decision and the checker's finding."""
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-checkfail"
+    dec_id = "DEC-9002"
     project.add_decision(dec_id, "ACTIVE", title="Decision")
-    dec_file = project.root / "docs" / "adr" / f"{dec_id}.md"
-    dec_file.write_text("---\nnot valid yaml: [[[broken\n---\n", encoding="utf-8")
-    project.commit("corrupt decision file", who=support.OWNER)
+    project.add_decision("DEC-checkfail-later", "ACTIVE", title="A later decision", supersedes=dec_id)
+    project.commit("a decision, and a later one that supersedes it", who=support.OWNER)
+    front = support.frontmatter_of(project.root / "docs" / "adr" / f"{dec_id}.md")
+    assert front.get("id") == dec_id and front.get("status") == "ACTIVE", \
+        f"the fixture is wrong: the decision file does not read as an active decision of that id: {front}"
+    about = [finding.get("code") for finding in support.decision_check(project, sandbox).get("findings", [])
+             if dec_id in finding.get("ids", [])]
+    assert len(about) == 1, f"the fixture is wrong: W1-11's checker has {about} about {dec_id}, not one finding"
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "a corrupted decision file must cause the checker to fail and refuse close"
-    assert run.returncode != support.EXIT_OK
+    text = support.error_text(support.refused(run, interface, support.EXIT_BLOCKED))
+    assert dec_id in text and about[0] in text, \
+        f"the refusal does not name {dec_id} and the checker's finding {about[0]}\n{run.describe()}"
 
 
 def test_owner_decision_only_when_escalated(project, sandbox, interface):
@@ -578,7 +588,7 @@ def test_owner_decision_only_when_escalated(project, sandbox, interface):
     escalated (after three consecutive failures).
     """
     _failing_project(project)
-    dec_id = "DEC-early"
+    dec_id = "DEC-9009"
     project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
     project.commit("add decision early", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -592,7 +602,7 @@ def test_owner_decision_id_recorded_in_count(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-owner-rec"
+    dec_id = "DEC-9018"
     project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
     project.commit("add owner decision", who=support.OWNER)
     support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)

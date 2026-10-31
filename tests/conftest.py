@@ -19,6 +19,14 @@
   ``.lock``; when its ``.lock`` is not held but ``.lock-held`` is there (the
   run that held it is gone); or when its ``.lock`` names a pid no namespace
   can have (``pid_max`` or above). Any other folder is kept, whatever its pid.
+- ``gov rebuild`` takes a machine-wide lock (W2-76), and the suites' rebuilds
+  in throwaway repositories must not queue behind real rebuilds. Each process
+  of a run (the controller and every xdist worker) therefore sets
+  ``GOV_REBUILD_LOCK`` at configure time, before any test runs and before
+  xdist starts its workers, to a lock file of its own in the session's temp
+  folder (``tempfile.gettempdir()``); a worker replaces the controller's. At
+  the end the file is removed and the variable's former state restored
+  (DEC-956 item 2).
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -39,15 +47,44 @@ from _pytest.tmpdir import get_user
 _ALLOW = "GOV_ALLOW_BASETEMP"
 _HELD = ".lock-held"
 _NUMBERED = re.compile(r"pytest-(\d+)")
+_REBUILD_LOCK = "GOV_REBUILD_LOCK"
 _refused = False
 _held = None
+_rebuild_lock = None  # this process's own lock file and the variable's former value
 
 
 def _is_worker(config) -> bool:
     return hasattr(config, "workerinput")
 
 
+def _own_rebuild_lock() -> tuple[str, str | None]:
+    """Point ``GOV_REBUILD_LOCK`` at a new lock file of this process's own; return it and the former value."""
+    fd, path = tempfile.mkstemp(prefix=f"gov-rebuild-{os.getpid()}-", suffix=".lock", dir=tempfile.gettempdir())
+    os.close(fd)
+    former = os.environ.get(_REBUILD_LOCK)
+    os.environ[_REBUILD_LOCK] = path
+    return path, former
+
+
+def _drop_rebuild_lock(path: str, former: str | None) -> None:
+    if former is None:
+        os.environ.pop(_REBUILD_LOCK, None)
+    else:
+        os.environ[_REBUILD_LOCK] = former
+    try:
+        os.unlink(path)
+    except FileNotFoundError:
+        pass
+
+
 def pytest_configure(config):
+    global _rebuild_lock
+    _refuse_basetemp(config)
+    if _rebuild_lock is None:
+        _rebuild_lock = _own_rebuild_lock()
+
+
+def _refuse_basetemp(config) -> None:
     global _refused
     if _is_worker(config) or config.option.basetemp is None:
         return
@@ -173,6 +210,10 @@ def _sweep(config) -> None:
 
 
 def pytest_unconfigure(config):
+    global _rebuild_lock
+    if _rebuild_lock is not None:
+        _drop_rebuild_lock(*_rebuild_lock)
+        _rebuild_lock = None
     if _refused or _is_worker(config):
         return
     _sweep(config)

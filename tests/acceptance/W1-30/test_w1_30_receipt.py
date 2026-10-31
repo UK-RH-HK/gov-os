@@ -23,7 +23,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-rcpt"
-WBS = "W1-rcpt"
+WBS = "W1-935"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-rcpt", "Role: engineer", "Implements: CAP-01")
 
@@ -44,7 +44,7 @@ def _close_and_find_record(project, sandbox):
 
 
 def _green_project(project):
-    project.add_decision("DEC-test", "ACTIVE")
+    project.add_decision("DEC-9021", "ACTIVE")
     project.commit("a decision", who=support.OWNER)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
@@ -120,27 +120,25 @@ def test_close_record_has_tests_and_deviations(project, sandbox, interface):
 
 
 def test_close_record_packet_hash_matches_context(project, sandbox, interface):
-    """KPI S5, CAP-50.c: the packet_hash equals the one from gov context."""
+    """KPI S5, CAP-50.c: the packet_hash equals the one from gov context.
+
+    Revised for W2-67 (I2 F2, PF9): when ``gov context`` could not be read, the case accepted any string of more than
+    eight characters, and it could not be read: the record store is loaded only by the close. The store is now
+    loaded first, the case fails when ``gov context`` does not answer, and the close record's packet hash must be
+    exactly the hash it gives."""
     _green_project(project)
+    support.load_store(project, sandbox)
     ctx_run = project.gov(sandbox, "context", TICKET, "--json")
-    ctx_data = {}
-    try:
-        ctx_data = json.loads(ctx_run.stdout)
-    except Exception:
-        pass
-    ctx_hash = None
-    if isinstance(ctx_data, dict):
-        result = ctx_data.get("result", ctx_data)
-        ctx_hash = result.get("hash") if isinstance(result, dict) else None
+    ctx_data = json.loads(ctx_run.stdout)
+    assert ctx_data.get("ok") is True, \
+        f"gov context does not answer for the ticket, so its hash cannot be compared\n{ctx_run.describe()}"
+    ctx_hash = ctx_data["result"].get("hash")
+    assert isinstance(ctx_hash, str) and len(ctx_hash) > 8, f"gov context gives no hash: {ctx_data['result']}"
 
     front = _close_and_find_record(project, sandbox)
     record_hash = front.get("packet_hash") or front.get("hash")
-    if ctx_hash:
-        assert record_hash == ctx_hash, \
-            f"packet_hash {record_hash!r} must match context hash {ctx_hash!r}"
-    else:
-        assert isinstance(record_hash, str) and len(record_hash) > 8, \
-            "packet_hash must be non-trivial even when context is unavailable"
+    assert record_hash == ctx_hash, \
+        f"packet_hash {record_hash!r} must match context hash {ctx_hash!r}"
 
 
 # --------------------------------------------------------------------------
@@ -159,8 +157,8 @@ def test_close_refuses_when_context_cannot_be_built(project, sandbox, interface)
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    project.add_decision("DEC-cyc1", "ACTIVE", supersedes="DEC-cyc2")
-    project.add_decision("DEC-cyc2", "ACTIVE", supersedes="DEC-cyc1")
+    project.add_decision("DEC-9003", "ACTIVE", supersedes="DEC-9004")
+    project.add_decision("DEC-9004", "ACTIVE", supersedes="DEC-9003")
     project.commit("create contradiction for context failure", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
@@ -176,8 +174,8 @@ def test_no_fallback_hash_when_context_fails(project, sandbox, interface):
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    project.add_decision("DEC-cyc3", "ACTIVE", supersedes="DEC-cyc4")
-    project.add_decision("DEC-cyc4", "ACTIVE", supersedes="DEC-cyc3")
+    project.add_decision("DEC-9005", "ACTIVE", supersedes="DEC-9006")
+    project.add_decision("DEC-9006", "ACTIVE", supersedes="DEC-9005")
     project.commit("contradiction", who=support.OWNER)
     before = cli_support.snapshot(project.root)
     run = support.run_close(project, sandbox, TICKET)
@@ -321,11 +319,11 @@ def test_context_failure_non_cycle_refuses_close(project, sandbox, interface):
 
     The cause: the ticket sources a superseded decision (W1-24 README: BLOCKED).
     """
-    project.add_ticket(TICKET, WBS, sources=["DEC-base"])
+    project.add_ticket(TICKET, WBS, sources=["DEC-9001"])
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.add_decision("DEC-base", "ACTIVE", title="Base")
-    project.add_decision("DEC-new", "ACTIVE", title="Replacement", supersedes="DEC-base")
+    project.add_decision("DEC-9001", "ACTIVE", title="Base")
+    project.add_decision("DEC-9012", "ACTIVE", title="Replacement", supersedes="DEC-9001")
     project.commit("implement with superseded source", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
@@ -362,7 +360,7 @@ def test_tests_produced_lists_ticket_own_tests(project, sandbox, interface):
     support.write(project.root, "tests/unit/preexisting/test_other.py",
                   "def test_other():\n    assert True\n")
     project.commit("set up pre-existing tests", who=support.ORCHESTRATOR)
-    project.write("tests/acceptance/W1-rcpt/test_mine.py",
+    project.write("tests/acceptance/W1-935/test_mine.py",
                   "def test_mine():\n    assert True\n")
     project.commit("implement and add own test", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)

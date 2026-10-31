@@ -1,6 +1,6 @@
 ---
 id: DAEO-0uhh
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -19,6 +19,8 @@ allowed_paths:
 - template/governance/kernel/schemas/close.schema.json
 - src/gov/check/schema.py
 - tests/unit/check/test_schema*
+- tests/unit/check/test_check.py
+- tests/unit/check/test_kernel_followup.py
 kpis:
   success:
   - 'core-schema validates every record against its schema through check-jsonschema (pinned in the tool registry), not a subset; lens G''s planted ticket (a field the schema refuses that the subset passed) is refused [lens G R2 (a), F2, DEC-872 item 2]'

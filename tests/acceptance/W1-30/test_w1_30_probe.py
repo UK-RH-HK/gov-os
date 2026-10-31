@@ -21,7 +21,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-prob"
-WBS = "W1-probe"
+WBS = "W1-934"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-prob", "Role: engineer", "Implements: CAP-01")
 
@@ -100,7 +100,7 @@ def test_probe_reviewer_wrote_nothing_required(project, sandbox, interface):
 def test_standard_profile_closes_without_probe(project, sandbox, interface):
     """KPI S7, CAP-38.f: a STANDARD-profile ticket does not need a probe record."""
     ticket_id = "PROJ-std1"
-    wbs = "W1-std"
+    wbs = "W1-945"
     project.add_ticket(ticket_id, wbs, profile="STANDARD")
     project.add_passing_test(wbs)
     project.write("src/example/feature.py", "# feature\n")
@@ -124,7 +124,7 @@ def test_reviewer_commit_in_ticket_commits_refused(project, sandbox, interface):
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
-    project.write("tests/acceptance/W1-probe/test_extra.py",
+    project.write("tests/acceptance/W1-934/test_extra.py",
                   "def test_extra():\n    assert True\n")
     project.commit("reviewer also committed", who=support.REVIEWER,
                    trailers=("Task: PROJ-prob", "Role: independent-auditor"))

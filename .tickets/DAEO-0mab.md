@@ -1,7 +1,7 @@
 ---
 id: DAEO-0mab
 status: open
-deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-k7hz, DAEO-j8gn, DAEO-zqvn, DAEO-7y6v, DAEO-rd0g, DAEO-49o5, DAEO-sdhj, DAEO-057v, DAEO-jzvg, DAEO-r30l, DAEO-1ahb, DAEO-xm6l, DAEO-kmcr, DAEO-xxgp, DAEO-ha8z, DAEO-kl5e, DAEO-7rr2]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-ha8z, DAEO-kl5e, DAEO-7rr2, DAEO-cy5o, DAEO-siiz, DAEO-wnnz, DAEO-egsy, DAEO-2bdu]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -23,25 +23,21 @@ depends_on:
 - DAEO-kia7
 - DAEO-r9ss
 - DAEO-7r5e
-- DAEO-a3m2
-- DAEO-cuao
 - DAEO-k7hz
-- DAEO-j8gn
 - DAEO-zqvn
-- DAEO-7y6v
 - DAEO-rd0g
 - DAEO-49o5
-- DAEO-sdhj
-- DAEO-057v
-- DAEO-jzvg
 - DAEO-r30l
 - DAEO-1ahb
-- DAEO-xm6l
 - DAEO-kmcr
-- DAEO-xxgp
 - DAEO-ha8z
 - DAEO-kl5e
 - DAEO-7rr2
+- DAEO-cy5o
+- DAEO-siiz
+- DAEO-wnnz
+- DAEO-egsy
+- DAEO-2bdu
 allowed_paths:
 - docs/plan/wave-2/track-a-gate/**
 kpis:
@@ -61,6 +57,7 @@ sources:
 - CAP-45.a
 - DEC-726
 - DEC-721
+- DEC-954
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -71,6 +68,8 @@ list_rows:
 - W2-I035
 ---
 # W2-24 Track A gate run
+
+**DEC-954:** dependencies are the Wave 2 tickets only (W2-57, W2-52, W2-56, W2-51 and W2-88 added as later Track A tickets). The AR lines whose tickets moved to Wave 3 are named Wave 3 in this ticket's report (exit criterion 5). W2-17 is Wave 3, so the "gov update" step is a named Wave 3 line. The release is W2-16's.
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-24), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

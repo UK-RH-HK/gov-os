@@ -155,12 +155,13 @@ COMMIT_ID_KEYS = ("trailers_base", "decision_citations_base")
 
 
 def path_map_text(settings):
-    """The text of a path map that holds ``settings`` as top-level keys, one on a line, and no namespace (the
-    one key the loader requires of a path map). A value is written as given, but for a key that holds a commit
+    """The text of a path map that holds ``settings`` as top-level keys, one on a line, and one catch-all
+    namespace (``namespaces``, the one key the loader requires of a path map; ``**`` places every tracked path
+    in it once, so path-map compliance holds, DEC-970, DEC-959 item 9). A value is written as given, but for a key that holds a commit
     id (``COMMIT_ID_KEYS``), whose value is written as quoted text."""
     def written(key, value):
         return json.dumps(str(value)) if key in COMMIT_ID_KEYS else value
-    return "namespaces: {}\n" + "".join(f"{key}: {written(key, value)}\n" for key, value in settings.items())
+    return "namespaces: {all: {paths: ['**']}}\n" + "".join(f"{key}: {written(key, value)}\n" for key, value in settings.items())
 
 
 # --------------------------------------------------------------------------
@@ -190,6 +191,7 @@ def sandbox_env(sandbox):
         "PYTHONPATH": str(SRC),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
         **installed_packages_env(),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
 
 
