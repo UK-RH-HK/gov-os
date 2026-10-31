@@ -41,7 +41,7 @@ REFACTORED = {
 
 def _gov_pathmap(result):
     assert result.envelope is not None, "gov check --json printed no JSON:\n" + result.describe()
-    assert result.envelope.get("ok") is True, "gov check refused the planted project:\n" + result.describe()
+    assert result.answered(), "gov check refused the planted project:\n" + result.describe()
     check = result.pathmap()
     assert check is not None, "core-pathmap is not in gov check's result:\n" + result.describe()
     return check

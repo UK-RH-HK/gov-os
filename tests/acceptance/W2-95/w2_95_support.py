@@ -7,8 +7,10 @@ its public interfaces only:
 - the command its declaration states (``template/governance/kernel/checks/
   core-pathmap.yaml``), run from the planted repository's root: findings as JSON
   on stdout, non-zero exit when there are findings, zero when green;
-- ``gov check --json`` (``python3 -m gov.cli.main check --json``), whose result
-  carries the family "path-map compliance" and the check ``core-pathmap``.
+- ``gov check --json`` (``python3 -m gov.cli.main check --json``), whose answer
+  carries the family "path-map compliance" and the check ``core-pathmap``: under
+  ``result`` when no hard-block check is red, and under ``error.details`` (with
+  ``ok`` false and the code ``CHECK_FAILED``) when one is.
 
 The code under test is the ``src/`` folder of the repository that holds this
 file: ``REPO_ROOT`` is derived from this file's own location, never from an
@@ -176,9 +178,29 @@ class GovCheck:
     def describe(self):
         return f"exit {self.code}\nstdout: {self.run.stdout[:4000]}\nstderr: {self.run.stderr[-1500:]}"
 
+    def failed_form(self):
+        """True when gov check answered in its failure form: a hard-block check is red, so
+        ``ok`` is false, the error code is ``CHECK_FAILED`` and the checks are under
+        ``error.details`` (``result`` is empty)."""
+        env = self.envelope or {}
+        error = env.get("error") or {}
+        return env.get("ok") is False and error.get("code") == "CHECK_FAILED" and isinstance(
+            error.get("details"), dict
+        )
+
+    def answered(self):
+        """True when gov check answered with its checks, in either form; any other answer
+        (no JSON, or another error) is a refusal of the planted project."""
+        return (self.envelope or {}).get("ok") is True or self.failed_form()
+
     @property
     def result(self):
-        return (self.envelope or {}).get("result") or {}
+        """The checks and families, from ``result`` (success form) or ``error.details``
+        (failure form)."""
+        env = self.envelope or {}
+        if self.failed_form():
+            return env["error"]["details"]
+        return env.get("result") or {}
 
     def checks(self):
         return {c.get("id"): c for c in self.result.get("checks") or []}
