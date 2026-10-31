@@ -13,5 +13,5 @@ sources:
       heading: "depends_on:"
       lines: [17, 44]
     - path: docs/plan/WAVE_2_WBS.md
-      heading: "| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket | 0 | AR-1 … AR-10 |"
+      heading: "| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket still in Wave 2 (the Wave 3 ones and W2-48 removed, DEC-954) | 0 | AR-1 … AR-10 (the lines whose tickets moved are named Wave 3 in its report) |"
       lines: [118, 118]
