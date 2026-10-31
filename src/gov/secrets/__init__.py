@@ -55,7 +55,7 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 4  # the form of the record and of what a scan reads; another form is never trusted
+_FORM = 4  # the form of the record and of what a scan reads (in the cache's fingerprint too); another is never trusted
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
 # is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
 # 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
@@ -173,20 +173,21 @@ def _forms(content: bytes) -> list[bytes]:
 def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = None, kind: str | None = None) -> bool:
     """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``.
 
-    With ``kind``, bytes judged clean before by the same engine are answered from the record, and a scan that finds
-    nothing at all is kept there; a scan with any finding, exempt or not, is never kept.
+    With ``kind``, bytes judged clean before by the same engine (the rules, the gitleaks and the form of what a scan
+    reads, taken once before the scan) are answered from the record, and a scan that finds nothing at all is kept
+    there; a scan with any finding, exempt or not, is never kept.
     """
     if kind is None:
         return _scan(rules, _forms(content), root)
-    digest = hashlib.sha256(content).hexdigest()
-    if cache.remembered(kind, digest, rules):
+    digest, engine = hashlib.sha256(content).hexdigest(), cache.engine(rules, _FORM)
+    if cache.remembered(kind, digest, engine):
         _count(kind, "remembered")
         return False
     _count(kind, "scanned")
     found = []
     secret = _scan(rules, _forms(content), root, found)
     if not (secret or found):
-        cache.remember(kind, digest, rules)
+        cache.remember(kind, digest, engine)
     return secret
 
 
