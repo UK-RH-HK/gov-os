@@ -560,6 +560,127 @@ UNREADABLE_HEADINGS = {
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Run 2's planted projects (DEC-970: PKG-1 (a), review 2's N2, N5, N7 and N8, given as R8 to R12).
+# --------------------------------------------------------------------------------------------------------------
+
+MANY_FOLDERS, MANY_PER_FOLDER = 20, 1000   # R9: 20,000 files, so the removal takes a noticeable time
+MANY_FILES = MANY_FOLDERS * MANY_PER_FOLDER
+CHAIN_DEPTH = 1200                         # R10: more than 1,100 nested folders, and more than the recursion limit
+GO_FILE = "qzv96leak-go"                   # R11: the planted test waits for this file in the probe folder
+
+# R9: module-level code that fills ``base`` with MANY_FOLDERS folders of MANY_PER_FOLDER small files each.
+MANY = '''
+
+def qzv96leak_many_files(base):
+    """qzv96leak: many small files, so that removing them takes a noticeable time."""
+    made = 0
+    for folder in range(@FOLDERS@):
+        sub = os.path.join(str(base), "qzv96leak-many-%d" % folder)
+        os.mkdir(sub)
+        for index in range(@PER@):
+            with open(os.path.join(sub, "qzv96leak-%d.txt" % index), "w", encoding="utf-8") as handle:
+                handle.write("qzv96leak-many-content")
+            made += 1
+    return made
+'''.replace("@FOLDERS@", str(MANY_FOLDERS)).replace("@PER@", str(MANY_PER_FOLDER))
+
+# R10: module-level code that makes, in ``base``, a folder holding a chain of CHAIN_DEPTH nested folders, each of
+# the deepest three holding a file, then without write (0500), read (0300) and any permission (0000), deepest last.
+DEEP = '''
+
+def qzv96leak_deep_chain(base):
+    """qzv96leak: a chain of nested folders deeper than a recursive removal can go."""
+    top = os.path.join(str(base), "qzv96leak-chain")
+    os.mkdir(top)
+    path, folders = top, []
+    for _ in range(@DEPTH@):
+        path = os.path.join(path, "d")
+        os.mkdir(path)
+        folders.append(path)
+    for folder in folders[-3:]:
+        with open(os.path.join(folder, "qzv96leak-deep.txt"), "w", encoding="utf-8") as handle:
+            handle.write("qzv96leak-deep-content")
+    for folder, mode in zip(reversed(folders[-3:]), (0o000, 0o300, 0o500)):
+        os.chmod(folder, mode)
+    return top, len(folders)
+'''.replace("@DEPTH@", str(CHAIN_DEPTH))
+
+_CASES.update({
+    # R9: many files in its temporary folder, then sleeps (a Ctrl-C arrives while it runs). Needs ``MANY``.
+    "many_sleep": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    made = qzv96leak_many_files(tmp_path)
+    qzv96leak_record("sleeping", name="@NAME@", made=made, tmp_path=str(tmp_path))
+    time.sleep(600)
+''',
+    # R10: the deep chain left in its temporary folder, then passes or fails. Both need ``DEEP``.
+    "deep_pass": '''
+
+def @NAME@(tmp_path):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    top, depth = qzv96leak_deep_chain(tmp_path)
+    qzv96leak_record("deep", name="@NAME@", top=top, depth=depth)
+''',
+    "deep_fail": '''
+
+def @NAME@(tmp_path):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    top, depth = qzv96leak_deep_chain(tmp_path)
+    qzv96leak_record("deep", name="@NAME@", top=top, depth=depth)
+    assert False, "qzv96leak-deep-failure-message"
+''',
+    # R11: records that it waits, then passes once the go file appears in the probe folder (or fails after 120 s).
+    "wait_for_go": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    go = os.path.join(QZV96LEAK_PROBE, "@GO@")
+    qzv96leak_record("waiting", name="@NAME@")
+    deadline = time.monotonic() + 120
+    while not os.path.exists(go):
+        assert time.monotonic() < deadline, "qzv96leak: the go file never came"
+        time.sleep(0.05)
+    qzv96leak_record("went", name="@NAME@")
+'''.replace("@GO@", GO_FILE),
+})
+
+# R8, W1-30's form as review 2 planted it: a readable heading-form table maps the passing cases under ``### S1``,
+# while the failing case sits in a one-row table with no header row under ``### F1: …``, or in a ``Case | Clause``
+# table (no Test or File column) under ``### Failure 1: …``. Neither holds a Test or File table for its line.
+_W1_30_HEAD = """# qzv96leak planted suite (W1-30's form)
+
+Prose of the qzv96leak planted README.
+
+### S1: qzv96leak passing cases
+**Covers: qzv96leak**
+
+| Test | Area | Red reason |
+|------|------|------------|
+| `test_qzv96leak_alpha_one` | qzv96leak | qzv96leak |
+| `test_qzv96leak_alpha_param` | qzv96leak | qzv96leak |
+"""
+
+W1_30_FORMS = {
+    "a-row-with-no-header-under-f1": _W1_30_HEAD + """
+### F1: qzv96leak failing acceptance test
+
+| `test_qzv96leak_second_fails` | qzv96leak | qzv96leak failing test not caught |
+""",
+    "a-case-clause-table-under-failure-1": _W1_30_HEAD + """
+### Failure 1: qzv96leak failing acceptance test
+
+| Case | Clause |
+|---|---|
+| `test_qzv96leak_second_fails` | qzv96leak |
+""",
+}
+
+
+# --------------------------------------------------------------------------------------------------------------
 # The expected result (the design note's §6).
 # --------------------------------------------------------------------------------------------------------------
 
@@ -581,7 +702,10 @@ def error_result(kind, ticket=TICKET_ID):
             "totals": counts()}
 
 
-ROWS_EXPECTED = result("pass", [
+# Run 2 (DEC-970, R8) revised ROWS_EXPECTED and HEADINGS_EXPECTED: each map leaves the failing
+# ``test_qzv96leak_epsilon_other`` unmapped, and any failed case, mapped or not, now fails the run (exit 3). Every
+# line's result and every count are unchanged; only the run's outcome went from "pass" to "fail".
+ROWS_EXPECTED = result("fail", [
     line("success-1", "pass", 3), line("success-2", "pass", 1), line("success-3", "pass", 1, 0, 1),
     line("success-4", "pass", 1, 0, 1), line("success-5", "pass", 1), line("success-6", "pass", 1),
     line("success-7", "pass", 2), line("success-8", "pass", 2), line("success-9", "pass", 1),
@@ -589,7 +713,7 @@ ROWS_EXPECTED = result("pass", [
     line("failure-3", "pass", 1), line("failure-4", "pass", 1), line("failure-5", "pass", 1),
 ], unmapped=counts(3, 1, 0), totals=counts(12, 1, 1))
 
-HEADINGS_EXPECTED = result("pass", [
+HEADINGS_EXPECTED = result("fail", [
     line("success-1", "pass", 3), line("success-2", "pass", 1), line("success-3", "pass", 3),
     line("success-4", "pass", 1, 0, 1), line("failure-1", "pass", 3), line("failure-2", "pass", 1, 0, 1),
     line("failure-3", "pass", 1, 0, 1),
@@ -615,6 +739,10 @@ ITEMS_UNMATCHED_EXPECTED = result("fail", [
     line("success-1", "fail", 3), line("success-2", "fail", 1), line("success-3", "fail", 2),
     line("success-4", "fail", 1), line("failure-1", "pass", 4), line("failure-2", "pass", 1),
 ], unmapped=counts(1, 1), totals=counts(7, 1))
+
+# Run 2: ALPHA and a second file of one case under SECOND_README, both lines passing (R10's pass, R11).
+SECOND_PASSES_EXPECTED = result("pass", [line("success-1", "pass", 3), line("success-2", "pass", 1)],
+                                totals=counts(4))
 
 
 def projection(found):
@@ -716,6 +844,15 @@ def pid_gone(pid, wait_s=GONE_WAIT_S):
         time.sleep(0.2)
 
 
+def pid_running(pid):
+    """True while ``pid`` exists and is neither a zombie nor dead (run 2, R11)."""
+    try:
+        state = Path(f"/proc/{int(pid)}/stat").read_text().rsplit(")", 1)[1].split()[0]
+    except (OSError, IndexError, ValueError):
+        return False
+    return state not in ("Z", "X")
+
+
 def kill_quietly(pid, group=False):
     try:
         if group:
@@ -747,6 +884,49 @@ def unlock(top):
             return
         for name in names:
             unlock(os.path.join(top, name))
+
+
+def remove_tree(top):
+    """``top`` and everything under it removed without recursion, permissions given back first (links not
+    followed), so what a run left (run 2, R9 and R10: many files, a chain deeper than the recursion limit) does not
+    stay for pytest's own clean-up, whose removal recurses. Errors are ignored: this is the case's clean-up."""
+    top = str(top)
+    if not os.path.lexists(top):
+        return
+    if os.path.islink(top) or not os.path.isdir(top):
+        try:
+            os.unlink(top)
+        except OSError:
+            pass
+        return
+    try:
+        os.chmod(top, 0o700)
+    except OSError:
+        pass
+    for dirpath, dirnames, _ in os.walk(top):
+        for name in dirnames:
+            path = os.path.join(dirpath, name)
+            if not os.path.islink(path):
+                try:
+                    os.chmod(path, 0o700)
+                except OSError:
+                    pass
+    for dirpath, dirnames, filenames in os.walk(top, topdown=False):
+        for name in filenames:
+            try:
+                os.unlink(os.path.join(dirpath, name))
+            except OSError:
+                pass
+        for name in dirnames:
+            path = os.path.join(dirpath, name)
+            try:
+                os.unlink(path) if os.path.islink(path) else os.rmdir(path)
+            except OSError:
+                pass
+    try:
+        os.rmdir(top)
+    except OSError:
+        pass
 
 
 # --------------------------------------------------------------------------------------------------------------
@@ -887,10 +1067,15 @@ class Project:
             watched["cwd"] = workdir
         return tmpdir, workdir, command, watched
 
-    def _popen(self, command, workdir, tmpdir):
+    def _popen(self, command, workdir, tmpdir, ignore=()):
+        """``ignore``: signals set to "ignore" in the started process before ``gov`` runs, as ``nohup`` does for
+        SIGHUP (run 2, R11); an ignored signal stays ignored across ``exec``."""
+        def ignoring():
+            for signum in ignore:
+                signal.signal(signum, signal.SIG_IGN)
         return subprocess.Popen(command, cwd=workdir, env=self.env(tmpdir), stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8",
-                                errors="replace", start_new_session=True)
+                                errors="replace", start_new_session=True, preexec_fn=ignoring if ignore else None)
 
     def run(self, *args, json_mode=True, cwd=None, timeout=RUN_TIMEOUT_S):
         """``gov accept <args>`` (``--json`` unless ``json_mode`` is false), from the root or ``cwd``."""
@@ -910,11 +1095,15 @@ class Project:
         after = {name: tree_snapshot(path) for name, path in watched.items()}
         return Run(self, command, process.returncode, stdout, stderr, tmpdir, watched, before, after, elapsed)
 
-    def start(self, *args, json_mode=True):
-        """``gov accept <args>`` started, not waited for (the interrupt case)."""
+    def start(self, *args, json_mode=True, ignore=()):
+        """``gov accept <args>`` started, not waited for (the interrupt case); ``ignore`` as in ``_popen``."""
         tmpdir, workdir, command, watched = self._prepare(args, json_mode, None)
         before = {name: tree_snapshot(path) for name, path in watched.items()}
-        return Started(self, command, self._popen(command, workdir, tmpdir), tmpdir, watched, before)
+        return Started(self, command, self._popen(command, workdir, tmpdir, ignore), tmpdir, watched, before)
+
+    def go(self):
+        """The go file a ``wait_for_go`` planted test waits for (run 2, R11)."""
+        write(self.probe / GO_FILE, "go")
 
     def raw_pytest(self, python_path=None, timeout=RUN_TIMEOUT_S, basetemp=True):
         """Raw pytest on the planted folder, outside ``gov accept`` (the premises): its run and its outcomes.
@@ -1026,14 +1215,33 @@ class Started:
     def send(self, signum, wait_s=60.0):
         """``signum`` to gov alone (not its process group), then the finished run (review 1, R2)."""
         os.kill(self.process.pid, signum)
+        return self.finish(wait_s, f"signal {int(signum)}")
+
+    def send_all(self, schedule, wait_s=60.0):
+        """Each ``(delay_s, signum)`` of ``schedule`` in turn to gov alone, after its delay, while gov still runs;
+        then the finished run (run 2, R9 and R12). ``run.sent`` lists the signals sent."""
+        sent = []
+        for delay, signum in schedule:
+            if delay:
+                time.sleep(delay)
+            if self.process.poll() is not None:
+                break
+            os.kill(self.process.pid, signum)
+            sent.append(int(signum))
+        run = self.finish(wait_s, f"signals {sent}")
+        run.sent = sent
+        return run
+
+    def finish(self, wait_s=RUN_TIMEOUT_S, after="its start"):
+        """The run once gov ends by itself; an AssertionError if it does not within ``wait_s``."""
         try:
             stdout, stderr = self.process.communicate(timeout=wait_s)
         except subprocess.TimeoutExpired:
             self.stop()
-            raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of signal {int(signum)}") from None
-        after = {name: tree_snapshot(path) for name, path in self.watched.items()}
+            raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of {after}") from None
+        after_snapshot = {name: tree_snapshot(path) for name, path in self.watched.items()}
         return Run(self.project, self.command, self.process.returncode, stdout, stderr, self.tmpdir, self.watched,
-                   self.before, after, time.monotonic() - self.started)
+                   self.before, after_snapshot, time.monotonic() - self.started)
 
     def stop(self):
         """Whatever is left of the run killed: gov's process group and every recorded planted process."""

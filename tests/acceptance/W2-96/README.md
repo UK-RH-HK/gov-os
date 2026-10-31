@@ -4,8 +4,10 @@ Ticket DAEO-ouet (W2-96), profile FULL. Written by the independent test designer
 lines, its sources (DEC-959 items 6 and 7, DEC-957's work order, DEC-820 (c), DEC-317, ROLES-RESEARCH-1 §2.7) and
 the lead's design note for both workers, in parallel with the engineer (DEC-959 item 7). Review 1's cases
 (`test_w2_96_at_review_1.py`) were added by a second independent test designer from the reviewer's findings, given
-as described behaviours (DEC-136) in an addendum that overrides the design note where they differ. The
-implementation (`src/gov/accept/`, `tests/unit/accept/test_w2_96*`) was read by neither.
+as described behaviours (DEC-136) in an addendum that overrides the design note where they differ. Run 2's cases
+(`test_w2_96_at_run_2.py`) were added by a third, from DEC-970's decisions (PKG-1 (a); review 2's N2, N5, N7 and
+N8), given the same way as R8 to R12; they override both earlier texts where they differ. The implementation
+(`src/gov/accept/`, `tests/unit/accept/test_w2_96*`) was read by none of them.
 
 ## How the tests run the merged tree's code (DEC-732)
 
@@ -36,8 +38,8 @@ own text, carries **`qzv96leak`**. The ticket ids, WBS ids and declared paths do
 After every run, `w2_96_support.Run.problems` searches stdout and stderr (the envelope and the error message are in
 them), every file created or changed in the planted project (ignored files included), everything under the
 `TMPDIR` the run was given, and the run's `HOME`: none may hold the marker. stdout and stderr may not hold pytest's
-own words `Traceback`, `AssertionError`, `::` or `conftest` either (the interrupt case and review 1's signal cases
-check only the marker), the given `TMPDIR` must be empty after the run, and the project's tree must be unchanged (every path,
+own words `Traceback`, `AssertionError`, `::` or `conftest` either (the interrupt case, review 1's signal cases and
+run 2's R9 and R12 cases check only the marker), the given `TMPDIR` must be empty after the run, and the project's tree must be unchanged (every path,
 size, digest and mtime, folders included; `.git` aside). Each planted test that runs also writes a small probe
 record (process id, working folder, `tmp_path`, a grandchild's process id) into a folder outside the project and
 outside the given `TMPDIR`; the cases read it to check what ran, where, and that it stopped.
@@ -57,7 +59,12 @@ outside the given `TMPDIR`; the cases read it to check what ran, where, and that
 | Success 1 (review 1, R5) | `test_r5_items_holding_a_double_colon_with_no_py_file_before_it_map_by_function_name`, `test_r5_an_item_naming_a_test_that_matches_no_case_fails_its_line` | No envelope (exit 2). |
 | Success 2 / Success 5 / Failure 1 / Failure 4 (review 1, R6) | `test_r6_no_log_file_is_written_whatever_the_projects_pytest_configuration_says` | No envelope (exit 2). |
 | Success 4 / Failure 3 (review 1, R7) | `test_r7_a_tests_failed_exit_with_no_failed_case_in_the_report_is_a_crash` | No envelope (exit 2). |
-| Premises (no KPI line: counted under unmapped) | test_w2_96_at_premises.py, and the test_premise_ cases of the review 1 file, named without backticks (a row holding an item whose KPI cell names no line would refuse the run, R4) | **Green before the implementation, by design**: they test the tests. The planted suites give the designed outcomes under raw pytest and raw output holds the marker; the planted collection errors and crashes end pytest as designed; the decoy discriminates; the marker is nowhere in `src/`; this README is a map in the design note's form naming success 1 to 5 and failure 1 to 4 and every test here (a file whole, or a review 1 case by its function name), and every row holding an item begins with a line name. Review 1's premises: the planted conftest refuses `--basetemp` (exit 4) and only that; a plain `shutil.rmtree` leaves the planted locked folders; the unreadable READMEs each hold a readable line beside the unreadable one; the items files give their designed outcomes; raw pytest writes the configured log file, holding the marker; the planted `pytest.exit` ends pytest with code 1 and a report without failures. |
+| Success 3 / Success 5 / Failure 2 / Failure 4 (run 2, R8) | `test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes`, `test_r8_a_skipped_case_the_readme_never_names_leaves_a_passing_run_passing`, `test_r8_a_failing_case_outside_the_readable_map_in_w1_30s_form_fails_the_run` | Against run 1's code (the design note: unmapped cases never change the exit code): the unmapped failure leaves `outcome: pass`, exit 0: "the result is not the expected one" (`"outcome": "pass"`), and for W1-30's form "exit code 0, expected 3". The skipped case **passes already** (a guard: R8 must not make skips fail the run). |
+| Success 2 / Failure 1 (run 2, R9) | `test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends` | Seen on run 1's code: the spaced and mixed presses interrupt the removal, "the given TMPDIR holds N entries after the run" (18,913 and 9,862 in one run, 16,191 and 7,691 in the next), files left holding the marker, and "gov was killed by signal 2 (1)"; the two presses 0.2 s apart: "gov was killed by signal 2" (that second press fell while `gov` waited for its child, and the removal finished). |
+| Success 2 / Success 4 / Failure 3 (run 2, R10) | `test_r10_a_chain_of_nested_folders_deeper_than_a_recursive_removal_leaves_the_result_as_the_tests_gave_it` | Seen on run 1's code: "the given TMPDIR holds 1218 entries after the run" (the chain and the run's report, holding the marker) and "the result is not the expected one" (`error`, kind `crash`), passing and failing alike. |
+| Success 1 / Success 5 (run 2, R11) | `test_r11_a_signal_gov_was_started_ignoring_stays_ignored_and_the_run_completes` | Seen on run 1's code: "gov accept ended (exit code 129) on signal 1, which it was started ignoring" (SIGHUP to `gov` and to its group), "(exit code 143) on signal 15" (SIGTERM), the child stopped. The SIGINT variant **passes already** (run 1 leaves SIGINT to Python, which keeps an inherited ignore); it stays as R11's guard. |
+| Success 5 / Failure 4 (run 2, R12) | `test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal` | Seen on run 1's code: "gov was killed by signal 15" (SIGTERM twice), "signal 1" (SIGHUP twice), "signal 2" (one SIGINT), each "expected an ordinary exit with code 143 (129, 130)". |
+| Premises (no KPI line: counted under unmapped) | test_w2_96_at_premises.py, and the test_premise_ cases of the review 1 and run 2 files, named without backticks (a row holding an item whose KPI cell names no line would refuse the run, R4) | **Green before the implementation, by design**: they test the tests. The planted suites give the designed outcomes under raw pytest and raw output holds the marker; the planted collection errors and crashes end pytest as designed; the decoy discriminates; the marker is nowhere in `src/`; this README is a map in the design note's form naming success 1 to 5 and failure 1 to 4 and every test here (a file whole, or a review 1 or run 2 case by its function name), and every row holding an item begins with a line name. Review 1's premises: the planted conftest refuses `--basetemp` (exit 4) and only that; a plain `shutil.rmtree` leaves the planted locked folders; the unreadable READMEs each hold a readable line beside the unreadable one; the items files give their designed outcomes; raw pytest writes the configured log file, holding the marker; the planted `pytest.exit` ends pytest with code 1 and a report without failures. Run 2's premises: W1-30's two forms map the passing cases in one Test table and hold the failing case in no Test or File table under a header row; raw pytest leaves the planted chain, 1,200 folders deep (more than 1,100 and than Python's recursion limit), with its deepest three folders at 0500, 0300 and 0000, and the cases' own removal without recursion takes it away; a process started as the R11 case starts `gov` begins with the signal ignored. |
 
 What each file holds:
 
@@ -69,13 +76,14 @@ What each file holds:
   ignored, a row whose KPI cell names no line and that holds no item, and a table under a heading that names no
   line (and does not begin with success, failure or KPI), mapping nothing; every planted case
   ran and only those; the WBS id names the same ticket; each ticket runs its own declared folder; the child runs
-  in the root with the tree's own `src/` first; `--root` from another folder; text and `--json` agree.
+  in the root with the tree's own `src/` first; `--root` from another folder; text and `--json` agree. Every line
+  passes, and (since run 2, R8) the one unmapped failure makes the run's outcome `fail`, exit code 3.
 - **Success 2 / Failure 1** — a failing run (an assertion with values, a setup error, a teardown error, a skip,
   prints, logs, warnings) shows none of it in `--json` or text; the tests' temporary folders are made under the
   given `TMPDIR` and removed; an interrupted run (SIGINT to `gov` alone while a planted test sleeps) stops its
   child and leaves nothing. Every other case also runs the leak probe.
-- **Success 3 / Failure 2** — unmapped cases counted (3 passed, 1 failed) and never named, and an unmapped
-  failure leaves exit code 0, in `--json` and text; `ACCEPT_NO_MAP` for no README, an empty README, prose only, a
+- **Success 3 / Failure 2** — unmapped cases counted (3 passed, 1 failed) and never named, and (since run 2, R8)
+  the unmapped failure fails the run with exit code 3, in `--json` and text; `ACCEPT_NO_MAP` for no README, an empty README, prose only, a
   table whose rows name no line and hold no item, a table under a heading that names no line, and a KPI table with no Test or File
   column; never raw output (`collected`, `PASSED`, `FAILED`, `=====`); the text form gives the code on stderr.
 - **Success 4 / Failure 3** — `collection` for an import error, a syntax error and nothing collected; `timeout`
@@ -148,6 +156,72 @@ red reason against an implementation that keeps the design note and lacks the ad
 - The support module's line-name reader (for the README premise) no longer takes a number followed by a letter or
   digit (`Success 3a`, `S8b`), and `Started.interrupt` became `Started.send(SIGINT)` (no change of behaviour).
 
+## Run 2's cases (`test_w2_96_at_run_2.py`, DEC-970)
+
+Each point of run 2's addendum (R8 to R12), what its case checks beyond the leak probe, and its expected red
+reason against this branch's run-1 implementation (which keeps the design note and review 1's addendum, and lacks
+run 2's). R13 (`accept` recorded among the `gov` commands) has no case here: it is W1-07's and W1-32's command
+lists, revised in their own folders (see "Outside these paths").
+
+- **R8** — (a) the README maps ALPHA's three passing cases (`Success 1`); the second file's one case, named by no
+  item, fails its assertion, errors in setup or errors in teardown: the result exactly (`outcome: fail`, success 1
+  passing with 3, `unmapped` failed 1, totals 3 passed 1 failed), exit 3. (b) The same with the unmapped case
+  skipped: `outcome: pass`, `unmapped` skipped 1, exit 0. (c) W1-30's form, as review 2 planted it: a heading-form
+  Test table under `### S1: …` maps the passing cases, while the failing case sits in a one-row table with no
+  header row under `### F1: …`, or in a `Case | Clause` table under `### Failure 1: …`: `ok: true`, `outcome:
+  fail`, exit 3, success 1 first and passing with 3, totals 3 and 1, the failing case counted as failed once.
+  *Red without R8:* (a) and (c) answer `outcome: pass`, exit 0. (b) **passes already**; it stays as R8's guard
+  that a skip never fails the run.
+- **R9** — a planted test leaves 20,000 files (20 folders of 1,000) in its temporary folder, then sleeps; SIGINT to
+  `gov` alone ends the run, and more presses follow during the clean-up: one SIGINT 0.2 s later (review 2's form),
+  fifteen SIGINTs 0.1 s apart, or SIGTERM, SIGHUP and SIGINT in turn 0.1 s apart (a press is sent only while
+  `gov` still runs; at least a second press must be sent, or the case's premise failed). Checks, all reported
+  together: the given `TMPDIR` empty and no marker when `gov` ends (first); exit code 130; the child gone; the
+  planted files made under the given `TMPDIR`. *Red without R9:* a later press raises `KeyboardInterrupt`
+  inside the removal: "the given TMPDIR holds N entries after the run", and an exit code other than 130 (on run
+  1's code the two-press variant is red on the exit code alone: its second press fell before the removal).
+- **R10** — a planted test leaves in its temporary folder a chain of 1,200 nested folders, the deepest three at
+  0500, 0300 and 0000 (each holding a file), then passes or fails. Checks: the given `TMPDIR` empty (first), the
+  result as the tests gave it (both lines passing, exit 0; or success 2 failing, exit 3), the chain made under the
+  given `TMPDIR`. *Red without R10:* a recursive removal raises `RecursionError` (Python 3.12's `shutil.rmtree`
+  does, on this chain): the run is reported as an error, or the chain stays (on run 1's code, both).
+- **R11** — `gov accept` is started with the signal set to "ignore" in the starting process (as `nohup` does):
+  SIGHUP, SIGTERM or SIGINT to `gov` alone, or SIGHUP to `gov`'s process group, while a planted test waits; 1.5 s
+  later `gov` and the child must still run; the planted test is then let go (a file it waits for). Checks: the
+  result (both lines passing, exit 0), the planted test went on, the leak probe. *Red without R11:* review 1's R2
+  handlers replace the inherited "ignore" for SIGHUP and SIGTERM, so `gov` stops the run: "gov accept ended (exit
+  code 129 or 143) on signal N, which it was started ignoring". The SIGINT variant **passes already** on run 1's
+  code (SIGINT is left to Python, which keeps an inherited ignore); it stays as R11's guard.
+- **R12** — SIGTERM twice 5 ms apart, SIGHUP twice 5 ms apart, or one SIGINT, to `gov` alone while the planted test
+  and its grandchild sleep. Checks: the exit code is 143, 129 or 130, an ordinary exit (never `-15`, `-1`, `-2`);
+  the given `TMPDIR` empty, no marker; the child and the grandchild gone. *Red without R12:* a signal ending `gov`
+  by the default action: "gov was killed by signal N" (on run 1's code, all three).
+
+### Cases of the run-1 suite that run 2 changed (`Rewrite-Reason: DEC-970 (PKG-1 (a); review 2's N2, N5, N7, N8)`)
+
+R8 replaces "unmapped cases never change the exit code". Both common maps leave the failing
+`test_qzv96leak_epsilon_other` unmapped, so `ROWS_EXPECTED` and `HEADINGS_EXPECTED` now answer `outcome: fail`, and
+these cases expect exit code 3 instead of 0; every line's result and every count is unchanged, and each case keeps
+its purpose and its leak checks:
+
+- `test_w2_96_at_report.py`: `test_a_row_form_map_is_reported_per_kpi_line_with_its_counts`,
+  `test_a_heading_form_map_is_reported_per_kpi_line_with_its_counts`, `test_the_wbs_id_names_the_same_ticket`,
+  `test_the_root_option_runs_the_named_project_from_another_folder`, `test_the_text_output_gives_the_same_result_as_json`.
+- `test_w2_96_at_unmapped_and_no_map.py`: `test_unmapped_cases_are_counted_never_named`, and
+  `test_an_unmapped_failure_never_changes_the_exit_code_in_text_either`, renamed
+  `test_an_unmapped_failure_fails_the_run_in_text_too_and_is_never_named` (it still requires the unmapped counts
+  in the text and no unmapped case named).
+
+On run 1's code each of the seven is red for R8 alone: "the result is not the expected one" (`"outcome": "pass"`,
+every line as expected) or "exit code 0, expected 3 (R8)".
+
+No case of the run-1 suite expected a negative return code after a signal (R12): review 1's R2 case already
+requires 128 plus the signal, and the interrupt case judges no exit code (R12's SIGINT variant does). The support
+module gained, without changing what the earlier cases do: the planted kinds `many_sleep`, `deep_pass`,
+`deep_fail` and `wait_for_go`; `Project.start(..., ignore=…)`, `Project.go`, `Started.send_all`, `Started.finish`
+(which `Started.send` now uses); `pid_running`; and `remove_tree`, an iterative removal the R9 and R10 cases use
+in their own clean-up, since pytest's own removal of a kept temporary folder recurses.
+
 ## The brief change has no test
 
 The ticket's sixth success line (the common lead brief and the engineer's brief template name `gov accept` as the
@@ -188,8 +262,25 @@ No test here judges it, and the map above names no line for it.
 - **Review 1, R5:** an item that names no test (no `::`, not beginning with `test_`, not a `test_….py` file) and
   matches nothing leaves its line as the design note's §4 says (it passes when its other cases do); only test
   items that match nothing fail their line.
+- **Run 2, R8 in W1-30's form:** the suite does not judge whether a row with no header row, or a `Case | Clause`
+  table, maps its item to its heading's line: a `failure-1` line, failing, may be reported or not, and the failing
+  case may be counted there or under `unmapped`, once. It requires the run to fail (exit 3, `ok: true`), never
+  pass; a refusal fails the case too.
+- **Run 2, R9:** the presses go to `gov`'s own process, as review 1's R2 does; the exit code is the first press's
+  (130), since later signals "change nothing". The case does not judge how long the clean-up takes.
+- **Run 2, R10:** the chain is 1,200 folders deep, more than R10's 1,100 and than Python's default recursion
+  limit (1,000), with short names so every path stays under the system's path length limit.
+- **Run 2, R11:** "stops neither the run nor its child" is read as: after the signal, `gov` and the child pytest
+  both still run, and the run reports as if no signal had come. The process-group variant sends SIGHUP as a
+  hang-up reaches the foreground job; a child in `gov`'s group that does not keep the ignore fails it.
+- **Run 2, R12:** as for review 1's R2, the exit code is the process's own exit status; the second signal comes
+  5 ms after the first, wherever that falls (before or during the clean-up).
 
 ## Outside these paths (for the lead)
 
-Adding a `gov` command turns W1-07's, W1-26's and W1-32's command-list cases red; that revision is outside this
-folder and is returned as a package (DEC-747).
+Adding a `gov` command turns W1-07's, W1-26's and W1-32's command-list cases red. DEC-970 gave the revision to
+this suite's run-2 designer (R13, P-W2-96-CMDLIST (a), DEC-747): `accept` is added to W1-07's support list
+(`RECORDED_GOV_COMMANDS`), to W1-07's pinned sorted list and to W1-32's pinned set, and to the line of W1-07's
+README naming the list, in a commit of its own (`Rewrite-Reason: DEC-959 item 6`). W1-26's
+`test_w1_26_recorded_commands.py` reads W1-07's list, so its parametrized cases gain an `accept` variant, which
+holds the product's own list (`src/gov/check/commands.py`): it is red until the engineer adds `accept` there.
