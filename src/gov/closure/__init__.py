@@ -54,7 +54,8 @@ def closure(root: Path, ids: list[str], depth: int) -> dict:
     finally:
         connection.close()
     status = subprocess.run(["git", "--no-optional-locks", "-C", str(root), "-c", "core.quotePath=false", "status",
-                             "--porcelain"], capture_output=True, text=True, check=True, env=git_env(root)).stdout
+                             "--porcelain"], capture_output=True, text=True, check=True,
+                            env=git_env(root, pinned=True)).stdout
     kinds, gaps, code, front, askable = {}, {}, "not_asked", set(ids), set(ids)
     for _ in range(depth + 1):
         named = set()

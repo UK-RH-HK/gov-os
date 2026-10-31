@@ -140,7 +140,7 @@ def _commits(root: Path, ticket: str):
         done = subprocess.run(["git", "-C", str(root), "log", "HEAD", "--topo-order", "--reverse",
                                "--format=%x01%H%n%(trailers:only,unfold)"], capture_output=True, text=True,
                               stdin=subprocess.DEVNULL, timeout=60,
-                              env={**git_env(root), "GIT_CEILING_DIRECTORIES": str(root.parent)})
+                              env={**git_env(root, pinned=True), "GIT_CEILING_DIRECTORIES": str(root.parent)})
     except (OSError, subprocess.TimeoutExpired):
         return None
     if done.returncode != 0:

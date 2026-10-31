@@ -48,7 +48,7 @@ def _store_fault(root: Path) -> str | None:
 
     try:
         head = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True,
-                              check=True, env=git_env(root)).stdout.strip()
+                              check=True, env=git_env(root, pinned=True)).stdout.strip()
         loaded = {commit["commit"] for commit in records.commits(root)}
         records.records(root), records.edges(root)  # the READY rule answers "none ready" for a store without them
     except Exception as error:

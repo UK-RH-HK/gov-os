@@ -56,7 +56,7 @@ def _head(root: Path) -> str:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "rev-parse", "HEAD"],
-            capture_output=True, text=True, check=True, env=git_env(root),
+            capture_output=True, text=True, check=True, env=git_env(root, pinned=True),
         )
         return result.stdout.strip()
     except (subprocess.CalledProcessError, OSError):
@@ -238,7 +238,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
         try:
             diff_result = subprocess.run(
                 ["git", "-C", str(root), "diff", "HEAD~1", "--name-only", "--", SKILL_DIR],
-                capture_output=True, text=True, env=git_env(root),
+                capture_output=True, text=True, env=git_env(root, pinned=True),
             )
             if diff_result.returncode == 0 and diff_result.stdout.strip():
                 changed_files = [f for f in diff_result.stdout.strip().split("\n") if f]
@@ -253,7 +253,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
 
                     old_result = subprocess.run(
                         ["git", "-C", str(root), "show", f"HEAD~1:{rel}"],
-                        capture_output=True, text=True, env=git_env(root),
+                        capture_output=True, text=True, env=git_env(root, pinned=True),
                     )
                     if old_result.returncode != 0:
                         continue

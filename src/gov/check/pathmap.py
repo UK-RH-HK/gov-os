@@ -19,7 +19,7 @@ def _git_ls_files(root: Path) -> list[str]:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "ls-files", "-z"],
-            capture_output=True, text=True, check=True, env=git_env(root)
+            capture_output=True, text=True, check=True, env=git_env(root, pinned=True)
         )
         return [f for f in result.stdout.split("\0") if f]
     except (subprocess.CalledProcessError, OSError):

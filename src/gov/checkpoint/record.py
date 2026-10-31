@@ -28,7 +28,8 @@ HASH = re.compile(r"sha256:[0-9a-f]{64}")
 
 
 def _git(root: Path, *args: str) -> str:
-    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=git_env(root))
+    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                          env=git_env(root, pinned=True))
     if done.returncode != 0:  # never a silent "no commits": the watchdog does not pass what it could not count
         raise GovError("GIT_FAILED", f"git {args[0]} failed: {done.stderr.strip()}", {"args": list(args)})
     return done.stdout.strip()

@@ -987,14 +987,15 @@ def _started(root: Path, cmd: list[str], env: dict, timeout: int | None = None):
 
     ``env`` as the helper gives a program that may start git elsewhere (P-1, W2-M161): the tests start git in
     folders of their own, so no ``GIT_*`` variable of the caller reaches them (DEC-500), no index and no trace
-    among them; everything else of ``env`` is kept."""
+    among them, and the system and the person's git configuration are not read; everything else of ``env`` is
+    kept."""
     import os
     import signal
 
     from gov.util.gitenv import program_env
 
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=str(root),
-                               env=program_env(base={key: value for key, value in env.items()
+                               env=program_env(pinned=True, base={key: value for key, value in env.items()
                                                      if not key.startswith("GIT_")}),
                                start_new_session=True)
     try:

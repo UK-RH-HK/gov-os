@@ -186,13 +186,13 @@ def _check_taxonomy_change(root: Path) -> list[dict]:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "log", "--oneline", "-1", "--", READINESS_DIMENSIONS_REL],
-            capture_output=True, text=True, env=git_env(root)
+            capture_output=True, text=True, env=git_env(root, pinned=True)
         )
         if result.returncode != 0 or not result.stdout.strip():
             return findings
         diff_result = subprocess.run(
             ["git", "-C", str(root), "diff", "HEAD~1", "--", READINESS_DIMENSIONS_REL],
-            capture_output=True, text=True, env=git_env(root)
+            capture_output=True, text=True, env=git_env(root, pinned=True)
         )
         if diff_result.returncode != 0 or not diff_result.stdout.strip():
             return findings

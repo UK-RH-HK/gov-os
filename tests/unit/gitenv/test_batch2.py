@@ -139,9 +139,24 @@ def test_the_close_s_started_programs_get_no_git_variable_of_the_caller(project,
     show = [sys.executable, "-c", "import json, os; print(json.dumps(dict(os.environ)))"]
     env = {**os.environ, "PYTHONPATH": str(root / "src"), "GOV_SOME_CHECK_RESULT": "x"}
     seen = json.loads(_started(root, show, env).stdout)
-    assert [name for name in seen if name.startswith("GIT_")] == ["GIT_NO_LAZY_FETCH"]
+    assert sorted(name for name in seen if name.startswith("GIT_")) == [
+        "GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM", "GIT_NO_LAZY_FETCH"]
+    assert seen["GIT_CONFIG_GLOBAL"] == os.devnull
     assert seen["PYTHONPATH"] == str(root / "src") and seen["GOV_SOME_CHECK_RESULT"] == "x"
     assert seen["GIT_NO_LAZY_FETCH"] == "1"
+
+
+def test_the_reads_a_close_reaches_outside_its_package_are_pinned(project, person):
+    from gov.check import audit_validator, pathmap, runner
+    from gov.checkpoint import record
+    from gov.telemetry import counter
+    root, head = project
+    assert runner._head(root) == head
+    assert record._git(root, "rev-parse", "HEAD") == head
+    assert audit_validator._commit_resolves(head, str(root))
+    pathmap._git_ls_files(root)
+    list(counter._commits(root, "T-1") or [])
+    assert not person.exists()  # the person's trace setting was read by none of them
 
 
 def test_the_ticket_tool_runs_in_the_root_with_its_tickets_folder(project, planted, tmp_path, monkeypatch):
