@@ -21,6 +21,7 @@ import os
 import sqlite3
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -53,6 +54,8 @@ _DIGESTED = (
     "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, f.text FROM lexical_chunk c "
     "JOIN lexical_fts f ON f.rowid = c.id ORDER BY c.chunk_id",
 )
+RACY_NS = 10_000_000  # a file changed this recently (a coarse clock's tick) may not yet tell a later write apart
+_FRESHNESS: dict = {}  # resolved root -> (key, answer): the freshness worked out last in this process (W2-108)
 
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> bytes:
@@ -152,16 +155,64 @@ def refresh(root: Path) -> dict:
         connection.close()
 
 
+def _stamps(paths) -> tuple | None:
+    """Each path's device, inode, size and change times, which any write or replacement changes (None for one that is
+    absent); None for all when one cannot be read, or changed less than ``RACY_NS`` ago or later than now."""
+    now, stamps = time.time_ns(), []
+    for path in paths:
+        try:
+            st = os.stat(path)
+        except FileNotFoundError:
+            stamps.append(None)
+            continue
+        except OSError:
+            return None
+        if now - max(st.st_mtime_ns, st.st_ctime_ns) < RACY_NS:
+            return None
+        stamps.append((st.st_dev, st.st_ino, st.st_size, st.st_mtime_ns, st.st_ctime_ns))
+    return tuple(stamps)
+
+
+def _store_stamp(root: Path) -> tuple | None:
+    """The store's fingerprint: the stamps of its file, its write-ahead log and its journal."""
+    path = Path(root) / STORE_REL
+    return _stamps(path.with_name(path.name + suffix) for suffix in ("", "-wal", "-journal"))
+
+
+def _tree(root: Path) -> tuple | None:
+    """What ``_tracked`` depends on: ``HEAD``, the tracked paths and each one's stamps; None when one cannot be read."""
+    try:
+        head, names = _git(root, "rev-parse", "HEAD"), _git(root, "ls-files", "-z")
+    except GovError:
+        return None
+    top = os.fsencode(root)  # joined as bytes: a Path for each of thousands of files costs more than its stat
+    stamps = _stamps(os.path.join(top, name) for name in names.split(b"\0") if name)
+    return None if stamps is None else (head, names, stamps)
+
+
 def freshness(root: Path) -> dict:
-    """``status`` (fresh, stale, empty or missing) and the ``stale`` paths. Writes nothing."""
+    """``status`` (fresh, stale, empty or missing) and the ``stale`` paths. Writes nothing. Worked out once per store
+    and tree in a process, keyed by their fingerprints, and again whenever a fingerprint changes or cannot be read
+    (W2-108)."""
+    root = Path(root)
+    store, tree = _store_stamp(root), _tree(root)
+    key, place = None if store is None or tree is None else (store, tree), root.resolve()
+    if key is None or _FRESHNESS.get(place, (None,))[0] != key:
+        _FRESHNESS[place] = (key, _freshness(root))
+    status, stale = _FRESHNESS[place][1]
+    return {"status": status, "stale": list(stale)}
+
+
+def _freshness(root: Path) -> tuple[str, list[str]]:
+    """The status and the stale paths, worked out from the store and the tracked files as they stand."""
     connection = _open(root)
     if connection is None:
-        return {"status": "missing", "stale": []}
+        return "missing", []
     try:
         stored = dict(connection.execute("SELECT path, blob FROM lexical_file"))
         current = _tracked(Path(root))
         stale = sorted(rel for rel in stored.keys() | current.keys() if stored.get(rel) != current.get(rel))
-        return {"status": "stale" if stale else "empty" if _empty(connection) else "fresh", "stale": stale}
+        return "stale" if stale else "empty" if _empty(connection) else "fresh", stale
     finally:
         connection.close()
 
