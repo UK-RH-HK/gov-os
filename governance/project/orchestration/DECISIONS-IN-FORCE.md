@@ -22,14 +22,15 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-953 item 1: a ticket closes on the audit's 10 practices (AUDIT-GOV-FEATURES-1 §5), nothing more. No Gov OS feature gates this repo, and nothing is deleted from the product.
 - DEC-953 item 5: close W2-71, W2-77, W2-57, W2-03 and W2-26 now, then each ticket as its practices pass.
 - DEC-953 item 6: the proof of `gov close` happens on the proving ground (W2-81) and EXAMIN's copy, not by re-closing this repo's tickets.
-- DEC-906 item 1, DEC-462: a fresh independent test designer writes the acceptance tests first, from behaviour and sources. Only it commits under `tests/acceptance/`.
+- DEC-906 item 1, DEC-462, DEC-959 item 7: a fresh independent test designer writes the acceptance tests from behaviour and sources, in parallel with the engineer, both from the spec; the engineer runs them once they are ready. Only the designer commits under `tests/acceptance/`.
+- DEC-959: the local merge queue (Senior Engineers approve, the CTO's tool tests the candidate merge, advances only on green); tests run once per level (lead scoped once; QA re-runs nothing; the queue once per batch, skipped on identical code; full only nightly and for core); the QA engineer per stream (core one by one, others in batches of about five); the opaque acceptance runner now; one skill template with three scenarios; domain skills after ACT 2; everything before EXAMIN.
 - DEC-953 item 4, DEC-952: one selection tool at every level:
   - workers run their own unit tests;
   - a lead runs its acceptance tests plus the affected set (full only when core code changed);
   - the close runs the same set on the merged commit in a clean worktree;
   - the nightly runs everything.
   Governance files never widen a selection.
-- DEC-905, DEC-906 item 3, DEC-954: one full or close run at a time, under one lock (`/tmp/gov-os-verify.lock`; leads through `verify_lock.sh`, closes first), with `tmp_path_retention_policy=failed`.
+- DEC-962 (changing DEC-905, DEC-906 item 3, DEC-954): no shared test lock and no closes-first; every full run (a close's, the nightly's, a lead's through `verify_lock.sh`) asks the gate for room for its own peak; `tmp_path_retention_policy=failed` stays. One store rebuild at a time stays until W2-76's lock is measured. One writing worker per worktree (DEC-963): the test designer works in parallel in its own tests worktree, retrieving only from the integration branch's store (`~/gov-os-worktrees/W2-00-store`); the engineer merges its tests and runs them once.
 - DEC-954 (P-W2-64-1): a test revision the owner names is checked by a scoped run of the corrected tests; the nightly covers the rest.
 - DEC-137, DEC-498, DEC-413, DEC-916: a FULL ticket gets a fresh review before merge, at most two rounds (two per declared round). It is re-reviewed only if a later merge resolved conflicts in reviewed files.
 - DEC-801 to 803, DEC-808, DEC-809: findings are judged by ADR-0001's two questions, each with its two lines. A "no" becomes a row, never a round. Fixes ride the next resume.
@@ -46,6 +47,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
   - no installs without the owner.
 - DEC-083, DEC-040: the owner approves and makes every install, and it is recorded in the tool registry.
 - DEC-849: a refusal is taken, never routed round, and it is recorded.
+- DEC-958: every false refusal by the five-rule hook is recorded (time, form, rule, cost), counted in the daily document, and worked round only by an equivalent form. Three of one pattern, five in a week, or one that stops a lead or a close brings the owner a P1 package with a hook fix.
 - DEC-723: agents never write in, list or search `~/gov-os-workbench`. Writing work runs on clones under `~/gov-os-runs/<ticket>/`.
 
 ## The nightly
@@ -81,6 +83,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 ## Machine and disk
 - DEC-898, DEC-902: no launch or full run below 100 GiB or 10M inodes free. Each session has a scratch budget. A sweep runs weekly.
 - DEC-942 items 1 and 3: there is no fixed number of leads. A lead launches while the load is below nproc, and a running lead is never stopped.
+- DEC-961 (with DEC-947's floor and trip-wire): the machine is shared by capacity alone. The gate counts the memory floor, each running lead at what it uses (at least its working size) and the newcomer; nothing is set aside for a full run that has not started. A full run (a close's, the nightly's, a lead's) checks the gate itself and waits for room. No hold for a waiting close and no night window: closes, scoped runs and leads run side by side as capacity and paths allow. The nightly starts at 02:00, takes no lock and holds nothing.
 - DEC-939 item 1: long commands run in the background. A watchdog fires at 07:45 if the package is late.
 
 ## Reporting
