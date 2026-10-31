@@ -19,9 +19,12 @@ NO_MAP_READMES = {
     "empty": "",
     "prose-only": ("# qzv96leak planted suite\n\nSuccess 1: `test_qzv96leak_alpha.py` covers it (qzv96leak).\n\n"
                    "- KPI 2: `test_qzv96leak_beta.py`, qzv96leak\n"),
+    # Review 1 (R4) revised this case: a row holding a backticked item whose KPI cell names no line now refuses with
+    # ACCEPT_MAP_UNREADABLE, and which code a README answers when it is also mapless is open (returned as a
+    # package), so its rows hold no backticked item and name no line: no row maps a line.
     "rows-naming-no-line": support.rows_readme(
-        ("Edge qzv96leak", "`test_qzv96leak_alpha.py`"),
-        ("Notes qzv96leak", "`test_qzv96leak_alpha.py::test_qzv96leak_alpha_one`")),
+        ("Edge qzv96leak", "test_qzv96leak_alpha.py, with no backticks"),
+        ("Notes qzv96leak", "no item at all, qzv96leak")),
     "heading-naming-no-line": ("# qzv96leak planted suite\n\n## Notes qzv96leak\n\n| Test | Notes |\n|---|---|\n"
                                "| `test_qzv96leak_alpha.py` | qzv96leak |\n"),
     "kpi-table-without-a-test-column": support.rows_readme(

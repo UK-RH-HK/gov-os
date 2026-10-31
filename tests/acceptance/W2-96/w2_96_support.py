@@ -36,6 +36,7 @@ what it leaves on disk.
 
 from __future__ import annotations
 
+import ast
 import getpass
 import hashlib
 import json
@@ -66,6 +67,7 @@ OTHER_ID, OTHER_WBS, OTHER_FOLDER = "TDPL-b962", "W9-62", "tests/acceptance/W9-6
 
 EXIT_PASS, EXIT_REFUSED, EXIT_FAIL, EXIT_ERROR = 0, 1, 3, 4
 NO_MAP, UNKNOWN_TICKET, NO_TESTS = "ACCEPT_NO_MAP", "ACCEPT_UNKNOWN_TICKET", "ACCEPT_NO_TESTS"
+MAP_UNREADABLE = "ACCEPT_MAP_UNREADABLE"   # review 1, R4
 
 RESULT_KEYS = ("ticket", "outcome", "error_kind", "lines", "unmapped", "totals")
 LINE_KEYS = ("kpi", "outcome", "passed", "failed", "skipped")
@@ -193,7 +195,56 @@ def @NAME@(tmp_path):
     qzv96leak_noise(tmp_path, "@NAME@")
     os._exit(3)
 ''',
+    # Review 1 (R3): a failing test that leaves folders without permissions; a test that holds them at a timeout.
+    # Both need ``LOCK_UP`` as the file's ``extra``.
+    "locked_fail": '''
+
+def @NAME@(tmp_path):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    qzv96leak_record("locked", name="@NAME@", tops=qzv96leak_lock_up(tmp_path))
+    assert False, "qzv96leak-locked-failure-message"
+''',
+    "locked_sleep": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    qzv96leak_record("sleeping", name="@NAME@", tops=qzv96leak_lock_up(tmp_path))
+    time.sleep(600)
+''',
+    # Review 1 (R7): pytest's own exit call with its "tests failed" code (1), every case so far passed.
+    "exit_early": '''
+
+def @NAME@(tmp_path):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    pytest.exit("qzv96leak-exit-reason", returncode=1)
+''',
 }
+
+# Review 1 (R3): module-level code that makes, in ``base`` and in a new folder of the temporary folder, a folder
+# without read, one without write, one without execute and one without any permission (each holding a file and a
+# folder without any permission), and a file without any permission; it returns the two top folders' paths.
+LOCK_UP = '''
+
+def qzv96leak_lock_up(base):
+    """qzv96leak: folders and a file without read, write or execute permission."""
+    import pathlib
+    tops = [pathlib.Path(base), pathlib.Path(tempfile.mkdtemp(prefix="qzv96leak-locked-"))]
+    for top in tops:
+        for name, mode in (("qzv96leak-no-read", 0o300), ("qzv96leak-no-write", 0o500),
+                           ("qzv96leak-no-exec", 0o600), ("qzv96leak-no-permission", 0o000)):
+            folder = top / name
+            inner = folder / "qzv96leak-inner"
+            inner.mkdir(parents=True)
+            (inner / "qzv96leak-deep.txt").write_text("qzv96leak-locked-content", encoding="utf-8")
+            (folder / "qzv96leak-file.txt").write_text("qzv96leak-locked-content", encoding="utf-8")
+            os.chmod(inner, 0o000)
+            os.chmod(folder, mode)
+        locked = top / "qzv96leak-no-permission.txt"
+        locked.write_text("qzv96leak-locked-content", encoding="utf-8")
+        os.chmod(locked, 0o000)
+    return [str(top) for top in tops]
+'''
 
 _IMPORT_ERROR = "\nimport qzv96leak_no_such_module_anywhere  # noqa: F401  (a collection error naming the marker)\n"
 _SYNTAX_ERROR = '\n\ndef test_qzv96leak_syntax_error(:\n    "qzv96leak-syntax-error-text"\n'
@@ -264,6 +315,9 @@ def rows_readme(*rows, header=("KPI line", "Tests", "Red because qzv96leak"), ti
     return "\n".join(lines) + "\n"
 
 
+# Review 1 (R4) revised the row "Edge qzv96leak (names no line)": a row whose KPI cell names no line and whose Tests
+# cell holds a backticked item now refuses the whole run (ACCEPT_MAP_UNREADABLE), so its file is named without
+# backticks and the row holds no item; it still maps nothing, and the expected result is unchanged.
 ROWS_README = """# qzv96leak planted suite (rows)
 
 Prose that names `test_qzv96leak_zeta.py` and Success 1 outside any table: qzv96leak.
@@ -277,7 +331,7 @@ Prose that names `test_qzv96leak_zeta.py` and Success 1 outside any table: qzv96
 | S 7; KPI 8 — qzv96leak | `test_qzv96leak_epsilon` | qzv96leak |
 | kpi 10 and S9: qzv96leak | `test_qzv96leak_gamma.py::test_qzv96leak_gamma_pass` | qzv96leak |
 | failure 2 / FAILURE 3 / f4 / F 5: qzv96leak | `test_qzv96leak_beta.py::test_qzv96leak_beta_two` | qzv96leak |
-| Edge qzv96leak (names no line) | `test_qzv96leak_zeta.py` | qzv96leak |
+| Edge qzv96leak (names no line) | test_qzv96leak_zeta.py, with no backticks: no item | qzv96leak |
 
 ## Notes qzv96leak
 
@@ -388,6 +442,124 @@ OTHER_README = rows_readme(("Success 1: qzv96leak", "`test_qzv96leak_other.py`")
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Review 1's planted projects (the reviewer's findings as described behaviours, DEC-136). ``root_files`` are
+# written in the project itself, outside the acceptance folder, and committed; ``@ROOT@`` becomes the root's path.
+# --------------------------------------------------------------------------------------------------------------
+
+SECOND_FAILS = second_file("fail", "test_qzv96leak_second_fails")
+
+# R1: a conftest that refuses a run given a per-run base folder, as this repository's tests/conftest.py does (an
+# xdist worker aside), and records that it ran and what base folder it saw.
+REFUSING_CONFTEST = {"tests/conftest.py": '''"""qzv96leak planted conftest: a per-run --basetemp is refused."""
+import json
+import os
+import tempfile
+import uuid
+
+import pytest
+
+QZV96LEAK_PROBE = @PROBE@
+
+
+def pytest_configure(config):
+    if hasattr(config, "workerinput"):
+        return
+    basetemp = config.option.basetemp
+    record = dict(kind="conftest", pid=os.getpid(), cwd=os.getcwd(), tempdir=tempfile.gettempdir(),
+                  basetemp=None if basetemp is None else str(basetemp))
+    path = os.path.join(QZV96LEAK_PROBE, uuid.uuid4().hex)
+    with open(path + ".part", "w", encoding="utf-8") as handle:
+        json.dump(record, handle)
+    os.replace(path + ".part", path + ".json")
+    if basetemp is not None:
+        raise pytest.UsageError("qzv96leak: a per-run --basetemp is refused by the planted conftest")
+'''}
+
+# R6: a pytest configuration naming a log file inside the project, by a path relative to the working folder (the
+# root) or by an absolute one.
+LOG_FILES = {"relative": "qzv96leak-pytest.log", "absolute": "qzv96leak-absolute.log"}
+
+
+def log_file_config(where):
+    path = LOG_FILES[where] if where == "relative" else "@ROOT@/" + LOG_FILES[where]
+    return {"pyproject.toml": ('[project]\nname = "planted-w9"\nversion = "0.0.1"\n\n[tool.pytest.ini_options]\n'
+                               f'log_file = "{path}"\nlog_file_level = "INFO"\n')}
+
+
+# R7: three passing cases, then a test that ends the session by pytest.exit(returncode=1), then a failing test that
+# never runs.
+EXIT_FILES = {**ALPHA, "test_qzv96leak_second.py": planted_file(("exit_early", "test_qzv96leak_exits"),
+                                                                ("fail", "test_qzv96leak_after_exit"))}
+
+# R5: two files sharing a function name, so an item by function name maps a case in each.
+ITEMS_FILES = {
+    **ALPHA,
+    "test_qzv96leak_items.py": planted_file(("pass", "test_qzv96leak_items_pass"), ("fail", "test_qzv96leak_items_fail"),
+                                            ("pass", "test_qzv96leak_items_twin")),
+    "test_qzv96leak_items_more.py": planted_file(("pass", "test_qzv96leak_items_twin"),
+                                                 ("pass", "test_qzv96leak_items_extra")),
+}
+
+ITEMS_RAW = {
+    "test_qzv96leak_alpha::test_qzv96leak_alpha_one": "passed",
+    "test_qzv96leak_alpha::test_qzv96leak_alpha_param[qzv96leak-id-a]": "passed",
+    "test_qzv96leak_alpha::test_qzv96leak_alpha_param[qzv96leak-id-b]": "passed",
+    "test_qzv96leak_items::test_qzv96leak_items_pass": "passed",
+    "test_qzv96leak_items::test_qzv96leak_items_fail": "failed",
+    "test_qzv96leak_items::test_qzv96leak_items_twin": "passed",
+    "test_qzv96leak_items_more::test_qzv96leak_items_twin": "passed",
+    "test_qzv96leak_items_more::test_qzv96leak_items_extra": "passed",
+}
+
+# R5: an item holding "::" whose part before it is empty or does not end in ".py" maps every test of the folder
+# whose function name is the part after the last "::".
+ITEMS_COLON_README = rows_readme(
+    ("Success 1: qzv96leak", "`::test_qzv96leak_items_pass`"),
+    ("Success 2: qzv96leak", "`test_qzv96leak_items::test_qzv96leak_items_fail`"),
+    ("Success 3: qzv96leak", "`qzv96leak_every_form::test_qzv96leak_items_twin`"),
+    ("Failure 1: qzv96leak", "`test_qzv96leak_alpha.py`"))
+
+# R5: an item naming a test (it holds "::" or begins with "test_") that matches no case fails its line; a line
+# whose items all match and pass passes; an item that names no test and matches nothing changes nothing.
+ITEMS_UNMATCHED_README = rows_readme(
+    ("Success 1: qzv96leak", "`test_qzv96leak_alpha.py`, `test_qzv96leak_items_nothing`"),
+    ("Success 2: qzv96leak",
+     "`test_qzv96leak_alpha.py::test_qzv96leak_alpha_one`, `test_qzv96leak_items.py::test_qzv96leak_items_missing`"),
+    ("Success 3: qzv96leak", "`test_qzv96leak_items_more.py`, `test_qzv96leak_missing_file.py`"),
+    ("Success 4: qzv96leak", "`test_qzv96leak_items.py::test_qzv96leak_items_pass`, `::test_qzv96leak_items_absent`"),
+    ("Failure 1: qzv96leak", "`::test_qzv96leak_alpha_one`, `test_qzv96leak_alpha_param`, `qzv96leak_items_extra`"),
+    ("Failure 2: qzv96leak", "`test_qzv96leak_alpha.py::test_qzv96leak_alpha_one`, `qzv96leak_matches_no_case`"))
+
+# R4: a row of a KPI-column table whose Tests cell holds an item while its KPI cell begins with no line name the
+# reader takes; each beside a readable row, so the README has a map.
+_READABLE_ROW = ("Success 1: qzv96leak", "`test_qzv96leak_alpha.py`")
+UNREADABLE_ROWS = {
+    "failure-without-a-number": rows_readme(_READABLE_ROW, ("Failure: qzv96leak, no number",
+                                                            "`test_qzv96leak_second.py`")),
+    "success-3a": rows_readme(_READABLE_ROW, ("Success 3a: qzv96leak",
+                                              "`test_qzv96leak_second.py::test_qzv96leak_second_fails`")),
+    "s8b": rows_readme(_READABLE_ROW, ("S8b qzv96leak", "`qzv96leak_second_fails`")),
+    "a-cell-naming-no-line": rows_readme(_READABLE_ROW, ("Edge qzv96leak (names no line)",
+                                                         "`test_qzv96leak_second.py`")),
+}
+
+
+def _heading_readme(heading):
+    return ("# qzv96leak planted suite\n\nProse of the qzv96leak planted README.\n\n## Success 1: qzv96leak\n\n"
+            "| Test |\n|---|\n| `test_qzv96leak_alpha.py` |\n\n"
+            f"{heading}\n\n| Test | Notes |\n|---|---|\n| `test_qzv96leak_second.py` | qzv96leak |\n")
+
+
+# R4: a Tests table with no KPI column under a heading that begins with the word success, failure or KPI (any
+# case) but names no line the reader takes; each after a readable heading-form table.
+UNREADABLE_HEADINGS = {
+    "failure-without-a-number": _heading_readme("### Failure: qzv96leak, no number"),
+    "success-word": _heading_readme("## SUCCESS qzv96leak lines"),
+    "kpi-word": _heading_readme("#### kpi qzv96leak map"),
+}
+
+
+# --------------------------------------------------------------------------------------------------------------
 # The expected result (the design note's §6).
 # --------------------------------------------------------------------------------------------------------------
 
@@ -429,6 +601,20 @@ FAILS_EXPECTED = result("fail", [
 ], unmapped=counts(1), totals=counts(5, 3, 1))
 
 SIMPLE_EXPECTED = result("pass", [line("success-1", "pass", 3)], totals=counts(3))
+
+# Review 1: R1's ALPHA and SECOND_FAILS under SECOND_README; R5's two maps over ITEMS_FILES.
+SECOND_FAILS_EXPECTED = result("fail", [line("success-1", "pass", 3), line("success-2", "fail", 0, 1)],
+                               totals=counts(3, 1))
+
+ITEMS_COLON_EXPECTED = result("fail", [
+    line("success-1", "pass", 1), line("success-2", "fail", 0, 1), line("success-3", "pass", 2),
+    line("failure-1", "pass", 3),
+], unmapped=counts(1), totals=counts(7, 1))
+
+ITEMS_UNMATCHED_EXPECTED = result("fail", [
+    line("success-1", "fail", 3), line("success-2", "fail", 1), line("success-3", "fail", 2),
+    line("success-4", "fail", 1), line("failure-1", "pass", 4), line("failure-2", "pass", 1),
+], unmapped=counts(1, 1), totals=counts(7, 1))
 
 
 def projection(found):
@@ -540,6 +726,29 @@ def kill_quietly(pid, group=False):
         pass
 
 
+def unlock(top):
+    """Read, write and execute given back to the owner on ``top`` and everything under it (links not followed), so
+    what a planted test locked (review 1, R3) can be measured and removed by pytest's own clean-up."""
+    try:
+        info = os.lstat(top)
+    except OSError:
+        return
+    if stat.S_ISLNK(info.st_mode):
+        return
+    is_dir = stat.S_ISDIR(info.st_mode)
+    try:
+        os.chmod(top, 0o700 if is_dir else 0o600)
+    except OSError:
+        return
+    if is_dir:
+        try:
+            names = os.listdir(top)
+        except OSError:
+            return
+        for name in names:
+            unlock(os.path.join(top, name))
+
+
 # --------------------------------------------------------------------------------------------------------------
 # The planted project and its runs.
 # --------------------------------------------------------------------------------------------------------------
@@ -582,7 +791,7 @@ class Project:
     ``decoy/``, ``elsewhere/`` (an empty folder to run from), ``outside/`` (a folder outside the root, when asked)
     and one fresh ``given-tmp-<n>/`` per run."""
 
-    def __init__(self, base, files, readme, *, acceptance=DEFAULT_ACCEPTANCE, outside=None):
+    def __init__(self, base, files, readme, *, acceptance=DEFAULT_ACCEPTANCE, outside=None, root_files=None):
         self.base = Path(base)
         self.root = self.base / "project"
         self.home = self.base / "home"
@@ -590,10 +799,10 @@ class Project:
         self.decoy = self.base / "decoy"
         self.elsewhere = self.base / "elsewhere"
         self.runs = 0
-        self._build(files, readme, acceptance, outside)
+        self._build(files, readme, acceptance, outside, root_files or {})
 
     def _fill(self, text):
-        return text.replace("@PROBE@", repr(str(self.probe)))
+        return text.replace("@PROBE@", repr(str(self.probe))).replace("@ROOT@", str(self.root))
 
     def _folder(self, folder, files, readme):
         folder.mkdir(parents=True, exist_ok=True)
@@ -602,7 +811,7 @@ class Project:
         if readme is not None:
             write(folder / "README.md", readme)
 
-    def _build(self, files, readme, acceptance, outside):
+    def _build(self, files, readme, acceptance, outside, root_files):
         for folder in (self.root, self.home, self.probe, self.decoy, self.elsewhere):
             folder.mkdir(parents=True)
         userbase = Path(site.getuserbase())
@@ -620,6 +829,8 @@ class Project:
         self._folder(self.root / OTHER_FOLDER, OTHER_FILES, OTHER_README)
         if outside is not None:
             self._folder(self.base / "outside", *outside)
+        for rel, text in root_files.items():
+            write(self.root / rel, self._fill(text))
         _git(self.root, self.home, "init", "-q")
         _git(self.root, self.home, "add", "-A")
         _git(self.root, self.home, "commit", "-q", "-m", "the planted project")
@@ -705,8 +916,9 @@ class Project:
         before = {name: tree_snapshot(path) for name, path in watched.items()}
         return Started(self, command, self._popen(command, workdir, tmpdir), tmpdir, watched, before)
 
-    def raw_pytest(self, python_path=None, timeout=RUN_TIMEOUT_S):
-        """Raw pytest on the planted folder, outside ``gov accept`` (the premises): its run and its outcomes."""
+    def raw_pytest(self, python_path=None, timeout=RUN_TIMEOUT_S, basetemp=True):
+        """Raw pytest on the planted folder, outside ``gov accept`` (the premises): its run and its outcomes.
+        ``basetemp`` false runs it without ``--basetemp`` (pytest's own base folder, under the run's TMPDIR)."""
         self.runs += 1
         raw = self.base / f"raw-{self.runs}"
         (raw / "tmp").mkdir(parents=True)
@@ -715,7 +927,8 @@ class Project:
         env = {**self.env(raw / "tmp"), "PYTHONPATH": python_path or str(self.root / "src"),
                "PYTHONDONTWRITEBYTECODE": "1"}
         command = [sys.executable, "-m", "pytest", FOLDER, "-rA", "-p", "no:cacheprovider",
-                   "--basetemp", str(raw / "basetemp"), "--junitxml", str(report), "-o", "junit_family=xunit2"]
+                   *(["--basetemp", str(raw / "basetemp")] if basetemp else []),
+                   "--junitxml", str(report), "-o", "junit_family=xunit2"]
         done = subprocess.run(command, cwd=self.root, env=env, capture_output=True, text=True, encoding="utf-8",
                               errors="replace", timeout=timeout, stdin=subprocess.DEVNULL, start_new_session=True)
         return done, (junit_outcomes(report) if report.is_file() else None)
@@ -808,12 +1021,16 @@ class Started:
 
     def interrupt(self, wait_s=60.0):
         """SIGINT to gov alone, then the finished run."""
-        os.kill(self.process.pid, signal.SIGINT)
+        return self.send(signal.SIGINT, wait_s)
+
+    def send(self, signum, wait_s=60.0):
+        """``signum`` to gov alone (not its process group), then the finished run (review 1, R2)."""
+        os.kill(self.process.pid, signum)
         try:
             stdout, stderr = self.process.communicate(timeout=wait_s)
         except subprocess.TimeoutExpired:
             self.stop()
-            raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of an interrupt") from None
+            raise AssertionError(f"gov accept did not end within {wait_s:.0f} s of signal {int(signum)}") from None
         after = {name: tree_snapshot(path) for name, path in self.watched.items()}
         return Run(self.project, self.command, self.process.returncode, stdout, stderr, self.tmpdir, self.watched,
                    self.before, after, time.monotonic() - self.started)
@@ -901,7 +1118,8 @@ def text_problems(text, expected):
 # The README map form (the design note's §1), for this folder's own README (a premise).
 # --------------------------------------------------------------------------------------------------------------
 
-_NAME = re.compile(r"(success|failure|kpi|s|k|f)\s*(\d+)", re.IGNORECASE)
+# A number followed by a letter, digit or underscore is no line name (review 1, R4: ``Success 3a``, ``S8b``).
+_NAME = re.compile(r"(success|failure|kpi|s|k|f)\s*(\d+)(?!\w)", re.IGNORECASE)
 _SEPARATOR = re.compile(r"\s*(?:/|,|;|\band\b)\s*", re.IGNORECASE)
 
 
@@ -915,6 +1133,13 @@ def line_names(text):
         separator = _SEPARATOR.match(text, match.end())
         match = _NAME.match(text, separator.end()) if separator else None
     return names
+
+
+def test_functions(path):
+    """The names of the module-level test functions of a test file (read with ``ast``, never imported)."""
+    tree = ast.parse(Path(path).read_text(encoding="utf-8"))
+    return {node.name for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test")}
 
 
 def markdown_tables(text):
