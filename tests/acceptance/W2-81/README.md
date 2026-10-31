@@ -1,36 +1,44 @@
 # W2-81: the adoption proving ground
 
 Ticket `DAEO-l78m` (FULL, independent-test-designer; DEC-941, DEC-936 item 3.6, DEC-930). The proving ground is the
-deliverable: builders, planted problems, controls, the manifest, the judge, the scorer, the runner, the visible
-question half and their self-tests, all in this folder. It is built in three batches:
+deliverable, all in this folder: the builders, the planted problems, the controls, the manifest, the judge, the
+scorer, the runner, the visible question half and their self-tests. It was built in three batches:
 
-| Batch | What | State |
+| Batch | What | Commit |
 |---|---|---|
-| 1 | the five builders, the clean variant, the planted problems, the controls, the seed, the manifest, their self-tests | done (`e1d40b68d3b2`) |
-| 2 | the judge (FOUND_AND_HANDLED, MISSED, MISHANDLED; CLEAN, FLAGGED; NOT_BUILT; READY, NOT_READY; fail closed), the stand-in adoption outputs and the mutation self-tests | **this commit** |
-| 3 | the scorer, the visible question half, the runner (one command, not collected), the hidden half's form, the full KPI map | to come |
+| 1 | the five builders, the clean variant, the planted problems, the controls, the seed, the manifest, their self-tests | `e1d40b68d3b2` |
+| 2 | the judge, the stand-in adoption outputs and the mutation self-tests | `2dd40a4e530b`, `3cc35cd5cca1` |
+| 3 | the scorer, the visible question half, the hidden half's form and its variants hook, the runner, this README finished | this commit |
 
-**No implementation to be red against.** This ticket has no engineer: the self-tests check the proving ground
-itself, and they pass when the proving ground is right. They are green by design, not because something they
-measure is built. What they measure later (an adoption on these repositories) is the runner's real run, the
-orchestrator's, after blocks B and C.
+**Why there is no red step.** This ticket has no implementation and no engineer: the proving ground is test code,
+and its self-tests check the proving ground itself. They pass when the proving ground is right, so they are green by
+design, not because something they measure is built. What the proving ground measures (an adoption of these
+repositories) is the runner's real run. That run is the orchestrator's, after blocks B and C; on today's code it says
+NOT_READY ("NOT_BUILT versus MISSED" below).
 
-## Running
+## Running the self-tests
 
 ```
 PYTHONPATH=<this worktree>/src python3 -m pytest tests/acceptance/W2-81 -q -p no:cacheprovider
 ```
 
-Only `test_w2_81_*.py` files are collected. The support modules carry the `w2_81_` prefix so that no module name
-clashes with another suite's in one pytest process: `w2_81_git.py`, `w2_81_words.py`, `w2_81_secret.py`,
-`w2_81_manifest.py`, `w2_81_build.py`, `w2_81_judge.py` and `w2_81_standin.py`. `conftest.py` puts this folder on
-`sys.path`, as W1-41's does.
+- **What is collected.** Only `test_w2_81_*.py` files are collected. The support modules carry the `w2_81_` prefix
+  so that no module name clashes with another suite's in one pytest process: `w2_81_git.py`, `w2_81_words.py`,
+  `w2_81_secret.py`, `w2_81_manifest.py`, `w2_81_build.py`, `w2_81_judge.py`, `w2_81_standin.py`,
+  `w2_81_questions.py`, `w2_81_score.py` and the runner `w2_81_run.py`. `conftest.py` puts this folder on
+  `sys.path`, as W1-41's does.
+- **Speed.** The built repositories are shared: the self-tests' ground is built once per process, and the runner's
+  run folder once per module. The large files are 300,000 bytes in the ground and 4,096 in the runner's cases.
 
-Measured on 2026-10-31:
+Measured on 2026-10-31, on a machine shared with other leads:
 
-- batch 1: 42 cases, about 29 s alone and 22 s with `-n auto`; they also pass at six other seeds (1, 2, 3, 97,
-  2026, 65535);
-- with batch 2: 118 cases, 55 to 67 s alone and 24 to 29 s with `-n auto`, on a machine shared with other leads.
+| After | Cases | Alone | With `-n auto` |
+|---|---|---|---|
+| batch 1 | 42 | about 29 s | 22 s |
+| batch 2 | 118 | 48 to 67 s | 20 to 29 s |
+| batch 3 | 140 | 53 to 60 s | 17 s |
+
+Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
 ## The five shapes, and the clean variant
 
@@ -389,33 +397,251 @@ against these self-tests in one process. Five were killed:
 The sixth, a missing record read as present, behaves the same as the real judge: with no record there is still no
 evidence of handling, so the problem stays MISSED.
 
-## Batch 1's KPI lines and their tests
+## The scorer (`w2_81_score.py`)
 
-| KPI line (ticket `DAEO-l78m`) | Tests |
+**The two figures.** For each repository the scorer reports both figures, always together. A result with one
+figure alone counts as no figure.
+
+| Figure | What it counts | Threshold | Constant |
+|---|---|---|---|
+| hit@5 | the questions with a gold source matched by one of the first five items of the stacked context | 85, CAP-10's floor | `HIT_AT_5_FLOOR` |
+| stacked share | the questions whose stacked context holds every gold source | 99, the owner's target (DEC-833) | `STACKED_SHARE_TARGET` |
+
+DEC-957 sets memory's target at 95 %, with 85 % the floor. The owner may later change `STACKED_SHARE_TARGET`; this
+suite does not decide that. The judge reads the same constants (`judge.FLOORS is score.FLOORS`).
+
+**What counts as a match.**
+
+- The stacked context is what `gov retrieve` returned, stacked as `gov.retrieval.measure` stacks it: items in order,
+  each taken once, batch size 10, bundle budget 6,000, stack budget 24,000 tokens, continued while a continuation
+  comes back (DEC-860).
+- An item matches a gold source when its path is the source's and its lines hold the source's line.
+- **A forbidden citation in the top five is a miss** for that question, in both figures. A forbidden citation lower
+  down is not.
+- An unanswered question (a retrieval that failed) is a miss.
+- A repository with no question has no figure.
+
+**What it shows.** Question ids, booleans, a rank and the two percentages: never a question's text or its answer,
+visible or hidden. A `Question`'s `repr` is its id.
+
+**Its result feeds the judge.** `figures()` gives the judge `{repository: {hit_at_5, stacked_share}}`, and either one
+missing is not met. A scorer stand-in at 84 on hit@5 is NOT_READY, and so is one figure alone (KPI line 8).
+
+## The visible question half (`questions/`)
+
+One file per repository: `questions/<repository>.yaml`, `form: w2-81-questions/1`. The path map's
+`evaluation_sets` entry will name `tests/acceptance/W2-81/questions/**` as the visible half (the orchestrator's,
+DEC-845).
+
+```yaml
+form: w2-81-questions/1
+repository: python-app
+questions:
+  - id: python-app-v01
+    category: which-spec-governs
+    question: Which spec governs the upstream timeout of the {topic} service?
+    gold_answer: "{governing}, which states {spec_line}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+    forbidden: ["{stale}"]
+```
+
+**Templates over the seed.** Names, places and wording are seeded, so every text is a template, and `{name}` is a
+fact of the repository's manifest. Each builder records its seeded names and paths in the manifest's `facts`, which
+hold no secret. `w2_81_questions.resolve` then:
+
+- fills each template from the facts;
+- finds each source's line in the built HEAD (the manifest's `head`);
+- drops a forbidden citation whose fact the repository does not have (the clean variant plants nothing).
+
+A source whose fact is missing, or whose text is not at HEAD, is a `QuestionError` naming the question's id only.
+
+**The questions:**
+
+| Repository | Questions | Kinds |
+|---|---|---|
+| python-app | 11 | which spec governs, what value, where specified, which plan is current, what a module does, which test covers, where the configuration is, how to run, entry point, governing sources |
+| rust-workspace | 10 | which spec governs, what value, which plan is current, structure, what a module does, entry point, dependency, where the configuration is |
+| typescript-monorepo | 10 | which spec governs, what value, where specified, which plan is current, what a module does, how to run, structure, where the configuration is |
+| legacy-docs | 10 | which plan is current, what value, which spec governs, how to run, what a module does, which test covers, procedure, history, where the configuration is, structure |
+| secret-history | 10 | where the configuration is, which spec governs, what a module does, entry point, which test covers, structure, which plan is current, how to run |
+| python-app-clean | 10 | as python-app, with no forbidden citation (nothing is planted) |
+
+**Forbidden citations.** They are the planted sources no answer may cite: the stale spec, the superseded plan, and
+the dead file under a "current" name where a question touches it. Every stale spec and superseded plan is forbidden
+in at least one question of its repository. No question asks for a credential: the configuration questions are
+answered from HEAD, which holds none.
+
+The self-tests check all of this at the default seed and at another seed (`test_w2_81_questions.py`):
+
+- every gold source exists at HEAD and its line holds the evidence;
+- no gold source is a planted source;
+- every forbidden citation is a planted stale, superseded or dead source;
+- each repository has at least 10 questions of at least 5 categories;
+- the ids are unique.
+
+## The hidden half's form, for W2-93
+
+**Where it lives.** `fixtures/evaluation/adoption-proving-ground/hidden/` (W2-93's ticket, an independent auditor's).
+The `fixtures` namespace is one the indexer never reads, and the path map's `evaluation_sets` entry refuses it to
+the measured sessions (DEC-820 (d), DEC-845, DEC-873).
+
+**What it holds:**
+
+- **`<repository>.yaml`**: a question set in exactly the visible form above, ids `<repository>-h<nn>`, at least 10
+  per repository. Templates name the manifest's facts. The facts each builder records are listed in
+  `w2_81_build.py` (`b.facts(...)`), and a hidden question may also name a variant's paths literally.
+- **`variants.yaml`**: `variants:`, a list of planted-problem variants that the visible builders do not produce, at
+  least one per kind.
+
+**How a variant is described:**
+
+```yaml
+variants:
+  - id: f1                      # unique in the file; the manifest names it <repository>.<kind>.hidden-<id>
+    repository: rust-workspace  # one of the five, or python-app-clean
+    kind: stale-spec            # stale-spec, superseded-plan, misleading-name, secret, orphaned-test,
+                                # legacy-document or large-file
+    variant: front-matter-status   # a name of its own
+    paths: [docs/frames/frame-limits.md, "{fact:governing}"]
+    steps:                      # commits appended after the builder's history, in order
+      - message: Frame limits, reviewed
+        write: {docs/frames/frame-limits.md: "---\nstatus: current\n..."}
+        remove: []
+    evidence: {stale: docs/frames/frame-limits.md, governing: "{fact:governing}", ...}
+```
+
+- **Placeholders.** `{fact:<name>}` is a fact of the repository, and `{commit:<n>}` is step n's commit, as 12 digits.
+- **Evidence.** It holds the kind's fields as the manifest table above lists them, which is what the judge reads.
+- **A secret variant.** Its `evidence` gives `form` (`cloud-access-key` or `forge-token`), `path`, and `added_in` /
+  `removed_in` as `{commit:n}`. Its step texts write `{value}` where the value goes. The hook draws the value from
+  the seed (salt `<repository>:hidden:<id>`), holds it in memory, adds the rule and the salt to the evidence, and
+  checks that the value is at `added_in` and in no file at HEAD.
+
+**The builder hook.** `w2_81_build.apply_variants(built, variants, seed, manifests_root)` is called by
+`build_all(..., variants=...)`, which the runner passes when the hidden half is present. Each variant becomes:
+
+- commits of its own, dated after the history;
+- a manifest entry with `hidden: true`.
+
+The manifest is then written again. The judge and the stand-ins treat a variant by its kind and evidence, as any
+planted problem.
+
+**What the runner shows of it.** The runner reads the hidden half only from `--hidden`, or from that folder when it
+exists. The report and the log name hidden questions by id only. The self-tests never read that folder: they pass a
+stand-in hidden half written in their own temporary folder, or a path that is no folder
+(`test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`). They check that a stand-in hidden question's text and answer are in
+no report, log, file of the run folder, or output.
+
+## The runner: one command (`w2_81_run.py`, not collected)
+
+```
+PYTHONPATH=<the tree or release>/src python3 tests/acceptance/W2-81/w2_81_run.py \
+    --folder ~/gov-os-runs/W2-81/<run> --mode build|run|read [--seed N] \
+    [--gov <gov to adopt and retrieve with>] [--pinned-gov <W2-16's pinned gov>] \
+    [--close-ticket [<repository>=]<id>]... [--hidden <dir>] [--manifests <dir>] \
+    [--large-size <bytes>] [--stages A0,A1,A2]
+```
+
+**The run folder.** `--folder` is given by literal path: a temporary folder, or `~/gov-os-runs/W2-81/<run>`
+(DEC-728). The runner refuses:
+
+- a folder inside this repository, or one holding it;
+- a folder inside any git work tree it did not build;
+- a build into a folder that is not empty.
+
+**The modes:**
+
+- **`build`.** It builds the five repositories and the clean variant under `<folder>/repos/`, with their manifests
+  under `<manifests or folder>/manifests/`, and the hidden variants when the hidden half is present. It records the
+  seed in `<folder>/run.json`, drawing a fresh one when none is given. A launched session then adopts each
+  repository in place, leaving its logs and reports in `<folder>/outputs/<repository>/`.
+- **`read`.** It only reads what that adoption left. It asks each question set of `gov retrieve` (`--gov`), runs
+  `<pinned gov> close <ticket>` in each repository (DEC-953, DEC-954 Q8c), judges, and writes the report.
+- **`run`.** It does `build`, then runs the adoption stages that need no session (`--stages`, by default A0, A1 and
+  A2) with `--gov` in each repository, stopping a repository at its first non-zero exit, then reads as `read` does.
+
+**The report.** `<folder>/report.json` and `<folder>/report.md`, with a log of steps in `<folder>/run.log`. Per
+repository it holds the judge's result (each planted problem with its evidence, the controls, the stages,
+NOT_BUILT), both figures with the per-question ids and booleans, the `gov close` result, and the stages run. It also
+holds the seed, the hidden half's presence, and the verdict with every reason.
+
+**The verdict.** READY needs everything the judge's READY needs, and in every repository:
+
+- `gov close` was run and exited 0;
+- no stage the runner ran failed.
+
+A close not run, a non-zero close, or a failed stage is NOT_READY naming it.
+
+**What it never does.**
+
+- **The secret.** The secrets' values are drawn from the seed in memory. If the report or the log would hold one, an
+  ERROR report is written instead.
+- **This repository and the session.** It writes nothing in this repository, never reads the workbench and never
+  uses the dev-tier variable. Its subprocesses get an environment built from scratch: no `GOV_ROLE`, no
+  `GOV_TICKET`.
+- **The capabilities.** It counts as built only what today's code builds. The judge's `built` override is the
+  self-tests' alone.
+
+**The `gov close` step.** Its real run is the orchestrator's, once W2-16's numbered, frozen release is closed. The
+self-tests use a stand-in `gov` that exits 0, or 3.
+
+**Its self-tests** (`test_w2_81_runner.py`) use stand-ins: the perfect adoption model written in place, and a
+POSIX-shell `gov` that answers `retrieve` from a known ranking keyed by the question's hash, so its files never hold
+a question's text, and exits as told for `close` and `adopt`. They check:
+
+- READY with everything handled and both figures met;
+- NOT_READY for a failing close, a close not run, a forbidden citation first, no retrieval, and today's code;
+- the report's fields;
+- nothing written outside the run folder (the folder's parent and this tree's status compared around a run);
+- the refusals;
+- the command's verdict line and exit codes, with no secret in its output;
+- `run` mode naming a failing stage;
+- the hidden stand-in.
+
+**A risk for the real run.** By default the manifests sit in the run folder, beside the repositories that a launched
+session adopts, and a manifest names every planted problem. For the real run, pass `--manifests` with a folder
+outside the adopting session's reach, or have the guard refuse `<run>/manifests/**` to the measured sessions.
+
+## What W2-88 and W2-93 may read
+
+**W2-88 (DEC-954 Q9f, DEC-957)** reads the builders and the question sets, read-only, as its first proof of memory
+for any repository. It changes none of them. The import form:
+
+```python
+import sys; sys.path.insert(0, "tests/acceptance/W2-81")
+import w2_81_build as build, w2_81_questions as questions, w2_81_score as score
+built = build.build_all(folder, seed)            # folder: its own temporary folder or run folder
+for name, repo in built.items():
+    asked = questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
+                              "visible")
+    result = score.score_repository(name, asked, answers)   # answers: question id -> [(path, start, end)]
+```
+
+It may call `build_all`, `questions.load_set`, `questions.resolve`, `score.score_repository` and `score.figures`,
+and the runner's `--mode build` and `--mode read`.
+
+**W2-93** reads this README and the builders to write the hidden half in the form above. It writes only its hidden
+folder.
+
+## The KPI lines of the ticket, mapped to their tests
+
+| KPI line (`DAEO-l78m`) | Tests |
 |---|---|
-| Five repositories of different shapes, built at test time, file by file and commit by commit, each a git repository of its own; nothing cloned; none committed | `test_w2_81_builders.py` (all), `test_no_built_repository_or_large_file_is_tracked_in_this_repository` |
-| Large files generated at test time, never tracked | `test_the_large_files_are_at_the_size_asked_in_the_built_repository_only`, `test_no_built_repository_or_large_file_is_tracked_in_this_repository` |
-| Planted problems, each kind in at least two shapes | `test_every_kind_is_planted_in_two_repositories_two_shapes_and_two_variants`, `test_the_stale_spec_looks_current_and_is_contradicted_by_the_code_and_a_newer_spec`, `test_the_superseded_plans_successor_exists_and_names_it`, `test_the_misleading_names_are_live_or_dead_by_their_references`, `test_the_orphaned_tests_subject_is_gone`, `test_the_legacy_documents_are_planted` |
-| Names, places and wording drawn from a seed per run; the seed recorded | `test_w2_81_seed.py` (all) |
-| The manifest kept outside the built repository | `test_w2_81_manifest.py` (all) |
-| The secret generated from parts, in early history only, never whole in a tracked file of this repository | `test_w2_81_secret.py` (all) |
-| Controls in each repository, and one clean variant | `test_the_clean_variant_has_controls_only`, `test_every_repository_has_its_two_controls_and_each_says_what_flagging_it_looks_like`, `test_the_old_looking_spec_is_current`, `test_the_live_file_in_a_legacy_folder_is_live` |
-| Hermetic and bounded: no network, temporary folders only, under 120 s, none skipped, a missing tool fails naming it | `test_w2_81_hermetic.py` (all), and the module-scoped `this_repository_unchanged` fixture |
-| Failure: the secret's value written whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_a_build_prints_no_value`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects` |
-| Failure: a case that writes in this repository, reads the workbench, needs the network or is skipped | `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module` |
-
-## Batch 2's KPI lines and their tests
-
-| KPI line (ticket `DAEO-l78m`) | Tests |
-|---|---|
-| The correct handling of each kind, and the record that must show it, against the stages as built | this README, "The judge"; `test_todays_built_capabilities_follow_the_code`, `test_on_todays_code_the_handlings_not_built_are_named_and_never_passed` |
-| The secret: path, 12-digit commit and rule only; its value in no record, index store, log, proposal, report or output; the human gate; no ADOPTED_HEALTHY while it is open | `test_the_secret_found_but_its_value_in_a_record_is_mishandled`, `…_in_an_index_store_…`, `…_in_a_log_or_report_…`, `test_the_secret_reported_with_more_than_path_commit_and_rule_is_mishandled`, `test_adopted_healthy_with_the_secret_open_is_mishandled`, `test_the_judge_never_writes_the_value_even_when_an_output_is_named_by_it` |
-| Controls: flagging a control is mishandling | `test_a_stand_in_that_flags_a_control_is_not_ready_naming_it` (12), `test_a_control_proposed_for_retirement_or_named_by_a_finding_is_flagged` |
-| The judge: each status with its evidence; READY only when all are handled, no control flagged and every figure meets its floor; fail closed | `test_a_stand_in_that_handles_everything_is_ready`, `test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`, `test_a_missing_unreadable_or_malformed_record_is_missed_never_handled` (7), `test_a_control_whose_record_cannot_be_read_is_flagged`, `test_an_unreadable_finding_or_output_rules_nothing_out_for_the_secret`, `test_an_absent_stage_is_named`, `test_a_judge_error_is_an_error_never_ready`, `test_a_repository_not_judged_is_not_ready`, `test_a_figure_below_its_floor_or_missing_is_not_ready` (6) |
-| Mutation testing: READY on a full stand-in; one killed mutant per planted problem; the mishandling stand-ins; a flagged control; a figure at 84 or a single figure | `test_a_stand_in_that_misses_exactly_one_planted_problem_is_not_ready_naming_it` (21), the mishandling cases above, `test_the_mutant_lists_are_the_manifests` |
-| Failure: a planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases |
-| Failure: READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, the figure cases |
-| Failure: a case that writes in this repository | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_the_tripwire_names_only_w2_81_artefacts`, the `this_repository_unchanged` tripwire |
-
-The remaining lines (the question sets and the scorer, the runner, `gov close` in each repository, W2-88's read-only
-use, and the hidden half's form) are batch 3.
+| **S1** Five shapes built at test time, file by file and commit by commit, each a repository of its own; nothing cloned; none committed; the large files generated, never tracked | `test_w2_81_builders.py` (all), `test_the_large_files_are_at_the_size_asked_in_the_built_repository_only`, `test_no_built_repository_or_large_file_is_tracked_in_this_repository` |
+| **S2** Planted problems, each kind in at least two shapes; seeded per run; the seed in the report; the manifest outside the repository | `test_every_kind_is_planted_in_two_repositories_two_shapes_and_two_variants`, the instance checks of `test_w2_81_planted.py`, `test_w2_81_seed.py` (all), `test_w2_81_manifest.py` (all), `test_a_build_records_a_fresh_seed_and_keeps_the_manifests_outside_the_repositories`, `test_all_handled_and_both_figures_met_is_ready` (the seed in report.json and report.md) |
+| **S3** Each kind's correct handling and its record in the README, against the stages as built | this README ("The judge", "What the judge reads, per kind", "NOT_BUILT versus MISSED"); `test_todays_built_capabilities_follow_the_code`, `test_on_todays_code_the_handlings_not_built_are_named_and_never_passed` |
+| **S4** The secret: from parts, in history only, never whole in a tracked file; reported by path, 12-digit commit and rule; its value in no record, store, log, proposal, report or output; the human gate; no ADOPTED_HEALTHY while open | `test_w2_81_secret.py` (all); the secret mishandling cases of `test_w2_81_judge.py`; `test_the_judge_never_writes_the_value_even_when_an_output_is_named_by_it`; `test_the_command_prints_the_verdict_and_never_a_secret`; `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` (a variant's secret) |
+| **S5** Controls in each repository and a clean variant; flagging a control is mishandling | `test_the_clean_variant_has_controls_only`, `test_every_repository_has_its_two_controls_…`, `test_the_old_looking_spec_is_current`, `test_the_live_file_in_a_legacy_folder_is_live`, `test_a_stand_in_that_flags_a_control_is_not_ready_naming_it` (12), `test_a_control_proposed_for_retirement_or_named_by_a_finding_is_flagged` |
+| **S6** The judge: statuses with evidence; READY only when all handled, no control flagged and every figure met; fails closed; NOT_BUILT named | `test_a_stand_in_that_handles_everything_is_ready`, `test_an_adoption_that_ran_nothing_is_not_ready_in_every_repository`, the fail-closed cases (`test_a_missing_unreadable_or_malformed_record_is_missed_never_handled` ×7 and the rest), `test_a_figure_below_its_floor_or_missing_is_not_ready` (6) |
+| **S7** A question set per repository: the visible half (at least 10, gold sources, forbidden citations); the hidden half's form; both figures, never one alone; a forbidden citation in the top five a miss; scores and ids only | `test_w2_81_questions.py` (all), `test_w2_81_score.py` (all), `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`; this README ("The hidden half's form") |
+| **S8** Mutation testing: READY on a full stand-in; one killed mutant per planted problem; the mishandling stand-ins; a flagged control; a scorer at 84 or with one figure | `test_a_stand_in_that_misses_exactly_one_planted_problem_is_not_ready_naming_it` (21, listed above), the mishandling cases, the control cases, `test_a_scorer_at_84_on_hit_at_5_or_one_figure_alone_is_not_ready`, `test_the_mutant_lists_are_the_manifests` |
+| **S9** One command for the real run, not collected; builds under a literal folder; runs the stages and `gov retrieve`, or reads a session's outputs; the report as JSON and markdown; nothing in this repository | `test_w2_81_runner.py` (all) |
+| **S10** Hermetic and bounded: stand-ins, no network, no model, no adoption; temporary folders only, removed; under 120 s alone and in parallel; none skipped; a missing tool fails naming it; no workbench, no dev tiers | `test_w2_81_hermetic.py` (all), the `this_repository_unchanged` tripwire, `_removed_after` in `test_w2_81_judge.py`; the timings in the return |
+| **S11** In each repository, a ticket closes with `gov close` at exit 0 on a pinned release | the runner's close step: `test_all_handled_and_both_figures_met_is_ready` (exit 0 recorded), `test_each_failure_is_not_ready_naming_it[close-fails]` and `[close-not-run]`. The real run is the orchestrator's, on W2-16's release |
+| **S12** The builders and question sets serve W2-88 read-only; the hidden half is W2-93's | this README ("What W2-88 and W2-93 may read"); `test_the_questions_resolve_at_another_seed` (the interface W2-88 calls) |
+| **F1** A planted problem judged handled when missed or mishandled, or a missing or unreadable record read as handled | the 21 mutants, the mishandling cases, the fail-closed cases |
+| **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_on_todays_code_…`, the figure cases, `test_a_scorer_at_84_…` |
+| **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
+| **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
+| **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |

@@ -112,9 +112,11 @@ def _front(stage, data):
 
 
 def render(model, built, dest, beside):
-    """Write the model: a copy of the built repository's working tree (no .git), with the outputs in it."""
+    """Write the model: a copy of the built repository's working tree (no .git), with the outputs in it. With
+    ``dest`` the built repository itself, the outputs are written in place, as a launched session's adoption would."""
     dest, beside = gitlib.outside_this_repository(dest), gitlib.outside_this_repository(beside)
-    shutil.copytree(built.root, dest, ignore=shutil.ignore_patterns(".git"))
+    if dest != Path(built.root).resolve():
+        shutil.copytree(built.root, dest, ignore=shutil.ignore_patterns(".git"))
     beside.mkdir(parents=True, exist_ok=True)
 
     def put(rel, content, base=dest):
@@ -159,6 +161,57 @@ def render(model, built, dest, beside):
     for rel, text in model["beside"].items():
         put(rel, text, beside)
     return dest, beside
+
+
+_GOV = """#!/bin/sh
+# A stand-in gov for the W2-81 runner's self-tests: it writes nothing and prints no question.
+d="$0.d"
+case "$1" in
+  retrieve)
+    h=$(printf %s "$2" | sha256sum | cut -c1-64)
+    if [ -f "$d/$h.json" ]; then cat "$d/$h.json"; else cat "$d/none.json"; fi ;;
+  close) exit "$(cat "$d/close_exit")" ;;
+  adopt) exit "$(cat "$d/adopt_exit")" ;;
+  *) exit 64 ;;
+esac
+"""
+
+
+def question_key(text):
+    return hashlib.sha256(text.encode()).hexdigest()
+
+
+def write_gov(folder, name="gov", ranking=None, close_exit=0, adopt_exit=0):
+    """A stand-in ``gov`` executable in ``folder`` (a POSIX shell script, quick to start): ``retrieve`` answers from
+    ``ranking`` (question hash -> items), one answer file per question; ``close`` and ``adopt`` exit as given."""
+    import json
+
+    folder = gitlib.outside_this_repository(folder)
+    answers = folder / f"{name}.d"
+    answers.mkdir(parents=True, exist_ok=True)
+    exe = folder / name
+    exe.write_text(_GOV, encoding="utf-8")
+    exe.chmod(0o755)
+
+    def bundle(items):
+        return json.dumps({"ok": True, "result": {"evidence": items, "continuation": None}})
+    for key, items in (ranking or {}).items():
+        (answers / f"{key}.json").write_text(bundle(items), encoding="utf-8")
+    (answers / "none.json").write_text(bundle([]), encoding="utf-8")
+    (answers / "close_exit").write_text(str(close_exit), encoding="utf-8")
+    (answers / "adopt_exit").write_text(str(adopt_exit), encoding="utf-8")
+    return exe
+
+
+def ranking_for(asked, order="gold"):
+    """A known ranking for resolved questions: ``gold`` puts each gold source first; ``forbidden`` puts a forbidden
+    citation first (where the question has one), then the gold; ``none`` returns nothing useful."""
+    out = {}
+    for q in asked:
+        gold = [{"path": p, "start_line": line, "end_line": line, "text": "evidence"} for p, line, _ in q.sources]
+        bad = [{"path": p, "start_line": 1, "end_line": 1, "text": "planted"} for p in q.forbidden[:1]]
+        out[question_key(q.question)] = {"gold": gold, "forbidden": bad + gold, "none": []}[order]
+    return out
 
 
 def mutant(model):

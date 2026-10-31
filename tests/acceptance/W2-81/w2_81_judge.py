@@ -58,7 +58,7 @@ FINDING_KINDS = ("secret", "orphaned-test", "drift")
 FINDING_STATES = ("OPEN", "ACCEPTED", "RESOLVED")
 VERDICTS = ("ADOPTED_HEALTHY", "ADOPTED_WITH_ACCEPTED_EXCEPTIONS", "NOT_ADOPTED_HEALTHY")
 LEAVING = ("MOVE", "RENAME", "SPLIT", "MERGE", "EXTRACT", "RETIRE", "DELETE_FROM_ACTIVE_TREE")
-FLOORS = {"hit_at_5": 85.0, "stacked_share": 99.0}  # CAP-10's floor; DEC-833's target
+from w2_81_score import FLOORS  # noqa: E402 - CAP-10's floor; DEC-833's target, one constant each
 
 # The record names of the stages not built yet: the provisional form the stand-ins write (README, "The judge").
 PROVISIONAL = {"A7": f"{FOLDER}/A7-independent-migration-verification.md",

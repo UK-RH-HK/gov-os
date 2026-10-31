@@ -19,13 +19,15 @@ returned in memory only, never written in a manifest.
 from __future__ import annotations
 
 import random
+import re
 import shutil
 import struct
+from datetime import datetime
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import w2_81_manifest as manifest_form
-from w2_81_git import Repo
+from w2_81_git import Repo, blob, tree
 from w2_81_secret import FORMS, make_secret
 from w2_81_words import (CURRENT_WORDS, DEFAULT_SEED, HELPERS, LEGACY_FOLDERS, OLD_WORDS, PRODUCTS, REVIEW_WORDS,
                          STATUS_LINES, TOPICS, Draw)
@@ -66,6 +68,10 @@ class _Build:
         for rel in remove:
             self.repo.remove(rel)
         return self.repo.commit(message, self.draw.author(), self.draw.tick())
+
+    def facts(self, **named):
+        """The seeded names and paths the question sets refer to (no secret, no hidden material)."""
+        self.manifest.data["facts"] = {key: value for key, value in named.items() if value is not None}
 
     def finish(self, run_folder):
         data = self.manifest.close([c for c, _ in self.repo.commits])
@@ -156,8 +162,17 @@ def build_python(root, seed, run_folder, planted=True, name="python-app"):
                        claim_line=f"- Code length: {code_len}", code_line=f"CODE_LENGTH = {code_len}")
     b.manifest.control("live-file-in-legacy-folder", [f"{src}/{folder}/{codes_mod}.py"], why="the entry point "
                        "imports it", token=codes_mod, referenced_by=[f"{src}/app.py"])
+    value = new_v if planted else old_v
+    b.facts(product=pkg, topic=topic, other=other, const=const, app=f"{src}/app.py", topic_code=topic_code,
+            topic_test=f"tests/test_{topic}.py", adapter=adapter, adapter_module=f"{src}/{live_mod}.py",
+            codes_module=f"{src}/{folder}/{codes_mod}.py", control_spec=control_spec,
+            code_len_line=f"- Code length: {code_len}", code_len_code=f"CODE_LENGTH = {code_len}",
+            governing=governing, spec_line=f"- {label}: {value}", value_line=f"{const} = {value}",
+            plan=plan_new, plan_title=plan.replace("-", " "), stale=stale if planted else None,
+            plan_old=plan_old if planted else None, dead_module=f"{src}/{dead_mod}.py" if planted else None,
+            run_line=f"python -m {pkg}.app")
     if not planted:
-        b.commit(f"Note the {adapter} in the README", {"README.md": f"# {pkg}\n\nThe {topic} service of {pkg}.\n\n"
+        b.commit(f"Note the {adapter} in the README", {"README.md": f"# {pkg}\n\nThe {topic} service of {pkg}.\n\nRun it with `python -m {pkg}.app`.\n\n"
                  f"Governing specs: `{governing}`, `{control_spec}`. Plan: `{plan_new}`.\n"})
         return b.finish(run_folder)
     dead = b.commit(f"Add the {cur_word} {exporter}", {
@@ -186,7 +201,7 @@ def build_python(root, seed, run_folder, planted=True, name="python-app"):
     reviewed = d.day(-d.number(0, 3))
     touched = b.commit(f"Review the {topic} specs", {
         stale: _spec(f"The {topic} service", status, review, reviewed, [f"{label}: {old_v}"]),
-        "README.md": f"# {pkg}\n\nThe {topic} service of {pkg}.\n\nGoverning specs: `{governing}`, "
+        "README.md": f"# {pkg}\n\nThe {topic} service of {pkg}.\n\nRun it with `python -m {pkg}.app`.\n\nGoverning specs: `{governing}`, "
                      f"`{control_spec}`. Plan: `{plan_new}`.\n"})
     b.manifest.plant("stale-spec", "newer-version", [stale, governing], [first, raised, touched], stale=stale,
                      governing=governing, code=topic_code, status_line=status, reviewed=reviewed, review_line=f"{review}: {reviewed}",
@@ -267,6 +282,13 @@ def build_rust(root, seed, run_folder, name="rust-workspace"):
     b.manifest.control("live-file-in-legacy-folder", [f"crates/{c2}/src/{folder}/mod.rs"], why="its crate's "
                        "lib.rs declares it and the binary calls it", token=table,
                        referenced_by=[f"crates/{c2}/src/lib.rs", f"crates/{c3}/src/main.rs"])
+    b.facts(product=product, topic=topic, other=other, crate_a=a, crate_store=c2, crate_bin=c3, lib_a=lib_a,
+            bin_main=f"crates/{c3}/src/main.rs", store_lib=f"crates/{c2}/src/lib.rs",
+            table_module=f"crates/{c2}/src/{folder}/mod.rs", table=table, control_spec=control_spec,
+            width_line=f"- Record width: {width}", width_code=f"RECORD_WIDTH: usize = {width}",
+            governing=governing, stale=stale, spec_line=f"- Maximum frame: {new_v} bytes",
+            frame_code=f"MAX_FRAME_BYTES: usize = {new_v}", plan=plan_v2, plan_old=plan_v1, plan_id=plan_id,
+            members_line=f'members = ["crates/{a}", "crates/{c2}", "crates/{c3}"]', fn=fn, orphan=test_rel)
     b.commit(f"Test the {fn}", {test_rel: f"use {ident(a)}::{fn};\n\n#[test]\nfn {fn}_of_bytes() {{\n"
                                           f"    assert_eq!({fn}(&[1, 2, 3]), 6);\n}}\n"})
     v1 = b.commit(f"The {plan_id.replace('-', ' ')}, version 1", {
@@ -371,6 +393,13 @@ def build_typescript(root, seed, run_folder, name="typescript-monorepo"):
                        token=f"{folder}/{other}-records", referenced_by=[f"packages/{p1}/src/index.ts"])
     b.manifest.plant("misleading-name", "live-under-old-name", [live_rel], [wired], token=f"{old_word}-{adapter}",
                      referenced_by=[f"packages/{p1}/src/index.ts"], live=True)
+    b.facts(product=product, topic=topic, other=other, p1=p1, p2=p2, p3=p3, paging=index2,
+            page_code=f"PAGE_SIZE = {new_v}", governing=governing, stale=stale,
+            spec_line=f"- Page size: {new_v}", script=script, records_module=codes_rel,
+            width_line=f"- Record width: {width}", width_code=f"RECORD_WIDTH = {width}",
+            control_spec=control_spec, client_module=live_rel, p1_index=f"packages/{p1}/src/index.ts",
+            release_plan=f"docs/plans/{p1}-release.md", dead_module=dead_rel, orphan=test_rel,
+            p1_package=f"packages/{p1}/package.json", p1_name=f"@{product}/{p1}")
     helped = b.commit(f"The {helper} helper and its test", {
         helper_rel: f"export function {helper}<T>(items: T[]): T[] {{\n  return [...items];\n}}\n",
         test_rel: f'import {{ {helper} }} from "../src/{helper}";\n\ntest("{helper} copies", () => {{\n'
@@ -457,6 +486,11 @@ def build_legacy(root, seed, run_folder, large_size=SELF_TEST_LARGE, name="legac
                        claim_line=f"- Record width: {width}", code_line=f"RECORD_WIDTH = {width}")
     b.manifest.control("live-file-in-legacy-folder", [tool_rel], why="the Makefile runs it", token=tool_rel,
                        referenced_by=["Makefile"])
+    b.facts(product=product, topic=topic, other=other, tool=tool_rel, tool_test=f"tests/test_{tool}.py",
+            control_spec=control_spec, width_line=f"- Record width: {width}",
+            width_code=f"RECORD_WIDTH = {width}", procedure=extract_doc, manual=retire_doc, system=system,
+            plan=plan_new, plan_old=plan_old, plan_title=plan.replace("-", " "), dataset=dataset, media=media,
+            make_line=f"python3 {tool_rel} data/")
     docs = b.commit("Scanned documents from the old share", {
         extract_doc: f"{topic.upper()} RECONCILIATION PROCEDURE ({year})\n\n1. Each night, total the {topic} "
                      f"batches.\n2. A batch whose total differs is held for the {other} desk.\n3. Held batches "
@@ -545,6 +579,11 @@ def build_go(root, seed, run_folder, name="secret-history"):
                        "calls it", token="StatusText", referenced_by=[f"cmd/{product}/main.go"])
     b.manifest.plant("misleading-name", "live-under-old-name", [live_rel], [b.repo.commits[0][0]], token="Routes()",
                      referenced_by=[f"cmd/{product}/main.go"], live=True)
+    b.facts(product=product, other=other, main=f"cmd/{product}/main.go", router=live_rel, package=pkg,
+            codes=codes_rel, config=config, control_spec=control_spec, retries_line=f"- Retry limit: {retries}",
+            retries_code=f"RetryLimit = {retries}", plan="docs/plans/next-quarter.md",
+            router_test=f"internal/{pkg}/{mux}_test.go", module_line=f"module example.invalid/{product}",
+            dead_module=dead_rel)
     dead = b.commit(f"Draft the {cur_word} routing table", {
         dead_rel: f"package {pkg}\n\n// {dead_fn} is the {cur_word} routing table.\nfunc {dead_fn}() []string {{\n"
                   f"\treturn []string{{\"/v0/{other}\"}}\n}}\n"})
@@ -569,19 +608,112 @@ SHAPES = ("python-app", "rust-workspace", "typescript-monorepo", "legacy-docs", 
 CLEAN = "python-app-clean"
 
 
-def build_all(run_folder, seed=DEFAULT_SEED, large_size=SELF_TEST_LARGE):
-    """Build the five repositories and the clean variant under ``<run>/repos/``; manifests under ``<run>/manifests/``."""
+def build_all(run_folder, seed=DEFAULT_SEED, large_size=SELF_TEST_LARGE, manifests_root=None, variants=()):
+    """Build the five repositories and the clean variant under ``<run>/repos/``, their manifests under
+    ``<manifests_root or run>/manifests/``, and the hidden half's ``variants`` (when given) on top."""
     run_folder = Path(run_folder)
-    repos = run_folder / "repos"
+    repos, beside = run_folder / "repos", Path(manifests_root) if manifests_root else run_folder
     built = {
-        "python-app": build_python(repos / "python-app", seed, run_folder),
-        "rust-workspace": build_rust(repos / "rust-workspace", seed, run_folder),
-        "typescript-monorepo": build_typescript(repos / "typescript-monorepo", seed, run_folder),
-        "legacy-docs": build_legacy(repos / "legacy-docs", seed, run_folder, large_size),
-        "secret-history": build_go(repos / "secret-history", seed, run_folder),
-        CLEAN: build_python(repos / CLEAN, seed, run_folder, planted=False, name=CLEAN),
+        "python-app": build_python(repos / "python-app", seed, beside),
+        "rust-workspace": build_rust(repos / "rust-workspace", seed, beside),
+        "typescript-monorepo": build_typescript(repos / "typescript-monorepo", seed, beside),
+        "legacy-docs": build_legacy(repos / "legacy-docs", seed, beside, large_size),
+        "secret-history": build_go(repos / "secret-history", seed, beside),
+        CLEAN: build_python(repos / CLEAN, seed, beside, planted=False, name=CLEAN),
     }
+    if variants:
+        apply_variants(built, variants, seed, beside)
     return built
+
+
+# --------------------------------------------------------------------------
+# The hidden half's planted-problem variants (README, "The hidden half"): built here, described there
+# --------------------------------------------------------------------------
+
+_PLACE = re.compile(r"\{(commit|fact):([A-Za-z0-9_-]+)\}")
+VARIANT_KEYS = ("id", "repository", "kind", "variant", "paths", "steps", "evidence")
+
+
+def _put(value, hashes, facts, where):
+    """``{commit:N}`` (step N's commit, 12 digits) and ``{fact:name}`` filled in a string, a list or a mapping."""
+    if isinstance(value, dict):
+        return {k: _put(v, hashes, facts, where) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_put(v, hashes, facts, where) for v in value]
+    if not isinstance(value, str):
+        return value
+
+    def one(match):
+        kind, key = match.groups()
+        try:
+            return hashes[int(key) - 1][:12] if kind == "commit" else str(facts[key])
+        except (ValueError, IndexError, KeyError):
+            raise AssertionError(f"variant {where}: {match.group(0)} names no step or fact") from None
+    return _PLACE.sub(one, value)
+
+
+def apply_variants(built, variants, seed, manifests_root):
+    """Append each variant to its repository as commits of its own, plant it in the manifest, rewrite the manifest.
+
+    A variant is ``{id, repository, kind, variant, paths, steps, evidence}``: ``steps`` are the commits, each
+    ``{message, write: {path: text}, remove: [path]}``; ``evidence`` is the kind's evidence as the manifest holds it.
+    Texts and evidence may name ``{commit:N}`` and ``{fact:name}``; a secret's step texts name ``{value}``, its
+    evidence names ``form``, and its value is drawn from the seed here and held in memory only.
+    """
+    from w2_81_git import outside_this_repository, run_git
+    from w2_81_secret import assert_absent
+
+    for number, variant in enumerate(variants, 1):
+        where = f"#{number}"
+        if not isinstance(variant, dict) or set(VARIANT_KEYS) - set(variant):
+            raise AssertionError(f"variant {where}: it needs {', '.join(VARIANT_KEYS)}")
+        if variant["kind"] not in manifest_form.KINDS + manifest_form.LEGACY_KINDS:
+            raise AssertionError(f"variant {where}: kind {variant['kind']!r} is not a planted kind")
+        if variant["repository"] not in built:
+            raise AssertionError(f"variant {where}: no repository {variant['repository']!r}")
+        target = built[variant["repository"]]
+        data, facts = target.manifest, target.manifest.get("facts") or {}
+        draw = Draw(seed, f"{target.name}:hidden:{variant['id']}")
+        draw.clock = datetime.fromisoformat(run_git(target.root, "log", "-1", "--format=%cI").strip())
+        held = None
+        if variant["kind"] == "secret":
+            form = variant["evidence"].get("form")
+            if form not in FORMS:
+                raise AssertionError(f"variant {where}: a secret names its form, one of {', '.join(FORMS)}")
+            held = make_secret(form, seed, f"{target.name}:hidden:{variant['id']}")
+        hashes = []
+        for step in variant["steps"]:
+            for rel, content in (step.get("write") or {}).items():
+                content = _put(str(content), hashes, facts, where)
+                content = held.line(content) if held is not None else content
+                place = outside_this_repository(target.root / rel)
+                place.parent.mkdir(parents=True, exist_ok=True)
+                place.write_text(content, encoding="utf-8")
+            for rel in step.get("remove") or []:
+                (target.root / rel).unlink()
+            run_git(target.root, "add", "-A")
+            run_git(target.root, "commit", "-q", "-m", str(step.get("message") or f"Change {number}"),
+                    author=draw.author(), date=draw.tick())
+            hashes.append(run_git(target.root, "rev-parse", "HEAD").strip())
+        evidence = _put(variant["evidence"], hashes, facts, where)
+        if held is not None:
+            evidence = {**evidence, "rule": FORMS[evidence["form"]]["rule"],
+                        "salt": f"{target.name}:hidden:{variant['id']}"}
+            assert held.found_in(blob(target.root, evidence["added_in"], evidence["path"])), \
+                f"variant {where}: the secret is not in {evidence['path']} at its added_in"
+            for rel in tree(target.root):
+                assert_absent(held, blob(target.root, "HEAD", rel), f"variant {where}: {rel} at HEAD")
+            target.secrets.append(held)
+        data["planted"].append({
+            "id": f"{target.name}.{variant['kind']}.hidden-{variant['id']}", "kind": variant["kind"],
+            "variant": str(variant["variant"]), "shape": data["shape"], "hidden": True,
+            "paths": _put(variant["paths"], hashes, facts, where), "commits": [h[:12] for h in hashes],
+            "detectable_by": manifest_form.DETECTABLE_BY[variant["kind"]],
+            "correct_handling": manifest_form.CORRECT_HANDLING[variant["kind"]], "evidence": evidence})
+        commits = run_git(target.root, "rev-list", "--reverse", "HEAD").split()
+        data["clean"] = False
+        data["commits"], data["head"] = [c[:12] for c in commits], commits[-1][:12]
+        target.manifest_path = manifest_form.write(data, manifests_root, target.root)
 
 
 def remove(run_folder):

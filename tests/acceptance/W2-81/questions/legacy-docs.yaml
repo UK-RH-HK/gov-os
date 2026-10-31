@@ -1,0 +1,67 @@
+# The visible half of the question set: legacy-docs (W2-81). Templates over the manifest's facts.
+form: w2-81-questions/1
+repository: legacy-docs
+questions:
+  - id: legacy-docs-v01
+    category: which-plan-current
+    question: Which {plan_title} plan is current?
+    gold_answer: "{plan}, which replaces {plan_old} in full"
+    sources:
+      - {path: "{plan}", holds: "This revision replaces"}
+    forbidden: ["{plan_old}"]
+  - id: legacy-docs-v02
+    category: what-value
+    question: Where do the {other} records keep their records, now that tape is gone?
+    gold_answer: "in the repository ({plan})"
+    sources:
+      - {path: "{plan}", holds: "Keep the records in the repository; tape is gone."}
+    forbidden: ["{plan_old}"]
+  - id: legacy-docs-v03
+    category: which-spec-governs
+    question: What is the record width of the {other} records, and which spec states it?
+    gold_answer: "{width_line}, in {control_spec}"
+    sources:
+      - {path: "{control_spec}", holds: "{width_line}"}
+      - {path: "{tool}", holds: "{width_code}"}
+  - id: legacy-docs-v04
+    category: how-to-run
+    question: How are the records converted?
+    gold_answer: "make records, which runs {make_line}"
+    sources:
+      - {path: Makefile, holds: "{make_line}"}
+  - id: legacy-docs-v05
+    category: what-module-does
+    question: What does the {tool} tool read?
+    gold_answer: "the {other} records, fixed width"
+    sources:
+      - {path: "{tool}", holds: "Convert the {other} records (fixed width)."}
+  - id: legacy-docs-v06
+    category: which-test-covers
+    question: Which test covers the record width of the conversion tool?
+    gold_answer: "{tool_test}, test_record_width"
+    sources:
+      - {path: "{tool_test}", holds: "def test_record_width():"}
+  - id: legacy-docs-v07
+    category: procedure
+    question: How are held {topic} batches released?
+    gold_answer: "only by two signatures ({procedure})"
+    sources:
+      - {path: "{procedure}", holds: "are released only by two signatures."}
+  - id: legacy-docs-v08
+    category: history
+    question: When was the {system} switched off?
+    gold_answer: "as its operations manual states ({manual})"
+    sources:
+      - {path: "{manual}", holds: "was switched off in"}
+  - id: legacy-docs-v09
+    category: where-config
+    question: Which files does the repository mark as binary?
+    gold_answer: "*.bin and *.wav (.gitattributes)"
+    sources:
+      - {path: .gitattributes, holds: "*.bin binary"}
+  - id: legacy-docs-v10
+    category: structure
+    question: What do the {product} records hold, and how are they converted?
+    gold_answer: "the {topic} records of {product} and the tools that read them; make records"
+    sources:
+      - {path: README.md, holds: "Run `make records` to convert them."}

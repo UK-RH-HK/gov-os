@@ -1,0 +1,80 @@
+# The visible (development) half of the adoption proving ground's question set: python-app (W2-81, DEC-833).
+# Templates: {name} is a fact of the repository's manifest (its seeded names and paths). A source is a path and the
+# text of the line that holds the answer's evidence; a forbidden citation is a planted source no answer may cite.
+form: w2-81-questions/1
+repository: python-app
+questions:
+  - id: python-app-v01
+    category: which-spec-governs
+    question: Which spec governs the upstream timeout of the {topic} service?
+    gold_answer: "{governing}, which states {spec_line}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+    forbidden: ["{stale}"]
+  - id: python-app-v02
+    category: what-value
+    question: What value does the {topic} service use for {const}?
+    gold_answer: "{value_line}, in {topic_code}"
+    sources:
+      - {path: "{topic_code}", holds: "{value_line}"}
+    forbidden: ["{stale}"]
+  - id: python-app-v03
+    category: where-specified
+    question: Where are the timeout of the {topic} service specified and implemented?
+    gold_answer: "specified in {governing}, implemented in {topic_code}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+      - {path: "{topic_code}", holds: "{value_line}"}
+    forbidden: ["{stale}"]
+  - id: python-app-v04
+    category: which-plan-current
+    question: Which plan is current for the {plan_title}?
+    gold_answer: "{plan}, which supersedes {plan_old}"
+    sources:
+      - {path: "{plan}", holds: "This plan supersedes"}
+    forbidden: ["{plan_old}"]
+  - id: python-app-v05
+    category: what-module-does
+    question: What does the upstream {adapter} module of {product} do?
+    gold_answer: "{adapter_module} opens the upstream connection with a timeout (connect)"
+    sources:
+      - {path: "{adapter_module}", holds: "def connect(timeout):"}
+    forbidden: ["{dead_module}"]
+  - id: python-app-v06
+    category: which-test-covers
+    question: Which test covers the settlement of {topic} amounts?
+    gold_answer: "{topic_test}, test_settle_rounds"
+    sources:
+      - {path: "{topic_test}", holds: "def test_settle_rounds():"}
+  - id: python-app-v07
+    category: where-config
+    question: Where is the package configuration of {product}?
+    gold_answer: pyproject.toml
+    sources:
+      - {path: pyproject.toml, holds: 'name = "{product}"'}
+  - id: python-app-v08
+    category: how-to-run
+    question: How is the {product} service started?
+    gold_answer: "{run_line}"
+    sources:
+      - {path: README.md, holds: "{run_line}"}
+  - id: python-app-v09
+    category: which-spec-governs
+    question: What is the length of the {other} codes, and which spec states it?
+    gold_answer: "{code_len_line}, in {control_spec}; {codes_module} holds {code_len_code}"
+    sources:
+      - {path: "{control_spec}", holds: "{code_len_line}"}
+      - {path: "{codes_module}", holds: "{code_len_code}"}
+  - id: python-app-v10
+    category: entry-point
+    question: Which module is the entry point of {product}, and what does it wire together?
+    gold_answer: "{app}: the {topic} timeout, the upstream {adapter} and the {other} codes"
+    sources:
+      - {path: "{app}", holds: "def main():"}
+  - id: python-app-v11
+    category: governing-sources
+    question: Which specs and plan does the README of {product} name as governing?
+    gold_answer: "{governing}, {control_spec} and {plan}"
+    sources:
+      - {path: README.md, holds: "Governing specs:"}
+    forbidden: ["{stale}", "{plan_old}"]

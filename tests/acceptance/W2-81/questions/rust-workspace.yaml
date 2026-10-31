@@ -1,0 +1,68 @@
+# The visible half of the question set: rust-workspace (W2-81). Templates over the manifest's facts.
+form: w2-81-questions/1
+repository: rust-workspace
+questions:
+  - id: rust-workspace-v01
+    category: which-spec-governs
+    question: Which RFC governs the maximum frame size of the {topic} stream?
+    gold_answer: "{governing}, which states {spec_line}"
+    sources:
+      - {path: "{governing}", holds: "{spec_line}"}
+    forbidden: ["{stale}"]
+  - id: rust-workspace-v02
+    category: what-value
+    question: What is MAX_FRAME_BYTES in the {crate_a} crate?
+    gold_answer: "{frame_code}, in {lib_a}"
+    sources:
+      - {path: "{lib_a}", holds: "{frame_code}"}
+    forbidden: ["{stale}"]
+  - id: rust-workspace-v03
+    category: which-plan-current
+    question: Which version of the {plan_id} is current?
+    gold_answer: "{plan}, version 2, which supersedes version 1 ({plan_old})"
+    sources:
+      - {path: "{plan}", holds: "supersedes: version 1"}
+    forbidden: ["{plan_old}"]
+  - id: rust-workspace-v04
+    category: structure
+    question: Which crates make up the {product} workspace?
+    gold_answer: "{crate_a}, {crate_store} and {crate_bin}"
+    sources:
+      - {path: Cargo.toml, holds: "{members_line}"}
+  - id: rust-workspace-v05
+    category: what-module-does
+    question: What does the {table} function of the {crate_store} crate return?
+    gold_answer: "RECORD_WIDTH, from {table_module}"
+    sources:
+      - {path: "{table_module}", holds: "pub fn {table}() -> usize"}
+  - id: rust-workspace-v06
+    category: which-spec-governs
+    question: What is the record width of the {other} table, and where is it described?
+    gold_answer: "{width_line}, in {control_spec}"
+    sources:
+      - {path: "{control_spec}", holds: "{width_line}"}
+      - {path: "{table_module}", holds: "{width_code}"}
+  - id: rust-workspace-v07
+    category: entry-point
+    question: What does the {crate_bin} binary print?
+    gold_answer: "the frame length of a payload and the {other} table's width ({bin_main})"
+    sources:
+      - {path: "{bin_main}", holds: "fn main() {{"}
+  - id: rust-workspace-v08
+    category: dependency
+    question: How does the {crate_store} crate expose its {other} table?
+    gold_answer: "its lib.rs re-exports {table} from its legacy-named module"
+    sources:
+      - {path: "{store_lib}", holds: "pub use "}
+  - id: rust-workspace-v09
+    category: what-module-does
+    question: How does the {crate_a} crate compute a frame's length?
+    gold_answer: "frame_len: the payload's length, at most MAX_FRAME_BYTES"
+    sources:
+      - {path: "{lib_a}", holds: "pub fn frame_len(payload: &[u8]) -> usize {{"}
+  - id: rust-workspace-v10
+    category: where-config
+    question: Where is the {crate_bin} binary's package configured, and what does it depend on?
+    gold_answer: "crates/{crate_bin}/Cargo.toml, on {product}-{crate_a} and {product}-{crate_store}"
+    sources:
+      - {path: "crates/{crate_bin}/Cargo.toml", holds: '{product}-{crate_a} = {{ path = "../{crate_a}" }}'}
