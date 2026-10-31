@@ -133,12 +133,13 @@ def test_the_close_s_commits_without_an_identity_are_gov_s(project, tmp_path, mo
     assert repo.git(root, "log", "-1", "--format=%ae %ce", commit).strip() == "gov@localhost gov@localhost"
 
 
-def test_the_close_s_started_programs_get_no_git_variable_of_the_caller(project, planted):
+def test_the_close_s_started_programs_get_no_git_variable_of_the_caller(project, planted, monkeypatch):
     root, _head = project
+    monkeypatch.setenv("GIT_AUTHOR_NAME", "caller")
     show = [sys.executable, "-c", "import json, os; print(json.dumps(dict(os.environ)))"]
     env = {**os.environ, "PYTHONPATH": str(root / "src"), "GOV_SOME_CHECK_RESULT": "x"}
     seen = json.loads(_started(root, show, env).stdout)
-    assert not [name for name in PLANTED if name in seen]
+    assert [name for name in seen if name.startswith("GIT_")] == ["GIT_NO_LAZY_FETCH"]
     assert seen["PYTHONPATH"] == str(root / "src") and seen["GOV_SOME_CHECK_RESULT"] == "x"
     assert seen["GIT_NO_LAZY_FETCH"] == "1"
 

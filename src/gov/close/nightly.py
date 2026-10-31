@@ -103,7 +103,7 @@ def _bisect(tree: Path, good: str, bad: str, test: str, limit: list[str], env: d
     step = [sys.executable, "-c", _BISECT_STEP, path + sep + rest, "-q", "-p", "no:cacheprovider", "--no-header",
             "--rootdir", str(tree)] + limit
     # The clone is another folder and the step starts the tests, which start git in folders of their own (P-1).
-    bisect_env = program_env(base=env)
+    bisect_env = program_env(base={key: value for key, value in env.items() if not key.startswith("GIT_")})
     try:
         subprocess.run(["git", "-C", str(tree), "bisect", "start", bad, good], capture_output=True, text=True,
                        env=bisect_env, check=True)
