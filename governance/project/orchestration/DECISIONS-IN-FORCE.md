@@ -23,12 +23,12 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-953 item 5: close W2-71, W2-77, W2-57, W2-03 and W2-26 now, then each ticket as its practices pass.
 - DEC-953 item 6: the proof of `gov close` happens on the proving ground (W2-81) and EXAMIN's copy, not by re-closing this repo's tickets.
 - DEC-906 item 1, DEC-462, DEC-959 item 7: a fresh independent test designer writes the acceptance tests from behaviour and sources, in parallel with the engineer, both from the spec; the engineer runs them once they are ready. Only the designer commits under `tests/acceptance/`.
-- DEC-959: the local merge queue (Senior Engineers approve, the CTO's tool tests the candidate merge, advances only on green); tests run once per level (lead scoped once; QA re-runs nothing; the queue once per batch, skipped on identical code; full only nightly and for core); the QA engineer per stream (core one by one, others in batches of about five); the opaque acceptance runner now; one skill template with three scenarios; domain skills after ACT 2; everything before EXAMIN.
+- DEC-959: the local merge queue (Senior Engineers approve, the CTO's tool tests the candidate merge, advances only on green); tests run once per level (lead scoped once; QA re-runs nothing; the queue once per batch, skipped on identical code; full only in the nightly, DEC-968); the QA engineer per stream (core one by one, others in batches of about five); the opaque acceptance runner now; one skill template with three scenarios; domain skills after ACT 2; everything before EXAMIN.
 - DEC-953 item 4, DEC-952: one selection tool at every level:
   - workers run their own unit tests;
-  - a lead runs its acceptance tests plus the affected set (full only when core code changed);
+  - a lead runs its acceptance tests plus the affected set (never full, core changes included, DEC-968);
   - the close runs the same set on the merged commit in a clean worktree;
-  - the nightly runs everything.
+  - the nightly runs everything, once a day, and nowhere else (DEC-968).
   Governance files never widen a selection.
 - DEC-962 (changing DEC-905, DEC-906 item 3, DEC-954): no shared test lock and no closes-first; every full run (a close's, the nightly's, a lead's through `verify_lock.sh`) asks the gate for room for its own peak; `tmp_path_retention_policy=failed` stays. One store rebuild at a time stays until W2-76's lock is measured. One writing worker per worktree (DEC-963): the test designer works in parallel in its own tests worktree, retrieving only from the integration branch's store (`~/gov-os-worktrees/W2-00-store`, refreshed at most twice a day or on request, DEC-966); the engineer merges its tests and runs them once.
 - DEC-954 (P-W2-64-1): a test revision the owner names is checked by a scoped run of the corrected tests; the nightly covers the rest.
@@ -92,3 +92,4 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-941 item 4.3, DEC-930 item 2: one daily document, and the weekly numbers (with ticket growth and drift).
 - DEC-953: three milestone reports, each pinged. Between them, the block plus at most five lines.
 - DEC-966: the template's install block removed and its hook lines pinned (two tickets, before EXAMIN's copy); rebuild speed a priority (gitleaks results by content hash, a full scan nightly).
+- DEC-968: a close is refused only by a failure its own change caused (each red alone re-run with the batch's merges reverted); a failure it did not cause is named in the close record and dealt with at once (fixed on the spot, or a P1); no accepted-reds list.

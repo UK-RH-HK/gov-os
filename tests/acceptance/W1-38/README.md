@@ -59,6 +59,17 @@ stricter and gives the suite's own rulesync waits limits a loaded machine meets 
   names rulesync and says it gave no answer in time, and no finding that reads it as absent; it waits the
   suite's check wait, not the old limit plus 5 s, and its stand-in `exec`s its sleep so nothing outlives it.
 
+**The revision of W2-106 (2026-10-31, ticket `DAEO-0mtg`, DEC-966 item 2; `Rewrite-Reason: DEC-966 item 2`)** adds
+no case, removes none and changes no expectation. The template's three guard lines take the pinned form (DEC-822,
+W2-59): they find the installed gov at `$HOME/.local/bin/gov`, else on `PATH`, and start their program with the
+interpreter its first line names, with `-E`. The stand-in session (`hooks.make_session_sandbox`) held only a path file
+naming this worktree's `src` in its home's user site folder, so a pinned line would take the `gov` on the runner's
+`PATH` (on this machine the owner's pin, whose environment imports its own package under `-E`, not the path file's:
+measured by W2-106's test designer), or refuse every call where there is none. The session's home now also holds the
+editable install's `gov` script at `.local/bin/gov`, its first line naming the test's interpreter, as `pip install
+--user -e` leaves it (DEC-605): the pinned line starts that interpreter, and the path file gives this worktree's
+package, as before (DEC-732). On lines that run a bare `python3` the script is never read.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
