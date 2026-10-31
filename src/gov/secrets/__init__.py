@@ -15,6 +15,11 @@ reads at 1 MB/s or faster (DEC-853). A store whose bytes were scanned clean befo
 and the same gitleaks, is not scanned again: the check's record of clean results says so, and the reuse
 is labelled on standard error with the store's path and digest. A finding is never recorded.
 
+The filter remembers too (W2-107, DEC-966 item 4): a file's content or a path's names judged clean, with no finding at
+all by any rule set, is kept by its digest in the machine-wide record of ``cache``, so the same bytes judged again by
+the same gitleaks and rules are answered without a scan. A finding, an exempt commit hash included, is scanned every
+time. ``scan_counts()`` says how many texts of each kind were scanned and how many answered from the record.
+
 What gitleaks reads (DEC-897, docs/research/W2-69-secrets-scan.md): a SQLite store is judged by each value it
 holds and by each region of its freed space, each on its own; any other file, or a store that cannot be read, by
 its bytes. Each is given in overlapping pieces that begin and end at a true boundary, a blank line after each, so
@@ -41,6 +46,7 @@ from pathlib import Path
 
 from gov.config.loader import load_config
 from gov.guard.runs import root as runs_root
+from gov.secrets import cache
 
 CONFIG_REL = ".gitleaks.toml"
 RUNTIME_REL = ".gov-runtime"
@@ -71,7 +77,23 @@ _SQLITE = b"SQLite format 3\0"
 _BUSY_S = 10.0  # how long a store's lock held by another process is waited out before the store is judged by its bytes
 _FTS5 = re.compile(rb"\s*CREATE\s+VIRTUAL\s+TABLE\b.*?\bUSING\s+fts5\b", re.IGNORECASE | re.DOTALL)
 
-__all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
+__all__ = ["indexable", "path_holds_secret", "scan_counts", "stores_with_secrets"]
+
+_KINDS = ("content", "path")  # what the filter judges: a file's content, a path's names
+_counts = {kind: {"scanned": 0, "remembered": 0} for kind in _KINDS}
+_counting = threading.Lock()
+
+
+def scan_counts() -> dict[str, dict[str, int]]:
+    """The texts of each kind this process gave to gitleaks (``scanned``) and answered from the record
+    (``remembered``), as a fresh dict: a caller takes the difference around its own work."""
+    with _counting:
+        return {kind: dict(each) for kind, each in _counts.items()}
+
+
+def _count(kind: str, what: str) -> None:
+    with _counting:
+        _counts[kind][what] += 1
 
 
 def _toml(value) -> str:
@@ -148,9 +170,24 @@ def _forms(content: bytes) -> list[bytes]:
     return [content, content.replace(b"\0", b"")] if b"\0" in content else [content]
 
 
-def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = None) -> bool:
-    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``."""
-    return _scan(rules, _forms(content), root)
+def _holds_secret(rules: tuple[str, ...], content: bytes, root: Path | None = None, kind: str | None = None) -> bool:
+    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``.
+
+    With ``kind``, bytes judged clean before by the same engine are answered from the record, and a scan that finds
+    nothing at all is kept there; a scan with any finding, exempt or not, is never kept.
+    """
+    if kind is None:
+        return _scan(rules, _forms(content), root)
+    digest = hashlib.sha256(content).hexdigest()
+    if cache.remembered(kind, digest, rules):
+        _count(kind, "remembered")
+        return False
+    _count(kind, "scanned")
+    found = []
+    secret = _scan(rules, _forms(content), root, found)
+    if not (secret or found):
+        cache.remember(kind, digest, rules)
+    return secret
 
 
 # Row W2-L423's rule (DEC-911 item 4): its id is written only in parts, so no file holds it whole.
@@ -217,12 +254,13 @@ def _exempt(finding, root: Path | None) -> str | None:
     return secret if isinstance(secret, str) and _HASH.fullmatch(secret) else None
 
 
-def _scan(rules: tuple[str, ...], chunks, root: Path | None = None) -> bool:
+def _scan(rules: tuple[str, ...], chunks, root: Path | None = None, found: list | None = None) -> bool:
     """Whether gitleaks finds a secret in any of ``chunks`` by any of ``rules``. Raises when gitleaks cannot run or does not decide.
 
     Each chunk is a text of its own: its pieces are never joined to another chunk's but by a blank line. With ``root``,
     a match of row W2-L423's rule that is exactly a commit of the repository at ``root`` is no finding (DEC-911 item 4);
-    the matches are read from gitleaks' report on its standard output and held in memory only.
+    the matches are read from gitleaks' report on its standard output and held in memory only. A rule set that reports
+    anything at all, exempt or not, is added to ``found``.
     """
     # The leading newline keeps gitleaks from skipping content it would take for a binary file.
     parts = [b"\n"]
@@ -243,6 +281,8 @@ def _scan(rules: tuple[str, ...], chunks, root: Path | None = None) -> bool:
         if done.returncode not in (0, _LEAKS):
             raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
         if done.returncode == _LEAKS:
+            if found is not None:
+                found.append(each)
             try:
                 findings = json.loads(done.stdout)
             except ValueError:
@@ -282,7 +322,7 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
             return False
         if not (_governance(namespaces, rel) and _governance(namespaces, target)):
             return False
-        return not _holds_secret(rules, content, root)
+        return not _holds_secret(rules, content, root, "content")
 
     with ThreadPoolExecutor() as pool:
         verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
@@ -291,7 +331,7 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
 
 def path_holds_secret(root: Path, path: str) -> bool:
     """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is."""
-    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])), root)
+    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])), root, "path")
 
 
 def _number(content: bytes, at: int, size: int) -> int:
