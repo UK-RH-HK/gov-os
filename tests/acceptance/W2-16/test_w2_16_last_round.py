@@ -10,9 +10,11 @@ Written from the KPI lines and DEC-761's described behaviour (DEC-136), without 
   never held a record waits for the owner (README, "Open: a source that never held a record"): no case here.
 - **R2-F2 (KPI success 4: "a project cannot silence the lock comparison").** A lock whose release entries were
   deleted fails doctor's lock part.
-- **The role check (KPI success 2, "agents never tag"; DEC-761, DEC-365).** ``gov release`` (both forms) runs only
-  for the orchestrator (``GOV_ROLE=orchestrator``) or the owner (``GOV_ROLE`` unset: a plain terminal). Only the
-  cases of this check set ``GOV_ROLE``; every other ``gov`` and Copier run of the suite has it unset.
+- **The role check (KPI success 2, "agents never tag"; DEC-761, DEC-365).** ``gov release --lock-from`` runs only
+  for the orchestrator (``GOV_ROLE=orchestrator``) or the owner (``GOV_ROLE`` unset: a plain terminal). The build
+  form ``gov release <version>`` is the owner's alone from a plain terminal with a typed code (DEC-772 item 1,
+  replacing DEC-761 item 1's line; round 3): from these runs it refuses for every ``GOV_ROLE`` value and unset. Only
+  the cases of this check set ``GOV_ROLE``; every other ``gov`` and Copier run of the suite has it unset.
 
 Every repository and project is a temporary one (``w2_16_support``); every tag is made by the case, unsigned,
 standing for the owner.
@@ -156,7 +158,7 @@ def test_a_source_whose_release_records_were_removed_is_refused(copier_bin, rele
            f"and edited {TAMPERED}")
     if how == "copier copy":
         _remove_the_records(release_repo)
-        destination = tmp_path / "product"
+        destination = tmp_path / "copied-from-v1.6.0"   # a fresh folder: tmp_path / "product" is filled (DEC-767)
         done = support.copy(copier_bin, sandbox, release_repo, destination, REMOVED_RECORDS_TAG)
         assert done.returncode != 0, f"Copier installed {REMOVED_RECORDS_TAG} although {why}\n" \
                                      f"{support.copier_report(done)}"
@@ -278,13 +280,26 @@ def test_a_lock_whose_release_entries_were_deleted_fails(releases, own_release_p
 REFUSED_ROLES = ("engineer", "independent-auditor", "independent-test-designer", "product-spec", "research",
                  "ticket-lead", "w2-16-unknown-role", "")
 ALLOWED_ROLES = ("orchestrator", _UNSET)
-FORMS = ("gov release <version>", "gov release --lock-from")
+BUILD, LOCK_FROM = "gov release <version>", "gov release --lock-from"
+FORMS = (BUILD, LOCK_FROM)
+# DEC-772 item 1 (Rewrite-Reason: DEC-772): the build form refuses for every GOV_ROLE value, `orchestrator`
+# included, and with GOV_ROLE unset without a terminal (these runs have none). Its two earlier positive controls are
+# refusals now; the seam's positive control (`test_w2_16_owner_terminal.py`) replaces them. `--lock-from` unchanged.
+REFUSED_CALLS = [(BUILD, role) for role in REFUSED_ROLES + ALLOWED_ROLES] + [(LOCK_FROM, role) for role in REFUSED_ROLES]
+ALLOWED_CALLS = [(LOCK_FROM, role) for role in ALLOWED_ROLES]
+# What a refusal of the build form says (DEC-772: which reason is given, where several hold, is not fixed).
+BUILD_REASON_WORDS = ("gov_role", "role", "terminal", "tty", "claude", "session", "ancest", "process")
 
 
 def _role_id(role):
     if role is _UNSET:
         return "GOV_ROLE unset (the owner)"
     return f"GOV_ROLE={role}" if role else "GOV_ROLE set and empty"
+
+
+def _call_id(call):
+    form, role = call
+    return f"{form}-{_role_id(role)}"
 
 
 @pytest.fixture()
@@ -308,43 +323,59 @@ def _release_in(form, where, request, sandbox, role):
     return _lock_from(where, sandbox, request.getfixturevalue("first_release_source"), role=role)
 
 
-@pytest.mark.parametrize("role", REFUSED_ROLES, ids=_role_id)
-@pytest.mark.parametrize("form", FORMS)
-def test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner(request, sandbox, form, role):
+@pytest.mark.parametrize("call", REFUSED_CALLS, ids=_call_id)
+def test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner(request, sandbox, call):
     """Engineers, auditors, test designers and every other role never cut or rewrite a release: non-zero exit, no
-    traceback, the role named (or: only the orchestrator or the owner may release), nothing written (the whole
-    snapshot; for --lock-from, the project's lock as it was: absent). The same call releases as the orchestrator and
-    as the owner (the next case)."""
+    traceback, nothing written (the whole snapshot; for --lock-from, the project's lock as it was: absent).
+    `--lock-from`: the role named (or: only the orchestrator or the owner may release); the same call releases as the
+    orchestrator and as the owner (the next case).
+
+    **Rewritten (DEC-772 item 1, which replaces DEC-761 item 1's line for the build form; Rewrite-Reason: DEC-772).**
+    The build form `gov release <version>` is the owner's alone, from a plain terminal: these runs (an agent's
+    session or none, no terminal) are refused for every GOV_ROLE value, `orchestrator` included, and with GOV_ROLE
+    unset, with the code RELEASE_REFUSED and a reason said in words (which one is not fixed). Its earlier positive
+    controls (`orchestrator`, unset) are refusals here; the seam's positive control replaces them
+    (`test_w2_16_owner_terminal.py::test_the_owner_in_person_builds_the_release`). The `--lock-from` half is as it
+    was."""
+    form, role = call
     where = _where(form, request)
     before, lock_before = support.snapshot(where), support.lock_bytes(where)
     run = _release_in(form, where, request, sandbox, role)
-    why = f"{_role_id(role)} is neither the orchestrator nor the owner"
-    _assert_refused(run, why)
     text = run.output.lower()
-    assert (role and role in run.output) or ("orchestrator" in text and "owner" in text), \
-        f"the refusal ({why}) names neither the role nor who may release\n{run.describe()}"
+    if form == BUILD:
+        why = f"the build form is the owner's alone from a plain terminal (DEC-772), and {_role_id(role)}, no terminal"
+        _assert_refused(run, why)
+        assert support.RELEASE_REFUSED in run.output, \
+            f"the refusal ({why}) does not give the code {support.RELEASE_REFUSED}\n{run.describe()}"
+        assert any(word in text for word in BUILD_REASON_WORDS), \
+            f"the refusal ({why}) does not say its reason in words\n{run.describe()}"
+    else:
+        why = f"{_role_id(role)} is neither the orchestrator nor the owner"
+        _assert_refused(run, why)
+        assert (role and role in run.output) or ("orchestrator" in text and "owner" in text), \
+            f"the refusal ({why}) names neither the role nor who may release\n{run.describe()}"
     changed = support.snapshot_difference(before, support.snapshot(where))
     assert not changed, f"a refused release ({why}) wrote or changed: {changed[:10]}\n{run.describe()}"
     assert support.lock_bytes(where) == lock_before, f"a refused --lock-from ({why}) wrote the lock"
 
 
-@pytest.mark.parametrize("role", ALLOWED_ROLES, ids=_role_id)
-@pytest.mark.parametrize("form", FORMS)
-def test_gov_release_runs_for_the_orchestrator_and_the_owner(request, sandbox, releases, form, role):
-    """Positive controls: the same calls release with GOV_ROLE=orchestrator and with GOV_ROLE unset."""
+@pytest.mark.parametrize("call", ALLOWED_CALLS, ids=_call_id)
+def test_gov_release_runs_for_the_orchestrator_and_the_owner(request, sandbox, releases, call):
+    """Positive controls: `gov release --lock-from` writes the lock with GOV_ROLE=orchestrator and with GOV_ROLE
+    unset.
+
+    **Rewritten (DEC-772; Rewrite-Reason: DEC-772):** the build form's two controls left this case (they are
+    refusals in the case above); the build form's positive control is the seam's, the owner in person
+    (`test_w2_16_owner_terminal.py::test_the_owner_in_person_builds_the_release`). The `--lock-from` half is as
+    it was."""
+    form, role = call
     where = _where(form, request)
-    built_from = support.head(where)
     run = _release_in(form, where, request, sandbox, role)
     assert run.returncode == 0 and "Traceback" not in run.output, \
         f"`gov {' '.join(run.args)}` did not run for {_role_id(role)}\n{run.describe()}"
-    if form == "gov release <version>":
-        written = support.porcelain_paths(where) + support.git(where, "diff", "--name-only", built_from, "HEAD").split()
-        assert any(support.under(rel, support.RELEASES_REL) for rel in written), \
-            f"`gov release {support.FIRST_VERSION}` wrote no record under {support.RELEASES_REL}/\n{run.describe()}"
-    else:
-        scalars = support.lock_scalars(where)
-        assert support.FIRST_VERSION in scalars and releases.first.manifest_hash in scalars, \
-            f"the lock written by --lock-from does not record release {support.FIRST_VERSION}\n{run.describe()}"
+    scalars = support.lock_scalars(where)
+    assert support.FIRST_VERSION in scalars and releases.first.manifest_hash in scalars, \
+        f"the lock written by --lock-from does not record release {support.FIRST_VERSION}\n{run.describe()}"
 
 
 def test_the_suite_runs_gov_and_copier_with_gov_role_unset(sandbox):
