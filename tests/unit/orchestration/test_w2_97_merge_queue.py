@@ -298,6 +298,18 @@ def test_approve_needs_a_request_and_a_request_alone_never_runs(w):
     assert run(w).returncode == 0 and head(w) == before and not (w.q / "landed").exists()
 
 
+def test_a_short_id_enqueued_outside_the_repository_is_resolved_by_run(w):
+    c = ticket(w, "A", {"tests/test_a.py": "def test_a():\n    pass\n"})
+    r = subprocess.run([sys.executable, str(TOOL), "enqueue", "--queue", str(w.q), "--ticket", "A", "--task", "T-A",
+                        "--branch", "w2/A", "--commit", c[:12]], capture_output=True, text=True, cwd=w.tmp)
+    assert r.returncode == 0, r.stderr
+    assert tool("enqueue", "--queue", w.q, "--ticket", "B", "--task", "T-B", "--branch", "w2/B",
+                "--commit", "w2/B", "--repo", w.tmp).returncode != 0  # a name it cannot resolve is not an id
+    assert tool("approve", "--queue", w.q, "--ticket", "A", "--by", "CTO").returncode == 0
+    assert run(w).returncode == 0
+    assert entry(w, "landed", "A")["commit"] == c and git(w.repo, "rev-parse", "w2/integrate^2") == c
+
+
 def test_green_advances_by_fast_forward_to_the_tested_merge_and_records_it(w):
     c = ticket(w, "A", {"tests/test_a.py": "def test_a():\n    pass\n"})
     enter(w, "A", c)

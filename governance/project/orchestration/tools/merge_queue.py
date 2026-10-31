@@ -229,10 +229,12 @@ def valid_name(ticket):
 def enqueue(a):
     if not valid_name(a.ticket):
         sys.exit(f"merge queue: not a ticket name: {a.ticket!r}")
+    # resolved here when the current folder (or --repo) holds it, else kept as given (a hex id) and resolved by run in
+    # its --repo; one that does not resolve there is ejected as missing
     r = sh(["git", "-C", a.repo, "rev-parse", "--verify", "-q", a.commit + "^{commit}"])
-    commit = r.stdout.strip() if r.returncode == 0 else a.commit if re.fullmatch(r"[0-9a-f]{40}", a.commit) else None
+    commit = r.stdout.strip() if r.returncode == 0 else a.commit if re.fullmatch(r"[0-9a-f]{7,40}", a.commit) else None
     if not commit:
-        sys.exit(f"merge queue: {a.commit} does not name a commit in {a.repo}")
+        sys.exit(f"merge queue: {a.commit} does not name a commit in {a.repo}, and is not a commit id")
     write_json(Path(a.queue) / "requested" / f"{a.ticket}.json",
                {"ticket": a.ticket, "task": a.task, "branch": a.branch, "commit": commit, "requested_at": now()})
     return 0
@@ -297,6 +299,9 @@ class Queue:
                 raise Stop(f"{p} cannot be read as an approval (ticket, task, branch, commit)")
             if e["ticket"] != p.stem:
                 raise Stop(f"{p} names ticket {e['ticket']}, not {p.stem}")
+            full = sh(["git", "-C", str(self.repo), "rev-parse", "--verify", "-q", e["commit"] + "^{commit}"])
+            if re.fullmatch(r"[0-9a-f]{7,40}", e["commit"]) and full.returncode == 0:  # an id enqueued outside the
+                e["commit"] = full.stdout.strip()  # repository (never a branch name): its full id from here on
             entries.append(e)
         return sorted(entries, key=lambda e: (str(e.get("approved_at", "")), e["ticket"]))
 
