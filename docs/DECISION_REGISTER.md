@@ -12113,3 +12113,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.349 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-966 (P-W2-90-1 (a) and (a); the designers' store twice a day; rebuild speed a priority, P-SPEED-1). Next free id: DEC-967. |
+
+### DEC-967 — P-SPEED-1 (a): W2-107 starts now, at the front of the queue with W2-106 (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-966 item 4 · **Basis:** `packages/P-SPEED-1.md`
+- **Decision:** option (a): gitleaks results remembered by content hash, in a ticket of its own (W2-107, `DAEO-kiar`, FULL), started now at the front of the queue with W2-106, since every rebuild, close and nightly waits on it. The nightly's full-scan setting (`GOV_SECRETS_FULL_SCAN=1` in `nightly.sh`) is the orchestrator's at W2-107's merge, with `test_nightly.sh` and a review.
+- **Where it goes (DEC-851):** this register; W2-107's ticket and brief; the chain; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.350 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-967 (P-SPEED-1 (a): W2-107 now, at the front with W2-106). Next free id: DEC-968. |
