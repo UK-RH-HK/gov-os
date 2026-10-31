@@ -9,17 +9,10 @@ file's path is typed: where a case needs one, it comes from
 ``w1_02_protected_support``.
 
 **How a decision is made slow.** Never by a slow machine, never by a weaker
-rule, never by a switch of the product. Three stand-ins, all placed through what
-the suite already uses to reach the hook (its environment, its input, the
-temporary project):
+rule, never by a switch of the product, never by a program first on the search
+path. Every route is placed through what the suite already uses to reach the
+hook (its environment, its input, the temporary project):
 
-- **a stand-in for the program the hook starts** (``git``), first on the search
-  path of the hook's environment. It writes its process id to a file of the
-  case, may start a child of its own that does the same, sleeps for the time the
-  case names, and then runs the real program with the same arguments, so that a
-  step that ends gives the hook what the real program gives. Which start sleeps
-  is named by its number (the first, or every one), never by its arguments.
-  Every stand-in ends by itself after ``STAND_IN_ENDS_S`` at the latest;
 - **a named pipe in the hook's bookkeeping folder** of the temporary project.
   The program as built opens what it finds there and waits on a pipe for ever;
   no process is involved. The folder and the counter's name are taken from the
@@ -27,28 +20,34 @@ temporary project):
 - **an input that arrives late** on the hook's stdin, inside the bound the
   program has on reading its input.
 
-**Since W2-L160 (DEC-951 item 2, P-B1-1 (a); DEC-783 item 2).** The guard's freeze
-look-up, the first program a decision starts, runs git by absolute path from the
-system folders with a pinned environment and a limit of its own of 15 s: a
-stand-in first on the search path no longer reaches it. The stand-in stays only
-for the cases whose slow program is one the hook still starts from the search
-path (the bookkeeping of a Bash call); it is put on the search path only for a
-call that names ``sleeps`` or ``every``. Two further stand-ins, again through the
+**Since W2-L160 (DEC-951 item 2, P-B1-1 (a); DEC-783 item 2; DEC-802).** The
+guard's freeze look-up, the first program a decision starts, runs git by
+absolute path from the system folders with a pinned environment and a limit of
+its own of 15 s; since the ticket's second batch the Bash bookkeeping's git is
+started by the same absolute path. A stand-in first on the search path reaches
+neither, and is gone from this support. Further routes, again through the
 temporary project and the input only:
 
 - **the repository's own configuration file as a named pipe** (``config_after``):
-  every git that opens the project's repository, the look-up's real git among
-  them, waits on it until the case serves the real content, ``config_after``
-  seconds after the hook's start, and then runs as it would; never served
-  (``NEVER``), the look-up does not end. The processes the hook starts are seen
-  in the project (their working folder or their arguments), not by a stand-in;
+  every git that opens the project's repository, the look-up's real git and the
+  Bash bookkeeping's among them, waits on it until the case serves the real
+  content, ``config_after`` seconds after the hook's start, and then runs as it
+  would; never served (``NEVER``), the look-up does not end. The processes the
+  hook starts are seen in the project (their working folder or their
+  arguments), not by a stand-in;
+- **the same pipe, paced by program** (``config_every``): each git process that
+  opens the configuration is held that many seconds the first time it opens it,
+  and served at once on its later openings. Which process opens it is read from
+  ``/proc`` (the process that holds the pipe open), never from its arguments.
+  Once the hook has answered, nothing more is served: a git it left behind
+  stays where it waits, and is seen;
 - **a pipe of the bookkeeping let go late** (``release_after``): the named pipe
   among the pending calls, opened and closed by the case that many seconds after
   the input was sent, so that the bookkeeping step ends.
 
 **Side by side.** A case that waits for the deadline is slow. All hook
 processes of one module are started together by ``run_side_by_side``, each in
-its own project with its own stand-in, and each case asserts on one outcome
+its own project with its own slow step, and each case asserts on one outcome
 afterwards: a module waits once.
 
 **The hook is started as the suite starts it**: as a child of the test, in the
@@ -63,7 +62,6 @@ import json
 import math
 import os
 import re
-import shutil
 import signal
 import subprocess
 import sys
@@ -92,8 +90,6 @@ LOWER_S = 19.0
 UPPER_S = 26.0
 # The test's own limit on a hook process, so that a run cannot hang: a hook still running then has given no answer.
 PROCESS_LIMIT_S = 32.0
-# Every stand-in ends by itself after this long: well over UPPER_S, well under the harness's 60 s.
-STAND_IN_ENDS_S = 40.0
 # Once the hook has answered, everything it started is gone within this long.
 GONE_WITHIN_S = 5.0
 
@@ -117,8 +113,9 @@ LOOK_UP_UPPER_S = 21.0
 NEVER = math.inf
 # How often the case looks for the processes the hook started in the project.
 WATCH_EVERY_S = 0.25
-
-REAL_GIT = shutil.which("git")
+# Rewrite-Reason: DEC-802 (P-B1-2); W2-L160. How long the case looks in ``/proc`` for the process that opened the
+# paced configuration, before it takes the opening for a program it has not held yet.
+FIND_READER_S = 1.0
 
 # Who makes a call: name -> (GOV_ROLE, GOV_TICKET).
 ENGINEER = "engineer"
@@ -134,34 +131,6 @@ IN_TICKET_REL = "src/gov/guard/decide.py"     # the engineer's ticket names it
 OUTSIDE_TICKET_REL = "README.md"              # the engineer's ticket does not
 MARKER = "w1-02-deadline-case-marker"         # a word of the call's input that no answer may carry
 
-_STAND_IN = '''#!{python}
-"""A stand-in for a program the hook starts (W1-02 acceptance, DEC-580). It ends by itself."""
-import json
-import os
-import subprocess
-import sys
-import time
-
-HERE = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(HERE, "plan.json"), encoding="utf-8") as handle:
-    PLAN = json.load(handle)
-with open(os.path.join(HERE, "started.log"), "a", encoding="utf-8") as handle:
-    handle.write(str(os.getpid()) + "\\n")
-with open(os.path.join(HERE, "started.log"), encoding="utf-8") as handle:
-    NUMBER = sum(1 for _ in handle)
-SLEEPS = PLAN["sleeps"]
-SECONDS = min(float(SLEEPS[NUMBER - 1] if NUMBER <= len(SLEEPS) else PLAN["every"]), {ends})
-if SECONDS > 0 and PLAN["child"]:
-    CHILD = ("import os, sys, time\\n"
-             "with open(sys.argv[1], 'a') as handle:\\n"
-             "    handle.write(str(os.getpid()) + '\\\\n')\\n"
-             "time.sleep(float(sys.argv[2]))\\n")
-    subprocess.Popen([sys.executable, "-c", CHILD, os.path.join(HERE, "children.log"), str(SECONDS)]).wait()
-elif SECONDS > 0:
-    time.sleep(SECONDS)
-os.execv({real!r}, [{real!r}] + sys.argv[1:])
-'''
-
 
 # --------------------------------------------------------------------------
 # One hook process of a module
@@ -172,25 +141,21 @@ class Call:
     """One hook process: the call, who makes it, and what makes its decision slow.
 
     ``tool_input`` is a mapping, or a function of the project that returns one.
-    ``sleeps`` are the seconds the stand-in sleeps on its first, second, ...
-    start; ``every`` the seconds on each later start; ``child`` lets a sleeping
-    stand-in start a child of its own that does the sleeping. ``prepare`` is
-    called with the project before the hook starts. ``top`` are further fields
-    of the hook input; ``env`` further variables of the hook's environment.
-    ``send_after`` delays the input; ``send`` is ``whole``, ``half`` (half of
-    the object, the input left open) or ``nothing`` (the input left open);
-    ``raw`` is an input sent as it is. ``config_after`` makes the repository's
-    configuration a named pipe served that many seconds after the hook's start
-    (``NEVER``: not served). ``release_after`` lets the bookkeeping's pipes go
-    that many seconds after the input was sent.
+    ``prepare`` is called with the project before the hook starts. ``top`` are
+    further fields of the hook input; ``env`` further variables of the hook's
+    environment. ``send_after`` delays the input; ``send`` is ``whole``,
+    ``half`` (half of the object, the input left open) or ``nothing`` (the input
+    left open); ``raw`` is an input sent as it is. ``config_after`` makes the
+    repository's configuration a named pipe served that many seconds after the
+    hook's start (``NEVER``: not served). ``config_every`` makes it a named pipe
+    that holds each git process that opens it that many seconds, once.
+    ``release_after`` lets the bookkeeping's pipes go that many seconds after
+    the input was sent.
     """
     label: str
     tool_name: str
     tool_input: object
     who: str = ENGINEER
-    sleeps: tuple = ()
-    every: float = 0.0
-    child: bool = False
     prepare: object = None
     top: dict = field(default_factory=dict)
     env: dict = field(default_factory=dict)
@@ -198,12 +163,13 @@ class Call:
     send: str = "whole"
     raw: object = None
     config_after: float = None
+    config_every: float = None
     release_after: float = None
 
     @property
-    def stand_in(self):
-        """Whether the stand-in goes first on the hook's search path: only for a slow program it names."""
-        return bool(self.sleeps or self.every)
+    def config(self):
+        """Whether the repository's configuration is a pipe of the case: the real git is the slow program."""
+        return self.config_after is not None or self.config_every is not None
 
 
 @dataclass
@@ -211,12 +177,12 @@ class Outcome:
     label: str
     project: Path
     result: support.HookResult
-    stand_in_starts: int = 0     # how often the hook started the stand-in program
-    children: int = 0            # how many of those stand-ins started a child of their own
     left_running: int = 0        # processes the hook started that were still there GONE_WITHIN_S after its answer
     before: tuple = ()           # the findings file's lines before the hook ran
     config_served: int = 0       # how often the case served the repository's configuration to a waiting program
     seen: int = 0                # processes other than the hook seen in the project while it ran
+    held: int = 0                # the git processes the paced configuration held (``config_every``)
+    released: bool = False       # whether the case let go a pipe of the bookkeeping on which the hook waited
 
     @property
     def answered(self):
@@ -258,61 +224,80 @@ def _alive(pid):
         return True
 
 
-def _pids(bin_dir):
-    found = []
-    for name in ("started.log", "children.log"):
-        try:
-            text = (bin_dir / name).read_text(encoding="utf-8")
-        except OSError:
-            continue
-        found.extend(int(line) for line in text.split() if line.isdigit())
-    return found
-
-
-def _starts(bin_dir, name):
-    try:
-        return len((bin_dir / name).read_text(encoding="utf-8").split())
-    except OSError:
-        return 0
-
-
-def _make_stand_in(bin_dir, call):
-    bin_dir.mkdir(parents=True)
-    (bin_dir / "plan.json").write_text(
-        json.dumps({"sleeps": list(call.sleeps), "every": call.every, "child": call.child}), encoding="utf-8")
-    program = bin_dir / "git"
-    program.write_text(_STAND_IN.format(python=sys.executable, real=REAL_GIT, ends=STAND_IN_ENDS_S), encoding="utf-8")
-    program.chmod(0o755)
-
-
 class _ConfigPipe:
     """The repository's configuration file of a project as a named pipe, served by the case after a while.
 
     Every program that opens it waits until the case writes the file's real
     content into it; from ``after`` seconds past ``start`` on, each one that
-    opens it is served at once. ``stop`` lets go whoever still waits and puts
-    the real file back.
+    opens it is served at once. With ``every`` (Rewrite-Reason: DEC-802 (P-B1-2);
+    W2-L160), each git process is held ``every`` seconds the first time it opens
+    it and served at once on its later openings, and nothing is served once the
+    hook has ended. ``stop`` lets go whoever still waits and puts the real file
+    back.
     """
 
-    def __init__(self, project, after):
+    def __init__(self, project, after, every=None):
         self.path = Path(project) / ".git" / "config"
         self.content = self.path.read_bytes()
         self.after = after
+        self.every = every
         self.served = 0
+        self.held = set()
         self._stop = threading.Event()
         self._thread = None
+        self._hook = None
         self.path.unlink()
         os.mkfifo(self.path)
 
-    def start(self, started):
+    def start(self, started, hook):
+        self._hook = hook
         self._thread = threading.Thread(target=self._serve, args=(started,), daemon=True)
         self._thread.start()
+
+    def _hook_ended(self):
+        return self._hook is not None and self._hook.poll() is not None
+
+    def _reader(self):
+        """The process, other than this test, that holds the pipe open for reading; ``None`` if none is found."""
+        target = os.path.realpath(self.path)
+        me = os.getpid()
+        until = time.monotonic() + FIND_READER_S
+        while time.monotonic() < until and not self._stop.is_set():
+            for name in os.listdir("/proc"):
+                if not name.isdigit() or int(name) == me:
+                    continue
+                try:
+                    fds = os.listdir(f"/proc/{name}/fd")
+                except OSError:
+                    continue
+                for fd in fds:
+                    try:
+                        if os.readlink(f"/proc/{name}/fd/{fd}") == target:
+                            return int(name)
+                    except OSError:
+                        continue
+            time.sleep(0.01)
+        return None
+
+    def _paced(self):
+        """``every``: hold a program the first time it opens the pipe. False: stop, or the hook ended meanwhile."""
+        reader = self._reader()
+        if reader is not None and reader in self.held:
+            return not self._hook_ended()
+        self.held.add(reader if reader is not None else object())
+        until = time.perf_counter() + self.every
+        while time.perf_counter() < until:
+            if self._stop.wait(0.05) or self._hook_ended():
+                return False
+        return True
 
     def _serve(self, started):
         while not self._stop.is_set():
             if time.perf_counter() - started < self.after:
                 self._stop.wait(0.05)
                 continue
+            if self.every is not None and self._hook_ended():
+                return                             # a git left behind by the hook stays where it waits
             try:
                 fd = os.open(self.path, os.O_WRONLY | os.O_NONBLOCK)
             except OSError as exc:
@@ -321,6 +306,9 @@ class _ConfigPipe:
                 self._stop.wait(0.02)
                 continue
             try:
+                if self.every is not None and not self._paced():
+                    self._stop.wait()              # keep the reader waiting until the case lets it go
+                    return
                 os.write(fd, self.content)
                 self.served += 1
             except OSError:
@@ -376,8 +364,11 @@ def _processes_in(project, hook_pid):
     return found
 
 
-def _release_pipes(project, when, proc):
-    """From ``when`` on, open and close each pipe of the bookkeeping once a reader waits on it; stop at the hook's end."""
+def _release_pipes(project, when, proc, slot):
+    """From ``when`` on, open and close each pipe of the bookkeeping once a reader waits on it; stop at the hook's end.
+
+    ``slot["released"]`` says whether a pipe was let go (a reader waited on it).
+    """
     while time.perf_counter() < when:
         if proc.poll() is not None:
             return
@@ -391,6 +382,7 @@ def _release_pipes(project, when, proc):
             except OSError:
                 pass
         if let_go:
+            slot["released"] = True
             return
         time.sleep(0.05)
 
@@ -407,7 +399,7 @@ def _stdin_text(call, project, sandbox):
     return text[:len(text) // 2] if call.send == "half" else text
 
 
-def _attend(call, proc, started, text, bin_dir, project, limit_s, slot):
+def _attend(call, proc, started, text, project, limit_s, slot):
     """Send the input, wait for the hook's end, then watch what it started."""
     try:
         if call.send_after:
@@ -420,10 +412,10 @@ def _attend(call, proc, started, text, bin_dir, project, limit_s, slot):
     except OSError:
         pass
     if call.release_after is not None:
-        threading.Thread(target=_release_pipes, args=(project, time.perf_counter() + call.release_after, proc),
+        threading.Thread(target=_release_pipes, args=(project, time.perf_counter() + call.release_after, proc, slot),
                          daemon=True).start()
     seen = set()
-    watch = call.config_after is not None
+    watch = call.config
     while True:
         if watch:
             seen.update(_processes_in(project, proc.pid))
@@ -442,8 +434,7 @@ def _attend(call, proc, started, text, bin_dir, project, limit_s, slot):
     slot["returncode"] = returncode
 
     def still_there():
-        return ([pid for pid in _pids(bin_dir) if _alive(pid)]
-                + [pid for pid in seen if _alive(pid) and pid in _processes_in(project, proc.pid)])
+        return [pid for pid in seen if _alive(pid) and pid in _processes_in(project, proc.pid)]
 
     until = time.monotonic() + GONE_WITHIN_S
     alive = still_there()
@@ -452,17 +443,15 @@ def _attend(call, proc, started, text, bin_dir, project, limit_s, slot):
         alive = still_there()
     slot["left"] = len(alive)
     slot["seen"] = sorted(seen)
-    slot["starts"] = _starts(bin_dir, "started.log")
-    slot["children"] = _starts(bin_dir, "children.log")
 
 
-def _end_everything(bin_dir, project, seen=(), config=None):
-    """Leave nothing behind: end every stand-in process and every process seen in the project, let go whatever waits
-    on a named pipe, and put the repository's configuration back."""
+def _end_everything(project, seen=(), config=None):
+    """Leave nothing behind: end every process seen in the project, let go whatever waits on a named pipe, and put
+    the repository's configuration back."""
     for _ in range(3):
         # A process seen earlier is ended only while it is still in the project: its number may have been reused.
         in_project = set(_processes_in(project, -1)) if seen else set()
-        for pid in _pids(bin_dir) + [pid for pid in seen if pid in in_project]:
+        for pid in [pid for pid in seen if pid in in_project]:
             if _alive(pid):
                 try:
                     os.kill(pid, signal.SIGKILL)
@@ -483,9 +472,9 @@ def _end_everything(bin_dir, project, seen=(), config=None):
 def run_side_by_side(base, calls, limit_s=PROCESS_LIMIT_S):
     """Start one hook process per call, all together; return ``{label: Outcome}`` when every one has ended.
 
-    Each call gets a project, a sandbox and a stand-in of its own under
-    ``base``. A hook still running at ``limit_s`` is ended and has no answer.
-    Nothing a call started is left running when this returns.
+    Each call gets a project and a sandbox of its own under ``base``. A hook
+    still running at ``limit_s`` is ended and has no answer. Nothing a call
+    started is left running when this returns.
     """
     base = Path(base)
     running = []
@@ -493,18 +482,14 @@ def run_side_by_side(base, calls, limit_s=PROCESS_LIMIT_S):
         home = base / call.label
         sandbox = support.make_sandbox(home / "sandbox")
         project = support.make_project(home / "project")
-        bin_dir = home / "bin"
-        _make_stand_in(bin_dir, call)
         if call.prepare is not None:
             call.prepare(project)
         role, ticket = ACTORS[call.who]
         env = support.hook_environment(project, sandbox, role, ticket, call.env)
-        if call.stand_in:
-            env["PATH"] = str(bin_dir) + os.pathsep + env["PATH"]
         text = _stdin_text(call, project, sandbox)
         before = tuple(support.findings(project))
         # Last of the preparation: from here on every git in the project's repository waits for the case.
-        config = _ConfigPipe(project, call.config_after) if call.config_after is not None else None
+        config = (_ConfigPipe(project, call.config_after or 0.0, call.config_every) if call.config else None)
         out, err = home / "stdout.txt", home / "stderr.txt"
         # The hook's output goes to files: a process the hook leaves behind cannot hold the case on a pipe.
         with open(out, "wb") as out_handle, open(err, "wb") as err_handle:
@@ -512,29 +497,29 @@ def run_side_by_side(base, calls, limit_s=PROCESS_LIMIT_S):
             proc = subprocess.Popen(support._argv(project / support.installed_hook_rel()), stdin=subprocess.PIPE,
                                     stdout=out_handle, stderr=err_handle, cwd=str(project), env=env)
         if config is not None:
-            config.start(started)
+            config.start(started, proc)
         slot = {}
-        thread = threading.Thread(target=_attend, args=(call, proc, started, text, bin_dir, project, limit_s, slot),
+        thread = threading.Thread(target=_attend, args=(call, proc, started, text, project, limit_s, slot),
                                   daemon=True)
         thread.start()
-        running.append((call, project, bin_dir, proc, thread, slot, out, err, before, config))
+        running.append((call, project, proc, thread, slot, out, err, before, config))
 
     outcomes = {}
-    for call, project, bin_dir, proc, thread, slot, out, err, before, config in running:
+    for call, project, proc, thread, slot, out, err, before, config in running:
         thread.join()
         try:
             proc.stdin.close()
         except OSError:
             pass
-        _end_everything(bin_dir, project, slot["seen"], config)
+        _end_everything(project, slot["seen"], config)
         stdout = out.read_text(encoding="utf-8", errors="replace")
         stderr = err.read_text(encoding="utf-8", errors="replace")
         returncode = slot["returncode"]
         decision = "timeout" if returncode is None else support.classify(returncode, stdout)
         result = support.HookResult(decision, returncode, stdout, stderr, slot["seconds"])
-        outcomes[call.label] = Outcome(call.label, project, result, slot["starts"], slot["children"],
-                                       slot["left"], before, config.served if config is not None else 0,
-                                       len(slot["seen"]))
+        outcomes[call.label] = Outcome(call.label, project, result, slot["left"], before,
+                                       config.served if config is not None else 0, len(slot["seen"]),
+                                       len(config.held) if config is not None else 0, slot.get("released", False))
     return outcomes
 
 

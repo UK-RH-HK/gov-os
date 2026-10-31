@@ -208,16 +208,25 @@ def _only_the_order_of_the_events(repository):
     return repository, template
 
 
+# Rewrite-Reason: DEC-953 item 2 (ACT 1): the repository's hooks source has no ``postToolUse`` since ACT 1, so the
+# case's two hooks no longer come from it. They are written here, and the event that holds them is set in both sources
+# alike, whatever the live source holds (was: the repository's first ``postToolUse`` hook, and a copy of it).
+ORDER_EVENT = "postToolUse"
+ORDER_HOOKS = (
+    {"type": "command", "matcher": "Bash", "command": f"python3 \"{REPO_HOOKS_PATH}posttooluse.py\"", "timeout": 60},
+    {"type": "command", "matcher": "Edit|Write", "command": f"python3 \"{REPO_HOOKS_PATH}precompact.py\"",
+     "timeout": 60},
+)
+
+
 def _only_the_order_of_the_hooks(repository):
     """The repository's ``postToolUse`` holds two hooks (``Bash``, then ``Edit|Write``); the template's the same
-    two, the other way round."""
+    two, the other way round. Every other event is the repository's, alike in both."""
     repository = copy.deepcopy(repository)
-    first = repository["hooks"]["postToolUse"][0]
-    second = _with_matcher(dict(first, command=first["command"].replace("posttooluse.py", "precompact.py")),
-                           "Edit|Write")
-    repository["hooks"]["postToolUse"] = [first, second]
+    first, second = (dict(entry) for entry in ORDER_HOOKS)
+    repository["hooks"][ORDER_EVENT] = [first, second]
     template = copy.deepcopy(repository)
-    template["hooks"]["postToolUse"] = [second, first]
+    template["hooks"][ORDER_EVENT] = [copy.deepcopy(second), copy.deepcopy(first)]
     return repository, template
 
 
