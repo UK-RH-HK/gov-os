@@ -190,6 +190,7 @@ def sandbox_env(sandbox):
         "PYTHONPATH": str(SRC),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
         **installed_packages_env(),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
 
 
