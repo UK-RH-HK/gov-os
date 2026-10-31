@@ -68,6 +68,9 @@ def test_the_marker_is_nowhere_in_the_code_under_test():
 
 
 def test_this_readme_is_a_kpi_map_gov_accept_can_run():
+    """Revised for review 1: the map names the review file's cases one by one (bare words, their function names),
+    and the premises without backticks, since a row holding an item whose KPI cell names no line refuses the whole
+    run (R4); every row holding an item begins with a line name the reader takes."""
     text = (support.HERE / "README.md").read_text(encoding="utf-8")
     tables = [(header, body) for header, body in support.markdown_tables(text)
               if any(cell.lower().startswith(("test", "file")) for cell in header)]
@@ -76,11 +79,25 @@ def test_this_readme_is_a_kpi_map_gov_accept_can_run():
     kpi = next((i for i, cell in enumerate(header) if cell.lower().startswith("kpi")), None)
     tests = next(i for i, cell in enumerate(header) if cell.lower().startswith(("test", "file")))
     assert kpi is not None, "the map is in the row form: a KPI column"
-    named, items = set(), set()
+    named, files, words = set(), set(), set()
     for row in body:
-        named |= set(support.line_names(row[kpi]))
-        items |= set(re.findall(r"`([^`]+)`", row[tests]))
+        items = re.findall(r"`([^`]+)`", row[tests])
+        if not items:
+            continue
+        names = support.line_names(row[kpi])
+        assert names, f"a row holding items names no line, which refuses the whole run (R4): {row[kpi]!r}"
+        named |= set(names)
+        for item in items:
+            (files if item.endswith(".py") else words).add(item)
     every_line = {f"success-{n}" for n in range(1, 6)} | {f"failure-{n}" for n in range(1, 5)}
     assert named == every_line, f"the map names success 1 to 5 and failure 1 to 4, not success 6: {sorted(named)}"
-    files = {path.name for path in support.HERE.glob("test_*.py")}
-    assert items == files, f"the map's items are exactly this folder's test files: {sorted(items ^ files)}"
+    defined = {path.name: support.test_functions(path) for path in support.HERE.glob("test_*.py")}
+    premises = {"test_w2_96_at_premises.py"}
+    assert files <= set(defined) - premises, f"file items that are no test file here, or the premises: {files}"
+    owner = {name: file for file, names in defined.items() for name in names}
+    stray = sorted(word for word in words
+                   if word not in owner or owner[word] in premises or word.startswith("test_premise_"))
+    assert not stray, f"names in the map that are no test function here, or are premises: {stray}"
+    missing = sorted(f"{file} {name}" for file, names in defined.items() if file not in files | premises
+                     for name in names if name not in words and not name.startswith("test_premise_"))
+    assert not missing, f"tests the map names neither by their file nor by their name: {missing}"
