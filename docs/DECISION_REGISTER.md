@@ -12300,3 +12300,16 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.362 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-979 (CAPACITY-1 D1-D6; the stores; batch closes send back only the culprit; the shared reranker as a P1; the order of work). Next free id: DEC-980. |
+
+### DEC-980 — W2-110's and W2-05's returns: two test revisions under existing decisions (delegated); H already decided (DEC-971)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: P2s, "revises older tests under an existing decision" (the escalation rubric); reversible; the leads' recommendations and the orchestrator's agree; nothing in the Charter, the master rules or the Contract's scope; the guard not weakened; for the owner to overturn) · **Under:** DEC-957, DEC-971, DEC-802, DEC-906, DEC-974, DEC-979 · **Basis:** `log/W2-110-A5-run1.json` (20:04, PACKAGES), `log/W2-05-A5-resume-dec970.json` (18:46, PACKAGES)
+- **Decision:**
+  1. **P-W2-110-1 (a):** a test-design batch, `Rewrite-Reason: DEC-957, DEC-971 item 4`, gives each fixture of the cases that still assert DEC-083's "any orchestrator is asked" (about 420 in W1-04, W1-47, W1-50, W1-03, W1-46, W1-05's live-hook case, and five in `tests/unit/install/test_install.py`) a roster whose `coordination_ticket` names its orchestrator ticket, which keeps their asks; the cases of an orchestrator subagent in a worker's session flip to refused; nothing else lowered. `tests/unit/install/test_install.py` joins a writer's paths for it. In W2-110's resume, then its scoped run and its close (W2-105 follows).
+  2. **P-W2-05-W2-72 (a):** a fresh independent test designer revises W2-72's four cases that a failing `git` first on `PATH` no longer reaches (containment takes git by absolute path, DEC-802 P-B1-2) onto routes containment still takes, `Rewrite-Reason: DEC-802 (P-B1-2)`, nothing lowered. In W2-05's resume.
+  3. **W2-05's H and R3-1 are already the owner's decisions:** DEC-971 item 3 (H (a) refined: DEC-805's comparison excepts exactly the two hook events ACT 1 lifted, named in it, ending when they return with W2-08) and R3-1 (b). W2-05's lead started before DEC-971 (12:50); its resume carries them.
+  4. **New tickets, to the owner as P1s (DEC-974), not decided here:** W2-110's P-W2-110-2 (the adopt step writes the coordination-ticket key; both orchestrator role files rewritten; the refusal names `GOV_TICKET`) and W2-108's W1-28 follow-up (its copy check reads message text as whole-tree routes). W2-110's P-W2-110-3 (renew the pinned gov after its merge) is ACT 2's re-pin (DEC-954 item 6).
+- **Where it goes (DEC-851):** this register; the two resume briefs; `packages/P1-NEW-TICKETS-2026-10-31.md`; the daily document.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.363 | 2026-10-31 | Delegated (orchestrator): DEC-980 (P-W2-110-1 (a), P-W2-05-W2-72 (a); H and R3-1 already DEC-971's; two new tickets to the owner). Next free id: DEC-981. |
