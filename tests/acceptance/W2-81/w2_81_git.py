@@ -45,6 +45,36 @@ def _inside(path, folder):
         return False
 
 
+class InsideThisRepository(AssertionError):
+    """A W2-81 write aimed inside this repository: refused before anything is written."""
+
+
+def outside_this_repository(path):
+    """``path``, resolved; refused when it lies in this repository (or holds it). Every W2-81 write goes through it."""
+    resolved = Path(path).resolve()
+    if _inside(resolved, REPO_ROOT) or _inside(REPO_ROOT, resolved):
+        raise InsideThisRepository(f"a W2-81 case never writes in this repository: {resolved}")
+    return resolved
+
+
+# The names only a W2-81 case writes: the built repositories, the manifests' folder, a run folder, a stand-in's
+# outputs (a self-test holds this list to the builders' names).
+ARTEFACTS = ("python-app", "rust-workspace", "typescript-monorepo", "legacy-docs", "secret-history",
+             "python-app-clean", "manifests", "w2-81-run", "adopted", "beside")
+
+
+def porcelain_here(*paths):
+    """This repository's ``git status --porcelain`` (of ``paths`` only, when given)."""
+    return subprocess.run(["git", "-C", str(REPO_ROOT), "status", "--porcelain", "--untracked-files=all", "--",
+                           *paths], capture_output=True, text=True, env=git_env(REPO_ROOT.parent)).stdout
+
+
+def w2_81_artefacts(porcelain):
+    """The untracked paths of a status that only a W2-81 case could have written."""
+    return {line[3:] for line in porcelain.splitlines()
+            if line.startswith("?? ") and set(Path(line[3:].rstrip("/")).parts) & set(ARTEFACTS)}
+
+
 def git_env(home, author=None, date=None):
     """A git environment built from scratch: no system or global configuration, a fixed identity and date."""
     name, email = author or ("Proving Ground", "proving-ground@example.invalid")
@@ -89,7 +119,7 @@ class Repo:
     """A repository being built, file by file and commit by commit."""
 
     def __init__(self, root):
-        self.root = Path(root)
+        self.root = outside_this_repository(root)
         if self.root.exists():
             raise AssertionError(f"a W2-81 repository is built in a new folder only: {self.root} exists")
         self.root.mkdir(parents=True)
@@ -98,7 +128,7 @@ class Repo:
         self.commits = []  # (full hash, message)
 
     def write(self, rel, content):
-        path = self.root / rel
+        path = outside_this_repository(self.root / rel)
         path.parent.mkdir(parents=True, exist_ok=True)
         if isinstance(content, bytes):
             path.write_bytes(content)
@@ -107,7 +137,7 @@ class Repo:
         return path
 
     def remove(self, rel):
-        (self.root / rel).unlink()
+        outside_this_repository(self.root / rel).unlink()
 
     def commit(self, message, author, date):
         """Commit everything with the author and date given; returns the full hash."""

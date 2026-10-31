@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -17,21 +16,25 @@ from w2_81_secret import scan_history  # noqa: E402
 from w2_81_words import DEFAULT_SEED  # noqa: E402
 
 
-def porcelain_here():
-    """This repository's ``git status --porcelain``: no case may change it."""
-    return subprocess.run(["git", "-C", str(gitlib.REPO_ROOT), "status", "--porcelain", "--untracked-files=all"],
-                          capture_output=True, text=True, env=gitlib.git_env(gitlib.REPO_ROOT.parent)).stdout
+SUITE = Path(__file__).resolve().parent
+porcelain_here, w2_81_artefacts = gitlib.porcelain_here, gitlib.w2_81_artefacts
 
 
 @pytest.fixture(scope="module", autouse=True)
 def this_repository_unchanged():
-    """Nothing is written in this repository by any case of this suite (checked around each module)."""
+    """No W2-81 case writes in this repository (checked around each module, attributable to this suite).
+
+    Every write of the suite is refused inside this repository before it is made (``outside_this_repository``).
+    Around each module: the suite's own folder is unchanged, and no new untracked path that only a W2-81 case
+    writes appears anywhere in the tree. Another suite's transient file in the same tree is not blamed here.
+    """
     for tool in gitlib.TOOLS:
         gitlib.require(tool)  # a missing tool fails naming it (DEC-899 item 7), never a skip
-    before = porcelain_here()
+    suite_before, tree_before = porcelain_here(str(SUITE)), w2_81_artefacts(porcelain_here())
     yield
-    after = porcelain_here()
-    assert after == before, "a W2-81 case changed this repository's working tree"
+    assert porcelain_here(str(SUITE)) == suite_before, "a W2-81 case changed the suite's own folder"
+    new = w2_81_artefacts(porcelain_here()) - tree_before
+    assert not new, f"a W2-81 case wrote in this repository: {sorted(new)}"
 
 
 @pytest.fixture(scope="session")

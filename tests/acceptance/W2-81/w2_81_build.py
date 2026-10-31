@@ -585,5 +585,7 @@ def build_all(run_folder, seed=DEFAULT_SEED, large_size=SELF_TEST_LARGE):
 
 
 def remove(run_folder):
-    """Remove a run folder's built repositories and manifests."""
-    shutil.rmtree(run_folder, ignore_errors=False)
+    """Remove a run folder's built repositories and manifests (never a folder of this repository)."""
+    from w2_81_git import outside_this_repository
+
+    shutil.rmtree(outside_this_repository(run_folder), ignore_errors=False)

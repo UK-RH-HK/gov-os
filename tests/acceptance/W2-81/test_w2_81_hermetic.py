@@ -8,7 +8,9 @@ from pathlib import Path
 
 import w2_81_build as build
 import w2_81_git as gitlib
-from conftest import porcelain_here
+import w2_81_manifest as manifest_form
+import w2_81_standin as standin
+from w2_81_git import porcelain_here, w2_81_artefacts
 
 SUITE = Path(__file__).resolve().parent
 # Words the suite must not hold, written in parts so this file does not hold them either.
@@ -21,12 +23,40 @@ def _python_files():
 
 
 def test_a_build_and_its_removal_write_nothing_in_this_repository(run_folder):
-    before = porcelain_here()
+    suite, artefacts = porcelain_here(str(SUITE)), w2_81_artefacts(porcelain_here())
     build.build_all(run_folder, 77)
-    assert run_folder.is_dir()
+    assert run_folder.is_dir() and not gitlib._inside(run_folder, gitlib.REPO_ROOT)
     build.remove(run_folder)
-    assert porcelain_here() == before, "a build changed this repository's working tree"
+    assert porcelain_here(str(SUITE)) == suite, "a build changed the suite's folder"
+    assert w2_81_artefacts(porcelain_here()) == artefacts, "a build left a W2-81 artefact in this repository"
     assert not run_folder.exists()
+
+
+def test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made(ground, tmp_path):
+    inside = gitlib.REPO_ROOT / "tests" / "acceptance" / "W2-81" / "w2-81-run"
+    attempts = {
+        "a built repository": lambda: build.build_python(inside / "repos" / "python-app", 1, tmp_path),
+        "a manifest": lambda: manifest_form.write(ground["python-app"].manifest, inside, tmp_path / "elsewhere"),
+        "a removal": lambda: build.remove(gitlib.REPO_ROOT / "tests" / "acceptance" / "W2-81"),
+        "a stand-in's outputs": lambda: standin.render(standin.perfect(ground["python-app"]), ground["python-app"],
+                                                       inside / "adopted", tmp_path / "beside"),
+        "the repository's root": lambda: gitlib.outside_this_repository(gitlib.REPO_ROOT),
+        "a folder holding it": lambda: gitlib.outside_this_repository(gitlib.REPO_ROOT.parent),
+    }
+    for what, attempt in attempts.items():
+        try:
+            attempt()
+        except gitlib.InsideThisRepository:
+            pass
+        else:
+            raise AssertionError(f"{what} inside this repository was not refused")
+    assert not inside.exists(), "a refused write left a folder behind"
+
+
+def test_the_tripwire_names_only_w2_81_artefacts():
+    assert set(build.SHAPES) | {build.CLEAN} <= set(gitlib.ARTEFACTS)
+    status = "?? tests/acceptance/W2-81/w2-81-run/x\n?? some/other/suite/tmp.txt\n?? a/manifests/b.json\n"
+    assert w2_81_artefacts(status) == {"tests/acceptance/W2-81/w2-81-run/x", "a/manifests/b.json"}
 
 
 def test_a_missing_tool_fails_naming_it(monkeypatch, tmp_path):

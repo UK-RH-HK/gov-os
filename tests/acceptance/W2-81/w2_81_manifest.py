@@ -136,7 +136,9 @@ def _inside(path, folder):
 
 def write(data, run_folder, repository_root):
     """Write the manifest beside the repository (``<run>/manifests/<name>.json``); never inside it."""
-    path = Path(run_folder) / "manifests" / f"{data['repository']}.json"
+    from w2_81_git import outside_this_repository
+
+    path = outside_this_repository(Path(run_folder) / "manifests" / f"{data['repository']}.json")
     if _inside(path, repository_root):
         raise AssertionError(f"the manifest is never written inside the built repository: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
