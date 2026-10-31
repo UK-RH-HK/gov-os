@@ -39,7 +39,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-evry"
-WBS = "W1-evry"
+WBS = "W1-908"
 
 FEATURE = "src/example/feature.py"
 NOTES = "governance/project/notes.yaml"

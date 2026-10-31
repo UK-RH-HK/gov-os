@@ -49,6 +49,8 @@ list_rows: []
 ---
 # W2-83b This project's nine keystone playbooks, placing annex D's standing practices
 
+**DEC-963 (owner, 2026-10-30):** each stream's playbook carries the parallel work order: the lead adds the tests worktree, the test designer retrieves only from the integration branch's store (`~/gov-os-worktrees/W2-00-store`), the TESTS-READY marker, the engineer's merge and single run, and the tests worktree removed before the return.
+
 **DEC-959 (2026-10-30):** the Senior Engineer approves for the merge queue (item 1); the engineer's acceptance run once tests are ready (item 7); the QA batches per stream (item 3).
 
 **Re-scoped by DEC-953 and DEC-954 (PLAN-W2-DEC953 §6):** the stream playbooks, a three-layer foundation built in S2 before ACT 2; no longer spare capacity. **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7).

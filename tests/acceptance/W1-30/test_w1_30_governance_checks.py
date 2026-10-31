@@ -19,7 +19,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-gvc1"
-WBS = "W1-govchecks"
+WBS = "W1-911"
 
 SETTINGS = "governance/project/settings.yaml"
 NOTES = "governance/project/notes.yaml"

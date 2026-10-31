@@ -1,6 +1,6 @@
 ---
 id: DAEO-s9qc
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-30T16:27:09Z
