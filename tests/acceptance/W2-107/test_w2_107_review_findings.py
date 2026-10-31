@@ -16,9 +16,11 @@ log each scan call and each version call; they never log content.
 
 from __future__ import annotations
 
+import contextlib
 import os
 import sqlite3
 import stat
+import subprocess
 import sys
 from pathlib import Path
 
@@ -395,11 +397,60 @@ def test_a_read_only_cache_still_answers_the_current_engines_clean_texts_and_wri
         target.chmod(mode)
 
 
+_HOLDER = r'''import sqlite3, sys
+# W2-107: holds the write lock on the cache (BEGIN IMMEDIATE: no other connection may write, every one may read) until a
+# line on standard input tells it to let go. It opens nothing else, so nothing drops the lock before then.
+holder = sqlite3.connect(sys.argv[1], isolation_level=None)
+holder.execute("BEGIN IMMEDIATE")
+print("held", flush=True)
+sys.stdin.readline()
+holder.execute("ROLLBACK")
+holder.close()
+print("released", flush=True)
+'''
+
+
+@contextlib.contextmanager
+def write_lock_held_elsewhere(cache):
+    """The write lock on ``cache`` held, for the whole block, by a connection in a process of its own.
+
+    On POSIX, closing any descriptor of a file drops every lock the closing process holds on that file. A holder in
+    the case's own process would therefore lose the lock the first time the case read the cache's bytes. A holder in
+    a process of its own keeps the lock, and the case may read the file as often as it likes."""
+    proc = subprocess.Popen([sys.executable, "-c", _HOLDER, str(cache)], stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        assert proc.stdout.readline().strip() == "held", "premise: the other process took the write lock"
+        yield
+    finally:
+        try:
+            out, err = proc.communicate("let go\n", timeout=60)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            out, err = proc.communicate()
+    assert proc.returncode == 0 and out.strip() == "released", \
+        f"premise: the other process held the lock until told to let go: {err[-300:]}"
+
+
+def a_plain_writer_is_refused(cache):
+    """Whether a plain writer in this process (not the holder's) is refused the write lock at once."""
+    writer = sqlite3.connect(cache, timeout=0, isolation_level=None)
+    try:
+        writer.execute("BEGIN IMMEDIATE")
+    except sqlite3.OperationalError:
+        return True
+    else:
+        writer.execute("ROLLBACK")
+        return False
+    finally:
+        writer.close()
+
+
 def test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_texts(
         project, engine, cache, per_text):
-    """Another connection holds the write lock (readers may still read) while the filter judges remembered texts, a
-    new clean text and the texts holding the secret: the remembered texts are answered, the rest are scanned, and the
-    lock is waited out only a short while."""
+    """Another connection, in a process of its own, holds the write lock (readers may still read) while the filter
+    judges remembered texts, a new clean text and the texts holding the secret. The remembered texts are answered, the
+    rest are scanned, and the lock is waited out only a short while."""
     rels, secret, names = scene(project)
     full, findings, seconds = costs(project, engine, rels, secret, names)
     for label, scanned in (("populated", full), ("populated, again", findings)):
@@ -407,17 +458,14 @@ def test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_text
         assert run.error is None and run.indexable == rels, f"{label}: the verdicts are right"
         assert calls == scanned, f"{label}: premise: a cache that can be written answers the clean texts"
     fresh = support.put(project, {"docs/fresh.md": "W2-107: a page written while the write lock is held.\n"})
-    holder = sqlite3.connect(cache, isolation_level=None)
-    try:
-        holder.execute("BEGIN IMMEDIATE")  # the write lock: no other connection may write, every one may read
+    with write_lock_held_elsewhere(cache):
+        assert a_plain_writer_is_refused(cache), "premise: the write lock is held"
         snapshot = cache.read_bytes()
         run, calls = child(project, rels + secret + fresh, names, engine, cache)
+        assert a_plain_writer_is_refused(cache), "premise: the write lock is still held after the pass"
         assert run.error is None, f"the filter raised {run.error} under a held write lock"
         assert run.indexable == rels + fresh and run.names == [False, True], "the verdicts are right"
         assert calls == findings + per_text, \
             "the remembered clean texts are answered; only the new text and the texts holding the secret are scanned"
         assert run.seconds <= seconds + LOCKED_EXTRA_S, "the write lock is waited out only a short while"
         assert cache.read_bytes() == snapshot, "nothing is written while the lock is held elsewhere"
-    finally:
-        holder.execute("ROLLBACK")
-        holder.close()

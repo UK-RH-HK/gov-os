@@ -240,6 +240,12 @@ code, which never asks the version. It keeps the cost of every suite that scans:
 - **The write-lock case.** Another connection holds `BEGIN IMMEDIATE`: the write lock, under which readers may still
   read. Round 1's lock case holds an exclusive lock with a write open, which keeps readers out too, so it stays a miss.
   A pass under the write lock may take at most 120 s longer than a pass without a cache, as in round 1.
+  - **The holder runs in a process of its own** (revised once). On POSIX, closing any descriptor of a file drops every
+    lock the closing process holds on that file. The first form kept the holder in the case's own process, so the
+    case's read of the cache's bytes dropped the lock it meant to hold. The holder now opens nothing else.
+  - **The lock is checked in the case.** A plain writer in the case's process is refused before the pass and again
+    after it, and the holder lets go only when told to.
+  - **The case's red reason on the base code is unchanged.**
 
 ## Not tested here
 
