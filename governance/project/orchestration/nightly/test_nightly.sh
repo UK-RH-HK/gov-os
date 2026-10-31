@@ -108,6 +108,34 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=99999 NIGHTLY_WAI
 grep -q "P1 NIGHTLY-MISSED 2026-10-29 .*(held from " "$work/pings.txt" 2>/dev/null || fail "K8: the held P1 did not go at 08:00"
 [ ! -s "$work/orch/log/nightly/pending-pings.txt" ] || fail "K8: the held file was not emptied"
 [ "$(grep -c '^2026-10-29' "$S")" -eq 1 ] || fail "K8: the night was checked twice"
+# K9, K10 (DEC-971 item 6): the run still going at 05:30 (its marker written today, no verdict) is `running`, not
+# FAILED; the check waits (here 2 s a step) and writes the night's final line: ran when a verdict comes (no P1),
+# FAILED with a P1 when none has come by the last re-check.
+R9=$work/orch/log/nightly/20261029-0200
+rm -f "$S" "$work/pings.txt" "$work/orch/log/nightly/pending-pings.txt"; mkdir -p "$R9"
+printf 'x nightly night: estimate {}\nhead abc\nparallel running\n' > "$R9/run.txt"
+echo "2026-10-29 02:00:05 nightly: running (a marker only, DEC-961)" > "$work/orch/NIGHTLY-RUNNING"
+( NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=0 NIGHTLY_WAIT_STEP=2 NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=0530 \
+  NIGHTLY_RECHECK_AT="0700 0800" bash "$HERE/nightly_check.sh" > /dev/null ) & k9=$!
+sleep 1
+grep -q "^2026-10-29 running | parallel running" "$S" || fail "K9: no running line at 05:30: $(cat "$S" 2>/dev/null)"
+grep -q "^2026-10-29 FAILED" "$S" && fail "K9: a running night written as FAILED"
+printf 'verdict: green\nduration: estimate 5000 s, actual 9000 s\n' >> "$R9/run.txt"
+wait $k9
+grep -q "^2026-10-29 ran | verdict: green duration: estimate 5000 s, actual 9000 s" "$S" || fail "K9: no ran line once the verdict came: $(cat "$S")"
+[ ! -e "$work/pings.txt" ] || fail "K9: a night that ended with a verdict pinged"
+rm -f "$S" "$work/pings.txt"; printf 'x nightly night: estimate {}\nhead abc\nparallel running\n' > "$R9/run.txt"
+NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=0 NIGHTLY_WAIT_STEP=1 NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=0530 \
+  NIGHTLY_RECHECK_AT="0700 0800" timeout 20 bash "$HERE/nightly_check.sh" > /dev/null
+grep -q "^2026-10-29 running" "$S" || fail "K10: no running line"
+grep -q "^2026-10-29 FAILED | parallel running" "$S" || fail "K10: no FAILED line by 08:00: $(cat "$S")"
+grep -q "P1 NIGHTLY-FAILED 2026-10-29" "$work/pings.txt" 2>/dev/null || fail "K10: no P1 for the failed night"
+# K11: a stale marker (an earlier day's) does not hold a night that ended without a verdict: FAILED at once
+rm -f "$S" "$work/pings.txt"; echo "2026-10-28 02:00:05 nightly: running" > "$work/orch/NIGHTLY-RUNNING"
+NIGHTLY_ORCH=$work/orch NIGHTLY_PING=$work/ping NIGHTLY_IDLE_S=0 NIGHTLY_WAIT_STEP=1 NIGHTLY_DAY=20261029 NIGHTLY_NOW_HM=0530 \
+  timeout 10 bash "$HERE/nightly_check.sh" > /dev/null
+grep -q "^2026-10-29 FAILED" "$S" && ! grep -q "^2026-10-29 running" "$S" || fail "K11: a stale marker held the night: $(cat "$S")"
+rm -f "$work/orch/NIGHTLY-RUNNING" "$S" "$work/pings.txt"; rm -rf "$R9"
 
 # ---- ping_gate.sh: at once by day or when active; held at night; flushed, marked held ----------------------------
 gate() { NIGHTLY_ORCH=$work/g NIGHTLY_PING=$work/ping NIGHTLY_WAIT_STEP=1 "$@"; }
@@ -173,5 +201,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K11, ping_gate.sh G1-G6, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
 exit "$fails"
