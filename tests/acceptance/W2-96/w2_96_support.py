@@ -681,6 +681,190 @@ W1_30_FORMS = {
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Review 3's planted projects (V1 and V2, given as R14 and R15). Every folder they make is a new folder of the
+# planted test's temporary folder (``tempfile.mkdtemp``), so pytest's own handling of ``tmp_path`` never removes it
+# before gov's clean-up does.
+# --------------------------------------------------------------------------------------------------------------
+
+CHURNERS, CHURN_BATCH = 3, 100   # R14: processes that keep making and removing files, and how many per cycle
+SIBLINGS = 8000                  # R15: empty folders side by side in one folder
+CANARY = "qzv96leak-canary"      # R14: a churner stops once this file of its folder is gone
+
+# R14: the churner, run as ``python -c CHURNER <folder> <probe folder> <batch>`` in a session of its own. It makes
+# its canary file, then, in cycles, makes ``batch`` files and removes them again, until one of its own operations
+# fails (the canary gone, a file it made removed by another process, its folder gone) or 120 s pass. It looks for
+# its canary before each operation, so once the clean-up has removed it, the churner makes at most one more file
+# and stops: its folder then stays still, and a removal that empties a folder found not empty again finishes.
+CHURNER = '''
+import json, os, sys, time, uuid
+folder, probe, batch = sys.argv[1], sys.argv[2], int(sys.argv[3])
+canary = os.path.join(folder, "@CANARY@")
+
+
+def record(kind, **more):
+    path = os.path.join(probe, uuid.uuid4().hex)
+    with open(path + ".part", "w", encoding="utf-8") as handle:
+        json.dump(dict(kind=kind, pid=os.getpid(), folder=folder, **more), handle)
+    os.replace(path + ".part", path + ".json")
+
+
+with open(canary, "w", encoding="utf-8") as handle:
+    handle.write("qzv96leak-canary-content")
+record("churning")
+cycles, why, deadline = 0, "deadline", time.monotonic() + 120
+try:
+    while time.monotonic() < deadline:
+        made = []
+        for index in range(batch):
+            os.stat(canary)
+            path = os.path.join(folder, "qzv96leak-churn-%d-%d.txt" % (cycles, index))
+            os.close(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600))
+            made.append(path)
+        for path in made:
+            os.stat(canary)
+            os.unlink(path)
+        cycles += 1
+except OSError as error:
+    why = type(error).__name__
+record("stopped", cycles=cycles, why=why)
+'''.replace("@CANARY@", CANARY)
+
+# R14: module-level code that starts CHURNERS churners, each on a new folder of the temporary folder, and returns
+# once each has begun.
+CHURN = '''
+
+QZV96LEAK_CHURNER = @CHURNER@
+
+
+def qzv96leak_churn():
+    """qzv96leak: processes of their own session that keep making and removing files in the temporary folder."""
+    import subprocess
+    import time
+    folders = []
+    for _ in range(@CHURNERS@):
+        folder = tempfile.mkdtemp(prefix="qzv96leak-churn-")
+        subprocess.Popen([sys.executable, "-c", QZV96LEAK_CHURNER, folder, QZV96LEAK_PROBE, "@BATCH@"],
+                         stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+        folders.append(folder)
+    deadline = time.monotonic() + 60
+    while not all(len(os.listdir(folder)) > 1 for folder in folders):
+        assert time.monotonic() < deadline, "qzv96leak: a churner never began"
+        time.sleep(0.01)
+    return folders
+'''.replace("@CHURNER@", repr(CHURNER)).replace("@CHURNERS@", str(CHURNERS)).replace("@BATCH@", str(CHURN_BATCH))
+
+# R15: module-level code that makes SIBLINGS empty folders side by side in a new folder of the temporary folder.
+SIBLING_FOLDERS = '''
+
+def qzv96leak_siblings():
+    """qzv96leak: many empty folders side by side."""
+    top = tempfile.mkdtemp(prefix="qzv96leak-siblings-")
+    for index in range(@COUNT@):
+        os.mkdir(os.path.join(top, "qzv96leak-%d" % index))
+    return top, len(os.listdir(top))
+'''.replace("@COUNT@", str(SIBLINGS))
+
+# R14: module-level code for a planted test that runs ``gov accept`` on a nested planted project, in a session of
+# its own as this suite's harness starts gov (so the outer run's stop of its child never reaches it), from the
+# nested root, with an environment built from scratch: the nested project's HOME, the code under test's ``src/``
+# as PYTHONPATH (DEC-732), and as TMPDIR the planted test's own temporary folder, which is inside the outer run's
+# private folder. Use ``run_nested_extra``.
+_RUN_NESTED = '''
+
+QZV96LEAK_NESTED_ROOT = @NESTED_ROOT@
+QZV96LEAK_NESTED_HOME = @NESTED_HOME@
+QZV96LEAK_GOV_SRC = @GOV_SRC@
+
+
+def qzv96leak_start_nested():
+    """qzv96leak: gov accept on the nested planted project, in a session of its own."""
+    import subprocess
+    env = {key: os.environ[key] for key in ("PATH", "USER", "LOGNAME", "LANG", "LC_ALL", "PYTHONUSERBASE")
+           if key in os.environ}
+    env.update(HOME=QZV96LEAK_NESTED_HOME, TMPDIR=tempfile.gettempdir(), PYTHONPATH=QZV96LEAK_GOV_SRC)
+    return subprocess.Popen([sys.executable, "-m", "gov.cli.main", "accept", "@TICKET@", "--json"],
+                            cwd=QZV96LEAK_NESTED_ROOT, env=env, stdin=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+'''.replace("@TICKET@", TICKET_ID)
+
+
+def run_nested_extra(nested):
+    """``_RUN_NESTED`` for the nested ``Project`` ``nested``."""
+    return (_RUN_NESTED.replace("@NESTED_ROOT@", repr(str(nested.root)))
+            .replace("@NESTED_HOME@", repr(str(nested.home))).replace("@GOV_SRC@", repr(str(SRC))))
+
+
+_CASES.update({
+    # R14 (outer): runs gov accept on the nested project and waits for it by polling, so an interrupt ends the wait
+    # at once (``Popen.wait`` would wait up to 0.25 s more for the nested gov). Needs ``run_nested_extra``.
+    "run_nested": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    nested = qzv96leak_start_nested()
+    qzv96leak_record("nested", name="@NAME@", nested=nested.pid)
+    while nested.poll() is None:
+        time.sleep(0.01)
+''',
+    # R14 (nested): MANY_FILES small files in a new folder of the temporary folder, then about 1 s of sleep and a
+    # pass (the nested gov then removes them), or a long sleep (a signal comes). Both need ``MANY``. The sleeper's
+    # process ends at once on SIGINT, SIGTERM or SIGHUP, however the nested gov stops it, so the nested pytest
+    # writes nothing (no report) once the signal has come: only the two gov processes then act on the folders.
+    "fill_then_pass": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    top = tempfile.mkdtemp(prefix="qzv96leak-nested-")
+    made = qzv96leak_many_files(top)
+    qzv96leak_record("filled", name="@NAME@", top=top, made=made)
+    time.sleep(1)
+''',
+    "fill_then_sleep": '''
+
+def @NAME@(tmp_path):
+    import signal
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    for signum in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(signum, lambda *_: os._exit(1))
+    top = tempfile.mkdtemp(prefix="qzv96leak-nested-")
+    made = qzv96leak_many_files(top)
+    qzv96leak_record("filled", name="@NAME@", top=top, made=made)
+    time.sleep(600)
+''',
+    # R14: starts the churners, then passes while they keep going. Needs ``CHURN``.
+    "churn_pass": '''
+
+def @NAME@(tmp_path):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    folders = qzv96leak_churn()
+    qzv96leak_record("churned", name="@NAME@", folders=folders)
+''',
+    # R15: leaves SIBLINGS empty sibling folders, then passes; its record holds when they were made, on the clock
+    # every process of the machine shares (``time.monotonic``). Needs ``SIBLING_FOLDERS``.
+    "siblings_pass": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    top, made = qzv96leak_siblings()
+    qzv96leak_record("siblings", name="@NAME@", top=top, made=made, at=time.monotonic())
+''',
+})
+
+NESTED_FILE = "test_qzv96leak_nested_fill.py"
+NESTED_README = rows_readme(("Success 1: qzv96leak", f"`{NESTED_FILE}`"))
+
+
+def nested_files(kind):
+    """The nested project's one file: one case of ``kind`` (``fill_then_pass`` or ``fill_then_sleep``)."""
+    return {NESTED_FILE: planted_file((kind, "test_qzv96leak_nested_fill"), extra=MANY)}
+
+
+# --------------------------------------------------------------------------------------------------------------
 # The expected result (the design note's §6).
 # --------------------------------------------------------------------------------------------------------------
 
