@@ -6,7 +6,7 @@ W2-H029, W2-L002, W2-L014, W2-L227, W2-M174, W2-M175 with their origin lines, an
 DEC-488, DEC-493, DEC-499, DEC-542, DEC-194, DEC-244, DEC-654, DEC-221, DEC-752, DEC-753. 75 cases in three files;
 10 more in a fourth, added after implementation from the first review of W2-16 (DEC-136; see "Cases added after the
 first review" below); 29 more in a fifth, the last round ordered by DEC-761 after the second review (see "The last
-round" below). 114 cases in all.
+round" below); 28 more in a sixth, round 3 ordered by DEC-772 item 1 (see "Round 3" below). 142 cases in all.
 
 Run from this worktree:
 
@@ -28,15 +28,21 @@ PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/go
 - `test_every_gov_the_suite_runs_is_this_worktree_s` checks all three: each imports `gov` from `<SRC>`.
 - **`GOV_ROLE` is unset** in every `gov` and Copier run of the suite (each environment is built from scratch, so
   the role of the session that runs the tests never reaches them): the caller is the owner in a plain terminal
-  (DEC-365, DEC-761). Only the role cases of the last round set it, per call. Keep it so; the guard
-  `test_the_suite_runs_gov_and_copier_with_gov_role_unset` holds it.
+  (DEC-365, DEC-761). Only the role cases of the last round and round 3's seam cases set it (or `GOV_TICKET`), per
+  call. Keep it so; the guard `test_the_suite_runs_gov_and_copier_with_gov_role_unset` holds it.
+- **The suite's own releases are built through the seam** (round 3, DEC-772 item 1): `build_release` calls
+  `gov.release.command._release_test` in a new process as the owner in person (a planted chain with no Claude Code
+  session that reaches process 1, a pseudo-terminal, the shown code typed back, `GOV_ROLE` and `GOV_TICKET`
+  absent), because `gov release <version>` refuses from every test run. The driver imports the code with
+  `PYTHONPATH=<SRC>`, like every other `gov` the suite runs.
 
 ## What the cases use
 
 Public interfaces only: the `gov` command line (`gov release <version>`, `gov doctor --json`), the tool `copier`
 (the registered 9.18.2, needed and never skipped, as W1-39 holds it), the files of a created project
 (`governance/framework.lock`, `.copier-answers.yml`), the files of a release record, and `git` in temporary
-repositories. No module of `src/gov/lock/` or of the release code is imported or named.
+repositories. No module of `src/gov/lock/` or of the release code is imported or named, but one, from round 3: the
+seam `gov.release.command._release_test` of DEC-772 item 1, imported only inside the seam driver's own process.
 
 - **A stand-in Gov OS repository, never a copy of this one.** `build_gov_os_repository` builds it in a
   temporary folder from single named files of this worktree, listed by `git ls-files` and limited to
@@ -225,6 +231,9 @@ template's Copier task runs it (`gov release --lock-from <source>`).
 | `test_gov_release_runs_for_the_orchestrator_and_the_owner` (4: 2 forms × `orchestrator`, unset) | success 2 | DEC-761; DEC-365 | positive controls: the same calls release (a record under `docs/releases/`; a lock recording 1.4.0 and its manifest hash) | **green today** (positive controls) |
 | `test_the_suite_runs_gov_and_copier_with_gov_role_unset` | — | DEC-761 (the lead's note) | guard: no `gov` or Copier environment of the suite carries `GOV_ROLE` | **green today** (a guard) |
 
+The two role cases' build halves were rewritten in round 3 (DEC-772 replaces DEC-761 item 1's line for the build
+form): see "Round 3", "The three recorded rewrites". The `--lock-from` halves are as the table states.
+
 **Seen on `ee557d02`:** the whole suite `23 failed, 91 passed` (no skip, no error): the 23 are this file's
 refusal cases, each on its own assertion as the table states; the 85 earlier cases pass; 6 of this file pass (the
 genuine-source guard, the 4 positive controls, the `GOV_ROLE` guard).
@@ -272,10 +281,117 @@ docstring. Nothing else in W1-39's or W1-32's folders changes.
   any other unrecorded command, a recorded command gone, or the module command offered still fails it. Today: it
   passed after the rewrite (before it: `gov has commands the command list does not record: ['release']`).
 
+## Round 3 (DEC-772 item 1) — `test_w2_16_owner_terminal.py`
+
+Written by a fresh Independent Test Designer for W2-16's round 3, from KPI success 2 ("The owner tags the release
+commit (agents never tag)"), DEC-772 item 1 and the lead's specification for this round, passed as described
+behaviour (DEC-136), without reading the implementation. Red as seen on `2c8cfc7a` (the code in this tree before the
+round).
+
+DEC-772 item 1, word for word: "`gov release` is owner-only, from a plain terminal, like `gov approve` and the
+freeze lift: it refuses with a Claude Code process among its ancestors, with `GOV_ROLE` or `GOV_TICKET` set, or
+without a terminal, and asks for a typed one-time code. This replaces DEC-761 item 1's line '`gov release` refuses
+unless the role is orchestrator, or the owner in a plain terminal'."
+
+**The lead's reading, fixed for this round.** Item 1 governs the build form (`gov release <version>`, and every call
+that is not `--lock-from`). `gov release --lock-from` (the template's Copier task) keeps its caller check: a
+terminal-and-code check there would refuse every install and update not typed by hand (KPI 4, "at copy as well as at
+update"; W1-39's closed suite, DEC-771 item 1). No new case for it: the last round's role cases hold it, unchanged.
+The build form refuses before it reads or writes anything (non-zero exit, no traceback, the error code
+`RELEASE_REFUSED`, `details["reason"]` one word, the reason said in words): `session` (a Claude Code session among
+the ancestors: the freeze lift's chain and signs, DEC-409), `ancestry` (the chain cannot be read whole up to process
+1, `init` or `systemd`), `role` (`GOV_ROLE` set, to any value), `ticket` (`GOV_TICKET` set, to any value),
+`terminal` (standard input and output not both a terminal), `code` (only after every other check passed: a prompt
+holding `RELEASE-` and four digits from the system's random source, one line read; a wrong line, an empty line or the
+end of input refuses). Nothing is shown on a call refused earlier. On success the build is what it was: the record
+under `docs/releases/<version>/`, no commit, no tag; the result `{"version", "record"}`.
+
+**The seam.** Its name and form are the lead's specification for this round, in the freeze lift's form (W1-50's
+`gov.pause.command._lift_test`): `gov.release.command._release_test(root, version, ancestry=None, terminal=None)`.
+`ancestry` is a chain in the form `gov.pause.command.read_ancestry()` returns (this process first, the system's
+first process last); `terminal` a pair of descriptors, each asked `os.isatty` by the product whatever is passed;
+`GOV_ROLE` and `GOV_TICKET` are read from the process environment, never planted. It returns the command's result or
+raises `GovError` (`RELEASE_REFUSED`, `details["reason"]`). The command itself always reads `/proc` and uses
+`(0, 1)`. The driver (`w2_16_support.drive_release`) is W1-50's, copied into this suite's support (no W1-50 module is
+imported): a new process, an environment built from scratch, a pseudo-terminal it reads the code from and types the
+reply on; whatever the build prints goes to a log in the sandbox, never into the driver's answer.
+
+| Case | KPI line | Source | Holds | Red (seen on `2c8cfc7a`) |
+|---|---|---|---|---|
+| `test_the_owner_in_person_builds_the_release` (2: a plain terminal's chain to `init`, an editor terminal's to `systemd`) | success 2 | DEC-772 item 1; the lead's specification, item 2 (success) | the positive control: one code shown and typed back, the result names the version and `docs/releases/1.4.0`, the record written there alone, no commit, no tag, the code not in the result | the seam is missing (`module 'gov.release.command' has no attribute '_release_test'`) |
+| `test_a_claude_code_session_among_the_ancestors_refuses_the_build` (5: headless `-p`, the operator console, `gov launch`, the npm shape, the command line alone) | success 2 | DEC-772 item 1; DEC-409's signs (W1-50's chains) | refused, reason `session`, the message says `claude` or `session`, nothing written, no code shown | the seam is missing |
+| `test_a_chain_that_does_not_reach_process_1_refuses_the_build` (5: nothing read, stops before process 1, an entry not the parent of the one before, the sandbox's own first process, a shell as first process) | success 2 | DEC-772 item 1 (the lead's item 2, `ancestry`); W1-50's unreadable chains | refused, reason `ancestry`, said in words, nothing written, no code shown | the seam is missing |
+| `test_gov_role_set_to_any_value_refuses_the_build` (4: `orchestrator`, `owner`, `engineer`, empty) | success 2 | DEC-772 item 1 | refused, reason `role`, said in words, nothing written, no code shown | the seam is missing |
+| `test_gov_ticket_set_to_any_value_refuses_the_build` (2: `DAEO-49o5`, empty) | success 2 | DEC-772 item 1 | refused, reason `ticket`, said in words, nothing written, no code shown | the seam is missing |
+| `test_without_a_terminal_on_both_sides_the_build_refuses` (4: piped input, piped output, both pipes, `/dev/null`) | success 2 | DEC-772 item 1 | refused, reason `terminal`, said in words, nothing written, no code shown | the seam is missing |
+| `test_anything_but_the_shown_code_refuses_the_build` (3: a wrong code, an empty line, end of input) | success 2 | DEC-772 item 1 (the typed one-time code) | refused, reason `code`, one code shown, none shown again after the reply, nothing written | the seam is missing |
+| `test_the_code_comes_from_the_system_s_random_source` | success 2 | the lead's specification, item 2 (`code`); W1-50's form | 12 calls in one process, Python's `random` seeded with 0 before each, a wrong code typed back: all refused for `code`, more than one code seen | the seam is missing |
+| `test_the_command_refuses_with_standard_input_from_dev_null` | success 2 | DEC-772 item 1 | the real `gov release 1.4.0` as the suite runs it (`GOV_ROLE`, `GOV_TICKET` absent; input `/dev/null`, output a pipe): non-zero, no traceback, `RELEASE_REFUSED` in its output, no code shown, nothing written; the reason is not asserted | own: exit 0, the record written (`{"version": "1.4.0", "record": ".../docs/releases/1.4.0"}`) |
+| `test_the_command_refuses_on_a_terminal_under_this_suite_s_ancestry` | success 2 | DEC-772 item 1 | the real command on a pseudo-terminal, the code typed back if shown: the same refusal, the reason not asserted. Where this suite's own chain holds no Claude Code session and reaches process 1 (a plain terminal, a nightly run) it is **skipped with that reason, never passed**: from there the build is the owner's | own: exit 0, the record written; this suite's own chain read as `ancestry` (inside the launched session's sandbox no Claude process is visible and process 1 is the sandbox's own, as W1-50 saw it) |
+
+Counts as seen on `2c8cfc7a`: this file `28 failed` (26 for the missing seam, 2 on their own assertion: the real
+command builds).
+
+### The three recorded rewrites (DEC-491, DEC-866)
+
+Each is in the designer's round-3 commit with its `Rewrite-Reason:` trailer and states the rewrite and its reason in
+its docstring or on its line. Each keeps its purpose; no other expectation is lowered.
+
+- **The suite's release builds (`w2_16_support.build_release`; `Rewrite-Reason: DEC-772`).** It ran
+  `gov release <version>` as a child process; under DEC-772 that call refuses from every test run, so every case
+  that needs a release would fail for a reason not its own. It now builds through the seam as the owner in person
+  (`release_as_the_owner`: a planted clean chain, a pseudo-terminal, the code typed back, `GOV_ROLE` and
+  `GOV_TICKET` absent). Every assertion it made is kept: a release from a clean `w2/integrate` commit, nothing
+  changed outside `docs/releases/`, a record written, the owner's commit and tag. **Today:** every case that needs a
+  release fails at the `releases` fixture for the missing seam: 82 errors at set-up and 11 failures (the 8
+  `--lock-from` refusal role cases and 3 cases that reach the fixture through a parameter), each with "DEC-772 item 1
+  is not built: gov.release.command._release_test(...) is missing". **Trial, outside the tree:** with a scratch
+  plugin standing the earlier child-process build in for the seam (the earlier code allows `GOV_ROLE` unset), the
+  suite without the new file gave `2 failed, 112 passed`: the 2 are the build-form refusals below, red as they must
+  be; every case that needs a release passed as before.
+- **The two role cases' build halves (`test_w2_16_last_round.py`; `Rewrite-Reason: DEC-772`).** DEC-772 replaces
+  DEC-761 item 1's line for the build form. In
+  `test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner` the build form is now held refused for
+  every `GOV_ROLE` value, `orchestrator` included, and with `GOV_ROLE` unset (these runs have no terminal): non-zero,
+  no traceback, `RELEASE_REFUSED` in the output, a reason said in words (which reason is not fixed), nothing written.
+  Its two earlier positive controls in `test_gov_release_runs_for_the_orchestrator_and_the_owner` (build form,
+  `orchestrator` and unset) are refusals there now; the seam's positive control replaces them. The `--lock-from`
+  half of both cases is as it was (8 refusals, 2 controls). Ids are kept (`[<form>-<role>]`); the build form has 10
+  refusal cases, the controls 2. **Today:** the build form's 8 old refusal roles pass (the earlier code's role check
+  refuses them with `RELEASE_REFUSED`, which DEC-772 keeps); `orchestrator` and unset fail on their own assertion
+  (exit 0, the release built); the `--lock-from` halves fail or error for the missing seam (they need a release), and
+  pass in the trial.
+- **R3-F5 (`test_a_source_whose_release_records_were_removed_is_refused[copier copy]`; `Rewrite-Reason: DEC-767`,
+  P-R3-2 (a)).** It copied into `tmp_path / "product"`, which the `own_release_project` fixture had already filled,
+  so Copier stopped before its task ran and the case failed whatever the code did. The one line now copies into a
+  fresh folder, `tmp_path / "copied-from-v1.6.0"`; nothing else changed. **Today:** an error at set-up for the
+  missing seam (it needs the releases); **in the trial it passed** (the earlier code refuses the copy there).
+
+**W1-07's list.** The entry for `release` in W1-07's list (and `src/gov/check/commands.py`) is not made in this
+round: W2-20's change is not in this tree (DEC-753 items 2 and 3).
+
+### Red today, the whole suite (seen on `2c8cfc7a`)
+
+`41 failed, 19 passed, 82 errors` (142 cases, no skip). The 82 errors and 11 of the failures: the missing seam, at
+the `releases` fixture. 28 failures: this round's file (above). 2 failures: the build form's refusals for
+`orchestrator` and unset. 19 passed: the 10 cases and guards that need no release (W2-L227, W2-H029 plain, W2-M174
+(4), the overlay guard, the stand-in "before any release" guard, W2-M175 plain, the worktree guard), the build form's
+8 old refusal roles, and the `GOV_ROLE` guard.
+
+### Open after round 3 (a package of the designer's return)
+
+The earlier refusal cases of `test_w2_16_release.py` (unclean tree, not on `w2/integrate`, a version that is not
+semantic, no version, the same version from another commit: 15 cases) and `test_w2_16_immutability.py` (an older
+commit, a removed record, an owner's tag, build metadata, a hidden edit: 10 cases) run the real `gov release` as a
+child process. Under DEC-772 that call refuses for its ancestry or its missing terminal before it reaches the rule
+each case holds, so those cases would pass whatever that rule does. They are not changed in this round (the brief
+names three rewrites); the designer's return carries a package to route their call through the seam as the owner.
+
 ## Covers and rows
 
 | Id | Cases |
 |---|---|
+| CAP-43.b (lite), success 2, DEC-772 item 1 | round 3's cases (`gov release <version>` the owner's alone, from a plain terminal, with a typed code) |
 | CAP-43.b (lite) | success 1, the failure line |
 | CAP-43 | success 3 (with the four immutability cases added after the first review), success 4 (lock records the release; the last round's `--lock-from`, removed-records and release-entry cases), the failure line |
 | CAP-43.b (lite), success 2 | the last round's role cases (DEC-761: only the orchestrator or the owner releases) |
