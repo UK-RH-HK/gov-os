@@ -4,7 +4,7 @@ type: brief
 status: ACTIVE
 state_class: NARRATIVE
 title: "Brief: ticket lead for <ticket id>"
-version: "2.0.0"
+version: "<brief version>"
 role: orchestrator
 ticket: "<ticket id>"
 profile: "<profile>"
@@ -17,7 +17,7 @@ sources: [CAP-33, CAP-37, MR-3, MR-6, DEC-096, DEC-106, DEC-136, DEC-182, DEC-23
 
 A lead is a session of the orchestrator role bound to one ticket and one worktree (DEC-236); the role file's
 section on the ticket lead says what it is. Start it by hand, in the background, in its worktree, with the
-absolute path of the CLI, its identity in the settings argument and the model named (DEC-183, DEC-460); read
+absolute path of the CLI, its identity in the settings argument and the model named (DEC-371, DEC-460); read
 only its final summary. Where the project has one stable launch command, it starts the lead instead (DEC-715).
 Put the ticket's own part before this text: why it starts now, the decisions staged for it, this run's order,
 its probe's focus. Fill in every <placeholder>; a line that does not apply is deleted, not left. The
@@ -60,7 +60,7 @@ while you work, and only your final message is read.
   your budget (DEC-860). A code question uses the code graph's own small, targeted traversal, never a load of the
   whole graph (DEC-859). A new worktree has no store: build it with a full rebuild before the first worker. Every
   worker brief you write says all of this.
-- **The code under test (DEC-732):** in this worktree, every test run and every `gov` command used for verification runs this worktree's own `src/` (the project's source folder, `<source folder>`): `<the per-command setting that selects this worktree's own src/>` set per command, never in a session's settings.
+- **The code under test (DEC-732):** in this worktree, every test run and every `gov` command used for verification runs this worktree's own `src/` (the project's source folder): `<the setting that selects the code under test>=<worktree path>/src` set per command (for a Python project, `PYTHONPATH=<worktree path>/src`), never in a session's settings.
   Your verification shows it with <the import line that prints where the code under test was loaded from>, quoted
   in your return. **This rule goes into every worker brief you write, word for
   word.**
@@ -96,7 +96,7 @@ while you work, and only your final message is read.
 ## Four rules that make the orchestrator discard a round
 
 1. A writing worker (test designer, engineer, product-spec worker, research worker) is a fresh session started
-   with the launcher, `gov launch <role> <ticket id>`, and in no other way (DEC-371). An in-session subagent is
+   with the launcher (the launch command below), and in no other way (DEC-371). An in-session subagent is
    only for a reviewer that writes nothing. The launch command is the project's one stable form, below (DEC-715).
 2. You write no file a worker is started to write, a one-line fix included: not the product's source, not the
    tests, not the documentation. You never write the acceptance tests (MR-3). You write only under

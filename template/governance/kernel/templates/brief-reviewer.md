@@ -4,7 +4,7 @@ type: brief
 status: ACTIVE
 state_class: NARRATIVE
 title: "Brief: reviewer for <ticket id>"
-version: "2.0.0"
+version: "<brief version>"
 role: "<role the session runs as>"
 ticket: "<ticket id>"
 profile: "<profile>"

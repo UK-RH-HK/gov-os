@@ -4,7 +4,7 @@ type: brief
 status: ACTIVE
 state_class: NARRATIVE
 title: "Brief: independent test designer for <ticket id>"
-version: "2.0.0"
+version: "<brief version>"
 role: independent-test-designer
 ticket: "<ticket id>"
 profile: "<profile>"
