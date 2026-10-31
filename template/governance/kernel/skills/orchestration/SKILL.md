@@ -28,6 +28,8 @@ A method for the orchestrator role and its ticket leads. The guard, the launcher
 4. The close: `gov close` on the merge commit (DEC-536). A close is refused only by a failure its change caused (DEC-968 item 2); no load-sensitive case is retried to let it through (DEC-780); no check is weakened (DEC-768 item 4).
 5. Residuals are recorded; the worktree and branch are removed (DEC-135, DEC-235). An open ticket's file is never edited on the integration branch after its review (DEC-757 item 6).
 
+The merge queue: [integration-queue.md](integration-queue.md). A red nightly: [nightly-sheriff.md](nightly-sheriff.md).
+
 ## The ticket loop
 
 The lead runs it from `brief-lead.md`: tests and implementation in parallel; red against the ticket's base; one verification; for FULL a review, at most two per declared round (DEC-413, DEC-916); a guard hole only unsandboxed sessions can reach is a row (DEC-779). The lead holds the loop count; three non-converging iterations end in ESCALATION (DEC-096). It returns DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED, then `brief_gaps:` (DEC-943 item 1).
@@ -35,7 +37,7 @@ The lead runs it from `brief-lead.md`: tests and implementation in parallel; red
 ## Decisions
 
 - Delegation: the orchestrator decides a package itself when it is P2 or P3, reversible, its recommendation and the proposer's agree, confidence is medium or higher, and it touches neither the charter, the master rules, the contract's scope, the guard, containment, the held-out material, installs, merges into the main branch nor releases (MR-6, DEC-220, DEC-416). A stricter-only option is delegated too (DEC-537).
-- **The escalation rubric** (DEC-957): P3 the stream's Senior Engineer decides and logs; P2 the Senior Engineer decides, the orchestrator approves; P1 the owner decides; Emergency stops the work at once, then P1. Each level's test: [briefs-and-returns.md](briefs-and-returns.md).
+- **The escalation rubric** (DEC-957): P3 the stream's Senior Engineer decides and logs; P2 the Senior Engineer decides, the orchestrator approves; P1 the owner decides; Emergency stops the work at once, then P1. Each level's test: [briefs-and-returns.md](briefs-and-returns.md). An Emergency: [incident-response.md](incident-response.md).
 - Packages go to the owner in six parts (DEC-818); only the orchestrator contacts the owner (DEC-850, DEC-855). At most five open with the owner; a P1 may bypass the cap (DEC-220).
 - **Decision records** (DEC-861, DEC-862): the orchestrator commits the records of the owner's decisions itself, as soon as they are written, with `Role: orchestrator`, `Task: decision-record` and `Decided-by: owner (<channel>, <date>)`; never `Role: owner`. The owner's push is the acceptance. Entries the close reads only from the owner's own commit (known-red lists, escalation lifts) stay the owner's commits until the project reads the push as the acceptance; `Decided-by` alone never counts. No worker or lead puts `Role: owner` or `Decided-by:` on a commit.
 - **Supersession** (DEC-866): the old entry is marked at once; everything that cites or enforces it is swept by id and by value and updated, or kept with a recorded reason.
