@@ -24,8 +24,13 @@ measure). Subprocesses get a throwaway `HOME`, no `GOV_*` variables, and git wit
 global configuration. Deterministic, no network.
 
 Interfaces used: the declared command (findings as JSON on stdout, exit non-zero on findings,
-zero when green) and `gov check --json` (the check `core-pathmap` in `result.checks`, the family
-`path-map compliance` in `result.families`). The codes `PATH_NO_NAMESPACE` and
+zero when green) and `gov check --json`. `gov check` answers in one of two forms, and the tests
+read both (`GovCheck` in `w2_95_support.py`): when no hard-block check is red, `ok` is true and
+the check `core-pathmap` is in `result.checks`, the family `path-map compliance` in
+`result.families`; when any hard-block check is red (core-pathmap is hard-block), `gov check`
+exits non-zero with its failure form, `ok` false, `result` empty, `error.code` `CHECK_FAILED`,
+and the same checks and families under `error.details.checks` and `error.details.families`.
+Any other answer (no JSON, or another error code) is a refusal of the planted project. The codes `PATH_NO_NAMESPACE` and
 `PATH_MULTIPLE_NAMESPACES`, with the fields `path` and `namespaces`, are what the check already
 gives on `w2/integrate` and are held. For the new path-map faults no code is pinned: the check is
 not green, and a finding that is not one of those two per-path codes names `path-map.yaml` and
@@ -76,3 +81,13 @@ Passing already on `w2/integrate` (expected): `every_path_in_exactly_one_namespa
 "key 'namespaces': must be a map", from the config loader, which is outside this ticket's
 paths), and refuses an unparsable one the same way. Neither is green; the list form is therefore
 tested through the declared command only.
+
+## Revision (test batch 2)
+
+The first version read only `result`, so once core-pathmap was red the `gov check` cases found no
+check and no family in the failure form (`error.details`). `adopted_repository_names_each_...`,
+`gov_check_family_is_not_green_...` and `other_checks_results_do_not_change_...` therefore failed
+against a correct implementation, and `missing_path_map_is_never_green_in_gov_check` took the
+failure form for a refusal. All four now read both forms, and no expectation changed. On
+`w2/integrate` the counts and reasons above are unchanged: core-pathmap is never red there
+through `gov check`, so only the success form is seen.

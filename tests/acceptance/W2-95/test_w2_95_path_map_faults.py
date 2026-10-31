@@ -105,8 +105,9 @@ def test_w2_95_missing_path_map_is_never_green_in_gov_check(tmp_path):
     result = repo.gov_check()
     assert result.envelope is not None, "gov check --json printed no JSON:\n" + result.describe()
     check = result.pathmap()
-    if result.envelope.get("ok") is False:
-        # The command refused the project as a whole: not green, and it must say why.
+    if not result.answered():
+        # The command refused the project as a whole (an error other than its failure form,
+        # CHECK_FAILED, which carries the checks): not green, and it must say why.
         assert PM_NAME in str(result.envelope.get("error")), result.describe()
         return
     assert check is not None, "core-pathmap is not in gov check's result:\n" + result.describe()
