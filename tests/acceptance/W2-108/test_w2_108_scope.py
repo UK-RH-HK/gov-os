@@ -36,7 +36,7 @@ def git_out(*args):
 
 def test_w2_54_is_not_changed_by_this_ticket():
     if not (S.REPO_ROOT / ".git").exists():
-        pytest.skip(f"{S.REPO_ROOT} is not a git worktree")
+        pytest.skip(f"{S.REPO_ROOT} has no .git: this ticket's history cannot be read there")
     paths = [W2_54_TESTS, *DECLARATIONS]
     commits = git_out("log", "--no-merges", "--format=%h %s", f"--grep=^Task: {TASK}$", "--", *paths).strip()
     assert not commits, f"commits of {TASK} change W2-54's tests or the context check's limit:\n{commits}"
