@@ -23,6 +23,7 @@ from typing import NamedTuple
 from gov.cli.errors import GovError
 
 NAME = re.compile(r"(success|failure|kpi|s|f|k)[ \t-]*(\d+)(?!\w)", re.I)
+NAMING = re.compile(r"(success|failure|kpi)\b", re.I)  # a heading that means to name lines
 JOIN = re.compile(r"\s*(?:/|,|;|\band\b)\s*", re.I)
 ITEM = re.compile(r"`([^`]+)`")
 WORD = re.compile(r"\w+")
@@ -36,6 +37,14 @@ class Case(NamedTuple):
     file: str     # relative to the project root, as pytest names it
     name: str     # the function name, with any parameter id
     outcome: str  # passed, failed or skipped
+
+
+class Unreadable(Exception):
+    """A map row (or a naming heading) whose line names the reader does not take: the run is refused."""
+
+
+class Stopped(BaseException):
+    """SIGTERM or SIGHUP during the run: it is stopped and cleaned up, and ``gov`` exits 128 plus the signal."""
 
 
 # --- the README map -------------------------------------------------------------------------------------------------
@@ -57,9 +66,14 @@ def _cells(row: str) -> list[str]:
 
 
 def parse_map(text: str) -> dict[str, list[str]]:
-    """``{line: [item, ...]}`` from the README's tables, in row form (a KPI column) or heading form."""
+    """``{line: [item, ...]}`` from the README's tables, in row form (a KPI column) or heading form.
+
+    Raises ``Unreadable`` for a row with items whose KPI cell names no line, or a table under a heading that
+    begins with ``success``, ``failure`` or ``KPI`` but names no line.
+    """
     mapping: dict[str, list[str]] = {}
     heading: list[str] = []
+    naming = False  # the nearest heading means to name lines
     fenced, table = False, None  # table: None before a header row, False when ignored, else (kpi, test, names)
     for raw in text.splitlines():
         line = raw.strip()
@@ -71,7 +85,8 @@ def parse_map(text: str) -> dict[str, list[str]]:
         if not line.startswith("|"):
             table = None
             if line.startswith("#"):
-                heading = line_names(line.lstrip("#"))
+                title = line.lstrip("#").replace("*", "").strip()
+                heading, naming = line_names(title), bool(NAMING.match(title))
             continue
         cells = _cells(line)
         if table is None:
@@ -86,6 +101,8 @@ def parse_map(text: str) -> dict[str, list[str]]:
         if kpi is not None:
             names = line_names(cells[kpi]) if kpi < len(cells) else []
         items = ITEM.findall(cells[test]) if test < len(cells) else []
+        if items and not names and (kpi is not None or naming):
+            raise Unreadable
         for name in names if items else []:
             mapping.setdefault(name, []).extend(items)
     return mapping
@@ -107,11 +124,17 @@ def matches(item: str, case: Case) -> bool:
     if "::" in item:
         path, *rest = item.split("::")
         test = rest[-1]
-        return path.endswith(".py") and _same_file(path, case.file) and (
-            case.name == test if "[" in test else function == test)
+        same = case.name == test if "[" in test else function == test
+        return same and (_same_file(path, case.file) if path.endswith(".py") else True)
     if item.endswith(".py"):
         return _same_file(item, case.file)
     return bool(WORD.fullmatch(item)) and function in (item, "test_" + item)
+
+
+def names_a_test(item: str) -> bool:
+    """Whether the item names a test, so that matching no collected case fails its line."""
+    item = item.strip()
+    return "::" in item or item.rsplit("/", 1)[-1].startswith("test_")
 
 
 # --- the child run --------------------------------------------------------------------------------------------------
@@ -137,18 +160,40 @@ def _kill(process: subprocess.Popen) -> None:
     process.wait()
 
 
+def _unlock(folder: str) -> None:
+    """Give back read, write and execute on every folder a test locked, so that the whole tree can be removed."""
+    try:
+        os.chmod(folder, 0o700)
+        entries = list(os.scandir(folder))
+    except OSError:
+        return
+    for entry in entries:
+        if entry.is_dir(follow_symlinks=False):
+            _unlock(entry.path)
+
+
+def _stop(signum, _frame):
+    raise Stopped(signum)
+
+
+STOPS = (signal.SIGTERM, signal.SIGHUP)
+
+
 def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Case]]:
     """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after."""
-    private = Path(tempfile.mkdtemp(prefix="gov-accept-"))
-    process = None
+    signal.pthread_sigmask(signal.SIG_BLOCK, STOPS)  # held back until the private folder is in the try's hands
+    previous = {signum: signal.signal(signum, _stop) for signum in STOPS}
+    private = process = None
     try:
+        private = Path(tempfile.mkdtemp(prefix="gov-accept-"))
+        signal.pthread_sigmask(signal.SIG_UNBLOCK, STOPS)
         report, temp = private / "report.xml", private / "tmp"
         temp.mkdir()
         env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "PYTHON"))}
         env.update(PYTHONPATH=str(root / "src"), PYTHONDONTWRITEBYTECODE="1", TMPDIR=str(temp))
         command = [sys.executable, "-B", "-m", "pytest", str(folder), f"--rootdir={root}", "-p", "no:cacheprovider",
-                   f"--basetemp={private / 'basetemp'}", f"--junitxml={report}", "-o", "junit_family=xunit1",
-                   "-o", "junit_logging=no", "-o", "junit_log_passing_tests=false"]
+                   f"--junitxml={report}", "-o", "junit_family=xunit1", "-o", "junit_logging=no",
+                   "-o", "junit_log_passing_tests=false", f"--log-file={os.devnull}"]
         process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL, start_new_session=True)
         try:
@@ -160,11 +205,23 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
         if code not in (0, 1):  # 3, 4, killed by a signal, anything else
             return "crash", []
         cases, collection = read_cases(report)
-        return ("collection", []) if collection else (None, cases)
+        if collection:
+            return "collection", []
+        if code == 1 and all(case.outcome != "failed" for case in cases):  # "tests failed" with none failed
+            return "crash", []
+        return None, cases
     finally:
-        if process is not None:
-            _kill(process)
-        shutil.rmtree(private, ignore_errors=True)
+        signal.pthread_sigmask(signal.SIG_BLOCK, STOPS)  # a second signal never cuts the clean-up short
+        try:
+            if process is not None:
+                _kill(process)
+            if private is not None:
+                _unlock(str(private))
+                shutil.rmtree(private, ignore_errors=True)
+        finally:
+            for signum, handler in previous.items():
+                signal.signal(signum, handler)  # a signal held back meanwhile then ends gov as it would have
+            signal.pthread_sigmask(signal.SIG_UNBLOCK, STOPS)
 
 
 # --- the command ----------------------------------------------------------------------------------------------------
@@ -223,6 +280,9 @@ def _report(ticket: str, mapping: dict, cases: list[Case]) -> tuple[dict, int]:
             counts[name][case.outcome] += 1
         if not hits:
             unmapped[case.outcome] += 1
+    for name, items in mapping.items():  # a named test no case matches is a failure of its line, counted only
+        counts[name]["failed"] += sum(1 for item in set(items) if names_a_test(item)
+                                      and not any(matches(item, case) for case in cases))
     lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"] else "fail",
               **counts[name]} for name in ordered(mapping)]
     passed = all(line["outcome"] == "pass" for line in lines)
@@ -238,8 +298,13 @@ def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
     try:
         readme = folder / "README.md"
         mapping = parse_map(readme.read_text(encoding="utf-8")) if readme.is_file() else {}
+    except Unreadable:
+        mapping = None
     except Exception:  # a README it cannot read or decode: never its message
         return error
+    if mapping is None:
+        raise GovError("ACCEPT_MAP_UNREADABLE", f"ticket {ticket}: the README of {declared} has a map row "
+                       "naming no KPI line it can read", {"ticket": ticket, "path": declared})
     if not mapping:
         raise GovError("ACCEPT_NO_MAP", f"ticket {ticket}: the README of {declared} maps no KPI line",
                        {"ticket": ticket, "path": declared})
@@ -248,6 +313,8 @@ def accept(root: Path, ticket: str, timeout: float) -> tuple[dict, int]:
         if kind is None:
             return _report(ticket, mapping, cases)
         error[0]["error_kind"] = kind
+    except Stopped as stopped:  # the run is stopped and cleaned up: gov ends as the signal asked
+        raise SystemExit(128 + stopped.args[0]) from None
     except Exception:  # any exception of the runner's own is a crash, with no message
         pass
     return error
