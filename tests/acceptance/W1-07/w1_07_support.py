@@ -48,7 +48,8 @@ RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "conte
 # DEC-542: four commands are recorded in the command list beside the twelve, one line each (DEC-546). The first
 # three are ``gov`` commands. ``lock`` is no ``gov`` command: it is the module command ``python3 -m gov.lock``, the
 # template's Copier task (DEC-499), and recording it adds none. Cases: ``test_w1_07_recorded_commands.py``.
-RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry")
+# DEC-970 (W2-96, P-W2-96-CMDLIST (a)): ``accept`` joins the recorded ``gov`` commands.
+RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry", "accept")
 RECORDED_MODULE_COMMANDS = ("lock",)
 
 # What W1-07 builds: a minimal ``status`` and ``check --list`` (ticket text, DEC-186).
