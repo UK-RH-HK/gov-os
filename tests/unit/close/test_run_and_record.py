@@ -12,8 +12,10 @@ from gov.cli.errors import GovError
 from gov.close import command
 from gov.close.command import NOT_MEASURED, _read_skill_versions, _write_close_record
 
-# The runs these cases start have two workers (DEC-549): not as many as the machine gives, inside a parallel run.
-_run_tests = partial(command._run_tests, workers=2)
+# The runs these cases start have one worker (DEC-549) and, but for the time-limit case, a limit of LIMIT seconds:
+# inside a parallel run, beside the heaviest cases, a loaded machine meets both (W2-67, lens I2 finding 5).
+LIMIT = 180
+_run_tests = partial(command._run_tests, workers=1)
 
 
 def _tests(root, **files):
@@ -26,13 +28,13 @@ def _tests(root, **files):
 
 def test_a_passing_run_has_no_finding_and_its_counts(tmp_path):
     tests = _tests(tmp_path, test_a="def test_a():\n    assert True\n")
-    assert _run_tests(tmp_path, tests, 60) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 0})
+    assert _run_tests(tmp_path, tests, LIMIT) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 0})
 
 
 def test_every_failing_test_is_a_finding(tmp_path):
     tests = _tests(tmp_path, test_a="def test_a():\n    assert False\n\n\ndef test_b():\n    assert False\n",
                    test_c="def test_c():\n    assert True\n")
-    findings, counts = _run_tests(tmp_path, tests, 60)
+    findings, counts = _run_tests(tmp_path, tests, LIMIT)
     assert len(findings) == 2 and "test_a" in findings[0] and "test_b" in findings[1]
     assert counts == {"passed": 1, "failed": 2, "errors": 0, "skipped": 0}
 
@@ -44,7 +46,7 @@ def test_a_collection_error_is_a_finding(tmp_path):
     from gov.close.gates import check_collection
 
     tests = _tests(tmp_path, test_a="def test_a(:\n")
-    findings, counts = _run_tests(tmp_path, tests, 60)
+    findings, counts = _run_tests(tmp_path, tests, LIMIT)
     assert findings and counts["errors"] >= 1
     with pytest.raises(_Finding) as refused:
         check_collection(tmp_path, [(tests, None)], 60)
@@ -52,7 +54,11 @@ def test_a_collection_error_is_a_finding(tmp_path):
     assert any(line.startswith("collect") and "tests/unit/test_a.py" in line for line in refused.value.findings)
 
 
-def test_a_run_over_the_time_limit_is_a_finding_not_an_error(tmp_path):
+def test_a_run_over_the_time_limit_is_a_finding_not_an_error(tmp_path, monkeypatch):
+    """The run the limit ends leaves its base folder behind: it is made in this case's own temp folder, so it
+    goes with the case's ``tmp_path`` (DEC-914 item 2)."""
+    (tmp_path / "tmp").mkdir()
+    monkeypatch.setenv("TMPDIR", str(tmp_path / "tmp"))
     tests = _tests(tmp_path, test_slow="import time\n\n\ndef test_slow():\n    time.sleep(999)\n")
     findings, counts = _run_tests(tmp_path, tests, 1)
     assert findings == ["the test run of tests exceeded the time limit of 1s"]
@@ -61,13 +67,13 @@ def test_a_run_over_the_time_limit_is_a_finding_not_an_error(tmp_path):
 
 def test_no_test_collected_is_a_finding_unless_the_run_may_be_empty(tmp_path):
     tests = _tests(tmp_path, helper="x = 1\n")
-    assert _run_tests(tmp_path, tests, 60)[0] == ["no test was collected in tests"]
-    assert _run_tests(tmp_path, tests, 60, none_collected_ok=True)[0] == []
+    assert _run_tests(tmp_path, tests, LIMIT)[0] == ["no test was collected in tests"]
+    assert _run_tests(tmp_path, tests, LIMIT, none_collected_ok=True)[0] == []
 
 
 def test_the_ignored_folder_is_not_run(tmp_path):
     tests = _tests(tmp_path, test_a="def test_a():\n    assert False\n")
-    assert _run_tests(tmp_path, tests, 60, ignore=tests / "unit", none_collected_ok=True)[0] == []
+    assert _run_tests(tmp_path, tests, LIMIT, ignore=tests / "unit", none_collected_ok=True)[0] == []
 
 
 def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_alone_on_the_path(tmp_path, monkeypatch):
@@ -100,7 +106,7 @@ def test_the_switch_that_removes_assertions_does_not_reach_the_run(tmp_path, mon
     monkeypatch.setenv("PYTHONOPTIMIZE", level)
     tests = _tests(tmp_path, helper_of_a="def must_be_one(value):\n    assert value == 1\n",
                    test_a="from helper_of_a import must_be_one\n\n\ndef test_a():\n    must_be_one(2)\n")
-    findings, counts = _run_tests(tmp_path, tests, 60)
+    findings, counts = _run_tests(tmp_path, tests, LIMIT)
     assert counts["failed"] == 1 and any("test_a" in finding for finding in findings)
 
 
@@ -108,9 +114,9 @@ def test_skipped_tests_are_counted_and_are_no_finding(tmp_path):
     skips = ("import pytest\n\n\n@pytest.mark.skip(reason='not here')\ndef test_one():\n    assert False\n\n\n"
              "def test_two():\n    pytest.skip('not here')\n")
     tests = _tests(tmp_path, test_a="def test_a():\n    assert True\n", test_skips=skips)
-    assert _run_tests(tmp_path, tests, 60) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 2})
+    assert _run_tests(tmp_path, tests, LIMIT) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 2})
     failing = _tests(tmp_path / "other", test_a="def test_a():\n    assert False\n", test_skips=skips)
-    findings, counts = _run_tests(tmp_path / "other", failing, 60)
+    findings, counts = _run_tests(tmp_path / "other", failing, LIMIT)
     assert len(findings) == 1 and counts == {"passed": 0, "failed": 1, "errors": 0, "skipped": 2}
 
 

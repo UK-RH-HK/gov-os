@@ -105,7 +105,9 @@ PLUG=$CLONE/src/gov/close/pytest_plugin
 # The tests that read the repository's own state (W2-54's green-here and time-limit cases) need its stores, as a
 # close has them after its rebuild: a fresh clone has none (the first rehearsal's two reds, 2026-10-21 19:00).
 # One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 builds it into gov rebuild).
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
+# The nightly's rebuild scans every file in full (DEC-966 item 4, W2-107): GOV_SECRETS_FULL_SCAN=1 reads nothing from
+# the machine's secrets-scan cache and refreshes it. Only the rebuild: the suites keep their own cache settings.
+env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")

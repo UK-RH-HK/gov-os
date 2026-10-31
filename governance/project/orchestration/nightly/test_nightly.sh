@@ -55,6 +55,12 @@ rm -f "$work/pings.txt"; timeout 5 bash "$work/n/nightly.sh" > /dev/null 2>&1; c
 grep -q 'window_end=$(date -d "today 08:00" +%s)' "$HERE/nightly.sh" || fail "N9: the night window does not end at 08:00"
 grep -q 'EST=14400;' "$HERE/nightly.sh" || fail "N9: the no-history estimate is not the whole 04:00-08:00 window"
 
+# ---- nightly.sh: the rebuild scans in full (DEC-966 item 4, W2-107); the suites do not get the setting ---------------
+rb=$(grep -n 'gov.cli.main rebuild' "$HERE/nightly.sh")
+[ "$(echo "$rb" | grep -c .)" -eq 1 ] || fail "N10: not exactly one rebuild line in nightly.sh"
+echo "$rb" | grep -q 'GOV_SECRETS_FULL_SCAN=1 ' || fail "N10: the rebuild line does not set GOV_SECRETS_FULL_SCAN=1"
+grep -v 'gov.cli.main rebuild' "$HERE/nightly.sh" | grep -v '^ *#' | grep -q 'GOV_SECRETS_FULL_SCAN' && fail "N11: GOV_SECRETS_FULL_SCAN set outside the rebuild line"
+
 # ---- nightly_cron.sh: committed code only, a session's PATH, a log ----------------------------------------------
 mkdir -p "$work/repo/governance/project/orchestration/nightly"
 printf '#!/bin/bash\necho "NIGHTLY RAN $1 PATH=$PATH"\n' > "$work/repo/governance/project/orchestration/nightly/nightly.sh"
@@ -278,5 +284,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N9, nightly_cron.sh C1-C3, nightly_check.sh K1-K17, ping_gate.sh G1-G11, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N11, nightly_cron.sh C1-C3, nightly_check.sh K1-K17, ping_gate.sh G1-G11, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
 exit "$fails"

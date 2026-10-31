@@ -12,10 +12,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W1-07"))
 
 import w1_27_support as support  # noqa: E402
+import w2_67_codegraph  # noqa: E402
 
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "local_only: needs the dev tiers on this machine (GOV_DEV_TIERS); not for CI")
+
+
+@pytest.fixture(autouse=True)
+def codegraph_folders():
+    """Once the case is over, the code index's daemon folder of each project it built goes (W2-67 batch 8; TD1C-A,
+    DEC-914 item 2): only the roots the builders noted during this case, only a folder not there before the
+    project was built, once no daemon holds it (``w2_67_codegraph``). Set up first, so it ends last."""
+    since = w2_67_codegraph.mark()
+    yield
+    w2_67_codegraph.release(since)
 
 
 @pytest.fixture(scope="session")
