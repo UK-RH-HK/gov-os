@@ -12263,3 +12263,15 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.360 | 2026-10-31 | Delegated (orchestrator): DEC-977 (the batch of six refused by W2-108's whole-tree copy; W2-108 back for DEC-385's form; the five re-close after W2-107). Next free id: DEC-978. |
+
+### DEC-978 — W2-107's close refused by W1-27's no-embeddings case (the secrets cache in the given home): P-W2-107-2 (a) applied to it (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, "revises older tests under an existing decision" (the escalation rubric); reversible; nothing in the Charter, the master rules or the Contract's scope; the guard not weakened; for the owner to overturn) · **Under:** DEC-970 (P-W2-107-2 (a)), DEC-967, DEC-966 item 4, DEC-968, DEC-975 · **Basis:** the close `log/close-build/W2-107-20261031-*` (refused 20:19)
+- **Decision:**
+  1. **The cause:** W1-27's case `test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` asserts that the rebuild's no-embeddings mode writes nothing in the home it is given; since W2-107 a rebuild creates the machine-wide secrets cache there (`.cache`, `.cache/gov-os`, `.cache/gov-os/secrets-scan.sqlite`), the place the owner's approved design gives it (DEC-967). Red with W2-107 3 of 3, green without it 3 of 3. The same clash DEC-970's P-W2-107-2 (a) settled for W1-16's home case.
+  2. **The same remedy:** a fresh independent test designer revises that one case to leave out exactly `.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and the two folders `.cache` and `.cache/gov-os` only where they hold nothing else, under the home the case gives; anything else written there still fails the case; lowering nothing else; `Rewrite-Reason: DEC-967`. Then W1-27's file and W1-16's home file alone, the merge, and W2-107's close again, alone (DEC-975).
+  3. **The lesson:** W2-107's own scoped runs did not select W1-27's case; the close did. Recorded in the daily document.
+- **Where it goes (DEC-851):** this register; W2-107's ticket body (the file named for the designer); the daily document.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.361 | 2026-10-31 | Delegated (orchestrator): DEC-978 (W1-27's no-embeddings case revised to leave out exactly the secrets cache, as P-W2-107-2 (a) did for W1-16). Next free id: DEC-979. |
