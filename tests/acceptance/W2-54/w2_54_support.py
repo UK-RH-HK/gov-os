@@ -121,6 +121,7 @@ class Box:
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",
+            **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
             **extra,
         }
         if mode:
