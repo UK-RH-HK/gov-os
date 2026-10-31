@@ -54,6 +54,7 @@ record_only:
   - "docs/plan/wave-1-exit/evidence/**.txt"
   - "docs/plan/wave-1-exit/evidence/**.json"
   - "governance/project/orchestration/**.md"
+  - "governance/project/orchestration/packages/*.patch"
 
 # DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
 # every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
