@@ -16,6 +16,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 from typing import NamedTuple
 
@@ -159,37 +160,92 @@ def _kill(process: subprocess.Popen) -> None:
     process.wait()
 
 
-def _remove(folder: str) -> None:
-    """Remove the folder and all it holds, whatever its depth and whatever permissions a test took away.
+FOLDER = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+PASSES = 20  # removal passes before whatever error remains is passed over
 
-    No recursion and no long path: one folder is open at a time, every name is taken relative to it, the names
-    of the folders above are kept in a list, and a link is removed, never followed.
+
+class _Moved(Exception):
+    """The folder above is no longer the one the removal came down from: this pass ends, the next starts again."""
+
+
+def _same(fd: int, known: os.stat_result) -> bool:
+    now = os.fstat(fd)
+    return (now.st_dev, now.st_ino) == (known.st_dev, known.st_ino)
+
+
+def _remove_pass(folder: str) -> None:
+    """One pass over the folder: every entry it can remove is removed, any single entry's error is passed over.
+
+    No recursion and no long path: one folder is open at a time, every name is taken relative to it, each folder
+    is listed once (its names still to do kept in a list, so the pass is linear in the entries), and a link is
+    removed, never followed. Going up is checked against the folder it came down from, so that a folder another
+    process moves away never takes the removal outside the private folder.
     """
-    os.chmod(folder, 0o700)
-    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
-    fd, above = os.open(folder, flags), []
     try:
+        os.chmod(folder, 0o700)
+    except OSError:
+        pass
+    try:
+        fd = os.open(folder, FOLDER)
+    except FileNotFoundError:
+        return
+    above: list[tuple[str, list[str], os.stat_result]] = []  # (the folder's name, its parent's names to do, parent)
+    try:
+        names = os.listdir(fd)
         while True:
-            inner = None
-            for name in os.listdir(fd):
-                if os.stat(name, dir_fd=fd, follow_symlinks=False).st_mode & 0o170000 == 0o040000:
-                    inner = name
-                    break
-                os.unlink(name, dir_fd=fd)
-            if inner is not None:  # down into a folder, after giving it back its permissions
-                os.chmod(inner, 0o700, dir_fd=fd)
-                fd, old = os.open(inner, flags, dir_fd=fd), fd
+            if names:
+                name = names.pop()
+                try:
+                    mode = os.stat(name, dir_fd=fd, follow_symlinks=False).st_mode
+                    if mode & 0o170000 != 0o040000:
+                        os.unlink(name, dir_fd=fd)
+                        continue
+                    os.chmod(name, 0o700, dir_fd=fd)  # down into a folder, after giving it back its permissions
+                    parent = os.fstat(fd)
+                    inner = os.open(name, FOLDER, dir_fd=fd)
+                except OSError:  # gone already, or changed meanwhile: the next pass sees what is left
+                    continue
+                fd, old = inner, fd
                 os.close(old)
-                above.append(inner)
+                above.append((name, names, parent))
+                names = os.listdir(fd)
             elif above:  # up, removing the folder just emptied
-                fd, old = os.open("..", flags, dir_fd=fd), fd
+                name, names, parent = above.pop()
+                fd, old = os.open("..", FOLDER, dir_fd=fd), fd
                 os.close(old)
-                os.rmdir(above.pop(), dir_fd=fd)
+                if not _same(fd, parent):
+                    raise _Moved
+                try:
+                    os.rmdir(name, dir_fd=fd)
+                except OSError:  # gone already, or refilled meanwhile: the next pass empties it again
+                    pass
             else:
                 break
+    except (OSError, _Moved):
+        pass
     finally:
         os.close(fd)
-    os.rmdir(folder)
+    try:
+        os.rmdir(folder)
+    except FileNotFoundError:
+        pass
+
+
+def _remove(folder: str) -> None:
+    """Remove the folder and all it holds, whatever its depth, whatever permissions a test took away, and whatever
+    a process the run cannot stop changes in it meanwhile; it never raises.
+
+    Passes are repeated, with a short wait between them, until the folder is gone; after a bounded number of
+    passes whatever error remains is passed over.
+    """
+    for attempt in range(PASSES):
+        try:
+            _remove_pass(folder)
+        except OSError:
+            pass
+        if not os.path.lexists(folder):
+            return
+        time.sleep(min(0.01 * 2 ** attempt, 0.25))
 
 
 def _stop(signum, _frame):
