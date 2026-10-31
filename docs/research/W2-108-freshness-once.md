@@ -27,11 +27,15 @@ stamp `None`, so its appearance is a change too.
 
 | Answer | Key | Where |
 |---|---|---|
-| Lexical freshness (`freshness`) | the store's fingerprint (the stamps of `store.db`, `store.db-wal`, `store.db-journal`) and the tree's: `HEAD` (`git rev-parse HEAD`), the tracked paths (`git ls-files -z`, raw) and the stamp of each tracked file in the working tree | `lexical._FRESHNESS` |
-| Vectors' status (`semantic._status`) | the store's fingerprint and the stamps of the configuration `_wanted` reads (`governance/project/path-map.yaml`, every file of `KNOWN_FILES`) | `semantic._STATUS` |
+| Lexical freshness (`freshness`, through `_checked`) | the store's fingerprint (the stamps of `store.db`, `store.db-wal`, `store.db-journal`) and the tree's: `HEAD` and the git index's stamp (one `git rev-parse HEAD --git-path index`), the tracked paths and the stamp of each tracked file in the working tree | `lexical._FRESHNESS` |
+| The tracked paths (`git ls-files -z`, raw) | `HEAD` and the git index's stamp: listed again only when either changed | `lexical._LISTED` |
+| Vectors' status (`semantic._status`) | the lexical key above (store and tree, taken in the same call) and the stamps of the configuration `_wanted` reads (`governance/project/path-map.yaml`, every file of `KNOWN_FILES`) | `semantic._STATUS` |
 
-`semantic._status` still asks `lexical.freshness` first on every call; that answer is itself remembered as above.
-The rest of the two modules (the searches, the embedder's client, the query-vector cache, fusion) is unchanged.
+`semantic._status` asks `lexical._checked` first on every call, which gives the lexical answer and its key together,
+so one call takes one stat sweep, not two. So a later call on an unchanged store and tree runs one `git rev-parse`
+and no listing or hashing git command. The first call lists the tracked files twice (once for the key, once in
+`_tracked` for the hashes; `_tracked` is left as it is, since the refresh uses it too) and hashes them once. The rest
+of the two modules (the searches, the embedder's client, the query-vector cache, fusion) is unchanged.
 
 ### Why each change is seen (KPI 3)
 
@@ -39,19 +43,21 @@ The rest of the two modules (the searches, the embedder's client, the query-vect
   write-ahead log or journal appears: a new store fingerprint, a fresh check of both answers. The query-vector cache
   is a file of its own beside the store (DEC-782), so a search's write to it changes no key.
 - **A tracked file changed, committed or not** (DEC-344: the index reads the working tree): its stamp changes, so
-  the tree's key changes without hashing any file. A file added to or removed from the index changes the
-  `ls-files` list. This costs two short git calls and one `stat` per tracked file on each call: on this worktree's
-  2,601 files, at load 40 to 53, 24 to 80 ms per call against 222 to 556 ms for hashing them (the same runs; the
-  paths are joined as bytes, since a `Path` per file cost three times its `stat`). Over the check's 656 freshness
-  calls that is about 15 to 50 s left, a residual the measure will show (§4).
-- **The head moved**: `HEAD`'s commit is in the tree's key.
+  the tree's key changes without hashing any file. A file added to or removed from the index rewrites the index,
+  so its stamp changes, the paths are listed again and the new list is in the key. This costs one short git call
+  and one `stat` per tracked file on each call: on this worktree's 2,601 files, at load 40 to 53, the earlier form
+  (two git calls and the stats) took 24 to 80 ms per call against 222 to 556 ms for hashing them (the paths are
+  joined as bytes, since a `Path` per file cost three times its `stat`). Over the check's 328 calls that is at most
+  about 8 to 26 s left, a residual the measure will show (§4).
+- **The head moved**: `HEAD`'s commit is in the tree's key, and so in the vectors' key: both are checked afresh.
 - **The path map changed**, even where it is not tracked: its stamp is in the status key.
 
 ### When a key cannot be read: check every time (never fail open)
 
 The key is `None`, and the answer is worked out afresh on that call and never reused, when:
 
-- `git rev-parse HEAD` or `git ls-files` fails (no head, an unborn branch, not a repository);
+- `git rev-parse HEAD --git-path index` or `git ls-files` fails (no head, an unborn branch, not a repository), or
+  the first does not give the two lines;
 - a file's stamp cannot be read for any reason other than its absence (for example permission refused);
 - a stamp is **too recent to trust**: a file changed less than `RACY_NS` (10 ms) ago, or later than the clock's now.
   On a filesystem with coarse times, a second write within one tick could leave the same stamp; a file that recent
@@ -77,10 +83,12 @@ before and nothing is remembered.
 `tmp_path`, with a stand-in endpoint and a Python `vec_distance_cosine` (no network, no `sqlite_vec`). A check is
 counted by the calls to `lexical._tracked` and `semantic._wanted`.
 
-- Six rounds of the semantic search, the lexical search and both statuses: one check of each, and every answer
-  equal to the first and to the answer worked out with nothing remembered.
+- Six rounds of the semantic search, the lexical search and both statuses: one check of each (the tracked files
+  listed twice and hashed once, all in the first round), and every answer equal to the first and to the answer
+  worked out with nothing remembered.
 - A store deleted and rebuilt, a tracked file edited to the same size and not committed (seen at once and after the
-  window), a head moved by an empty commit, an untracked path map changed: each seen, with a fresh check.
+  window, then not checked again while it stands), a new file added to the index and not committed, a head moved
+  by an empty commit (both checks afresh), an untracked path map changed: each seen, with a fresh check.
 - An unborn branch (no head) and an unreadable store fingerprint: a check on every call.
 - A stamp written inside the window gives no key; an absent file's stamp is `None`.
 

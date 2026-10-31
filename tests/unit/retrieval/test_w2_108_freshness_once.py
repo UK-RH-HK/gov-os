@@ -65,8 +65,13 @@ def project(tmp_path, monkeypatch):
             return {"models": [{"name": semantic.MODEL, "size": 1, "size_vram": 0}]}
         return {"embeddings": [[float("pear" in text), float("plum" in text)] for text in body["input"]]}
 
-    counts = {"tracked": 0, "wanted": 0}
-    tracked, wanted = lexical._tracked, semantic._wanted
+    counts = {"tracked": 0, "wanted": 0, "ls-files": 0, "hash-object": 0}
+    tracked, wanted, git = lexical._tracked, semantic._wanted, lexical._git
+
+    def counted_git(root, *args, stdin=None):
+        if args[0] in ("ls-files", "hash-object"):
+            counts[args[0]] += 1
+        return git(root, *args, stdin=stdin)
 
     def counted_tracked(root):
         counts["tracked"] += 1
@@ -82,13 +87,15 @@ def project(tmp_path, monkeypatch):
                         connection.create_function("vec_distance_cosine", 2, _distance))
     monkeypatch.setattr(lexical, "_tracked", counted_tracked)
     monkeypatch.setattr(semantic, "_wanted", counted_wanted)
+    monkeypatch.setattr(lexical, "_git", counted_git)
     monkeypatch.setattr(lexical, "_FRESHNESS", {})
+    monkeypatch.setattr(lexical, "_LISTED", {})
     monkeypatch.setattr(semantic, "_STATUS", {})
     _git(tmp_path, "init", "-q", "-b", "main")
     _commit(tmp_path, FILES)
     assert semantic.refresh(tmp_path)["available"] is True
     _settle()
-    counts.update(tracked=0, wanted=0)
+    counts.update(dict.fromkeys(counts, 0))
 
     def answers():
         return (semantic.search(tmp_path, "where is the pear", refresh=False),
@@ -101,6 +108,7 @@ def project(tmp_path, monkeypatch):
 def _afresh(answers):
     """The answers worked out with nothing remembered, as they were before W2-108."""
     lexical._FRESHNESS.clear()
+    lexical._LISTED.clear()
     semantic._STATUS.clear()
     return answers()
 
@@ -110,8 +118,20 @@ def test_each_check_runs_once_over_many_calls_and_every_answer_is_unchanged(proj
     first = answers()
     assert first[0]["available"] is True and first[0]["hits"] and first[1]["hits"] and first[3] is None
     assert all(answers() == first for _ in range(5))
-    assert counts == {"tracked": 1, "wanted": 1}, "a check was repeated within one process"
+    assert counts == {"tracked": 1, "wanted": 1, "ls-files": 2, "hash-object": 1}, \
+        "a check was repeated within one process (the tracked files listed once for the key, once for the hashes)"
     assert _afresh(answers) == first
+
+
+def test_a_file_added_to_the_index_and_not_committed_is_seen(project):
+    root, counts, answers = project
+    answers()
+    (root / "open/quince.md").write_text("quince trees\n", encoding="utf-8")
+    _git(root, "add", "open/quince.md")  # the head stays; the index changes
+    added = answers()
+    assert added[2] == {"status": "stale", "stale": ["open/quince.md"]} and added[3] == "stale"
+    _settle()
+    assert answers() == added == _afresh(answers)
 
 
 def test_a_store_rebuilt_is_seen(project):
@@ -135,6 +155,8 @@ def test_a_file_edited_and_not_committed_is_seen_at_once_and_after_a_while(proje
     assert edited[0]["available"] is False and edited[1]["available"] is False
     _settle()
     assert answers() == edited == _afresh(answers)
+    seen = dict(counts)
+    assert all(answers() == edited for _ in range(3)) and counts == seen, "the unchanged edit was checked again"
 
 
 def test_a_head_moved_is_a_new_key(project):
@@ -143,7 +165,7 @@ def test_a_head_moved_is_a_new_key(project):
     _git(root, "commit", "-q", "--allow-empty", "-m", "the head moves, no file does")
     _settle()
     assert answers() == before
-    assert counts["tracked"] == 2, "a moved head did not give a fresh check"
+    assert counts["tracked"] == 2 and counts["wanted"] == 2, "a moved head did not give a fresh check"
 
 
 def test_a_path_map_changed_outside_the_tracked_files_is_seen(project):

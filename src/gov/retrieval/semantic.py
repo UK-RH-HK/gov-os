@@ -270,14 +270,13 @@ def _build(root: Path) -> str | None:
 
 def _status(root: Path) -> str | None:
     """Why the vectors cannot be answered from as they stand (missing, empty or stale), or None. Writes nothing.
-    Worked out once per store and configuration in a process, keyed by their fingerprints, and again whenever a
+    Worked out once per store, tree and configuration in a process, keyed by their fingerprints, and again whenever a
     fingerprint changes or cannot be read (W2-108); the lexical index's freshness is kept the same way."""
-    status = lexical.freshness(root)["status"]
+    tree, status, _ = lexical._checked(root)  # the store's and the tree's key, taken with the lexical answer
     if status != "fresh":
         return status
-    store = lexical._store_stamp(root)
     config = lexical._stamps(Path(root) / PROJECT_DIR / name for name in KNOWN_FILES)  # what ``_wanted`` reads
-    key, place = None if store is None or config is None else (store, config), Path(root).resolve()
+    key, place = None if tree is None or config is None else (tree, config), Path(root).resolve()
     if key is None or _STATUS.get(place, (None,))[0] != key:
         _STATUS[place] = (key, _vectors(root))
     return _STATUS[place][1]
