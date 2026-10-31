@@ -1,0 +1,51 @@
+---
+id: DAEO-zkr9
+status: open
+deps: [DAEO-wq2b, DAEO-emq1, DAEO-r30l, DAEO-h4rh]
+links: []
+created: 2026-10-31T23:52:57Z
+type: task
+priority: 1
+assignee: engineer
+external-ref: W2-117
+tags: [wave-2, implementation, close, full, smart-work, after-examin]
+wbs_id: W2-117
+title: 'The merge queue in the product: gov queue enqueues, tests the merged result once, advances or ejects, and records, from W2-97''s tool (SMART-WORK-1)'
+class: implementation
+state_class: AUTHORITATIVE
+role: engineer
+depends_on:
+- DAEO-wq2b
+- DAEO-emq1
+- DAEO-r30l
+- DAEO-h4rh
+allowed_paths:
+- src/gov/queue/**
+- src/gov/cli/main.py
+- tests/unit/queue/**
+kpis:
+  success:
+  - '`gov queue` gives W2-97''s queue in the product: the commit tested is the commit landed; one run per batch on the merged result, in a heavy-job slot (W2-20); a run skipped when the merged code is identical to what the lead tested, with its reason; a red batch''s culprit ejected and the rest advanced (W2-115''s attribution) [DEC-959 item 1, DEC-983, DEC-982]'
+  - 'Each advance writes the record the close cites, and the close cites it instead of running its own tests on the same code [DEC-959 item 1, DEC-983, DEC-982]'
+  - 'Nothing project-specific: no branch, path or ticket of this repository is named in the code; this repository''s queue moves onto it and W2-97''s tool is retired [DEC-983, DEC-982]'
+  failure:
+  - 'A branch advanced to a commit that was not the one tested, or after a red.'
+  - 'A second run on identical code, or a skip without its reason.'
+profile: FULL
+sources:
+- DEC-983
+- DEC-982
+- DEC-959
+est_loc: 250
+acceptance_tests:
+  path: tests/acceptance/W2-117/
+  author: independent-test-designer (MR-3); from the spec and KPIs, in parallel with the implementer (DEC-963); planted repositories with queued branches, a red batch, a moving head
+track: B
+list_rows: []
+---
+# W2-117 The merge queue in the product
+
+The owner's SMART-WORK-1 decision 3 (DEC-983): after EXAMIN's copy (Wave 3 work, in the WBS for its order).
+
+- **Why:** W2-97 builds this repository's queue as its own tool (`governance/project/orchestration/tools/`), which is right for now; an adopted product with streams needs it as a `gov` command. EXAMIN's copy runs one LITE ticket, which needs no queue.
+- **Order:** after W2-97 (measured in use here first), W2-115 (its attribution), W2-20 (its slots) and W2-27 (EXAMIN's copy).
