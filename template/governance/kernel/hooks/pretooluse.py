@@ -296,7 +296,7 @@ def main() -> None:
             command = tool_input.get("command", "")
             try:
                 from gov.guard.install import (
-                    has_sudo, has_install, acting_role,
+                    has_sudo, has_install, acting_role, cto_install,
                     install_in_experiment_folder)
             except Exception as exc:
                 session_id = data.get("session_id", "")
@@ -309,26 +309,28 @@ def main() -> None:
                 if flag == "frozen":
                     _deny("frozen: install denied")
                 ar = acting_role(role, subagent_type)
-                if ar == "orchestrator":
-                    # The owner may approve; take the before-snapshot
-                    # so containment can run if the command executes.
-                    _record()
-                    _take_snapshot(project_root, data, flag)
-                    _ask(f"install command requires owner approval "
-                         f"(tool registry record required): {command}")
-                elif ar == "research" and install_in_experiment_folder(
+                if ar == "research" and install_in_experiment_folder(
                         command, cwd, project_root, ticket_id):
                     # DEC-163: the research role's one exception; the
                     # sandbox's write fence holds it to the folder.
                     _record()
                     _take_snapshot(project_root, data, flag)
                     _allow()
-                else:
-                    _deny(
-                        f"install by role "
-                        f"'{ar or 'none'}' denied: only the "
-                        f"orchestrator may propose installs, and research "
-                        f"may install inside its experiment folder")
+                # DEC-957, DEC-971 item 4: only the CTO's own session (the
+                # orchestrator on the coordination ticket named in the
+                # project's roster) asks the owner; every other session is
+                # refused and escalates, and every one when the key names
+                # no ticket (fail closed).
+                asks, why = cto_install(project_root, role, subagent_type,
+                                        ticket_id)
+                if asks:
+                    # The owner may approve; take the before-snapshot
+                    # so containment can run if the command executes.
+                    _record()
+                    _take_snapshot(project_root, data, flag)
+                    _ask(f"install command requires owner approval "
+                         f"(tool registry record required): {command}")
+                _deny(why)
             else:
                 # Non-install Bash: take the before-snapshot (DEC-126)
                 # and allow.
