@@ -24,8 +24,10 @@ Only public interfaces are used:
 - the variables `GOV_SECRETS_CACHE`, `GOV_SECRETS_FULL_SCAN`, `PYTEST_CURRENT_TEST` and `HOME`;
 - the cache file, read only as a file (its bytes, and whether it exists).
 
-No test reads the implementation or names its private parts. Nothing is marked `local_only`; every case is skipped
-(not failed) where gitleaks or git is not on `PATH`.
+No test reads the implementation or names its private parts, with one exception from round 2. The reading form case
+sets the module's `_FORM`, which the base documents as "the form of the record and of what a scan reads" (see
+[Round 2](#round-2-the-reviews-findings)). Nothing is marked `local_only`; every case is skipped (not failed) where
+gitleaks or git is not on `PATH`.
 
 ## The fixtures
 
@@ -138,9 +140,10 @@ The test files are all `test_w2_107_<name>.py`; the tables give `<name>::<case>`
 - **The rule sets enter the fingerprint on every call.** `test_a_rule_added_…` changes `.gitleaks.toml` between calls
   in one process. A fingerprint kept per process and binary alone would answer a project with other rules from the old
   results.
-- **The engine's identity is the sha256 of the bytes of the gitleaks that `PATH` finds** (design note 3), not
-  gitleaks' version string. KPI line S1 names the version string; the design note says the binary's digest stands for
-  it and is stronger.
+- **The engine's identity is the sha256 of the bytes of the gitleaks that `PATH` finds** (design note 3). Round 2
+  (addendum A) adds gitleaks' version string to it, so both enter the fingerprint (see
+  [Round 2](#round-2-the-reviews-findings)). Round 1's stand-ins hand `version` to the real gitleaks unchanged, so
+  the round-1 cases hold as written.
   - In these cases, every stand-in hands its calls to the same real gitleaks, so the version string never changes.
   - A fingerprint of the version string alone therefore fails `test_another_gitleaks_first_on_path_…` and
     `test_a_gitleaks_whose_bytes_change_in_place_…`.
@@ -156,6 +159,87 @@ The test files are all `test_w2_107_<name>.py`; the tables give `<name>::<case>`
   P-W2-107-TD-1:
   - a SQLite file of another form stays a miss until removed and is never written into;
   - whether an empty file becomes a cache is left open.
+
+## Round 2: the review's findings
+
+The FULL review found behaviours the round-1 cases miss. They came to the designer as behaviours, never as code
+(DEC-136), with the design note's round 2 addendum (items A to D). The cases are in `test_w2_107_review_findings.py`,
+written after the implementation began (DEC-491). No round-1 case was changed.
+
+### The fixtures of round 2
+
+- **The round-2 stand-in** (`make_standin`) logs each scan call and each `version` call, by its tag, never content. It
+  can act in three ways, each set when it is made:
+  - **An older engine** (`old=`): it hands the scan to the real gitleaks and drops every finding of one rule (the
+    kernel's canary rule), as a gitleaks that does not know that rule would.
+  - **Its version** (`version=`): a file next to it says how it answers `gitleaks version`: the real answer, a
+    non-zero exit with a version on standard output (`exit-1`), no output at all (`empty`), or a string of its own.
+    Changing that file never changes the stand-in's bytes or file status.
+  - **A swap** (`staged=`): while a staged engine exists, at its `swap_at`-th scan call it renames that engine over
+    its own place on `PATH` before it answers.
+- **The shim** is a `gitleaks` whose own bytes and file status never change. It runs whichever release a setting file
+  next to it names, as a version manager's shim does:
+  - release one is an older engine reporting `8.0.0-w2-107-release-one`;
+  - release two is the real gitleaks.
+
+### The findings and their tests
+
+| Finding (design note, round 2) | Tests |
+|---|---|
+| A. An upgrade behind a shim whose bytes stay the same forgets every verdict (the version string is in the fingerprint) | `review_findings::test_a_gitleaks_upgraded_behind_a_shim_whose_bytes_stay_the_same_forgets_every_verdict` |
+| A. A version that cannot be read means no cache for that call: every text is scanned every time, nothing is remembered or written | `review_findings::test_a_gitleaks_whose_version_cannot_be_read_scans_every_text_every_time_and_remembers_nothing[exit-1]`, `[empty]` |
+| A. The version is asked only when a cache is in use, at most once a process | `review_findings::test_the_version_is_asked_only_when_a_cache_is_used_and_at_most_once_a_process` (a guard) |
+| C. One engine per judgement: a gitleaks replaced during a scan has nothing remembered for what it judged, under the new engine or the old | `review_findings::test_a_gitleaks_replaced_during_a_scan_has_nothing_remembered_for_that_text[the-new-engine]`, `[the-old-engine-put-back]` |
+| B. A raised reading form forgets every remembered verdict | `review_findings::test_a_raised_reading_form_rescans_every_remembered_text` |
+| D. A read-only cache (the file, or its folder) still answers the current engine's clean texts, writes nothing, clears nothing, and never answers another engine's rows | `review_findings::test_a_read_only_cache_still_answers_the_current_engines_clean_texts_and_writes_nothing[the-file]`, `[its-folder]` |
+| D. A cache whose write lock is held elsewhere still answers | `review_findings::test_a_cache_whose_write_lock_is_held_elsewhere_still_answers_its_clean_texts` |
+
+### Red on the base code, and the guard
+
+**Run on the base code: 10 cases; 9 fail, 1 passes. The one that passes is the guard.** The whole folder on the base
+code: 43 cases; 36 fail, 7 pass (round 1's 6 guards and this one), none skipped.
+
+| Test | Red reason on the base code (as seen) |
+|---|---|
+| `…_upgraded_behind_a_shim_…` | "release one again": its premise fails, nothing is remembered (10 scan calls, not 0) |
+| `…_version_cannot_be_read_…` [exit-1], [empty] | the verdicts and the scans are right, but the filter never asks gitleaks its version (0 `version` calls) |
+| `…_replaced_during_a_scan_…` [the-new-engine], [the-old-engine-put-back] | the switch and the rescan after it hold, but the control fails: no clean verdict is remembered afterwards |
+| `…_raised_reading_form_…` | "the form as it is, again": nothing is remembered (6 scan calls, not 0) |
+| `…_read_only_cache_…` [the-file], [its-folder] | "populated, again": its premise fails, no cache answers the clean texts |
+| `…_write_lock_is_held_elsewhere_…` | "populated, again": its premise fails, no cache answers the clean texts |
+
+**The guard**, `test_the_version_is_asked_only_when_a_cache_is_used_and_at_most_once_a_process`, passes on the base
+code, which never asks the version. It keeps the cost of every suite that scans:
+
+- with `GOV_SECRETS_CACHE` empty, or under pytest with no cache named, gitleaks is never asked its version;
+- with a cache, it is asked at most once in a process.
+
+### What the round-2 cases assume of the code
+
+- **Fresh processes.** The version is asked at most once a process for each binary, by its path and file status. So
+  the shim's release is changed only between processes: every pass of the shim and swap cases is a child process.
+- **The swap's timing.** The old engine renames the new one over its own place during its last scan call of the
+  planted text: its `per_text`-th call, the last rule set's run. So the whole judgement is the old engine's, and the
+  switch lands before the filter can compare the file after the scan. The call in which the switch lands may let the
+  text through: nothing in the design asks it to scan again. Only what is remembered afterwards is tested.
+- **"Nothing written".** It is tested two ways:
+  - where the file can be written, by the next pass scanning the text again, and by the main cache file's bytes
+    unchanged after a pass whose version cannot be read;
+  - where the cache is read-only or its write lock is held, by the main cache file's bytes unchanged.
+  The `-wal` and `-shm` companions are not compared: SQLite may make them for a reader.
+- **The reading form is a private name.** It can be reached only through the module's `_FORM`. The test sets it on the
+  `gov.secrets` the run imports, in-process, between calls, as the round-1 rule case changes `.gitleaks.toml` between
+  calls. It therefore assumes the fingerprint reads `_FORM` when a call is made, not a copy taken at import. `_FORM`
+  is the base's documented convention ("the form of the record and of what a scan reads"), so the test is kept. A
+  move of the constant to another module or name is a dispute for the designer, not a reason to lower the case. The
+  engineer's builder test covers the same behaviour from inside.
+- **The read-only cases.** "Engine B" is round 1's stand-in with other bytes. On a read-only cache it can clear
+  nothing, so the case shows two things:
+  - B is answered no row of A's: every text is scanned;
+  - A, back again, is answered as before: nothing was cleared.
+- **The write-lock case.** Another connection holds `BEGIN IMMEDIATE`: the write lock, under which readers may still
+  read. Round 1's lock case holds an exclusive lock with a write open, which keeps readers out too, so it stays a miss.
+  A pass under the write lock may take at most 120 s longer than a pass without a cache, as in round 1.
 
 ## Not tested here
 
