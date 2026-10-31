@@ -31,6 +31,12 @@ it links to (README, reading 16: a residual for EXP-002).
 
 The guard is asked through the PreToolUse commands the project's committed
 settings register. No session is started.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
+ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
+template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
+lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
+Each moved case names its fixtures by their old names in its first line; its verdict is the same.
 """
 
 from __future__ import annotations
@@ -137,8 +143,9 @@ def test_the_guard_refuses_a_plain_bash_write_under_gov_runtime_to_every_role(gu
 
 
 @pytest.mark.parametrize("role", sorted(EVERY_ROLE))
-def test_scratch_stays_writable_for_every_role(guard, project, role):
+def test_scratch_stays_writable_for_every_role(kernel_guard, kernel_project, role):
     """A file tool and a plain Bash write, to a file that exists and to a new one."""
+    guard, project = kernel_guard, kernel_project
     result = guard("Write", w47.write_input("Write", project / SEED), role, EVERY_ROLE[role])
     w47.assert_allowed(result, f"Write to {SEED} by {role}")
     command = f"echo x > {RUNTIME}/scratch/w1-46/new.txt"
@@ -173,8 +180,9 @@ def test_the_guard_refuses_ln_to_a_destination_the_role_may_not_write(guard, pro
 
 @pytest.mark.parametrize("kind", sorted(LINK))
 @pytest.mark.parametrize("name", sorted(WRITABLE))
-def test_the_guard_does_not_refuse_ln_to_a_destination_the_role_may_write(guard, project, kind, name):
+def test_the_guard_does_not_refuse_ln_to_a_destination_the_role_may_write(kernel_guard, kernel_project, kind, name):
     """The control: the target is a file in scratch, the destination a new name the role may write."""
+    guard, project = kernel_guard, kernel_project
     command = f"{LINK[kind]} {SEED} {WRITABLE[name]}"
     result = guard("Bash", w47.bash_input(command), ENGINEER, cwd=project)
     w47.assert_allowed(result, f"`{command}` by an engineer")
@@ -202,8 +210,9 @@ def test_the_guard_refuses_ln_into_gov_runtime_to_the_orchestrator_and_the_resea
         w47.assert_stopped(result, f"`{command}` by {role}")
 
 
-def test_the_guard_holds_a_research_ln_to_the_experiment_folder(guard, project):
+def test_the_guard_holds_a_research_ln_to_the_experiment_folder(kernel_guard, kernel_project):
     """The research role's allow-list is its folder: ``ln`` into a sibling is refused, into the folder it is not."""
+    guard, project = kernel_guard, kernel_project
     inside = f"ln -s README.md {FOLDER}/w1-46-link.md"
     w47.assert_allowed(guard("Bash", w47.bash_input(inside), RESEARCH, cwd=project), f"`{inside}` by research")
     sibling = f"ln -s {FOLDER}/README.md experiments/spikes/exp-900/w1-46-link.md"

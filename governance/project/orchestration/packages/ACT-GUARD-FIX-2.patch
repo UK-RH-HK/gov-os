@@ -1,0 +1,45 @@
+diff --git a/.claude/hooks/pretooluse.py b/.claude/hooks/pretooluse.py
+index ac04b2ae..e937a0fc 100644
+--- a/.claude/hooks/pretooluse.py
++++ b/.claude/hooks/pretooluse.py
+@@ -39,6 +39,29 @@ CTO_WBS = "W2-00"  # the coordination ticket whose orchestrator session is the C
+ INLINE_CODE = re.compile(r"\b(python3?|perl|node|ruby)\s+(-\w*\s+)*-[cei]\b")
+ 
+ 
++def inline_writes_acceptance(command):
++    """Rule 1 for inline interpreter code (DEC-958, ACT-GUARD-FIX-2): each simple command of ``command`` is judged
++    alone (split at ; && || | and newlines, quotes kept), and one is refused only when it holds inline code and names
++    the acceptance tests itself. A command that cannot be split (unbalanced quotes) is judged whole, as before."""
++    import shlex
++    try:
++        lex = shlex.shlex(command, posix=True, punctuation_chars=";&|\n")
++        lex.whitespace_split = True
++        lex.whitespace = " \t\r"
++        lex.commenters = ""
++        parts, cur = [], []
++        for tok in lex:
++            if tok and set(tok) <= set(";&|\n"):
++                parts.append(" ".join(cur))
++                cur = []
++            else:
++                cur.append(tok)
++        parts.append(" ".join(cur))
++    except ValueError:
++        parts = [command]
++    return any(INLINE_CODE.search(part) and ACCEPTANCE in part for part in parts)
++
++
+ def tree_roots(root):
+     """This tree, every worktree of its repository, and the run clones under ~/gov-os-runs (W2-84's every tree)."""
+     roots = [os.path.realpath(root)]
+@@ -153,8 +176,8 @@ def main():
+             found = _extract_bash_write_targets(command, cwd)
+             # None is a read-only command (running or reading the tests is open, DEC-820); a write the parser
+             # cannot resolve, or inline interpreter code, is refused only when it names the acceptance tests.
+-            unreadable = (found is not None and _UNRESOLVABLE in found) or INLINE_CODE.search(command)
+-            if unreadable and ACCEPTANCE in command:
++            unresolved = found is not None and _UNRESOLVABLE in found and ACCEPTANCE in command
++            if unresolved or inline_writes_acceptance(command):
+                 answer("deny", "a command that may write the acceptance tests, which only the "
+                                "independent test designer writes")
+             targets = [t for t in (found or []) if t != _UNRESOLVABLE]

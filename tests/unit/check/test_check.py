@@ -98,9 +98,9 @@ def test_schema_clean_record(tmp_path):
     from gov.check.schema import check
     root = tmp_path / "project"
     _copy_kernel_schemas(root, "ticket.schema.json", "common.schema.json")
-    _write(root, ".tickets/T-001.md",
-           "---\nid: T-001\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\nrole: engineer\n"
-           "allowed_paths:\n- src/**\nkpis:\n  success:\n  - it works\n  failure: []\n---\n# T-001\n")
+    _write(root, ".tickets/T-0001.md",
+           "---\nid: T-0001\ntype: task\nstatus: open\nstate_class: AUTHORITATIVE\nrole: engineer\n"
+           "allowed_paths:\n- src/**\nkpis:\n  success:\n  - it works\n  failure: []\n---\n# T-0001\n")
     assert check(root) == []
 
 
