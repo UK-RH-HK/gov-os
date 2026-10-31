@@ -26,6 +26,11 @@ the test makes directly under ``/tmp`` and removes when it ends.
 **A session that did not run its probe to the end is a failure**, never a pass
 and never a skip. The session is asked for its stream of messages, and the
 failure says what its Bash call returned and what it answered.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The session is launched in W1-46's launch project built on a
+project generated from the template (``kernel_freeze_launch_base``): its ``.claude/settings.json`` is the one rulesync
+generates from the template's sources, so the session's guard is the kernel's, run from ``governance/kernel/hooks/``,
+no longer this repository's live wiring (``tests/acceptance/W2-90/README.md``).
 """
 
 from __future__ import annotations
@@ -34,6 +39,7 @@ import json
 import os
 import shutil
 import stat
+import sys
 import tempfile
 import threading
 import time
@@ -43,6 +49,19 @@ import pytest
 
 import w1_50_freeze_support as support
 from w1_50_freeze_support import freeze_launch_base  # noqa: F401  fixture
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
+
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
+
+
+@pytest.fixture(scope="module")
+def kernel_freeze_launch_base(tmp_path_factory):
+    """W1-46's launch fixture project on a project generated from the template, built once (W2-90)."""
+    try:
+        return kernel_wiring.w1_46_project(tmp_path_factory.mktemp("w2-90-w1-50-pause-kernel"))
+    except kernel_wiring.GenerationFailed as exc:
+        pytest.fail(str(exc), pytrace=False)
 
 launch_support = support.launch_support
 ENGINEER = support.ENGINEER
@@ -207,8 +226,9 @@ class _Owner(threading.Thread):
 
 
 @pytest.mark.local_only
-def test_a_flag_put_over_the_placeholder_during_a_command_stays(freeze_launch_base, tmp_path):
+def test_a_flag_put_over_the_placeholder_during_a_command_stays(kernel_freeze_launch_base, tmp_path):
     """A real engineer session, one Bash call of about fifteen seconds, with the owner acting from outside."""
+    freeze_launch_base = kernel_freeze_launch_base
     missing = [name for name in ("bwrap", "socat") if shutil.which(name) is None]
     if not (Path.home() / launch_support.CLI_REL).is_file():
         missing.append("~/.local/bin/claude")

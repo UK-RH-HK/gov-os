@@ -33,6 +33,12 @@ sources or with ``-d``.
 
 The guard is asked through the PreToolUse commands the project's committed
 settings register. No session is started.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
+ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
+template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
+lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
+Each moved case names its fixtures by their old names in its first line; its verdict is the same.
 """
 
 from __future__ import annotations
@@ -82,14 +88,17 @@ def test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write(guard, p
 
 
 @pytest.mark.parametrize("spelling", ("link", "cp -l"))
-def test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths(guard, project, spelling):
+def test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths(kernel_guard,
+                                                                                        kernel_project, spelling):
     """The control for the two new spellings; ``ln`` has its control in ``test_w1_46_links_and_cp_targets.py``."""
+    guard, project = kernel_guard, kernel_project
     command = f"{spelling} {OWN_FILE} {LINK}.py"
     w47.assert_allowed(_ask(guard, project, command), f"`{command}` by an engineer")
 
 
-def test_the_test_designer_may_hard_link_one_acceptance_test_to_another_name_there(guard, project):
+def test_the_test_designer_may_hard_link_one_acceptance_test_to_another_name_there(kernel_guard, kernel_project):
     """The control on the role: for the test designer the acceptance test is a file it may write."""
+    guard, project = kernel_guard, kernel_project
     command = f"ln {TEST_FILE} {TESTS}/test_w1_46_other_name.py"
     w47.assert_allowed(_ask(guard, project, command, TEST_DESIGNER), f"`{command}` by the test designer")
 
@@ -105,8 +114,9 @@ def test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory
     w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
 
 
-def test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths(guard, project):
+def test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths(kernel_guard, kernel_project):
     """The control: the directory exists, inside the engineer's paths."""
+    guard, project = kernel_guard, kernel_project
     os.mkdir(project / OWN_DIRECTORY)
     command = f"mv --target-directory={OWN_DIRECTORY} {OWN_FILE}"
     w47.assert_allowed(_ask(guard, project, command), f"`{command}` by an engineer")
@@ -131,7 +141,8 @@ def test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets(gua
     w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
 
 
-def test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths(guard, project):
+def test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths(kernel_guard, kernel_project):
     """The control: the plain form, from the engineer's own file to a new name beside it."""
+    guard, project = kernel_guard, kernel_project
     command = f"install {OWN_FILE} {OWN}/w1_46_installed.py"
     w47.assert_allowed(_ask(guard, project, command), f"`{command}` by an engineer")
