@@ -21,9 +21,9 @@ python3 merge_queue.py run --repo <repo> --queue <dir>
 ```
 
 - `enqueue` writes the request: the ticket (WBS id), its task (the `Task:` its commits carry), its branch, and the exact
-  commit its lead tested, resolved to its full id (in `--repo`, default the current folder). A commit id that folder
-  does not hold is kept as given and resolved by `run` in its own `--repo`; one that does not resolve there is
-  ejected as `missing`. **A request alone never enters the queue.**
+  commit its lead tested, resolved to its full id (in `--repo`, default the current folder: the lead's worktree); a
+  commit it cannot resolve there is refused unless given as a full id. `run` resolves a short id in a hand-written
+  approval in its own `--repo`. **A request alone never enters the queue.**
 - `approve` moves the request to `approved/`, adding `approved_by` and `approved_at`. **The approval file is the
   entry:** until the three layers start, only the CTO approves (by `approve`, or by writing the file in the same
   form). A ticket with no request is refused (non-zero exit, nothing written).

@@ -298,14 +298,17 @@ def test_approve_needs_a_request_and_a_request_alone_never_runs(w):
     assert run(w).returncode == 0 and head(w) == before and not (w.q / "landed").exists()
 
 
-def test_a_short_id_enqueued_outside_the_repository_is_resolved_by_run(w):
+def test_a_request_holds_the_full_id_and_run_resolves_a_hand_written_short_one(w):
     c = ticket(w, "A", {"tests/test_a.py": "def test_a():\n    pass\n"})
     r = subprocess.run([sys.executable, str(TOOL), "enqueue", "--queue", str(w.q), "--ticket", "A", "--task", "T-A",
                         "--branch", "w2/A", "--commit", c[:12]], capture_output=True, text=True, cwd=w.tmp)
-    assert r.returncode == 0, r.stderr
-    assert tool("enqueue", "--queue", w.q, "--ticket", "B", "--task", "T-B", "--branch", "w2/B",
-                "--commit", "w2/B", "--repo", w.tmp).returncode != 0  # a name it cannot resolve is not an id
-    assert tool("approve", "--queue", w.q, "--ticket", "A", "--by", "CTO").returncode == 0
+    assert r.returncode != 0 and not (w.q / "requested").exists()  # nowhere to resolve it: refused, nothing written
+    r = subprocess.run([sys.executable, str(TOOL), "enqueue", "--queue", str(w.q), "--ticket", "A", "--task", "T-A",
+                        "--branch", "w2/A", "--commit", c[:12]], capture_output=True, text=True, cwd=w.repo)
+    assert r.returncode == 0 and entry(w, "requested", "A")["commit"] == c  # the lead's worktree: resolved there
+    (w.q / "approved").mkdir()
+    (w.q / "approved/A.json").write_text(json.dumps(dict(entry(w, "requested", "A"), commit=c[:12],
+                                                         approved_by="CTO", approved_at="2026-10-31T00:00:00")))
     assert run(w).returncode == 0
     assert entry(w, "landed", "A")["commit"] == c and git(w.repo, "rev-parse", "w2/integrate^2") == c
 

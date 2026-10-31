@@ -229,12 +229,10 @@ def valid_name(ticket):
 def enqueue(a):
     if not valid_name(a.ticket):
         sys.exit(f"merge queue: not a ticket name: {a.ticket!r}")
-    # resolved here when the current folder (or --repo) holds it, else kept as given (a hex id) and resolved by run in
-    # its --repo; one that does not resolve there is ejected as missing
     r = sh(["git", "-C", a.repo, "rev-parse", "--verify", "-q", a.commit + "^{commit}"])
-    commit = r.stdout.strip() if r.returncode == 0 else a.commit if re.fullmatch(r"[0-9a-f]{7,40}", a.commit) else None
+    commit = r.stdout.strip() if r.returncode == 0 else a.commit if re.fullmatch(r"[0-9a-f]{40}", a.commit) else None
     if not commit:
-        sys.exit(f"merge queue: {a.commit} does not name a commit in {a.repo}, and is not a commit id")
+        sys.exit(f"merge queue: {a.commit} does not name a commit in {a.repo} (give --repo, or the full id)")
     write_json(Path(a.queue) / "requested" / f"{a.ticket}.json",
                {"ticket": a.ticket, "task": a.task, "branch": a.branch, "commit": commit, "requested_at": now()})
     return 0
