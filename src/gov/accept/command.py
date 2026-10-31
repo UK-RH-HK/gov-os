@@ -11,7 +11,7 @@ from pathlib import Path
 
 HELP = "run a ticket's acceptance tests, reporting only pass or fail per KPI line"
 CLASS = "read"
-EXIT_CODES = {3: "a mapped KPI line fails", 4: "the run errored (collection, timeout or crash)"}
+EXIT_CODES = {3: "a mapped KPI line fails, or any test failed",4: "the run errored (collection, timeout or crash)"}
 
 
 def add_arguments(parser) -> None:

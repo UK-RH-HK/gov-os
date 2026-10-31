@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import os
 import re
-import shutil
 import signal
 import subprocess
 import sys
@@ -44,7 +43,7 @@ class Unreadable(Exception):
 
 
 class Stopped(BaseException):
-    """SIGTERM or SIGHUP during the run: it is stopped and cleaned up, and ``gov`` exits 128 plus the signal."""
+    """SIGINT, SIGTERM or SIGHUP during the run: it is stopped and cleaned up, and ``gov`` exits 128 plus the signal."""
 
 
 # --- the README map -------------------------------------------------------------------------------------------------
@@ -160,33 +159,67 @@ def _kill(process: subprocess.Popen) -> None:
     process.wait()
 
 
-def _unlock(folder: str) -> None:
-    """Give back read, write and execute on every folder a test locked, so that the whole tree can be removed."""
+def _remove(folder: str) -> None:
+    """Remove the folder and all it holds, whatever its depth and whatever permissions a test took away.
+
+    No recursion and no long path: one folder is open at a time, every name is taken relative to it, the names
+    of the folders above are kept in a list, and a link is removed, never followed.
+    """
+    os.chmod(folder, 0o700)
+    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+    fd, above = os.open(folder, flags), []
     try:
-        os.chmod(folder, 0o700)
-        entries = list(os.scandir(folder))
-    except OSError:
-        return
-    for entry in entries:
-        if entry.is_dir(follow_symlinks=False):
-            _unlock(entry.path)
+        while True:
+            inner = None
+            for name in os.listdir(fd):
+                if os.stat(name, dir_fd=fd, follow_symlinks=False).st_mode & 0o170000 == 0o040000:
+                    inner = name
+                    break
+                os.unlink(name, dir_fd=fd)
+            if inner is not None:  # down into a folder, after giving it back its permissions
+                os.chmod(inner, 0o700, dir_fd=fd)
+                fd, old = os.open(inner, flags, dir_fd=fd), fd
+                os.close(old)
+                above.append(inner)
+            elif above:  # up, removing the folder just emptied
+                fd, old = os.open("..", flags, dir_fd=fd), fd
+                os.close(old)
+                os.rmdir(above.pop(), dir_fd=fd)
+            else:
+                break
+    finally:
+        os.close(fd)
+    os.rmdir(folder)
 
 
 def _stop(signum, _frame):
     raise Stopped(signum)
 
 
-STOPS = (signal.SIGTERM, signal.SIGHUP)
+STOPS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 
 
 def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Case]]:
-    """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after."""
-    signal.pthread_sigmask(signal.SIG_BLOCK, STOPS)  # held back until the private folder is in the try's hands
-    previous = {signum: signal.signal(signum, _stop) for signum in STOPS}
-    private = process = None
+    """(error kind or None, cases): pytest in a child process, all its files in one private folder removed after.
+
+    SIGINT, SIGTERM and SIGHUP stop the run; one that arrives before the private folder is in the try's hands, or
+    during the clean-up, is held back and acted on once the clean-up is done. A signal the caller set to be
+    ignored stays ignored.
+    """
+    stops = [signum for signum in STOPS if signal.getsignal(signum) is not signal.SIG_IGN]
+    held: list[int] = []
+
+    def hold(signum, _frame):
+        held.append(signum)
+
+    previous = {signum: signal.signal(signum, hold) for signum in stops}
+    private = process = stopped = None
     try:
         private = Path(tempfile.mkdtemp(prefix="gov-accept-"))
-        signal.pthread_sigmask(signal.SIG_UNBLOCK, STOPS)
+        for signum in stops:
+            signal.signal(signum, _stop)
+        if held:
+            raise Stopped(held[0])
         report, temp = private / "report.xml", private / "tmp"
         temp.mkdir()
         env = {key: value for key, value in os.environ.items() if not key.startswith(("PYTEST_", "PYTHON"))}
@@ -210,18 +243,22 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
         if code == 1 and all(case.outcome != "failed" for case in cases):  # "tests failed" with none failed
             return "crash", []
         return None, cases
+    except Stopped as error:
+        stopped = error
+        raise
     finally:
-        signal.pthread_sigmask(signal.SIG_BLOCK, STOPS)  # a second signal never cuts the clean-up short
+        for signum in stops:
+            signal.signal(signum, hold)  # a signal during the clean-up is held back, never cuts it short
         try:
             if process is not None:
                 _kill(process)
             if private is not None:
-                _unlock(str(private))
-                shutil.rmtree(private, ignore_errors=True)
+                _remove(str(private))
         finally:
             for signum, handler in previous.items():
-                signal.signal(signum, handler)  # a signal held back meanwhile then ends gov as it would have
-            signal.pthread_sigmask(signal.SIG_UNBLOCK, STOPS)
+                signal.signal(signum, handler)
+        if held and stopped is None:  # held back during the clean-up: now it ends the run
+            raise Stopped(held[0])
 
 
 # --- the command ----------------------------------------------------------------------------------------------------
@@ -284,7 +321,7 @@ def _report(ticket: str, mapping: dict, cases: list[Case]) -> tuple[dict, int]:
                if any(names_a_test(item) and not any(matches(item, case) for case in cases) for item in items)}
     lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"]
               and name not in missing else "fail", **counts[name]} for name in ordered(mapping)]  # counts: tests run
-    passed = all(line["outcome"] == "pass" for line in lines)
+    passed = all(line["outcome"] == "pass" for line in lines) and not totals["failed"]  # any failed case, mapped or not
     return _result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals), 0 if passed else EXIT_FAIL
 
 
