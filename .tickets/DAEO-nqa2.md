@@ -2,7 +2,7 @@
 id: DAEO-nqa2
 status: open
 deps: [DAEO-zpdj, DAEO-0mtg]
-links: []
+links: [DAEO-8lmb]
 created: 2026-10-31T13:15:13Z
 type: task
 priority: 1
