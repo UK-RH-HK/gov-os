@@ -22,6 +22,7 @@ allowed_paths:
 - tests/unit/launch/test_session_record*
 - tests/unit/telemetry/test_sessionlog*
 - docs/changes/W2-60b-CIT-E.md
+- src/gov/guard/decide.py
 kpis:
   success:
   - 'When a launched session ends, whatever its exit (DEC-392''s signals included), the launcher writes one record keyed by its session id: model (the main session''s and each subagent''s), effort, window, tokens (input, output, cache creation, cache read), cost, minutes, turns, subagents (count and model) and every rate-limit event; role, ticket and task class come from W2-60a''s launch record [CAP-36.a lite, DEC-838 item 3, lens F R6]'
@@ -32,6 +33,7 @@ kpis:
   - 'W2-07''s close can join it: the record''s path and keys are stated in the CIT-E, and a test reads a record back by ticket and session id; pass or fail and the repair count stay the close''s [CAP-36.a lite, lens F R6]'
   - 'The launcher''s set of launchable roles (today the fixed WORKER_ROLES and OWN_TICKET_ROLES tuples in launcher.py) is read from the kernel''s role files, so a new role is a file, not a code change; a role file that is missing or unreadable refuses the launch; the five roles launch exactly as before [DEC-946 (W3-P09), DEC-826 Q1]'
   - 'A role named in a ticket but with no role file is refused at launch, naming the role [DEC-946 (W3-P09)]'
+  - '`qa-engineer` is a known role: it is in the guard''s KNOWN_ROLES (`src/gov/guard/decide.py`, that set only) and in the reviewer set the session record and launcher read, so a QA engineer is held to rule 5 (it writes only its findings report); this repository''s own hook''s reviewer line is prepared beside it as an owner ACT, not changed here [DEC-959 item 3, DEC-953 item 2]'
   failure:
   - A fixed list of launchable roles left in code.
   - A value the log does not hold reported as measured; a zero for not measured; log text in a record.
@@ -49,6 +51,7 @@ sources:
 - DEC-941
 - DEC-954
 - DEC-957
+- DEC-959
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/
@@ -57,6 +60,8 @@ track: A
 list_rows: []
 ---
 # W2-60b One record per session: model, effort, window, tokens, cost, minutes, turns, subagents
+
+**DEC-959 (2026-10-30):** `qa-engineer` joins KNOWN_ROLES and the reviewer set (item 3; ROLES-RESEARCH-1 §5.3 item 2). `src/gov/guard/decide.py` is added for the KNOWN_ROLES set only. The repository's own hook (`.claude/hooks/pretooluse.py`, its REVIEWERS line) is the owner's ACT, prepared with this ticket.
 
 **DEC-954, DEC-957:** **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7).
 

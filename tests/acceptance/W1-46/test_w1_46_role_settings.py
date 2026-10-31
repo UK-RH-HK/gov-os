@@ -22,6 +22,12 @@ carry an Edit deny rule for .gov-runtime/** except .gov-runtime/scratch/**".
 No session is started. The parts of these lines that need one ("a launched
 worker is sandboxed", "the profile applies", "whether the session uses it") are
 in ``test_w1_46_live_sessions.py``.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
+ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
+template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
+lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
+Each moved case names its fixtures by their old names in its first line; its verdict is the same.
 """
 
 from __future__ import annotations
@@ -63,8 +69,9 @@ def test_the_role_and_the_ticket_are_in_the_settings_env_block(launch, project, 
 
 
 @pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_both_variables_reach_the_guard(launch, guard, project, sandbox, role):
+def test_both_variables_reach_the_guard(kernel_launch, kernel_guard, kernel_project, kernel_sandbox, role):
     """The guard, run with exactly the two values the session was given, decides as that role on that ticket."""
+    guard, project, launch, sandbox = kernel_guard, kernel_project, kernel_launch, kernel_sandbox
     result = launch(role)
     given_role, given_ticket = result.variable("GOV_ROLE"), result.variable("GOV_TICKET")
     assert given_role and given_ticket, "the session was given no GOV_ROLE or no GOV_TICKET"

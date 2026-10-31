@@ -24,7 +24,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-intp"
-WBS = "W1-intp"
+WBS = "W1-913"
 SWITCH = "PYTHONOPTIMIZE"
 FOLDER = f"tests/acceptance/{WBS}"
 TEST_NAME = "test_the_helper_holds"

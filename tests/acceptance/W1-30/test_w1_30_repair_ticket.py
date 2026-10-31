@@ -18,7 +18,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-rprt"
-WBS = "W1-rprt"
+WBS = "W1-937"
 TOOL = "governance/kernel/bin/tk"
 NAMES_THE_TOOL = re.compile(r"\btk\b|ticket tool", re.IGNORECASE)
 

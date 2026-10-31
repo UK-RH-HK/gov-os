@@ -26,7 +26,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-rfrn"
-WBS = "W1-rfrn"
+WBS = "W1-936"
 ACCEPTANCE = f"tests/acceptance/{WBS}"
 DECLARED = f"{ACCEPTANCE}/test_apart.py::test_apart"
 FINDINGS = ("a commit without Implements", "no probe record")

@@ -18,7 +18,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-prbr"
-WBS = "W1-prbr"
+WBS = "W1-928"
 FEATURE = "src/example/feature.py"
 PROBE = f"docs/probes/{TICKET}/PR-{TICKET}.md"
 REVIEWER_ROLE = "Role: independent-auditor"

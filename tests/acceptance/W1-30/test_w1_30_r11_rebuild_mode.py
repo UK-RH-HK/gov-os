@@ -24,7 +24,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-lean"
-WBS = "W1-lean"
+WBS = "W1-916"
 MODE = "--no-embeddings"
 STORE_STALE = "STORE_STALE"
 

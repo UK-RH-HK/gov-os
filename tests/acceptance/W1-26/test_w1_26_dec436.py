@@ -263,21 +263,22 @@ def test_record_in_new_directory_discovered_by_schema_check(green_project, sandb
     defective one and its missing field once it is added.
     """
     project = green_project
-    project.write("docs/custom-records/REC-NEW-001.md",
-                  "---\nid: REC-NEW-001\ntype: decision\nstatus: ACTIVE\n"
+    # decision ids the decision schema takes (DEC-954): the records differ only by the missing status
+    project.write("docs/custom-records/DEC-9001.md",
+                  "---\nid: DEC-9001\ntype: decision\nstatus: ACTIVE\n"
                   "state_class: AUTHORITATIVE\ntitle: Custom record\n---\n"
-                  "# REC-NEW-001\n")
+                  "# DEC-9001\n")
     project.commit()
     run1 = support.run_check(project, sandbox)
     support.assert_check_green(run1, interface, "core-schema")
 
-    project.write("docs/custom-records/REC-BAD-001.md",
-                  "---\nid: REC-BAD-001\ntype: decision\n"
+    project.write("docs/custom-records/DEC-9002.md",
+                  "---\nid: DEC-9002\ntype: decision\n"
                   "state_class: AUTHORITATIVE\ntitle: Missing status\n---\n"
-                  "# REC-BAD-001\n")
+                  "# DEC-9002\n")
     project.commit()
     run2 = support.run_check(project, sandbox)
-    support.assert_check_red_naming(run2, interface, "core-schema", "docs/custom-records/REC-BAD-001.md", "status")
+    support.assert_check_red_naming(run2, interface, "core-schema", "docs/custom-records/DEC-9002.md", "status")
 
 
 def test_record_in_nested_path_discovered_by_graph_check(project, sandbox, interface):

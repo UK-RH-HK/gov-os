@@ -18,8 +18,8 @@ import yaml
 import w1_30_support as support
 
 TICKET = "PROJ-aaaa"
-WBS = "W1-test"
-OTHER, OTHER_WBS = "PROJ-oooo", "W1-other"
+WBS = "W1-946"
+OTHER, OTHER_WBS = "PROJ-oooo", "W1-923"
 OTHER_FOLDER = f"tests/acceptance/{OTHER_WBS}"
 OTHER_TEST = f"{OTHER_FOLDER}/test_other.py"
 TEST_MAP_REL = "governance/project/test-map.yaml"

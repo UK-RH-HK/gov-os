@@ -92,7 +92,8 @@ def declaration_text(check_id, command, family=SMALL_FAMILY, severity="hard-bloc
 
 def task_record(**changes):
     front = {"id": "PROJ-0001", "type": "task", "status": "OPEN", "state_class": "AUTHORITATIVE",
-             "title": "A ticket", "role": "engineer", "allowed_paths": ["src/**"], "kpis": ["one case is green"]}
+             "title": "A ticket", "role": "engineer", "allowed_paths": ["src/**"],
+             "kpis": {"success": ["one case is green"], "failure": []}}   # the ticket schema's form (DEC-954)
     front.update(changes)
     front = {key: value for key, value in front.items() if value is not ...}
     return "---\n" + yaml.safe_dump(front, sort_keys=False) + "---\n\n# A ticket\n"

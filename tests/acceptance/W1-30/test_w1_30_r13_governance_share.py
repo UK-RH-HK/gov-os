@@ -39,7 +39,7 @@ if _W1_31 not in sys.path:
 import w1_31_support as telemetry  # noqa: E402
 
 TICKET = "PROJ-shar"
-WBS = "W1-shar"
+WBS = "W1-940"
 SESSION_OPTION = "--ticket-session"
 SHARE_KEY = "governance_share"
 SHARE_PARTS = ("measured", "estimated", "total")

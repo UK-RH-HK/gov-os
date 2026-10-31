@@ -29,7 +29,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-cmts"
-WBS = "W1-cmts"
+WBS = "W1-903"
 MISTYPED = "PROJ-cmtz"
 A_RECORD = support.BASE_SOURCE
 INSIDE = "src/example/more.py"

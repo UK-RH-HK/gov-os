@@ -37,6 +37,12 @@ write in a later call (DP-19), and ``mv`` and ``install`` (DP-20).
 
 The guard is asked through the PreToolUse commands the project's committed
 settings register. No session is started.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
+ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
+template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
+lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
+Each moved case names its fixtures by their old names in its first line; its verdict is the same.
 """
 
 from __future__ import annotations
@@ -103,8 +109,9 @@ def test_the_guard_refuses_the_write_when_the_symbolic_link_was_made_by_an_earli
 
 @pytest.mark.parametrize("kind", ("symbolic", "hard"))
 def test_the_guard_does_not_refuse_a_link_whose_source_and_destination_are_inside_the_roles_paths(
-        guard, project, kind):
+        kernel_guard, kernel_project, kind):
     """The control: the link alone, from a file of the engineer's own to a new name beside it."""
+    guard, project = kernel_guard, kernel_project
     command = {"symbolic": f"ln -s {project}/{OWN_FILE} {LINK}.py", "hard": f"ln {OWN_FILE} {LINK}.py"}[kind]
     w47.assert_allowed(_ask(guard, project, command), f"`{command}` by an engineer")
 
@@ -134,8 +141,9 @@ def test_the_guard_refuses_cp_with_the_tickets_as_the_target_directory_option(gu
     w47.assert_stopped(_ask(guard, project, command), f"`{command}` by an engineer")
 
 
-def test_cp_with_the_destination_as_the_last_operand_is_judged_as_before(guard, project):
+def test_cp_with_the_destination_as_the_last_operand_is_judged_as_before(kernel_guard, kernel_project):
     """The control: allowed inside the engineer's paths, refused in the acceptance tests and the tickets."""
+    guard, project = kernel_guard, kernel_project
     inside = f"cp {OWN_FILE} {OWN}/w1_46_copy.py"
     w47.assert_allowed(_ask(guard, project, inside), f"`{inside}` by an engineer")
     for destination in (TEST_FILE, f"{TESTS}/", TICKET_FILE):

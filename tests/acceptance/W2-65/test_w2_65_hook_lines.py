@@ -8,15 +8,27 @@ than 0 or 2, and must pass 0 (with whatever the program wrote, a deny decision i
 
 The lines are read from this worktree's sources and run through ``sh -c`` in a temporary project and home; the program
 each line starts is a stand-in placed where the line looks for it (``w2_65_support``).
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). Since ACT 1 this repository's hook source holds no
+containment lines and its preToolUse line runs its own five-rule hook. The case that asked both sources for the guard
+and the containment lines now asks the kernel's two: the template's source, and the hook source of a project generated
+from the template (``.rulesync/hooks.jsonc`` as Copier puts it there), read and filtered as ``guarded_lines`` reads
+this repository's (``tests/acceptance/W2-90/README.md``).
 """
 
 from __future__ import annotations
 
 import json
+import sys
+from pathlib import Path
 
 import pytest
 
 import w2_65_support as support
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
+
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 LINES = support.guarded_lines()
 IDS = [line.id for line in LINES]
@@ -42,17 +54,40 @@ def _marking(text: str, mark) -> str:
     return text.replace("os.environ['W265_MARK']", repr(str(mark)))
 
 
-def test_both_sources_hold_the_guard_and_the_containment_lines_and_the_guard_stays_recognisable():
+@pytest.fixture(scope="module")
+def kernel_sources(tmp_path_factory):
+    """``{source: (where, lines)}`` for the kernel's two hook sources: the template's, and a generated project's
+    (W2-90). The lines are those ``guarded_lines`` keeps: the guard's on preToolUse, the containment program's."""
+    try:
+        project = kernel_wiring.generate_project(tmp_path_factory.mktemp("w2-90-w2-65-kernel"))
+    except kernel_wiring.GenerationFailed as exc:
+        pytest.fail(str(exc), pytrace=False)
+    found = {"template": (support.TEMPLATE_SOURCE_REL, [line for line in LINES if line.source == "template"])}
+    data = support.load_jsonc(project / kernel_wiring.HOOK_SOURCE_REL)
+    generated = []
+    for event, listed in (data.get("hooks") or {}).items():
+        for index, entry in enumerate(listed or []):
+            command = entry.get("command", "") if isinstance(entry, dict) and entry.get("type") == "command" else None
+            if command is not None and ((event == "preToolUse" and support.GUARD_PROGRAM in command)
+                                        or support.CONTAINMENT_PROGRAM in command):
+                generated.append(support.Line("generated", event, index, command))
+    found["generated"] = (f"the generated project's {kernel_wiring.HOOK_SOURCE_REL}", generated)
+    return found
+
+
+def test_both_sources_hold_the_guard_and_the_containment_lines_and_the_guard_stays_recognisable(kernel_sources):
     """Each source has a preToolUse line that runs the guard, and lines that run the containment program on
     postToolUse and postToolUseFailure. The guard's line keeps the text the launcher recognises it by
-    (``hooks/pretooluse.py``, I1 §2.3), so the launcher still sees the guard in the generated settings."""
-    for source in support.SOURCES:
-        found = {(line.event, line.program_name) for line in LINES if line.source == source}
+    (``hooks/pretooluse.py``, I1 §2.3), so the launcher still sees the guard in the generated settings.
+
+    The sources are the kernel's (W2-90): the template's, and a generated project's."""
+    for source, (where, lines) in kernel_sources.items():
+        found = {(line.event, line.program_name) for line in lines}
         assert ("preToolUse", "pretooluse.py") in found, (
-            f"{support.SOURCES[source]} has no preToolUse line containing {support.GUARD_PROGRAM!r}: {found}")
+            f"{where} has no preToolUse line containing {support.GUARD_PROGRAM!r}: {found}")
         for event in ("postToolUse", "postToolUseFailure"):
             assert (event, "posttooluse.py") in found, (
-                f"{support.SOURCES[source]} has no {event} line running the containment program: {found}")
+                f"{where} has no {event} line running the containment program: {found}")
 
 
 @pytest.mark.parametrize("line", LINES, ids=IDS)

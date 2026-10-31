@@ -289,7 +289,7 @@ Changed one by one, because the engineer's commit held a file outside the ticket
 | `test_close_record_lists_vendor_skill_without_version` | close | the skills are the orchestrator's commit |
 | `test_time_limit_is_configurable`, `test_time_limit_exceeded_refuses_close` | close | the slow test is the orchestrator's commit |
 | `test_containment_refuses_ticket_changing_acceptance_tests` | close | the planted file is one commit made exactly as the engineer |
-| every case on `_green_project` | receipt | `DEC-test` is the owner's commit |
+| every case on `_green_project` | receipt | `DEC-9021` is the owner's commit |
 | every case on a closed ticket | traceability | the status replaced is `in_progress` |
 
 Removed: `test_failing_close_with_context_failure_no_context_hash` (receipt). Its project's
@@ -866,7 +866,7 @@ the tree first.
 
 | Case | Red now because |
 |------|-----------------|
-| `test_a_file_no_commit_holds_lifts_no_escalation` (untracked `docs/adr/DEC-planted.md` holding `status: ACTIVE` only) | lifted: the close given the decision ran the tests (exit code 3) |
+| `test_a_file_no_commit_holds_lifts_no_escalation` (untracked `docs/adr/DEC-9020.md` holding `status: ACTIVE` only) | lifted: the close given the decision ran the tests (exit code 3) |
 | `test_a_path_to_a_file_outside_the_project_lifts_no_escalation` (`../`-paths from each place a decision is looked for) | lifted, the same |
 | `test_the_tickets_own_checkpoint_lifts_no_escalation` | lifted, the same |
 | `test_a_decision_recorded_before_the_escalation_began_lifts_none` (the owner's, ACTIVE, no finding of W1-11's checker) | lifted, the same |

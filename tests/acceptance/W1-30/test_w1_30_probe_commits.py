@@ -21,7 +21,7 @@ import shutil
 import w1_30_support as support
 
 TICKET = "PROJ-prbc"
-WBS = "W1-prbc"
+WBS = "W1-927"
 REVIEWER_ROLE = "independent-auditor"
 REVIEWER_SESSION = "reviewer-001"
 NAMES_THE_REVIEWER = re.compile(r"reviewer|" + REVIEWER_ROLE, re.IGNORECASE)

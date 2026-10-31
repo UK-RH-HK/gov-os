@@ -90,14 +90,17 @@ GOV_CHECK_TIMEOUT_S = 1800.0
 # --------------------------------------------------------------------------
 
 class Box:
-    """A scratch place: HOME, TMPDIR, a PATH of wrappers (python3, git, gitleaks), and the retrieval stand-in."""
+    """A scratch place: HOME, TMPDIR, a PATH of wrappers (python3, git, gitleaks, check-jsonschema), and the
+    retrieval stand-in."""
 
     def __init__(self, workdir):
         self.workdir = Path(workdir)
         for name in ("home", "tmp", "pycache", "elsewhere", "bin", "hook", "log"):
             (self.workdir / name).mkdir(parents=True, exist_ok=True)
+        # check-jsonschema: core-schema's validator (DEC-872 item 2, DEC-954), the one the suite's PATH finds
         for tool, found in (("python3", sys.executable), ("git", shutil.which("git")),
-                            ("gitleaks", shutil.which("gitleaks"))):
+                            ("gitleaks", shutil.which("gitleaks")),
+                            ("check-jsonschema", shutil.which("check-jsonschema"))):
             if found:
                 wrapper = self.workdir / "bin" / tool
                 wrapper.write_text(f'#!/bin/sh\nexec "{found}" "$@"\n', encoding="utf-8")
@@ -456,16 +459,28 @@ def schema_project(project, files, require_audit=True):
     return project
 
 
+def schema_findings(done):
+    """Core-schema's findings from its output (DEC-954): a list of findings; the refusal form ``{"findings":
+    [...], ...}``; or the success form ``{"ok": true, "result": {...}}``, which carries no finding."""
+    try:
+        output = json.loads(done.stdout) if done.stdout.strip() else []
+    except ValueError:
+        raise AssertionError(f"core-schema did not print its findings as JSON\n{done.describe()}") from None
+    if isinstance(output, dict) and "findings" in output:
+        findings = output["findings"]
+    elif isinstance(output, dict) and output.get("ok") is True and isinstance(output.get("result"), dict):
+        findings = output["result"].get("findings", [])
+    else:
+        findings = output
+    assert isinstance(findings, list), done.describe()
+    return findings
+
+
 def core_schema(box, project):
     """Core-schema as its declaration says, in ``project``: its exit code and its findings."""
     declaration = yaml.safe_load((REPO_ROOT / CHECKS_REL / "core-schema.yaml").read_text(encoding="utf-8"))
     done = run(["sh", "-c", declaration["command"]], cwd=project, env=box.env(), timeout=CALL_TIMEOUT_S)
-    try:
-        findings = json.loads(done.stdout) if done.stdout.strip() else []
-    except ValueError:
-        raise AssertionError(f"core-schema did not print its findings as JSON\n{done.describe()}") from None
-    assert isinstance(findings, list), done.describe()
-    return done, findings
+    return done, schema_findings(done)
 
 
 def of_path(findings, rel):
@@ -603,12 +618,7 @@ def core_schema_at(box, project, commit):
     module.write_bytes(show(commit, SCHEMA_MODULE_REL))
     done = run([*argv[:at], "-c", _SCHEMA_AS, module, *argv[at + 2:]], cwd=project, env=box.env(),
                timeout=CALL_TIMEOUT_S)
-    try:
-        findings = json.loads(done.stdout) if done.stdout.strip() else []
-    except ValueError:
-        raise AssertionError(f"core-schema did not print its findings as JSON\n{done.describe()}") from None
-    assert isinstance(findings, list), done.describe()
-    return done, findings
+    return done, schema_findings(done)
 
 
 def schema_project_at(project, files, commit):

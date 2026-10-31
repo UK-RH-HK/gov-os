@@ -18,7 +18,7 @@ answer of ``gov check --json`` itself, with the commit in its ``provenance``.
 import w1_30_support as support
 
 TICKET = "PROJ-stl1"
-WBS = "W1-stale"
+WBS = "W1-944"
 
 SETTINGS = "governance/project/settings.yaml"
 NOTES = "governance/project/notes.yaml"

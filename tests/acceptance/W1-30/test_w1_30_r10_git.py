@@ -35,7 +35,7 @@ import subprocess
 import w1_30_support as support
 
 TICKET = "PROJ-gitb"
-WBS = "W1-gitb"
+WBS = "W1-909"
 PLANTED = "conftest.py"
 FEATURE = "src/example/feature.py"
 

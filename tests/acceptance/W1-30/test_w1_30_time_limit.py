@@ -10,7 +10,7 @@ after it the next attempt is blocked.
 import w1_30_support as support
 
 TICKET = "PROJ-slow"
-WBS = "W1-slow"
+WBS = "W1-943"
 LIMIT = ("--timeout", "1")
 
 

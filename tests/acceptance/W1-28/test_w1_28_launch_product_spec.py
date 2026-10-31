@@ -30,13 +30,27 @@ role's own name.
 - **The roster** (DEC-163) names the session and the profile of every launched
   role. The committed entry of product-spec must name them too. The ticket
   lead changes ``governance/project/roster.yaml``; the engineer cannot.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The case that asked this repository's live guard about the
+launched session's identity now asks the kernel's: the ``kernel_launch*`` fixtures below are the same launch project
+built on a project generated from the template, whose ``.claude/settings.json`` rulesync generates from the
+template's sources; the guard is the PreToolUse line those settings register, run from ``governance/kernel/hooks/``
+(``tests/acceptance/W2-90/README.md``).
 """
 
 from __future__ import annotations
 
+import shutil
+import sys
+from pathlib import Path
+
 import pytest
 
 import w1_28_launch_support as support
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
+
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 w46, w47 = support.w46, support.w47
 
@@ -158,9 +172,42 @@ def test_the_product_spec_session_knows_its_role_and_ticket(launch):
     )
 
 
+@pytest.fixture(scope="module")
+def kernel_launch_base(tmp_path_factory):
+    """The launcher's project (DEC-386) on a project generated from the template, built once (W2-90)."""
+    try:
+        return kernel_wiring.w1_28_project(tmp_path_factory.mktemp("w2-90-w1-28-kernel"))
+    except kernel_wiring.GenerationFailed as exc:
+        pytest.fail(str(exc), pytrace=False)
+
+
+@pytest.fixture()
+def kernel_launch_project(kernel_launch_base, tmp_path, sandbox):
+    """This test's own copy of it, with a ``held-out.yaml`` made up here, and this worktree's ``gov`` package
+    importable for the sandbox's home as an install makes it (the kernel's line starts ``python3``)."""
+    target = tmp_path / "launch-repo"
+    shutil.copytree(kernel_launch_base, target, symlinks=True)
+    stand_in = w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in")
+    w47.configure_stand_in(target, stand_in)
+    kernel_wiring.install_gov_for(sandbox.home)
+    return target
+
+
+@pytest.fixture()
+def kernel_launch(kernel_launch_project, sandbox, cli):
+    """``launch(role, ticket=None, *cli_args)`` in the project on a generated project."""
+
+    def _launch(role, ticket=None, *cli_args):
+        return w46.launch(kernel_launch_project, sandbox, cli, role,
+                          ticket or support.TICKET_OF.get(role, support.ENGINEER_TICKET), *cli_args)
+
+    return _launch
+
+
 @pytest.mark.parametrize("tool", ("Write", "Edit"))
-def test_the_guard_decides_by_the_identity_the_launcher_gave(launch, launch_project, sandbox, tool):
+def test_the_guard_decides_by_the_identity_the_launcher_gave(kernel_launch, kernel_launch_project, sandbox, tool):
     """The role and the ticket of the session, handed to the guard: its own path is allowed, another is denied."""
+    launch, launch_project = kernel_launch, kernel_launch_project
     result = _started(launch)
     role, ticket = result.variable("GOV_ROLE"), result.variable("GOV_TICKET")
     own = w46.ask_guard(launch_project, sandbox, tool,

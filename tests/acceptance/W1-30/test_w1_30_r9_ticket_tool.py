@@ -25,7 +25,7 @@ import re
 import w1_30_support as support
 
 TICKET = "PROJ-tool"
-WBS = "W1-tool"
+WBS = "W1-948"
 NAMES_THE_TOOL = re.compile(r"\btk\b|ticket tool", re.IGNORECASE)
 
 FAILING_TOOL = "#!/bin/sh\necho 'planted: this ticket tool fails' >&2\nexit 7\n"
