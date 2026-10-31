@@ -296,7 +296,7 @@ def main() -> None:
             command = tool_input.get("command", "")
             try:
                 from gov.guard.install import (
-                    has_sudo, has_install, acting_role, cto_install,
+                    has_sudo, has_install, acting_role,
                     install_in_experiment_folder)
             except Exception as exc:
                 session_id = data.get("session_id", "")
@@ -320,7 +320,18 @@ def main() -> None:
                 # orchestrator on the coordination ticket named in the
                 # project's roster) asks the owner; every other session is
                 # refused and escalates, and every one when the key names
-                # no ticket (fail closed).
+                # no ticket (fail closed).  Imported here, on its own: a
+                # pinned gov older than this hook has no CTO rule, and
+                # then every install is refused while every other call
+                # is decided as before.
+                try:
+                    from gov.guard.install import cto_install
+                except Exception as exc:
+                    _deny(f"install refused in every session: the installed "
+                          f"gov has no CTO install rule ({exc}); update the "
+                          f"pinned gov, and until then raise the install as "
+                          f"a P1 escalation to the CTO, who asks the owner "
+                          f"(DEC-957)")
                 asks, why = cto_install(project_root, role, subagent_type,
                                         ticket_id)
                 if asks:

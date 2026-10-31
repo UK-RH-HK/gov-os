@@ -65,12 +65,20 @@ def _project(tmp_path, key="W9-00", roster_text=None):
     return project
 
 
-def _hook(project, tmp_path, command="pip install requests", role=None, ticket=None, subagent=None, cwd=None):
+def _hook(project, tmp_path, command="pip install requests", role=None, ticket=None, subagent=None, cwd=None,
+          older_gov=False):
     home = tmp_path / "home"
     (home / ".local" / "bin").mkdir(parents=True, exist_ok=True)
     (tmp_path / "tmp").mkdir(exist_ok=True)
+    pythonpath = str(REPO / "src")
+    if older_gov:
+        # A pinned gov older than the hook: its install module has no CTO rule.
+        shim = tmp_path / "older-gov"
+        shim.mkdir(exist_ok=True)
+        (shim / "sitecustomize.py").write_text("import gov.guard.install as m\ndel m.cto_install\n", encoding="utf-8")
+        pythonpath = f"{shim}{os.pathsep}{pythonpath}"
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LANG": "C.UTF-8",
-           "LC_ALL": "C.UTF-8", "TMPDIR": str(tmp_path / "tmp"), "PYTHONPATH": str(REPO / "src"),
+           "LC_ALL": "C.UTF-8", "TMPDIR": str(tmp_path / "tmp"), "PYTHONPATH": pythonpath,
            "PYTHONPYCACHEPREFIX": str(tmp_path / "pycache"), "CLAUDE_PROJECT_DIR": str(project)}
     if role is not None:
         env["GOV_ROLE"] = role
@@ -230,3 +238,35 @@ def test_a_bash_call_that_is_not_an_install_is_unchanged(tmp_path, key):
     project = _project(tmp_path, key=key)
     assert _hook(project, tmp_path, command="ls", role="engineer", ticket="T-02")[0] == "allow"
     assert _hook(project, tmp_path, command="ls", role="orchestrator", ticket="T-01")[0] == "allow"
+
+
+# -- the regression: a pinned gov older than the hook (no ``cto_install``) -----------------------------------------
+# The hook once imported the CTO rule with the rest of the install rule, so under an older gov every Bash call ended
+# with exit 2. Now only installs depend on it, and they are refused by a rule (fail closed).
+
+def test_under_an_older_gov_a_bash_call_that_is_not_an_install_is_unchanged(tmp_path):
+    project = _project(tmp_path)
+    for role, ticket in (("engineer", "T-02"), ("orchestrator", "C-00"), ("research", "R-01")):
+        assert _hook(project, tmp_path, command="ls", role=role, ticket=ticket, older_gov=True)[0] == "allow"
+
+
+def test_under_an_older_gov_the_research_exception_stands(tmp_path):
+    project = _project(tmp_path)
+    decision, _ = _hook(project, tmp_path, command="uv sync", role="research", ticket="R-01", cwd=project / FOLDER,
+                        older_gov=True)
+    assert decision == "allow"
+
+
+@pytest.mark.parametrize("role, ticket", [("orchestrator", "C-00"), ("orchestrator", "T-01"), ("engineer", "T-02"),
+                                          ("research", "R-01")])
+def test_under_an_older_gov_every_install_is_refused_by_a_rule_the_ctos_included(tmp_path, role, ticket):
+    project = _project(tmp_path)
+    decision, reason = _hook(project, tmp_path, role=role, ticket=ticket, older_gov=True)
+    assert decision == "deny"
+    assert "no CTO install rule" in reason and "P1 escalation to the CTO" in reason
+
+
+def test_under_an_older_gov_sudo_is_still_refused(tmp_path):
+    project = _project(tmp_path)
+    decision, reason = _hook(project, tmp_path, command="sudo ls", role="engineer", ticket="T-02", older_gov=True)
+    assert decision == "deny" and "sudo" in reason
