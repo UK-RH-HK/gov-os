@@ -1,6 +1,6 @@
 ---
 id: DAEO-kiar
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-31T01:22:30Z
@@ -63,3 +63,5 @@ Card: the owner's order of 2026-10-31 (DEC-966 item 4): rebuild speed is a prior
 - **Profile FULL:** the secrets filter guards the index against secrets; an independent review of the final code (the QA step) on every path where a remembered result is used.
 
 **At merge (DEC-970 P-W2-107-3, DEC-975 item 1):** `src/gov/rebuild/command.py` is in this ticket's paths for one change only: the rebuild's JSON record gives the secrets stage's counts from `gov.secrets.scan_counts()` (contents and names, scanned and remembered), taken as the difference around the stage; nothing else in that file changes (W2-76's file, merged).
+
+**W1-27 (DEC-978):** a fresh independent test designer revises W1-27's case `test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` to leave out exactly the secrets cache (`.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and `.cache`, `.cache/gov-os` only where they hold nothing else) under the home it gives, and W1-27's README line for it; nothing else (`Rewrite-Reason: DEC-967`).

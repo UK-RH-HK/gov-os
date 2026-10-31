@@ -12263,3 +12263,40 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.360 | 2026-10-31 | Delegated (orchestrator): DEC-977 (the batch of six refused by W2-108's whole-tree copy; W2-108 back for DEC-385's form; the five re-close after W2-107). Next free id: DEC-978. |
+
+### DEC-978 — W2-107's close refused by W1-27's no-embeddings case (the secrets cache in the given home): P-W2-107-2 (a) applied to it (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, "revises older tests under an existing decision" (the escalation rubric); reversible; nothing in the Charter, the master rules or the Contract's scope; the guard not weakened; for the owner to overturn) · **Under:** DEC-970 (P-W2-107-2 (a)), DEC-967, DEC-966 item 4, DEC-968, DEC-975 · **Basis:** the close `log/close-build/W2-107-20261031-*` (refused 20:19)
+- **Decision:**
+  1. **The cause:** W1-27's case `test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` asserts that the rebuild's no-embeddings mode writes nothing in the home it is given; since W2-107 a rebuild creates the machine-wide secrets cache there (`.cache`, `.cache/gov-os`, `.cache/gov-os/secrets-scan.sqlite`), the place the owner's approved design gives it (DEC-967). Red with W2-107 3 of 3, green without it 3 of 3. The same clash DEC-970's P-W2-107-2 (a) settled for W1-16's home case.
+  2. **The same remedy:** a fresh independent test designer revises that one case to leave out exactly `.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and the two folders `.cache` and `.cache/gov-os` only where they hold nothing else, under the home the case gives; anything else written there still fails the case; lowering nothing else; `Rewrite-Reason: DEC-967`. Then W1-27's file and W1-16's home file alone, the merge, and W2-107's close again, alone (DEC-975).
+  3. **The lesson:** W2-107's own scoped runs did not select W1-27's case; the close did. Recorded in the daily document.
+- **Where it goes (DEC-851):** this register; W2-107's ticket body (the file named for the designer); the daily document.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.361 | 2026-10-31 | Delegated (orchestrator): DEC-978 (W1-27's no-embeddings case revised to leave out exactly the secrets cache, as P-W2-107-2 (a) did for W1-16). Next free id: DEC-979. |
+
+### DEC-979 — The owner's decisions on CAPACITY-1, the stores, batch closes and the order of work (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** CAPACITY-1 (`packages/CAPACITY-1.md`, `bde35d69`), DEC-974, DEC-975, DEC-968, DEC-906, DEC-969 · **Changes:** the leads' load wait (the common brief) once the heavy-job limit runs; DEC-976's option (b) (settled); DEC-974 item 3 (decided); the lead queue's order
+- **Decision:**
+  1. **CAPACITY-1:**
+     - **D1 (a):** a machine-wide heavy-job limit replaces the leads' load wait: test runs and rebuilds take one of a few slots and wait for one; sessions, reviews and single-process runs run freely. Its slots are sized from the re-measure after W2-107, so that the load stays near the number of processors (20). Every status block shows the load. Until the limit runs, the load wait stays as it is.
+     - **D2 (a), P-LATENCY-1:** a fresh independent test designer revises the 11 hook-latency cases (W1-02's, W1-05's and W2-57's p95 under 100 ms) to time the hook's own work, at the same 100 ms, lowering nothing; this decision is the P1 that files its ticket (DEC-974), after W2-90b (W1-05's file shared).
+     - **D3 (a), P-TOOLS-LANE-1:** the CTO's own tools and scripts (the close tool, the selection, the gate, the watchers, the samplers, the brief builders, the nightly folder) are not product work: each has its own tests, run before use; an independent review only when a change could fail open (let a red or a refusal through, widen a gate) or lose work (kill, delete, lock, overwrite); each change logged in the daily document's "Tools changed" section; never a WBS ticket (commits `Task:` W2-00).
+     - **D4 (a), P-W2-108-BATCH:** no query-embedding batching; the remaining time of the context check at load is profiled first.
+     - **D5 (a):** W2-90b, filed by the CTO under delegation, is approved as filed.
+     - **D6:** settled by D1 (single-process runs take no slot).
+     - **No bigger machine now:** re-sized on the re-measure after W2-107, as planned.
+  2. **The stores:** the main tree's store is rebuilt now with the integration branch's code; the designers' store is refreshed tonight; old or stale worktree stores are rebuilt when their leads next start. A store shared across clones for the embeddings (so a fresh clone does not embed every chunk again) goes into the re-measure as the next speed-up.
+  3. **Batch closes, working smart:** when a batch close finds a failure its change caused, it finds the ticket that caused it (that ticket's merges taken out, the failing tests re-run without it); if they pass without it, the rest of the batch closes on the same run and only the culprit goes back. A failure no single ticket explains refuses the batch (fail closed). Applied to the close tool now, in the lighter lane with its tests, and used for the next batch.
+  4. **The shared reranker:** brought to the owner as a P1 ticket proposal before the three layers, showing how it serves many sessions at once and what searches fall back to if it is down.
+  5. **The order of closes and work:**
+     - a. **First, what speeds up all the work:** W2-107's close; the batch of seven (W2-106, W2-84, W2-76, W2-49, W2-16, W2-67, W2-95); W2-108 after its test fix; then the heavy-job limit and the merge queue (W2-97).
+     - b. **Then the critical chain:** memory (W2-86's measure, the graph routes W2-92 and full embeddings W2-91, W2-13, W2-15a, W2-32, the 48-question measure, the shared reranker) and, in parallel, the roles (W2-11, W2-33, W2-60a and W2-60b, W2-83); then ACT 2 and the three layers.
+     - c. **Alongside, what EXAMIN needs:** W2-81 (the proving ground, claimed but never run), W2-88, W2-96.
+     - The critical chain's files are kept clear of other work.
+- **Where it goes (DEC-851):** this register (DEC-976 and DEC-974 marked); the prompt §0 (v3.61); the common lead brief (the new-worktree rebuild runs the worktree's own code; the load wait until the limit runs); the decisions-in-force list; RESUME HERE; the close tool and its tests; the lead queue.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.362 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-979 (CAPACITY-1 D1-D6; the stores; batch closes send back only the culprit; the shared reranker as a P1; the order of work). Next free id: DEC-980. |
