@@ -5,7 +5,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import re
 import subprocess
+import threading
 
 import pytest
 import yaml
@@ -208,26 +211,193 @@ def test_lock_from_refuses_a_lock_it_cannot_tell(tmp_path, lock):
 
 
 @pytest.mark.parametrize("role", ("engineer", "independent-auditor", "ticket-lead", ""))
-@pytest.mark.parametrize("lock", (False, True))
-def test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner(tmp_path, monkeypatch, role, lock):
+def test_the_lock_task_refuses_every_role_but_the_orchestrator_and_the_owner(tmp_path, monkeypatch, role):
     from gov.cli.errors import GovError
     from gov.release.command import run
 
     repo = _repo(tmp_path / "gov-os")
     monkeypatch.setenv("GOV_ROLE", role)
-    args = argparse.Namespace(version=None if lock else "1.4.0", lock_from=str(repo) if lock else None)
     with pytest.raises(GovError, match="only the orchestrator") as refused:
-        run(repo, args, {})
-    assert refused.value.code == "RELEASE_REFUSED" and not (repo / RELEASES_REL).exists()
+        run(repo, argparse.Namespace(version=None, lock_from=str(repo)), {})
+    assert refused.value.code == "RELEASE_REFUSED" and not (repo / LOCK_REL).exists()
 
 
 @pytest.mark.parametrize("role", ("orchestrator", None))
-def test_gov_release_runs_for_the_orchestrator_and_the_owner(tmp_path, monkeypatch, role):
+def test_the_lock_task_runs_for_the_orchestrator_and_the_owner(tmp_path, monkeypatch, role):
     from gov.release.command import run
 
     repo = _repo(tmp_path / "gov-os")
+    project = _installed(repo, tmp_path / "product", "v0.1.0")
     if role is None:
         monkeypatch.delenv("GOV_ROLE", raising=False)
     else:
         monkeypatch.setenv("GOV_ROLE", role)
-    assert run(repo, argparse.Namespace(version="1.4.0", lock_from=None), {})["version"] == "1.4.0"
+    args = argparse.Namespace(version=None, lock_from=str(_plain(repo, tmp_path / "plain")))
+    assert run(project, args, {}) == {"lock": str(project / LOCK_REL), "release": None}
+
+
+# The build form is the owner's alone, in person (DEC-772), driven through the seam as W1-50 drives the lift's.
+_WHOLE = [{"pid": 4242, "ppid": 4241, "comm": "python3", "exe": "/usr/bin/python3.12",
+           "cmdline": ["python3", "-m", "gov.cli.main", "release", "1.4.0"]},
+          {"pid": 4241, "ppid": 1, "comm": "bash", "exe": "/usr/bin/bash", "cmdline": ["-bash"]},
+          {"pid": 1, "ppid": 0, "comm": "systemd", "exe": "/usr/lib/systemd/systemd", "cmdline": ["/sbin/init"]}]
+_SESSION = {"pid": 4241, "ppid": 1, "comm": "node", "exe": "/usr/bin/node",
+            "cmdline": ["node", "/usr/lib/node_modules/@anthropic-ai/claude-code/cli.js"]}
+
+
+@pytest.fixture
+def owner(monkeypatch):
+    monkeypatch.delenv("GOV_ROLE", raising=False)
+    monkeypatch.delenv("GOV_TICKET", raising=False)
+
+
+@pytest.fixture
+def pty():
+    master, slave = os.openpty()
+    yield master, slave
+    for fd in (master, slave):
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+
+
+def _answer(master, reply):
+    """Read the prompt on the pty's other side and type back ``reply(code)``; what was shown, in a list."""
+    shown = []
+
+    def typist():
+        seen = b""
+        try:
+            while (found := re.search(rb"RELEASE-\d{4}", seen)) is None:
+                chunk = os.read(master, 1024)
+                if not chunk:
+                    return
+                seen += chunk
+            shown.append(seen.decode())
+            os.write(master, reply(found.group().decode()))
+        except OSError:
+            pass
+
+    thread = threading.Thread(target=typist, daemon=True)
+    thread.start()
+    return thread, shown
+
+
+def _untouched(repo, head):
+    assert not (repo / RELEASES_REL).exists()
+    assert _git(repo, "status", "--porcelain", "--untracked-files=all", "--ignored") == ""
+    assert _git(repo, "rev-parse", "HEAD").strip() == head and _git(repo, "tag", "--list") == ""
+
+
+def _nothing_shown(master):
+    os.set_blocking(master, False)
+    with pytest.raises(BlockingIOError):
+        os.read(master, 1024)
+
+
+def _refused(tmp_path, reason, ancestry=_WHOLE, terminal=None, pty=None):
+    from gov.cli.errors import GovError
+    from gov.release.command import _release_test
+
+    repo = _repo(tmp_path / "gov-os")
+    head = _git(repo, "rev-parse", "HEAD").strip()
+    with pytest.raises(GovError) as refused:
+        _release_test(repo, "1.4.0", ancestry=ancestry, terminal=terminal or (pty[1], pty[1]))
+    assert refused.value.code == "RELEASE_REFUSED" and refused.value.details["reason"] == reason
+    assert refused.value.message
+    _untouched(repo, head)
+    return refused.value
+
+
+def test_the_owner_builds_a_release_with_the_code_typed_back(tmp_path, owner, pty):
+    from gov.release.command import _release_test
+
+    repo = _repo(tmp_path / "gov-os")
+    head = _git(repo, "rev-parse", "HEAD").strip()
+    thread, shown = _answer(pty[0], lambda code: f"  {code} \n".encode())
+    result = _release_test(repo, "1.4.0", ancestry=_WHOLE, terminal=(pty[1], pty[1]))
+    thread.join(5)
+    assert re.search(r"\bRELEASE-\d{4}\b", shown[0]) and "1.4.0" in shown[0]
+    assert result == {"version": "1.4.0", "record": str(repo / RELEASES_REL / "1.4.0")}
+    assert (repo / RELEASES_REL / "1.4.0" / MANIFEST_NAME).is_file() and verify(repo, "1.4.0")
+    assert _git(repo, "rev-parse", "HEAD").strip() == head and _git(repo, "tag", "--list") == ""
+
+
+@pytest.mark.parametrize("ancestry", (
+    [_WHOLE[0], _SESSION, _WHOLE[2]],
+    [_WHOLE[0], {**_WHOLE[1], "comm": "claude"}, _WHOLE[2]],
+    [_WHOLE[0], {**_WHOLE[1], "exe": "/home/o/.local/share/claude/versions/2.1.3"}, _WHOLE[2]],
+), ids=("cli.js", "comm", "version file"))
+def test_a_claude_code_session_among_the_ancestors_refuses(tmp_path, owner, pty, ancestry):
+    _refused(tmp_path, "session", ancestry=ancestry, pty=pty)
+    _nothing_shown(pty[0])
+
+
+@pytest.mark.parametrize("ancestry", (
+    [], _WHOLE[:2], [_WHOLE[0], {**_WHOLE[1], "ppid": 7}, _WHOLE[2]],
+    [*_WHOLE[:2], {**_WHOLE[2], "comm": "bwrap"}], [*_WHOLE[:2], {**_WHOLE[2], "cmdline": []}],
+    [{"pid": 4242}, *_WHOLE[1:]], {"pid": 1},
+), ids=("empty", "short", "broken link", "another first process", "unread process", "malformed", "not a list"))
+def test_an_ancestry_not_read_whole_refuses(tmp_path, owner, pty, ancestry):
+    _refused(tmp_path, "ancestry", ancestry=ancestry, pty=pty)
+    _nothing_shown(pty[0])
+
+
+@pytest.mark.parametrize("variable, reason", (("GOV_ROLE", "role"), ("GOV_TICKET", "ticket")))
+@pytest.mark.parametrize("value", ("orchestrator", "owner", "engineer", "DAEO-49o5", ""))
+def test_gov_role_or_gov_ticket_set_to_any_value_refuses(tmp_path, owner, monkeypatch, pty, variable, reason, value):
+    monkeypatch.setenv(variable, value)
+    _refused(tmp_path, reason, pty=pty)
+    _nothing_shown(pty[0])
+
+
+@pytest.mark.parametrize("which", ("pipes", "input a pipe", "output a pipe", "closed", "not descriptors"))
+def test_input_and_output_not_both_a_terminal_refuses(tmp_path, owner, pty, which):
+    read, write = os.pipe()
+    try:
+        terminal = {"pipes": (read, write), "input a pipe": (read, pty[1]), "output a pipe": (pty[1], write),
+                    "closed": (987, 988), "not descriptors": ("0", None)}[which]
+        _refused(tmp_path, "terminal", terminal=terminal)
+    finally:
+        os.close(read)
+        os.close(write)
+    _nothing_shown(pty[0])
+
+
+@pytest.mark.parametrize("reply", ("wrong", "empty", "end of input", "the code on a later line"))
+def test_a_code_typed_back_wrong_refuses(tmp_path, owner, pty, reply):
+    typed = {"wrong": lambda code: f"{code}0\n".encode(), "empty": lambda code: b"\n",
+             "end of input": lambda code: b"\x04", "the code on a later line": lambda code: f"x\n{code}\n".encode()}
+    thread, shown = _answer(pty[0], typed[reply])
+    _refused(tmp_path, "code", pty=pty)
+    thread.join(5)
+    assert shown and re.search(r"RELEASE-\d{4}", shown[0])
+
+
+def test_the_command_reads_the_real_chain_and_the_real_terminal(tmp_path, monkeypatch):
+    from gov.release import command
+
+    seen = []
+    monkeypatch.setattr(command, "_release_test", lambda *args, **kwargs: seen.append((args, kwargs)) or {})
+    command.run(tmp_path, argparse.Namespace(version="1.4.0", lock_from=None), {})
+    assert seen == [((tmp_path, "1.4.0"), {})]
+
+
+@pytest.mark.parametrize("role", ("orchestrator", None))
+def test_the_command_refuses_from_this_process(tmp_path, monkeypatch, role):
+    """Run under pytest, with no terminal planted and the real chain read: never built, by whichever check."""
+    from gov.cli.errors import GovError
+    from gov.release.command import run
+
+    repo = _repo(tmp_path / "gov-os")
+    head = _git(repo, "rev-parse", "HEAD").strip()
+    monkeypatch.delenv("GOV_TICKET", raising=False)
+    if role is None:
+        monkeypatch.delenv("GOV_ROLE", raising=False)
+    else:
+        monkeypatch.setenv("GOV_ROLE", role)
+    with pytest.raises(GovError) as refused:
+        run(repo, argparse.Namespace(version="1.4.0", lock_from=None), {})
+    assert refused.value.details["reason"] in ("session", "ancestry", "role", "terminal")
+    _untouched(repo, head)
