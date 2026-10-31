@@ -12250,3 +12250,16 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.359 | 2026-10-31 | Delegated (orchestrator): DEC-976 (W2-96 resumes when the queue allows; no gate exemption; its P3 stands). Next free id: DEC-977. |
+
+### DEC-977 — The batch of six refused by W2-108's whole-tree copy; W2-108 back for its test's DEC-385 form; the other five re-close after W2-107 (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and DEC-968: a P2, reversible, nothing in the Charter, the master rules or the Contract's scope, the guard not weakened; for the owner to overturn) · **Under:** DEC-968, DEC-385, DEC-969, DEC-975 · **Basis:** the close `log/close-build/W2-106+W2-84+W2-76+W2-49+W2-16+W2-108-20261031-153237/` (refused 18:31)
+- **Decision:**
+  1. **The cause:** W2-108's acceptance test `test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket` copies the repository's whole tree in a form W1-28's check cannot run and W1-50 cannot find on a synthetic root (DEC-385: a whole-tree copy is a module-level function with `root=REPO_ROOT` that leaves `governance/project/held-out.yaml` out by its path, or is limited to named paths). Red with the batch, green without it, 3 rounds each way: W1-28's `test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs` and W1-50's `test_the_two_whole_tree_fixtures_are_found`. W1-50's four cases parametrised on that test were marked "red without the change too" by the close tool's old trace: without the change they do not exist; under the reviewed rule (absent without = the change's) they are W2-108's too.
+  2. **W2-108 goes back** (merged `789513df`, not closed) for a fresh independent test designer to put that one test's copy into DEC-385's form, lowering nothing (`Rewrite-Reason: DEC-385`); then W1-28's and W1-50's files and W2-108's own suite alone, and the merge. It is first in the lead queue after W2-107's close (memory's critical chain: W2-108, then W2-13).
+  3. **W2-106, W2-84, W2-76, W2-49 and W2-16** caused none of the reds; they re-close in the next batch with W2-67 and W2-95, right after W2-107's own close (DEC-975), and W2-108 joins a close once its fix is merged.
+  4. **Not this batch's (DEC-968, dealt with at once):** W1-05's two and W1-46's one install cases, W2-59's four hook-line cases and W1-33's four cases are W2-90b's; W1-35's two files pass alone (flaky candidates); the hook-latency cases pass alone (P-LATENCY-1, to the owner in CAPACITY-1).
+- **Where it goes (DEC-851):** this register; W2-108's resume brief; the close records of the five; the daily document.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.360 | 2026-10-31 | Delegated (orchestrator): DEC-977 (the batch of six refused by W2-108's whole-tree copy; W2-108 back for DEC-385's form; the five re-close after W2-107). Next free id: DEC-978. |
