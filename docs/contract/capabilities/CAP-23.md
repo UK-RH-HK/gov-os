@@ -1,7 +1,7 @@
 ---
 id: CAP-23
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Concurrency and task claims
 depends_on:

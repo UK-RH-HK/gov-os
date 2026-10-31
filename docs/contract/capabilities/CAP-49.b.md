@@ -1,7 +1,7 @@
 ---
 id: CAP-49.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher passes; hiding is silent: the directory looks empty'
 depends_on:

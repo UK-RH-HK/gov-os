@@ -1,7 +1,7 @@
 ---
 id: CAP-48.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived memory rebuildable'
 depends_on:

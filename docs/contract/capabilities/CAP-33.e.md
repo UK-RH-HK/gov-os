@@ -1,7 +1,7 @@
 ---
 id: CAP-33.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: An experiment or finding that contradicts a closed specification opens a CIT-P whose impact assessment gives three costed options (apply now, defer, re-baseline); the owner chooses; CIT-E records what was done; every version of the specification is kept
 depends_on:

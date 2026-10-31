@@ -1,7 +1,7 @@
 ---
 id: CAP-53.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Profiles LITE/STANDARD/FULL by radius; readiness rows per profile
 depends_on:

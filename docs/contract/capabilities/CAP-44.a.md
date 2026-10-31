@@ -1,7 +1,7 @@
 ---
 id: CAP-44.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'gov init: kernel, overlay, repository contract, initial state, health checks'
 depends_on:

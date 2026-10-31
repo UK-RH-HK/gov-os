@@ -1,7 +1,7 @@
 ---
 id: CAP-33.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned promotion
 depends_on:

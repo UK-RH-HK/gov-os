@@ -232,9 +232,9 @@ Adoption Protocol v3.0,Conditional Recovery Role — Interrupted Repository Reco
 Adoption Protocol v3.0,Role A — Adoption Auditor/Planner,OK,Contract v4 CAP-44 (W1-41 adopt skill and command); role roster W3 (CAP-47)
 Adoption Protocol v3.0,Role B — Independent Migration Reviewer & Test Author,OK,"A5 path-map review by the W1 Independent Auditor (DEC-090, W1-41) + MR-3 Independent Test Designer (W1-33); full role W3 (CAP-47)"
 Adoption Protocol v3.0,Role C — Migration/Adoption Executor,OK,Engineer role (W1-33) running W1-41 adopt --lite
-Adoption Protocol v3.0,Role D — Independent Migration Verifier,OK,"Contract v4 CAP-44 covers A7 + CAP-47 (KEPT, wave W3); Independent Auditor role exists from W1 (W1-33)"
+Adoption Protocol v3.0,Role D — Independent Migration Verifier,OK,"Contract v4 CAP-44 + CAP-47 (KEPT, wave W3) cover A7: lite, W2 (v4.2 CAP-44.f; DEC-741, with DEC-722); beyond the lite form, W3 (v4.2 CAP-44.k); Independent Auditor role exists from W1 (W1-33)"
 Adoption Protocol v3.0,Role E — Memory Foundation Engineer,OK,Contract v4 CAP-20 rebuild + W1-27; memory/knowledge role W3 (DEC-066)
-Adoption Protocol v3.0,Role F — Independent Memory Verifier/Test Author,OK,"Contract v4 CAP-44 covers A10 + CAP-47 (KEPT, wave W3) + qualification memory oracle CAP-49"
+Adoption Protocol v3.0,Role F — Independent Memory Verifier/Test Author,OK,"Contract v4 CAP-44 + CAP-47 (KEPT, wave W3) cover A10: lite, W2 (v4.2 CAP-44.f; DEC-741, with DEC-722); beyond the lite form, W3 (v4.2 CAP-44.k) + qualification memory oracle CAP-49"
 Adoption Protocol v3.0,Role G — Independent Full v4 Auditor,OK,"MR-4 Independent Auditor (W1-33, W1-43); CAP-47"
 Adoption Protocol v3.0,Role H — Operator/CTO,OK,Charter v5 §6 owner as L5 customer (MR-6) + operator console until Release 1 (DEC-073)
 Adoption Protocol v3.0,4. Conditional interrupted-session recovery and freeze,OK,"Contract v4 CAP-44 (KEPT, wave W3) — sub-requirements in each capability's covers list (DEC-092)"
@@ -245,15 +245,15 @@ Adoption Protocol v3.0,8. A3 — Target path map,OK,"Contract v4 CAP-06 (KEPT, w
 Adoption Protocol v3.0,9. A4 — Adoption/migration plan,OK,"Contract v4 CAP-44 (KEPT, wave W3) — sub-requirements in each capability's covers list (DEC-092)"
 Adoption Protocol v3.0,10. B — Independent migration review and test authoring,OK,"Contract v4 CAP-44 covers: A5 independent review of the path map before any move, by the W1 Independent Auditor (W1-41, DEC-090); MR-3 independent tests"
 Adoption Protocol v3.0,11. C — Controlled migration execution,OK,"Contract v4 CAP-44 (KEPT, wave W3) — sub-requirements in each capability's covers list (DEC-092)"
-Adoption Protocol v3.0,12. D — Independent migration verification,OK,"Contract v4 CAP-44 covers: A7 independent migration verification (W3, with CAP-47; DEC-090)"
+Adoption Protocol v3.0,12. D — Independent migration verification,OK,"Contract v4 CAP-44 covers: A7 independent migration verification, lite, W2 (v4.2 CAP-44.f; DEC-741, with DEC-722); beyond the lite form, W3, with CAP-47 (v4.2 CAP-44.k; DEC-090)"
 Adoption Protocol v3.0,13. Legacy memory extraction after migration,OK,"Contract v4 CAP-44 (KEPT, wave W3) — sub-requirements in each capability's covers list (DEC-092)"
 Adoption Protocol v3.0,14. E — New Development Knowledge Fabric,OK,"Contract v4 CAP-44 (KEPT, wave W3) — sub-requirements in each capability's covers list (DEC-092)"
-Adoption Protocol v3.0,15. F — Independent memory verifier,OK,"Contract v4 CAP-44 covers: A10 independent memory verification (W3, with CAP-47; DEC-090)"
+Adoption Protocol v3.0,15. F — Independent memory verifier,OK,"Contract v4 CAP-44 covers: A10 independent memory verification, lite, W2 (v4.2 CAP-44.f; DEC-741, with DEC-722); beyond the lite form, W3, with CAP-47 (v4.2 CAP-44.k; DEC-090)"
 Adoption Protocol v3.0,16. G — Comprehensive v4 project audit,OK,"Contract v4 CAP-44 covers: A11 comprehensive audit (W3, with CAP-47; DEC-090); MR-4 audit skill (W1-36)"
 Adoption Protocol v3.0,17. Iterative remediation,OK,Charter v5 §5 loop policy (DEC-044 as amended by DEC-096) + Contract v4 CAP-59; audit findings become tickets or owner packages (DEC-088); CAP-44 covers (W3)
 Adoption Protocol v3.0,18. Migration finding states,OK,Audit findings classed per DEC-070 (W1-36 audit skill); CAP-44 covers remediation and finding states (W3)
 Adoption Protocol v3.0,19. Human gates during adoption,OK,MR-6 + Contract v4 CAP-34; adopt asks customer questions as packages (W1-41); CAP-44 covers (W3)
-Adoption Protocol v3.0,20. Final adoption verdict,OK,"Contract v4 CAP-44 acceptance: verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY conditions (W3; DEC-006, DEC-090)"
+Adoption Protocol v3.0,20. Final adoption verdict,OK,"Contract v4 CAP-44 acceptance: verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY: lite, W2 (v4.2 CAP-44.h; DEC-741, with DEC-722); with the ten ADOPTED_HEALTHY conditions, W3 (v4.2 CAP-44.l; DEC-006, DEC-090)"
 Distribution Protocol v1.2,"Governance OS Release, Distribution, Adoption & Upstream Learning Protocol",OK,"Carried by Contract v4 CAP-02, CAP-43..CAP-46, CAP-54; original kept as provenance (DEC-058)"
 Distribution Protocol v1.2,1. Architecture,OK,"Contract v4 CAP-43 (KEPT, wave W1) — sub-requirements in each capability's covers list (DEC-092)"
 Distribution Protocol v1.2,2. Recommended canonical remote,OK,"Contract v4 CAP-43 (KEPT, wave W1) — sub-requirements in each capability's covers list (DEC-092)"
@@ -277,10 +277,10 @@ Distribution Protocol v1.2,Stage A3 — Target path map,OK,"Contract v4 CAP-06 (
 Distribution Protocol v1.2,Stage A4 — Migration plan,OK,Contract v4 CAP-44 covers A4 (W1-41 KPI: batched plan with a rollback point per batch)
 Distribution Protocol v1.2,Stage A5 — Independent migration review and test authoring,OK,Contract v4 CAP-44 covers A5: independent path-map review before any move by the W1 Independent Auditor (W1-41; DEC-090)
 Distribution Protocol v1.2,Stage A6 — Controlled migration,OK,Contract v4 CAP-44 covers A6 (W1-41: batched git mv; failed batch rolls back)
-Distribution Protocol v1.2,Stage A7 — Independent migration verification,OK,"Contract v4 CAP-44 covers A7 (W3, with CAP-47; DEC-090)"
+Distribution Protocol v1.2,Stage A7 — Independent migration verification,OK,"Contract v4 CAP-44 covers A7: lite, W2 (v4.2 CAP-44.f; DEC-741, with DEC-722); beyond the lite form, W3, with CAP-47 (v4.2 CAP-44.k; DEC-090)"
 Distribution Protocol v1.2,Stage A8 — Legacy memory audit/extraction/retirement,OK,Contract v4 CAP-42 (W1-41 legacy importer)
 Distribution Protocol v1.2,Stage A9 — Development Knowledge Fabric build/rebuild,OK,Contract v4 CAP-44 covers A9 (W3 stage gate); mechanism gov rebuild CAP-20 (W1-27)
-Distribution Protocol v1.2,Stage A10 — Independent memory verification,OK,"Contract v4 CAP-44 covers A10 (W3, with CAP-47) + CAP-55 canaries"
+Distribution Protocol v1.2,Stage A10 — Independent memory verification,OK,"Contract v4 CAP-44 covers A10: lite, W2 (v4.2 CAP-44.f; DEC-741, with DEC-722); beyond the lite form, W3, with CAP-47 (v4.2 CAP-44.k) + CAP-55 canaries"
 Distribution Protocol v1.2,Stage A11 — Full v4 project audit,OK,Contract v4 CAP-44 covers A11 (W3) + MR-4 audit (W1-36)
 Distribution Protocol v1.2,11. Why path migration precedes new indexing,OK,Contract v4 CAP-44 covers A6 (W1-41 KPI: moves precede gov rebuild)
 Distribution Protocol v1.2,12. `gov update`,OK,"Contract v4 CAP-45 (KEPT, wave W2) — sub-requirements in each capability's covers list (DEC-092)"
@@ -289,7 +289,7 @@ Distribution Protocol v1.2,14. Upstream Export Gate,OK,"DROP — upstream lesson
 Distribution Protocol v1.2,15. Framework lesson intake,OK,"DROP — upstream lesson export / FCP loop is a non-goal (DEC-053 Q7; Charter v5 §7); lessons stay in docs/lessons (Contract v4 CAP-41, KEPT, wave W1)"
 Distribution Protocol v1.2,16. Cross-machine mechanics,OK,"Contract v4 CAP-46 (KEPT, wave W1) — sub-requirements in each capability's covers list (DEC-092)"
 Distribution Protocol v1.2,17. Security invariant,OK,"Contract v4 CAP-03 (KEPT, wave W1) — sub-requirements in each capability's covers list (DEC-092)"
-Distribution Protocol v1.2,18. Adoption acceptance,OK,"Contract v4 CAP-44 (verdict set, W3), CAP-54; DEC-006, DEC-090"
+Distribution Protocol v1.2,18. Adoption acceptance,OK,"Contract v4 CAP-44 verdict set: lite, W2 (v4.2 CAP-44.h; DEC-741, with DEC-722); with the ten ADOPTED_HEALTHY conditions, W3 (v4.2 CAP-44.l); CAP-54; DEC-006, DEC-090"
 Owner record,OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE,OK,Contract v4 CAP-10 (whole-repo corpus) + CAP-03 covers (whole repo minus secrets)
 Owner record,OWNER-DIRECTION-BR-0003-VERIFIER-CHALLENGE-ITEMS,OK,"Contract v4 CAP-03 covers (secret exclusion on every route incl. the code route, W1-15/W1-16) + CAP-37; the Bridge-phase verifier hand-off process itself is superseded (DEC-051, DEC-058)"
 Owner record,OWNER-DIRECTION-BR-0004-CHECKPOINT-DISCIPLINE,OK,Contract v4 CAP-37 (checkpoint discipline); §2D no manufactured history → lesson record W1-44 (CAP-41 covers)

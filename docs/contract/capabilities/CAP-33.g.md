@@ -1,7 +1,7 @@
 ---
 id: CAP-33.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: From Wave 2 the same plain-language question runs `gov impact`
 depends_on:

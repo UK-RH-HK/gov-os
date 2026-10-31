@@ -1,7 +1,7 @@
 ---
 id: CAP-60
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Below-floor recovery (break-glass)
 depends_on:

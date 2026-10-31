@@ -1,7 +1,7 @@
 ---
 id: CAP-42.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Chat-memory retirement: raw chat DB not active truth; unique knowledge extracted; dependency proof before retirement; CIT-E and index refresh on retirement'
 depends_on:

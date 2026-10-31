@@ -1,7 +1,7 @@
 ---
 id: CAP-03
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Security and sensitivity classification
 depends_on:

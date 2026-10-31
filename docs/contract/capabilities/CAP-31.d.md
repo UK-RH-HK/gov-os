@@ -1,7 +1,7 @@
 ---
 id: CAP-31.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A task cannot be READY if a mandatory input is absent
 depends_on:

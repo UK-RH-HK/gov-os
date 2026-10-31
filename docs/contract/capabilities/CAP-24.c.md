@@ -1,7 +1,7 @@
 ---
 id: CAP-24.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
 depends_on:

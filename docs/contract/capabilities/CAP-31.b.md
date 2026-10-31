@@ -1,7 +1,7 @@
 ---
 id: CAP-31.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Dynamic generation of repair/revalidation tasks
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-39
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Governance health scheduler (G0-G6 tiers)
 depends_on:

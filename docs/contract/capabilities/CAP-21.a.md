@@ -1,7 +1,7 @@
 ---
 id: CAP-21.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Approval facts only from the owner's git account
 depends_on:

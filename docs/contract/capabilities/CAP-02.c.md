@@ -1,7 +1,7 @@
 ---
 id: CAP-02.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: SSH-signed release tag, verified by `git tag -v`
 depends_on:

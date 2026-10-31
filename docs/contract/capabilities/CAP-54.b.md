@@ -1,7 +1,7 @@
 ---
 id: CAP-54.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Simplification principle; minimal system identification
 depends_on:

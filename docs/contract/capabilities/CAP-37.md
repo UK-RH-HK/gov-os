@@ -1,7 +1,7 @@
 ---
 id: CAP-37
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Structured checkpoints and mandatory triggers
 depends_on:

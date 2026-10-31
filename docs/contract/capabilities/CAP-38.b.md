@@ -1,7 +1,7 @@
 ---
 id: CAP-38.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility'
 depends_on:

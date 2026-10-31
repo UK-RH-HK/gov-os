@@ -1,7 +1,7 @@
 ---
 id: CAP-22
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Agent roles and typed A2A handoffs
 depends_on:

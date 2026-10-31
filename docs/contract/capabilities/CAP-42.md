@@ -1,7 +1,7 @@
 ---
 id: CAP-42
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Legacy governance retirement and archive policy
 depends_on:

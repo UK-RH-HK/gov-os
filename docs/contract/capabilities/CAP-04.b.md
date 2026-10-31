@@ -1,7 +1,7 @@
 ---
 id: CAP-04.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Governance share ≤ 10–15 % measured per ticket (DEC-086)
 depends_on:

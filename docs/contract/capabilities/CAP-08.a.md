@@ -1,7 +1,7 @@
 ---
 id: CAP-08.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Exact structured queries over records (status, type, owner, links)
 depends_on:

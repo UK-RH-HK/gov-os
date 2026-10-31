@@ -1,7 +1,7 @@
 ---
 id: CAP-25.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'The guard''s install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs: `ask` for the orchestrator, denied for engineer, independent test designer and independent auditor, and let through for the research role inside its experiment folder (`CAP-25.e`)'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-37.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Model/provider switch reconstructs the same inputs
 depends_on:

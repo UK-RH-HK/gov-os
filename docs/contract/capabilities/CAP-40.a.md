@@ -1,7 +1,7 @@
 ---
 id: CAP-40.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions'
 depends_on:

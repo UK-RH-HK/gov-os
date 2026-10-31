@@ -12,8 +12,12 @@ The Contract at this branch's base (``a02e3485``, version 4.1) is read with
 
 from __future__ import annotations
 
+import csv
+import io
+import os
 import re
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -348,3 +352,106 @@ def read_record(cap_id: str) -> tuple[dict, str]:
     if not path.is_file():
         pytest.fail(f"{CAPABILITIES}/{cap_id}.md does not exist")
     return frontmatter(path.read_text(encoding="utf-8"))
+
+
+# --------------------------------------------------------------------------
+# Added for the plan validator's lines (DEC-744), the source map's eight rows
+# (DEC-745 item 2) and the capability records (DEC-750 item 5)
+
+# W2-51's Wave 2 plan validator, an existing public tool, and what its two
+# CIT-P checks read: the WBS (its baseline Wave 2 items), contract.yaml and
+# every docs/changes/*-CIT-P.md.
+VALIDATOR = "docs/plan/tools/validate_w2.py"
+WBS = "docs/plan/WAVE_2_WBS.md"
+CHANGES = "docs/changes"
+CHECK_MOVED = "cit-p-moved-items"
+CHECK_APPLIED = "cit-p-lines-applied"
+
+SOURCE_MAP = "docs/contract/SOURCE_MAP.csv"
+# A fixed commit from before this ticket's source-map change; never a branch
+# name, so the reference holds after the merge into w2/integrate and at close.
+SOURCE_MAP_BASE = "ffc60703e373"
+
+_CHECK_LINE = re.compile(r"^(PASS|FAIL|NOT RUN) ([A-Za-z0-9._-]+) — (.+)$")
+
+
+def read_at(commit: str, rel: str) -> str:
+    proc = subprocess.run(
+        ["git", "show", f"{commit}:{rel}"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        pytest.fail(f"cannot read {rel} at {commit}: {proc.stderr.strip()}")
+    return proc.stdout
+
+
+def cit_p_files(root: Path = ROOT) -> list[str]:
+    folder = root / CHANGES
+    return sorted(f"{CHANGES}/{p.name}" for p in folder.glob("*-CIT-P.md")) if folder.is_dir() else []
+
+
+def validator_inputs() -> list[str]:
+    """The files of this tree the validator's two CIT-P checks read."""
+    return [WBS, CONTRACT_YAML] + cit_p_files()
+
+
+def run_validator(root: Path) -> tuple[dict[str, tuple[str, str]], str]:
+    """Run this tree's validator on ``root``: {check name: (status, reason)} and its whole output."""
+    script = ROOT / VALIDATOR
+    if not script.is_file():
+        pytest.fail(f"{VALIDATOR} does not exist: W2-51's plan validator is not in this tree")
+    env = dict(os.environ, PYTHONPATH=str(ROOT / "src"))
+    proc = subprocess.run(
+        [sys.executable, str(script), "--root", str(root)],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+    checks: dict[str, tuple[str, str]] = {}
+    for line in proc.stdout.splitlines():
+        m = _CHECK_LINE.match(line)
+        if m:
+            assert m.group(2) not in checks, f"the validator printed {m.group(2)} twice:\n{proc.stdout}"
+            checks[m.group(2)] = (m.group(1), m.group(3))
+    return checks, proc.stdout + proc.stderr
+
+
+def names_id(text: str, cid: str) -> bool:
+    """``cid`` as a whole id: ``CAP-44.f`` never matches ``CAP-44.fx`` or ``XCAP-44.f``."""
+    return re.search(rf"(?<![\w.-]){re.escape(cid)}(?![\w])", text) is not None
+
+
+def csv_rows(text: str) -> list[list[str]]:
+    return list(csv.reader(io.StringIO(text)))
+
+
+def top_segments(text: str) -> list[str]:
+    """A cell's parts: split at ``;`` and ``. `` outside brackets, so a bracket stays with its part."""
+    out, cur, depth = [], [], 0
+    for i, ch in enumerate(text):
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth = max(0, depth - 1)
+        if depth == 0 and (ch == ";" or (ch == "." and text[i + 1 : i + 2] == " ")):
+            out.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    out.append("".join(cur))
+    return [s for s in out if s.strip()]
+
+
+def record_shape(body: str, cap_id: str, item: str, parent: str, parent_title: str) -> str:
+    """A record body with its own values replaced by placeholders (as the K (2) records are compared)."""
+    out = body.replace(item, "{ITEM}").replace(cap_id, "{ID}").replace(parent_title, "{PARENT_TITLE}")
+    out = re.sub(rf"{re.escape(parent)}(?![\w.])", "{PARENT}", out)
+    return re.sub(r"^(- \*\*Wave:\*\*) \S+$", r"\1 {WAVE}", out, flags=re.MULTILINE)
+
+
+def capability_record_paths() -> list[Path]:
+    return sorted((ROOT / CAPABILITIES).glob("*.md"))

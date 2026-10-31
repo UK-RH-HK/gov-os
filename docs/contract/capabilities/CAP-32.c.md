@@ -1,7 +1,7 @@
 ---
 id: CAP-32.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point; they run in sandboxes outside production paths and leave an evidence record (what was tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P
 depends_on:

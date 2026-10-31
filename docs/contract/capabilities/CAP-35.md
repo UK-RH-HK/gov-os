@@ -1,7 +1,7 @@
 ---
 id: CAP-35
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Model routing (T0-T3 tiers, reasoning levels)
 depends_on:

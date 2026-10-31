@@ -1,7 +1,7 @@
 ---
 id: CAP-31
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Unified task DAG with dynamic generation
 depends_on:

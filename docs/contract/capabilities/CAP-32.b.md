@@ -1,7 +1,7 @@
 ---
 id: CAP-32.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Experiment lifecycle; discovery flow
 depends_on:

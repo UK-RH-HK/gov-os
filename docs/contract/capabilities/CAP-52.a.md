@@ -1,7 +1,7 @@
 ---
 id: CAP-52.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Model-agnostic adapters for Claude Code and AGENTS.md from one source
 depends_on:

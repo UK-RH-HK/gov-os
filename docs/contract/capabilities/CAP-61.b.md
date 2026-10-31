@@ -1,7 +1,7 @@
 ---
 id: CAP-61.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Per-role `--settings`: the sandbox block plus the role''s `Edit` deny rules; the launcher sets `GOV_ROLE` and `GOV_TICKET`, and both reach the guard; a launched worker is shown to be sandboxed. The sandbox applies to launched worker sessions only; in-session subagents remain for read-only work (review, exploration, web research)'
 depends_on:

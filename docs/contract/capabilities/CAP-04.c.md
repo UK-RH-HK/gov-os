@@ -1,7 +1,7 @@
 ---
 id: CAP-04.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Two budgets: retrieval spend vs final packet; hitting the spend budget is a governed event'
 depends_on:

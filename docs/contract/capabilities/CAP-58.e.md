@@ -1,7 +1,7 @@
 ---
 id: CAP-58.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket''s `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding (DEC-171)'
 depends_on:

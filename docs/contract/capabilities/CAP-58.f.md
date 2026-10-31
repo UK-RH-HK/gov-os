@@ -1,7 +1,7 @@
 ---
 id: CAP-58.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook
 depends_on:

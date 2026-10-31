@@ -1,7 +1,7 @@
 ---
 id: CAP-07.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Authoritative state in git; derived state rebuildable and gitignored
 depends_on:

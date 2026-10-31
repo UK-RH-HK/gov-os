@@ -1,7 +1,7 @@
 ---
 id: CAP-10.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Paraphrase retrieval with pinned embedder (Qwen3-Embedding-0.6B via Ollama)
 depends_on:

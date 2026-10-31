@@ -1,7 +1,7 @@
 ---
 id: CAP-03.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Development/governance memory separated from customer/runtime product data
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-39.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: G6 qualification (synthetic repos, chaos, soak, hidden tests)
 depends_on:

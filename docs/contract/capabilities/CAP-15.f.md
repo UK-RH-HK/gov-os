@@ -1,7 +1,7 @@
 ---
 id: CAP-15.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable'
 depends_on:

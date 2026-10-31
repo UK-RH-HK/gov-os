@@ -1,7 +1,7 @@
 ---
 id: CAP-59.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Loops (review→repair, audit→repair, test→fix, verification) run to convergence or to three consecutive non-converging iterations, then an escalation package with each iteration's outcome, the reason it is not converging and the options fix differently / narrow / split / defer / delete / continue; the owner decides
 depends_on:

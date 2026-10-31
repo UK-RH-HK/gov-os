@@ -1,7 +1,7 @@
 ---
 id: CAP-44.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary of each index (CAP-55)'
 depends_on:

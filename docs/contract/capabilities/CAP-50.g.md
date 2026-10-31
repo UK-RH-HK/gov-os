@@ -1,7 +1,7 @@
 ---
 id: CAP-50.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Health-scheduler integration
 depends_on:

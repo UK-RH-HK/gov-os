@@ -1,7 +1,7 @@
 ---
 id: CAP-58.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them; a launched worker session''s network grant comes from the launcher''s network profile (`CAP-61.c`), which the role definition names'
 depends_on:

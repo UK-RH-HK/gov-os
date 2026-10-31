@@ -1,7 +1,7 @@
 ---
 id: CAP-36
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Empirical model routing telemetry
 depends_on:

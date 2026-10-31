@@ -1,7 +1,7 @@
 ---
 id: CAP-47.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Fresh-session independence with a bounded context pack
 depends_on:

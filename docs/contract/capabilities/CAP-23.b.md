@@ -1,7 +1,7 @@
 ---
 id: CAP-23.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Parallel-agent concurrency and the claims role
 depends_on:

@@ -119,6 +119,10 @@ overturns the reading.
   (DEC-741)", records each answer A to K in one line and names W2-52 (DAEO-siiz) as the new ticket of Question H.
   Nothing else in its body changes: the reviewed text stays as approved.
 
+**Resume round, DEC-745 item 2** (commit "the eight source-map rows follow Contract v4.2"): in `docs/contract/SOURCE_MAP.csv` only the `carried_by_or_disposition` cell of the eight rows CIT-P §8 names changed (rows 235, 237, 248, 251, 256, 280, 283, 292): each states its lite part W2 under v4.2's CAP-44.f (A7, A10) or CAP-44.h (the verdict), and its rest W3 under CAP-44.k or CAP-44.l, citing DEC-741 with DEC-722; rows 252 (A11) and 282 (A9) and every other row unchanged.
+
+**Resume round, DEC-750 item 5** (commit "CAP-45.a's record regenerated … every record's status is the Contract's ACCEPTED"): `docs/contract/capabilities/CAP-45.a.md` regenerated from the approved `contract.yaml` (its title, heading and `Item:` line now carry v4.2's CAP-45.a text; by a throwaway generator, not committed, that first reproduced the other 213 covers records byte for byte), and the frontmatter `status:` line of all 276 records set from PROPOSED to ACCEPTED, the status both Contract files state; nothing else in the records changed.
+
 ## 4. The owner's answers (DEC-741) and how each was applied
 
 | Q | Answer | How it was applied |
@@ -181,7 +185,7 @@ the CIT-P proposed (§3.1).
 | (c) | CAP-45.a's "(signed tag)" now reads "(the signed tag in W3, CAP-02.c)", and the Wave 2 clause of §7 D (ii) follows; DEC-722 is added to CAP-45.a's source field, not to CAP-45's `sources`. | D (ii) gives the clause, not the edit; §6.1 shows no CAP-45.a text and names neither source field; every mention of the signed tag then carries W3 |
 | (d) | The new ids sit after the last existing item of their capability: CAP-43.d after CAP-43.c; CAP-44.k and CAP-44.l after CAP-44.j. | §6.1's excerpt shows CAP-44.k and CAP-44.l right after CAP-44.h; placed after the last item, the ids of each capability read in letter order. The CIT-P gives no rule on placement |
 | (e) | The 4.2 change-log entry and change row add to §6.1's text: the approval by the owner (DEC-741), the ten conditions from the named read (C), CAP-45.a's Wave 2 wording (D) and the status ACCEPTED in both files (row W2-L343). | the answers C, D and the row W2-L343 changed more than §6.1's entry named |
-| (f) | CAP-45.a's capability record (`docs/contract/capabilities/CAP-45.a.md`) cites version 4.2 but keeps its 4.1 item text: it is DERIVED and now stale against `contract.yaml`. | it is in neither K (1) (the version line) nor the K (2) reading (the records CIT-P §8 names); open for the owner (§8) |
+| (f) | CAP-45.a's capability record (`docs/contract/capabilities/CAP-45.a.md`) cites version 4.2 but keeps its 4.1 item text: it is DERIVED and now stale against `contract.yaml`. | it is in neither K (1) (the version line) nor the K (2) reading (the records CIT-P §8 names); open for the owner (§8). **Applied** under DEC-750 item 5: regenerated from `contract.yaml` in the resume round (§3, "Resume round, DEC-750 item 5") |
 | (g) | Three wordings of CAP-44.h differ from §6.1's: "gov doctor green (exit 0)" for "gov doctor green"; "each lite condition not met" for "each condition not met"; "only the owner accepts an exception; the auditor accepts none" for "the auditor accepts no exception". | the wording of the answers themselves: "`gov doctor` green (exit 0)" is CIT-P §7 G (i)'s; "only the owner accepts an exception" is DEC-741 F (i)'s; "lite condition" is the term of (a) |
 
 ## 7. Against the KPI lines and the acceptance tests
@@ -200,9 +204,10 @@ implementation, MR-3). `docs/plan/tools/validate_s1.py` was not run (DEC-738).
 ## 8. What stays open
 
 - **The eight rows of `docs/contract/SOURCE_MAP.csv`** that state W3 for the moved parts (rows 235, 237, 248, 251, 256,
-  280, 283, 292; CIT-P §8): not decided by DEC-741, left as they are.
+  280, 283, 292; CIT-P §8): not decided by DEC-741, left as they are. **Applied** under DEC-745 item 2 in the resume round (§3, "Resume round, DEC-745 item 2").
 - **CAP-45.a's capability record** (difference (f)): stale against `contract.yaml` (it still says "authenticated source
-  (signed tag)", with no Wave 2 clause). For the owner: whether it is regenerated, and by which commit.
+  (signed tag)", with no Wave 2 clause). For the owner: whether it is regenerated, and by which commit. **Applied**
+  under DEC-750 item 5: regenerated in the resume round (§3, "Resume round, DEC-750 item 5").
 - **The validator lines (DEC-744):** KPI success line 3 and the failure line need the Wave 2 plan validator, ticket
   W2-51 (DAEO-egsy). This ticket closes after W2-51; no test is written for them yet.
 - **Row W2-I017:** carried to Wave 3 at W2-30's close, by the orchestrator, under J (i). Nothing changes it at W2-49's

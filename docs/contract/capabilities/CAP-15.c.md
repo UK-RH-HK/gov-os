@@ -1,7 +1,7 @@
 ---
 id: CAP-15.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Missing mandatory input → refusal or explicit BLOCKED; superseded input cannot satisfy a current requirement; conflicting inputs → contradiction handling
 depends_on:

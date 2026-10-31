@@ -1,7 +1,7 @@
 ---
 id: CAP-01.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Project files cannot manufacture authority; approvals are owner git facts
 depends_on:

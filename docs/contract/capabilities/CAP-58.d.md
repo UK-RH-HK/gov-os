@@ -1,7 +1,7 @@
 ---
 id: CAP-58.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Claim split by tool: in a launched worker session the OS sandbox stops a Bash write outside the repository without parsing the command; the file tools (Read, Edit, Write) run outside the sandbox and are held by the permission rules and the guard; `Edit(...)` and `Read(...)` deny rules bind both layers'
 depends_on:

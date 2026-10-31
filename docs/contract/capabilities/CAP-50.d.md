@@ -1,7 +1,7 @@
 ---
 id: CAP-50.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Upstream-change staleness propagation; COMPLETE is not permanently valid
 depends_on:

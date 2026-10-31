@@ -1,7 +1,7 @@
 ---
 id: CAP-41.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j)'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-49.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail
 depends_on:

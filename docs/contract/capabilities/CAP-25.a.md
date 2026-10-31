@@ -1,7 +1,7 @@
 ---
 id: CAP-25.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks
 depends_on:

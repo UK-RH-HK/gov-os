@@ -1,7 +1,7 @@
 ---
 id: CAP-44.k
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles, A10 over the A9 knowledge fabric)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-35.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Role defaults: minimum tier and default reasoning per role'
 depends_on:

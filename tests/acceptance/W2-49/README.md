@@ -11,8 +11,9 @@ Run (DEC-732: this worktree's own `src/` first on the path, set per command):
 PYTHONPATH=/home/usain/gov-os-worktrees/W2-49/src python3 -m pytest tests/acceptance/W2-49 -q -p no:cacheprovider -rs
 ```
 
-129 tests, deterministic, no network, nothing skipped: the 76 written before the CIT-P, and 53 added after the owner
-approved it (DEC-741, 2026-10-17; §2a). No earlier test was rewritten.
+154 tests, deterministic, no network, nothing skipped: the 76 written before the CIT-P, 53 added after the owner
+approved it (DEC-741, 2026-10-17; §2a), and 25 added for DEC-744, DEC-745 item 2 and DEC-750 item 5 (§2b). No earlier
+test was rewritten.
 
 ## 1. What the suite reads (its public interface)
 
@@ -130,14 +131,12 @@ The CIT-E matches the CIT-P, or lists the differences (CAP-33's acceptance).
 **Red reason now:** `docs/changes/W2-49-CIT-E.md does not exist yet` (10 failures). They stay red until the Contract
 change is made and recorded; `test_cit_e_records_every_covers_item_the_contract_changed` also needs Contract v4.2.
 
-### KPI success line 3 and the failure line: pending W2-51 (no test)
+### KPI success line 3 and the failure line: no longer pending W2-51
 
+W2-51's validator (`docs/plan/tools/validate_w2.py`, DEC-744) now exists, so these two lines are tested in §2b,
+`test_w2_49_validator_lines.py`:
 - Line 3, "The plan validator's two-way check covers the moved parts."
 - The failure line: "A Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator."
-
-Both need a plan validator that reads Wave 2. `docs/plan/tools/validate_s1.py` is Wave 1's and is in no Wave 2
-ticket's paths. Its Wave 2 form, first held as package P-W2-11, is now ticket **W2-51 (DAEO-egsy)** (DEC-744). No test
-is written for these two lines here; they are added when W2-51's validator exists.
 
 ## 2a. The owner's answers to the CIT-P (DEC-741) — added after the approval
 
@@ -217,6 +216,88 @@ records exactly at 4.1):
   PROPOSED in the yaml; one record citing 4.1; a stale CAP-44.h record, a missing CAP-44.k record and CAP-44.l missing
   from CAP-44's Covers; the CIT-P and CIT-E without W2-52.
 
+## 2b. The validator's lines, the source map's eight rows and the records — added for DEC-744, DEC-745, DEC-750
+
+Four behaviours the owner has decided that the 129 earlier tests did not test. Written by a fresh independent test
+designer in the tests worktree (DEC-963), without reading this round's implementation.
+
+### KPI success line 3 and the failure line (DEC-744) — `test_w2_49_validator_lines.py` (12 tests)
+
+W2-51's validator is run as `sys.executable docs/plan/tools/validate_w2.py --root <tree>` (the script found from the
+test file's own location; `PYTHONPATH=<this tree>/src` for the subprocess). The tests read only its two CIT-P lines,
+`cit-p-moved-items` and `cit-p-lines-applied`, in its output form `<STATUS> <name> — <reason>` (W2-51's README §1),
+never its exit: its other checks judge the whole plan and are not this ticket's. "Names an id" is the id as a whole
+token in the reason.
+
+| Test | What it checks |
+|---|---|
+| `test_validator_passes_both_cit_p_checks_on_this_tree` | line 3: on this tree, both checks PASS |
+| `test_a_tree_of_the_validators_inputs_alone_passes_both_cit_p_checks` | the control: a temporary tree of the single files the two checks read (`docs/plan/WAVE_2_WBS.md`, `contract.yaml`, every `docs/changes/*-CIT-P.md`), copied as they are, passes both |
+| `test_an_item_moved_to_wave_2_without_its_cit_p_line_fails_naming_it[CAP-44.f, CAP-44.h, CAP-43.b]` | failure (i): the control with that item's `wave:` removed from its CIT-P entry: `cit-p-moved-items` FAIL naming it and neither of the other two; `cit-p-lines-applied` still PASS |
+| `test_a_cit_p_line_with_no_change_in_the_contract_fails_naming_it[CAP-43.b, CAP-43.d, CAP-44.f, CAP-44.h, CAP-44.k, CAP-44.l]` | failure (ii): the control with that line's change taken out of `contract.yaml` (a moved item put back in W3, its 4.1 wave; a W3 split item removed, as 4.1 has none): `cit-p-lines-applied` FAIL naming it and none of the other five; `cit-p-moved-items` still PASS |
+| `test_a_cit_p_line_for_an_item_the_contract_does_not_change_fails_naming_it` | failure (ii), edge: one extra CIT-P line (`CAP-45.a`, `wave: W3`; the Contract has it in W2): `cit-p-lines-applied` FAIL naming it |
+
+**The accounting.** The PASS lines alone give only counts, in wording the tests do not fix. That the passing checks
+cover the three moved items (CAP-43.b, CAP-44.f, CAP-44.h) and the six CIT-P lines (those three and the split's
+CAP-43.d, CAP-44.k, CAP-44.l) is shown by the validator's own output: each, given one change, is named. No count is
+asserted, so the tests do not need any other item to move, and fix the wave of none (DEC-841's open question is not
+tested). For the same reason no file of this suite names DEC-841's nine items: under W2-51's reading R4 every file
+under `tests/acceptance/` counts as a citation.
+
+**Green now, by the behaviour (seen):** W2-51's validator and the approved v4.2 with the CIT-P's §6.1 lines are both in
+this tree (merged from `w2/integrate`), so line 3 and the failure line hold already. They are green by the behaviour,
+not by accident: each failing case flips exactly the named check on exactly the named id, and the control shows the
+cases differ from a passing tree by that one change. Checked against stand-ins: a validator that always prints PASS
+fails the 10 failure cases; one whose FAIL reasons name no id fails the same 10; a CIT-P without CAP-44.h's line fails
+line 3, the control and the cases (`moved to Wave 2 with no CIT-P line: CAP-44.h`).
+
+### DEC-745 item 2: the source map's eight rows — `test_w2_49_source_map.py` (11 tests)
+
+`docs/contract/SOURCE_MAP.csv`, columns `source_document,source_item,class,carried_by_or_disposition`. A row is found
+by its `source_document` and the start of its `source_item` ("Role D" matches "Role D — Independent Migration
+Verifier"), never by line number. The reference for "no other row changes" is the file at the fixed commit
+`ffc60703e373` (before this ticket's change), never a branch, so the tests stay green after the merge into
+`w2/integrate` and at the close.
+
+| Test | What it checks |
+|---|---|
+| `test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[8 rows]` | Adoption Protocol v3.0 "Role D", "Role F", "12. D", "15. F", "20. Final adoption verdict"; Distribution Protocol v1.2 "Stage A7", "Stage A10", "18. Adoption acceptance": four columns; the cell still names its part (A7, A10 or "verdict"); one part of the cell names the lite item (A7, A10: CAP-44.f; verdict: CAP-44.h) with "lite" and W2/Wave 2; one part names the rest's item (A7, A10: CAP-44.k; verdict: CAP-44.l) with W3/Wave 3. Failure: a row that still states its part as W3 only |
+| `test_source_map_rows_of_a11_and_a9_still_say_wave_3_unchanged[16. G, Stage A9]` | the row equals the base's and says W3 |
+| `test_source_map_no_row_but_the_eight_differs_from_before_this_ticket` | the header; four columns on every row; the same number of rows; the eight keep `source_document`, `source_item` and `class`; every other row equals the base's |
+
+*Reading of "states" (an assumption, not a source):* the cell is split into parts at `;` and `. ` outside brackets,
+so a bracket stays with its part (`CAP-44.f covers A7, lite (W2; DEC-722)` is one part). A part that names both items
+and both waves satisfies both statements; the tests do not require a fixed wording.
+
+**Red reason now (seen):** `<document> / <item> does not state its part as Wave 2, lite, under CAP-44.f (Contract
+v4.2): '<the cell as before>'` (CAP-44.h for the two verdict rows), 8 failures. The three other tests are green now
+because the file is unchanged since the base; they guard the change.
+
+### DEC-750 item 5 (P-W2-16): the records — `test_w2_49_records_v4_2.py` (2 tests)
+
+| Test | What it checks |
+|---|---|
+| `test_cap_45a_record_carries_contract_v4_2_item_text` | `docs/contract/capabilities/CAP-45.a.md`: `id`; `title` = `contract.yaml`'s CAP-45.a `item` (D (ii)'s Wave 2 wording); `depends_on: [CAP-45]`; the frontmatter keys and `type`, `status`, `state_class` of the unchanged sibling CAP-45.b; the heading `# CAP-45.a: <item>`, the `Item:` and `Wave:` lines; the body in CAP-45.b's form once id, item, wave and parent are replaced |
+| `test_every_capability_record_states_the_contracts_status` | both Contract files state one status, ACCEPTED; every record under `docs/contract/capabilities/` has that `status:` in its frontmatter |
+
+**Red reasons now (seen):** `CAP-45.a.md: title 'gov update: check/impact, authenticated source (signed tag), …' is
+not contract.yaml's item …` and `276 of 276 capability records do not state the Contract's status ACCEPTED`.
+
+The K (2) test `test_record_of_split_item_follows_contract_v4_2` compares a record's `status` with its sibling's; it
+holds when every record says ACCEPTED, so DEC-750 item 5 contradicts no earlier test and none was rewritten.
+
+### How the added tests were checked (before the commit)
+
+Against throwaway stand-in trees built outside the repository from single named files (the four files of this
+section, the validator, the WBS, the two Contract files, the source map, the five CIT-Ps, five records; `git show`
+read through the repository's git folder):
+- the decided behaviour (the eight rows rewritten as DEC-745 item 2 says, in two different wordings; the five records
+  ACCEPTED and CAP-45.a regenerated): **all 25 pass**;
+- each break fails its test with the stated message: one of the eight left as it was ("Stage A7"); a row naming
+  CAP-44.f with W3 and no W2; a row with no CAP-44.k part; a verdict row under CAP-44.f/CAP-44.k; the A9 row changed;
+  a far row changed; one of the eight with its `class` changed; a row with five columns; CAP-45.a's record stale; its
+  heading alone stale; one record PROPOSED; the three validator breaks above.
+
 ## 3. Source ids cited
 
 | Source | Tests |
@@ -230,7 +311,10 @@ records exactly at 4.1):
 | DEC-105 | `test_cit_p_presents_dec_105_three_options_with_their_cost`, `test_yaml_change_log_keeps_every_earlier_version_unchanged` |
 | DEC-741 | every test of `test_w2_49_owner_answers.py` and `test_w2_49_capability_records.py` (§2a, answer by answer) |
 | CAP-45.a | `test_cap_45a_stays_w2_with_the_release_manifest_and_hashes_as_its_wave_2_source`, `test_cap_45a_names_no_signed_tag_as_a_wave_2_requirement` |
-| DEC-614 | the K (1) and K (2) tests (the records are derived from `contract.yaml`) |
+| DEC-614 | the K (1) and K (2) tests (the records are derived from `contract.yaml`); `test_w2_49_records_v4_2.py` |
+| DEC-744 | every test of `test_w2_49_validator_lines.py` (KPI line 3 and the failure line) |
+| DEC-745 | every test of `test_w2_49_source_map.py` (item 2) |
+| DEC-750 | every test of `test_w2_49_records_v4_2.py` (item 5, P-W2-16) |
 
 ## 4. Files
 
@@ -239,5 +323,8 @@ records exactly at 4.1):
   a capability's wave note, the capability records, the three new split ids. No test logic of its own.
 - `test_w2_49_cit_p.py`, `test_w2_49_contract.py`, `test_w2_49_cit_e.py`: the tests of §2.
 - `test_w2_49_owner_answers.py`, `test_w2_49_capability_records.py`: the tests of §2a (the second is K (2) alone).
+- `test_w2_49_validator_lines.py`, `test_w2_49_source_map.py`, `test_w2_49_records_v4_2.py`: the tests of §2b. The
+  support module gained (nothing earlier changed): running the validator and reading its check lines, the files its
+  two CIT-P checks read, a read at a fixed commit, CSV rows, a cell's parts, the record form, the record paths.
 
 No earlier ticket's test is changed by these KPIs.

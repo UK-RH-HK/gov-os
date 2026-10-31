@@ -1,7 +1,7 @@
 ---
 id: CAP-04.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Token/cost budgets per task with executable thresholds
 depends_on:

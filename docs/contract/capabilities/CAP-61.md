@@ -1,7 +1,7 @@
 ---
 id: CAP-61
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Worker session launcher and OS sandbox
 depends_on:

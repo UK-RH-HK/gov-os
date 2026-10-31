@@ -1,7 +1,7 @@
 ---
 id: CAP-15.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-58.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write, as a guard exception
 depends_on:

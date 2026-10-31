@@ -1,7 +1,7 @@
 ---
 id: CAP-36.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings'
 depends_on:

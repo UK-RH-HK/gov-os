@@ -1,7 +1,7 @@
 ---
 id: CAP-40.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: For a launched worker session the sandbox's instruction tokens in the system prompt are reported as a separate line of the ticket's telemetry record, not inside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures
 depends_on:

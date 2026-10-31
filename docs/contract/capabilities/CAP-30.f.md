@@ -1,7 +1,7 @@
 ---
 id: CAP-30.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code'
 depends_on:

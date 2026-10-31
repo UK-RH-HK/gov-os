@@ -1,7 +1,7 @@
 ---
 id: CAP-20
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Rebuild guarantee (delete derived, rebuild from git)
 depends_on:
