@@ -18,7 +18,7 @@ depends_on: []
 allowed_paths:
 - src/gov/secrets/__init__.py
 - src/gov/secrets/cache.py
-- tests/unit/secrets/test_w2_107*
+- tests/unit/secrets_check/test_w2_107*
 kpis:
   success:
   - 'A rebuild scans with gitleaks only content it has not judged clean before: each scan''s verdict is remembered in one machine-wide cache (`~/.cache/gov-os/secrets-scan.sqlite`, outside every repository, shared by worktrees, close clones and the nightly), keyed by the sha256 of the bytes scanned, the kind (a file''s content, or a path''s names for `path_holds_secret`) and the engine''s fingerprint (gitleaks'' version string, the sha256 of every rule set in force, the cache format''s version); a second rebuild of an unchanged tree scans nothing again [DEC-966 item 4, DEC-939]'
@@ -50,6 +50,8 @@ track: A
 list_rows: []
 ---
 # W2-107 Rebuild speed
+
+**DEC-970 (2026-10-31):** the unit path is `tests/unit/secrets_check/test_w2_107*` (W2-69 renamed `tests/unit/secrets/`; an engineer moves the two files). For the independent test designer, not in allowed_paths: `tests/acceptance/W1-16/test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run` leaves out exactly the scan cache's file and its `-wal`/`-shm` (P-W2-107-2 (a), `Rewrite-Reason: DEC-967`).
 
 Card: the owner's order of 2026-10-31 (DEC-966 item 4): rebuild speed is a priority.
 

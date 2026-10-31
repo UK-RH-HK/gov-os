@@ -84,6 +84,7 @@ def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
         "LC_ALL": "C.UTF-8",
         "PYTHONPATH": str(Path(code_root) / "src"),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
     started = time.perf_counter()
     try:

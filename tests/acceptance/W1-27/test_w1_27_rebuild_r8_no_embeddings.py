@@ -154,6 +154,7 @@ def gov(tiny, sandbox, endpoint, program):
         "GOV_QUERY_OLLAMA_HOST": endpoint.host,
         "GOV_OLLAMA_BIN": str(program),
         **({"PYTHONUSERBASE": site.getuserbase()} if site.ENABLE_USER_SITE else {}),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
 
     def _gov(*args, project=None):
