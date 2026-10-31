@@ -17,7 +17,8 @@ The design of W2-60a (DAEO-cv58): `gov launch` starts a worker as its role, with
 default model and effort, sets no compaction threshold, keeps connectors, user-level agents and skills, and
 model-side memory out, and writes one launch record before the session starts (DEC-826 Q1 and Q5, DEC-838, DEC-839,
 DEC-832 item 1). Status **APPLIED**: the code exists (implementation batch 1, §1), with the lead's corrections
-after the lead's follow-up measurements (Behaviour 8, P-W2-60a-2; probe part 2b), and round 2's changes (§2).
+after the lead's follow-up measurements (Behaviour 8, P-W2-60a-2; probe part 2b), round 2's changes (§2) and
+round 3's (§3).
 
 ## 1. The changes
 
@@ -60,6 +61,26 @@ Review 1 found two gaps, and the round takes two ride-alongs with them (DEC-802:
 
 Every refusal of round 1 still refuses with its message; round 2's run after them in the same step (Behaviour 10).
 
+## 3. Round 3 (review 2, DEC-951)
+
+The last round, under DEC-413's exception (DEC-951 item 4), strictly two items:
+
+- **F1, the main checkout's local file:** CLI 2.1.292 loads a linked worktree session's local settings from the
+  main checkout's `.claude/settings.local.json`, not the worktree's own, and the CLI's `/add-dir` ("remember this
+  directory") writes `permissions.additionalDirectories` there in ordinary work. A worktree's launch now judges that
+  file too, with every refusal the tree's own copy gets; a main checkout that cannot be found refuses (Behaviour 6,
+  Behaviour 10 step 4). `record.py`'s look-up is factored into `main_checkout`, which the record's folder and the
+  check share; the record folder's messages are unchanged.
+- **P-W2-60a-4 (a), the adopted layout:** a tree with no `template/` reads its role file from
+  `governance/kernel/roles/<role>.md` (Behaviour 1). Where `template/` exists, nothing changes; the "both with
+  different role files" refusal of option (a) is not taken (DEC-951 item 4 scopes the round to the path).
+
+| # | File | Change | Evidence |
+|---|---|---|---|
+| 9 | `src/gov/launch/record.py` | `main_checkout(root, what)` factored out of `folder`; `folder` calls it. | `tests/unit/launch/test_launch_record.py` |
+| 10 | `src/gov/launch/launcher.py` | `_check_repository_settings` adds the main checkout's local file for a linked worktree; the loop judges each file as before. | the same |
+| 11 | `src/gov/launch/role.py` | `ADOPTED_ROLES_REL`; the role file's folder chosen by whether `template` exists. | `tests/unit/launch/test_role.py` |
+
 ## A. Behaviour
 
 ### Behaviour: the line the session is started with
@@ -86,8 +107,11 @@ root:
 
 ### Behaviour 1: the role's text
 
-- **Read from** the role file `template/governance/kernel/roles/<role>.md` of the tree the session starts in. The
-  generated agent `.claude/agents/<role>.md` is not the session's own text: it stays what it is today, a subagent
+- **Read from** the role file `template/governance/kernel/roles/<role>.md` of the tree the session starts in; in a
+  tree with no `template/` (an adopted repository, DEC-487), from `governance/kernel/roles/<role>.md` (round 3,
+  P-W2-60a-4 (a)). Anything named `template` keeps the template path, so its absence alone selects the adopted one;
+  neither file refuses, naming the path looked for. The record's path and hash and the text appended are the file
+  read. The generated agent `.claude/agents/<role>.md` is not the session's own text: it stays what it is today, a subagent
   type the session may start (governed by the guard, DEC-113).
 - **How it reaches the session:** appended to the CLI's default system prompt with `--append-system-prompt-file`.
   The launcher writes the role file's bytes (then the named skills', Behaviour 2) into `role-<role>.md` in the
@@ -223,6 +247,14 @@ environment (B, "two edges").
   spellings the CLI takes: `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, `env.CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS`, and
   `modelSettings.<model>.autoCompactWindow` for any model, the role's or another; a `modelSettings` that is not a
   map, or holds a value that is not a map, is refused too (it could not be shown to hold none).
+- **A worktree's launch also judges the main checkout's `.claude/settings.local.json`** (round 3, review 2's F1):
+  the CLI loads a linked worktree's local settings from there. Every refusal of Behaviour 10 step 4 applies to it
+  as to the tree's own copy (the guard-wiring requirement stays on the tree's own `.claude/settings.json`), and the
+  message names the file by its full path. The main checkout is found as the record's folder is (Behaviour 9): a
+  `.git` that cannot be read, gives no common directory or a bare one refuses; a main checkout with no local file
+  adds nothing; a launch from the main checkout checks its own file once, as before. A link there is judged as the
+  tree's own is: the file the link leads to is read, and a link that leads nowhere cannot be read and refuses; no
+  new link rule.
 - The record states `"compaction_threshold": "none"` (DEC-838 items 1 and 2).
 - The process environment's copy (a parent's `CLAUDE_CODE_AUTO_COMPACT_WINDOW`) falls on W2-56's cleaned
   environment: this ticket does not change what process environment the session is started with.
@@ -329,7 +361,8 @@ refusal the launcher makes today still refuses with its message:
 4. the repository's settings: no sandbox key (DEC-233), no `disableAllHooks`, no bypass mode or added directory
    (DEC-313), the guard wired (today); then no `agent` key, no `CLAUDE_CODE_AUTO_COMPACT_WINDOW` in `env` and no
    `autoCompactWindow` (this ticket: either would change the session's prompt or threshold); then round 2's
-   spellings and `modelSettings` (Behaviour 6);
+   spellings and `modelSettings` (Behaviour 6); for a linked worktree, the main checkout found first and its
+   local file judged after the tree's two, with the same refusals (round 3);
 5. the CLI at `~/.local/bin/claude` (DEC-205, today);
 6. the settings built: the research folder and allowlist (DEC-242, DEC-273), the held-out list (DEC-218), the
    evaluation sets (DEC-820, DEC-873), the sandbox strict (today);
@@ -526,6 +559,7 @@ the revisions named, and none of them is handled by launching without the role.
   template path only and let W2-21 or the adoption work decide; (c) a project setting naming the kernel's place.
 - **Recommendation:** (b) now, (a) in W2-21, medium confidence: (a) is small but widens this ticket past its card.
 - **Blocks:** launches in an adopted repository (EXAMIN's copy), and W1-38's 3 cases (C).
+- **Decided:** (a), the path only, in round 3 (DEC-951 item 4; §3).
 
 ### P-W2-60a-5: the live harness tests on Haiku against "a model not the role's is refused"
 

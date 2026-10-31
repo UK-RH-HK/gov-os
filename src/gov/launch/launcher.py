@@ -241,14 +241,21 @@ def _check_repository_settings(root: Path) -> None:
     """The repository's settings carry no sandbox key (DEC-233) and wire the guard, with the hooks on.
 
     The CLI may merge the repository's settings into the built ones, and a
-    session whose settings register no guard has none.
+    session whose settings register no guard has none. For a linked worktree the
+    CLI loads the local settings from the main checkout's file, which is judged
+    as the tree's own copy is (round 3, review 2's F1); a main checkout that
+    cannot be found refuses.
     """
     wired = False
-    for rel in REPO_SETTINGS:
-        if not os.path.lexists(root / rel):
+    files = [(root / rel, rel) for rel in REPO_SETTINGS]
+    main = record.main_checkout(root, "the local settings file the CLI loads for a worktree session")
+    if main != root:
+        files.append((main / REPO_SETTINGS[1], str(main / REPO_SETTINGS[1])))
+    for path, rel in files:
+        if not os.path.lexists(path):
             continue
         try:
-            data = json.loads((root / rel).read_text(encoding="utf-8"))
+            data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             raise _refuse(f"{rel} cannot be read, so it cannot be shown to carry no sandbox key") from None
         if not isinstance(data, dict) or "sandbox" in data:

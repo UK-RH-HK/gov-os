@@ -26,19 +26,23 @@ def _refuse(reason: str) -> GovError:
     return GovError("LAUNCH_REFUSED", reason)
 
 
+def main_checkout(root: Path, what: str = "the launch record's folder") -> Path:
+    """The main checkout of the repository ``root`` belongs to, found from ``.git`` (no git is run); ``root`` itself
+    when it has no ``.git``. ``root`` is a real path; ``what`` names, in a refusal, what the look-up is for."""
+    if not os.path.lexists(root / ".git"):
+        return root
+    common = runs.common_dir(str(root))
+    if common is None:
+        raise _refuse(f"the tree's .git cannot be read or gives no common directory, so {what} cannot be found")
+    if os.path.basename(common) != ".git":
+        raise _refuse(f"the tree's git common directory is not named .git (a bare repository), so {what} has no "
+                      f"main checkout")
+    return Path(os.path.dirname(common))
+
+
 def folder(root: Path) -> Path:
     """The record folder of the repository ``root`` belongs to, made when it is missing. ``root`` is a real path."""
-    main = root
-    if os.path.lexists(root / ".git"):
-        common = runs.common_dir(str(root))
-        if common is None:
-            raise _refuse("the tree's .git cannot be read or gives no common directory, so the launch record's "
-                          "folder cannot be found")
-        if os.path.basename(common) != ".git":
-            raise _refuse("the tree's git common directory is not named .git (a bare repository), so the launch "
-                          "record's folder has no main checkout")
-        main = Path(os.path.dirname(common))
-    here = main
+    here = main_checkout(root)
     for name in (RUNTIME, LAUNCHES):
         here = here / name
         if os.path.lexists(here) and (here.is_symlink() or not here.is_dir()):

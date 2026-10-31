@@ -22,8 +22,8 @@ VERSION = "- **Version:** 1.2.3"
 DEFAULT = "- **Launch default:** model claude-opus-5-5, effort high"
 
 
-def _tree(tmp_path, *lines, skills=None):
-    roles = tmp_path / role.ROLES_REL
+def _tree(tmp_path, *lines, skills=None, roles_rel=role.ROLES_REL):
+    roles = tmp_path / roles_rel
     roles.mkdir(parents=True)
     (roles / "engineer.md").write_text("# Engineer\n\n" + "\n".join(lines) + "\n", encoding="utf-8")
     for name, text in (skills or {}).items():
@@ -38,6 +38,28 @@ def test_the_lines_give_the_version_model_and_effort(tmp_path):
     assert (loaded["role_text"]["version"], loaded["model"], loaded["effort"]) == ("1.2.3", "claude-opus-5-5", "high")
     assert loaded["role_text"]["path"] == f"{role.ROLES_REL}/engineer.md"
     assert loaded["appended"] == (tmp_path / role.ROLES_REL / "engineer.md").read_bytes()
+
+
+def test_an_adopted_tree_with_no_template_reads_its_kernel_s_role_file(tmp_path):
+    loaded = role.read_role(_tree(tmp_path, VERSION, DEFAULT, roles_rel=role.ADOPTED_ROLES_REL), "engineer")
+    data = (tmp_path / role.ADOPTED_ROLES_REL / "engineer.md").read_bytes()
+    assert loaded["role_text"] == {"path": f"{role.ADOPTED_ROLES_REL}/engineer.md", "version": "1.2.3",
+                                   "sha256": role.sha256(data)}
+    assert loaded["appended"] == data
+
+
+def test_where_template_exists_its_role_file_is_read_and_no_other(tmp_path):
+    tree = _tree(tmp_path, VERSION, DEFAULT)
+    _tree(tmp_path, "- **Version:** 9.9.9", DEFAULT, roles_rel=role.ADOPTED_ROLES_REL)
+    assert role.read_role(tree, "engineer")["role_text"]["path"] == f"{role.ROLES_REL}/engineer.md"
+    (tree / role.ROLES_REL / "engineer.md").unlink()
+    with pytest.raises(GovError, match=role.ROLES_REL):
+        role.read_role(tree, "engineer")
+
+
+def test_a_tree_with_neither_role_file_refuses(tmp_path):
+    with pytest.raises(GovError, match=role.ADOPTED_ROLES_REL):
+        role.read_role(tmp_path, "engineer")
 
 
 @pytest.mark.parametrize("lines", (

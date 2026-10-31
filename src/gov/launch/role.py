@@ -2,6 +2,7 @@
 
 The role file ``template/governance/kernel/roles/<role>.md`` carries a version
 line and a default line (model and effort, nothing else), and may name its skills.
+In a tree with no ``template/`` (an adopted repository) it is ``governance/kernel/roles/<role>.md``.
 The skills the session can load are the project's copies under ``.claude/skills/``
 and its command files under ``.claude/commands/``; each is described from that copy.
 The user settings file's ask and deny rules are read here for the launcher to carry
@@ -25,6 +26,7 @@ from gov.cli.errors import GovError
 from gov.guard.heldout import load_yaml_unique
 
 ROLES_REL = "template/governance/kernel/roles"
+ADOPTED_ROLES_REL = "governance/kernel/roles"  # P-W2-60a-4 (a): an adopted repository's kernel, read when no template/
 SKILLS_REL = ".claude/skills"
 COMMANDS_REL = ".claude/commands"  # each Markdown file loads as a skill too
 USER_SETTINGS_REL = ".claude/settings.json"  # under the caller's home; --setting-sources project,local drops it
@@ -187,7 +189,8 @@ def read_role(root: Path, role: str) -> dict:
     ``skills`` holds every loadable skill, named or not, in the record's form; ``appended`` the bytes of the text
     appended to the session's prompt: the role file, then each named skill's ``SKILL.md`` in the order named.
     """
-    rel = f"{ROLES_REL}/{role}.md"
+    roles_rel = ROLES_REL if os.path.lexists(root / ROLES_REL.split("/")[0]) else ADOPTED_ROLES_REL
+    rel = f"{roles_rel}/{role}.md"
     try:
         data = (root / rel).read_bytes()
         lines = data.decode("utf-8").splitlines()
