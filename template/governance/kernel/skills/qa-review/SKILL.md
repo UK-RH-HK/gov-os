@@ -35,10 +35,10 @@ Copy this checklist into your notes and tick each step as you go.
 - [ ] 2. **Tests against the spec.** A missing failure line; a weak assertion; a test that would pass for the wrong reason; a test that reads the implementation's private parts; tests out of proportion to the change.
 - [ ] 3. **Code against the spec.** Behaviour the tests miss; a write outside the ticket's paths; a guard or gate that fails open; work that can be lost (DEC-137, DEC-498).
 - [ ] 4. **Probes, in proportion to the profile.** LITE: the trace only. STANDARD: the trace and a probe of each key failure line. FULL: a full probe of the final head. A probe is a small run of the code by the QA engineer; it never re-runs the ticket's suites (DEC-959 item 1).
-- [ ] 5. **Judge each finding** by the audit skill's judgement rules: the two questions, word for word, and the two lines `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808). Give it a severity (below).
+- [ ] 5. **Judge each finding** by the audit skill's judgement rules: the two questions, word for word, and the two lines `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other` (DEC-808). Give it a severity tied to P3/P2/P1 (below).
 - [ ] 6. **Write the findings report** at `<the QA findings path>/<ticket id>.md`, then check it against "Done when".
 
-**Severity**, tied to the escalation rubric (DEC-957):
+**Severity**, tied to P3/P2/P1 of the escalation rubric (DEC-957):
 
 - **P1:** ordinary work "yes" and it fails open or loses work; or a KPI line neither tested nor built. It blocks the merge.
 - **P2:** ordinary work "yes" and a wrong result or a broken KPI line, with no fail-open and no loss; or a failure line with no test. Fixed in the ticket's current round or its next resume (DEC-802).

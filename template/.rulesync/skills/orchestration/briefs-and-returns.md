@@ -87,18 +87,32 @@ They changed DEC-724, under which the owner committed the owner's entries with `
   would fail open (DEC-862 (a), (c)).
 - No worker and no lead puts `Role: owner` or `Decided-by:` on a commit.
 
+## The work order in parallel (DEC-957, DEC-959 item 7, DEC-963)
+
+- The specification's KPI lines drive two sessions at the same time: the independent test designer, in a tests
+  worktree of its own, and the implementer (an engineer or a product-spec worker), in the ticket's worktree. One
+  writer per worktree; neither reads the other's work (Policy 2 (c)). The test designer retrieves from the
+  integration branch's store only (DEC-963 item 2).
+- The implementer builds to the specification, never to the tests. Once the lead has merged the tests, it runs them
+  once, reading results only; if it has returned, a fresh implementer does. The QA engineer reads the tests and the
+  code, changes neither, and writes only its findings report (DEC-957).
+- **Tests run no more than this** (DEC-959 item 1, DEC-968): the lead runs the scoped set once before returning;
+  the QA engineer and the reviewer re-run nothing; the merge queue or the close runs the scoped set once on the
+  merged result; the full suite runs only in the nightly. A close is refused only by a failure its change caused
+  (DEC-968 item 2); no load-sensitive case is retried to let it through (DEC-780).
+
 ## The escalation rubric (DEC-957)
 
 - **P3, the stream's Senior Engineer decides and logs it** (the orchestrator, where there are no streams):
   reversible; inside one ticket's scope and paths; no change to the spec, the KPIs or any standing decision; no
-  effect on other streams; a delay under half a day.
+  effect on other streams; a delay under `<the project's P3 delay limit>`.
 - **P2, the Senior Engineer decides, the orchestrator approves:** touches another stream or shared code; changes a
-  ticket's scope or KPIs within the approved spec; changes the plan's order; delays a milestone by up to a day;
-  revises older tests under an existing decision.
+  ticket's scope or KPIs within the approved spec; changes the plan's order; delays a milestone by up to
+  `<the project's P2 delay limit>`; revises older tests under an existing decision.
 - **P1, the lead and the Senior Engineer recommend, the orchestrator amends or escalates, the owner decides:**
   changes the spec, the Contract, the Charter or a standing decision; weakens any guard rule or anything that fails
   open; irreversible or destructive; secrets or security; cost, installs or paid services; `<the project's own P1
-  items>`; a milestone slipping more than a day.
+  items>`; a milestone slipping more than `<the project's P2 delay limit>`.
 - **Emergency:** a secret exposed, a risk of losing data, the disk below its floor, or the guard failing open: stop
   the affected work at once, then P1.
 - Installs: only the orchestrator's own session asks the owner; every other session, leads included, raises an
@@ -121,18 +135,18 @@ Each in the part that holds in any repository; entries scoped to one repository 
 
 | Decision | The rule | Where it stands |
 |---|---|---|
-| DEC-715, DEC-731 | One stable launch command starts leads and workers and builds the whole invocation; a session starts one with the Bash tool's own background run, never a trailing `&`; a denied launch is LAUNCH_BLOCKED with the exact denial, and no other form is tried | lead brief; skill, Sessions |
+| DEC-715, DEC-731 | One stable launch command starts leads and workers and builds the whole invocation; a session starts one with the Bash tool's own background run, never a trailing `&`; a denied launch is LAUNCH_BLOCKED with the exact denial, and no other form is tried | lead brief; this file |
 | DEC-719 | A rebuild of the store is a full rebuild, never one without embeddings, and never in a tree while a worker's command runs there | lead, engineer and product-spec briefs |
 | DEC-732 | In a ticket worktree every test run and verification command runs that worktree's own code, set per command, never in the session's settings; the lead's verification shows where the code was loaded from; the rule is in every brief, word for word | every brief |
 | DEC-733 | A FULL ticket's lead commits the reviewer's probe record under `docs/probes/<ticket id>/`, a passing one only; it is the one documentation path a lead writes | lead and reviewer briefs |
 | DEC-847 | No fixed number of tickets in flight: the eligible tickets, the measured resource gate and the owner's usage limits decide; a ticket idle on the owner does not count; every countdown says how many and why | skill, Parallel tickets |
-| DEC-750, DEC-754 | Every merge carries `Task:`; never `-s ours`; never a conflict resolved by dropping the ticket's side; never removing what git's own merge of its parents keeps; a conflict that cannot keep both sides' intent is a package | lead brief; skill, Integration |
-| DEC-757 item 6 | Never edit an open ticket's file on the integration branch after its review | skill, Integration |
-| DEC-766 | The known-red lists only shrink; an addition comes to the owner as a package first | lead brief; skill, Decisions |
-| DEC-768 item 4 | No hard-block check is weakened to let a close pass | every writing brief; skill, Integration |
-| DEC-779 | A guard hole is a row, not a round, when it needs a precondition no session can create through the guard, or only unsandboxed sessions can reach it | lead and reviewer briefs; skill, The ticket loop |
-| DEC-780 | A load-sensitive case is never retried to let a close through; where the project keeps a quiet window for closes, no lead starts during one | skill, Integration |
-| DEC-787 | Every report of the orchestrator ends with one line `OWNER_ACTION: <P1, P2, COMMIT or none> <ids> - <one-line summary>` | skill, Stops |
+| DEC-750, DEC-754 | Every merge carries `Task:`; never `-s ours`; never a conflict resolved by dropping the ticket's side; never removing what git's own merge of its parents keeps; a conflict that cannot keep both sides' intent is a package | lead brief; this file |
+| DEC-757 item 6 | Never edit an open ticket's file on the integration branch after its review | this file |
+| DEC-766 | The known-red lists only shrink; an addition comes to the owner as a package first | lead brief; this file |
+| DEC-768 item 4 | No hard-block check is weakened to let a close pass | every writing brief; this file |
+| DEC-779 | A guard hole is a row, not a round, when it needs a precondition no session can create through the guard, or only unsandboxed sessions can reach it | lead and reviewer briefs; this file |
+| DEC-780 | A load-sensitive case is never retried to let a close through; where the project keeps a quiet window for closes, no lead starts during one | this file; the work order above |
+| DEC-787, DEC-948 | Every report of the orchestrator ends with the same short block, readable on a phone, whose last line is `OWNER_ACTION: <P1, P2, COMMIT or none> <ids> - <one-line summary>` | skill, Stops |
 
 ## Supersession in the briefs (DEC-866)
 

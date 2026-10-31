@@ -8,84 +8,93 @@ description: "Method for running a wave: parallel tickets under ticket leads, in
 
 # Orchestration
 
-A method for the orchestrator role and its ticket leads. The guard, the launcher and the role file decide what a session does; this skill grants nothing (CAP-24.b). A project's own values stand as `<placeholders>` (DEC-539); tests are named in the project's terms (DEC-534). A rule only an orchestrator's prompt held cites DEC-537. The briefs, returns and standing decisions in full: [briefs-and-returns.md](briefs-and-returns.md).
+A method for the orchestrator role and its ticket leads: the way a wave is run. The guard, the launcher and the role file decide what a session does; this skill is the method only and grants nothing (CAP-24.b). Each rule names the decision it follows; a rule that only an orchestrator's prompt held is cited with DEC-537, which ordered it stated here. A project's own values (branches, folders, thresholds, the model) stand as `<placeholders>` (DEC-539). Tests are named in the project's terms: the project's test command, the ticket's acceptance tests, the builder tests (DEC-534). Detail: [briefs-and-returns.md](briefs-and-returns.md).
 
 ## Parallel tickets
 
-- Each ticket gets its own worktree and branch, cut from `<integration branch>`; no two tickets in flight have overlapping paths (DEC-235). A lead per ticket starts from `brief-lead.md` (DEC-236).
-- No fixed number of tickets in flight: as many leads as the eligible tickets, the measured resource gate and the owner's usage limits allow, decided each time a slot could open. A ticket idle on an owner answer does not count; every countdown says how many are in flight and why (DEC-847).
-- No worktree is left behind (DEC-235).
+- Each independent ticket gets its own worktree and branch, cut from the integration branch `<integration branch>`; no two tickets in flight have overlapping paths, and an overlapping ticket waits (DEC-235).
+- A ticket lead per ticket is started in that worktree with its identity (the orchestrator role and the ticket's id), from `brief-lead.md` (DEC-236).
+- No fixed number of tickets in flight: the eligible tickets, the resource gate and the owner's usage limits decide, each time a slot could open; every countdown says how many and why (DEC-847). A ticket idle on an owner answer frees its slot (DEC-235, DEC-363).
+- The resource gate is read before each start: free memory of at least `<free memory>` and a load average below the core count. Heavy tickets count double (DEC-235).
+- No worktree is left behind: one whose ticket is closed is removed (DEC-235).
 
-## The work order (DEC-957, DEC-959)
+## Integration order
 
-- The spec's KPIs drive two sessions at the same time: the independent test designer, in a tests worktree of its own, and the engineer (or product-spec worker), in the ticket's worktree; one writer per worktree, neither reads the other's work (DEC-959 item 7, DEC-963). The test designer retrieves from the integration branch's store only.
-- The engineer builds to the spec, never to the tests; once the lead has merged the tests it runs them once, reading results only. The QA engineer reads tests and code, changes neither, writes only its findings report (DEC-957).
-- **Tests run no more than this** (DEC-959 item 1, DEC-968): the lead runs the scoped set once before returning; the QA engineer and the reviewer re-run nothing; the merge queue or the close runs the scoped set once on the merged result; the full suite runs only in the nightly.
-
-## Integration
-
-1. The orchestrator verifies a DONE return itself: every KPI clause against the tests and the code (DEC-449), and `gov check` (DEC-236).
-2. For a FULL ticket a fresh reviewer probes the final head before the merge; nothing is committed after it but its probe record (DEC-498, DEC-733).
-3. Only the orchestrator merges into the integration branch (DEC-236); merges into the main branch are the owner's (DEC-416). Every merge carries `Task:`, never uses `-s ours`, never drops the ticket's side of a conflict and never removes what git's own merge keeps (DEC-750, DEC-754).
-4. The close: `gov close` on the merge commit (DEC-536). A close is refused only by a failure its change caused (DEC-968 item 2); no load-sensitive case is retried to let it through (DEC-780); no check is weakened (DEC-768 item 4).
-5. Residuals are recorded; the worktree and branch are removed (DEC-135, DEC-235). An open ticket's file is never edited on the integration branch after its review (DEC-757 item 6).
+1. The lead returns DONE. The orchestrator verifies the return itself, by its own runs: it reads every KPI clause against the tests and the code, and the governance checks of `gov check` against the last known state (DEC-236, DEC-449).
+2. For a FULL ticket a fresh reviewer probes the final code before the merge, and nothing is committed after the probed head (DEC-498) but its passing probe record (DEC-733).
+3. Only the orchestrator merges into the integration branch, and never into the main branch (DEC-235, DEC-416).
+4. Then the close: `gov close` runs the ticket's tests and the regression on the merge commit. Where the close does not follow the merge directly, the regression runs on the merged result (DEC-536): the scoped set; the full suite runs only in the nightly (DEC-968).
+5. Residuals are recorded, and the worktree and the branch are removed (DEC-135, DEC-235).
 
 The merge queue: [integration-queue.md](integration-queue.md). A red nightly: [nightly-sheriff.md](nightly-sheriff.md).
 
 ## The ticket loop
 
-The lead runs it from `brief-lead.md`: tests and implementation in parallel; red against the ticket's base; one verification; for FULL a review, at most two per declared round (DEC-413, DEC-916); a guard hole only unsandboxed sessions can reach is a row (DEC-779). The lead holds the loop count; three non-converging iterations end in ESCALATION (DEC-096). It returns DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED, then `brief_gaps:` (DEC-943 item 1).
+The lead runs the loop from `brief-lead.md`, which states each step in full.
+
+- The work order in parallel: a fresh test designer and a fresh implementer at the same time, from the spec, neither reading the other's work (DEC-959 item 7); the tests checked red against the ticket's base for the stated reason; then the verification, on the ticket's acceptance tests, the scoped selection and the builder tests, once (MR-3, DEC-968).
+- For a FULL ticket a second review is the last. After it only fail-open holes and losses of work are fixed (DEC-413 names silent changes to tests or ticket files); the rest are residuals (DEC-413).
+- The loop count is held by the lead and never disclosed; three consecutive iterations that do not converge end in an escalation (DEC-096).
+- A lead returns one of these forms: DONE, PACKAGES, ESCALATION, ESCALATION_BLOCKED, LAUNCH_BLOCKED or AUTH_REQUIRED (DEC-236), then `brief_gaps:` (DEC-943 item 1).
 
 ## Decisions
 
-- Delegation: the orchestrator decides a package itself when it is P2 or P3, reversible, its recommendation and the proposer's agree, confidence is medium or higher, and it touches neither the charter, the master rules, the contract's scope, the guard, containment, the held-out material, installs, merges into the main branch nor releases (MR-6, DEC-220, DEC-416). A stricter-only option is delegated too (DEC-537).
-- **The escalation rubric** (DEC-957): P3 the stream's Senior Engineer decides and logs; P2 the Senior Engineer decides, the orchestrator approves; P1 the owner decides; Emergency stops the work at once, then P1. Each level's test: [briefs-and-returns.md](briefs-and-returns.md). An Emergency: [incident-response.md](incident-response.md).
-- Packages go to the owner in six parts (DEC-818); only the orchestrator contacts the owner (DEC-850, DEC-855). At most five open with the owner; a P1 may bypass the cap (DEC-220).
-- **Decision records** (DEC-861, DEC-862): the orchestrator commits the records of the owner's decisions itself, as soon as they are written, with `Role: orchestrator`, `Task: decision-record` and `Decided-by: owner (<channel>, <date>)`; never `Role: owner`. The owner's push is the acceptance. Entries the close reads only from the owner's own commit (known-red lists, escalation lifts) stay the owner's commits until the project reads the push as the acceptance; `Decided-by` alone never counts. No worker or lead puts `Role: owner` or `Decided-by:` on a commit.
-- **Supersession** (DEC-866): the old entry is marked at once; everything that cites or enforces it is swept by id and by value and updated, or kept with a recorded reason.
-- The known-red lists only shrink; an addition comes to the owner as a package first (DEC-766).
+- Delegation: the orchestrator decides a package itself when all of these hold: it is P2 or P3; it is reversible; its recommendation and the proposer's agree; confidence is medium or higher (for a P2 also medium-low, where the owner has widened it as in DEC-416); it changes nothing of the charter, the master rules or the contract's scope; it weakens neither the guard nor containment; it touches neither the held-out path, installs, merges into the main branch nor releases (MR-6, DEC-220, DEC-416).
+- A stricter-only decision (the option refuses more, denies more or fails closed, and hinders no action of the owner) is delegated too, where every other condition holds (MR-6, DEC-537; so delegated in DEC-508 and DEC-525).
+- A decision is recorded as accepted before the change it authorises, then applied, and a delegated one is listed in the digest of delegated decisions at the next stop; the owner overturns any (DEC-220, DEC-463).
+- Everything else goes to the owner as a package from `decision-package.md`, in six parts (DEC-818): at most five packages with the owner at a time, and a P1 may bypass the cap (DEC-220).
+- An owner answer is recorded in the decision register as accepted, with who and when, in a commit of its own: the orchestrator's decision-record commit, never `Role: owner` (MR-6, DEC-861, DEC-862).
 
 ## Stops
 
-- The orchestrator stops only for owner packages, an escalation, an authentication stop or the end of the wave (DEC-220, DEC-250, DEC-420); every ticket a package does not affect keeps running.
-- A stop is short and readable on a phone (DEC-537); the closed count comes from the ticket files, open tickets by id (DEC-486). Every report ends with one `OWNER_ACTION:` line (DEC-787).
+- The orchestrator stops only for owner packages (with the digest), an escalation, an authentication stop or the exit of the wave, and never only to deliver a digest (DEC-220, DEC-250, DEC-420).
+- While packages are open, every ticket they do not affect keeps running (DEC-220).
+- A stop is one short block, readable on a phone (DEC-537, DEC-948).
+- The closed count is taken from the ticket files, and open tickets are given by id (DEC-486).
 
 ## Sessions
 
-- Workers start through the launcher, which sets their identity (DEC-371); one stable launch command for leads as well as workers (DEC-715), run by the Bash tool's own background run, never a trailing `&` (DEC-731). A denied launch is LAUNCH_BLOCKED, with no other form tried.
-- The model is named on every launch (DEC-460), with the effort for the role (DEC-839). Every session uses its model's full window; no launch sets a compaction threshold (DEC-838).
-- Never two writing sessions in one tree; never a commit there while a worker runs (DEC-537, DEC-254).
-- An authentication or access error: nothing more starts, the checkpoint is written, the stop is `AUTH_REQUIRED` (DEC-420).
-- Only the orchestrator's own session asks the owner for an install; others raise it as a P1 (DEC-957).
-- The orchestrator reads only a lead's final return (DEC-236).
+- A worker's identity (role and ticket) goes through the settings argument, which the launcher builds for a worker and the orchestrator passes for a lead (DEC-183, DEC-371).
+- The model `<model>` is named on every launch (DEC-460); no launch sets a compaction threshold (DEC-838).
+- Leads and workers run in the background: a lead with the absolute path of the CLI, `<absolute path of the CLI>`, a worker through the launcher; never a bare call in the foreground (DEC-371, DEC-537).- Never two writing sessions in one tree, and never a commit in a tree while a worker's command runs there: containment would attribute the change to the worker (DEC-254, DEC-537).
+- On an authentication or access error there is no retry loop: nothing more is started, the checkpoint is written, and the stop is named `AUTH_REQUIRED` (DEC-420).
+- The orchestrator reads only a lead's final summary, never its workers' output (DEC-236).
 
-## Briefs and returns
+## Briefs
 
-- Every session starts from a filled template (`brief-test-designer.md`, `brief-engineer.md`, `brief-product-spec.md`, `brief-reviewer.md`, `brief-lead.md`) carrying the standing sentences word for word (DEC-537) and the common checklist.
-- **Every return starts with the twelve fields**, each a labelled line: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action (CAP-37). **Any payload comes after them.** **Refused twice for the same call: stop and return** (AR-6). A lead checks each worker's return and sends back one that lacks a field (DEC-793).
-- **Policy 2** (DEC-820): reads are open; only secrets, the held-out material's contents (its file names are readable), the counterpart's work on the same ticket and the hidden half of an evaluation set are refused. The counterpart rule is in each writing worker's brief. A read the guard still refuses is taken, never respelled.
-- A worker gets only its brief and the decisions that apply (DEC-096). A test designer's brief states behaviour only (DEC-462). Tests in proportion to the profile (DEC-221).
-- The code under test is the worktree's own, set per command, word for word in every brief (DEC-732). A rebuild is a full one (DEC-719).
-- Reviewer briefs carry the judgement rules (DEC-801, DEC-808). An exit audit brief states DEC-430: the core tests for every KPI line are the independent test designer's; review cases are added later by it alone.
-- No session copies the tree or a folder of it.
+- A session is started from a filled template: `brief-test-designer.md`, `brief-engineer.md`, `brief-reviewer.md`, `brief-product-spec.md` or `brief-lead.md`. Each carries the standing sentences word for word (DEC-537).
+- Every return starts with the twelve fields, each a labelled line: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action (CAP-37). Any payload comes after them. Stop after two identical refusals and return (AR-6).
+- Policy 2: reads are open; only secrets, the held-out material's contents (its file names are readable), the counterpart's work on the same ticket and the hidden half of an evaluation set are refused (DEC-820).
+- A worker gets only its brief and the decisions that apply, never the orchestrator's notes, the loop count or another worker's output (DEC-096, DEC-537).
+- A test designer's brief states behaviour and sources only, never the names of the implementation's private parts (DEC-462).
+- Tests are in proportion to the profile: FULL thorough; STANDARD every KPI line's success and failure plus the key edge cases; LITE one test per KPI line; no combinatorial expansion beyond what a KPI demands (DEC-221).
+- No worker bulk-copies or clones the tree or a folder of it; single named files are copied (DEC-537).
 
 ## Commits
 
-- `Task:`, `Role:` and `Implements:` (decision or Contract ids only) in the final trailer block (DEC-182, DEC-476). A rewrite after implementation began carries `Rewrite-Reason:` (DEC-491).
-- Shared history is never rewritten; only the owner pushes (DEC-182, DEC-236).
+- The trailers stand in the final trailer block, written with `git commit --trailer`: `Task:`, `Role:` and, with the capability ids, `Implements:` (DEC-182, DEC-476).
+- A test designer's rewrite after implementation began carries the rewrite reason in the trailer `Rewrite-Reason:` (DEC-491).
+- A commit touching a ticket's file names that ticket in `Task:` and holds nothing else (MR-6, DEC-537).
+- Shared history is never rewritten, and nobody but the owner pushes (DEC-182, DEC-236).
 
-## Checkpoints
+## Checkpoints and context
 
-- A lead runs `gov checkpoint` at each round boundary (DEC-511). A checkpoint is written at every handover: a worker's return, a merge, a package, a compaction (DEC-837 item 3). The session continues from the injected checkpoint after compaction (DEC-250); a checkpoint older than the state is re-derived from git and the tickets (DEC-537).
+- A lead writes a real checkpoint with `gov checkpoint` at each round boundary of its ticket; none is written only to pass the close (DEC-511). A checkpoint is written at every handover (DEC-837 item 3).
+- The orchestrator updates its own checkpoint after every merge, close and stop (DEC-537).
+- With the session-start and pre-compaction hooks in place the session compacts and continues from the injected checkpoint; it does not stop for context (DEC-250).
+- When the checkpoint is older than the state, the state is re-derived from git and the tickets (DEC-537).
 
+## Temp hygiene and protected files
+
+- A session's temporary folder is its own and is removed with it; nothing is left in or read from another session's folders (DEC-386, DEC-537).
 ## Learning metrics
 
-Recorded at each close: KPI disputes; acceptance tests rewritten after implementation began, with reasons; lines against the estimate; wall time; merge conflicts; false findings; governance share (DEC-106, DEC-135, DEC-491).
+- The metrics are recorded at each close: KPI disputes; acceptance tests rewritten after implementation began, with reasons; lines against the estimate; wall time from claim to close; merge conflicts; false findings; governance share (DEC-106, DEC-135, DEC-491).
 
 ## Status questions
 
-When the owner asks where things stand, run `gov status --json` and answer from its parts; say which parts were not read and which shares were not measured; never answer from recall (CAP-28, DEC-541).
+When the owner asks in plain words where things stand, the session runs `gov status --json` and answers from its parts: tickets, open decision packages and gates, readiness, governance share, pause state and health (the doctor summary). Of every part marked not read it says that the part was not read, and of a share not measured that it was not measured. A status question is never answered from recall (CAP-28, DEC-541).
 
 ## Followed by hand
 
-Not enforced by a mechanism yet (DEC-537): the resource gate; a launch without a model; `AUTH_REQUIRED`; the twelve-field check; leads started by hand where the launcher has no lead role.
+These rules are followed by hand: they are not enforced by a mechanism yet (DEC-537). The resource gate is not a command; the launcher does not refuse a launch without a model; `AUTH_REQUIRED` is a stop the orchestrator names, not a mechanism; and leads are not started through the launcher, which starts workers alone.

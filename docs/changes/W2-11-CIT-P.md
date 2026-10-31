@@ -55,6 +55,19 @@ read in the register before it was cited.
 Every skill copy carries its version as `metadata.version`: the adapter writes no top-level `version` into a Claude
 Code skill, and it keeps the `metadata` block.
 
+**Repair in round 1 (DEC-537, DEC-539, DEC-541):** the five brief templates and the orchestration skill had dropped
+standing sentences of W1-35's delivery that no newer decision supersedes. They are restored word for word from the
+base (`4c064bab`) and changed only where a newer decision changes them: DEC-820 (reads open; no listing or search
+refusal; the held-out file names readable), DEC-847 (no fixed number of tickets in flight), DEC-837 and DEC-838 (no
+lead checkpoint status, no context-limit stop, a checkpoint at every handover), DEC-861 and DEC-862 (decision-record
+commits), DEC-959 items 1 and 7 and DEC-968 (the work order in parallel; tests run once per level; the full suite
+only in the nightly), CAP-37 (the twelve fields first, so `AUTH_REQUIRED` is the status, not the first line). The
+stop's short block cites DEC-537 and DEC-948; DEC-486 covers the closed count only. The escalation rubric's delay
+thresholds are the project's placeholders (DEC-539). To keep the skill's body within the validator's 2,500 tokens,
+the work order's detail moved to `briefs-and-returns.md`. Test-design states the work order in parallel, red
+against the ticket's base, the 2,980 test lines for 713 code lines and the README map in the form gov accept reads
+in its own body; qa-review ties severity to P3/P2/P1.
+
 ## 3. Options (DEC-105)
 
 1. **Apply now** (recommended): the rules in force reach every adopted repository's briefs and skills, and the
