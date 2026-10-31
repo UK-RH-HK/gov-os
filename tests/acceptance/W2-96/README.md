@@ -61,7 +61,7 @@ outside the given `TMPDIR`; the cases read it to check what ran, where, and that
 | Success 2 / Success 5 / Failure 1 / Failure 4 (review 1, R6) | `test_r6_no_log_file_is_written_whatever_the_projects_pytest_configuration_says` | No envelope (exit 2). |
 | Success 4 / Failure 3 (review 1, R7) | `test_r7_a_tests_failed_exit_with_no_failed_case_in_the_report_is_a_crash` | No envelope (exit 2). |
 | Success 3 / Success 5 / Failure 2 / Failure 4 (run 2, R8) | `test_r8_a_failed_case_the_readme_never_names_fails_the_run_while_every_mapped_line_passes`, `test_r8_a_skipped_case_the_readme_never_names_leaves_a_passing_run_passing`, `test_r8_a_failing_case_outside_the_readable_map_in_w1_30s_form_fails_the_run` | Against run 1's code (the design note: unmapped cases never change the exit code): the unmapped failure leaves `outcome: pass`, exit 0: "the result is not the expected one" (`"outcome": "pass"`), and for W1-30's form "exit code 0, expected 3". The skipped case **passes already** (a guard: R8 must not make skips fail the run). |
-| Success 2 / Failure 1 (run 2, R9) | `test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends` | Seen on run 1's code: the spaced and mixed presses interrupt the removal, "the given TMPDIR holds N entries after the run" (18,913 and 9,862 in one run, 16,191 and 7,691 in the next), files left holding the marker, and "gov was killed by signal 2 (1)"; the two presses 0.2 s apart: "gov was killed by signal 2" (that second press fell while `gov` waited for its child, and the removal finished). |
+| Success 2 / Failure 1 (run 2, R9) | `test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends` | Seen on run 1's code: the spaced and mixed presses interrupt the removal, "the given TMPDIR holds N entries after the run" (18,913 and 9,862 in one run, 16,191 and 7,691 in the next), files left holding the marker, and "gov was killed by signal 2 (1)"; the two presses 0.2 s apart (the variant P-W2-96-R9-PREMISE (a) revised): "gov was killed by signal 2" (that second press fell while `gov` waited for its child, and the removal finished). |
 | Success 2 / Success 4 / Failure 3 (run 2, R10) | `test_r10_a_chain_of_nested_folders_deeper_than_a_recursive_removal_leaves_the_result_as_the_tests_gave_it` | Seen on run 1's code: "the given TMPDIR holds 1218 entries after the run" (the chain and the run's report, holding the marker) and "the result is not the expected one" (`error`, kind `crash`), passing and failing alike. |
 | Success 1 / Success 5 (run 2, R11) | `test_r11_a_signal_gov_was_started_ignoring_stays_ignored_and_the_run_completes` | Seen on run 1's code: "gov accept ended (exit code 129) on signal 1, which it was started ignoring" (SIGHUP to `gov` and to its group), "(exit code 143) on signal 15" (SIGTERM), the child stopped. The SIGINT variant **passes already** (run 1 leaves SIGINT to Python, which keeps an inherited ignore); it stays as R11's guard. |
 | Success 5 / Failure 4 (run 2, R12) | `test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal` | Seen on run 1's code: "gov was killed by signal 15" (SIGTERM twice), "signal 1" (SIGHUP twice), "signal 2" (one SIGINT), each "expected an ordinary exit with code 143 (129, 130)". |
@@ -177,8 +177,9 @@ lists, revised in their own folders (see "Outside these paths").
   *Red without R8:* (a) and (c) answer `outcome: pass`, exit 0. (b) **passes already**; it stays as R8's guard
   that a skip never fails the run.
 - **R9** — a planted test leaves 20,000 files (20 folders of 1,000) in its temporary folder, then sleeps; SIGINT to
-  `gov` alone ends the run, and more presses follow during the clean-up: one SIGINT 0.2 s later (review 2's form),
-  fifteen SIGINTs 0.1 s apart, or SIGTERM, SIGHUP and SIGINT in turn 0.1 s apart (a press is sent only while
+  `gov` alone ends the run, and more presses follow during the clean-up: one SIGINT once the planted files begin
+  to disappear (review 2's form, a press 0.2 s later, revised: see below), fifteen SIGINTs 0.1 s apart, or
+  SIGTERM, SIGHUP and SIGINT in turn 0.1 s apart (a press is sent only while
   `gov` still runs; at least a second press must be sent, or the case's premise failed). Checks, all reported
   together: the given `TMPDIR` empty and no marker when `gov` ends (first); exit code 130; the child gone; the
   planted files made under the given `TMPDIR`. *Red without R9:* a later press raises `KeyboardInterrupt`
@@ -225,6 +226,18 @@ module gained, without changing what the earlier cases do: the planted kinds `ma
 `deep_fail` and `wait_for_go`; `Project.start(..., ignore=…)`, `Project.go`, `Started.send_all`, `Started.finish`
 (which `Started.send` now uses); `pid_running`; and `remove_tree`, an iterative removal the R9 and R10 cases use
 in their own clean-up, since pytest's own removal of a kept temporary folder recurses.
+
+### R9's two-press variant, revised (P-W2-96-R9-PREMISE (a), `Rewrite-Reason`: a test timing fault, DEC-136)
+
+The variant `two-presses-0.2-s-apart` sent its second SIGINT 0.2 s after the first. On a lightly loaded machine
+run 2's code ended its whole clean-up sooner (0.18 s after the first press here), so no second press was sent and
+the case failed its own premise, a red that was no fault of `gov`'s; a faster removal would fail it more often. The
+variant is now `a-second-press-once-the-removal-began`: the second SIGINT goes as soon as an entry of the planted
+test's temporary folder or of one of its 20 folders of files is removed (or the folder is gone), polled every
+millisecond, so it comes while `gov` removes the 20,000 files however fast the removal is. It still requires two
+presses (the premise), exit code 130, the given `TMPDIR` empty, no marker and the child gone; nothing else of the
+case changed. Here, on run 2's code, the removal began 4 ms to 15 ms after the first press, and `gov` ended 0.18 s
+to 0.62 s after the second press (8 runs of 8).
 
 ## Review 3's cases (`test_w2_96_at_review_3.py`)
 

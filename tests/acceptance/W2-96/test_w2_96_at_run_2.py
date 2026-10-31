@@ -146,24 +146,71 @@ def test_r8_a_failing_case_outside_the_readable_map_in_w1_30s_form_fails_the_run
 # The presses to gov alone, each ``(seconds after the one before, signal)``; the first ends the run while the
 # planted test sleeps, the others arrive while gov cleans up its 20,000 files (removing them alone takes about
 # 0.4 s on this machine). The run ends as the first press's interrupt: exit code 130 (R12).
+# P-W2-96-R9-PREMISE (a) revised review 2's form, a second press 0.2 s after the first: a clean-up that ended within
+# 0.2 s left the case's premise (a second press) unmet. Its second press now goes once the planted files begin to
+# disappear (``ON_REMOVAL``), so it comes while gov removes them, however fast the removal is.
+ON_REMOVAL = "once the planted files begin to disappear"
 CLEAN_UP_PRESSES = {
-    "two-presses-0.2-s-apart": [(0, INT), (0.2, INT)],
+    "a-second-press-once-the-removal-began": [(0, INT), (ON_REMOVAL, INT)],
     "spaced-presses": [(0, INT)] + [(0.1, INT)] * 15,
     "mixed-kinds": [(0, INT)] + [(0.1, TERM), (0.1, HUP), (0.1, INT)] * 5,
 }
+REMOVAL_WAIT_S = 60.0   # how long the revised form waits, after the first press, for the removal to begin
+POLL_S = 0.001          # how often it looks
+
+
+def _folder_marks(folders):
+    """Each folder's modification time, or None once it is gone: an entry removed from it changes its mark."""
+    found = []
+    for folder in folders:
+        try:
+            found.append(os.stat(folder).st_mtime_ns)
+        except OSError:
+            found.append(None)
+    return found
+
+
+def _press_on_removal(started, schedule, sleeping):
+    """``Started.send_all``, with ``ON_REMOVAL`` as a delay: that press goes as soon as an entry of the planted
+    test's temporary folder or of one of its MANY_FOLDERS folders is removed (or the folder is gone), while gov
+    still runs. ``run.sent`` lists the signals sent."""
+    base = Path(sleeping["tmp_path"])
+    folders = [base] + [base / f"qzv96leak-many-{index}" for index in range(support.MANY_FOLDERS)]
+    first = _folder_marks(folders)
+    sent = []
+    for delay, signum in schedule:
+        if delay == ON_REMOVAL:
+            deadline = time.monotonic() + REMOVAL_WAIT_S
+            while (started.process.poll() is None and time.monotonic() < deadline
+                   and _folder_marks(folders) == first):
+                time.sleep(POLL_S)
+        elif delay:
+            time.sleep(delay)
+        if started.process.poll() is not None:
+            break
+        os.kill(started.process.pid, signum)
+        sent.append(int(signum))
+    run = started.finish(60.0, f"signals {sent}")
+    run.sent = sent
+    return run
 
 
 @pytest.mark.parametrize("presses", list(CLEAN_UP_PRESSES))
 def test_r9_a_ctrl_c_during_the_clean_up_is_held_back_until_the_clean_up_ends(tmp_path, presses):
     """A planted test leaves 20,000 files in its temporary folder, then sleeps. SIGINT to gov alone ends the run;
-    further presses (SIGINT, or SIGTERM, SIGHUP and SIGINT in turn) arrive during the clean-up. When gov ends, the
-    given TMPDIR is empty, no marker anywhere, the child gone, and the exit code is 130."""
+    further presses (SIGINT, or SIGTERM, SIGHUP and SIGINT in turn) arrive during the clean-up, the revised form's
+    second once the planted files begin to disappear. When gov ends, the given TMPDIR is empty, no marker
+    anywhere, the child gone, and the exit code is 130."""
     files = support.second_file("many_sleep", "test_qzv96leak_many", extra=support.MANY)
     project = support.Project(tmp_path, files, support.SECOND_README)
     started = project.start(support.TICKET_ID)
     try:
         sleeping = started.wait_for("sleeping", support.START_WAIT_S)
-        run = started.send_all(CLEAN_UP_PRESSES[presses])
+        schedule = CLEAN_UP_PRESSES[presses]
+        if any(delay == ON_REMOVAL for delay, _ in schedule):
+            run = _press_on_removal(started, schedule, sleeping)
+        else:
+            run = started.send_all(schedule)
         problems = run.problems(generic=False)   # first, so it is what gov left when it ended
         problems += _ended(run, 128 + int(INT))
         if len(run.sent) < 2:
