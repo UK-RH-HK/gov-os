@@ -2,6 +2,8 @@
 name: audit
 description: Method for running an independent fidelity audit against the Contract and governing decisions
 version: "1.2.0"
+metadata:
+  version: "1.2.0"
 ---
 
 # Audit

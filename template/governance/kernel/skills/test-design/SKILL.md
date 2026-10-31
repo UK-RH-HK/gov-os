@@ -1,6 +1,8 @@
 ---
 name: test-design
 version: "1.1.0"
+metadata:
+  version: "1.1.0"
 description: Method for independent test design from the specification and KPIs, in parallel with the implementer and never reading its work.
 ---
 

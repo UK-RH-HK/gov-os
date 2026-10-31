@@ -1,6 +1,8 @@
 ---
 name: orchestration
 version: "1.1.0"
+metadata:
+  version: "1.1.0"
 description: "Method for running a wave: parallel tickets under ticket leads, integration, decisions, stops, sessions, briefs, commits and status answers."
 ---
 

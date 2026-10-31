@@ -1,6 +1,8 @@
 ---
 name: discovery
 version: "1.0.0"
+metadata:
+  version: "1.0.0"
 description: Method for discovery, research, experiments and decision packages during specification work.
 ---
 
