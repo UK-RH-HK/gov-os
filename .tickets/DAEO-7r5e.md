@@ -28,6 +28,7 @@ kpis:
   - A commit of a report in DEC-441's form passes the pre-commit hook, straight after staging, with no hand rebuild [AR-3, F-M13].
   - 'gov check on this repository: 17 of 17 families, no RED, no unexplained YELLOW [W2-H020, W2-L106, W2-L335, W2-M142, W2-L017].'
   - DEC-709 is retired by a register entry (DEC-719 item 4).
+  - 'Entry criterion (DEC-971 item 3, W2-05''s R3-1): before the hooks go back on, a declared check that reads what is staged sees the staged content under `git commit -a` and `git commit -- <path>` too (git''s own index handed to it under a separate name), with a test; until then the hooks are not reinstalled [DEC-971, DEC-803]'
   failure:
   - Any hook refusal is reported to the owner and never worked round.
 profile: STANDARD
@@ -37,6 +38,7 @@ sources:
 - DEC-441
 - DEC-709
 - DEC-719
+- DEC-971
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -54,6 +56,8 @@ list_rows:
 - W2-M142
 ---
 # W2-08 Hooks back on: F-M4 restated, gov check green here, a report commits through the hook
+
+**DEC-971 item 3 (owner, 2026-10-31):** W2-05's R3-1 is this ticket's entry criterion (a declared check that reads what is staged sees nothing under `git commit -a`; feature-gated, DEC-803). When the hooks return, DEC-805's exception for the two lifted hook events ends (W2-05's package H).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-08), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 

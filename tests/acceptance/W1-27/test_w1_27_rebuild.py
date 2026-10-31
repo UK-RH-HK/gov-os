@@ -17,6 +17,7 @@ from __future__ import annotations
 import shutil
 
 import w1_27_support as support
+import w2_67_codegraph
 import w2_67_doctor
 import w2_67b_support
 
@@ -123,7 +124,7 @@ def test_fresh_clone_doctor_rebuild(tmp_path):
     """
     origin = w2_67b_support.rebuild_project(tmp_path / "origin")
     w2_67b_support.write_committed(origin, "docs/guide.md", "a document of the project\n")
-    clone = tmp_path / "clone"
+    clone = w2_67_codegraph.note(tmp_path / "clone")   # its daemon folder goes when the case is over (batch 8)
     support.git(tmp_path, "clone", "-q", str(origin), str(clone))
     sandbox = support.make_sandbox(tmp_path / "sandbox")
 
