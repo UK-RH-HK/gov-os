@@ -8793,7 +8793,7 @@ W2-05's second and last review (DEC-413) failed on F-A (a declared check running
   3. **P-1 is accepted:** an inherited `GIT_INDEX_FILE` is honoured only for git calls in the project root; a program that may start git elsewhere gets no index.
 
 ### DEC-805 — W2-M281: drift is hook events and matchers, paths normalised; the template's sessionStart matcher added (P-W2-42 (a))
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the kernel file's change is approved here, CAP-33) · **Under:** DEC-601, DEC-783, DEC-802 · **Basis:** W2-05 run 2b: the template's `.rulesync/hooks.jsonc` legitimately differs from the repository's (paths, the hooks' order), and its `sessionStart` has no `matcher: "compact|clear|resume"`.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the kernel file's change is approved here, CAP-33) · **Under:** DEC-601, DEC-783, DEC-802 · **Basis:** W2-05 run 2b: the template's `.rulesync/hooks.jsonc` legitimately differs from the repository's (paths, the hooks' order), and its `sessionStart` has no `matcher: "compact|clear|resume"`. · **Changed by:** DEC-971 item 3 (an exception for exactly the two hook events ACT 1 lifted, named in the comparison, ending when they return with W2-08)
 - **Decision:**
   1. Adapter-portability compares the template's hooks source with the repository's by hook events and matchers, with paths normalised (`src/gov/adapters/portability.py`, in W2-05's paths).
   2. **In the same change, the template's missing `sessionStart` matcher is added** to `template/.rulesync/hooks.jsonc` (W2-05 is widened by that one line), so adapter-portability lands green and never blocks a close.
@@ -12166,3 +12166,19 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.353 | 2026-10-31 | Delegated (orchestrator): DEC-970 (the night's P2s and P3s; four fixes on the spot; P-GATE-WAIT-1 withdrawn; three slips). Next free id: DEC-971. |
+
+### DEC-971 — The owner's answers to P1-MORNING-2026-10-31: six items as recommended, with the exception of item 3 bounded (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-968, DEC-970, DEC-805, DEC-962 item 2, DEC-934 · **Basis:** `packages/P1-MORNING-2026-10-31.md`. **DEC-970's delegated decisions stand.**
+- **Decision:**
+  1. **W2-52 P-8 (a):** the CTO makes the one write of the regenerated `.claude/skills/adopt/SKILL.md` in W2-52's worktree, in its own session, and the owner approves the prompt it raises.
+  2. **W2-49 P-A (b) and P-B:** W2-49 closes on Contract v4.2; DEC-841's nine items go to a small v4.3 Contract ticket, with CAP-53.b split. `contract.yaml` is the Contract's authority; the three missing providers are added to `CONTRACT_v4.md`, the 276 one-line records fixed, and a check that the two forms agree is added (`validate_w2.py`), riding with the v4.3 ticket.
+  3. **W2-05 H (a), refined, and R3-1 (b):** DEC-805's comparison gets an exception covering **exactly the two hook events ACT 1 lifted** (the post-tool events), **named in the comparison**, and **ending when those events return** (with W2-08); a test designer revises the tests to it. R3-1 (a declared check reading staged content sees nothing under `git commit -a`) becomes an entry criterion of W2-08.
+  4. **W2-105 P-W2-105-1 (a):** W2-105's KPI 2 is re-baselined to what it tests (the template's install block removed); a small ticket gives a product the CTO-only install rule (only the orchestrator on the product's coordination ticket is asked; every other session refused and escalates).
+  5. **Rule 3, the rebuild lock (a):** kept until W2-107 merges; then its waits are measured again for a week and brought to the owner.
+  6. **The nightly's 05:30 check (a):** it sees the running marker, writes `running`, checks again at 07:00 and 08:00, and calls the night FAILED only if no verdict has come by 08:00 (a reviewed change to the nightly folder with `test_nightly.sh`).
+- **Also asked (P-PING-1 to follow):** a way to ping the owner that does not stop the CTO's work while it waits for the answer (the ping of 04:05 held the session until 11:46).
+- **Where it goes (DEC-851):** this register (DEC-805 marked for item 3); the prompt §0 (v3.56); the tickets of W2-05, W2-08, W2-105 and the two new ones; the nightly folder; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.354 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-971 (the morning's six items; item 3's exception bounded to the two lifted hook events, named, ending with W2-08). Next free id: DEC-972. |
