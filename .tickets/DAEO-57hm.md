@@ -44,6 +44,8 @@ list_rows: []
 ---
 # W2-95 core-pathmap checks what it says
 
+**DEC-970 (2026-10-31), package 1 (a):** for the independent test designer, not in allowed_paths: W1-30's planted path maps that write `namespaces: {}` get one catch-all namespace (`paths: ["**"]`), lowering nothing, `Rewrite-Reason: DEC-959 item 9`: `tests/acceptance/W1-30/test_w1_30_r15_command_success.py`, `tests/acceptance/W1-30/test_w1_30_r15_context_tickets.py`, `tests/acceptance/W1-30/test_w1_30_r15_policy_pairs.py`, `tests/acceptance/W1-30/test_w1_30_r16_context_own_tickets.py`, `tests/acceptance/W1-30/w1_30_r15_support.py`, `tests/acceptance/W1-30/w1_30_support.py`, and any other W1-30 file that writes an empty namespaces map.
+
 Card: P-W2-H064, decided (a) by the owner in DEC-959 item 9: a check that checks nothing is fixed in Wave 2.
 
 - **The fault (row W2-H064, found by W2-78's lead):** `src/gov/check/pathmap.py:47-49` returns no finding unless `namespaces` is a list; this repository's path map writes a mapping, so core-pathmap has never checked anything here. `:40-45` also returns none when the path map cannot be parsed.

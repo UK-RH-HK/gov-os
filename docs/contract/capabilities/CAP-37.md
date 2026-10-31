@@ -1,7 +1,7 @@
 ---
 id: CAP-37
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Structured checkpoints and mandatory triggers
 depends_on:
@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-37: Structured checkpoints and mandatory triggers
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
 - **Acceptance:** After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes the ticket at the recorded next step.
