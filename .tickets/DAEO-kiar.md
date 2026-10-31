@@ -19,6 +19,7 @@ allowed_paths:
 - src/gov/secrets/__init__.py
 - src/gov/secrets/cache.py
 - tests/unit/secrets_check/test_w2_107*
+- src/gov/rebuild/command.py
 kpis:
   success:
   - 'A rebuild scans with gitleaks only content it has not judged clean before: each scan''s verdict is remembered in one machine-wide cache (`~/.cache/gov-os/secrets-scan.sqlite`, outside every repository, shared by worktrees, close clones and the nightly), keyed by the sha256 of the bytes scanned, the kind (a file''s content, or a path''s names for `path_holds_secret`) and the engine''s fingerprint (gitleaks'' version string, the sha256 of every rule set in force, the cache format''s version); a second rebuild of an unchanged tree scans nothing again [DEC-966 item 4, DEC-939]'
@@ -60,3 +61,5 @@ Card: the owner's order of 2026-10-31 (DEC-966 item 4): rebuild speed is a prior
 - **Where:** `src/gov/secrets/__init__.py` (`indexable`, `path_holds_secret`, `_scan`) and a new `cache.py`. No running ticket holds `src/gov/secrets/`, but W2-05 (`DAEO-0z8c`, in progress) lists `src/gov/**/*.py` for the git environment of its helpers: split by file, W2-05 leaves `src/gov/secrets/__init__.py` to this ticket (its `_commits` git call's environment, if W2-05 needs it, is a merge-back between them, whichever merges second).
 - **Not here:** W2-76's timing and lock (`src/gov/rebuild/**`); batching many files into one gitleaks call (a further speed-up, a later option if the cache is not enough).
 - **Profile FULL:** the secrets filter guards the index against secrets; an independent review of the final code (the QA step) on every path where a remembered result is used.
+
+**At merge (DEC-970 P-W2-107-3, DEC-975 item 1):** `src/gov/rebuild/command.py` is in this ticket's paths for one change only: the rebuild's JSON record gives the secrets stage's counts from `gov.secrets.scan_counts()` (contents and names, scanned and remembered), taken as the difference around the stage; nothing else in that file changes (W2-76's file, merged).
