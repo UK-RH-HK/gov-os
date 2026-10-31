@@ -20,7 +20,7 @@ What is held (README, round 13, settlement 32):
 import w1_30_support as support
 
 TICKET = "PROJ-skil"
-WBS = "W1-skil"
+WBS = "W1-941"
 INSTALLED = "governance/kernel"
 NO_VERSION = "no version"
 NOT_MEASURED = "not measured"

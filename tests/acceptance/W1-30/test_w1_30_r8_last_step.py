@@ -25,7 +25,7 @@ import shutil
 import w1_30_support as support
 
 TICKET = "PROJ-last"
-WBS = "W1-last"
+WBS = "W1-915"
 TOOL = "governance/kernel/bin/tk"
 INSTALLED = "governance/kernel/hooks/sample-hook.sh"
 
@@ -87,8 +87,8 @@ def test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the
     support.load_store(project, sandbox)
     assert project.gov(sandbox, "context", TICKET, "--json").envelope()["ok"] is True, \
         "the fixture is wrong: the ticket's context cannot be built before the owner's commit"
-    project.add_decision(support.BASE_SOURCE, "SUPERSEDED", title="The base decision", superseded_by="DEC-newer")
-    project.add_decision("DEC-newer", "ACTIVE", title="The decision that replaces it", supersedes=[support.BASE_SOURCE])
+    project.add_decision(support.BASE_SOURCE, "SUPERSEDED", title="The base decision", superseded_by="DEC-90121")
+    project.add_decision("DEC-90121", "ACTIVE", title="The decision that replaces it", supersedes=[support.BASE_SOURCE])
     project.commit("the owner supersedes the base decision", who=support.OWNER)
 
     run = support.run_close(project, sandbox, TICKET, store=False)

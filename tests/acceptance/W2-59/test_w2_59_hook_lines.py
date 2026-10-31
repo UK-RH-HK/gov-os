@@ -12,6 +12,12 @@ project that holds the kernel's hook programs, with ``CLAUDE_PROJECT_DIR`` set t
 
 Never fail open: with no pin to be found, the preToolUse line must block the call (Claude Code blocks on exit 2 or
 a deny decision; any other non-zero exit lets the call proceed), and the after-call lines must not end silently.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). Since ACT 1 this repository's source holds five lines, its
+preToolUse line running its own five-rule hook. The case that counted the seven governance lines now counts them in
+the hook source of a project generated from the template, where the kernel's lines are (``.rulesync/hooks.jsonc`` as
+Copier puts it there). The cases on the pin's interpreter and package stay on this repository's lines: the kernel's
+lines start ``python3`` and carry no pin (``tests/acceptance/W2-90/README.md``).
 """
 
 from __future__ import annotations
@@ -19,10 +25,16 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
 import w2_59_support as support
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
+
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 ENTRIES = support.hook_entries()
 IDS = [f"{event}[{index}]" for event, index, _ in ENTRIES]
@@ -36,8 +48,23 @@ PROGRAM_ADDS_SRC = {"preCompact", "sessionStart"}
 VERSIONED_PIN = re.compile(r"pin-[0-9a-f]{7,40}")
 
 
-def test_the_source_holds_the_seven_governance_hook_lines():
-    """The cases below cover every command line of the source; each starts a kernel hook program."""
+@pytest.fixture(scope="module")
+def kernel_entries(tmp_path_factory):
+    """(event, index, entry) for every command entry of a generated project's rulesync hooks source (W2-90)."""
+    try:
+        project = kernel_wiring.generate_project(tmp_path_factory.mktemp("w2-90-w2-59-kernel"))
+    except kernel_wiring.GenerationFailed as exc:
+        pytest.fail(str(exc), pytrace=False)
+    source = support.load_jsonc(project / kernel_wiring.HOOK_SOURCE_REL)
+    return [(event, index, entry) for event, entries in (source.get("hooks") or {}).items()
+            for index, entry in enumerate(entries or []) if isinstance(entry, dict) and entry.get("type") == "command"]
+
+
+def test_the_source_holds_the_seven_governance_hook_lines(kernel_entries):
+    """The cases below cover every command line of the source; each starts a kernel hook program.
+
+    The source is the generated project's (W2-90): the kernel's seven lines."""
+    ENTRIES = kernel_entries
     assert len(ENTRIES) == 7, f"{support.HOOK_SOURCE_REL} holds {len(ENTRIES)} command entries; seven are expected"
     for event, index, entry in ENTRIES:
         assert "governance/kernel/hooks/" in entry["command"], (
