@@ -12077,3 +12077,13 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.346 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-963 (P-PARALLEL-1 (b), amended: the test designer in its own worktree, retrieving only from the integration branch's store; the engineer merges its tests and runs them once). Next free id: DEC-964. |
+
+### DEC-964 — W2-76's P-W2-76-4: the rebuild-lock override passed through the eight test helpers that build their own environment (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: P2, older tests revised under an existing decision (DEC-956 item 2), reversible, the orchestrator's recommendation and the lead's agree, confidence medium-high, nothing in the Charter, the master rules or the Contract's scope, the guard not weakened; for the owner to overturn) · **Under:** DEC-956, DEC-939 item 2, DEC-906, DEC-962 item 2 · **Basis:** W2-76's run-2 return (`log/W2-76-A5-run2.json`, 2026-10-31 00:52)
+- **Decision:** P-W2-76-4 (a). A fresh independent test designer adds one pass-through line per helper (pass `GOV_REBUILD_LOCK` through when it is set) at the eight sites where an existing suite builds the rebuild's environment from scratch, with `Rewrite-Reason: DEC-956 item 2`, lowering nothing: `tests/acceptance/W1-07/w1_07_support.py`, `tests/acceptance/W1-27/w1_27_support.py`, `tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py`, `tests/acceptance/W1-30/w1_30_support.py`, `tests/acceptance/W1-41/w1_41_support.py`, `tests/acceptance/W2-50/w2_50_support.py`, `tests/acceptance/W2-54/w2_54_support.py`, `tests/acceptance/W2-69/w2_69_support.py`. W2-76's paths are widened by these eight files. `w2_54_support.py` is also being changed by W2-64: whichever merges second merges back. P-W2-76-5 (the hook refusing acceptance-test runs) is already answered by ACT-GUARD-FIX-1 (`c3392f46`); W2-76's worktree gets it by merging `w2/integrate` before run 3.
+- **Then:** W2-76's measured figures for the machine-wide rebuild lock go to the owner for rule 3 (DEC-962 item 2).
+- **Where it goes (DEC-851):** this register; W2-76's ticket (paths); its run-3 brief; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.347 | 2026-10-31 | Delegated (orchestrator, DEC-936 item 2.5): DEC-964 (W2-76: the rebuild-lock override passed through eight test helpers by a test designer). Next free id: DEC-965. |
