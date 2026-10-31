@@ -12137,3 +12137,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.351 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-968 (the full suite only in the nightly; a close refused only by a failure its change caused; every other failure dealt with at once, no accepted reds). Next free id: DEC-969. |
+
+### DEC-969 — P-W2-54-LOAD-1 (a): W2-108, the context check's freshness checked once per run, a follow-up of W2-54 in the memory stream (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-968 item 3, DEC-966 item 4 · **Basis:** `packages/P-W2-54-LOAD-1.md`
+- **Decision:** option (a). W2-108 is filed as a follow-up of W2-54, linked to it (W2-54 stays closed): the semantic store's status and the lexical index's freshness are checked once per run (per process, keyed by the store's fingerprint and the tree's head), not on each of the context check's 328 retrieval calls. It belongs to the memory stream and starts after the tickets already queued. If its measure is still too slow at load, the orchestrator brings the owner the embedding batching as its next step. **The time limit is not raised.**
+- **Where it goes (DEC-851):** this register; W2-108's ticket and brief; the WBS; the chain; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.352 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-969 (W2-108, freshness once per run, a follow-up of W2-54; the time limit not raised). Next free id: DEC-970. |
