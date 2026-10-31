@@ -31,6 +31,10 @@ allowed_paths:
 - template/.rulesync/skills/orchestration/**
 - .rulesync/skills/audit/**
 - template/.rulesync/skills/audit/**
+- .claude/skills/*/SKILL.md
+- .rulesync/skills/*/SKILL.md
+- template/.rulesync/skills/*/SKILL.md
+- template/governance/kernel/skills/*/SKILL.md
 - template/governance/kernel/skills/test-design/**
 - .claude/skills/test-design/**
 - .rulesync/skills/test-design/**
@@ -112,3 +116,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-11), as approved (DEC-729). The list row
   - The five brief templates carry record frontmatter [W2-L258], and loose citations are fixed [W2-L256].
   - **The test-design skill (DEC-889 item 11 c; lens H finding 10):** it states the test kinds (unit, acceptance, live or harness, dev-tier, load-sensitive, repository-state), the run-time cost a test may take and how it is measured, that a test never copies the whole working tree where a minimal fixture will do, and that a test asserting the live repository's own state is declared as such (the record-reading set).
 - **KPIs, failure:** the skill validator refuses a brief without the twelve-field rule.
+
+**DEC-981 (ROLES-SPEC-1 G13, round 1):** the version line of every skill's `SKILL.md` (the kernel's source and its generated copies under `.claude/skills/`, `.rulesync/skills/` and `template/.rulesync/skills/`) is in this ticket's paths for that line only; **not the adopt skill's** while W2-52 (`DAEO-siiz`) holds it (it gets its version line when W2-52 merges); nothing else in those files changes. The role file stays limited to DEC-866's sweep sentences (W2-33 holds the rest).

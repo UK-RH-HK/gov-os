@@ -12313,3 +12313,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.363 | 2026-10-31 | Delegated (orchestrator): DEC-980 (P-W2-110-1 (a), P-W2-05-W2-72 (a); H and R3-1 already DEC-971's; two new tickets to the owner). Next free id: DEC-981. |
+
+### DEC-981 — W2-11's round 1 gets every skill's version line (ROLES-SPEC-1 G13), the adopt skill's after W2-52 (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, "changes a ticket's scope within the approved spec" (the escalation rubric; ROLES-SPEC-1 approved by DEC-957); reversible; nothing in the Charter, the master rules or the Contract's scope; for the owner to overturn) · **Under:** DEC-957, DEC-832 item 2, DEC-979 item 5
+- **Decision:** W2-11 (`DAEO-k7hz`) round 1 meets G13 ("no generated skill copy carries a version", which holds W2-60a) in full: the version line of every skill's `SKILL.md` (the kernel's source and the generated copies under `.claude/skills/`, `.rulesync/skills/`, `template/.rulesync/skills/`) joins its paths for that line only; the adopt skill's copies wait for W2-52 (`DAEO-siiz`), which holds them; the role file stays limited to DEC-866's sweep sentences (W2-33 holds the rest of it).
+- **Where it goes (DEC-851):** this register; W2-11's ticket; its brief.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.364 | 2026-10-31 | Delegated (orchestrator): DEC-981 (W2-11 r1 versions every skill copy, adopt's after W2-52). Next free id: DEC-982. |
