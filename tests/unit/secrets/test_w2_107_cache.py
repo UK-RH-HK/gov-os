@@ -87,6 +87,15 @@ def test_a_second_judgement_of_unchanged_content_and_names_starts_no_gitleaks(be
     assert _delta(middle, secrets.scan_counts())["content"] == {"scanned": 1, "remembered": 2}
 
 
+def test_the_filter_threads_at_once_lose_no_verdict(bench):
+    project, tools, record = bench
+    rels = [_write(project, f"many/{number}.md", f"Ordinary text {number}.\n") for number in range(24)]
+    assert secrets.indexable(project, rels) == rels
+    before = secrets.scan_counts()["content"]
+    assert secrets.indexable(project, rels) == rels
+    assert secrets.scan_counts()["content"] == {"scanned": before["scanned"], "remembered": before["remembered"] + 24}
+
+
 def test_a_finding_is_never_remembered_and_the_record_holds_no_text(bench):
     project, tools, record = bench
     clean = _write(project, "notes/clean.md", "Ordinary text.\n")
