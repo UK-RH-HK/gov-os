@@ -3,7 +3,8 @@
 # five minutes after WSL starts (@reboot), so a night is checked even when WSL was down at 05:30:
 #   30 5 * * * bash /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/nightly/nightly_check.sh
 #   @reboot sleep 300 && bash /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/nightly/nightly_check.sh
-# It writes one line per night to log/nightly/status.txt, which the morning digest reads:
+# It writes one final line per night to log/nightly/status.txt (a `running` line may come before it; a reader takes
+# the night's last line), which the morning digest reads:
 #   <date> ran | <verdict> head <head> duration ...      the night ran to a verdict;
 #   <date> running | <its last line>                        at 05:30 the run is still going (DEC-971 item 6): the check
 #                                                           waits and writes the night's final line by 08:00;
@@ -24,6 +25,26 @@ STATUS=$ORCH/log/nightly/status.txt
 mkdir -p "$ORCH/log/nightly"
 [ "$((10#$NOW_HM))" -ge 500 ] || exit 0
 label=$(date -d "$DAY" +%F)
+# One check at a time (DEC-971 item 6's review, F1): the 05:30 job and the @reboot job can overlap during the long
+# wait; the second leaves at once, and the first writes the night's one final line and its one ping.
+exec 9>"$ORCH/log/nightly/.check.lock"
+flock -n 9 || exit 0
+# An earlier night left with only a `running` line (its check was killed while it waited, F2) is finished now:
+# FAILED with its P1, so no night is ever silent (DEC-934 item 2).
+if [ -f "$STATUS" ]; then
+  for d in $(awk '$2 == "running" {print $1}' "$STATUS" | sort -u); do
+    [ "$d" \< "$label" ] || continue
+    grep -qE "^$d (ran|FAILED|MISSED) " "$STATUS" && continue
+    # that night's own record decides (review W1): a run that reached its verdict after the check died is `ran`
+    r=$(ls -d "$ORCH/log/nightly/$(echo "$d" | tr -d -)"-0[1-4]*/ 2>/dev/null | tail -1)
+    if [ -n "$r" ] && grep -q "^verdict:" "$r/run.txt" 2>/dev/null; then
+      echo "$d ran | $(grep -E '^(verdict|duration)' "$r/run.txt" | tr '\n' ' ')head $(grep -m1 '^head ' "$r/run.txt" | cut -d' ' -f2)" >> "$STATUS"
+      continue
+    fi
+    echo "$d FAILED | its check stopped while it waited, no final line written (DEC-971)" >> "$STATUS"
+    "$PING" "P1 NIGHTLY-FAILED $d | its check stopped while it waited | the orchestrator's package follows"
+  done
+fi
 # A night already checked is not checked again; its held pings (if any) still go out.
 # A `running` line is not a final line: a check that died while it waited (WSL restarted) is done again (DEC-971).
 if grep -qE "^$label (ran|FAILED|MISSED) " "$STATUS" 2>/dev/null; then bash "$GATE" --wait-flush; exit 0; fi
@@ -50,12 +71,14 @@ elif ! grep -q "^verdict:" "$run/run.txt"; then
     echo "$first"
     for at in ${NIGHTLY_RECHECK_AT:-0700 0800}; do
       [ "$((10#$at))" -gt "$((10#$NOW_HM))" ] || continue
+      [ -f "$marker" ] || break  # the run has ended (its marker gone): judge it now (F3)
       if [ -n "$NIGHTLY_NOW_HM" ]; then
-        sleep "${NIGHTLY_WAIT_STEP:-1}"
+        sleep "${NIGHTLY_WAIT_STEP:-1}" 9>&-
       else
         wait_s=$(( $(date -d "today ${at:0:2}:${at:2:2}" +%s) - $(date +%s) ))
-        [ "$wait_s" -gt 0 ] && sleep "$wait_s"
+        [ "$wait_s" -gt 0 ] && sleep "$wait_s" 9>&-  # the lock is not held by an orphaned sleep
       fi
+      [ -f "$marker" ] || break
       grep -q "^verdict:" "$run/run.txt" && break
     done
   fi
