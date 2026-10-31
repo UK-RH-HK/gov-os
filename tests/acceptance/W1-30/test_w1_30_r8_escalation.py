@@ -32,7 +32,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-escl"
-WBS = "W1-escl"
+WBS = "W1-907"
 COUNTER = f"{support.ITERATION_DIR}/{TICKET}.json"
 
 
@@ -61,8 +61,8 @@ def test_a_file_no_commit_holds_lifts_no_escalation(project, sandbox, interface)
     file also makes the tree another than its commit, and no source states which of the two the close answers
     first: blocked (exit code 4) or "could not measure" for the tree (exit code 1). The case accepts both."""
     _escalated(project, sandbox, interface)
-    planted = project.write("docs/adr/DEC-planted.md", "---\nstatus: ACTIVE\n---\n")
-    _not_lifted_by(project, sandbox, interface, "DEC-planted", "a file no commit holds was taken as the owner's decision",
+    planted = project.write("docs/adr/DEC-9020.md", "---\nstatus: ACTIVE\n---\n")
+    _not_lifted_by(project, sandbox, interface, "DEC-9020", "a file no commit holds was taken as the owner's decision",
                    codes=(support.EXIT_BLOCKED, support.EXIT_GOV_ERROR))
     planted.unlink()
     support.commit_what_a_refusal_left(project)
@@ -71,11 +71,11 @@ def test_a_file_no_commit_holds_lifts_no_escalation(project, sandbox, interface)
 
 def test_a_path_to_a_file_outside_the_project_lifts_no_escalation(project, sandbox, interface):
     _escalated(project, sandbox, interface)
-    outside = project.root.parent / "outside" / "DEC-outside.md"
+    outside = project.root.parent / "outside" / "DEC-9017.md"
     outside.parent.mkdir()
-    outside.write_text(support.decision("DEC-outside", "ACTIVE", title="Continue"), encoding="utf-8")
+    outside.write_text(support.decision("DEC-9017", "ACTIVE", title="Continue"), encoding="utf-8")
     for start in ("docs/adr", "governance/decisions", "docs", "."):
-        name = "/".join([".."] * len([part for part in start.split("/") if part != "."]) + ["..", "outside", "DEC-outside"])
+        name = "/".join([".."] * len([part for part in start.split("/") if part != "."]) + ["..", "outside", "DEC-9017"])
         assert (project.root / start / f"{name}.md").resolve() == outside.resolve()
         _not_lifted_by(project, sandbox, interface, name, f"a path that leaves the project ({name}) was taken as the owner's decision")
         support.commit_what_a_refusal_left(project)
@@ -94,13 +94,13 @@ def test_the_tickets_own_checkpoint_lifts_no_escalation(project, sandbox, interf
 
 def test_a_decision_recorded_before_the_escalation_began_lifts_none(project, sandbox, interface):
     """The owner's decision, active and committed by the owner, is older than the ticket's first refusal."""
-    project.add_decision("DEC-earlier", "ACTIVE", title="An earlier decision of the owner")
+    project.add_decision("DEC-9008", "ACTIVE", title="An earlier decision of the owner")
     project.commit("the owner's decision", who=support.OWNER)
     _escalated(project, sandbox, interface)
     codes = [finding.get("code") for finding in support.decision_check(project, sandbox).get("findings", [])
-             if "DEC-earlier" in json.dumps(finding)]
+             if "DEC-9008" in json.dumps(finding)]
     assert not codes, f"the fixture is wrong: W1-11's checker has findings about the decision: {codes}"
-    _not_lifted_by(project, sandbox, interface, "DEC-earlier", "a decision older than the escalation lifted it")
+    _not_lifted_by(project, sandbox, interface, "DEC-9008", "a decision older than the escalation lifted it")
     support.commit_what_a_refusal_left(project)
     support.assert_escalation_in_force(project, sandbox, interface, TICKET, "a decision older than the escalation")
 
@@ -109,9 +109,9 @@ def test_a_decision_that_lifted_one_escalation_lifts_no_second(project, sandbox,
     """The decision is recorded after the first escalation began and lifts it: the close runs and is refused
     for the failing test. Two more refusals bring the second escalation; the same decision is given again."""
     _escalated(project, sandbox, interface)
-    project.add_decision("DEC-once", "ACTIVE", title="Continue")
+    project.add_decision("DEC-9015", "ACTIVE", title="Continue")
     project.commit("the owner's decision", who=support.OWNER)
-    first = support.run_close(project, sandbox, TICKET, "--owner-decision", "DEC-once")
+    first = support.run_close(project, sandbox, TICKET, "--owner-decision", "DEC-9015")
     support.refused(first, interface, support.EXIT_CHECK_FAILED)   # lifted: the tests ran and failed
     support.commit_what_a_refusal_left(project)
     for _ in range(2):
@@ -119,7 +119,7 @@ def test_a_decision_that_lifted_one_escalation_lifts_no_second(project, sandbox,
         support.commit_what_a_refusal_left(project)
     support.refused(support.run_close(project, sandbox, TICKET), interface, support.EXIT_BLOCKED)
 
-    _not_lifted_by(project, sandbox, interface, "DEC-once", "a decision lifted a second escalation")
+    _not_lifted_by(project, sandbox, interface, "DEC-9015", "a decision lifted a second escalation")
     support.commit_what_a_refusal_left(project)
     support.assert_escalation_in_force(project, sandbox, interface, TICKET, "a decision used before")
 

@@ -27,8 +27,8 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-tree"
-WBS = "W1-tree"
-OTHER, OTHER_WBS = "PROJ-othr", "W1-othr"
+WBS = "W1-950"
+OTHER, OTHER_WBS = "PROJ-othr", "W1-924"
 PLANTED = "PROJ-plnt"
 FEATURE = "src/example/feature.py"
 NOTES = "governance/project/notes.yaml"
