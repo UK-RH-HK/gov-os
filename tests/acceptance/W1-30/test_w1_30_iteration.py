@@ -26,7 +26,7 @@ cli_support = support.cli_support
 # --------------------------------------------------------------------------
 
 TICKET = "PROJ-iter"
-WBS = "W1-iter"
+WBS = "W1-914"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-iter", "Role: engineer", "Implements: CAP-01")
 ITERATION_FIELDS = ("iteration_count", "iterations_remaining", "loop_count",
@@ -115,7 +115,7 @@ def test_different_failures_still_increment_count(project, sandbox, interface):
 def test_successful_close_resets_count(project, sandbox, interface):
     """A6: a successful close resets the iteration count."""
     ticket_a = "PROJ-rst1"
-    wbs_a = "W1-rst1"
+    wbs_a = "W1-938"
     trailers_a = ("Task: PROJ-rst1", "Role: engineer", "Implements: CAP-01")
     project.add_ticket(ticket_a, wbs_a)
     project.add_failing_test(wbs_a)
@@ -238,7 +238,7 @@ def test_owner_decision_resets_count(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-owner1"
+    dec_id = "DEC-9019"
     project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
     project.commit("owner decision", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -263,7 +263,7 @@ def test_owner_decision_must_be_active(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-draft1"
+    dec_id = "DEC-9007"
     project.add_decision(dec_id, "DRAFT", title="Not yet active")
     project.commit("add draft decision", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -545,7 +545,7 @@ def test_owner_decision_unapproved_refused(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-noapproval"
+    dec_id = "DEC-9013"
     project.add_decision(dec_id, "ACTIVE", title="Unapproved decision")
     project.commit("add decision without owner approval", who=support.AGENT)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -561,7 +561,7 @@ def test_owner_decision_checker_failing_refuses(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-checkfail"
+    dec_id = "DEC-9002"
     project.add_decision(dec_id, "ACTIVE", title="Decision")
     dec_file = project.root / "docs" / "adr" / f"{dec_id}.md"
     dec_file.write_text("---\nnot valid yaml: [[[broken\n---\n", encoding="utf-8")
@@ -578,7 +578,7 @@ def test_owner_decision_only_when_escalated(project, sandbox, interface):
     escalated (after three consecutive failures).
     """
     _failing_project(project)
-    dec_id = "DEC-early"
+    dec_id = "DEC-9009"
     project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
     project.commit("add decision early", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
@@ -592,7 +592,7 @@ def test_owner_decision_id_recorded_in_count(project, sandbox, interface):
     _failing_project(project)
     for _ in range(3):
         support.run_close(project, sandbox, TICKET)
-    dec_id = "DEC-owner-rec"
+    dec_id = "DEC-9018"
     project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
     project.commit("add owner decision", who=support.OWNER)
     support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)

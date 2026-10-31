@@ -13,6 +13,12 @@ refused by the permission rules and the guard".
 
 The guard is asked through the PreToolUse commands the committed settings
 register, run through the shell as the harness runs them. No call is made.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90, DEC-957, DEC-906). The cases that asked this repository's live guard now
+ask the kernel's: the ``kernel_*`` fixtures are W1-46's launch project built on a project generated from the
+template, whose ``.claude/settings.json`` rulesync generates from the template's sources, and the PreToolUse
+lines those settings register, run from ``governance/kernel/hooks/`` (``tests/acceptance/W2-90/README.md``).
+Each moved case names its fixtures by their old names in its first line; its verdict is the same.
 """
 
 from __future__ import annotations
@@ -95,20 +101,23 @@ def test_the_roster_has_an_entry_for_the_research_role():
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("tool", ("Write", "Edit"))
-def test_a_research_session_may_write_inside_its_experiment_folder(guard, project, tool):
+def test_a_research_session_may_write_inside_its_experiment_folder(kernel_guard, kernel_project, tool):
+    guard, project = kernel_guard, kernel_project
     for rel in (f"{FOLDER}/notes.md", f"{FOLDER}/results/run-1.json"):
         result = guard(tool, w47.write_input(tool, project / rel), RESEARCH)
         w47.assert_allowed(result, f"{tool} to {rel} by research")
 
 
-def test_a_research_session_may_write_inside_its_experiment_folder_with_bash(guard, project):
+def test_a_research_session_may_write_inside_its_experiment_folder_with_bash(kernel_guard, kernel_project):
+    guard, project = kernel_guard, kernel_project
     for command in (f"mkdir -p {FOLDER}/results", f"echo done > {FOLDER}/results/run-1.txt",
                     f"cp README.md {FOLDER}/copy.md"):
         w47.assert_allowed(guard("Bash", w47.bash_input(command), RESEARCH), f"`{command}` by research")
 
 
-def test_a_research_session_may_use_scratch(guard, project):
+def test_a_research_session_may_use_scratch(kernel_guard, kernel_project):
     """Scratch is every known role's (W1-02). Red until the guard knows the role."""
+    guard, project = kernel_guard, kernel_project
     result = guard("Write", w47.write_input("Write", project / ".gov-runtime/scratch/research/notes.md"), RESEARCH)
     w47.assert_allowed(result, "a Write to .gov-runtime/scratch/ by research")
 
@@ -143,8 +152,9 @@ def test_another_role_gains_nothing_from_the_research_ticket(guard, project, rol
     w47.assert_stopped(result, f"a Bash write into the experiment folder by {role} on the research ticket")
 
 
-def test_the_guard_grants_the_research_role_no_network_and_asks_nothing_for_it(guard, project):
+def test_the_guard_grants_the_research_role_no_network_and_asks_nothing_for_it(kernel_guard, kernel_project):
     """ "Its network grant comes from the launcher's profile ... not from the guard": the guard just lets the call by."""
+    guard, project = kernel_guard, kernel_project
     for command in ("curl -sI https://pypi.org/simple/", "git ls-remote https://github.com/astral-sh/uv"):
         result = guard("Bash", w47.bash_input(command), RESEARCH, cwd=project / FOLDER)
         w47.assert_allowed(result, f"`{command}` by research")

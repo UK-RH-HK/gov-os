@@ -28,7 +28,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-long"
-WBS = "W1-long"
+WBS = "W1-917"
 CASES = 1200
 ID_LENGTH = 300
 # One argument of a command carries less than this on Linux (32 pages of 4 KiB).

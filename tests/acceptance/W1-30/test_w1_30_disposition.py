@@ -22,7 +22,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-disp"
-WBS = "W1-disp"
+WBS = "W1-906"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-disp", "Role: engineer", "Implements: CAP-01")
 
@@ -136,8 +136,8 @@ def test_disposition_with_context_failure(project, sandbox, interface):
     but without the context hash.
     """
     _project_with_finding(project)
-    project.add_decision("DEC-cyc1", "ACTIVE", supersedes="DEC-cyc2")
-    project.add_decision("DEC-cyc2", "ACTIVE", supersedes="DEC-cyc1")
+    project.add_decision("DEC-9003", "ACTIVE", supersedes="DEC-9004")
+    project.add_decision("DEC-9004", "ACTIVE", supersedes="DEC-9003")
     project.commit("create contradiction", who=support.OWNER)
     run = support.run_close(project, sandbox, TICKET,
                             "--disposition", "defer")

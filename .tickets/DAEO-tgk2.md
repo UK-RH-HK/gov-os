@@ -19,6 +19,14 @@ allowed_paths:
 - src/gov/rebuild/**
 - tests/unit/rebuild/test_w2_76*
 - tests/conftest.py
+- tests/acceptance/W1-07/w1_07_support.py
+- tests/acceptance/W1-27/w1_27_support.py
+- tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py
+- tests/acceptance/W1-30/w1_30_support.py
+- tests/acceptance/W1-41/w1_41_support.py
+- tests/acceptance/W2-50/w2_50_support.py
+- tests/acceptance/W2-54/w2_54_support.py
+- tests/acceptance/W2-69/w2_69_support.py
 kpis:
   success:
   - 'gov rebuild''s output and record give the time of each stage (the lexical, semantic and code-index stores, the secrets filter where it runs, the compaction), not the lexical stage alone [DEC-939 item 2, row W2-L451]'

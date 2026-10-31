@@ -24,7 +24,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-runs"
-WBS = "W1-runs"
+WBS = "W1-939"
 FAILING_TEST = f"tests/acceptance/{WBS}/test_fail.py::test_fail"
 
 CALLERS_OPTIONS = {
