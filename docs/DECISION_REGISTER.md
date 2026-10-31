@@ -12189,7 +12189,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
   1. **(a) The ping:** the line goes to `~/.config/gov-os-notify/pings.log` by a plain logging command that asks nothing (`tools/ping_log.sh`), then Claude Code's `PushNotification` sends the same line (a desktop notification, and a push to the owner's phone while Remote Control is connected). It returns at once; the CTO's work goes on. The tool's answer ("sent" or "not sent") is written beside the line in the log.
   2. **(d) No pings at night:** from midnight to 07:30, a P1 waits for the 07:30 morning package, emergencies alone excepted (DEC-949's exception for an active owner no longer applies to pings).
   3. **The fallback:** a daytime P1 that needs the owner that day and shows "not sent" falls back, for that one, to the old blocking `owner-ping` (its ask rule stays in the owner's settings for this).
-  4. **First, a test:** one test notification, sent while the owner is away from the terminal; the owner says whether it reached the phone.
+  4. **First, a test:** one test notification, sent while the owner is away from the terminal; the owner says whether it reached the phone. **Done 2026-10-31 12:58:** "mobile push requested"; the owner confirmed it reached the phone. The first try at 12:51 was "not sent" (the owner was at the terminal), as designed.
 - **Where it goes (DEC-851):** this register (DEC-855 marked); the prompt §7 and §8 (v3.57); `tools/ping_log.sh`; RESUME HERE; the decisions-in-force list.
 
 | Version | Date | Change |
