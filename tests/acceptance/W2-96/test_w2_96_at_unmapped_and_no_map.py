@@ -1,6 +1,10 @@
 """KPI success 3 and failure 2: a test the README does not map is counted under ``unmapped`` (pass, fail and skip
 counts), never named; a folder with no README, or a README with no map, is refused with ``ACCEPT_NO_MAP`` and
 never answered with raw output.
+
+Revised for run 2 (DEC-970, PKG-1 (a), R8): an unmapped failed case now fails the run (exit code 3), while it is
+still only counted, never named. The two cases that held "an unmapped failure never changes the exit code" hold
+the new rule; run 2's own R8 cases are in ``test_w2_96_at_run_2.py``.
 """
 
 from __future__ import annotations
@@ -39,15 +43,17 @@ def rows(tmp_path_factory):
 
 def test_unmapped_cases_are_counted_never_named(rows):
     run = rows.run(support.TICKET_ID)
-    support.assert_outcome(run, support.ROWS_EXPECTED, support.EXIT_PASS)  # unmapped: 3 passed, 1 failed
+    # unmapped: 3 passed, 1 failed; R8: the unmapped failure fails the run, every mapped line still passing
+    support.assert_outcome(run, support.ROWS_EXPECTED, support.EXIT_FAIL)
     named = [name for name in support.ROWS_UNMAPPED_NAMES if name in (run.stdout + run.stderr).lower()]
     assert not named, f"unmapped cases are named: {named}\n{run.describe()}"
     support.assert_clean(run)
 
 
-def test_an_unmapped_failure_never_changes_the_exit_code_in_text_either(rows):
+def test_an_unmapped_failure_fails_the_run_in_text_too_and_is_never_named(rows):
+    """Revised for run 2 (R8) from ``test_an_unmapped_failure_never_changes_the_exit_code_in_text_either``."""
     run = rows.run(support.TICKET_ID, json_mode=False)
-    assert run.returncode == support.EXIT_PASS, f"exit code {run.returncode}, expected 0\n{run.describe()}"
+    assert run.returncode == support.EXIT_FAIL, f"exit code {run.returncode}, expected 3 (R8)\n{run.describe()}"
     assert "unmapped" in run.stdout.lower(), f"the text gives the unmapped counts\n{run.describe()}"
     named = [name for name in support.ROWS_UNMAPPED_NAMES if name in (run.stdout + run.stderr).lower()]
     assert not named, f"unmapped cases are named: {named}\n{run.describe()}"
