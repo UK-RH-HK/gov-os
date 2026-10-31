@@ -32,7 +32,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-prfd"
-WBS = "W1-prfd"
+WBS = "W1-930"
 ACCEPTANCE = f"tests/acceptance/{WBS}"
 FEATURE = "src/example/feature.py"
 

@@ -2,7 +2,7 @@
 id: DAEO-0rfi
 status: closed
 deps: []
-links: []
+links: [DAEO-zoex]
 created: 2026-10-18T03:12:15Z
 type: task
 priority: 1
