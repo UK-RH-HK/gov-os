@@ -57,7 +57,7 @@
           "items": {
             "type": "object",
             "required": ["test", "reason"],
-            "properties": { "test": { "$ref": "#/$defs/text" }, "reason": { "$ref": "#/$defs/text" } }
+            "properties": { "test": { "$ref": "#/$defs/text" }, "reason": { "type": "string" } }
           }
         },
         "skip_count": { "type": "integer", "minimum": 0 },
