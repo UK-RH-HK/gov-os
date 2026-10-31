@@ -406,10 +406,10 @@ def test_w2_96_r5_a_named_test_that_matches_nothing_fails_its_line(project, caps
     _plant(root, readme, {"test_a.py": "def test_a():\n    pass\n"})
     code, envelope, text = _accept(root, "DAEO-t001", capsys)
     assert code == 3
-    assert envelope["result"]["lines"] == [
-        {"kpi": "success-1", "outcome": "fail", "passed": 1, "failed": 1, "skipped": 0},
-        {"kpi": "success-2", "outcome": "fail", "passed": 1, "failed": 1, "skipped": 0},
-        {"kpi": "success-3", "outcome": "fail", "passed": 1, "failed": 1, "skipped": 0},
+    assert envelope["result"]["lines"] == [  # the line fails; its counts stay the counts of tests that ran
+        {"kpi": "success-1", "outcome": "fail", "passed": 1, "failed": 0, "skipped": 0},
+        {"kpi": "success-2", "outcome": "fail", "passed": 1, "failed": 0, "skipped": 0},
+        {"kpi": "success-3", "outcome": "fail", "passed": 1, "failed": 0, "skipped": 0},
         {"kpi": "success-4", "outcome": "pass", "passed": 1, "failed": 0, "skipped": 0},
     ]
     assert envelope["result"]["totals"] == {"passed": 1, "failed": 0, "skipped": 0}

@@ -280,11 +280,10 @@ def _report(ticket: str, mapping: dict, cases: list[Case]) -> tuple[dict, int]:
             counts[name][case.outcome] += 1
         if not hits:
             unmapped[case.outcome] += 1
-    for name, items in mapping.items():  # a named test no case matches is a failure of its line, counted only
-        counts[name]["failed"] += sum(1 for item in set(items) if names_a_test(item)
-                                      and not any(matches(item, case) for case in cases))
-    lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"] else "fail",
-              **counts[name]} for name in ordered(mapping)]
+    missing = {name for name, items in mapping.items()  # a named test no case matches fails its line, unnamed;
+               if any(names_a_test(item) and not any(matches(item, case) for case in cases) for item in items)}
+    lines = [{"kpi": name, "outcome": "pass" if counts[name]["passed"] and not counts[name]["failed"]
+              and name not in missing else "fail", **counts[name]} for name in ordered(mapping)]  # counts: tests run
     passed = all(line["outcome"] == "pass" for line in lines)
     return _result(ticket, "pass" if passed else "fail", None, lines, unmapped, totals), 0 if passed else EXIT_FAIL
 
