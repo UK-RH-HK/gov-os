@@ -4,8 +4,6 @@
       ".tickets/**": "deny"
     },
     "bash": {
-      "npm install*": "deny",
-      "pip install*": "deny",
       "sudo *": "deny"
     }
   }
