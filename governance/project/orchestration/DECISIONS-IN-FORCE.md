@@ -7,6 +7,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
 - DEC-949, DEC-850, DEC-855, DEC-972: P1s and owner-only decisions are sent as they arise, 07:30 to midnight: a package file, then the line logged (`tools/ping_log.sh`, no ask) and sent by `PushNotification` (it does not stop the CTO); a daytime P1 needed that day that shows "not sent" falls back to the blocking `owner-ping`. None from 02:00 to 07:30 (the morning package, DEC-973). Only the orchestrator asks the owner.
 - DEC-818: a P1 package stands alone, in six parts.
+- DEC-975: W2-107 first: no new lead until it is closed; merged on DONE, reviewed on its final head, closed alone at once. CAPACITY-1 re-measured after it. The query embedder stays on the CPU (DEC-798) until W2-15b's GPU-against-CPU KPI is decided by the owner.
 - DEC-974: a new ticket in the WBS (follow-up, split, a red's ticket) is a P1 to the owner with the CTO's recommendation before it is filed; never delegated. Leads name a needed ticket in their return.
 - DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
 - DEC-945: no paid notifier and no app install.
