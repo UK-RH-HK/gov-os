@@ -1,7 +1,7 @@
 ---
 id: DAEO-nn1s
 status: open
-deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-swdu, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-0mab, DAEO-btt7, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-b926, DAEO-60rw, DAEO-0pyc, DAEO-lrre, DAEO-6n5k, DAEO-6ox0, DAEO-ha8z, DAEO-kl5e, DAEO-egsy, DAEO-siiz, DAEO-7rr2, DAEO-0rfi, DAEO-arrl, DAEO-wnnz, DAEO-cy5o, DAEO-5j8b, DAEO-kh9l, DAEO-cv58, DAEO-ecac, DAEO-iw1f, DAEO-h2k3, DAEO-juee, DAEO-pl6k, DAEO-0uhh, DAEO-e82f, DAEO-c1uz, DAEO-9nys, DAEO-2gc7, DAEO-rmbe, DAEO-uzme, DAEO-e8f0, DAEO-ye2a, DAEO-qty6, DAEO-2azm, DAEO-ebmh, DAEO-tgk2, DAEO-b6hm, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-mc6n, DAEO-m1u3, DAEO-gdzh, DAEO-s9qc, DAEO-jsg1, DAEO-2bdu, DAEO-8lmb, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-g87r]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-k7hz, DAEO-zqvn, DAEO-rd0g, DAEO-swdu, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-0mab, DAEO-btt7, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-b926, DAEO-60rw, DAEO-0pyc, DAEO-lrre, DAEO-6n5k, DAEO-6ox0, DAEO-ha8z, DAEO-kl5e, DAEO-egsy, DAEO-siiz, DAEO-7rr2, DAEO-0rfi, DAEO-arrl, DAEO-wnnz, DAEO-cy5o, DAEO-5j8b, DAEO-kh9l, DAEO-cv58, DAEO-ecac, DAEO-iw1f, DAEO-h2k3, DAEO-juee, DAEO-pl6k, DAEO-0uhh, DAEO-e82f, DAEO-c1uz, DAEO-9nys, DAEO-2gc7, DAEO-rmbe, DAEO-uzme, DAEO-e8f0, DAEO-ye2a, DAEO-qty6, DAEO-2azm, DAEO-ebmh, DAEO-tgk2, DAEO-b6hm, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-mc6n, DAEO-m1u3, DAEO-gdzh, DAEO-s9qc, DAEO-jsg1, DAEO-2bdu, DAEO-8lmb, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-g87r, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-lxzn, DAEO-uw5h, DAEO-6icv, DAEO-rpfv, DAEO-hgv3, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-6b2q, DAEO-3r1j, DAEO-nqa2]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -87,6 +87,23 @@ depends_on:
 - DAEO-n0wb
 - DAEO-6y0x
 - DAEO-g87r
+- DAEO-57hm
+- DAEO-ouet
+- DAEO-wq2b
+- DAEO-wi46
+- DAEO-lxzn
+- DAEO-uw5h
+- DAEO-6icv
+- DAEO-rpfv
+- DAEO-hgv3
+- DAEO-drhj
+- DAEO-zpdj
+- DAEO-0mtg
+- DAEO-kiar
+- DAEO-zoex
+- DAEO-6b2q
+- DAEO-3r1j
+- DAEO-nqa2
 allowed_paths:
 - docs/plan/wave-2-exit/**
 kpis:
@@ -114,6 +131,8 @@ list_rows:
 - W2-M343
 ---
 # W2-46 Wave 2 exit run
+
+**Dependencies widened (PLAN-GROWTH-1 §2 gap 6):** W2-95 to W2-110 and W2-90b.
 
 **DEC-954:** dependencies are the Wave 2 tickets only (Wave 3, withdrawn and parked removed; W2-86, W2-88, W2-90 and W2-91 to W2-94 added). The exit run checks §5 as revision 4 states it: 10-practice close records; a clean gov close on W2-81 and EXAMIN's copy; the governance share on W2-81 and EXAMIN; gov doctor green on EXAMIN's copy. Each stream's coordination ticket is added when filed.
 
