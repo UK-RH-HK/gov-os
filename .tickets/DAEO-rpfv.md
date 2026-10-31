@@ -1,7 +1,7 @@
 ---
 id: DAEO-rpfv
 status: open
-deps: [DAEO-49o5]
+deps: [DAEO-49o5, DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z
 type: task
@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - DAEO-49o5
+- DAEO-drhj
 allowed_paths:
 - template/governance/kernel/skills/release/**
 - .claude/skills/release/**
@@ -49,5 +50,7 @@ track: B
 list_rows: []
 ---
 # W2-102 The release skill for the CTO
+
+**Dependencies (PLAN-GROWTH-1 §2 gap 3):** also after W2-104 (the skill harness, DEC-959 item 5).
 
 Card: ROLES-RESEARCH-1 §5.3 item 11, approved (DEC-959 item 8). With W2-16 (`DAEO-49o5`), after its release form is merged.
