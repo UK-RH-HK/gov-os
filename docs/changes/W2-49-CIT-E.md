@@ -119,6 +119,8 @@ overturns the reading.
   (DEC-741)", records each answer A to K in one line and names W2-52 (DAEO-siiz) as the new ticket of Question H.
   Nothing else in its body changes: the reviewed text stays as approved.
 
+**Resume round, DEC-745 item 2** (commit "the eight source-map rows follow Contract v4.2"): in `docs/contract/SOURCE_MAP.csv` only the `carried_by_or_disposition` cell of the eight rows CIT-P §8 names changed (rows 235, 237, 248, 251, 256, 280, 283, 292): each states its lite part W2 under v4.2's CAP-44.f (A7, A10) or CAP-44.h (the verdict), and its rest W3 under CAP-44.k or CAP-44.l, citing DEC-741 with DEC-722; rows 252 (A11) and 282 (A9) and every other row unchanged.
+
 ## 4. The owner's answers (DEC-741) and how each was applied
 
 | Q | Answer | How it was applied |
@@ -200,7 +202,7 @@ implementation, MR-3). `docs/plan/tools/validate_s1.py` was not run (DEC-738).
 ## 8. What stays open
 
 - **The eight rows of `docs/contract/SOURCE_MAP.csv`** that state W3 for the moved parts (rows 235, 237, 248, 251, 256,
-  280, 283, 292; CIT-P §8): not decided by DEC-741, left as they are.
+  280, 283, 292; CIT-P §8): not decided by DEC-741, left as they are. **Applied** under DEC-745 item 2 in the resume round (§3, "Resume round, DEC-745 item 2").
 - **CAP-45.a's capability record** (difference (f)): stale against `contract.yaml` (it still says "authenticated source
   (signed tag)", with no Wave 2 clause). For the owner: whether it is regenerated, and by which commit.
 - **The validator lines (DEC-744):** KPI success line 3 and the failure line need the Wave 2 plan validator, ticket
