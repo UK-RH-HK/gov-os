@@ -27,7 +27,7 @@ def _project(scratch, sandbox, broken=False):
     """A project whose store holds two tickets whose context reproduces and, with ``broken``, one whose context
     cannot be built (it names a mandatory input the store does not hold)."""
     project = scratch()
-    project.write(r15.PATH_MAP_REL, "namespaces: {}\n")
+    project.write(r15.PATH_MAP_REL, "namespaces: {all: {paths: ['**']}}\n")
     project.base_source()
     for number, ticket in enumerate(REPRODUCES, start=1):
         project.write(f".tickets/{ticket}.md", r15.ticket_text(ticket, f"W9-0{number}"))
