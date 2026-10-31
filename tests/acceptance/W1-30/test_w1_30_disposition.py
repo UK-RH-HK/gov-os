@@ -155,7 +155,7 @@ def test_disposition_with_context_failure(project, sandbox, interface):
     # decisions and carries no hash, and the one repair ticket records the class and no context hash.
     assert run.returncode == support.EXIT_CHECK_FAILED, f"expected exit code 3\n{run.describe()}"
     text = support.error_text(error)
-    assert "DEC-cyc1" in text and "DEC-cyc2" in text, \
+    assert "DEC-9003" in text and "DEC-9004" in text, \
         f"the answer does not name the decisions that fail the context\n{run.describe()}"
     assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
     repairs = _repair_tickets(project)
