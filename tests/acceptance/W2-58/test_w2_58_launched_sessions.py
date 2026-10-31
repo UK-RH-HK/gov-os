@@ -152,10 +152,11 @@ def _start(tmp, role, probe):
     """Build the fixture project, start one real session through ``gov launch`` and return what its probe left."""
     _prerequisites()
     sandbox = s.make_sandbox(tmp)
-    project = s.make_project(sandbox, base=True)
     # W2-60a: the model and effort come from the role file's default line (DEC-839 item 5); a live harness case runs
-    # on Haiku 4.5 at effort low (DEC-839 item 2), so its role file says so and no --model is passed.
-    s.write(project / s.ROLES_REL / f"{role}.md", s.role_file_text(role, "claude-haiku-4-5-20251001", "low"))
+    # on Haiku 4.5 at effort low (DEC-839 item 2), so its role file says so and no --model is passed. The file is in
+    # the base commit, so the tree is clean when the session starts (DEC-951).
+    project = s.make_project(sandbox, base=True, extra={
+        f"{s.ROLES_REL}/{role}.md": s.role_file_text(role, "claude-haiku-4-5-20251001", "low")})
     s.write(project / SCRATCH / "probe.sh", probe)
     env = {key: value for key, value in os.environ.items()
            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}

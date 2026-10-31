@@ -62,6 +62,8 @@ The live file runs only when chosen: `-m local_only` (see "Live cases").
 | **S2, F1** (round 2, F1) the project's command files are skills the session can load; the record names each | `test_w2_60a_command_skills.py` (12): every Markdown file under `.claude/commands/` recorded as `<name>` or `<namespace>:<name>` (never its front matter's `name`), with its path, its version as written or `no version` (quoted, unquoted, none, no front matter), its sha256 and `named: false`; a `.txt` there not recorded; the entry follows the file as it stands at the launch; the `.claude/skills/` entries unchanged beside them; commands with no `.claude/skills/` recorded; refused (after a control launch, naming the file or folder): a command file that is a link (top level, in a namespace), a namespace folder that is a link, a front matter that is not YAML. Green guards: no `.claude/commands/` or an empty one adds nothing; a command's name in a role's skills line refuses. Live: `test_every_project_skill_in_the_session_s_start_is_in_its_record` | the record holds no command entry; the refusals do not refuse |
 | **F3** (round 2, F2) no protection a launched worker has today is lost: the user's ask and deny rules | `test_w2_60a_user_permissions.py` (19): every `permissions.ask` and `permissions.deny` string of the test home's `~/.claude/settings.json` in the `--settings` value's `permissions.ask` / `permissions.deny`, per worker role, the launcher's own deny rules kept (those of a launch with no user file all still there); refused (after a control launch, with "settings"): the file unreadable, a folder, not JSON, not an object, `permissions` not a map, `ask` / `deny` not a list or holding a non-string. Green guards: no allow rule, `defaultMode`, `env`, model, `effortLevel` or hook of the file carried; an absent file, or one with no `permissions`, only `allow`, or empty lists, launches carrying no ask rule. **Revised:** `test_w2_60a_kept_out.py::test_nothing_of_the_test_home_but_the_user_s_ask_and_deny_rules_reaches_the_session_s_start` | the settings carry no ask rule and none of the user's deny rules; the refusals do not refuse |
 | **S5** (round 2) more spellings of a threshold | `test_w2_60a_no_compaction_threshold.py::test_another_spelling_of_a_threshold_in_the_repository_s_settings_is_refused` (8): `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, `env.CLAUDE_CODE_IDLE_COMPACT_MIN_TOKENS`, `modelSettings.<the role's model>.autoCompactWindow` and `modelSettings.<another model>.autoCompactWindow`, each in `.claude/settings.json` and `.claude/settings.local.json`, refused with `LAUNCH_REFUSED`, "no launch sets a compaction threshold (DEC-838)" and the key's name. Green guard: a `modelSettings` entry without the key launches (2) | the refusals do not refuse |
+| **S1, S5, S6, F1** (round 3) a worktree launch checks the main checkout's local settings | `test_w2_60a_main_checkout_and_adopted_layout.py::test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch` (8): `autoCompactWindow`, `env.CLAUDE_CODE_AUTO_COMPACT_WINDOW`, `modelSettings.<model>.autoCompactWindow`, `agent`, `sandbox`, `permissions.defaultMode: bypassPermissions`, `permissions.additionalDirectories`, `disableAllHooks` in the main checkout's `.claude/settings.local.json`, refused from a linked worktree with `LAUNCH_REFUSED` and the words of the tree's own file's case; `..._not_json_refuse_a_worktree_launch` (1, naming `settings.local.json`); each after a control launch from the worktree | the main checkout's local file is not read: "gov launch did not refuse (exit code 0)" |
+| **S1** (round 3) an adopted tree's role file | `test_w2_60a_main_checkout_and_adopted_layout.py::test_an_adopted_tree_s_role_file_is_read_from_its_kernel` (1): no `template/`, the role file at `governance/kernel/roles/engineer.md`; the launch starts and the record's `role_text` names that path, version and sha256 | refused: "the role file template/governance/kernel/roles/engineer.md cannot be read" |
 | **S4, S6, S7** (round 2) more arguments refused after `--` | `test_w2_60a_refused_arguments.py::test_a_model_connector_or_prompt_argument_is_refused_after_the_double_dash` (6): `--fallback-model` spaced and `=`, `--chrome`, `--ide`, `--system-prompt-snapshot` spaced and `=`, each with `LAUNCH_REFUSED`, "the CLI arguments carry" and its name. Green guards: `--no-chrome` launches, passed unchanged; a prompt naming the four as words launches | today's launcher passes them |
 
 ### Counts
@@ -127,6 +129,31 @@ W2-56 case. The 36, by the first assertion each meets: 27 "gov launch did not re
 files, 9 user settings files, 8 threshold spellings, 6 arguments); 5 "the user settings' ask rules ... are not in the
 session's permissions.ask" (one per worker role); 4 "the record's skills are not ... the .claude/commands/ Markdown
 files" or "the command ... is not recorded" (the record holds no command entry).
+
+## Round 3 (review 2, DEC-951)
+
+Round 3 is the ticket's last (DEC-951 item 4). Review 2's five items were given to the test designer as text (DEC-136),
+with no reading of the implementation (DEC-820 (c)); the cases were written and shown red against this tests
+worktree's `src/` (the ticket's code before the round, DEC-732) on 2026-10-31:
+
+1. **A worktree's local settings**: the CLI loads a linked worktree session's local settings from the main
+   checkout's `.claude/settings.local.json`, so a worktree launch refuses on that file what it refuses on the tree's
+   own. New file `test_w2_60a_main_checkout_and_adopted_layout.py`, 9 cases, all red ("gov launch did not refuse").
+   The control (a worktree launch with no such file launches) is the existing record case and each case's own first
+   launch.
+2. **The adopted layout**: with no `template/`, the role file is `governance/kernel/roles/<role>.md`. One case in the
+   same file, red (the launch is refused for want of `template/governance/kernel/roles/engineer.md`). W1-38's cases
+   are not touched.
+3. **The unit cases** `tests/unit/launch/test_runs.py` (6), `test_w1_28.py` (2), `test_w1_32.py` (18): each bare tree
+   gets the engineer's role file at `template/governance/kernel/roles/engineer.md` (version `1.0.0`, default
+   `claude-opus-5-5`, `high`); nothing else changes (P-W2-60a-6). All 26 pass.
+4. **The nightly route**: the live file's line is in `tests/acceptance/serial-only.txt` (P-TD-4).
+5. **W2-58's live phantom-deletion pair**: the fixture's role file is written before the fixture's commit (it was
+   written after it, so the tree was not clean when the session started).
+
+| File | Cases now | Added | Red at the base | Green |
+|---|---|---|---|---|
+| `test_w2_60a_main_checkout_and_adopted_layout.py` (new) | 10 | 10 | 10 | 0 |
 
 ## Beyond the design, and what waits on another ticket
 
@@ -200,4 +227,5 @@ until W2-11 has merged. Nothing in them is revised.
   repository never has and make the case pass for a reason a product does not share. Package P-TD-W2-60a-2 (the
   design's P-W2-60a-4).
 - `tests/unit/launch/` (the design's class (ii) unit cases): W2-56's folder; the lead's package P-W2-60a-6.
-- The `serial-only.txt` entry for the live file (above).
+  **Revised in round 3** (DEC-951): see "Round 3".
+- The `serial-only.txt` entry for the live file (above). **Added in round 3** (DEC-951).

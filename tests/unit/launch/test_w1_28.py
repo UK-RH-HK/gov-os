@@ -19,6 +19,15 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.cli.errors import GovError  # noqa: E402
 from gov.launch import launcher  # noqa: E402
 
+# The engineer's role file each launch reads (W2-60a, DEC-826 Q1): its version and default lines, nothing else.
+ROLE = "# engineer\n\n- **Version:** 1.0.0\n- **Launch default:** model claude-opus-5-5, effort high\n"
+
+
+def _role_file(project):
+    path = project / "template" / "governance" / "kernel" / "roles" / "engineer.md"
+    path.parent.mkdir(parents=True)
+    path.write_text(ROLE, encoding="utf-8")
+
 
 @pytest.fixture
 def session(tmp_path, monkeypatch):
@@ -27,6 +36,7 @@ def session(tmp_path, monkeypatch):
     for folder in (home / ".local" / "bin", temp, project):
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    _role_file(project)
     monkeypatch.setenv("HOME", str(home))
     monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
     monkeypatch.setattr(launcher, "_check_ticket", lambda *args: None)
