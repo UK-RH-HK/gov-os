@@ -125,7 +125,7 @@ before they were stopped. The suite now bounds this in three ways:
 
 | KPI | Test (file::case) |
 |---|---|
-| **S1**: every check, test helper and command that runs git in another folder clears the inherited `GIT_*` variables; one helper does it; the sweep record lists every call [AR-2, W2-M105, W2-M113, W2-M161, W2-L160] | `test_w2_05_sweep.py`: all 4 cases (the record, every git-starting file named, the code index's tool as a call that starts git (F2), the helper). The behaviour half is in `test_w2_05_planted.py`, listed under the covers ids below, and in `test_w2_05_code_index_tool.py::test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable` (F2: a program the Gov OS starts that starts git itself). |
+| **S1**: every check, test helper and command that runs git in another folder clears the inherited `GIT_*` variables; one helper does it; the sweep record lists every call [AR-2, W2-M105, W2-M113, W2-M161, W2-L160] | `test_w2_05_sweep.py`: all 4 cases (the record, every git-starting file named, the code index's tool as a call that starts git (F2), the helper). The behaviour half is in `test_w2_05_planted.py`, listed under the covers ids below, and in `test_w2_05_code_index_tool.py::test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable` (F2: a program the Gov OS starts that starts git itself). The nightly's `git bisect run` step, a test helper that runs git in another folder (review R4-1, DEC-970): `test_w2_05_bisect_step.py`, all 3 cases (see "The review's R4-1" below). |
 | **S2**: a hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (DEC-710) | `test_w2_05_linked_worktree.py`: `test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree]` (success); `[the main tree]` (guard); `test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change` (the refusing side); `test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file` (through lefthook and `gov ci checks G1 G2`); and, for a check the project declares that runs git in a repository of its own (F-A, DEC-804, DEC-807), `test_w2_05_declared_check.py::test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged[a linked worktree, a plain commit]`, `[the main tree, a plain commit]`, `[the main tree, git commit -a]` (new): the commit lands with exactly the staged tree, the index matches it and names no missing object |
 | **S3**, as DEC-783 (b) re-baselined it: `lefthook install` leaves `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green; `uninstall` is an owner act, followed by restoring the committed file (DEC-712) | `test_w2_05_settings.py`: `test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore[lefthook.yml]`, `[the template's hooks file]`; `test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean`; `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`. What `uninstall` alone does to the file is lefthook's own behaviour and is not asserted. The state after the owner's act is: `lefthook uninstall`, then `git restore -- .claude/settings.json` in each tree whose file changed. "adapter-portability stays green" also covers the hooks sources it now compares (W2-M281, DEC-805): `test_w2_05_hooks_source.py`, all 10 cases (new; listed under W2-M281 below) |
 | **F1**: a planted `GIT_DIR` or `GIT_INDEX_FILE` in a hook's environment reaches no child git call; and (review F1) the staged-secrets gate never passes on an index other than the one being committed | `test_w2_05_planted.py`: `test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy[the check's declared command]`, `[gov ci checks G1]`; `test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index[GIT_INDEX_FILE]`, `[GIT_DIR and GIT_INDEX_FILE]` (rewritten); `test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret[GIT_DIR]`; `test_a_clean_index_under_a_planted_decoy_index_is_refused_naming_the_index` (rewritten); `test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it[a secret in that index, the project's index clean]`, `[nothing secret in that index, the project's index clean]`, `[nothing secret in that index, a secret in the project's index]` (new); `test_a_hooked_commit_with_its_index_outside_the_git_directory_and_a_secret_there_does_not_land` (new, through lefthook); `test_read_merge_under_a_planted_git_dir_reads_its_own_repository`; `test_the_containment_check_catches_the_change_whatever_its_environment_holds[a decoy GIT_DIR and GIT_INDEX_FILE]`; the S2 linked-worktree cases, where git itself plants both variables; and (F-A with P-1, DEC-804 items 1 and 3, DEC-807 item 2) the three cases of `test_w2_05_declared_check.py` (new): the `GIT_INDEX_FILE` git exports to the pre-commit hook (relative in the main tree, absolute on `commit -a` and in a linked worktree) reaches no declared check, and no location variable does |
@@ -471,3 +471,44 @@ W2-05 whole, after the change, in a launched session: 48 cases, 40 passed and 8 
 - `test_w2_05_sweep.py::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep`. The sweep record
   does not name `src/gov/release/__init__.py`, which came into the branch with `0cfa8684f720`'s merge of
   `w2/integrate` (W2-16). This change does not reach it, and it is returned to the lead.
+
+## The review's R4-1 (2026-10-31): the nightly's bisect step gets the environment of the run that found the red
+
+Ticket `DAEO-0z8c`. Written by a fresh independent test designer on `w2/W2-05-tests` from the ticket's head
+`ba807a032603`, before the fix (DEC-136: the review found a behaviour the cases missed). Sources: KPI success 1 (a
+test helper that runs git in another folder clears the inherited `GIT_*`; W2-M161), the failure KPI, P-1 (DEC-804
+item 3), DEC-970's W2-05 line (the nightly's bisect pinned as the close's test runs are). No implementation file of
+the ticket was read; the nightly's mechanics were read on `w2/integrate` (`git show w2/integrate:src/gov/close/nightly.py`).
+
+- **What git does (measured, git 2.43.0):** `git bisect run <cmd>` puts `GIT_DIR` (the git directory of the tree it
+  runs in: the night clone's, under the project's `.git/worktrees/`), `GIT_EXEC_PATH` and `GIT_PREFIX` into the
+  environment of `<cmd>`, whatever the caller cleared. A test that runs git in a folder of its own with the
+  environment it inherits then acts on the clone and, through its common git directory, on the project.
+- **The project, built from scratch** in the case's temporary folder: the main tree on `work`; `main` checked out
+  nowhere, holding the person's own commit; on `work` the tool's test (green), a committed green night's record
+  naming it, `harmless one`, `the culprit` (the test's data says `BROKEN`), `harmless two` (the head). The tool's test
+  makes a repository of its own in its `tmp_path` (`git init -b main`, a commit, `checkout -b side`, a commit,
+  `checkout main`, `merge side`), requires its two commits there, then reads the data. At each run it adds the commit
+  it runs at (`stage.txt`) and the names of the `GIT_*` variables it sees (never a value) to a file outside every
+  repository.
+- **The night, as the product runs it:** `python3 -m gov.close.nightly work --root <project> --json`, this worktree's
+  `src/`, W1-30's sandbox environment (no `GIT_*` of the caller); a real `git bisect run`, no stand-in. It runs once
+  for the three cases (a module fixture), with the project's state read before and after it by the suite's clean git.
+  A bisect over the four commits after the green night needs at most three steps: the night is stopped, with every
+  process it started, once the tool's test has run more than 20 times (its bisect does not converge), or at 240 s.
+- **Each case first requires that a bisect step ran the tool's test,** so that none is green for want of a bisect.
+
+| Case (`test_w2_05_bisect_step.py::`) | Requires | Red on `ba807a032603` because (seen; 3 failed, 29 s and 47 s, two runs) |
+|---|---|---|
+| `test_the_night_s_bisect_leaves_every_branch_head_and_reflog_of_the_project_as_it_was` | every ref, the reflog of every branch and of HEAD, HEAD (its branch and commit), the main tree's index, the commits reachable from refs and reflogs, and `.git/config` as before the night | the project's refs moved: `refs/heads/main` moved onto a foreign merge commit (its reflog 2 -> 3 entries), a foreign branch `refs/heads/side` appeared, 20 commits outside the project's history became reachable, and `.git/config` went from `bare = false` to `bare = true` (the step's `git init` re-initialised the project's git directory). The night was stopped after 21 runs of the test |
+| `test_the_night_s_bisect_names_the_commit_that_made_the_test_red` | the night ends, red (exit 3, `NIGHTLY_RED`), and its bisect package for the tool's test names the culprit as the first bad commit | the night did not end: the bisect did not converge (each step's test made new commits in the range it bisects), stopped after the tool's test had run 21 times. Without the stop it ran 554 steps in 300 s (a first draft's limit). No first bad commit was named |
+| `test_each_bisect_step_s_test_sees_only_the_git_variables_of_the_run_that_found_the_red` | each step's `GIT_*` names are among `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_NOSYSTEM`, `GIT_NO_LAZY_FETCH` and the same as the run that found the red | the run that found the red (and the run alone) saw exactly the three; every one of the 19 steps saw `GIT_DIR`, `GIT_EXEC_PATH` and `GIT_PREFIX` beside them |
+
+**Can they go green?** Checked by the designer outside the suite, with a scratch script that was not committed and
+touched no product file: the same project, a real `git bisect run` driven as `w2/integrate`'s nightly drives it (a
+detached worktree of the head, `bisect start <head> <green>`, `bisect run` of the step script), with the step taking
+every `GIT_*` but the three out of its environment before pytest. Then: no change to the project's state; the culprit
+named as the first bad commit; the two steps (at `harmless one` and at the culprit) saw the three names only; four
+runs of the test in all.
+
+W2-05 has 51 cases with these three.
