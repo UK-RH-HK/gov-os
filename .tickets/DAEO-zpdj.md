@@ -20,7 +20,7 @@ allowed_paths:
 kpis:
   success:
   - 'A project generated from the template (copier, then rulesync generate) holds no deny rule for `npm install*` or `pip install*` in its generated settings [DEC-966 item 1, DEC-172]'
-  - 'In that project, an install in the CTO''s session (the orchestrator role on its coordination ticket) reaches the guard''s install rule and is asked; in every other session, leads included, it is refused by the guard, as this repository''s after DEC-957 [DEC-966 item 1, DEC-957]'
+  - 'In that project, an install reaches the guard''s install rule (nothing denies it before the guard is asked): the kernel''s guard decides it, by its rule as it stands; a product''s CTO-only rule (only the orchestrator on the project''s coordination ticket asked) is W2-110''s [DEC-971 item 4, DEC-966 item 1]'
   - 'Every other permission and deny rule of the template is unchanged: the generated project''s rules counted and compared before and after, by name, only the two install rules gone [DEC-966 item 1]'
   - 'The template''s own suites (W1-38, W1-39) pass on the change [DEC-966 item 1, DEC-965]'
   failure:
@@ -34,6 +34,7 @@ sources:
 - DEC-172
 - DEC-957
 - DEC-965
+- DEC-971
 est_loc: 10
 acceptance_tests:
   path: tests/acceptance/W2-105/
@@ -42,6 +43,8 @@ track: A
 list_rows: []
 ---
 # W2-105 The template's install block removed
+
+**DEC-971 item 4 (owner, 2026-10-31):** KPI 2 re-baselined to what this ticket tests (an install reaches the guard's install rule in a generated project); the product's CTO-only install rule is W2-110 (`DAEO-3r1j`).
 
 Card: the owner's answer to P-W2-90-1 P1-A, (a) (DEC-966 item 1).
 

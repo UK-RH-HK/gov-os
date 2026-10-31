@@ -7,10 +7,10 @@
 #   case re-run alone (lens H, P-H-9: a red that passes alone is a flaky candidate, not a red of the head).
 # It writes nothing in the repository. Its state and logs are the orchestrator's scratch (.gov-runtime/, ignored).
 #
-# `nightly.sh night` (started by nightly_cron.sh, which cron runs at 02:00):
-#   - window 02:00 to 05:00. The run books only its measured estimate (nightly_estimate.py: the last full runs'
+# `nightly.sh night` (started by nightly_cron.sh, which cron runs at 04:00, owner DEC-973):
+#   - window 04:00 to 08:00. The run books only its measured estimate (nightly_estimate.py: the last full runs'
 #     per-test durations and their measured effective parallelism, the serial phase, setup, 10 %), and starts no
-#     later than 05:00 less that estimate;
+#     later than 08:00 less that estimate;
 #   - it starts once the state is clean: no close (CLOSE-RUNNING) and no merge in progress, the main tree clean, and
 #     w2/integrate's head unchanged for 5 minutes. Past the latest start it does not start (a P1);
 #   - it holds nothing else (owner, DEC-961): leads, closes and their full runs keep starting during it as the gate's
@@ -31,7 +31,8 @@ RUNS=/home/usain/gov-os-runs/W2-00/nightly
 # DEC-911: JUnit XML holds every test name and failure text (full hashes), so it is written outside .gov-runtime/,
 # where the secrets-indexing check reads.
 JUNIT=/tmp/gov-os-nightly-junit/$STAMP
-# Every ping through the gate: at night a ping waits until 07:30 unless the owner is active (DEC-936).
+# Every ping through the gate: in the quiet hours (02:00 to 07:30, DEC-973) a ping is held unless the owner is active,
+# and goes out with the 08:00 check (DEC-936).
 PING=$HERE/ping_gate.sh
 mkdir -p "$OUT" "$RUNS" "$JUNIT"
 MODE=${1:-day}
@@ -45,17 +46,17 @@ fi
 EST=""
 if [ "$MODE" = night ]; then
   now=$(date +%s)
-  window_end=$(date -d "today 05:00" +%s)
-  [ "$now" -lt "$window_end" ] || { date "+%F %T nightly NOT STARTED: started after 05:00" > "$OUT/run.txt"; exit 2; }
+  window_end=$(date -d "today 08:00" +%s)
+  [ "$now" -lt "$window_end" ] || { date "+%F %T nightly NOT STARTED: started after 08:00" > "$OUT/run.txt"; exit 2; }
   est_json=$(python3 "$HERE/nightly_estimate.py" estimate)
   EST=$(echo "$est_json" | python3 -c "import json, sys; print(json.load(sys.stdin).get('estimate_s') or '')")
   date "+%F %T nightly night: estimate $est_json" > "$OUT/run.txt"
   if [ -z "$EST" ]; then
-    EST=10800; echo "no full run measured: the estimate is the whole window" >> "$OUT/run.txt"
+    EST=14400; echo "no full run measured: the estimate is the whole window" >> "$OUT/run.txt"
   fi
   latest=$((window_end - EST))
   if [ "$latest" -lt "$now" ]; then
-    "$PING" "P2 NIGHTLY-WINDOW | estimate $((EST / 60)) min no longer fits 02:00-05:00 | the orchestrator's package with the options follows; tonight's run is not cut"
+    "$PING" "P2 NIGHTLY-WINDOW | estimate $((EST / 60)) min no longer fits 04:00-08:00 | the orchestrator's package with the options follows; tonight's run is not cut"
     echo "estimate does not fit the window: starts once clean, not cut" >> "$OUT/run.txt"
     latest=$window_end
   fi
@@ -86,7 +87,7 @@ else
   date '+%F %T nightly day: quiet' > "$OUT/run.txt"
 fi
 # DEC-898: free disk space and free inodes above the floor, or no run.
-# Below the floor is an emergency (DEC-938 item 6): it goes first in the 07:30 morning package, from the
+# Below the floor is an emergency (DEC-938 item 6): it goes first in the 09:00 morning package (DEC-973), from the
 # orchestrator's own session (DEC-945: no push service).
 disk=$(bash "$HERE/disk_gate.sh" 2>&1) || {
   date "+%F %T nightly NOT STARTED: $disk" >> "$OUT/run.txt"
@@ -104,7 +105,9 @@ PLUG=$CLONE/src/gov/close/pytest_plugin
 # The tests that read the repository's own state (W2-54's green-here and time-limit cases) need its stores, as a
 # close has them after its rebuild: a fresh clone has none (the first rehearsal's two reds, 2026-10-21 19:00).
 # One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 builds it into gov rebuild).
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
+# The nightly's rebuild scans every file in full (DEC-966 item 4, W2-107): GOV_SECRETS_FULL_SCAN=1 reads nothing from
+# the machine's secrets-scan cache and refreshes it. Only the rebuild: the suites keep their own cache settings.
+env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")

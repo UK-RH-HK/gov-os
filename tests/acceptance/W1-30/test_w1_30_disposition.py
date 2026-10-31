@@ -13,6 +13,7 @@ B3: The repair ticket is created through the ticket tool, records findings and
 """
 
 import json
+import re
 
 import pytest
 import yaml
@@ -25,6 +26,7 @@ TICKET = "PROJ-disp"
 WBS = "W1-906"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-disp", "Role: engineer", "Implements: CAP-01")
+SHA256 = re.compile(r"\b[0-9a-f]{64}\b")
 
 
 # --------------------------------------------------------------------------
@@ -147,6 +149,22 @@ def test_disposition_with_context_failure(project, sandbox, interface):
     full_text = json.dumps(envelope)
     assert '"context": "whole-system"' not in full_text, \
         "when context fails, 'context: whole-system' must NOT appear"
+    # Revised for W2-67 (I2 F2, PF2; DEC-868 item 3): the case asserted only the absence of a literal the close
+    # never writes. The two decisions supersede each other, so the ticket's context cannot be built; since W2-07
+    # the pre-close ``gov check`` finds that first and refuses at once, naming what fails. So the answer names both
+    # decisions and carries no hash, and the one repair ticket records the class and no context hash.
+    assert run.returncode == support.EXIT_CHECK_FAILED, f"expected exit code 3\n{run.describe()}"
+    text = support.error_text(error)
+    assert "DEC-9003" in text and "DEC-9004" in text, \
+        f"the answer does not name the decisions that fail the context\n{run.describe()}"
+    assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
+    repairs = _repair_tickets(project)
+    assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
+    front = _repair_frontmatter(repairs[0])
+    assert (front.get("disposition") or front.get("finding_disposition")) == "defer", \
+        f"the repair ticket does not record the class given: {front}"
+    assert front.get("context_hash") is None and not SHA256.search(repairs[0].read_text(encoding="utf-8")), \
+        f"the repair ticket carries a context hash although no context was built: {front}"
 
 
 # --------------------------------------------------------------------------
@@ -163,11 +181,25 @@ def test_only_six_disposition_names_accepted(project, sandbox, interface):
         "an invented disposition name must be refused"
 
 
-def test_all_six_dispositions_recognized():
-    """A3, S6: all six short-name dispositions are defined."""
-    assert len(support.DISPOSITIONS) == 6
+def test_all_six_dispositions_recognized(built, tmp_path, sandbox, interface):
+    """A3, S6: all six short-name dispositions are defined.
+
+    Revised for W2-67 (I2 F2, PF1): the case read this suite's own tuple, not the close's. Each of the six names is
+    now given to ``gov close`` itself, on a project of its own whose acceptance test fails: the close takes the
+    name (it is refused for the failing test, exit code 3, not for the argument) and the repair ticket records
+    that class."""
+    not_taken = {}
     for name in ("repair", "reuse", "delete", "narrow", "defer", "owner"):
-        assert name in support.DISPOSITIONS
+        project = support.Project(tmp_path / name)
+        _project_with_finding(project)
+        run = support.run_close(project, sandbox, TICKET, "--disposition", name)
+        error = support.envelope_of(run, interface).get("error") or {}
+        recorded = [_repair_frontmatter(path).get("disposition") or _repair_frontmatter(path).get("finding_disposition")
+                    for path in _repair_tickets(project)]
+        if run.returncode != support.EXIT_CHECK_FAILED or "planted failure" not in support.error_text(error) \
+                or recorded != [name]:
+            not_taken[name] = {"exit": run.returncode, "code": error.get("code"), "recorded": recorded}
+    assert not not_taken, f"gov close does not take these dispositions as a class: {not_taken}"
 
 
 # --------------------------------------------------------------------------

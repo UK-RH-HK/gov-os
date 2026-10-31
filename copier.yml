@@ -6,10 +6,13 @@ _subdirectory: template
 _skip_if_exists:
   - governance/project/**
 
-# Writes governance/framework.lock (template tag and commit, answers reference, sha256 manifest of
-# governance/kernel/). The adapter generation is not a task: it is a step of the procedure below.
+# Verifies the release being installed against its hashes (docs/releases/<version>/ of this template; W2-16)
+# and refuses one that does not match, then writes governance/framework.lock (template tag and commit, answers
+# reference, the release's version and manifest hash, sha256 manifest, modes and folders of the shipped paths).
+# It runs `gov`, the installed tool, not a python3 that imports it (W2-M175). The adapter generation is not a
+# task: it is a step of the procedure below.
 _tasks:
-  - command: [python3, -m, gov.lock]
+  - command: [gov, release, --lock-from, "{{ _copier_conf.src_path }}"]
 
 _message_after_copy: &procedure |
   governance/kernel/ and governance/framework.lock are written.
