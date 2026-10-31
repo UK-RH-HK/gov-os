@@ -256,6 +256,33 @@ def fixture_ticket_text():
     )
 
 
+# The coordination ticket of the kernel's generated project (DEC-957, DEC-971 item 4; DEC-980): the orchestrator on
+# it is the CTO, the one session whose install the kernel guard asks the owner about.
+ORCHESTRATOR_TICKET_ID = "DAEO-zz91"
+ROSTER_REL = "governance/project/roster.yaml"
+
+
+def orchestrator_ticket_text():
+    """``DAEO-zz91``: the fixture ticket's form, for the orchestrator, on ``governance/project/**``."""
+    return (
+        fixture_ticket_text()
+        .replace(f"id: {FIXTURE_TICKET_ID}\n", f"id: {ORCHESTRATOR_TICKET_ID}\n")
+        .replace("assignee: engineer\n", "assignee: orchestrator\n")
+        .replace("role: engineer\n", "role: orchestrator\n")
+        .replace("W1-90", "W1-91")
+        .replace("".join(f"- {p}\n" for p in FIXTURE_TICKET_PATHS), "- governance/project/**\n")
+        .replace("Switch-over fixture ticket", "Coordination fixture ticket")
+    )
+
+
+def coordination_files():
+    """The orchestrator's ticket and the roster that names it as the coordination ticket."""
+    return {
+        f".tickets/{ORCHESTRATOR_TICKET_ID}.md": orchestrator_ticket_text(),
+        ROSTER_REL: f"coordination_ticket: {ORCHESTRATOR_TICKET_ID}\n",
+    }
+
+
 def strip_held_out_rules(project):
     """Leave the ``Read`` deny rules with an absolute path out of the copied settings file (owner decision, DEC-399).
 

@@ -284,6 +284,15 @@ Retired by a fresh Independent Test Designer on ticket `DAEO-2azm` (W2-74), `Rew
   (`Edit(**/.env*)`, `Edit(**/*.pem)`, `Edit(**/*.key)`, `Edit(config/secrets*)`, `Bash(sudo:*)`) stays a case,
   with the same assertion, and `test_the_sudo_deny_rule_is_in_place` is unchanged.
 
+## The CTO-only install rule (DEC-980, 2026-10-31)
+
+`Rewrite-Reason: DEC-957, DEC-971 item 4` (ticket `DAEO-3r1j`, W2-110). "The orchestrator is asked" now means the CTO:
+the orchestrator on the coordination ticket. The fixture project (W1-03's `make_project`) now holds
+`governance/project/roster.yaml` with `coordination_ticket: DAEO-zz91`, the orchestrator's ticket here, so every ask
+in `test_w1_47_uv_installs.py` and `test_the_template_s_guard_asks_before_an_install` is kept as it was. No case of
+this suite flips and none is changed. The template case runs the hook under the owner's pinned, installed `gov`, so
+it stays red until ACT 2's re-pin.
+
 ## Earlier tests
 
 No earlier acceptance test is changed, and none is made wrong by this ticket's KPIs as far as their text shows:
