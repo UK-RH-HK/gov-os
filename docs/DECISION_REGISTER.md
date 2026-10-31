@@ -12087,3 +12087,16 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.347 | 2026-10-31 | Delegated (orchestrator, DEC-936 item 2.5): DEC-964 (W2-76: the rebuild-lock override passed through eight test helpers by a test designer). Next free id: DEC-965. |
+
+### DEC-965 — W2-90's run 1: merged with 7 named reds; its parameter splits, the 236th case and a resume for the 14 ids ACT 1 dropped (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: P2s, reversible, the orchestrator's recommendation and the lead's agree, confidence medium to high, nothing in the Charter, the master rules or the Contract's scope, the guard not weakened; for the owner to overturn) · **Under:** DEC-957 (ACT 1 option (a)), DEC-953 item 2, DEC-906 · **Basis:** W2-90's run-1 return (`log/W2-90-A5-run1.json`, 2026-10-31 01:12)
+- **Decision:**
+  1. **Merged now** (`21eac66b`): 228 of the 235 cases judge the kernel's wiring and pass on both heads; the 7 that cannot move without lowering stay red, named: W1-05's two orchestrator-asks cases and W1-46's research `npm-install` case (the template denies installs, P1-A), and four W2-59 cases (the template's hook line has no pinned interpreter, P1-B). Both P1s go to the owner (`packages/P-W2-90-1.md`).
+  2. **P2-C (a):** the test designer's splits of two mixed functions by parameter, and W1-49's two containment parameters moved to a new function, are accepted: every id is kept or mapped, the count unchanged.
+  3. **P2-D (a):** the 236th ACT-1 red (`W1-05::test_the_hooks_stay_wired_in_every_later_commit`), revised the same way in a file already in scope, is accepted into W2-90.
+  4. **P2-E (a):** the 14 parametrized ids ACT 1 removed without a red (W2-59's 10 post-tool ids, W2-65's 4) and W2-59's empty-parameter skip are moved to the template's post-tool lines by a test designer in W2-90's next round, with the owner's answers to P1-A and P1-B.
+- **Where it goes (DEC-851):** this register; W2-90's ticket and its run-2 brief; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.348 | 2026-10-31 | Delegated (orchestrator, DEC-936 item 2.5): DEC-965 (W2-90 merged with 7 named reds; P2-C, P2-D, P2-E (a)). Next free id: DEC-966. |
