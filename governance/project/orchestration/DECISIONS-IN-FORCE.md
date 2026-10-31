@@ -5,7 +5,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 ## Working with the owner
 - DEC-065: master rules MR-1 to MR-6. The owner decides (MR-6), the builder never writes its own acceptance tests (MR-3), review and audit stay independent (MR-4).
 - DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
-- DEC-949, DEC-850, DEC-855: P1s and owner-only decisions are sent as they arise: a package file, then `owner-ping` as the last act, 07:30 to midnight. Only the orchestrator asks the owner.
+- DEC-949, DEC-850, DEC-855, DEC-972: P1s and owner-only decisions are sent as they arise, 07:30 to midnight: a package file, then the line logged (`tools/ping_log.sh`, no ask) and sent by `PushNotification` (it does not stop the CTO); a daytime P1 needed that day that shows "not sent" falls back to the blocking `owner-ping`. None from midnight to 07:30 (the morning package). Only the orchestrator asks the owner.
 - DEC-818: a P1 package stands alone, in six parts.
 - DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
 - DEC-945: no paid notifier and no app install.
