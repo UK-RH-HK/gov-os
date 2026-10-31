@@ -348,10 +348,16 @@ def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
     Revised for W2-67 (I2 F2, PF15): ticket A has its checkpoint, so it is not refused for the missing checkpoint;
     the refusal is the trailer gate's: no commit carries ``Task: A`` exactly, and AB's commit is not named as A's.
     A and AB take ids of the kernel's ticket grammar (DEC-954), since ``gov checkpoint`` takes no other (``PROJ-a``
-    could have no checkpoint); AB is A's id with one more character in front, a ticket no case closes."""
+    could have no checkpoint); AB is A's id with one more character in front, a ticket no case closes.
+
+    Run 6 (DEC-954's merge): ``Task: XPROJ-tkaa`` does not hold the text ``Task: PROJ-tkaa``, so a search for A's
+    trailer never finds AB's commit and a substring match (PF15) never sees it. A commit whose ``Task:`` is A's id
+    with one more character after it, a value that names no ticket (no valid id is another's with more after it),
+    is found by that search, and must not count as A's either."""
     # ids the ticket schema takes (DEC-954): a valid id is never another's prefix, so AB holds A inside it
     ticket_a = "PROJ-tkaa"
     ticket_ab = "XPROJ-tkaa"
+    task_after = f"{ticket_a}b"  # A's id with one character after it: the form PF15 can see
     wbs_a = "W1-947"
     wbs_ab = "W1-9471"
     project.add_ticket(ticket_a, wbs_a)
@@ -361,6 +367,9 @@ def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
     project.write("src/example/feature_ab.py", "# feature for AB\n")
     ab_commit = project.commit("implement AB only", who=IMPL,
                                trailers=(f"Task: {ticket_ab}", "Role: engineer", "Implements: CAP-01"))
+    project.write("src/example/feature_after.py", "# feature for no ticket\n")
+    after_commit = project.commit("implement a task that names no ticket", who=IMPL,
+                                  trailers=(f"Task: {task_after}", "Role: engineer", "Implements: CAP-01"))
     support.checkpointed(project, ticket_a)
     assert support.ticket_commits(project.root, ticket_a) == [], "the fixture is wrong: ticket A has a commit"
     run = support.run_close(project, sandbox, ticket_a)
@@ -369,6 +378,8 @@ def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
         f"the refusal does not say that no commit carries Task: {ticket_a}\n{run.describe()}"
     assert ab_commit[:7] not in text, \
         f"a commit with Task: {ticket_ab} is named as a commit of {ticket_a} (substring match bug)\n{run.describe()}"
+    assert after_commit[:7] not in text, \
+        f"a commit with Task: {task_after} is named as a commit of {ticket_a} (substring match bug)\n{run.describe()}"
     support.assert_not_closed(project, ticket_a)
 
 

@@ -42,7 +42,7 @@ runs, and the run the answer states). No expectation is lowered; each name is ke
 | `…::test_close_refuses_when_acceptance_tests_fail` | PF5: `_check_acceptance` makes no run and reports one pass | passed (missing checkpoint) | `gov close was not refused` | green | refused for the missing checkpoint or for containment, not for the gate it names; the success cases asserted only ok; `37e8a18760a9` |
 | `…::test_close_runs_acceptance_tests` | PF5 | passed (`ok` alone) | `the ticket's acceptance test did not run once in the close: {}` | green | the same; `37e8a18760a9` |
 | `…::test_containment_blocks_close_for_out_of_scope_commit` | PF4: `_check_containment` returns before judging | passed (missing checkpoint) | `gov close closed a ticket although W1-50's judgement of its commits has findings (DEC-453)` | green | refused for the missing checkpoint, not for the gate it names; `eae5892e2a4a` |
-| `…::test_task_trailer_exact_match_not_substring` | PF15: a ticket's commits matched by substring of `Task:` | passed (missing checkpoint) | `gov close was not refused` (marker: 2 commits by substring, 0 exactly) | green | the same; `PROJ-a` could have no checkpoint, so A is `PROJ-tska`; `41d0ebde76e9` |
+| `…::test_task_trailer_exact_match_not_substring` | PF15: a ticket's commits matched by substring of `Task:` | passed (missing checkpoint); passed again after DEC-954's merge (marker: 0 commits found), see run 6 below | run 6, on the head's ids: `the refusal does not say that no commit carries Task: PROJ-tkaa` (refused `CONTAINMENT_FINDING`; marker: 1 commit by substring, 0 exactly) | green | the same; `PROJ-a` could have no checkpoint; A is `PROJ-tkaa`, AB `XPROJ-tkaa` (DEC-954), and a commit with `Task: PROJ-tkaab` (no ticket) is the one PF15 can see; `41d0ebde76e9`, then run 6 |
 | `…::test_regression_runs_to_end_all_failures_collected` | PF11: `--maxfail=1` on the regression run; PF12: its findings dropped; PF16: no regression run | passed under PF11 and PF12 (containment named the files), PF16 not run before | PF11: `does not name the failing regression tests ['test_reg_1', 'test_reg_3', …]` (2 of 8 counted); PF12, PF16: `gov close was not refused` | green | as for the acceptance cases; `37e8a18760a9` |
 | `…::test_regression_failure_blocks_close` | PF12, PF16 | passed under both (missing checkpoint; containment) | `gov close was not refused` under both | green | the same; `37e8a18760a9` |
 | `…::test_close_runs_regression_tests_when_present` | PF16 | passed (`ok` alone) | `the regression test did not run once in the close: {}` | green | the same; `37e8a18760a9` |
@@ -82,3 +82,28 @@ hash. It is shown red against PF2b, a fault of that last claim.
 - The revised cases on the head: 9 + 4 passed (`head-close-10.xml`, `head-other-4.xml`). Under their plants: every
   one failed as in the table (`after-*.xml`).
 - The six W1-30 files changed, whole, on the head (`-n 4`): 133 passed in 161.6 s (`head-w1-30-six-files.xml`).
+
+## Run 6: the merge of W2-64's ids (repair batch)
+
+**What the merge lowered.** The merge of `w2/integrate` (`0568d91baf56`, DEC-954) gave
+`test_task_trailer_exact_match_not_substring` W2-64's schema-valid ids: A `PROJ-tkaa`, AB `XPROJ-tkaa` (A's id with
+one character in front). The close finds a ticket's commits with git's fixed-string search for `Task: <ticket>`, and
+`Task: XPROJ-tkaa` does not hold the text `Task: PROJ-tkaa`, so AB's commit is never found and PF15's substring match
+never sees it: on the head the case passed under PF15. Under the ticket schema no valid id is another valid id with
+more characters after it, so no pair of tickets can show PF15.
+
+**How it was found.** A reviewer ran the case under td-6's PF15 plant on the head: 1 passed, the marker saying 0
+commits found. Seen again here through td-6's carrier, the marker in `.gov-runtime/scratch/td-10/`:
+`commits of PROJ-tkaa matched by substring: 0, of them exactly: 0`, 1 passed.
+
+**What changed.** The case keeps W2-64's ids, AB's commit and every assertion it had, and gets one more commit: its
+`Task:` is `PROJ-tkaab`, A's id with one character after it, which names no ticket of the project (it is made with
+the case's own commit helper, which checks no trailer). Git's search for `Task: PROJ-tkaa` finds it; it must not count
+as A's: the close still refuses with the trailer gate (exit 3, `Task: PROJ-tkaa` named exactly) and does not name that
+commit. Added to the case rather than beside it, so that the case that names the rule is the one its plant turns red.
+
+**Red and green.** Under PF15: 1 failed, `the refusal does not say that no commit carries Task: PROJ-tkaa`; the close
+counted the `PROJ-tkaab` commit as A's, passed its trailer gate and refused for containment instead
+(`CONTAINMENT_FINDING`, naming `src/example/feature_after.py`); marker `commits of PROJ-tkaa matched by substring: 1,
+of them exactly: 0`. On the head: 1 passed. `test_w1_30_close.py` whole on the head (`-n 4`): 33 passed before, 33
+passed after.
