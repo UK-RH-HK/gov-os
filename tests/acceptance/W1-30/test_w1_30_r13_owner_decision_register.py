@@ -26,7 +26,7 @@ How a case holds "lifted": the close given the decision runs the tests and is re
 import w1_30_support as support
 
 TICKET = "PROJ-ownr"
-WBS = "W1-ownr"
+WBS = "W1-925"
 REGISTER_KEY = "decision_register"
 # The register of these projects. No file of this repository has this path.
 REGISTER = "records/decision-log.md"
@@ -126,10 +126,10 @@ def test_a_decision_file_lifts_the_escalation_of_a_project_that_names_a_register
     """As today: the register is named and the owner's decision is a decision file."""
     project = _project(tmp_path)
     _escalated(project, sandbox, interface)
-    project.add_decision("DEC-file", "ACTIVE", title="Continue")
+    project.add_decision("DEC-9010", "ACTIVE", title="Continue")
     project.commit("the owner's decision", who=support.OWNER)
 
-    _lifted_by(project, sandbox, interface, "DEC-file")
+    _lifted_by(project, sandbox, interface, "DEC-9010")
 
 
 def test_with_no_register_named_an_entry_lifts_nothing(built, tmp_path, sandbox, interface):

@@ -23,7 +23,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-skps"
-WBS = "W1-skps"
+WBS = "W1-942"
 COUNTS = ("passed", "failed", "errors")
 SKIPPED = "skipped"
 
