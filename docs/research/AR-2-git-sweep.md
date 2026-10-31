@@ -167,6 +167,7 @@ before this ticket. "Change" says what W2-05 did. A call in a file another ticke
 | 63 | `src/gov/retrieval/measure.py` | `main`: `git -C <root> rev-parse HEAD`; `_retriever` and `_ask`: `gov --version` and `gov retrieve` (rows 57 and 24) | the project root | yes | after W2-87 merges (W2-61 too) |
 | 64 | `src/gov/rebuild/**` | through rows 24, 41 and 43 to 45 (`lexical.refresh`, `store.load`, `codeintel.index`) | the project root | as those rows | after W2-76 merges; it starts no process of its own |
 | 65 | `src/gov/launch/launcher.py` | the session (`Popen` of the harness), whose hooks are the rows above | the worktree of the session | yes | after W2-60a merges |
+| 66 | `src/gov/release/__init__.py` | `_git`: `git -C <repo> <args>` (`rev-parse`, `status --porcelain`, `ls-tree`, `log --all`, `for-each-ref`, `show`); `_blobs`: `cat-file --batch`; `_wheel`: `archive`; `build`: `merge-base --is-ancestor` (`gov release`) | the repository being released | yes | open: W2-16's file, merged into `w2/W2-05` at `2359f6d79e3e` after batch 2's sweep; outside package I (b)'s paths, a package of this round (P-W2-05-RELEASE) |
 
 Files that name git or start a program and start no git:
 
@@ -181,14 +182,16 @@ Files that name git or start a program and start no git:
 - `src/gov/telemetry/counter.py` starts `ccusage`, which reads the harness's logs.
 - `src/gov/retrieval/ollama.py` starts `ollama serve` and `src/gov/retrieval/rerank.py` its Python worker
   (W2-87's): neither starts git.
-- `src/gov/impact/**` (W2-37), `src/gov/release/**` and `src/gov/lock/**` (W2-16), `src/gov/launch/gate*` and
-  `src/gov/resources/**` (W2-20), and the rest of `src/gov/launch/**` (W2-56) start no process.
+- `src/gov/impact/**` (W2-37), `src/gov/lock/**` (W2-16), `src/gov/launch/gate*` and `src/gov/resources/**`
+  (W2-20), and the rest of `src/gov/launch/**` (W2-56) start no process. `src/gov/release/**` (W2-16) did not when
+  first swept; as merged it starts git (row 66).
 
-**Counts:** 65 rows. 60 changed by W2-05, directly or through a changed row: rows 1 to 60. Of them, 40 changed in
+**Counts:** 66 rows. 60 changed by W2-05, directly or through a changed row: rows 1 to 60. Of them, 40 changed in
 batch 2: rows 2 to 8, 10 to 12, 15, 29 and 31 (pinned: reads a close reaches), 19 to 21, 32 to 42 and 46 to 58. Rows 16, 17 and 43 to 45 (W2-56's file now) and 24 and 28 (W2-87's)
 were changed in the first runs and are recorded only since. 5 marked "after <W2 id> merges": rows 61 (W2-84), 62
 (W2-107), 63 (W2-87), 64 (W2-76) and 65 (W2-60a). No row is open for W2-50, W2-53 or W2-03: those have merged.
-Package I (b) (DEC-970) changed rows 36 and 55, and through row 36 rows 51 and 52; it adds no row.
+Package I (b) (DEC-970) changed rows 36 and 55, and through row 36 rows 51 and 52. 1 open: row 66 (W2-16's
+`gov release`, merged after batch 2), recorded in package I (b)'s round and unchanged.
 
 The test helpers outside `src/` (`tests/**/*support*.py`) build their own environments and are not Gov OS calls.
 The test runs the Gov OS starts are rows 36, 51, 52 and 55, all in `runner_env`.
@@ -204,5 +207,7 @@ The test runs the Gov OS starts are rows 36, 51, 52 and 55, all in `runner_env`.
   `install` leaves the file byte-identical; `uninstall` is the owner's act, followed by restoring it.
 - **The rows marked "after <W2 id> merges"** (61 to 65) are changed by the ticket that holds each file, or by a
   later W2-05 round after it merges.
+- **Row 66** (`gov release`, W2-16's, merged): its git calls inherit the caller's whole environment. They take
+  `git_env(repo)` (pinned for the reads) once a round's paths hold the file (P-W2-05-RELEASE).
 
 W2-L160 (rows 19 to 21 and 42) and W2-M161 (rows 32 to 38 and 46 to 56) are settled in this record.
