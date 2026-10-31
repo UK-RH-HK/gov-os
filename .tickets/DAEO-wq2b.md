@@ -1,6 +1,6 @@
 ---
 id: DAEO-wq2b
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-30T23:20:53Z

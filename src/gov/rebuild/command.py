@@ -99,6 +99,7 @@ def _build(root: Path, args, config: dict, watch) -> dict:
     from gov.cli.errors import GovError
     from gov.retrieval import lexical
     from gov.retrieval.lexical import refresh as lexical_refresh
+    from gov.secrets import scan_counts
     from gov.store import load as store_load
 
     has_path_map = "path-map.yaml" in config
@@ -116,6 +117,8 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             )
 
     stores: dict = {}
+    # The secrets filter's counts around the stages that run it, all in this process (W2-107, DEC-970 P-W2-107-3).
+    counted = scan_counts()
 
     if has_path_map:
         with watch.stage("lexical"), watch.filtered(lexical, "indexable"):
@@ -188,6 +191,8 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             }
         else:
             tool_home = codeintel_home(root)
+    secrets_counts = {kind: {what: number - counted[kind][what] for what, number in each.items()}
+                      for kind, each in scan_counts().items()}
 
     # The compaction: both calls together, after the code index (the record store and query vectors, then its home).
     with watch.stage("compaction"):
@@ -203,4 +208,5 @@ def _build(root: Path, args, config: dict, watch) -> dict:
         "store": store_result,
         "stores": stores,
         "compaction": compaction,
+        "secrets_counts": secrets_counts,
     }

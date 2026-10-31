@@ -42,6 +42,7 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_codegraph
 
 base = support.base
 
@@ -249,7 +250,7 @@ def test_the_mode_builds_everything_else_a_rebuild_builds(gov, interface, tiny, 
     """Two projects with the same commits: one rebuilt without the argument, one with it. The record store's
     digest is the same; the lexical index is recreated in both; the code index has the same outcome; and the
     store of the mode holds no vector."""
-    twin = tmp_path / "twin"
+    twin = w2_67_codegraph.note(tmp_path / "twin")   # its daemon folder goes when the case is over (batch 8)
     base.git(tmp_path, "clone", "-q", str(tiny), str(twin))
 
     full = _rebuilt(gov, interface, project=twin)
@@ -275,6 +276,9 @@ def test_the_mode_writes_only_under_gov_runtime(gov, interface, tiny, sandbox):
     # included and the tool absent included, makes /tmp/gov-cbm-<uid>/<its root's hash>/ for the tool's lock and
     # socket files, which cannot live under .gov-runtime/ (DEC-338: a socket path is limited to 108 bytes). That
     # place is written by design; the evidence is in README-W2-67.md.
+    # Revised (Rewrite-Reason: DEC-967; DEC-978, as DEC-970's P-W2-107-2 (a)): every rebuild keeps W2-107's
+    # machine-wide cache of gitleaks verdicts in the home it is given, the place the owner's approved design gives it.
+    # The home check leaves out exactly that cache; anything else written in the home still fails the case.
     before = support.snapshot(tiny)
     before_elsewhere = support.snapshot(sandbox.elsewhere, skip=())
     before_home = support.snapshot(sandbox.home, skip=())
@@ -283,8 +287,41 @@ def test_the_mode_writes_only_under_gov_runtime(gov, interface, tiny, sandbox):
 
     assert not support.snapshot_difference(before, support.snapshot(tiny)), "the mode wrote outside .gov-runtime/"
     assert not support.snapshot_difference(before_elsewhere, support.snapshot(sandbox.elsewhere, skip=()))
-    written = support.snapshot_difference(before_home, support.snapshot(sandbox.home, skip=()))
+    after_home = support.snapshot(sandbox.home, skip=())
+    written = _without_the_scan_cache(support.snapshot_difference(before_home, after_home), after_home)
     assert not written, "the mode wrote in the home it was given:\n" + "\n".join(written)
+
+
+# The secrets scan cache (W2-107): one SQLite file and its two side files, at one place under the home, outside every
+# repository (DEC-967, DEC-966 item 4). Its folders are left out only where they hold nothing but it (DEC-978).
+SCAN_CACHE_FOLDERS = (".cache", ".cache/gov-os")
+SCAN_CACHE_FILES = frozenset(".cache/gov-os/secrets-scan.sqlite" + suffix for suffix in ("", "-wal", "-shm"))
+
+
+def _without_the_scan_cache(written, after_home):
+    """The lines of ``written`` (``created: <rel>`` and so on, under the home) but those of the secrets scan cache:
+    its three files, each a plain file where it is still there, and its two folders where they were created and hold
+    nothing but those files and each other."""
+
+    def plain_file(rel):
+        value = after_home.get(rel)
+        return value is not None and value != "dir" and not value.startswith("link:")
+
+    def holds_only_the_cache(folder):
+        inside = [rel for rel in after_home if rel.startswith(folder + "/")]
+        return after_home.get(folder) == "dir" and all(
+            (rel in SCAN_CACHE_FILES and plain_file(rel)) or (rel in SCAN_CACHE_FOLDERS and after_home[rel] == "dir")
+            for rel in inside)
+
+    kept = []
+    for line in written:
+        kind, _, rel = line.partition(": ")
+        if rel in SCAN_CACHE_FILES and (kind == "deleted" or plain_file(rel)):
+            continue
+        if rel in SCAN_CACHE_FOLDERS and kind == "created" and holds_only_the_cache(rel):
+            continue
+        kept.append(line)
+    return kept
 
 
 # =========================================================================== #

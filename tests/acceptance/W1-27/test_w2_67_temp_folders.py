@@ -103,7 +103,30 @@ def _round_1_sources():
 
 
 def _passes_basetemp(item):
+    """An item of an argument list that passes ``--basetemp``: a string constant, or an f-string whose literal start
+    is the option (``f"--basetemp={folder}"``; P-W2-67-TD4-A, DEC-914 item 2)."""
+    if isinstance(item, ast.JoinedStr) and item.values:
+        item = item.values[0]
     return isinstance(item, ast.Constant) and isinstance(item.value, str) and item.value.split("=", 1)[0] == BASETEMP
+
+
+def _shown(item):
+    return repr(item.value) if isinstance(item, ast.Constant) else ast.unparse(item)
+
+
+def _passes_the_given(elts, index, given):
+    """The ``--basetemp`` at ``elts[index]`` passes the ``FORMS`` form's own parameter: the separate option followed
+    by ``given`` or ``str(given)``, or the f-string ``f"--basetemp={given}"`` (or of ``str(given)``) and nothing
+    else."""
+    def is_given(node):
+        return ast.unparse(node) in (given, f"str({given})")
+
+    item = elts[index]
+    if isinstance(item, ast.Constant):
+        return item.value == BASETEMP and index + 1 < len(elts) and is_given(elts[index + 1])
+    head, *rest = item.values
+    return head.value == BASETEMP + "=" and len(rest) == 1 and isinstance(rest[0], ast.FormattedValue) and \
+        rest[0].conversion == -1 and rest[0].format_spec is None and is_given(rest[0].value)
 
 
 def _hands_own_folder(call, form):
@@ -117,7 +140,8 @@ def _hands_own_folder(call, form):
 def _refusal_forms(tree):
     """The argument lists the refusal cases' file may pass ``--basetemp`` in (DEC-907 item 2): those of its one
     module-level ``FORMS`` table (one-parameter lambdas) whose every ``--basetemp`` is the separate option followed by
-    that parameter, alone or as ``str(...)``. None when the file uses the table other than as ``list(FORMS)`` or
+    that parameter, alone or as ``str(...)``, or the f-string ``f"--basetemp={<that parameter>}"``
+    (``_passes_the_given``). None when the file uses the table other than as ``list(FORMS)`` or
     ``FORMS[...](tmp_path / "<name>")``, or rebinds ``tmp_path``: a folder given is then not sure to be the case's."""
     parents = {child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
     names = [node for node in ast.walk(tree) if isinstance(node, ast.Name)]
@@ -144,8 +168,7 @@ def _refusal_forms(tree):
             continue
         for node in ast.walk(form.body):
             if isinstance(node, (ast.List, ast.Tuple)) and all(
-                    item.value == BASETEMP and index + 1 < len(node.elts) and
-                    ast.unparse(node.elts[index + 1]) in (given, f"str({given})")
+                    _passes_the_given(node.elts, index, given)
                     for index, item in enumerate(node.elts) if _passes_basetemp(item)):
                 exempt.add(node)
     return exempt
@@ -160,7 +183,7 @@ def _settings_in(path):
         if isinstance(node, (ast.List, ast.Tuple)) and node not in exempt:
             for item in node.elts:
                 if _passes_basetemp(item):
-                    found.append(f"line {node.lineno}: an argument list passes {item.value!r}")
+                    found.append(f"line {node.lineno}: an argument list passes {_shown(item)}")
         if isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
             for target in (node.targets if isinstance(node, ast.Assign) else [node.target]):
                 if isinstance(target, ast.Attribute) and target.attr in ("basetemp", "_basetemp"):
@@ -177,7 +200,11 @@ def _settings_in(path):
 
 def test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention():
     """Green on the head: a guard. The refusal's own cases (DEC-907 item 2) are exempt for their FORMS table alone:
-    an argument list that passes --basetemp anywhere else, in that file or another, is still found."""
+    an argument list that passes --basetemp anywhere else, in that file or another, is still found.
+
+    Revised for W2-67 batch 6 (P-W2-67-TD4-A, DEC-914 item 2): an f-string whose literal start is ``--basetemp``
+    (``f"--basetemp={folder}"``) is found too, and in the FORMS table only ``f"--basetemp={given}"`` of the form's
+    own parameter is exempt."""
     wrong = {str(path.relative_to(REPO_ROOT)): found for path in _round_1_sources() if (found := _settings_in(path))}
     assert not wrong, f"a per-run base folder or another retention count (DEC-898): {wrong}"
 

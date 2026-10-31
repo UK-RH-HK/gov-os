@@ -20,8 +20,10 @@ from gov.close.command import (DEFAULT_TIMEOUT, EXIT_CHECK_FAILED, _GOVERNANCE_P
 from gov.store import load
 from gov.tasks.tickets import frontmatter
 
-# The runs these cases start have two workers (DEC-549): not as many as the machine gives, inside a parallel run.
-_run_tests = partial(command._run_tests, workers=2)
+# The runs these cases start have one worker (DEC-549) and a limit of LIMIT seconds: inside a parallel run, beside
+# the heaviest cases, a loaded machine meets both (W2-67, lens I2 finding 5).
+LIMIT = 180
+_run_tests = partial(command._run_tests, workers=1)
 
 TICKET = "T-0001"
 TICKETS = frozenset({TICKET, "T-0002"})
@@ -438,7 +440,7 @@ SKIPPED ="import pytest\n\n\n@pytest.mark.skip(reason='not now')\ndef test_skipp
 def test_options_of_the_callers_environment_do_not_reach_the_run(tmp_path, monkeypatch, options):
     monkeypatch.setenv("PYTEST_ADDOPTS", options)
     monkeypatch.setenv("PYTEST_PLUGINS", "a_plugin_that_is_not_installed")
-    findings, counts = _run_tests(tmp_path, _tests(tmp_path, test_a=FAILS), 60)
+    findings, counts = _run_tests(tmp_path, _tests(tmp_path, test_a=FAILS), LIMIT)
     assert counts["failed"] == 1 and any("test_fail" in finding for finding in findings)
     assert os.environ["PYTEST_ADDOPTS"] == options, "the caller's own environment was changed"
 
@@ -462,15 +464,15 @@ def test_nothing_else_of_the_callers_environment_is_taken_away(tmp_path, monkeyp
 @pytest.mark.parametrize("files", [{"test_a": SKIPPED}, {"test_a": SKIPPED, "test_b": SKIPPED},
                                    {"test_a": "import pytest\n\n\n@pytest.mark.xfail\ndef test_x():\n    assert False\n"}])
 def test_an_acceptance_run_in_which_no_test_passed_is_a_finding(tmp_path, files):
-    findings, counts = _run_tests(tmp_path, _tests(tmp_path, **files), 60)
+    findings, counts = _run_tests(tmp_path, _tests(tmp_path, **files), LIMIT)
     assert counts["passed"] == 0 and len(findings) == 1 and "no test passed" in findings[0]
 
 
 def test_one_passing_test_beside_a_skipped_one_is_measured_and_a_regression_run_may_pass_none(tmp_path):
     tests = _tests(tmp_path, test_a=SKIPPED, test_b="def test_b():\n    assert True\n")
-    assert _run_tests(tmp_path, tests, 60) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 1})
+    assert _run_tests(tmp_path, tests, LIMIT) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 1})
     skipped = _tests(tmp_path / "other", test_a=SKIPPED)
-    assert _run_tests(tmp_path / "other", skipped, 60, none_collected_ok=True)[0] == []
+    assert _run_tests(tmp_path / "other", skipped, LIMIT, none_collected_ok=True)[0] == []
 
 
 # ---- the last step ----

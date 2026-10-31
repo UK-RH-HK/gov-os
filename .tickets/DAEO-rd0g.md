@@ -8,6 +8,7 @@ type: task
 priority: 1
 assignee: research
 external-ref: W2-15a
+wbs_id: W2-15a
 tags: [wave-2, research, full]
 title: 'EXP-003, pass 1: the baseline'
 class: research

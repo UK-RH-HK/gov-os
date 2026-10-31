@@ -1,7 +1,7 @@
 ---
 id: DAEO-h4rh
 status: open
-deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-2bdu, DAEO-g87r]
+deps: [DAEO-g0ip, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-49o5, DAEO-r30l, DAEO-1ahb, DAEO-kmcr, DAEO-2ds6, DAEO-ha8z, DAEO-kl5e, DAEO-siiz, DAEO-wnnz, DAEO-0pyc, DAEO-cv58, DAEO-ecac, DAEO-k7hz, DAEO-lrre, DAEO-l78m, DAEO-4k3l, DAEO-dy7j, DAEO-2bdu, DAEO-g87r, DAEO-h2k3, DAEO-jsg1, DAEO-a3u2, DAEO-n0wb, DAEO-6y0x, DAEO-57hm, DAEO-ouet, DAEO-wq2b, DAEO-wi46, DAEO-lxzn, DAEO-uw5h, DAEO-6icv, DAEO-rpfv, DAEO-hgv3, DAEO-drhj, DAEO-zpdj, DAEO-0mtg, DAEO-kiar, DAEO-zoex, DAEO-6b2q, DAEO-3r1j, DAEO-nqa2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -39,6 +39,28 @@ depends_on:
 - DAEO-dy7j
 - DAEO-2bdu
 - DAEO-g87r
+- DAEO-h2k3
+- DAEO-jsg1
+- DAEO-a3u2
+- DAEO-n0wb
+- DAEO-6y0x
+- DAEO-57hm
+- DAEO-ouet
+- DAEO-wq2b
+- DAEO-wi46
+- DAEO-lxzn
+- DAEO-uw5h
+- DAEO-6icv
+- DAEO-rpfv
+- DAEO-hgv3
+- DAEO-drhj
+- DAEO-zpdj
+- DAEO-0mtg
+- DAEO-kiar
+- DAEO-zoex
+- DAEO-6b2q
+- DAEO-3r1j
+- DAEO-nqa2
 allowed_paths:
 - docs/plan/wave-2/examin-copy/**
 kpis:
@@ -83,6 +105,8 @@ closes:
 list_rows: []
 ---
 # W2-27 EXAMIN adoption on a copy
+
+**Dependencies widened (PLAN-GROWTH-1 §2 gap 5):** the tickets DEC-959, DEC-966, DEC-969 and DEC-971 put before EXAMIN's copy (W2-61h, W2-86, W2-91 to W2-110, W2-90b).
 
 **DEC-954 Q1:** this ticket starts only when K9's entry criteria are met: memory proven, the roles, skills and briefs landed, the proving ground passed, the rest of the minimum closed. Never because a date arrived.
 
