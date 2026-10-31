@@ -9,7 +9,7 @@ Covers the ticket's two last success lines:
   orchestration skill states the route.
 
 The cases read delivered text and say what a reader must be able to find in it. They fix no heading and no
-sentence but the three standing sentences of a brief. See the README for the reading rules and the red reasons.
+sentence but the standing sentences of a brief. See the README for the reading rules and the red reasons.
 """
 
 from __future__ import annotations
@@ -237,7 +237,8 @@ class TestTicketLeadSection:
 
     def test_the_section_says_what_a_lead_returns(self):
         section = self._section()
-        missing = [form for form in ("DONE", "PACKAGES", "ESCALATION", "LEAD_CHECKPOINT")
+        # DEC-838 item 2: LEAD_CHECKPOINT is no longer a lead's status (W2-11, DEC-866).
+        missing = [form for form in ("DONE", "PACKAGES", "ESCALATION")
                    if not re.search(rf"\b{form}\b", section)]
         assert not missing, f"the ticket lead section does not name the return forms {missing}"
 
