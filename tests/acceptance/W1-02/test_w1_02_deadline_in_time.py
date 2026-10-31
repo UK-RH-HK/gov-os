@@ -10,7 +10,9 @@ project of its own (``w1_02_deadline_support``; the module's hook processes run
 side by side and the module waits once, about four seconds):
 
 - **a step that is slow and ends before the deadline** (the first program the
-  hook starts takes four seconds) changes nothing: an allowed call is allowed
+  hook starts takes four seconds: for the Read and the Write, the freeze
+  look-up's real git waiting on the repository's configuration, since W2-L160;
+  for the Bash call, a program of its bookkeeping) changes nothing: an allowed call is allowed
   and its bookkeeping is done, a refused one is refused with the reason it has
   without the slow step;
 - **a refusal reached in time** is never the deadline's answer;
@@ -43,13 +45,18 @@ TINY_FIELDS = deadline.limit_fields(deadline.TINY)
 TINY_ENV = deadline.limit_environment(deadline.TINY)
 TINY_FILES = deadline.files_that_name_a_limit(deadline.TINY)
 
+# Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160. A Read and a Write start no program from the search
+# path since W2-L160: their slow step is the freeze look-up's real git, which waits four seconds on the repository's
+# configuration (was: a stand-in first on the search path). The Bash call's bookkeeping still starts its programs from
+# the search path, and keeps its stand-in.
 SLOW_AND_ALLOWED = (
     Call("a-Bash-call-by-an-engineer", "Bash", deadline.bash(), deadline.ENGINEER, sleeps=SHORT),
     Call("a-Read-by-a-session-with-no-role", "Read", deadline.read_of(deadline.OUTSIDE_TICKET_REL),
-         deadline.NO_ROLE, sleeps=SHORT),
+         deadline.NO_ROLE, config_after=deadline.SHORT_STEP_S),
 )
 SLOW_AND_REFUSED = Call("a-slow-Write-by-an-engineer-outside-its-ticket", "Write",
-                        deadline.write_to(deadline.OUTSIDE_TICKET_REL), deadline.ENGINEER, sleeps=SHORT)
+                        deadline.write_to(deadline.OUTSIDE_TICKET_REL), deadline.ENGINEER,
+                        config_after=deadline.SHORT_STEP_S)
 REFUSED_AT_ONCE = (
     Call("a-Write-by-an-engineer-outside-its-ticket", "Write", deadline.write_to(deadline.OUTSIDE_TICKET_REL),
          deadline.ENGINEER),
@@ -97,7 +104,10 @@ def prompt(hook, tmp_path_factory):
 def _assert_answered_in_time(outcome, what, slow):
     assert outcome.answered, f"{what}: {outcome.describe()}"
     if slow:
-        assert outcome.stand_in_starts >= 1, f"{what}: the hook did not start the stand-in program"
+        # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160: the slow step is the stand-in or the configuration.
+        assert outcome.stand_in_starts >= 1 or outcome.config_served >= 1, (
+            f"{what}: the hook neither started the stand-in program nor waited on the repository's configuration"
+        )
         assert outcome.result.seconds >= deadline.SHORT_STEP_S, (
             f"{what} was answered before its slow step could have ended: {outcome.describe()}"
         )
