@@ -1,7 +1,7 @@
 ---
 id: CAP-07.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: State classes recorded per record (state_class convention)
 depends_on:

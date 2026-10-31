@@ -1,7 +1,7 @@
 ---
 id: CAP-13.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Temporal memory: change history with causal decision/task links (trailers)'
 depends_on:

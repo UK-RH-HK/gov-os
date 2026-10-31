@@ -1,7 +1,7 @@
 ---
 id: CAP-22.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced by W1-33''s generated definitions'
 depends_on:

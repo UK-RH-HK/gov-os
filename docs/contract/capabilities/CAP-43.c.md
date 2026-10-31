@@ -1,7 +1,7 @@
 ---
 id: CAP-43.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Release certification by qualification
 depends_on:

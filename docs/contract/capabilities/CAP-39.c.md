@@ -1,7 +1,7 @@
 ---
 id: CAP-39.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes; cache keyed by content/policy/framework hashes'
 depends_on:

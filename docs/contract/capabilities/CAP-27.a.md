@@ -1,7 +1,7 @@
 ---
 id: CAP-27.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Read commands never mutate
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-25.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the owner
 depends_on:

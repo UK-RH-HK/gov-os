@@ -1,7 +1,7 @@
 ---
 id: CAP-01.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Authority semantics preserved across stages: research cannot silently become a decision, lessons cannot silently become policy, historical material cannot replace current input'
 depends_on:

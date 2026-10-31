@@ -1,7 +1,7 @@
 ---
 id: CAP-41.j
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox
 depends_on:

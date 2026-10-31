@@ -1,7 +1,7 @@
 ---
 id: CAP-62.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'The guard denies any Bash call carrying `dangerouslyDisableSandbox: true`, as defence in depth behind strict mode'
 depends_on:

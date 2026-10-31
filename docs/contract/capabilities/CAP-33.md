@@ -1,7 +1,7 @@
 ---
 id: CAP-33
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Change-impact transactions (CIT-P simulation, CIT-E execution)
 depends_on:

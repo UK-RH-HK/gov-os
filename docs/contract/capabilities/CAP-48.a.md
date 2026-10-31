@@ -1,7 +1,7 @@
 ---
 id: CAP-48.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'SLOs tracked with thresholds: suite freshness, product-test health, retrieval Recall@K, stale-index count, orphan-graph count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success'
 depends_on:

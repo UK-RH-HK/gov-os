@@ -1,7 +1,7 @@
 ---
 id: CAP-05
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Emergency controls (pause/freeze/cancel/rollback)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-10
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Semantic memory (vector/embedding retrieval)
 depends_on:

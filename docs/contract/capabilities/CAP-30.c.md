@@ -1,7 +1,7 @@
 ---
 id: CAP-30.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Automatic generation (gov readiness --generate)
 depends_on:

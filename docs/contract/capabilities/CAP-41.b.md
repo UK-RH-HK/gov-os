@@ -1,7 +1,7 @@
 ---
 id: CAP-41.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Decision vs lesson distinction; lessons cannot silently become policy
 depends_on:

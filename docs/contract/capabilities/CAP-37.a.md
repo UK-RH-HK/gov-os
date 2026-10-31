@@ -1,7 +1,7 @@
 ---
 id: CAP-37.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Structured checkpoint in the repository with input ids/versions/hashes
 depends_on:

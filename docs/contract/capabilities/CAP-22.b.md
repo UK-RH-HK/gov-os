@@ -1,7 +1,7 @@
 ---
 id: CAP-22.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Typed handoff records readable by a fresh agent
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-16.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Batches with continuation; batch size never a completeness limit
 depends_on:

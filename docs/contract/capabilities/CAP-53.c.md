@@ -1,7 +1,7 @@
 ---
 id: CAP-53.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Governance budget within profile
 depends_on:

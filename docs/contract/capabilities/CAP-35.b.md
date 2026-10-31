@@ -1,7 +1,7 @@
 ---
 id: CAP-35.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Task reasoning requirement low/medium/high/extra-high declared and enforced
 depends_on:

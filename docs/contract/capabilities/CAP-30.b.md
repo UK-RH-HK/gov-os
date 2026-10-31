@@ -1,7 +1,7 @@
 ---
 id: CAP-30.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Readiness gaps generate linked tickets (W1 planning skill + gov check)
 depends_on:

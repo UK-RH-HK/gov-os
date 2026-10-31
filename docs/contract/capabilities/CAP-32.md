@@ -1,7 +1,7 @@
 ---
 id: CAP-32
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Research and experiment lifecycle
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-30.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Capability taxonomy for STANDARD rows; extended only through a governed change
 depends_on:

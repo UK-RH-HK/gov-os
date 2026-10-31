@@ -1,7 +1,7 @@
 ---
 id: CAP-43.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations, schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure'
 depends_on:

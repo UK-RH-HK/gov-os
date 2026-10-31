@@ -1,7 +1,7 @@
 ---
 id: CAP-35.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Capability tiers T0–T3
 depends_on:

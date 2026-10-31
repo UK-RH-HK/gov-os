@@ -1,7 +1,7 @@
 ---
 id: CAP-15.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Packet hash/provenance proves what the worker received
 depends_on:

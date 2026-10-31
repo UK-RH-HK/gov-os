@@ -1,7 +1,7 @@
 ---
 id: CAP-15.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency'
 depends_on:

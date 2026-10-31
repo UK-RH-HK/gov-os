@@ -1,7 +1,7 @@
 ---
 id: CAP-03.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Secret exclusion holds on every retrieval route, including the code route
 depends_on:

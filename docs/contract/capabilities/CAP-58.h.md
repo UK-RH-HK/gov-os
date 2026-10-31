@@ -1,7 +1,7 @@
 ---
 id: CAP-58.h
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Containment attribution by commit trailers: a forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit, each commit''s paths against the allowed paths of its own `Role` and `Task` trailers and not against the caller; a merge commit is not a finding when every commit it brings passes; a commit with no `Role` or `Task` trailer is judged against the caller'
 depends_on:

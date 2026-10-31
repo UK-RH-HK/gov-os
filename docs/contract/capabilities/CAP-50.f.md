@@ -1,7 +1,7 @@
 ---
 id: CAP-50.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection, staleness accuracy, requirement→code and →test coverage, orphan recall, reconstruction correctness'
 depends_on:

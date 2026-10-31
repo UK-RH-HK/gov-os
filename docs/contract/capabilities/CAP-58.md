@@ -1,7 +1,7 @@
 ---
 id: CAP-58
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Path guards as default-deny allow-lists
 depends_on:

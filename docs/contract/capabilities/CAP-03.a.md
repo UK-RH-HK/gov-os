@@ -1,7 +1,7 @@
 ---
 id: CAP-03.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Sensitivity class per path/dataset/namespace before read, index or export; secrets excluded by default-deny content filter
 depends_on:

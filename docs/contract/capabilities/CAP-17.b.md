@@ -1,7 +1,7 @@
 ---
 id: CAP-17.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Commit-time re-index hook
 depends_on:

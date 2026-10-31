@@ -1,7 +1,7 @@
 ---
 id: CAP-20.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Delete derived state, rebuild from git, identical digest; fresh agent reconstructs
 depends_on:

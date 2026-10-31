@@ -1,7 +1,7 @@
 ---
 id: CAP-25.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The committed `.claude/settings.json` carries no install or download ask rule; the guard's install rule decides install commands alone, and in a launched worker session the sandbox backs it
 depends_on:

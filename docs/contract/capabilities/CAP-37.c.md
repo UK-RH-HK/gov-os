@@ -1,7 +1,7 @@
 ---
 id: CAP-37.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Provider-independent watchdog: not only proprietary hooks; marks stale; checkpoints on context utilisation; blocks handoff/close when freshness violates policy'
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-41.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Lesson lifecycle: report → candidate → corroboration → scope → rule/skill/retrieval/tool proposal → independent validation → owner approval → versioned'
 depends_on:

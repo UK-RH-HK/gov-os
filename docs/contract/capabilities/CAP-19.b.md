@@ -1,7 +1,7 @@
 ---
 id: CAP-19.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Evidence-driven model selection (bake-off, per-repository benchmark)
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-59.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Iteration count and budget held by the orchestrator or gov, never disclosed to sessions inside the loop
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-02.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: File-hash manifest in framework.lock; gov doctor MATCH/DRIFT
 depends_on:

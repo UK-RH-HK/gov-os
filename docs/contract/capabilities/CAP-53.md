@@ -1,7 +1,7 @@
 ---
 id: CAP-53
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Proportionality profiles (LITE/STANDARD/FULL)
 depends_on:

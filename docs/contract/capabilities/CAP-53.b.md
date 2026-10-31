@@ -1,7 +1,7 @@
 ---
 id: CAP-53.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Profile computed from impact
 depends_on:

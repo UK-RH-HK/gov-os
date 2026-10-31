@@ -1,7 +1,7 @@
 ---
 id: CAP-50.e
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Orphan/dead-output detection with governed remediation
 depends_on:

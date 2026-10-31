@@ -1,7 +1,7 @@
 ---
 id: CAP-15.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: File path + summary ≤ ~2.5k tokens (harness output caps)
 depends_on:

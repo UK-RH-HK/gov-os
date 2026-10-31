@@ -1,7 +1,7 @@
 ---
 id: CAP-43.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Release contents, lite: the release''s own manifest and file hashes, built with the release (the lock on the install side is CAP-02.a, W1); a release is pinned and hash-verified, not signed'
 depends_on:

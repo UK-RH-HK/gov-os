@@ -1,7 +1,7 @@
 ---
 id: CAP-50.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Stable artefact identity: id, type, canonical path, status, lifecycle, version/hash, provenance, lineage, expected consumers'
 depends_on:

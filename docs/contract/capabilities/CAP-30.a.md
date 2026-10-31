@@ -1,7 +1,7 @@
 ---
 id: CAP-30.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 26-row readiness checklist, five states, silent N/A invalid, no defaulted N/A
 depends_on:

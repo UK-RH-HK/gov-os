@@ -1,7 +1,7 @@
 ---
 id: CAP-38.f
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
 depends_on:

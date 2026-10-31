@@ -1,7 +1,7 @@
 ---
 id: CAP-08
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Deterministic structured memory (records)
 depends_on:

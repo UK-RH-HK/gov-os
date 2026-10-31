@@ -1,7 +1,7 @@
 ---
 id: CAP-05.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: PAUSE and FREEZE_WRITES (gov pause)
 depends_on:

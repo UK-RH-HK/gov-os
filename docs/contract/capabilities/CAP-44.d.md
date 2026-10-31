@@ -1,7 +1,7 @@
 ---
 id: CAP-44.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A6 controlled migration; failed batch rolls back; moves precede new indexing
 depends_on:

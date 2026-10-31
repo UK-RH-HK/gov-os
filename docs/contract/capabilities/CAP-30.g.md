@@ -1,7 +1,7 @@
 ---
 id: CAP-30.g
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs); owned by the UX role
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-15
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Context packet compilation
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-58.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: A session with no or an unknown role has no write privilege
 depends_on:

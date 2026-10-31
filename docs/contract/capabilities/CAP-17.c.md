@@ -1,7 +1,7 @@
 ---
 id: CAP-17.c
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Zero-result canaries after reindex
 depends_on:

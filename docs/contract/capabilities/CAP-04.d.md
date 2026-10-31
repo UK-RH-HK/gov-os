@@ -1,7 +1,7 @@
 ---
 id: CAP-04.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Exceeding a delegated limit raises a decision package
 depends_on:

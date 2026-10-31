@@ -1,7 +1,7 @@
 ---
 id: CAP-44.j
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: The path map keeps a healthy native framework/package layout unless the target structure is materially better and the migration risk is justified
 depends_on:

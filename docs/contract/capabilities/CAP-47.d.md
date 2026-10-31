@@ -1,7 +1,7 @@
 ---
 id: CAP-47.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: 'Audit triggers: spine, STANDARD/FULL feature closure, CIT-E on a closed spine, wave and release exits'
 depends_on:

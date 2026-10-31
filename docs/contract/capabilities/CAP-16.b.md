@@ -1,7 +1,7 @@
 ---
 id: CAP-16.b
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Parallel facet retrieval → merge/filter → unresolved dependencies → sequential follow-up → bounded compilation
 depends_on:

@@ -1,7 +1,7 @@
 ---
 id: CAP-19.a
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Components separable; model swap by configuration under a fail-closed pin
 depends_on:

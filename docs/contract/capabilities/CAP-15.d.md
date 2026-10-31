@@ -1,7 +1,7 @@
 ---
 id: CAP-15.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
 depends_on:
