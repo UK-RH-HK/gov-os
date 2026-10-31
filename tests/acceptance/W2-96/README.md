@@ -6,8 +6,9 @@ the lead's design note for both workers, in parallel with the engineer (DEC-959 
 (`test_w2_96_at_review_1.py`) were added by a second independent test designer from the reviewer's findings, given
 as described behaviours (DEC-136) in an addendum that overrides the design note where they differ. Run 2's cases
 (`test_w2_96_at_run_2.py`) were added by a third, from DEC-970's decisions (PKG-1 (a); review 2's N2, N5, N7 and
-N8), given the same way as R8 to R12; they override both earlier texts where they differ. The implementation
-(`src/gov/accept/`, `tests/unit/accept/test_w2_96*`) was read by none of them.
+N8), given the same way as R8 to R12; they override both earlier texts where they differ. Review 3's cases
+(`test_w2_96_at_review_3.py`) were added by a fourth, from review 3's V1 and V2, given the same way as R14 and
+R15. The implementation (`src/gov/accept/`, `tests/unit/accept/test_w2_96*`) was read by none of them.
 
 ## How the tests run the merged tree's code (DEC-732)
 
@@ -38,8 +39,8 @@ own text, carries **`qzv96leak`**. The ticket ids, WBS ids and declared paths do
 After every run, `w2_96_support.Run.problems` searches stdout and stderr (the envelope and the error message are in
 them), every file created or changed in the planted project (ignored files included), everything under the
 `TMPDIR` the run was given, and the run's `HOME`: none may hold the marker. stdout and stderr may not hold pytest's
-own words `Traceback`, `AssertionError`, `::` or `conftest` either (the interrupt case, review 1's signal cases and
-run 2's R9 and R12 cases check only the marker), the given `TMPDIR` must be empty after the run, and the project's tree must be unchanged (every path,
+own words `Traceback`, `AssertionError`, `::` or `conftest` either (the interrupt case, review 1's signal cases,
+run 2's R9 and R12 cases and review 3's nested R14 case check only the marker), the given `TMPDIR` must be empty after the run, and the project's tree must be unchanged (every path,
 size, digest and mtime, folders included; `.git` aside). Each planted test that runs also writes a small probe
 record (process id, working folder, `tmp_path`, a grandchild's process id) into a folder outside the project and
 outside the given `TMPDIR`; the cases read it to check what ran, where, and that it stopped.
@@ -64,7 +65,10 @@ outside the given `TMPDIR`; the cases read it to check what ran, where, and that
 | Success 2 / Success 4 / Failure 3 (run 2, R10) | `test_r10_a_chain_of_nested_folders_deeper_than_a_recursive_removal_leaves_the_result_as_the_tests_gave_it` | Seen on run 1's code: "the given TMPDIR holds 1218 entries after the run" (the chain and the run's report, holding the marker) and "the result is not the expected one" (`error`, kind `crash`), passing and failing alike. |
 | Success 1 / Success 5 (run 2, R11) | `test_r11_a_signal_gov_was_started_ignoring_stays_ignored_and_the_run_completes` | Seen on run 1's code: "gov accept ended (exit code 129) on signal 1, which it was started ignoring" (SIGHUP to `gov` and to its group), "(exit code 143) on signal 15" (SIGTERM), the child stopped. The SIGINT variant **passes already** (run 1 leaves SIGINT to Python, which keeps an inherited ignore); it stays as R11's guard. |
 | Success 5 / Failure 4 (run 2, R12) | `test_r12_a_signal_that_ends_the_run_ends_gov_by_an_ordinary_exit_with_128_plus_the_signal` | Seen on run 1's code: "gov was killed by signal 15" (SIGTERM twice), "signal 1" (SIGHUP twice), "signal 2" (one SIGINT), each "expected an ordinary exit with code 143 (129, 130)". |
-| Premises (no KPI line: counted under unmapped) | test_w2_96_at_premises.py, and the test_premise_ cases of the review 1 and run 2 files, named without backticks (a row holding an item whose KPI cell names no line would refuse the run, R4) | **Green before the implementation, by design**: they test the tests. The planted suites give the designed outcomes under raw pytest and raw output holds the marker; the planted collection errors and crashes end pytest as designed; the decoy discriminates; the marker is nowhere in `src/`; this README is a map in the design note's form naming success 1 to 5 and failure 1 to 4 and every test here (a file whole, or a review 1 or run 2 case by its function name), and every row holding an item begins with a line name. Review 1's premises: the planted conftest refuses `--basetemp` (exit 4) and only that; a plain `shutil.rmtree` leaves the planted locked folders; the unreadable READMEs each hold a readable line beside the unreadable one; the items files give their designed outcomes; raw pytest writes the configured log file, holding the marker; the planted `pytest.exit` ends pytest with code 1 and a report without failures. Run 2's premises: W1-30's two forms map the passing cases in one Test table and hold the failing case in no Test or File table under a header row; raw pytest leaves the planted chain, 1,200 folders deep (more than 1,100 and than Python's recursion limit), with its deepest three folders at 0500, 0300 and 0000, and the cases' own removal without recursion takes it away; a process started as the R11 case starts `gov` begins with the signal ignored. |
+| Success 2 / Success 5 / Failure 1 / Failure 4 (review 3, R14) | `test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing` | Seen on run 2's code (its removal stops at the first entry another process removed): "gov exited with code 4, expected an ordinary exit with code 143" (the result `error`, kind `crash`) and "the given TMPDIR holds N entries after the run" (the outer private folder and its `tmp`, or the nested test's files, holding the marker). Here run 2's code failed 17 races of 40 of the first form and 8 of 8 of the second; the case runs 10 and 3, and fails at the first bad race. |
+| Success 2 / Success 4 / Failure 3 (review 3, R14) | `test_r14_processes_of_their_own_session_churning_in_the_temporary_folder_leave_the_result_as_the_tests_gave_it` | Seen on run 2's code: "the result is not the expected one" (`error`, kind `crash`, exit 4 instead of a pass and 0), "the given TMPDIR holds N entries after the run" (churn files and canaries holding the marker), and churners still running on folders gov left. Run 2's code failed 11 runs of 12 here; the case makes 3. |
+| Success 2 / Failure 1 (review 3, R15) | `test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound` | Seen on run 2's code: "the clean-up took N s from the folders' making to gov's end, more than 3 s for 8000 empty sibling folders" (9.7 s to 12.4 s here), and mostly "the run took N s, more than 10 s" too (7.1 s to 13.3 s here; review 3 measured 22.7 s for the removal alone); the result and the given `TMPDIR` are right. |
+| Premises (no KPI line: counted under unmapped) | test_w2_96_at_premises.py, and the test_premise_ cases of the review 1, run 2 and review 3 files, named without backticks (a row holding an item whose KPI cell names no line would refuse the run, R4) | **Green before the implementation, by design**: they test the tests. The planted suites give the designed outcomes under raw pytest and raw output holds the marker; the planted collection errors and crashes end pytest as designed; the decoy discriminates; the marker is nowhere in `src/`; this README is a map in the design note's form naming success 1 to 5 and failure 1 to 4 and every test here (a file whole, or a review 1 or run 2 case by its function name), and every row holding an item begins with a line name. Review 1's premises: the planted conftest refuses `--basetemp` (exit 4) and only that; a plain `shutil.rmtree` leaves the planted locked folders; the unreadable READMEs each hold a readable line beside the unreadable one; the items files give their designed outcomes; raw pytest writes the configured log file, holding the marker; the planted `pytest.exit` ends pytest with code 1 and a report without failures. Run 2's premises: W1-30's two forms map the passing cases in one Test table and hold the failing case in no Test or File table under a header row; raw pytest leaves the planted chain, 1,200 folders deep (more than 1,100 and than Python's recursion limit), with its deepest three folders at 0500, 0300 and 0000, and the cases' own removal without recursion takes it away; a process started as the R11 case starts `gov` begins with the signal ignored. Review 3's premises: a churner keeps going until its canary file is removed, then ends at once and its folder stays still (a plain removal then takes it); a plain `shutil.rmtree` removes 8,000 empty sibling folders in under 2 s. |
 
 What each file holds:
 
@@ -222,6 +226,48 @@ module gained, without changing what the earlier cases do: the planted kinds `ma
 (which `Started.send` now uses); `pid_running`; and `remove_tree`, an iterative removal the R9 and R10 cases use
 in their own clean-up, since pytest's own removal of a kept temporary folder recurses.
 
+## Review 3's cases (`test_w2_96_at_review_3.py`)
+
+Each point of review 3's addendum (R14, R15), what its case checks beyond the leak probe, and its red reason
+against this branch's run-2 implementation (which keeps the design note and the addenda R1 to R13, and lacks
+review 3's). Every folder these planted tests make is a new folder of the planted test's temporary folder
+(`tempfile.mkdtemp`), so pytest's own handling of `tmp_path` never removes it before gov's clean-up does.
+
+- **R14, a nested `gov accept`** — the outer planted test runs `gov accept` on a nested planted project (built
+  beside the outer one, its own root, home and probe folder), as `python3 -m gov.cli.main` with the code under
+  test's `src/` (DEC-732), in a session of its own as this suite's harness starts gov, with an environment built
+  from scratch whose `TMPDIR` is the outer test's own temporary folder (so the nested private folder sits inside
+  the outer one), and waits for it by polling. The nested test leaves 20,000 small files (`MANY`) in a folder of
+  its temporary folder, then either sleeps about 1 s and passes (first form) or sleeps on (second form; its
+  process then ends at once on SIGINT, SIGTERM or SIGHUP, so the nested pytest writes nothing after the signal).
+  First form: SIGTERM to the outer gov alone while the nested gov removes its folder, its pytest ended, one race
+  at each of ten moments 0 s to 0.27 s after the nested pytest ended (or as soon as the nested gov has ended, if
+  sooner). Second form: SIGTERM to the outer and the nested gov at the same moment while the nested test sleeps,
+  three races. Checks per race,
+  all reported together: the given `TMPDIR` empty and no marker when the outer gov ends (first); exit code 143,
+  an ordinary exit; the outer child gone; the nested files made under the given `TMPDIR`. *Red without R14:* the
+  outer removal stops at an entry the nested gov removed, so gov answers `crash` with exit 4 and leaves the
+  private folder (or the nested files) in the given `TMPDIR`.
+- **R14, no signal** — a passing planted test starts three churners, each in a session of its own on a new
+  folder of its temporary folder, and returns once each has begun; each churner makes a canary file, then in
+  cycles makes 100 files and removes them again, until the clean-up removes its canary (or a file of its own,
+  or its folder), or 120 s pass. The run ends with no signal. Checks, per run, three runs: the given `TMPDIR`
+  empty and no marker (first); the result as the tests gave it (both lines passing, exit 0); the churners
+  started under the given `TMPDIR`; every churner gone within 15 s of gov's end. *Red without R14:* a removal
+  that stops at a missing entry or a folder found not empty turns the run into `crash` (exit 4) and leaves the
+  churn folders.
+- **R15** — a passing planted test leaves 8,000 empty folders side by side in a folder of its temporary folder,
+  and records when it had made them (`time.monotonic`, the clock every process of the machine shares). Checks:
+  the given `TMPDIR` empty (first); the result (both lines passing, exit 0); the folders made under the given
+  `TMPDIR`; the whole run within 10 s; the clean-up, from the folders' making to gov's end, within 3 s. *Red
+  without R15:* a removal whose time grows with the square of the entries takes far longer than the clean-up's
+  bound (and mostly than the run's).
+
+No earlier case changed: R14 and R15 add to the addenda without changing what an earlier case expects. The
+support module gained, without changing what the earlier cases do: `CHURNER` (the churner's program), `CHURN`,
+`SIBLING_FOLDERS`, `run_nested_extra` (the nested runner's module code), the planted kinds `run_nested`,
+`fill_then_pass`, `fill_then_sleep`, `churn_pass` and `siblings_pass`, and `NESTED_README`, `nested_files`.
+
 ## The brief change has no test
 
 The ticket's sixth success line (the common lead brief and the engineer's brief template name `gov accept` as the
@@ -275,6 +321,36 @@ No test here judges it, and the map above names no line for it.
   hang-up reaches the foreground job; a child in `gov`'s group that does not keep the ignore fails it.
 - **Run 2, R12:** as for review 1's R2, the exit code is the process's own exit status; the second signal comes
   5 ms after the first, wherever that falls (before or during the clean-up).
+- **Review 3, R14's races:** the moments are chosen from what was measured here on run 2's code, not from its
+  source. SIGTERM sent at the first sign of the nested removal (an entry of the nested folder gone) never failed
+  run 2's code (0 races of 20, with 20,000 or 3,000 files). Sent 0 s to 0.35 s after the nested pytest ended,
+  while the nested gov parses and begins its removal, it failed 17 races of 40, with no clear best moment, so
+  the first form spreads ten moments over that span. Sent while the nested test still finished (0.05 s to 0.4 s
+  after it passed) it failed more often (11 of 16), but then the nested pytest could still write its report
+  (pytest makes the report's folder if it is missing) after a correct clean-up had removed the folders, which
+  would fail a correct `gov`: no moment is used where a pytest of the nested run is still alive. For the same
+  reason the second form's sleeping test ends at once on the signal, whichever signal the nested gov stops it
+  with. The nested runner polls instead of `Popen.wait`, whose interrupt handling waits up to 0.25 s more for the
+  nested gov, which kept the outer child alive until the nested removal had nearly ended. Each case fails at its
+  first bad race, so a red case is short; a green one runs every race (about 45 s and 15 s here).
+- **Review 3, R14's churners:** "a bounded number of passes" is not judged by a count, and a churner that never
+  stops would defeat any bound. So each churner stops at the first failure of its own work and looks for its
+  canary before each operation: once the clean-up has removed the canary, it makes at most one more file, and a
+  removal that passes over a missing entry and empties a folder found not empty again finishes. A stand-in for
+  such a removal (bottom-up, every error passed over, up to three passes) beat the churners in 40 rounds of 40
+  here, never needing a third pass; a plain `shutil.rmtree` raised in 19 of 40. The case requires the given
+  `TMPDIR` empty when gov ends, as every other case does: a churner gov could not outlast is not planted.
+- **Review 3, R15's bounds:** the whole run, from `gov`'s start to its end, within 10 s (the generous bound the
+  brief asked for), and the clean-up, from the moment the planted test had made the folders to `gov`'s end
+  (pytest's end, the parse, the clean-up and the exit), within 3 s. Here a run of the same project without the
+  folders takes about 0.5 s, making the folders about 0.4 s, and a plain recursive removal of them 0.14 s: with
+  a removal that grows with the entries the whole run takes about 1.2 s and the clean-up about 0.5 s, so both
+  bounds leave room for a machine six times slower or as loaded. Run 2's code took 7.1 s to 13.3 s for the whole
+  run and 9.7 s to 12.4 s for the clean-up here (review 3 measured its removal alone at 22.7 s). The run's bound
+  alone could not part the two with room on both sides (run 2's fastest run here, 7.1 s, was within 6 times a
+  linear run); the clean-up's leaves out gov's start and the folders' making, and run 2's code misses it two to
+  four times over. The premise checks that a plain removal of the same folders takes under 2 s on the machine
+  running the suite; if it does not, the bounds may not be fair there.
 
 ## Outside these paths (for the lead)
 
