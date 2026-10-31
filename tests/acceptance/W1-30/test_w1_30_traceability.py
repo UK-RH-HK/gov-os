@@ -25,7 +25,7 @@ IMPL = support.IMPLEMENTER
 # Helpers
 # --------------------------------------------------------------------------
 
-def _project_with_closed_ticket(project, trailers, ticket_id="PROJ-tttt", wbs="W1-trace"):
+def _project_with_closed_ticket(project, trailers, ticket_id="PROJ-tttt", wbs="W1-949"):
     """A project with one ticket whose commits carry ``trailers`` and whose status is closed."""
     project.add_ticket(ticket_id, wbs)
     project.add_passing_test(wbs)
@@ -180,7 +180,7 @@ def test_traceability_commits_from_head_not_all_branches(project, sandbox, inter
     state; this case now asserts on the product-traceability-trailers check entry.
     """
     ticket_id = "PROJ-head"
-    wbs = "W1-head"
+    wbs = "W1-912"
     trailers_head = ("Task: PROJ-head", "Role: engineer", "Implements: CAP-01")
     project.add_ticket(ticket_id, wbs)
     project.add_passing_test(wbs)
