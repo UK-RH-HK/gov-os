@@ -12066,7 +12066,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.345 | 2026-10-30 | Owner (recorded by the orchestrator, DEC-861): DEC-962 (the one-run lock and closes-first ended; the rebuild lock kept until W2-76 is measured; rules 4 to 17 kept; P-PARALLEL-1 for parallel work, rule 6 holding meanwhile; the nightly's own estimate kept). Next free id: DEC-963. |
 
 ### DEC-963 — P-PARALLEL-1 (b), amended: the test designer in its own worktree, retrieving only from the integration branch's store; the engineer in the ticket's worktree (standing)
-- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-959 item 7, DEC-962 item 4, DEC-820 (c), MR-3 · **Basis:** `packages/P-PARALLEL-1.md`
+- **Status:** ACCEPTED (owner, 2026-10-30, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-30)`; standing) · **Under:** DEC-959 item 7, DEC-962 item 4, DEC-820 (c), MR-3 · **Basis:** `packages/P-PARALLEL-1.md` · **Changed by:** DEC-966 (the designers' store is refreshed at most twice a day, morning and evening, or on request)
 - **Decision:** option (b), with the owner's amendment.
   1. The lead adds a tests worktree, `~/gov-os-worktrees/<W2>-tests` (branch `w2/<W2>-tests`, from the ticket branch's head). The test designer works and commits only there. The engineer works in the ticket's own worktree. Each worktree has one writer, and the two start at the same time from the spec and the KPIs.
   2. **The amendment:** the test designer's retrieval uses the integration branch's store, never the ticket worktree's, so its searches can never surface the engineer's in-progress code.
@@ -12100,3 +12100,16 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.348 | 2026-10-31 | Delegated (orchestrator, DEC-936 item 2.5): DEC-965 (W2-90 merged with 7 named reds; P2-C, P2-D, P2-E (a)). Next free id: DEC-966. |
+
+### DEC-966 — The owner's decisions on P-W2-90-1 and on speed: the template's install block removed, its hook lines pinned; the designers' store refreshed twice a day; rebuild speed a priority (standing)
+- **Status:** ACCEPTED (owner, 2026-10-31, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-31)`; standing) · **Under:** DEC-957, DEC-965, DEC-172, DEC-822, DEC-963, DEC-939 item 2 · **Changes:** DEC-963 (the store's refresh) · **Basis:** `packages/P-W2-90-1.md`; W2-76's measured rebuild stages (`log/W2-76-A5-run1.json`: secrets 274.8 of 307.4 s; run 2: 547.9 of 735.4 s)
+- **Decision:**
+  1. **P1-A (a):** the template's install block is removed (`template/.rulesync/permissions.jsonc`'s `npm install*` and `pip install*` deny rules), so an adopted product's CTO session can ask the owner, as this repository does (DEC-172). A small ticket; then W2-90's next round moves its 3 cases.
+  2. **P1-B (a):** the template's hook lines get the fixed-interpreter form this repository uses (DEC-822, W2-59): a fail-open must not ship in EXAMIN's copy. A ticket; then W2-90's next round moves its 4 cases.
+  3. **The designers' store** (DEC-963) is refreshed at most twice a day, morning and evening, or on request, not after every merge: its searches are for context, so a few hours old is fine.
+  4. **Rebuild speed is a priority.** About 90 % of a rebuild is gitleaks re-scanning every file. The orchestrator brings the fastest safe fix: each file's scan result remembered by its content hash, so a rebuild scans only new or changed files; the nightly scans every file in full; any update to gitleaks or its rules clears every remembered result. It says where the fix belongs (`packages/P-SPEED-1.md`).
+- **Where it goes (DEC-851):** this register (DEC-963 marked); the prompt §0 (v3.54); the common lead brief (the store's age); the decisions-in-force list; the new tickets; `tools/refresh_integration_store.sh` and its timers; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.349 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-966 (P-W2-90-1 (a) and (a); the designers' store twice a day; rebuild speed a priority, P-SPEED-1). Next free id: DEC-967. |
