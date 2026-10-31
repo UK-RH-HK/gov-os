@@ -375,6 +375,23 @@ def test_a_code_typed_back_wrong_refuses(tmp_path, owner, pty, reply):
     assert shown and re.search(r"RELEASE-\d{4}", shown[0])
 
 
+def test_no_version_is_the_builds_own_refusal_after_the_code(tmp_path, owner, pty):
+    """P-R3-A: the caller checks and the code come first; a missing version is the build's refusal, not a caller's."""
+    from gov.cli.errors import GovError
+    from gov.release.command import _REASONS, _release_test
+
+    repo = _repo(tmp_path / "gov-os")
+    head = _git(repo, "rev-parse", "HEAD").strip()
+    thread, shown = _answer(pty[0], lambda code: f"{code}\n".encode())
+    with pytest.raises(GovError) as refused:
+        _release_test(repo, None, ancestry=_WHOLE, terminal=(pty[1], pty[1]))
+    thread.join(5)
+    assert shown and re.search(r"RELEASE-\d{4}", shown[0]) and "None" not in shown[0]
+    assert refused.value.code == "RELEASE_REFUSED" and "no version given" in refused.value.message
+    assert (refused.value.details or {}).get("reason") not in _REASONS
+    _untouched(repo, head)
+
+
 def test_the_command_reads_the_real_chain_and_the_real_terminal(tmp_path, monkeypatch):
     from gov.release import command
 

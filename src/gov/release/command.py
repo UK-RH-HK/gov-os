@@ -84,11 +84,9 @@ def _release_test(root: Path, version: str | None, ancestry: list[dict] | None =
         interactive = False
     if not interactive:
         raise _refused("terminal")
-    if version is None:
-        raise GovError("RELEASE_REFUSED", "no release built: no version given: gov release <version>")
     code, typed = f"{CODE_PREFIX}{random.SystemRandom().randrange(10000):04d}", b""
     try:
-        os.write(shown, f"type {code} to build release {version}: ".encode())
+        os.write(shown, f"type {code} to build release {version or '<no version given>'}: ".encode())
     except OSError:
         raise _refused("terminal") from None
     try:
@@ -101,6 +99,8 @@ def _release_test(root: Path, version: str | None, ancestry: list[dict] | None =
         typed = b""
     if typed.split(b"\n", 1)[0].decode("utf-8", "replace").strip() != code:
         raise _refused("code")
+    if version is None:  # P-R3-A: the build's own refusal, once the caller is known to be the owner
+        raise GovError("RELEASE_REFUSED", "no release built: no version given: gov release <version>")
     try:
         folder = build(root, version)
     except (ReleaseError, LockError) as exc:
