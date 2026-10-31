@@ -8,6 +8,7 @@ type: task
 priority: 1
 assignee: research
 external-ref: W2-15b
+wbs_id: W2-15b
 tags: [wave-2, research, full]
 title: 'EXP-003, pass 2: the final measurement against 99 %'
 class: research
