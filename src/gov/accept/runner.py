@@ -255,8 +255,9 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
             if private is not None:
                 _remove(str(private))
         finally:
-            for signum, handler in previous.items():
-                signal.signal(signum, handler)
+            ending = bool(held) or stopped is not None
+            for signum, handler in previous.items():  # gov is ending: a later signal changes nothing, never kills it
+                signal.signal(signum, signal.SIG_IGN if ending else handler)
         if held and stopped is None:  # held back during the clean-up: now it ends the run
             raise Stopped(held[0])
 

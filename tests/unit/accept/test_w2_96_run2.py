@@ -219,6 +219,27 @@ def test_w2_96_r9_r12_a_signal_during_the_run_then_more_during_the_clean_up(proj
     assert _gone(child)
 
 
+@pytest.mark.parametrize("kinds", [(2,), (15,), (2, 15, 1)])
+def test_w2_96_r9_r12_presses_until_gov_ends_never_kill_it(project, tmp_path, kinds):
+    root, temp = project
+    started, go, slow = tmp_path / "started", tmp_path / "go", tmp_path / "slow"
+    go.write_text("x")
+    _plant(root, ONE_LINE, {"test_a.py": GATED.format(started=str(started), go=str(go))})
+    gov = _launch(root, temp, tmp_path, slow=slow)
+    _wait_for(slow)
+    sent = 0
+    while gov.poll() is None and sent < 2000:  # through the clean-up and after it, until gov has ended
+        try:
+            gov.send_signal(kinds[sent % len(kinds)])
+        except ProcessLookupError:
+            break
+        sent += 1
+        time.sleep(0.005)
+    gov.communicate(timeout=60)
+    assert gov.returncode == 128 + kinds[0]  # an ordinary exit, never a death by a later signal
+    assert list(temp.iterdir()) == []
+
+
 def test_w2_96_r9_r12_ctrl_c_during_the_run_stops_it(project, tmp_path):
     root, temp = project
     started = tmp_path / "started"
