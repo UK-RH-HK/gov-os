@@ -57,6 +57,8 @@ list_rows:
 ---
 # W2-33 Wave 2 roles and typed handoff records
 
+**DEC-963 (owner, 2026-10-30):** the role files state the work order in parallel with one writer per worktree: the test designer works in its own tests worktree and retrieves only from the integration branch's store; the engineer works in the ticket's worktree, merges the tests when they are ready and runs them once.
+
 **DEC-959 (2026-10-30):** the QA engineer replaces `independent-reviewer.md` (item 3), and every role file states the work order in parallel (item 7).
 
 **Re-scoped by DEC-954 (Q6, Q13).** The earlier KPIs (test-execution, integration and UX roles) and CAP-22.c become Wave 3 rows unless the roles spec places them; CAP-22.b is carried lite (DEC-841 had moved CAP-22.b/c to Wave 3). **Roles spec approved (DEC-957);** builds to ROLES-SPEC-1 as approved, with the work order and the escalation rubric. Its CIT-P is part of the one combined K3 CIT-P (DEC-954 Q7).
