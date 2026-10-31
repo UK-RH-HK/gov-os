@@ -15,12 +15,15 @@ files, the ticket file and the path map.  No message carries a path.
 
 from __future__ import annotations
 
+import copy
 import fnmatch
 import os
 import re
 import shlex
+import stat
 import subprocess
 
+from gov.guard import runs
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _extract_bash_write_targets,
                               _get_allowed_paths, _has_glob, _is_punct,
@@ -115,6 +118,23 @@ CHANGED_REFUSAL = ("the call reads code the ticket's branch changes against its 
 HIDDEN_REFUSAL = ("the call reads the hidden part of an evaluation set that "
                   "measures this session, which is refused to it (DEC-820 (d), "
                   "DEC-845)")
+# W2-84: the hidden part under every tree, fail closed (DEC-950 item 1).
+_TREES_FAULT = "the repository's worktrees cannot be listed"
+_RUNS_FAULT = "the runs root cannot be read"
+_WALK_FAULT = "a hidden part's folder cannot be walked"
+_CLONE_FAULT = "the repository's trees cannot be found from this run clone"
+_REV_FAULT = "git cannot say whether a revision holds the hidden part"
+_LONG_PART = "a protected part holds more files than the guard reads in bounded time"
+# The options of a patch route that widen or choose its sides, carried into
+# the guard's own question; a count is carried too (W2-84).
+_GIT_SIDES = frozenset("--all --branches --tags --remotes -g --walk-reflogs --reflog "
+                       "--cached --staged --merge-base".split())
+_COUNT_RE = re.compile(r"-\d+|-n\d+|--max-count=\d+")
+_GIT_LOG_VALUED = frozenset("-S -G -O -L --author --committer --grep --since --until "
+                            "--after --before --skip --max-age --min-age".split())
+_ARCHIVE_VALUED = frozenset("-o --output --format --prefix --remote --exec "
+                            "--add-file --add-virtual-file".split())
+_NO_CONVERT = ("--no-ext-diff", "--no-textconv", "--name-only", "--no-renames")
 
 
 class PolicyError(Exception):
@@ -150,12 +170,20 @@ class _Part:
                 free = "**" in one or "{" in one
                 self.rx.append((_Glob(one), None if free else one.count("/") + 1))
         self._files = files
+        # A hidden part fails closed on a folder it cannot walk, and is walked
+        # only for a start at, in or above its tree (W2-84); (c)'s as before.
+        self.strict = reason == HIDDEN_REFUSAL
+        self.literals = [os.path.join(root, *g.split("/")[:next(
+            (i for i, p in enumerate(g.split("/")) if _has_glob(p)), None)]) for g in globs]
 
     def rel(self, path: str) -> str | None:
         return path[len(self.root) + 1:] if path.startswith(self.root + "/") else None
 
     def inside(self, path: str) -> bool:
-        rel = self.rel(path)
+        return self.match(self.rel(path))
+
+    def match(self, rel: str | None) -> bool:
+        """Whether a path relative to the tree is at or under a glob."""
         if not rel:
             return False
         if any(rel == p or rel.startswith(p + "/") for p in self.lead):
@@ -168,6 +196,13 @@ class _Part:
                 return True
         return False
 
+    def under(self, path: str) -> bool:
+        """Whether *path* is at or above one of the globs' literal folders."""
+        return any(_related(path, lit) and len(path) <= len(lit) for lit in self.literals)
+
+    def held(self) -> bool:
+        return bool(self.files)
+
     @property
     def files(self) -> list[str]:
         """The part's files that exist, as real paths."""
@@ -177,23 +212,98 @@ class _Part:
                 parts = g.split("/")
                 n = next((i for i, p in enumerate(parts) if _has_glob(p)), len(parts))
                 start = os.path.join(self.root, *parts[:n])
-                walk = os.walk(start) if os.path.isdir(start) else (
-                    [(os.path.dirname(start), [], [os.path.basename(start)])]
-                    if os.path.lexists(start) else [])
-                for folder, dirs, names in walk:
+                for folder, dirs, names in _walk(start, self.strict):
                     dirs[:] = [d for d in dirs if d != ".git"]
                     found |= {f for f in (os.path.join(folder, n) for n in names)
                               if self.inside(f)}
                     if len(found) > _MOST_FILES:
-                        raise PolicyError("a protected part holds more files than "
-                                          "the guard reads in bounded time")
+                        raise PolicyError(_LONG_PART)
             self._files = sorted(found)
         return self._files
 
     def below(self, folder: str | None) -> list[str]:
-        if not folder:
+        if not folder or (self.strict and not _related(folder, self.root)):
             return []
         return [f for f in self.files if folder == "/" or f.startswith(folder + "/")]
+
+
+class _Runs(_Part):
+    """The runs root's hidden part (W2-84): a path below the root is in it when
+    the globs match it relative to any folder below the root, at any depth,
+    whatever the clone's layout.  *names* are the root as named and real."""
+
+    def __init__(self, names: list[str], globs: list[str], entries: list[str]):
+        super().__init__(names[-1], globs, HIDDEN_REFUSAL)
+        self.names, self.entries = names, entries
+        self._walked: dict[str, list[str]] = {}
+
+    def inside(self, path: str) -> bool:
+        for top in self.names:
+            if path.startswith(top + "/"):
+                parts = path[len(top) + 1:].split("/")
+                return any(self.match("/".join(parts[k:])) for k in range(len(parts)))
+        return False
+
+    def under(self, path: str) -> bool:
+        return any(_related(path, top) for top in self.names)
+
+    def held(self) -> bool:
+        return bool(self.entries)
+
+    @property
+    def files(self) -> list[str]:
+        return self.below(self.root)
+
+    def below(self, folder: str | None) -> list[str]:
+        """Walked below the start, or whole from above it, never into ``.git``;
+        bounded, and a folder that cannot be walked refuses."""
+        if not folder or not _related(folder, self.root):
+            return []
+        start = folder if len(folder) > len(self.root) else self.root
+        if start not in self._walked:
+            found: list[str] = []
+            spent = 0
+            for top, dirs, names in _walk(start, True):
+                dirs[:] = [d for d in dirs if d != ".git"]
+                found += [f for f in (os.path.join(top, n) for n in names) if self.inside(f)]
+                spent += 1
+                if spent + len(found) > _MOST_FILES:
+                    raise PolicyError(_LONG_PART)
+            self._walked[start] = found
+        return self._walked[start]
+
+
+def _pathspecs(hidden: list[_Part]) -> list[str]:
+    """The hidden globs as git pathspecs from the tree's top: each and all below it."""
+    heads = {b[:-3] if b.endswith("/**") else b for h in hidden for g in h.globs
+             for b in _braces(g) if "{" not in b}
+    return [f":(top,glob){one}" for h in sorted(heads) for one in (h, h + "/**")]
+
+
+def _related(a: str, b: str) -> bool:
+    """Whether one of two real paths is at or under the other."""
+    return a == "/" or a == b or a.startswith(b + "/") or b.startswith(a.rstrip("/") + "/")
+
+
+def _walk_fault(err: OSError) -> None:
+    if not isinstance(err, (FileNotFoundError, NotADirectoryError)):
+        raise PolicyError(_WALK_FAULT)
+
+
+def _walk(start: str, strict: bool):
+    """The folders below *start* (or *start* alone, a file).  Strict, a
+    folder that cannot be walked or stat'ed but for its absence refuses
+    (W2-84); else as ``os.walk``, which passes over it."""
+    try:
+        kind = ("dir" if stat.S_ISDIR(os.stat(start).st_mode) else "file") if strict else (
+            "dir" if os.path.isdir(start) else os.path.lexists(start) and "file")
+    except (FileNotFoundError, NotADirectoryError):
+        kind = os.path.islink(start) and "file"
+    except OSError:
+        raise PolicyError(_WALK_FAULT) from None
+    if kind == "dir":
+        return os.walk(start, onerror=_walk_fault if strict else None)
+    return [(os.path.dirname(start), [], [os.path.basename(start)])] if kind else []
 
 
 _TICKET_FAULT = "the session's ticket file cannot be read for its WBS id"
@@ -377,9 +487,69 @@ def _hidden(root: str, role: str, ticket_id: str | None) -> list[str]:
     return out
 
 
-def parts(root: str, role: str, ticket_id: str | None) -> list[_Part]:
+def _worktrees(at: str, fault: str) -> list[str]:
+    """The real paths of the trees ``git worktree list`` names for the
+    repository at *at*; one that cannot be listed refuses with *fault*."""
+    try:
+        out = _git(at, "worktree", "list", "--porcelain", "-z")
+    except PolicyError:
+        raise PolicyError(fault) from None
+    if out.returncode:
+        raise PolicyError(fault)
+    return [os.path.realpath(f[9:]) for f in out.stdout.split("\0")
+            if f.startswith("worktree ")]
+
+
+def _clone_trees(own: str) -> list[str]:
+    """The trees of the repository whose launch made the own folder *own*,
+    from its marker (DEC-751): a regular file, not a link, naming a git
+    common directory."""
+    try:
+        fd = os.open(os.path.join(own, runs.MARKER), os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            if not stat.S_ISREG(os.fstat(fd).st_mode):
+                raise PolicyError(_CLONE_FAULT)
+            common = os.read(fd, 4097).decode("utf-8").strip()
+        finally:
+            os.close(fd)
+    except (OSError, UnicodeDecodeError):
+        raise PolicyError(_CLONE_FAULT) from None
+    if not os.path.isabs(common) or not os.path.isfile(os.path.join(common, "HEAD")):
+        raise PolicyError(_CLONE_FAULT)
+    return _worktrees(common, _CLONE_FAULT)
+
+
+def _trees(root: str) -> tuple[list[str], list[str], list[str]]:
+    """The trees of the session's repository, the runs root's names (as
+    named and real) and its entries (W2-84).  The trees are *root* and
+    those ``git worktree list`` names; for a session in a run clone, also
+    the repository's whose launch made its own folder.  Whatever cannot be
+    had refuses: nothing falls back to the session's own tree."""
+    trees = [root]
+    if os.path.lexists(os.path.join(root, ".git")):
+        trees += _worktrees(root, _TREES_FAULT)
+    named = runs.root()
+    names = [] if named is None else list(dict.fromkeys((named, os.path.realpath(named))))
+    entries: list[str] = []
+    if names:
+        try:
+            entries = os.listdir(names[-1])
+        except FileNotFoundError:
+            pass
+        except OSError:
+            raise PolicyError(_RUNS_FAULT) from None
+        top = next((n for n in names if root.startswith(n + "/")), None)
+        if top:
+            trees += _clone_trees(os.path.join(top, root[len(top) + 1:].split("/")[0]))
+    return list(dict.fromkeys(trees)), names, entries
+
+
+def parts(root: str, role: str, ticket_id: str | None,
+          found: dict | None = None) -> list[_Part]:
     """The protected parts of a session of *role* on *ticket_id* (DEC-820
-    (c), (d)); ``PolicyError`` when they cannot be worked out."""
+    (c), (d)); ``PolicyError`` when they cannot be worked out.  The hidden
+    part lies under every tree and the runs root, found once per call in
+    *found* (W2-84)."""
     root = os.path.realpath(root)
     out: list[_Part] = []
     if role in ("engineer", "independent-test-designer"):
@@ -394,7 +564,13 @@ def parts(root: str, role: str, ticket_id: str | None) -> list[_Part]:
                 if os.path.isfile(f)]))
     hidden = _hidden(root, role, ticket_id)
     if hidden:
-        out.append(_Part(root, hidden, HIDDEN_REFUSAL))
+        found = {} if found is None else found
+        if "trees" not in found:
+            found["trees"] = _trees(root)
+        trees, names, entries = found["trees"]
+        out += [_Part(t, hidden, HIDDEN_REFUSAL) for t in trees]
+        if names:
+            out.append(_Runs(names, hidden, entries))
     return out
 
 
@@ -820,7 +996,7 @@ class _Judge:
         that lies in it, matched by one of *names* when there are any."""
         real = (self.spellings(text, cwd) or [None])[-1]
         cased = (lambda s: s.lower()) if fold else (lambda s: s)
-        return next((p.reason for p in self.parts for f in p.files
+        return next((p.reason for p in self.parts for f in p.below(real)
                      if os.path.dirname(f) == real and (names is None or any(
                          fnmatch.fnmatchcase(cased(os.path.basename(f)), cased(n))
                          for n in names))), "")
@@ -908,14 +1084,21 @@ class _Judge:
         return ""
 
     def git(self, args: list[str], cwd: str) -> str:
-        i = 0
+        i, addr = 0, []  # the repository and tree the command addresses
         while i < len(args) and args[i].startswith("-"):
             if args[i] == "-C" and i + 1 < len(args):
                 cwd = os.path.join(cwd, _expand_token(args[i + 1]) or args[i + 1])
+            elif args[i] in ("--git-dir", "--work-tree") and i + 1 < len(args):
+                addr.append(f"{args[i]}={args[i + 1]}")
+            elif args[i].startswith(("--git-dir=", "--work-tree=")):
+                addr.append(args[i])
             i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree") else 1
         sub, rest = (args[i], args[i + 1:]) if i < len(args) else ("", [])
+        hidden = [p for p in self.parts if p.strict]
         if sub not in ("show", "log", "diff", "grep", "whatchanged"):
-            return self.reads("git", args, cwd)
+            why = self.reads("git", args, cwd)
+            if why or not hidden or sub not in ("cat-file", "format-patch", "archive"):
+                return why
         dd = rest.index("--") if "--" in rest else len(rest)
         before, specs = rest[:dd], rest[dd + 1:]
         operands = [a for a in before if not a.startswith("-")]
@@ -928,20 +1111,33 @@ class _Judge:
                 why = self.spec(s, cwd, True)
                 if why:
                     return why
+            revs = [o for o in operands if not os.path.lexists(os.path.join(cwd, o))]
+            if hidden and (revs or "--cached" in before) and self.covers(specs, cwd, hidden):
+                return self.stored(revs, "--cached" in before, cwd, addr, hidden)
             return ""
-        shown = [o for o in operands if ":" in o] if sub == "show" else []
+        if sub == "archive":  # its tree-ish, then its paths
+            operands = _options(before, _ARCHIVE_VALUED)[0] + specs
+            return self.stored(operands[:1], False, cwd, addr, hidden) if (
+                self.covers(operands[1:], cwd, hidden)) else ""
+        shown = [o for o in operands if ":" in o] if sub in ("show", "cat-file") else []
         for o in shown:
             rev, _, path = o.partition(":")
             if not path:
                 continue
             at = cwd if path.startswith(("./", "../")) else self.root
-            if any(self.secret(p) for p in self.spellings(path, at)):
+            if sub == "show" and any(self.secret(p) for p in self.spellings(path, at)):
                 return SECRET_REFUSAL
-            for part in self.parts:
+            for part in (self.parts if sub == "show" else []):
                 if any(part.inside(p) for p in self.spellings(path, at)) and not (
                         part.base and self.base_version(rev, part.rel(
                             os.path.abspath(os.path.join(at, path))))):
                     return part.reason
+            # The hidden part's path names it in whichever tree (W2-84).
+            if any(h.inside(p) for h in hidden for p in self.spellings(path, at)) or (
+                    at == self.root and any(h.match(os.path.normpath(path)) for h in hidden)):
+                return HIDDEN_REFUSAL
+        if sub == "cat-file":
+            return ""
         quiet = (any(a in _GIT_QUIET or a.startswith("--stat=") for a in before)
                  and not any(a in ("-p", "--patch", "-u") or a.startswith("-U")
                              for a in before))
@@ -949,21 +1145,134 @@ class _Judge:
             patch = not quiet and any(a in ("-p", "--patch", "-u") or a.startswith("-U")
                                       for a in before)
         else:
-            patch = not quiet and (sub == "diff" or len(shown) < len(operands)
-                                   or not operands)
-        if patch:  # with no pathspec, the whole tree
+            patch = sub == "format-patch" or not quiet and (
+                sub == "diff" or len(shown) < len(operands) or not operands)
+        if patch and sub != "format-patch":  # with no pathspec, the whole tree
+            others = copy.copy(self)
+            others.parts = [p for p in self.parts if not p.strict]
             for s in specs or [self.root]:
-                why = self.spec(s, cwd, False)
+                why = others.spec(s, cwd, False)
                 if why:
                     return why
+        # git show :/<text> names a commit by its message: a patch, too.
+        patch = patch or any(o.startswith(":/") for o in shown if sub == "show")
+        return self.patched(sub, before, specs, cwd, addr, hidden) if (
+            patch and hidden) else ""
+
+    def covers(self, specs: list[str], cwd: str, hidden: list[_Part]) -> bool:
+        """Whether pathspecs take the hidden part in: none, a glob or magic
+        one, one at or above a glob's literal folder, or one inside it."""
+        if not specs:
+            return True
+        for s in specs:
+            exp = _expand_token(s)
+            if exp is None or exp.startswith(":") or _has_glob(exp) or any(
+                    h.inside(p) or h.under(p) for h in hidden
+                    for p in self.spellings(exp, cwd)):
+                return True
+        return False
+
+    def patched(self, sub: str, before: list[str], specs: list[str], cwd: str,
+                addr: list[str], hidden: list[_Part]) -> str:
+        """Why a patch shows the hidden part, asked of git in a fixed
+        read-only form: the changed paths alone, filtered by the hidden
+        globs, with the command's revisions and the options that widen or
+        choose its sides; merges parent by parent (W2-84)."""
+        sides, revs, paths, negated = [], [], [], False
+        j = 0
+        while j < len(before):
+            a = before[j]
+            if a in _GIT_SIDES or a.startswith(("--branches=", "--tags=", "--remotes=",
+                                                "--glob=")) or _COUNT_RE.fullmatch(a):
+                sides.append(a)
+            elif a in ("-n", "--max-count") and j + 1 < len(before):
+                sides += before[j:j + 2]
+                j += 1
+            elif a in _GIT_LOG_VALUED:
+                j += 1
+            elif a == "--not":  # what follows is taken whole: never fewer sides
+                negated = True
+            elif not a.startswith("-") and not (
+                    sub == "show" and ":" in a and not a.startswith(":/")):
+                if os.path.lexists(os.path.join(cwd, a)):
+                    paths.append(a)
+                else:
+                    revs += ([e or "HEAD" for e in re.split(r"\.\.\.?", a.lstrip("^"))]
+                             if negated else [a])
+            j += 1
+        if "--no-index" in before:  # two files, no revision
+            return HIDDEN_REFUSAL if any(h.inside(p) for a in paths for h in hidden
+                                         for p in self.spellings(a, cwd)) else ""
+        if not self.covers(paths + specs, cwd, hidden):
+            return ""
+        if sub == "diff":
+            query = ["diff", *_NO_CONVERT]
+        else:
+            query = ["log", *_NO_CONVERT, "--format=", "--diff-merges=separate",
+                     "--full-history"]
+            counted = any(a in ("-n", "--max-count") or _COUNT_RE.fullmatch(a)
+                          for a in sides)
+            if sub == "show" and not counted:
+                query.append("--no-walk")
+            if (sub == "format-patch" and len(revs) == 1 and ".." not in revs[0]
+                    and not counted and "--root" not in before):
+                revs = [revs[0] + "..HEAD"]  # <since> means <since>..HEAD
+        words = [_expand_token(w) for w in sides + revs]
+        if None in words or "--stdin" in before:  # a revision it cannot resolve
+            raise PolicyError(_REV_FAULT)
+        # Each revision must be a commit: git log passes over a blob or tree.
+        ends = [e for w in words[len(sides):] if not w.startswith(":/")
+                for e in re.split(r"\.\.\.?", w.lstrip("^")) if e]
+        if ends:
+            self.ask(cwd, addr, "rev-parse", "--end-of-options",
+                     *(e + "^{commit}" for e in ends), "--")
+        out = self.ask(cwd, addr, *query, *words[:len(sides)], "--end-of-options",
+                       *words[len(sides):], "--", *_pathspecs(hidden))
+        return HIDDEN_REFUSAL if out.strip() else ""
+
+    def stored(self, revs: list[str], cached: bool, cwd: str, addr: list[str],
+               hidden: list[_Part]) -> str:
+        """Why a revision's tree (or the index) holds the hidden part, asked
+        of git in a fixed read-only form (W2-84)."""
+        for rev in revs:
+            word = _expand_token(rev)
+            if word is None:
+                raise PolicyError(_REV_FAULT)
+            prefix = os.path.normpath(word.partition(":")[2] or ".")
+            prefix = "" if prefix == "." else prefix
+            out = self.ask(cwd, addr, "ls-tree", "-r", "--full-tree", "--name-only", "-z",
+                           "--end-of-options", word)
+            if any(h.match(os.path.join(prefix, n) if prefix else n) for h in hidden
+                   for n in out.split("\0") if n):
+                return HIDDEN_REFUSAL
+        if cached and self.ask(cwd, addr, "ls-files", "--cached", "-z", "--",
+                               *_pathspecs(hidden)):
+            return HIDDEN_REFUSAL
         return ""
+
+    @staticmethod
+    def ask(cwd: str, addr: list[str], *args: str) -> str:
+        """git's answer in the repository the command addresses; one that
+        cannot be had refuses."""
+        words = [_expand_token(a) for a in addr]
+        if None in words:
+            raise PolicyError(_REV_FAULT)
+        try:
+            out = _git(cwd, *words, *args)
+        except PolicyError:
+            raise PolicyError(_REV_FAULT) from None
+        if out.returncode:
+            raise PolicyError(_REV_FAULT)
+        return out.stdout
 
     def spec(self, spec: str, cwd: str, secrets: bool) -> str:
         """A git pathspec: what it names, and the parts' files it takes in
         (``*`` in a pathspec crosses folders)."""
         if _has_glob(spec):
+            here = os.path.realpath(cwd)
             for part in self.parts:
-                for f in part.files:
+                for f in ([] if part.strict and not _related(here, part.root)
+                          else part.files):
                     rel = os.path.relpath(f, cwd)
                     if fnmatch.fnmatchcase(rel, spec) or fnmatch.fnmatchcase(
                             rel, spec.rstrip("/") + "/*"):
@@ -1057,7 +1366,7 @@ class _Judge:
         """Why the names a listing gives take in a part's files that exist;
         a listing whose start the guard cannot place refuses a session that
         has such files, and no other (fail closed)."""
-        if not any(p.files for p in self.parts):
+        if not any(p.held() for p in self.parts):
             return ""
         if cwd is None:
             return RUNTIME_REFUSAL
@@ -1172,8 +1481,9 @@ def policy_refusal(tool_name: str, tool_input: dict, project_root: str, cwd: str
     try:
         session = (role or "").strip()
         acting = acting_role(role, subagent_type)
+        found: dict = {}
         protected = [p for r in dict.fromkeys((session, acting))
-                     for p in parts(project_root, r, ticket_id)]
+                     for p in parts(project_root, r, ticket_id, found)]
         may_write = None
         if tool_name == "Bash":
             pats: list[str] | None = None
