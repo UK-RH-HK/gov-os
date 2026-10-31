@@ -10,6 +10,7 @@ which those handlings are NOT_BUILT.
 from __future__ import annotations
 
 import json
+import shutil
 
 import pytest
 
@@ -39,6 +40,14 @@ PLANTED_IDS = (
 )
 CONTROL_IDS = tuple(f"{name}.control.{kind}" for name in EXPECTED
                     for kind in ("current-spec-looks-old", "live-file-in-legacy-folder"))
+
+
+@pytest.fixture(autouse=True)
+def _removed_after(tmp_path):
+    """Each case removes the stand-in outputs it rendered (pytest keeps only the empty folder)."""
+    yield
+    for child in tmp_path.iterdir():
+        shutil.rmtree(child) if child.is_dir() and not child.is_symlink() else child.unlink()
 
 
 def _entry(ground, ident):
