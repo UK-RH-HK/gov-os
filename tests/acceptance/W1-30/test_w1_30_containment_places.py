@@ -15,9 +15,9 @@ close record is written.
 import w1_30_support as support
 
 TICKET = "PROJ-cont"
-WBS = "W1-cont"
+WBS = "W1-904"
 OTHER = "PROJ-othr"
-OTHER_WBS = "W1-othr"
+OTHER_WBS = "W1-924"
 
 
 def _refused_for(project, sandbox, interface, rel, text="planted\n", before=None):

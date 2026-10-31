@@ -30,7 +30,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-prmg"
-WBS = "W1-prmg"
+WBS = "W1-933"
 FEATURE = "src/example/feature.py"
 BRANCH = "work"
 MERGE_TRAILERS = support.trailers_of(TICKET, role="orchestrator")

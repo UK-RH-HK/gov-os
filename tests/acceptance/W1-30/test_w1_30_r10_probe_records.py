@@ -25,7 +25,7 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-prbs"
-WBS = "W1-prbs"
+WBS = "W1-929"
 FIRST = f"PR-{TICKET}"
 SECOND = f"PR-{TICKET}-2"
 

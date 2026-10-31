@@ -18,7 +18,7 @@ import w1_30_support as support
 cli_support = support.cli_support
 
 TICKET = "PROJ-wdog"
-WBS = "W1-wdog"
+WBS = "W1-951"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-wdog", "Role: engineer", "Implements: CAP-01")
 

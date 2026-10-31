@@ -72,6 +72,11 @@ several retrieval items share its id), eight notes and two tickets: `TK-W254-SMA
 everything fits) and `TK-W254-BIG` (a mandatory input of about 25,000 tokens, past the default 6,000). The
 retrieval returns 20 items for each, including same-id items and a chunk of a file that is no record.
 
+Core-schema runs with check-jsonschema as its validator (DEC-872 item 2, DEC-954): the scratch `PATH` holds a
+wrapper for the `check-jsonschema` the suite's own `PATH` finds, beside those for `python3`, `git` and `gitleaks`,
+and the support reads the check's output in each form it prints: a list of findings, the refusal form
+`{"findings": [...], ...}`, and the success form `{"ok": true, "result": {...}}`, which carries no finding.
+
 ## KPI lines and their cases
 
 | KPI line | cases | red today? |

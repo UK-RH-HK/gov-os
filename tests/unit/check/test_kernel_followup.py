@@ -70,9 +70,10 @@ def test_a_probe_record_is_never_silent_where_its_schema_cannot_be_read(tmp_path
     root = tmp_path / "project"
     _write(root, RECORD, _probe())
     assert [f["code"] for f in check(root)] == ["SCHEMA_UNREADABLE"]
-    # the shared definitions are gone: the shapes that refer to them cannot be measured
+    # the shared definitions are gone: the shapes that refer to them cannot be measured,
+    # and the validator says so as a finding (DEC-954): never silent, never green
     _with_schemas(root, "probe.schema.json")
-    assert {f["code"] for f in check(root)} == {"SCHEMA_INVALID_FIELD"}
+    assert {f["code"] for f in check(root)} == {"SCHEMA_VALIDATOR_FAILED"}
 
 
 def test_a_record_is_held_to_the_schemas_of_both_layouts_and_no_finding_is_doubled(tmp_path):

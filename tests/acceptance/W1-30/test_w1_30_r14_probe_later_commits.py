@@ -41,8 +41,8 @@ import pytest
 import w1_30_support as support
 
 TICKET = "PROJ-prlc"
-WBS = "W1-prlc"
-OTHER_WBS = "W1-prlo"
+WBS = "W1-931"
+OTHER_WBS = "W1-932"
 PROBE_INVALID = "PROBE_INVALID"
 FEATURE = "src/example/feature.py"
 ACCEPTANCE = f"tests/acceptance/{WBS}/"
