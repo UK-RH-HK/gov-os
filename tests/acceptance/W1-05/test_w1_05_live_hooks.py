@@ -260,10 +260,15 @@ def test_an_install_by_the_orchestrator_asks_the_owner(live, decide, command):
 @pytest.mark.parametrize("command", [command for command in INSTALLS if command not in NOT_MOVED_TO_THE_KERNEL])
 def test_an_install_by_the_orchestrator_asks_the_owner_through_the_kernel_s_wiring(kernel_live, kernel_decide,
                                                                                     command):
-    """The case above, for the install the kernel's wiring could be asked about (W2-90)."""
+    """The case above, for the install the kernel's wiring could be asked about (W2-90).
+
+    The orchestrator is the CTO: it declares the coordination ticket the project's roster names (DEC-957, DEC-971
+    item 4; DEC-980).
+    """
     live, decide = kernel_live, kernel_decide
     for mode in ("default", "auto", "acceptEdits"):
-        result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, permission_mode=mode)
+        result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, support.ORCHESTRATOR_TICKET_ID,
+                        permission_mode=mode)
         assert result.decision == "ask", (
             f"Bash `{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"
         )

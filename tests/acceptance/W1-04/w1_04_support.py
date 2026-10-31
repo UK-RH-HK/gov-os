@@ -18,6 +18,9 @@ text in the hook's input, so nothing is installed and no network is used.
   the two directories the download examples aim at. A role and an active ticket
   are declared through ``GOV_ROLE`` and ``GOV_TICKET`` (DEC-107); a call made
   inside a subagent carries ``agent_id`` and ``agent_type`` (DEC-117).
+- The project's ``governance/project/roster.yaml`` names the orchestrator's
+  ticket as its ``coordination_ticket``: the orchestrator on it is the CTO,
+  whose install alone is asked of the owner (DEC-957, DEC-971 item 4, DEC-980).
 
 Decisions of a PreToolUse hook:
 
@@ -40,6 +43,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -208,8 +212,14 @@ def default_tickets():
     }
 
 
+# The project's coordination ticket (DEC-957, DEC-971 item 4): the orchestrator on it is the CTO, the one session
+# whose install is asked of the owner. Every other session's install is refused (DEC-980).
+ROSTER_REL = "governance/project/roster.yaml"
+ROSTER_TEXT = f"coordination_ticket: {ORCHESTRATOR_TICKET_ID}\n"
+
 PROJECT_FILES = {
     "README.md": "# Fixture project\n",
+    ROSTER_REL: ROSTER_TEXT,
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
     "pyproject.toml": "[project]\nname = \"fixture\"\n",
     "docs/spec/feature.md": "VALUE = 1\n",
@@ -440,6 +450,22 @@ ORDINARY = (
     "cat README.md",
     "python3 -m pytest tests/unit -q",
 )
+
+
+# What a refusal of an install outside the CTO's session says, read as tests/acceptance/W2-110/ reads it
+# (``tells_to_escalate``): the words P1, escalat… and CTO (DEC-957, DEC-971 item 4).
+_P1 = re.compile(r"(?<![\w-])P1(?![\w-])")
+_ESCALATION = re.compile(r"escalat", re.IGNORECASE)
+_CTO = re.compile(r"(?<![\w-])CTO(?![\w-])")
+
+
+def tells_to_escalate(result):
+    """The refusal's reason tells the session to raise the install as a P1 escalation to the CTO."""
+    data = result.output() or {}
+    specific = data.get("hookSpecificOutput")
+    reason = specific.get("permissionDecisionReason") if isinstance(specific, dict) else None
+    reason = reason if isinstance(reason, str) else result.stderr
+    return bool(_P1.search(reason) and _ESCALATION.search(reason) and _CTO.search(reason))
 
 
 def command_id(command):

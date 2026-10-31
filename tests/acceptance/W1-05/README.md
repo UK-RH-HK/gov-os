@@ -193,6 +193,12 @@ afterwards.
 
 The case and its line in `serial-only.txt` are retired since 2026-10-23 (see [Retired](#retired)).
 
+**The CTO-only install rule (DEC-980; `Rewrite-Reason: DEC-957, DEC-971 item 4`).** The kernel's generated project
+(`kernel_base`) now also holds the orchestrator's ticket `DAEO-zz91` and `governance/project/roster.yaml` with
+`coordination_ticket: DAEO-zz91`, and `test_an_install_by_the_orchestrator_asks_the_owner_through_the_kernel_s_wiring`
+has its orchestrator declare `DAEO-zz91` (the CTO), so its `ask` is kept. It stays red until ACT 2's re-pin, because
+the hook runs under the owner's pinned, installed `gov`, which has no CTO install rule.
+
 ## Retired
 
 `test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` (failure 2) is retired by the owner's decision

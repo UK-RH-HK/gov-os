@@ -420,6 +420,13 @@ answer `https://<host>/`, fails its one test with `curl`'s exit code and the HTT
 the twelve operations and `launch` is not one. Checked again in batch 2; nothing was revised, so no "planned: command
 implemented" revision (DEC-190) is recorded. No earlier suite was changed.
 
+## The CTO-only install rule (DEC-980)
+
+`Rewrite-Reason: DEC-957, DEC-971 item 4`. The kernel's generated project (`kernel_base`) now starts its
+`governance/project/roster.yaml` with `coordination_ticket: DAEO-zz91`, ahead of the `roles:` block, so the
+orchestrator on `DAEO-zz91` is the CTO and `test_the_orchestrator_is_asked_about_uv_run_w_with_its_value_joined`
+keeps its `ask`. It stays red until ACT 2's re-pin, because the hook runs under the owner's pinned, installed `gov`.
+
 ## Decision packages
 
 ### Batch 1: all seven decided

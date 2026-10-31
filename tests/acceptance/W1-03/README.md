@@ -186,6 +186,11 @@ Tickets, all `in_progress`:
 `src/gov/guard/acceptance_link` is a committed symbolic link to `tests/acceptance`. `.gov-runtime/` and `__pycache__/`
 are ignored by git.
 
+`governance/project/roster.yaml` holds `coordination_ticket: DAEO-zz91` (DEC-980; DEC-957, DEC-971 item 4): the
+orchestrator on `DAEO-zz91` is the CTO, the one session whose install the kernel guard asks the owner about. The case
+`install-ask-the-owner-declined-then-an-engineer-subagent` therefore has its orchestrator declare `DAEO-zz91`
+(`CTO_MAIN`), not `DAEO-zz90`, and keeps its `ask`; nothing else in it changes.
+
 ## The finding record (DEC-122)
 
 What the tests require of each line the check adds:
