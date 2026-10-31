@@ -12239,3 +12239,14 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.358 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-975 (W2-107 first, no new lead until it closes; the machine re-measured after it for CAPACITY-1's sizing; the CPU query embedder kept, re-tested against the GPU on the combined memory as a W2-15b KPI). Next free id: DEC-976. |
+
+### DEC-976 — W2-96's run 2: P-W2-96-GATE (a), resume when the queue allows; its P3 logged (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, reversible, the lead's recommendation at high confidence and the orchestrator's agree, nothing in the Charter, the master rules or the Contract's scope, the guard not weakened; for the owner to overturn) · **Under:** DEC-970, DEC-961, DEC-975 · **Basis:** W2-96's return `log/W2-96-A5-resume-dec970.json` (17:26, PACKAGES, head `162f8f4ed51e`)
+- **Decision:**
+  1. **P-W2-96-GATE (a):** W2-96 resumes when the lead queue lets it start (DEC-975: after W2-107's close), with no exemption from the load gate; option (b), exempting single-process runs, is a capacity rule and goes to the owner inside CAPACITY-1, not here. Left: the lead's red check of review 3's cases, the engineer's `gov accept` on all 106 cases, review 4 (the round's last, DEC-916), the scoped run and the probe record. Brief `briefs/W2-96-A5-resume-dec976.md`; queued after W2-105.
+  2. **P-W2-96-R9-PREMISE (a)** (the lead's P3, `c348af6b`): listed, stands.
+- **Where it goes (DEC-851):** this register; the daily document's delegated list; the lead's brief.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.359 | 2026-10-31 | Delegated (orchestrator): DEC-976 (W2-96 resumes when the queue allows; no gate exemption; its P3 stands). Next free id: DEC-977. |
