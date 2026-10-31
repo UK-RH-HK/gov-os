@@ -232,7 +232,7 @@ template's Copier task runs it (`gov release --lock-from <source>`).
 | `test_the_suite_runs_gov_and_copier_with_gov_role_unset` | — | DEC-761 (the lead's note) | guard: no `gov` or Copier environment of the suite carries `GOV_ROLE` | **green today** (a guard) |
 
 The two role cases' build halves were rewritten in round 3 (DEC-772 replaces DEC-761 item 1's line for the build
-form): see "Round 3", "The three recorded rewrites". The `--lock-from` halves are as the table states.
+form): see "Round 3", "The four recorded rewrites". The `--lock-from` halves are as the table states.
 
 **Seen on `ee557d02`:** the whole suite `23 failed, 91 passed` (no skip, no error): the 23 are this file's
 refusal cases, each on its own assertion as the table states; the 85 earlier cases pass; 6 of this file pass (the
@@ -332,10 +332,11 @@ reply on; whatever the build prints goes to a log in the sandbox, never into the
 Counts as seen on `2c8cfc7a`: this file `28 failed` (26 for the missing seam, 2 on their own assertion: the real
 command builds).
 
-### The three recorded rewrites (DEC-491, DEC-866)
+### The four recorded rewrites (DEC-491, DEC-866)
 
-Each is in the designer's round-3 commit with its `Rewrite-Reason:` trailer and states the rewrite and its reason in
-its docstring or on its line. Each keeps its purpose; no other expectation is lowered.
+Each is in a designer's round-3 commit with its `Rewrite-Reason:` trailer (the first three in the round's first
+commit, the fourth in its own, after the lead's answer to P-R3-A) and states the rewrite and its reason in its
+docstring or on its line. Each keeps its purpose; no other expectation is lowered.
 
 - **The suite's release builds (`w2_16_support.build_release`; `Rewrite-Reason: DEC-772`).** It ran
   `gov release <version>` as a child process; under DEC-772 that call refuses from every test run, so every case
@@ -366,6 +367,31 @@ its docstring or on its line. Each keeps its purpose; no other expectation is lo
   so Copier stopped before its task ran and the case failed whatever the code did. The one line now copies into a
   fresh folder, `tmp_path / "copied-from-v1.6.0"`; nothing else changed. **Today:** an error at set-up for the
   missing seam (it needs the releases); **in the trial it passed** (the earlier code refuses the copy there).
+- **The build's own refusals (P-R3-A; `Rewrite-Reason: DEC-772`).** The lead's answer to P-R3-A: option (a), in
+  this round, before the review (DEC-866 with DEC-772). The two `_assert_refused_and_nothing_written` helpers
+  (`test_w2_16_release.py`: an unclean tree (4), not on `w2/integrate` (2), a version that is not semantic (6), no
+  version (1), the same version from another commit (2); `test_w2_16_immutability.py`: an older integration commit
+  (2), a record removed later (2), an owner's tag (2), build metadata (2)) and the hidden-edit case
+  `test_a_release_never_hashes_bytes_the_commit_does_not_hold` (2): 25 cases. They ran `gov release` as a child
+  process, the owner's old path of DEC-761's line, which DEC-772 replaced; that call now refuses for its ancestry or
+  its missing terminal before it reaches the rule each case names, so they would have passed whatever that rule
+  does. Each call now goes through the seam as the owner in person (`w2_16_support.assert_the_build_refuses`: a
+  planted clean chain, a pseudo-terminal, the code typed back, `GOV_ROLE` and `GOV_TICKET` absent), and each refusal
+  is held to come from the build's own rule: exactly one code shown and typed back right (every caller check passed),
+  the code `RELEASE_REFUSED`, a `reason` that is none of `session`, `ancestry`, `role`, `ticket`, `terminal`, `code`
+  (or none at all: the lead's specification fixes reasons only for the caller checks). Every assertion kept: refused,
+  no traceback (the error, the driver's detail and the build's own output), the whole snapshot unchanged; the
+  hidden-edit case's manifest branch is as it was. "No version" is the seam called with `version` None. **Today:**
+  all 25 are errors at set-up for the missing seam (each takes the `releases` fixture). **Trials, outside the
+  tree,** with a scratch plugin answering the seam's owner calls with the earlier child-process build
+  (`gov release [<version>] --json`, its envelope turned into the seam's answer as if the code had been typed back):
+  the 25 cases `25 passed` (the 23 refusals each `RELEASE_REFUSED`, no reason; the 2 hidden-edit cases released
+  and took the manifest branch); the same refusals altered so they are not the build's own each gave
+  `23 failed, 2 passed` (a caller check's reason `terminal`; another code; no code shown; not refused; a file written
+  by the refused call), the 2 passing being the hidden-edit cases, which the earlier build releases; every call
+  outside the `releases` fixture refused for a caller check gave `25 failed`, and refused by the build's own rule
+  with the code accepted `25 passed`. The whole suite without the new file under the plugin: `2 failed, 112 passed`
+  (the two build-form refusals above).
 
 **W1-07's list.** The entry for `release` in W1-07's list (and `src/gov/check/commands.py`) is not made in this
 round: W2-20's change is not in this tree (DEC-753 items 2 and 3).
@@ -376,16 +402,8 @@ round: W2-20's change is not in this tree (DEC-753 items 2 and 3).
 the `releases` fixture. 28 failures: this round's file (above). 2 failures: the build form's refusals for
 `orchestrator` and unset. 19 passed: the 10 cases and guards that need no release (W2-L227, W2-H029 plain, W2-M174
 (4), the overlay guard, the stand-in "before any release" guard, W2-M175 plain, the worktree guard), the build form's
-8 old refusal roles, and the `GOV_ROLE` guard.
-
-### Open after round 3 (a package of the designer's return)
-
-The earlier refusal cases of `test_w2_16_release.py` (unclean tree, not on `w2/integrate`, a version that is not
-semantic, no version, the same version from another commit: 15 cases) and `test_w2_16_immutability.py` (an older
-commit, a removed record, an owner's tag, build metadata, a hidden edit: 10 cases) run the real `gov release` as a
-child process. Under DEC-772 that call refuses for its ancestry or its missing terminal before it reaches the rule
-each case holds, so those cases would pass whatever that rule does. They are not changed in this round (the brief
-names three rewrites); the designer's return carries a package to route their call through the seam as the owner.
+8 old refusal roles, and the `GOV_ROLE` guard. After the fourth rewrite the counts are the same: the 25 rewritten
+cases were and are errors at set-up for the missing seam.
 
 ## Covers and rows
 

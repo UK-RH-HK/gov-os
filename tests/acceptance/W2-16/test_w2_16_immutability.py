@@ -16,15 +16,12 @@ import w2_16_support as support
 
 
 def _assert_refused_and_nothing_written(repo, sandbox, version, why):
-    """As the release file's helper: non-zero exit, no traceback, the whole snapshot unchanged."""
-    before = support.snapshot(repo)
-    run = support.run_gov(repo, sandbox, "release", version)
-    after = support.snapshot(repo)
-    assert run.returncode != 0, f"`gov release {version}` built a release although {why}\n{run.describe()}"
-    assert "Traceback" not in run.output, f"`gov release` ended with a traceback where {why}\n{run.describe()}"
-    changed = support.snapshot_difference(before, after)
-    assert not changed, f"a refused release ({why}) wrote or changed: {changed[:10]}\n{run.describe()}"
-    return run
+    """As the release file's helper: refused, no traceback, the whole snapshot unchanged.
+
+    **Rewritten (DEC-772, P-R3-A; Rewrite-Reason: DEC-772),** as the release file's helper: the call goes through
+    the seam as the owner in person, and the refusal is held to be the build's own (``RELEASE_REFUSED``, the code
+    accepted, a reason that is none of the caller checks'), not the caller checks' that DEC-772 put before it."""
+    return support.assert_the_build_refuses(repo, sandbox, version, why)
 
 
 def _tracked_at_head(repo, folder=support.RELEASES_REL):
@@ -123,7 +120,13 @@ def test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refus
 def test_a_release_never_hashes_bytes_the_commit_does_not_hold(releases, repo, sandbox, flag):
     """A tracked template file edited and hidden from `git status` by `git update-index <flag>`: `gov release`
     either refuses and writes nothing, or its manifest gives that file the sha256 of its bytes at the commit
-    (`git cat-file blob <commit>:template/<path>`), never the edited bytes' hash."""
+    (`git cat-file blob <commit>:template/<path>`), never the edited bytes' hash.
+
+    **Rewritten (DEC-772, P-R3-A; Rewrite-Reason: DEC-772):** `gov release` ran as a child process, which DEC-772
+    refuses before the build (its ancestry, its missing terminal), so the refusal branch passed whatever the build
+    did. It now runs through the seam as the owner in person; the caller checks pass (the code accepted), and a
+    refusal is held to be the build's own (`RELEASE_REFUSED`, a reason that is none of the caller checks'), with
+    nothing written. The other branch is as it was."""
     rel = support.TAMPERED_REL
     commit = support.head(repo)
     committed = _blob_sha256(repo, commit, rel)
@@ -133,9 +136,14 @@ def test_a_release_never_hashes_bytes_the_commit_does_not_hold(releases, repo, s
     assert edited != committed and not support.porcelain_paths(repo), \
         f"this case needs an edited tracked file that `git status` does not show ({flag})"
     before = support.snapshot(repo)
-    run = support.run_gov(repo, sandbox, "release", support.FIRST_VERSION)
-    assert "Traceback" not in run.output, f"`gov release` ended with a traceback\n{run.describe()}"
+    seam = support.release_through_the_seam(repo, sandbox, support.FIRST_VERSION)
+    run = seam.as_run(support.FIRST_VERSION)
+    support.assert_no_traceback(seam, flag)
+    support.assert_the_code_was_accepted(seam, flag)
     if run.returncode != 0:
+        assert seam.error.get("code") == support.RELEASE_REFUSED and seam.reason not in support.REASONS, (
+            f"`gov release` was refused ({flag}), but not by the build's own rule: code {seam.error.get('code')!r}, "
+            f"reason {seam.reason!r}\n{run.describe()}")
         changed = support.snapshot_difference(before, support.snapshot(repo))
         assert not changed, f"a refused release ({flag}) wrote or changed: {changed[:10]}\n{run.describe()}"
         return

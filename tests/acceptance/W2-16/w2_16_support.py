@@ -22,7 +22,9 @@ never in this repository.
 session among its ancestors, or no terminal). The suite builds its releases as the owner in person through the seam
 ``gov.release.command._release_test`` (the lead's specification for round 3, in the form of W1-50's freeze lift),
 called in a new process with a planted chain, a pseudo-terminal and the shown code typed back: see the last section
-of this module. The refusal cases still run the real command.
+of this module. The cases that hold the build's own refusals (an unclean tree, a bad version, immutability) call
+it the same way and hold the refusal to be the build's (``assert_the_build_refuses``); only round 3's real-command
+cases and the role cases run the real ``gov release``.
 
 **This worktree's code.** Every ``gov`` the tests run is this worktree's: ``gov release`` runs as
 ``sys.executable -m gov.cli.main`` with ``PYTHONPATH`` set to this worktree's ``src/``, and the seam's driver
@@ -1002,6 +1004,40 @@ def release_as_the_owner(root, sandbox, version):
     """The owner in person: a plain terminal's chain, a pseudo-terminal, the shown code typed back, GOV_ROLE and
     GOV_TICKET absent. The ``SeamRun``, whatever its status (``build_release`` judges it)."""
     return drive_release(root, sandbox, version)[0]
+
+
+def assert_the_code_was_accepted(run, what):
+    """Exactly one code ``RELEASE-<4 digits>`` was shown and it was typed back right: every caller check passed."""
+    codes = set(run.codes)
+    assert len(codes) == 1 and run.typed == codes.copy().pop() + "\n", (
+        f"{what}: the owner's call did not get past the caller checks (one code shown and typed back right): "
+        f"{run.describe()}")
+
+
+def assert_no_traceback(run, what):
+    told = "\n".join((run.message, run.detail, run.log))
+    assert "Traceback" not in told, f"{what}: `gov release` ended with a traceback\n{run.describe()}"
+
+
+def assert_the_build_refuses(repo, sandbox, version, why):
+    """``gov release <version>`` as the owner in person, through the seam: refused by the build's own rule, and
+    nothing written. The caller checks passed (the code shown and typed back right), so the refusal is the build's:
+    code ``RELEASE_REFUSED``, a ``reason`` that is none of the caller checks' (``session``, ``ancestry``, ``role``,
+    ``ticket``, ``terminal``, ``code``); no traceback; the whole snapshot unchanged. ``version`` None: no version
+    given. Returns the ``SeamRun`` (DEC-772; Rewrite-Reason: DEC-772, P-R3-A)."""
+    before = snapshot(repo)
+    run = release_through_the_seam(repo, sandbox, version)
+    after = snapshot(repo)
+    assert run.status == REFUSED, f"`gov release {version}` built a release although {why}\n{run.describe()}"
+    assert_no_traceback(run, why)
+    assert_the_code_was_accepted(run, why)
+    assert run.error.get("code") == RELEASE_REFUSED and run.reason not in REASONS, (
+        f"`gov release {version}` was refused ({why}), but not by the build's own rule: code "
+        f"{run.error.get('code')!r} (not {RELEASE_REFUSED}) or reason {run.reason!r} (one of the caller checks' "
+        f"{REASONS})\n{run.describe()}")
+    changed = snapshot_difference(before, after)
+    assert not changed, f"a refused release ({why}) wrote or changed: {changed[:10]}\n{run.describe()}"
+    return run
 
 
 # --------------------------------------------------------------------------

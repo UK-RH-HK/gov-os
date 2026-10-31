@@ -117,14 +117,16 @@ def test_the_manifest_s_own_hash_is_in_the_record_and_a_reader_finds_it_equal(re
 # --------------------------------------------------------------------------
 
 def _assert_refused_and_nothing_written(repo, sandbox, version, why):
-    before = support.snapshot(repo)
-    run = support.run_gov(repo, sandbox, "release", *((version,) if version is not None else ()))
-    after = support.snapshot(repo)
-    assert run.returncode != 0, f"`gov release` built a release although {why}\n{run.describe()}"
-    assert "Traceback" not in run.output, f"`gov release` ended with a traceback where {why}\n{run.describe()}"
-    changed = support.snapshot_difference(before, after)
-    assert not changed, f"a refused release ({why}) wrote or changed: {changed[:10]}\n{run.describe()}"
-    return run
+    """Refused, no traceback, the whole snapshot unchanged (``version`` None: no version given).
+
+    **Rewritten (DEC-772, P-R3-A; Rewrite-Reason: DEC-772).** It ran ``gov release`` as a child process, the
+    owner's path of DEC-761's line, which DEC-772 replaced: that call now refuses for its ancestry or its missing
+    terminal before it reaches the rule each case names, so a refusal there proves nothing about that rule. The call
+    goes through the seam as the owner in person (``support.assert_the_build_refuses``: a planted clean chain, a
+    pseudo-terminal, the code typed back, GOV_ROLE and GOV_TICKET absent), and the refusal is held to be the build's
+    own: ``RELEASE_REFUSED``, the code accepted, a reason that is none of the caller checks'. Every assertion it
+    made is kept."""
+    return support.assert_the_build_refuses(repo, sandbox, version, why)
 
 
 def _dirty(repo, how):
