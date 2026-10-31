@@ -62,8 +62,8 @@ STANDING_SENTENCES = (
     "Run everything in the foreground, one command after another: your session ends with your last message, and "
     "nothing started in the background is ever read. Return only after your commit exists.",
     "No `git checkout` of another commit, no `git reset`, no `git clean` in this worktree.",
-    "Run no glob, no search and no listing over `governance/project/`: name the files you need there one by one "
-    "(DEC-508). Never read `.claude/settings.json`, in this worktree or anywhere.",
+    # The third sentence (no listing over the governance folder, DEC-508; the settings file, DEC-525) is gone:
+    # DEC-820 opened those reads (W2-11, DEC-866). Policy 2 stands in the "temp hygiene" row below instead.
 )
 
 # What a brief is filled in with: a placeholder whose text names each of these.
@@ -100,16 +100,16 @@ NEVER = r"\b(never|not|no|nobody|nothing|none|without|only)\b"
 # ``(what the reader must find, [ideas])``; every idea of a clause stands in one statement.
 ROWS = {
     "parallel tickets": {
-        "ids": (),
+        "ids": ("DEC-847",),
         "clauses": (
             ("a worktree per independent ticket", [r"worktree", r"ticket", r"\b(each|per|every|own|one)\b"]),
             ("the worktree is cut from the integration branch", [r"worktree|branch", r"integration branch"]),
             ("a ticket lead per ticket, started in that worktree with its identity",
              [r"\blead", r"worktree", r"identit"]),
             ("no two tickets in flight with overlapping paths", [r"overlap", r"path"]),
-            ("a stated ceiling of tickets in flight",
-             [r"ceiling|at most|up to|no more than|maximum|limit", r"ticket",
-              r"in flight|at a time|at once|parallel|concurrent|running"]),
+            # DEC-847 replaced the stated ceiling (DEC-737, DEC-776, DEC-786) with no fixed number.
+            ("no fixed number of tickets in flight",
+             [r"no fixed|not (a )?fixed|no set", r"number|ceiling|cap|count", r"ticket|lead"]),
             ("the resource gate before each start",
              [r"resource gate", r"before (each|every|any|a)\b|(each|every) start"]),
             ("the gate reads free memory", [r"memory", r"free|available"]),
@@ -162,7 +162,8 @@ ROWS = {
             ("the return form DONE", [r"(?-i:\bDONE\b)"]),
             ("the return form PACKAGES", [r"(?-i:\bPACKAGES\b)"]),
             ("the return form ESCALATION", [r"(?-i:\bESCALATION\b)"]),
-            ("the return form LEAD_CHECKPOINT", [r"(?-i:\bLEAD_CHECKPOINT\b)"]),
+            # DEC-838 item 2 ended LEAD_CHECKPOINT as a lead's status; DEC-837 item 3: a checkpoint at every handover.
+            ("a checkpoint at every handover", [r"checkpoint", r"handover"]),
         ),
     },
     "decisions": {
@@ -277,16 +278,15 @@ ROWS = {
         ),
     },
     "temp hygiene and protected files": {
-        "ids": ("DEC-508", "DEC-525"),
+        # DEC-820 (Policy 2) replaced DEC-508's listing refusal and DEC-525's settings and held-out-file refusal.
+        "ids": ("DEC-820",),
         "clauses": (
             ("a session's temporary folder is its own and is removed with it",
              [r"temp", r"folder|director", r"\bown\b", r"remov|delet"]),
             ("nothing is left in or read from another session's folders",
              [r"(an)?other session", r"folder|director", r"read|le(ave|aves|ft)\b"]),
-            ("no glob, search or listing over the project's governance folder",
-             [r"glob", r"search", r"list", r"governance"]),
-            ("the settings file and the held-out file are never read",
-             [r"settings", r"held-out", r"read", NEVER]),
+            ("reads are open (Policy 2)", [r"\bread", r"\bopen\b|freely"]),
+            ("the held-out material's contents are never read", [r"held-out", r"content", r"read", NEVER]),
         ),
     },
     "learning metrics": {
