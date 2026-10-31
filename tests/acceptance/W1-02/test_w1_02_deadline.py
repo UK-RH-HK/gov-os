@@ -15,7 +15,7 @@ and each case asserts on one of them afterwards.
 **Where the slow step sits** (how each is made: the support module's head):
 
 - *before any rule on the call*: the first program a decision starts does not
-  end (a Bash call by an engineer, where the stand-in has a child of its own; a
+  end (a Bash call by an engineer; a
   Write by the orchestrator; a Read by a session with no role); the bookkeeping
   the hook does before it decides waits on a named pipe (a Bash call);
 - *after the rules have allowed the call*: the bookkeeping for a Write that is
@@ -50,6 +50,14 @@ slow step the look-up does not cover: a named pipe of the bookkeeping (point 4,
 and the late input, whose pipe the case lets go 19.5 s after the input). The
 labels are kept, so that a case is the same case before and after.
 
+**Since the ticket's batch 2** (``Rewrite-Reason: DEC-802 (P-B1-2); W2-L160``):
+the Bash bookkeeping starts git by the look-up's absolute path too. The
+orchestrator's Bash call whose every program takes a few seconds now holds each
+git the hook starts 5.5 s, once, on the repository's configuration as a pipe
+paced by program: the look-up ends after one such step, inside its 15 s, and the
+bookkeeping's steps pass the deadline, which refuses with DEC-580's reason in
+its window. No call has a stand-in first on the search path any more.
+
 No id and no failure message carries a path or a command.
 """
 
@@ -78,8 +86,12 @@ POINT_1 = (
          deadline.ENGINEER, prepare=deadline.a_pipe_among_the_pending_calls),
     Call("a-Write-by-an-engineer-with-a-pipe-in-the-bookkeeping-after-the-rules-allowed-it", "Write",
          deadline.write_to(deadline.IN_TICKET_REL), deadline.ENGINEER, prepare=deadline.a_pipe_at_the_counter),
+    # Rewrite-Reason: DEC-802 (P-B1-2); W2-L160. The Bash bookkeeping starts git by absolute path since the ticket's
+    # batch 2: every git the hook starts, the look-up's and the bookkeeping's, is held a few seconds by the repository's
+    # configuration, paced by program (was: a stand-in first on the search path, sleeping on every start). The look-up
+    # ends after one such step, well inside its 15 s; the bookkeeping's steps pass the deadline.
     Call("a-Bash-call-by-the-orchestrator-whose-every-program-takes-a-few-seconds", "Bash", deadline.bash(),
-         deadline.ORCHESTRATOR, every=A_FEW_SECONDS),
+         deadline.ORCHESTRATOR, config_every=A_FEW_SECONDS),
     # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160. The slow step is the bookkeeping before the
     # decision, a named pipe the case lets go 19.5 s after the input (was: the first program, now the look-up).
     Call("a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow", "Bash",
@@ -106,12 +118,12 @@ POINT_4 = (
 
 LABELS_1 = [call.label for call in POINT_1]
 LABELS_4 = [call.label for call in POINT_4]
-# The calls whose slow step is a program: the stand-in's process id is known to the case, or the real git's is seen in
-# the project (Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160).
-WITH_A_STAND_IN = [call.label for call in POINT_1 + POINT_4 if call.stand_in]
-WITH_A_REAL_GIT = [call.label for call in POINT_1 + POINT_4 if call.config_after is not None]
-WITH_A_PROGRAM = WITH_A_STAND_IN + WITH_A_REAL_GIT
-WITH_A_CHILD = [call.label for call in POINT_1 + POINT_4 if call.child]
+# The calls whose slow step is a program: the real git, seen in the project (Rewrite-Reason: DEC-951 (P-B1-1);
+# DEC-783 item 2; DEC-802 (P-B1-2); W2-L160). No call has a stand-in any more, and so no stand-in's child.
+WITH_A_REAL_GIT = [call.label for call in POINT_1 + POINT_4 if call.config]
+WITH_A_PROGRAM = WITH_A_REAL_GIT
+# The calls whose every git is held a few seconds: the paced configuration held one at least.
+PACED = [call.label for call in POINT_1 + POINT_4 if call.config_every is not None]
 # The calls whose slow step is the freeze look-up: its own limit answers (DEC-783 item 2).
 AT_THE_LOOK_UP = [call.label for call in POINT_1 + POINT_4 if call.config_after == deadline.NEVER]
 
@@ -158,19 +170,20 @@ def test_the_deadline_s_refusal_carries_nothing_of_the_call(late):
 
 
 def test_nothing_the_hook_started_is_left_running_after_its_answer(late):
-    """Point 1: the slow step's process, and a child of that process, are gone shortly after the answer."""
+    """Point 1: the slow step's process is gone shortly after the answer.
+
+    Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; DEC-802 (P-B1-2); W2-L160. The slow step's process is the real
+    git, seen in the project; for the paced call, the configuration held it (was: the stand-in's own record, and the
+    check of the stand-in's child, empty since the look-up's rewrite: P-W1-02-CHILD, with the orchestrator).
+    """
     unanswered = [label for label in WITH_A_PROGRAM if not late[label].answered]
     assert not unanswered, f"no answer, the hook was ended by the case: {unanswered}"
     for label in WITH_A_PROGRAM:
         outcome = late[label]
-        # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160: the real git is seen in the project.
-        if label in WITH_A_REAL_GIT:
-            assert outcome.seen >= 1, f"'{label}': no process the hook started was seen in the project"
-        else:
-            assert outcome.stand_in_starts >= 1, f"'{label}': the hook did not start the stand-in program"
+        assert outcome.seen >= 1, f"'{label}': no process the hook started was seen in the project"
+        if label in PACED:
+            assert outcome.held >= 1, f"'{label}': the hook started no git that the configuration held"
         assert outcome.left_running == 0, (
             f"'{label}': {outcome.left_running} process(es) the hook started were still running "
             f"{deadline.GONE_WITHIN_S:.0f} s after its answer ({outcome.describe()})"
         )
-    for label in WITH_A_CHILD:
-        assert late[label].children >= 1, f"'{label}': the stand-in program did not start its own child"

@@ -254,7 +254,8 @@ template's source:
   - only the paths (the template's form, `governance/kernel/hooks/`);
   - only the order of the events (reversed);
   - only the order of the hooks of an event (two `postToolUse` hooks, `Bash` and `Edit|Write`, the other way round;
-    the repository's source holds both, and the adapters are generated from it);
+    the repository's source holds both, and the adapters are generated from it). Since ACT 1 the two hooks are
+    written in the case, not taken from the live source (see "ACT 1 and the hooks sources" below);
   - only the command wrapper (the template's `python3` commands, with the repository's paths, in the repository's
     events, order and matchers).
 - **This repository's two sources,** byte for byte, are green. As its own step, the case reads the template's
@@ -381,3 +382,37 @@ P-1 and P-2 were returned as packages. DEC-783 accepted P-3 and P-4, answered P-
 - **lefthook 2.1.15:** `install` leaves a Claude Code settings file byte-identical; `uninstall` re-sorts its
   keys. Run from a linked worktree, `install` left both trees' files identical, and `uninstall` rewrote only
   the worktree's file, not the main tree's (measured on 2026-10-18).
+
+## ACT 1 and the hooks sources (2026-10-31): the order case built from hooks of its own
+
+`Rewrite-Reason: DEC-953 item 2 (ACT 1): the repository's hooks source has no postToolUse; the case's construction,
+not its expectation`. Ticket `DAEO-0z8c`, written by its independent test designer on `w2/W2-05-tests` from the
+ticket's head `f217353e59fa`, under DEC-906's repair batch.
+
+- **Why.** The owner's ACT 1 (`6c36c7b5`, DEC-953 item 2) took `postToolUse` and `postToolUseFailure` out of the
+  repository's `.rulesync/hooks.jsonc`; the template's source keeps both. `[only the order of the hooks of an
+  event]` built its two hooks from the repository's first `postToolUse` hook, and failed in its own construction
+  (`KeyError: 'postToolUse'`) before the check ran.
+- **Now.** The case's two hooks are written in the case (`ORDER_HOOKS`: `Bash` with `posttooluse.py`, then
+  `Edit|Write` with `precompact.py`, both in the repository's path form), and `ORDER_EVENT` (`postToolUse`) is set
+  in both sources alike: the repository's holds them in that order, the template's the other way round. Every other
+  event is the live repository source's, the same in both. Held as before: exit 0 and no finding; the two sources
+  are written differently (the case's own guard against a pair written the same). The id is unchanged.
+- **The other cases of the file that read the live source** do not fail in their construction for this reason, and
+  are unchanged: `[only the paths]`, `[only the order of the events]` and `[only the command wrapper]` vary the live
+  repository source alone (the wrapper case takes the template's commands only for the repository's events), and
+  the five drift cases plant into the template's source events it still carries. What the drift cases reach now
+  that their base pair differs in two events is returned to the lead as a package (P-W2-05-DRIFT-BASE): green, but
+  `[an event whose matcher differs]` is green through the event `postToolUseFailure` being in the template's source
+  only, not through its matcher.
+- **`test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources` is red, and stays red until the
+  orchestrator's decision (package H).** It compares this repository's two files byte for byte, and since ACT 1 they
+  differ in two events: `HOOKS_EVENT_DIFFERS` for `postToolUse` and `postToolUseFailure`, "only in
+  template/.rulesync/hooks.jsonc". That is a decision about the sources, not about the case, and the case is not
+  changed.
+
+| Case | At `f217353e59fa`, before | After |
+|---|---|---|
+| `test_w2_05_hooks_source.py::test_a_difference_that_is_not_drift_leaves_adapter_portability_green[only the order of the hooks of an event]` | **red:** `KeyError: 'postToolUse'`, in the case's construction | **green** |
+| `test_w2_05_hooks_source.py::test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources` | **red:** two `HOOKS_EVENT_DIFFERS` findings (ACT 1) | **red, the same** (package H) |
+| the other 8 cases of the file | green | green |
