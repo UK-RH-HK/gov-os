@@ -60,7 +60,7 @@ while you work, and only your final message is read.
   your budget (DEC-860). A code question uses the code graph's own small, targeted traversal, never a load of the
   whole graph (DEC-859). A new worktree has no store: build it with a full rebuild before the first worker. Every
   worker brief you write says all of this.
-- **The code under test (DEC-732):** in this worktree, every test run and every `gov` command used for verification runs this worktree's own `src/` (the project's source folder): `<the setting that selects the code under test>=<worktree path>/src` set per command (for a Python project, `PYTHONPATH=<worktree path>/src`), never in a session's settings.
+- **The code under test (DEC-732):** in this worktree, every test run and every `gov` command used for verification runs this worktree's own `src/` (the project's source folder): `<the setting that selects the code under test>=<worktree path>/src` set per command, never in a session's settings.
   Your verification shows it with <the import line that prints where the code under test was loaded from>, quoted
   in your return. **This rule goes into every worker brief you write, word for
   word.**
