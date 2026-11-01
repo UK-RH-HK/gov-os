@@ -266,3 +266,38 @@ def test_a_forbidden_citation_whose_fact_is_missing_is_still_dropped(ground):
     asked = questions.resolve({"form": questions.FORM, "repository": "python-app-clean", "questions": [item]},
                               built_repo.manifest, built_repo.root, "hidden")
     assert asked[0].forbidden == []
+
+
+# --------------------------------------------------------------------------
+# Round 3 (item 2): a forbidden citation naming a fact no builder of the repository knows is refused
+# --------------------------------------------------------------------------
+
+def _forbidding(qid, template):
+    return {"form": questions.FORM, "repository": qid.rsplit("-", 1)[0], "questions": [
+        {"id": qid, "category": "which-spec-governs", "question": "Which spec governs?", "gold_answer": "the one",
+         "sources": [{"path": "README.md", "holds": "#"}], "forbidden": [template]}]}
+
+
+@pytest.mark.parametrize("name, template", [("rust-workspace", "{stael}"), ("rust-workspace", "docs/{governign}.md"),
+                                            ("typescript-monorepo", "{plan_old}")])
+def test_a_forbidden_citation_naming_a_mistyped_fact_is_refused(ground, name, template):
+    """A mistyped fact (or one this repository neither has nor is known to lack) is refused naming the id only."""
+    built_repo = ground[name]
+    qid = f"{name}-h98"
+    with pytest.raises(questions.QuestionError) as refused:
+        questions.resolve(_forbidding(qid, template), built_repo.manifest, built_repo.root, "hidden")
+    message = str(refused.value)
+    assert message.startswith(f"{qid}: "), message
+    for word in (template, template.strip("{}"), "stael", "governign"):
+        assert word not in message, message
+
+
+def test_only_the_facts_a_builder_declares_absent_are_dropped(ground):
+    """The clean twin declares the facts it lacks; only a forbidden citation of one of those is dropped."""
+    clean = ground["python-app-clean"].manifest
+    assert clean["facts_absent"] == ["dead_module", "plan_old", "stale"]
+    assert all(not b.manifest["facts_absent"] for n, b in ground.items() if n != "python-app-clean")
+    for template in ("{stale}", "{plan_old}", "{dead_module}"):
+        asked = questions.resolve(_forbidding("python-app-clean-h97", template), clean, ground["python-app-clean"].root,
+                                  "hidden")
+        assert asked[0].forbidden == [], template

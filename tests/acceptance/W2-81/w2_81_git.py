@@ -60,7 +60,25 @@ def outside_this_repository(path):
 # The names only a W2-81 case writes: the built repositories, the manifests' folder, a run folder, a stand-in's
 # outputs (a self-test holds this list to the builders' names).
 ARTEFACTS = ("python-app", "rust-workspace", "typescript-monorepo", "legacy-docs", "secret-history",
-             "python-app-clean", "manifests", "w2-81-run", "adopted", "beside")
+             "python-app-clean", "manifests", "w2-81-run", "adopted", "beside", "no-hidden-questions",
+             "hidden-stand-in", "repos", "outputs")
+_NOT_THE_SUITES = ("__pycache__", ".claude")  # bytecode, and the editing harness's own marker folders
+
+
+def paths_under(folder):
+    """Every file and folder under ``folder``, empty folders included (``git status`` shows no empty folder), as
+    paths relative to it; bytecode caches and the editing harness's marker folders aside."""
+    found = set()
+    for here, dirs, names in os.walk(folder):
+        dirs[:] = [d for d in dirs if d not in _NOT_THE_SUITES]
+        base = Path(here).relative_to(folder)
+        found |= {(base / d).as_posix() for d in dirs} | {(base / n).as_posix() for n in names}
+    return found
+
+
+def top_level_artefacts():
+    """The entries at this worktree's top level, files or folders, empty or not, that only a W2-81 case makes."""
+    return {p.name for p in REPO_ROOT.iterdir() if p.name in ARTEFACTS}
 
 
 def porcelain_here(*paths):

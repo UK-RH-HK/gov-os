@@ -68,7 +68,12 @@ def sets_in(folder):
 
 
 class MissingFact(QuestionError):
-    """A template names a fact the repository does not have (a forbidden citation of it is dropped)."""
+    """A template names a fact the repository does not have. A forbidden citation of it is dropped only when the
+    repository's builder declares it lacks that fact (``facts_absent``); otherwise it is refused (round 3)."""
+
+    def __init__(self, message, name=None):
+        super().__init__(message)
+        self.name = name  # the fact's name, kept for the drop rule; never put in the message
 
 
 def _fill(template, facts, qid):
@@ -83,8 +88,9 @@ def _fill(template, facts, qid):
         return text.format_map(facts)
     except QuestionError:
         raise
-    except KeyError:
-        raise MissingFact(f"{qid}: a template names a fact the repository does not have") from None
+    except KeyError as missing:
+        raise MissingFact(f"{qid}: a template names a fact the repository does not have",
+                          missing.args[0] if missing.args else None) from None
     except Exception as exc:  # noqa: BLE001 - whatever the formatter refuses is refused, by its kind only
         raise QuestionError(f"{qid}: a template cannot be filled ({type(exc).__name__})") from None
 
@@ -117,8 +123,11 @@ def resolve(question_set, manifest, root, part):
         for template in item.get("forbidden") or []:
             try:
                 forbidden.append(_fill(template, facts, qid))
-            except MissingFact:
-                continue  # a planted source this repository does not have
+            except MissingFact as missing:
+                if missing.name in (manifest.get("facts_absent") or []):
+                    continue  # a planted source this repository is known to lack (the clean twin's)
+                raise QuestionError(f"{qid}: a forbidden citation names a fact this repository does not have and "
+                                    "is not known to lack (a mistyped fact name?)") from None
         resolved.append(Question(qid, part, item["category"], _fill(item["question"], facts, qid),
                                  _fill(item["gold_answer"], facts, qid), sources, forbidden))
     return resolved

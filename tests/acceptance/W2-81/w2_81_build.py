@@ -70,8 +70,11 @@ class _Build:
         return self.repo.commit(message, self.draw.author(), self.draw.tick())
 
     def facts(self, **named):
-        """The seeded names and paths the question sets refer to (no secret, no hidden material)."""
+        """The seeded names and paths the question sets refer to (no secret, no hidden material). A fact given as None
+        is one this repository knowingly lacks (the clean twin's stale spec, old plan and dead module): it is
+        recorded in ``facts_absent``, and only a forbidden citation naming such a fact is dropped (round 3)."""
         self.manifest.data["facts"] = {key: value for key, value in named.items() if value is not None}
+        self.manifest.data["facts_absent"] = sorted(key for key, value in named.items() if value is None)
 
     def finish(self, run_folder):
         data = self.manifest.close([c for c, _ in self.repo.commits])

@@ -31,17 +31,22 @@ RUNNER = Path(runner.__file__)
 SMALL = 4096  # the large files' size in these cases
 
 
-def _no_hidden_questions(folder):
-    """An empty hidden folder beside the run folder: a case never falls back to the real hidden half (and a --hidden
-    that names no folder is refused, round 2 item 3)."""
-    empty = Path(folder).parent / "no-hidden-questions"
-    empty.mkdir(parents=True, exist_ok=True)
-    return empty
+_EMPTY_HIDDEN = []  # this module's empty hidden folder, made by pytest's own temporary-folder factory
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _no_hidden_questions(tmp_path_factory):
+    """An empty hidden folder of this module's own, under pytest's temporary folders (round 3, item 1): never beside
+    a run folder a case was handed, which may be one aimed inside this repository to show it refused. A case never
+    falls back to the real hidden half, and a --hidden that names no folder is refused (round 2b, item 3)."""
+    _EMPTY_HIDDEN[:] = [tmp_path_factory.mktemp("no-hidden-questions")]
+    yield
+    shutil.rmtree(_EMPTY_HIDDEN.pop())
 
 
 def _options(folder, mode="read", **more):
     if "hidden" not in more:
-        more["hidden"] = _no_hidden_questions(folder)
+        more["hidden"] = _EMPTY_HIDDEN[0]
     argv = ["--folder", str(folder), "--mode", mode, "--large-size", str(SMALL)]
     for key, value in more.items():
         for one in value if isinstance(value, list) else [value]:
@@ -419,3 +424,20 @@ def test_a_hidden_template_with_an_error_is_refused_naming_its_id(ready_run, tmp
     product = ready_run["repos"]["rust-workspace"].manifest["facts"]["product"]
     for word in ("Quartzite", "quartzite", template, product):
         assert word not in out + err, f"the refusal shows {word!r}"
+
+
+
+def test_a_hidden_forbidden_citation_with_a_mistyped_fact_is_refused(ready_run, tmp_path, capfd):
+    """Round 3, item 2: one mistyped fact name in a hidden forbidden citation is refused by the command, naming the
+    hidden question's id only: it can never silently remove a forbidden citation from the measurement."""
+    hidden = tmp_path / "hidden"
+    shutil.copytree(ready_run["hidden"], hidden)
+    data = yaml.safe_load((hidden / "rust-workspace.yaml").read_text())
+    data["questions"][2]["forbidden"] = ["{stael}"]
+    (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
+    code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden),
+                        "--gov", str(ready_run["govs"]["good"])])
+    out, err = capfd.readouterr()
+    assert code == 2, (code, out, err)
+    assert err.startswith(f"refused: {data['questions'][2]['id']}: "), err
+    assert "stael" not in out + err

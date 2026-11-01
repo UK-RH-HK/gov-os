@@ -27,14 +27,21 @@ def this_repository_unchanged():
     Every write of the suite is refused inside this repository before it is made (``outside_this_repository``).
     Around each module: the suite's own folder is unchanged, and no new untracked path that only a W2-81 case
     writes appears anywhere in the tree. Another suite's transient file in the same tree is not blamed here.
+    Round 3: no new file or folder appears under the suite's folder, **empty folders included** (a listing, since
+    ``git status`` shows none), nor at the worktree's top level under a name only a W2-81 case makes.
     """
     for tool in gitlib.TOOLS:
         gitlib.require(tool)  # a missing tool fails naming it (DEC-899 item 7), never a skip
     suite_before, tree_before = porcelain_here(str(SUITE)), w2_81_artefacts(porcelain_here())
+    listed_before, top_before = gitlib.paths_under(SUITE), gitlib.top_level_artefacts()
     yield
     assert porcelain_here(str(SUITE)) == suite_before, "a W2-81 case changed the suite's own folder"
     new = w2_81_artefacts(porcelain_here()) - tree_before
     assert not new, f"a W2-81 case wrote in this repository: {sorted(new)}"
+    made = sorted(gitlib.paths_under(SUITE) - listed_before)
+    assert not made, f"a W2-81 case made files or folders in the suite's own folder: {made}"
+    top = sorted(gitlib.top_level_artefacts() - top_before)
+    assert not top, f"a W2-81 case made files or folders at this worktree's top level: {top}"
 
 
 @pytest.fixture(scope="session")

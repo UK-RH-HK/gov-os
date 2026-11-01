@@ -40,6 +40,7 @@ Measured on 2026-10-31, on a machine shared with other leads:
 | batch 4 | 183 | 28 to 66 s | 16 s |
 | batch 5 | 218 | 39 s | 16 s |
 | batch 6 | 271 | 36 s | 10 s |
+| batch 7 | 276 | see the return | see the return |
 
 Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
@@ -208,6 +209,15 @@ uses the dev-tier variable.
   suite's own folder is unchanged, and that no new untracked path that only a W2-81 case writes has appeared
   anywhere in the tree: a built repository's name, `manifests`, `w2-81-run`, `adopted` or `beside`. Under the
   close's parallel run, another suite's transient file in the same tree is not blamed on this ticket.
+- **Empty folders too (round 3).** `git status` shows no empty folder, so the tripwire also lists every file and
+  folder under the suite's folder (`w2_81_git.paths_under`, bytecode caches and the editing harness's `.claude`
+  marker folders aside) and the worktree's top level under the names only a W2-81 case makes
+  (`top_level_artefacts`), before and after each module, and fails on any new one. Every folder a case makes is
+  made under its own pytest temporary folder (`tmp_path`, or the module's `tmp_path_factory`), never beside a
+  run folder it was handed: the runner module's empty hidden folder comes from its own module fixture, since a
+  case hands the runner a run folder aimed inside this repository to show the refusal. Before round 3 that
+  helper made `tests/acceptance/W2-81/no-hidden-questions/` (empty) on every run; it is removed, and the
+  head's runner module fails the new listing.
 
 ## The judge
 
@@ -475,6 +485,13 @@ now. Each is NOT_READY, or the judgement's status, as stated:
 | 6 | A store without a vector table is read as no vectors | `test_a_store_without_a_vector_table_is_read_as_no_vectors` |
 | 7 | A template with an error is refused naming its id | `test_a_hidden_template_with_an_error_is_refused_naming_its_id` (7 forms in a question and in a forbidden citation, through the command; the 4 question forms the head's formatter already refused passed there too), `test_a_template_with_an_error_is_refused_naming_its_id_only` (7 forms in 4 places at the resolver; 13 passed on the head), and `test_a_forbidden_citation_whose_fact_is_missing_is_still_dropped` (the kept reading) |
 
+**The final review's findings (round 3, DEC-1005).** Each case failed on the head before it (`56af0a59973b`) and passes now:
+
+| # | Behaviour | Cases |
+|---|---|---|
+| 1 | No case makes a file or folder inside this repository, empty folders included | the tripwire's listing (`this_repository_unchanged`, after every module); on the head's runner module it fails: `a W2-81 case made files or folders in the suite's own folder: ['no-hidden-questions']` |
+| 2 | A hidden forbidden citation naming a mistyped fact is refused; only declared absences are dropped | `test_a_forbidden_citation_naming_a_mistyped_fact_is_refused` (a mistyped name, a mistyped name inside a path, and a fact this repository neither has nor is known to lack: 3), `test_only_the_facts_a_builder_declares_absent_are_dropped` (the clean twin's three), and `test_a_hidden_forbidden_citation_with_a_mistyped_fact_is_refused` (through the command, on a stand-in hidden half; on the head it read on to `NOT_READY` with the citation dropped) |
+
 **The judge's own mutation check (scratch run, 2026-10-31, not committed).** Six mutants of the judge were run
 against these self-tests in one process. Five were killed:
 
@@ -544,7 +561,13 @@ hold no secret. `w2_81_questions.resolve` then:
 
 - fills each template from the facts;
 - finds each source's line in the built HEAD (the manifest's `head`);
-- drops a forbidden citation whose fact the repository does not have (the clean variant plants nothing).
+- drops a forbidden citation only when its fact is one the repository's builder **declares it lacks**: a fact
+  given as None is recorded in the manifest's `facts_absent` (today the clean twin's `stale`, `plan_old` and
+  `dead_module`). A forbidden citation naming any other missing fact, a mistyped name above all, is refused
+  (`refused: <id>: a forbidden citation names a fact this repository does not have and is not known to lack`,
+  exit 2), never its text or a fact's value: one typo in the hidden half cannot silently take a forbidden
+  citation out of the measurement (round 3, item 2; refusing was chosen over naming and counting it, since a
+  refusal stops a READY at once and a count would rely on someone reading it).
 
 A source whose fact is missing, or whose text is not at HEAD, is a `QuestionError` naming the question's id only. **A template uses the form `{name}` only:** attribute or index access, a conversion, a format, a positional field, an unmatched brace or any other error of the formatter, in a question, gold answer, source or forbidden citation, is a `QuestionError` naming the id and the error's kind, never the template's text or a fact's value; the command refuses it as `refused: <id>: <reason>` (exit 2). A forbidden citation naming a fact the repository lacks is still dropped.
 
@@ -749,6 +772,7 @@ folder.
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
 | **Review (batch 4)** Items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |
+| **Round 3 (DEC-1005)** Items 1 and 2 of "The final review's findings": 1 (S10, F5), 2 (S7, F4) | the tripwire in `conftest.py`, and the three cases named there |
 | **Round 2b (DEC-997)** Items 1 to 7 of "The third review's findings": 1 (S10, F5: no flaky case), 2 (S4, F3), 3 (S6, S7, F2), 4 and 5 (S7, F4), 6 (S5, S6), 7 (S7, F4) | `test_w2_81_runner.py` (the cases named there), `test_w2_81_round2.py` (the store and template cases) |
 | **Round 2 (DEC-993)** Items 1 to 7 above: 1 and 2 (S3, S6, F1), 3 (S3, F1), 4 (S10, F5), 5 (S3, S9), 6 (S7, F4), 7 (S5) | `test_w2_81_round2.py` (all), and in `test_w2_81_runner.py` the `_removed_after` fixture, `test_the_markdown_report_says_what_the_json_says_is_not_measured` and `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` |
 | **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |
