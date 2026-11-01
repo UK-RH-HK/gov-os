@@ -122,7 +122,7 @@ def lazy_findings(api, project):
 
 def finding_at(found, rel, line, old, new):
     return [f for f in found if f["code"] == s.ENFORCES and f["paths"] == [rel] and f["ids"][:1] == [old]
-            and (new is None or f["ids"] == [old, new]) and s.holds_number(f["message"], line)]
+            and (new is None or f["ids"] == [old, new]) and s.names_line(f["message"], rel, line)]
 
 
 @pytest.mark.parametrize("rel", list(ENFORCING), ids=[KINDS[rel] for rel in ENFORCING])
