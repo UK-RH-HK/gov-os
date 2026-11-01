@@ -889,6 +889,7 @@ class Queue:
 
 
 def run(a):
+    os.environ["GOV_HEAVY_PRIORITY"] = "1"  # DEC-1011: a landing takes the next free heavy-job slot before any lead's step
     queue = Path(a.queue).resolve()
     queue.mkdir(parents=True, exist_ok=True)
     lock = open(queue / "run.lock", "a")
