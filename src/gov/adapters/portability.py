@@ -9,7 +9,9 @@ Three comparisons, each a finding when it fails or cannot be made:
    When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
    applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
 And, where the kernel is the template's, the template's hooks source with the repository's, by hook events
-and matchers with the paths normalised (DEC-805).
+and matchers with the paths normalised (DEC-805), except that postToolUse and postToolUseFailure, which ACT 1
+lifted from the repository's source only, are no drift while the template alone has them (DEC-971 item 3; it
+ends with W2-08, when they return).
 
 Prints ``{"findings": [...], "compared": {...}}`` and exits 0 only without findings.
 """
@@ -33,6 +35,10 @@ REGISTRY = "governance/project/tool-registry.yaml"
 KERNEL_ROOTS = ("governance/kernel", "template/governance/kernel")  # adopted project, this repository
 SOURCES = ".rulesync"
 HOOKS_SOURCE = "hooks.jsonc"
+# The two hook events ACT 1 lifted from the repository's hooks source and not the template's (DEC-953 item 2):
+# no drift while only the template has them (DEC-971 item 3). It ends with W2-08: once they are back in both
+# sources they are compared as any other event, and this constant goes.
+LIFTED_HOOK_EVENTS = frozenset({"postToolUse", "postToolUseFailure"})
 GENERATE = ("generate", "--targets", "claudecode,agentsmd",
             "--features", "rules,hooks,permissions,subagents,commands,skills", "--input-roots")
 GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")  # rulesync alone writes here (DEC-471)
@@ -208,7 +214,8 @@ def _hook_matchers(path: Path) -> dict[str, list[str]]:
 def _hooks_findings(root: Path) -> list[dict]:
     """The template's hooks source against the repository's, where the kernel is the template's (DEC-805): by
     hook events and matchers, so that the hooks' paths, their order and the command around them are no drift.
-    One finding per drifted event, naming it; none where the template has no hooks source."""
+    One finding per drifted event, naming it, but none for a lifted event only the template has (DEC-971 item 3);
+    none where the template has no hooks source."""
     template = root / "template" / SOURCES / HOOKS_SOURCE
     if not (root / KERNEL_ROOTS[1]).is_dir() or not template.is_file():
         return []
@@ -223,6 +230,8 @@ def _hooks_findings(root: Path) -> list[dict]:
     kept, ours = read
     findings = []
     for event in sorted(set(kept) | set(ours)):
+        if event in LIFTED_HOOK_EVENTS and event in kept and event not in ours:
+            continue
         if event not in ours or event not in kept:
             where = kept_rel if event in kept else ours_rel
             findings.append(_finding("HOOKS_EVENT_DIFFERS", f"hook event {event} is only in {where}", ours_rel))
