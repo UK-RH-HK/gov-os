@@ -12694,3 +12694,19 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.397 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1015 (item 4 delegated). Next free id: DEC-1016. |
+
+### DEC-1016 — W2-90b's P-W2-90b-1 goes to the owner; S4's two live-session harnesses move to W2-90c unchanged; W2-90b lands (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: a scope move with nothing lowered; the package's own choice is left to the owner, since DEC-1014 item 1 does not count a lead's agreement as corroboration on a decision that touches verification) · **Under:** DEC-970, DEC-999, DEC-822, DEC-784, DEC-1014
+- **Decision:** (1) P-W2-90b-1 (how W1-46's live sessions and W1-50's freeze launcher judge the worktree's code: (a) a stand-in HOME with `CLAUDE_CONFIG_DIR`, a P1 exception to DEC-784; (b) S4 re-baselined under DEC-822 item 3, the lead's and designer's recommendation; (c) a launcher override, not recommended) goes to the owner in the next package. (2) Until then those two harnesses' part of W2-90b's KPI S4 moves to W2-90c (`DAEO-fu3n`) word for word, with their two test files added to its paths; W2-90b keeps W1-47's part, which is met. (3) W2-90b lands at `73c18fea1e1f` (verified head `d2408361d185` plus its records commit) through the dispatcher's landing.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.398 | 2026-11-01 | Orchestrator (delegated): DEC-1016. Next free id: DEC-1017. |
+
+### DEC-1017 — ACT-OLLAMA-CAP-2: the query embedding server capped too; the durable cap of both servers in W2-20 and W2-123
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; applied by the owner's operator; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`) · **Under:** DEC-1010 item 7, DEC-1015, DEC-1003
+- **Decision:** (1) ACT-OLLAMA-CAP-2: the CPU-only query embedding server (127.0.0.1:11435), found running on all 20 logical CPUs at normal priority, gets the same cap as the shared one (`taskset -c 12-19`, `nice 10`), and stays CPU-only. (2) Both caps are lost when a server restarts, so the durable fix covers both ports. W2-20 (`DAEO-r30l`) carries the cap configuration of both servers, the gate counting both servers' CPU, and a planted restart test. W2-123 (`DAEO-qzrq`, which owns `src/gov/retrieval/ollama.py`) starts both under that cap, and every restart keeps it. (3) The finding behind it: ACT-OLLAMA-CAP-1's durable-fix line for W2-20 was proposed (DEC-1003) and never applied to the ticket. It is applied now, widened to both ports.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.399 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1017. Next free id: DEC-1018. |

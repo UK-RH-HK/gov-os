@@ -26,6 +26,7 @@ kpis:
   - 'Measured, in docs/changes/W2-123-evidence.md: throughput (chunks per second) and a cold rebuild''s semantic stage at 1, 2, 4 and 8 parallel requests, under the 8-core cap and without it, alone and with three rebuilds at once; the setting chosen is the one where the 8-core cap is not the limit (or the cap is raised with the figures), and the figures are stated [DEC-1014, DEC-996 item 3 A]'
   - 'A product feature for every adopted repository: the parallel requests and the CPU cap are read from the gate''s configuration file (W2-20), with the measured defaults; nothing of this machine (its CPU numbers, its ports) is written in the code [DEC-1014 item 6, DEC-982]'
   - 'The shared embedding server comes with a health probe (a fixed text embedded within a configured time, stated healthy, slow or hung) and a safe restart (the hung server stopped, started again under its configured cap, the restart recorded), both callable by the dispatcher (W2-121); a restart never happens while the server is answering [DEC-1015 item 2]'
+  - 'Both servers the Gov OS starts (`ensure_available` and `ensure_query_available`) start under their cap from the gate''s configuration file (W2-20), the query server CPU-only; every restart, whether the Gov OS''s own or the dispatcher''s safe restart (W2-121), keeps the cap; a planted start of each shows it [ACT-OLLAMA-CAP-2, DEC-1017]'
   failure:
   - 'Parallel requests that change a vector; a server started uncapped; a setting chosen without its measure [DEC-1014]'
 profile: STANDARD
