@@ -48,7 +48,7 @@ copies, the vendored code and `cli/` stay out; the restricted overlay stays rest
 
 ## KPI lines and cases
 
-| KPI line | Cases |
+| KPI line | Tests |
 |---|---|
 | Success 1: the root files, `governance/**` and `schemas/**` have vectors | `test_root_files_governance_and_schemas_are_embedded` (the path map's verdict for every tracked file in the three sets; each set non-empty; `CLAUDE.md`, `README.md` and `AGENTS.md` tracked); `test_a_rebuild_gives_vectors_exactly_to_the_files_the_path_map_embeds` (this repository's path map in a planted repository, rebuilt: the root, overlay and `schemas/` files have vectors, and the vectors are exactly the files the map embeds) |
 | Success 2 / failure 1: what stays out stays out; `schemas/**` gets a namespace of its own | `test_the_hidden_half_generated_copies_vendored_code_and_cli_are_not_embedded` (every tracked file under `fixtures/`, `.claude/`, `.rulesync/`, `template/.rulesync/` and W2-86's vendored parts, the probed `cli/` paths and the path map's `evaluation_sets` hidden patterns); `test_schemas_has_a_namespace_of_its_own_and_cli_stays_out`; the planted rebuild (none of the planted out-files has a vector); `test_failure_1_an_embedded_file_that_stays_out_is_refused` (4 cases) |
