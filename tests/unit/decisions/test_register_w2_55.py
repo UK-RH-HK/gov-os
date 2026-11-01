@@ -183,3 +183,31 @@ def test_leave_out_drops_a_superseded_entry_and_counts_it(tmp_path):
     assert [item["chunk_id"] for item in kept] == ["b", "c"]
     assert left_out == {"count": 1, "superseded": ["DEC-101"], "done": []}
     assert register.leave_out(root, evidence[1:]) == (evidence[1:], None)
+
+
+def test_the_register_is_parsed_once_per_head_and_a_new_commit_is_read_afresh(tmp_path, monkeypatch):
+    root = _repo(tmp_path, f"""### DEC-101 — old
+- **Status:** ACCEPTED
+{TAGS_R}
+""")
+    parsed = []
+    real = register._read
+    monkeypatch.setattr(register, "_read", lambda at: parsed.append(at) or real(at))
+    first = register.read(root)
+    first["entries"].clear()  # a caller that changes its copy changes no other
+    assert register.read(root) == real(root) and len(parsed) == 1
+    with (root / "docs/REG.md").open("a", encoding="utf-8") as reg:
+        reg.write("\n### DEC-102 — new\n- **Status:** ACCEPTED · **Supersedes:** DEC-101\n" + TAGS_R + "\n")
+    assert "DEC-101" not in register.read(root)["superseded"] and len(parsed) == 1  # the working tree is not HEAD
+    subprocess.run(["git", "-C", str(root), "commit", "-qam", "r2"], check=True, capture_output=True,
+                   env={**_ENV, "HOME": str(root)})
+    assert register.read(root)["superseded"] == {"DEC-101": ["DEC-102"]} and len(parsed) == 2
+    assert register.read(root)["superseded"] == {"DEC-101": ["DEC-102"]} and len(parsed) == 2
+
+
+def test_a_refusal_is_not_kept(tmp_path):
+    root = _repo(tmp_path, "", {"governance/project/path-map.yaml": "decision_register: docs/NONE.md\n"})
+    for _ in range(2):
+        with pytest.raises(GovError):
+            register.read(root)
+    assert str(root.resolve()) not in register._READ

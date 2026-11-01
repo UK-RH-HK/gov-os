@@ -81,9 +81,32 @@ def _entry(live: dict) -> dict:
     return entry
 
 
+_READ: dict[str, tuple[bytes, dict | None]] = {}  # resolved root -> (HEAD's commit, its register), one per root
+
+
 def read(root: Path) -> dict | None:
     """``{"path", "entries", "superseded", "changed", "done"}`` of the register ``HEAD`` holds; None where the path
-    map names none. ``superseded`` and ``changed`` map an old id to the ids that superseded or changed it."""
+    map names none. ``superseded`` and ``changed`` map an old id to the ids that superseded or changed it.
+
+    The register is parsed once per process for one root and one ``HEAD`` commit, which fixes the path map and the
+    register file: a new commit or another root reads afresh, a refusal is never kept, and each caller is given its
+    own copy."""
+    import copy
+
+    from gov.cli.errors import GovError
+    from gov.store.loader import _git
+
+    key = str(Path(root).resolve())
+    try:
+        head = _git(Path(root), "rev-parse", "--verify", "HEAD^{commit}").strip()
+    except GovError:  # no commit to key on: the read refuses or answers as it always has
+        return _read(root)
+    if key not in _READ or _READ[key][0] != head:
+        _READ[key] = (head, _read(root))
+    return copy.deepcopy(_READ[key][1])
+
+
+def _read(root: Path) -> dict | None:
     from gov.store.loader import _register, _tree, register_entries
 
     named = _register(Path(root), _tree(Path(root)))
