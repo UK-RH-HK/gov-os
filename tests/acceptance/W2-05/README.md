@@ -127,7 +127,7 @@ before they were stopped. The suite now bounds this in three ways:
 |---|---|
 | **S1**: every check, test helper and command that runs git in another folder clears the inherited `GIT_*` variables; one helper does it; the sweep record lists every call [AR-2, W2-M105, W2-M113, W2-M161, W2-L160] | `test_w2_05_sweep.py`: all 4 cases (the record, every git-starting file named, the code index's tool as a call that starts git (F2), the helper). The behaviour half is in `test_w2_05_planted.py`, listed under the covers ids below, and in `test_w2_05_code_index_tool.py::test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable` (F2: a program the Gov OS starts that starts git itself). The nightly's `git bisect run` step, a test helper that runs git in another folder (review R4-1, DEC-970): `test_w2_05_bisect_step.py`, all 3 cases (see "The review's R4-1" below). |
 | **S2**: a hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (DEC-710) | `test_w2_05_linked_worktree.py`: `test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree]` (success); `[the main tree]` (guard); `test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change` (the refusing side); `test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file` (through lefthook and `gov ci checks G1 G2`); and, for a check the project declares that runs git in a repository of its own (F-A, DEC-804, DEC-807), `test_w2_05_declared_check.py::test_a_declared_check_that_runs_git_in_a_repository_of_its_own_gets_no_index_and_the_commit_lands_as_staged[a linked worktree, a plain commit]`, `[the main tree, a plain commit]`, `[the main tree, git commit -a]` (new): the commit lands with exactly the staged tree, the index matches it and names no missing object |
-| **S3**, as DEC-783 (b) re-baselined it: `lefthook install` leaves `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green; `uninstall` is an owner act, followed by restoring the committed file (DEC-712) | `test_w2_05_settings.py`: `test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore[lefthook.yml]`, `[the template's hooks file]`; `test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean`; `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`. What `uninstall` alone does to the file is lefthook's own behaviour and is not asserted. The state after the owner's act is: `lefthook uninstall`, then `git restore -- .claude/settings.json` in each tree whose file changed. "adapter-portability stays green" also covers the hooks sources it now compares (W2-M281, DEC-805): `test_w2_05_hooks_source.py`, all 10 cases (new; listed under W2-M281 below) |
+| **S3**, as DEC-783 (b) re-baselined it: `lefthook install` leaves `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green; `uninstall` is an owner act, followed by restoring the committed file (DEC-712) | `test_w2_05_settings.py`: `test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore[lefthook.yml]`, `[the template's hooks file]`; `test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean`; `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`. What `uninstall` alone does to the file is lefthook's own behaviour and is not asserted. The state after the owner's act is: `lefthook uninstall`, then `git restore -- .claude/settings.json` in each tree whose file changed. "adapter-portability stays green" also covers the hooks sources it now compares (W2-M281, DEC-805): `test_w2_05_hooks_source.py`, all 24 cases (10, then 14 for DEC-971 item 3; listed under W2-M281 and DEC-971 item 3 below) |
 | **F1**: a planted `GIT_DIR` or `GIT_INDEX_FILE` in a hook's environment reaches no child git call; and (review F1) the staged-secrets gate never passes on an index other than the one being committed | `test_w2_05_planted.py`: `test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy[the check's declared command]`, `[gov ci checks G1]`; `test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index[GIT_INDEX_FILE]`, `[GIT_DIR and GIT_INDEX_FILE]` (rewritten); `test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret[GIT_DIR]`; `test_a_clean_index_under_a_planted_decoy_index_is_refused_naming_the_index` (rewritten); `test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it[a secret in that index, the project's index clean]`, `[nothing secret in that index, the project's index clean]`, `[nothing secret in that index, a secret in the project's index]` (new); `test_a_hooked_commit_with_its_index_outside_the_git_directory_and_a_secret_there_does_not_land` (new, through lefthook); `test_read_merge_under_a_planted_git_dir_reads_its_own_repository`; `test_the_containment_check_catches_the_change_whatever_its_environment_holds[a decoy GIT_DIR and GIT_INDEX_FILE]`; the S2 linked-worktree cases, where git itself plants both variables; and (F-A with P-1, DEC-804 items 1 and 3, DEC-807 item 2) the three cases of `test_w2_05_declared_check.py` (new): the `GIT_INDEX_FILE` git exports to the pre-commit hook (relative in the main tree, absolute on `commit -a` and in a linked worktree) reaches no declared check, and no location variable does |
 | Edge: a caller that set `GIT_*` on purpose for its own folder | `test_w2_05_planted.py::test_a_hooked_commit_in_a_linked_worktree_scans_the_index_git_gives_it` with `[git commit -a, a secret in a tracked file]`, `[git commit -- <path>, a secret in that file]` and `[git commit -a, nothing secret]` |
 | Edge: a check in a linked worktree | the S2 cases; `test_a_declared_check_..._lands_as_staged[a linked worktree, a plain commit]`; `test_install_from_a_linked_worktree_...`; `test_the_guard_hook_refuses_within_its_own_limit_...` |
@@ -142,7 +142,8 @@ before they were stopped. The suite now bounds this in three ways:
 | **W2-M113**: all governance git calls run with pinned configuration and a cleared environment | `test_the_containment_check_catches_the_change_whatever_its_environment_holds[a decoy GIT_DIR and GIT_INDEX_FILE]`, `[trace variables]`, `[a trace setting in the person's git configuration]` |
 | **W2-M161**: all subprocesses of close run with a sanitised environment and pinned git configuration | `test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment` |
 | **W2-L160**: git is resolved by absolute path, and the freeze look-up has its own limit, 15 s (DEC-783 item 2) | `test_the_guard_hook_does_not_run_the_git_first_on_path`; `test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs` (rewritten for the 15 s limit: a `deny` not before 14.5 s and by 18 s) |
-| **W2-M281**: adapter-portability goes red on a planted drift in the template's hooks source (`template/.rulesync/hooks.jsonc`, DEC-783 item 3), compared with the repository's by hook events and matchers, paths normalised (DEC-805) | `test_w2_05_hooks_source.py`: `test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event` with `[an event in the template's source only]`, `[an event in the repository's source only]`, `[an event whose matcher differs]`, `[a matcher in the repository's source only]`, `[a matcher in the template's source only]` (their base pair built from one source and checked green before the plant, DEC-970); `test_a_difference_that_is_not_drift_leaves_adapter_portability_green` with `[only the paths]`, `[only the order of the events]`, `[only the order of the hooks of an event]`, `[only the command wrapper]`; `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources` |
+| **W2-M281**: adapter-portability goes red on a planted drift in the template's hooks source (`template/.rulesync/hooks.jsonc`, DEC-783 item 3), compared with the repository's by hook events and matchers, paths normalised (DEC-805) | `test_w2_05_hooks_source.py`: `test_a_drift_in_the_template_s_hooks_source_turns_adapter_portability_red_naming_the_source_and_the_event` with `[an event in the template's source only]`, `[an event in the repository's source only]`, `[an event whose matcher differs]`, `[a matcher in the repository's source only]`, `[a matcher in the template's source only]` (their base pair built from one source and checked green before the plant, DEC-970); `test_a_difference_that_is_not_drift_leaves_adapter_portability_green` with `[only the paths]`, `[only the order of the events]`, `[only the order of the hooks of an event]`, `[only the command wrapper]`; `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources`; and DEC-971 item 3's exception for the two hook events ACT 1 lifted, 14 cases (see "DEC-971 item 3" below) |
+| **DEC-971 item 3** (H (a) refined): DEC-805's comparison excepts exactly the two hook events ACT 1 lifted (`postToolUse`, `postToolUseFailure`), named in it, until they return with W2-08 | `test_w2_05_hooks_source.py`: point 1 `test_a_lifted_hook_event_in_the_template_s_source_only_leaves_adapter_portability_green` `[postToolUse]`, `[postToolUseFailure]`, `[both]`; point 2 `test_a_drift_beside_the_lifted_hook_events_still_turns_adapter_portability_red_naming_its_event` × 4; point 3 `test_a_lifted_hook_event_in_the_repository_s_source_only_still_turns_adapter_portability_red` `[postToolUse]`, `[postToolUseFailure]`, `[both]`; point 4 `test_a_lifted_hook_event_back_in_both_sources_is_compared_as_any_other` × 4; point 5 (the output form) in each of the 14; and `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources` (unchanged). At `d1533bf30a10`: point 1's 3 and the over-this-repository case **red**, the other 10 **green** |
 
 Not written:
 
@@ -335,7 +336,7 @@ absent, and nothing skips.
 | `git` | every case that uses the box |
 | `lefthook` | the S3 cases; the lefthook case of S2; the lefthook case of F1 (an index outside the git directory); the 3 declared-check cases (F-A) |
 | `gitleaks` | the staged-secrets cases; the lefthook cases of S2 and F1; the 3 declared-check cases (F-A) |
-| `rulesync` | `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`; the 10 hooks-source cases (W2-M281), with the same rule (`skip_without("rulesync")`, then W1-38's `rulesync_version()`) |
+| `rulesync` | `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`; the 24 hooks-source cases (W2-M281 and DEC-971 item 3), with the same rule (`skip_without("rulesync")`, then W1-38's `rulesync_version()`) |
 | `sqlite_vec` | the retrieval-regression cases (the `tiers` fixture) |
 
 ## Readings the tests rest on
@@ -512,3 +513,61 @@ named as the first bad commit; the two steps (at `harmless one` and at the culpr
 runs of the test in all.
 
 W2-05 has 51 cases with these three.
+
+## DEC-971 item 3 (2026-11-01): the comparison's exception for the two hook events ACT 1 lifted (package H)
+
+Ticket `DAEO-0z8c`. Written by a fresh independent test designer on `w2/W2-05-tests` from the ticket's head
+`d1533bf30a10`, before the product change. Sources: DEC-971 item 3 (H (a) refined), DEC-805, DEC-953 item 2 (ACT 1),
+DEC-970 (the base pair). No implementation file of the ticket was read; the check's output form was read from its
+printed result (`{"findings": [{"code", "message", "file"}], "compared": {...}}`, seen at `d1533bf30a10`).
+
+- **The decision.** DEC-805's comparison of `template/.rulesync/hooks.jsonc` with `.rulesync/hooks.jsonc` gets an
+  exception covering exactly the two hook events ACT 1 took out of the repository's source, `postToolUse` and
+  `postToolUseFailure`, named in the comparison, ending when they return with W2-08. Nothing else is lowered.
+- **The cases (all new; each names DEC-971 item 3 in its docstring).** Each builds the project on the drift cases'
+  base pair (`BASE_HOOKS`: both lifted events in both sources, with the same matchers), requires the check green over
+  it (the control), then makes its one change and commits it. A change to the repository's source is generated
+  again by rulesync before the commit, so the adapters match it. Then:
+  1. **Point 1: a lifted event in the template's source only is no finding.** `postToolUse`, `postToolUseFailure`,
+     or both, taken out of the repository's source: exit 0, no finding.
+  2. **Point 2: the exception hides nothing else.** Both lifted events taken out of the repository's source, and one
+     of the drift cases' own plants made in the template's source: an event in the template's source only
+     (`userPromptSubmit`), an event in the repository's source only (`subagentStop`), a matcher in the repository's
+     source only (`sessionStart`), a matcher in the template's source only (`preToolUse`). Each is red with a
+     finding that names `hooks.jsonc` and its event. (The fifth plant, a matcher on `postToolUseFailure`, needs the
+     event in both sources: point 4.)
+  3. **Point 3: one direction only.** `postToolUse`, `postToolUseFailure`, or both, taken out of the template's
+     source: red, with a finding naming `hooks.jsonc` and each event taken out.
+  4. **Point 4: the exception ends when the events return.** Each lifted event, in both sources, with the template's
+     matcher `Bash|Edit` against `Bash`, or with no matcher in the template's source: red, with a finding naming
+     `hooks.jsonc` and the event.
+  5. **Point 5: the output form is unchanged,** asserted in every one of the 14 (`assert_the_form`): the printed
+     object's keys and those of `compared` are the control's, and every finding has the keys `code`, `file` and
+     `message`, as at `d1533bf30a10`.
+- **Event names are matched as whole words** in the new cases (`_naming_the_event`), so a finding about
+  `postToolUseFailure` does not count as naming `postToolUse`. The earlier cases keep their own matching.
+- **Unchanged:** the 10 earlier cases. `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources`
+  keeps its construction (this repository's two files, byte for byte). Since ACT 1 they differ in exactly the two
+  lifted events, both in the template's source only, so with the exception it is green at its first step, and its
+  second step (the template's `sessionStart` matcher taken out: red) still shows that the green is the comparison's.
+- **The mutation check** (a scratch plugin, not committed). With each case's own change made to do nothing, at
+  `d1533bf30a10`: the 4 point 2 cases fail at the naming step ("no finding names the hooks source and the event
+  ...": the only findings are the lifted events'), and the 3 point 3 and 4 point 4 cases fail with "stayed green".
+  So each of them is red only through its own change, and none is green through the lifted events' findings.
+  Point 1's cases pass their control and are red at their last step only.
+
+| Case (`test_w2_05_hooks_source.py::`) | Point | At `d1533bf30a10`, before the product change (seen) |
+|---|---|---|
+| `test_a_lifted_hook_event_in_the_template_s_source_only_leaves_adapter_portability_green[postToolUse]` | 1 | **red:** `HOOKS_EVENT_DIFFERS`, "hook event postToolUse is only in template/.rulesync/hooks.jsonc" |
+| `...[postToolUseFailure]` | 1 | **red:** `HOOKS_EVENT_DIFFERS`, "hook event postToolUseFailure is only in template/.rulesync/hooks.jsonc" |
+| `...[both]` | 1 | **red:** both findings above |
+| `test_a_drift_beside_the_lifted_hook_events_still_turns_adapter_portability_red_naming_its_event[an event in the template's source only]`, `[an event in the repository's source only]`, `[a matcher in the repository's source only]`, `[a matcher in the template's source only]` | 2 | **green** (and must stay green) |
+| `test_a_lifted_hook_event_in_the_repository_s_source_only_still_turns_adapter_portability_red[postToolUse]`, `[postToolUseFailure]`, `[both]` | 3 | **green** (and must stay green) |
+| `test_a_lifted_hook_event_back_in_both_sources_is_compared_as_any_other[postToolUse, a matcher that differs]`, `[postToolUseFailure, a matcher that differs]`, `[postToolUse, a matcher in the repository's source only]`, `[postToolUseFailure, a matcher in the repository's source only]` | 4 | **green** (and must stay green) |
+| `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources` (unchanged) | 1, over the live files | **red:** the two `HOOKS_EVENT_DIFFERS` findings, as before (ACT 1) |
+| the 9 other earlier cases | | **green** |
+
+The file, at `d1533bf30a10`, in a launched session: 24 cases, 4 failed and 20 passed (151 s). The 4 are to turn
+green with the exception; the other 20 are to stay green.
+
+W2-05 has 65 cases with these 14.

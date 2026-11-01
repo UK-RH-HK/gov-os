@@ -11,6 +11,12 @@ hook events and matchers, with paths normalised.
   interpreter; the template's call ``python3``). Each alone leaves adapter-portability green.
 - **This repository's two sources** leave it green once the template carries ``sessionStart``'s matcher
   (``"compact|clear|resume"``, the repository's): the one line DEC-805 item 2 adds to the template.
+- **DEC-971 item 3's exception** (H (a) refined): the comparison excepts exactly the two hook events ACT 1 (DEC-953
+  item 2) took out of the repository's source, ``postToolUse`` and ``postToolUseFailure``, named in it, until they
+  return with W2-08. Such an event in the template's source and not in the repository's is no finding. Every other
+  drift is still one when both are absent; a lifted event in the repository's source only is still one; a lifted
+  event in both sources is compared as any other; the check's output form is unchanged. Since ACT 1 this
+  repository's two sources differ in exactly those two events, so the case over them is green with the exception.
 
 The temporary project has this repository's shape: W1-38's adopted project (the kernel template's roles, skills and
 hooks, the template's rulesync sources, the registered rulesync version and the check's declaration, copied one
@@ -33,6 +39,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -340,3 +347,178 @@ def test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources(t
     done, findings = _check(w138, project)
     assert_drift_seen(w138, done, findings, "sessionStart",
                       "this repository's two hooks sources with the template's sessionStart matcher taken out")
+
+
+# --------------------------------------------------------------------------
+# DEC-971 item 3: the exception for the two hook events ACT 1 lifted
+# --------------------------------------------------------------------------
+#
+# DEC-971 item 3 (H (a) refined): DEC-805's comparison excepts exactly the two hook events ACT 1 (DEC-953 item 2)
+# took out of the repository's source, named in the comparison, until they return with W2-08. Each case below
+# starts from the drift cases' base pair (``BASE_HOOKS``: both events in both sources, the same matchers) and first
+# requires the check green over it (the control), so that what it finds after comes from its own change alone:
+#
+# 1. a lifted event in the template's source and not in the repository's: no finding (green);
+# 2. any other drift, while both lifted events are absent from the repository's source: a finding naming its event;
+# 3. a lifted event in the repository's source and not in the template's: a finding naming it;
+# 4. a lifted event in both sources with matchers that differ: a finding naming it (the exception has ended);
+# 5. in every case, the check's output form is the control's: no key added or renamed.
+
+LIFTED = ("postToolUse", "postToolUseFailure")      # ACT 1 took them out of the repository's source
+FINDING_KEYS = ("code", "file", "message")          # the keys of each finding of the check at d1533bf30a10 (seen)
+
+LIFTED_SETS = {
+    "postToolUse": ("postToolUse",),
+    "postToolUseFailure": ("postToolUseFailure",),
+    "both": LIFTED,
+}
+
+
+def _without(source, *events):
+    out = copy.deepcopy(source)
+    for event in events:
+        del out["hooks"][event]
+    return out
+
+
+def _from_the_control(tmp_path, w138):
+    """The project on the drift cases' base pair, generated, committed and checked green: the control."""
+    repository, template = _base_pair()
+    project = _project(tmp_path, w138, _dump(repository), _dump(template))
+    control, findings = _check(w138, project)
+    assert_green(w138, control, findings, "the drift cases' base pair, before anything is changed (the control)")
+    return project, repository, template, control
+
+
+def _rewrite(w138, project, repository, template, what):
+    """Write the two sources; generate the adapters again from the repository's source when it changed; commit."""
+    path = Path(project) / support.REPO_HOOKS_SOURCE_REL
+    if path.read_text(encoding="utf-8") != _dump(repository):
+        support.write(project, support.REPO_HOOKS_SOURCE_REL, _dump(repository))
+        generated = w138.run_rulesync_generate(project)
+        assert generated.returncode == 0, f"rulesync generate failed: {generated.stderr[-2000:]}"
+    support.write(project, support.TEMPLATE_HOOKS_SOURCE_REL, _dump(template))
+    w138.commit_all(project, what)
+
+
+def _naming_the_event(findings, event):
+    """The findings that name ``hooks.jsonc`` and ``event`` as a whole word (``postToolUse`` is not named by
+    ``postToolUseFailure``)."""
+    word = re.compile(rf"(?<![A-Za-z]){re.escape(event)}(?![A-Za-z])", re.IGNORECASE)
+    return [finding for finding in findings
+            if "hooks.jsonc" in json.dumps(finding).lower() and word.search(json.dumps(finding))]
+
+
+def assert_the_event_named(w138, done, findings, event, what):
+    assert done.returncode != 0, (
+        f"adapter-portability stayed green on {what}: DEC-971 item 3 excepts only the two hook events ACT 1 lifted, "
+        f"in the template's source only; nothing else is lowered:\n{w138.output_of(done)[-2000:]}")
+    assert _naming_the_event(findings, event), (
+        f"adapter-portability went red on {what}, but no finding names the hooks source and the event {event}:\n"
+        f"{json.dumps(findings, indent=1)[-3000:]}")
+
+
+def assert_the_form(done, control, what):
+    """DEC-971 item 3: the check's output form is unchanged: the printed object's keys and those of ``compared``
+    are the control's, and each finding has the keys of a finding at d1533bf30a10."""
+    printed, before = json.loads(done.stdout), json.loads(control.stdout)
+    assert sorted(printed) == sorted(before), (
+        f"the check's output on {what} has the keys {sorted(printed)}, the control's {sorted(before)}: its form "
+        f"changed (DEC-971 item 3 adds no key and renames none)")
+    assert sorted(printed.get("compared") or {}) == sorted(before.get("compared") or {}), (
+        f"the check's `compared` on {what} has the keys {sorted(printed.get('compared') or {})}, the control's "
+        f"{sorted(before.get('compared') or {})} (DEC-971 item 3 adds no key and renames none)")
+    forms = sorted({tuple(sorted(finding)) for finding in printed.get("findings", [])})
+    assert all(form == FINDING_KEYS for form in forms), (
+        f"a finding of the check on {what} has the keys {forms}, not {list(FINDING_KEYS)} (DEC-971 item 3 adds no "
+        f"key and renames none)")
+
+
+@pytest.mark.parametrize("lifted", tuple(LIFTED_SETS))
+def test_a_lifted_hook_event_in_the_template_s_source_only_leaves_adapter_portability_green(tmp_path, lifted):
+    """DEC-971 item 3 (H (a) refined), point 1 (new): the events ACT 1 lifted, in the template's source and not in
+    the repository's, are no finding; with nothing else different the check is green, in its unchanged form."""
+    w138 = _w138()
+    events = LIFTED_SETS[lifted]
+    project, repository, template, control = _from_the_control(tmp_path, w138)
+    _rewrite(w138, project, _without(repository, *events), template,
+             f"{', '.join(events)} taken out of the repository's hooks source, as ACT 1 took them")
+    what = f"{' and '.join(events)} in the template's hooks source only, nothing else different"
+
+    done, findings = _check(w138, project)
+
+    assert done.returncode == 0 and not findings, (
+        f"adapter-portability is red on {what}: DEC-971 item 3 excepts exactly the two hook events ACT 1 lifted "
+        f"from the repository's source ({', '.join(LIFTED)}), until they return with W2-08:\n"
+        f"{w138.output_of(done)[-3000:]}")
+    assert_the_form(done, control, what)
+
+
+BESIDE_THE_LIFTED = {drift: DRIFTS[drift] for drift in DRIFTS if DRIFTS[drift][0] not in LIFTED}
+
+
+@pytest.mark.parametrize("drift", tuple(BESIDE_THE_LIFTED))
+def test_a_drift_beside_the_lifted_hook_events_still_turns_adapter_portability_red_naming_its_event(tmp_path, drift):
+    """DEC-971 item 3 (H (a) refined), point 2 (new): with both lifted events in the template's source only, every
+    other drift is still a finding naming its event, in either direction, events and matchers alike: the exception
+    hides nothing else. The plants are the drift cases' own, on the events they name."""
+    w138 = _w138()
+    event, plant = BESIDE_THE_LIFTED[drift]
+    project, repository, template, control = _from_the_control(tmp_path, w138)
+    plant(template)
+    _rewrite(w138, project, _without(repository, *LIFTED), template,
+             f"{drift}, beside the two lifted events taken out of the repository's hooks source")
+    what = f"{drift} ({event}), with {' and '.join(LIFTED)} in the template's hooks source only"
+
+    done, findings = _check(w138, project)
+
+    assert_the_event_named(w138, done, findings, event, what)
+    assert_the_form(done, control, what)
+
+
+@pytest.mark.parametrize("lifted", tuple(LIFTED_SETS))
+def test_a_lifted_hook_event_in_the_repository_s_source_only_still_turns_adapter_portability_red(tmp_path, lifted):
+    """DEC-971 item 3 (H (a) refined), point 3 (new): the exception covers one direction only, the one ACT 1 made
+    (the events taken out of the repository's source). A lifted event in the repository's source and not in the
+    template's is a finding naming it."""
+    w138 = _w138()
+    events = LIFTED_SETS[lifted]
+    project, repository, template, control = _from_the_control(tmp_path, w138)
+    _rewrite(w138, project, repository, _without(template, *events),
+             f"{', '.join(events)} taken out of the template's hooks source")
+    what = f"{' and '.join(events)} in the repository's hooks source only"
+
+    done, findings = _check(w138, project)
+
+    for event in events:
+        assert_the_event_named(w138, done, findings, event, what)
+    assert_the_form(done, control, what)
+
+
+LIFTED_MATCHERS = {   # (the lifted event, the template's matcher for it; None: no matcher)
+    "postToolUse, a matcher that differs": ("postToolUse", "Bash|Edit"),
+    "postToolUseFailure, a matcher that differs": ("postToolUseFailure", "Bash|Edit"),
+    "postToolUse, a matcher in the repository's source only": ("postToolUse", None),
+    "postToolUseFailure, a matcher in the repository's source only": ("postToolUseFailure", None),
+}
+
+
+@pytest.mark.parametrize("change", tuple(LIFTED_MATCHERS))
+def test_a_lifted_hook_event_back_in_both_sources_is_compared_as_any_other(tmp_path, change):
+    """DEC-971 item 3 (H (a) refined), point 4 (new): the exception ends when the events return (with W2-08). A
+    lifted event in both sources is compared as any other event, so a matcher that differs, or is in one source
+    only, is a finding naming it."""
+    w138 = _w138()
+    event, matcher = LIFTED_MATCHERS[change]
+    project, repository, template, control = _from_the_control(tmp_path, w138)
+    template["hooks"][event] = [
+        _with_matcher(entry, matcher) if matcher is not None
+        else {key: value for key, value in entry.items() if key != "matcher"}
+        for entry in template["hooks"][event]]
+    _rewrite(w138, project, repository, template, f"{change}, in the template's hooks source")
+    what = f"{event} in both hooks sources, {change.split(', ', 1)[1]}"
+
+    done, findings = _check(w138, project)
+
+    assert_the_event_named(w138, done, findings, event, what)
+    assert_the_form(done, control, what)
