@@ -115,15 +115,15 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget)
 
     root = Path(root)
-    unread = None  # W2-92: a missing or unreadable record store fails the record and closure routes, not the answer
+    unread = None  # W2-92: a store whose record graph is missing or unreadable fails the record and closure routes
     try:
         record_of, not_current, record_types = _graph(root)
         # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
         known, edges = records.records(root), records.edges(root, type=authority.SUPERSEDES)
-    except (GovError, sqlite3.DatabaseError) as error:
-        if not (error.code == "STORE_MISSING" if isinstance(error, GovError) else type(error) in STORE_FAULTS):
+    except sqlite3.DatabaseError as error:  # no store file at all stays connect's STORE_MISSING: no route answers
+        if type(error) not in STORE_FAULTS:
             raise  # a fault that is not the store's is no unavailable route
-        missing = isinstance(error, GovError) or str(error).startswith("no such table")
+        missing = str(error).startswith("no such table")
         unread = f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure"
         record_of, not_current, record_types, known, edges = {}, {}, {}, [], []
     register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)

@@ -350,10 +350,14 @@ def test_a_missing_or_unreadable_record_store_is_named_and_the_other_routes_answ
 
 
 @needs_gitleaks
-def test_no_store_at_all_is_named_never_refused(repo):
+def test_an_absent_store_is_still_refused(repo):
+    from gov.cli.errors import GovError
+
     (repo / ".gov-runtime/store.db").unlink()
-    bundle = retrieve(repo, "What does DEC-001 say?", reranker=lambda: None)
-    assert "the record store is missing" in bundle["facets"]["closure"]["reason"] and bundle["evidence"] == []
+    with pytest.raises(GovError) as refused:  # no route can answer: as at the base, never a bundle
+        retrieve(repo, "What does DEC-001 say?", reranker=lambda: None)
+    assert (refused.value.code, refused.value.exit_code) == ("STORE_MISSING", 1)
+    assert refused.value.message == f".gov-runtime/store.db: no store at {repo}; load it first"
 
 
 @needs_gitleaks
