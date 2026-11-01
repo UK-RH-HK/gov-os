@@ -85,16 +85,57 @@ namespaces:
     deletion_rebuild: authoritative; restored from git only
   # DEC-887 (owner, 2026-10-21): the raw orchestration record (DEC-856's `orchestration-record` namespace) lives on
   # the branch record/w2, outside this tree; no namespace here holds it.
+  # DEC-952 item 1, DEC-388: the kernel's own files are embedded; vendored code and the generated adapter copies
+  # are in the two namespaces below it. `skills/*/*` holds each kernel skill and vendored.yaml, never a file in a
+  # folder below superpowers/.
   kernel-template:
-    paths: ["template/**"]
+    paths:
+      - "template/*"
+      - "template/.github/**"
+      - "template/openspec/**"
+      - "template/governance/project/**"
+      - "template/governance/kernel/*"
+      - "template/governance/kernel/canaries/**"
+      - "template/governance/kernel/checks/**"
+      - "template/governance/kernel/hooks/**"
+      - "template/governance/kernel/launch/**"
+      - "template/governance/kernel/roles/**"
+      - "template/governance/kernel/schemas/**"
+      - "template/governance/kernel/skills/*/*"
+      - "template/governance/kernel/templates/**"
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: allowed; copied into adopting products
-    embedding_policy: embedded, except vendored code
+    embedding_policy: embedded
     provenance: written under a ticket; vendored parts are pinned in the tool registry
     deletion_rebuild: authoritative; restored from git only
+  # DEC-952 item 1, DEC-388: vendored code, unchanged upstream copies, is not embedded.
+  kernel-vendored:
+    paths:
+      - "template/governance/kernel/vendor/**"
+      - "template/governance/kernel/skills/superpowers/*/**"
+      - "template/governance/kernel/bin/**"
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: allowed; copied into adopting products
+    embedding_policy: not embedded
+    provenance: vendored upstream code, pinned in the tool registry (superpowers v6.4.2, its kernel copies recorded in skills/superpowers/vendored.yaml; tk)
+    deletion_rebuild: restored from git; re-vendored by the tool registry's install command
+  # DEC-952 item 1, DEC-388: the generated adapter copies are not embedded, as the root's .rulesync/** and .claude/**.
+  kernel-adapter-copies:
+    paths: ["template/.rulesync/**"]
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: allowed; copied into adopting products
+    embedding_policy: not embedded
+    provenance: generated copies of the kernel's skills, roles and commands for the agent adapters (rulesync)
+    deletion_rebuild: rebuilt from the kernel's own files; restored from git
   gov-source:
     paths: ["src/**"]
     memory_class: governance
