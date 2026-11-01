@@ -306,11 +306,16 @@ class TestBriefTemplates:
         taken = {name: [word for word in support.RECORD_TEMPLATE_WORDS if word in name.lower()]
                  for name in support.BRIEFS.values()}
         assert not any(taken.values()), f"brief names that W1-08 reads as record templates: {taken}"
+        # W2-L258 (DEC-729, DEC-866): a brief carries record frontmatter of its own type; it never declares itself
+        # one of the record kinds W1-08 validates.
         for kind in support.BRIEFS:
             front, _ = support.split_frontmatter(support.read(support.brief_rel(kind)))
-            assert not (front or {}).get("type"), (
-                f"{support.brief_rel(kind)} has a record frontmatter (type: {front.get('type')}); a brief is "
-                f"not a record"
+            declared = str((front or {}).get("type") or "")
+            words = set(re.split(r"[^a-z0-9]+", declared.lower()))
+            kinds = [word for word in support.RECORD_TEMPLATE_WORDS if word in words]
+            assert not kinds, (
+                f"{support.brief_rel(kind)} declares itself a record kind W1-08 validates (type: {declared}); a "
+                f"brief has a record type of its own"
             )
 
 
