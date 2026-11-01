@@ -8,12 +8,11 @@ Round 1 covers every KPI line but the three-layer split and the lines DEC-983 pu
 ## How to run
 
 The cases find the repository from their own location (`parents[3]` of `w2_11_support.py`), so merged into the
-ticket's worktree they judge that worktree's files; the validator case runs that worktree's `src/` (DEC-732):
+ticket's worktree they judge that worktree's files; the run uses that worktree's `src/` (DEC-732):
 
     TMPDIR=/tmp/gov-os-lead-W2-11 PYTHONPATH=<worktree>/src python3 -m pytest tests/acceptance/W2-11 -q -p no:cacheprovider -o tmp_path_retention_policy=failed
 
-Text checks of files (the deliverables are text), plus one subprocess (the skill validator) and one opt-in
-subprocess (the brief builder). No network, no copy of the tree; planted files go in `tmp_path`. The suite
+Text checks of files (the deliverables are text), plus one opt-in subprocess (the brief builder). No network, no copy of the tree; planted files go in `tmp_path`. The suite
 takes about 3 seconds.
 
 **Kinds.** Every case is an acceptance case on the repository's own files. `test_w2_11_brief_gaps.py` is
@@ -46,8 +45,13 @@ brackets covers every parametrised case of that test) and the red reason on the 
 | success-11 (work order in parallel, red against the base, ISTQB, proportion, the README map) | `test_w2_11_skills.py::test_the_test_design_skill_states[the work order in parallel, never reading the engineer's work [DEC-959 item 7]]`, `test_w2_11_skills.py::test_the_test_design_skill_states[red against the ticket's base]`, `test_w2_11_skills.py::test_the_test_design_skill_states[ISTQB's black-box techniques]`, `test_w2_11_skills.py::test_the_test_design_skill_states[proportion: the minimum that shows each KPI line and failure line [DEC-951 item 5]]`, `test_w2_11_skills.py::test_the_test_design_skill_states[the README map of KPI lines to tests that gov accept reads]` | test-design cites no DEC-959 |
 | success-12 (orchestration's three reference files, the qa-review skill) | `test_w2_11_skills.py::test_orchestration_has_the_reference_file`, `test_w2_11_skills.py::test_the_qa_review_skill_states`, `test_w2_11_skills.py::test_the_qa_review_skill_has_its_three_copies`, `test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body` | no reference file and no qa-review skill; the copies of test-design, orchestration and audit already match (green) |
 | success-13 (the lead brief's brief_gaps section) | `test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[brief_gaps in the return]` | brief-lead.md does not cite DEC-943 |
-| failure-1 (the validator refuses a brief without the twelve-field rule) | `test_w2_11_validator.py::test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields` | the validator refuses the brief as it stands (SKILL_NO_FRONTMATTER): it reads no brief |
-| failure-2 (a file still teaching a superseded rule fails a test) | `test_w2_11_supersession.py::test_a_planted_file_that_still_teaches_the_old_rule_fails`, `test_w2_11_supersession.py::test_a_file_stating_only_the_current_rules_passes` | both pass on the base (they test the check) |
+| failure-1 (a file still teaching a superseded rule fails a test) | `test_w2_11_supersession.py::test_a_planted_file_that_still_teaches_the_old_rule_fails`, `test_w2_11_supersession.py::test_a_file_stating_only_the_current_rules_passes` | both pass on the base (they test the check) |
+
+**The failure line that moved, not in the table (DEC-995, DEC-996).** The former failure line "the skill
+validator refuses a brief without the twelve-field rule" (row W2-L097) moved to W2-120, a child engineer ticket
+that runs after W2-11, under DEC-995 and DEC-996; W2-120's own test designer writes its case, so this suite has
+none. With that line removed from the ticket file, the DEC-866 line is `failure-1`; it was `failure-2` before the
+removal, and its cases and red reason are unchanged.
 
 **Round 2's lines, not in the table (DEC-983).** success-14 (the anti-drift kit), success-15 (scope control) and
 success-16 (a timing test measures the work under test) have no case in round 1; they are round 2's, so the table
@@ -99,8 +103,6 @@ fixed number", no checkpoint at every handover, no DEC-820); the other two pass.
 - **DEC-791 (ii):** every group is required in the kernel corpus (the orchestration skill's folder and the five
   briefs), as the card lists them. Which groups are scoped to this repository (and so belong in the project prompt)
   is package P-W2-11-TD-1; a group the orchestrator rules repository-scoped is dropped by a test revision.
-- **failure-1:** the validator's code is `src/gov/check/skill_validator.py` (DEC-992, P-W2-11-2: an engineer in
-  W2-11's resume); the case may stay red until that work lands.
 - **success-9:** the case that runs the builder is opt-in, because the builder is untracked and absent from every
   clone: `GOV_BRIEF_BUILDER=<path of build_lead_brief.py>` runs it on this repository's common brief
   (`GOV_BRIEF_COMMON`). A row marked fixed in the register without a matching entry in `FIXES` fails until the test
