@@ -1,17 +1,17 @@
 """The code route of a plain question: the symbols it names, their callers and callees (W2-92; DEC-957, CAP-12).
 
-``route`` asks the code index for each word of the question shaped as code (``_CODE_SHAPED``: in backticks, called,
-or with an underscore or a capital inside it) that is the name of a function, method or class there, with the
-code-graph tool's own traversal (DEC-859): ``search_graph`` for the definitions, ``trace_path`` one hop both
-ways for the callers and callees, ``search_graph`` by qualified name for their spans. Every answer is a small page
-(``PAGE`` rows, far under the tool's cap), followed by its continuation; nothing loads the whole graph. A span is a
-file of the index's staged copy, given back as the repository's path, and joins the fusion as the store's lexical
-chunks that cover it. As the tool's ``trace_path`` does by default, test files are left out.
+``route`` asks the code index for each word of the question that names a function, method or class: a word shaped
+as code (``_CODE_SHAPED``: in backticks, called, or with an underscore or a capital inside it), or a plain word that
+a code file of the store, no test, defines (``def`` or ``class``). It asks with the code-graph tool's own traversal
+(DEC-859): ``search_graph`` for the definitions, then for each a targeted ``query_graph`` of the CALLS edges into
+and out of that one qualified name, which gives the callers' and callees' files and lines in one answer. Every
+answer is a small page (``PAGE`` rows, far under the tool's cap), followed by its continuation; nothing loads the
+whole graph. A span is a file of the index's staged copy, given back as the repository's path, and joins the fusion
+as the store's lexical chunks that cover it. As the tool's ``trace_path`` does by default, test files are left out.
 
-A question of plain words asks nothing of the index: a plain word that happens to name a symbol (``close``, ``load``)
-is no question about code, and a search for every word is no targeted answer. A question that names no symbol gives
-no route and no facet: today's bundle. A missing or unreadable code index gives the facet unavailable with its
-reason, and no hit, for a question with a word shaped as code. The other routes still answer (DEC-957, DEC-860).
+A question whose plain words no code file defines asks nothing of the index, and its daemon is not started: no
+route and no facet, today's bundle. A missing or unreadable code index gives the facet unavailable with its reason,
+and no hit, for a question that names a symbol. The other routes still answer (DEC-957, DEC-860).
 Everything is sorted. It only reads: it builds no index.
 """
 
@@ -23,13 +23,15 @@ from pathlib import Path
 from gov import codeintel
 
 FACET = "code"
-PAGE = 50  # rows of one answer of the tool: a small page, far under its cap of 500 (search) and 5000 (trace)
+PAGE = 50  # rows of one answer of the tool: a small page, far under its cap of 500 (search) and 5000 (query)
 _SYMBOLS = {"Function", "Method", "Class"}
 _TRACED = {"Function", "Method"}
 _WORD = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 # A word that names a symbol by its form: in backticks, called, or with an underscore or a capital inside it.
 _CODE_SHAPED = re.compile(r"`[^`\s]+`|\b[A-Za-z_]\w*\(|\b\w*_\w+|\b\w*[a-z0-9][A-Z]\w*")
-_QNS = 20  # qualified names asked of search_graph at once
+_CODE_FILES = (".py",)
+_NEIGHBOURS = ("MATCH (a)-[:CALLS]->(b) WHERE {near}.qualified_name = '{qualified}' "
+               "RETURN {far}.qualified_name, {far}.label, {far}.file_path, {far}.start_line, {far}.end_line")
 
 
 def _test_file(path: str) -> bool:
@@ -41,6 +43,21 @@ def _repo_path(root: Path, file: str) -> str:
     """A file of the index, as the repository's path: the tool's paths are under the staged copy, or relative to it."""
     staged = str(Path(root) / codeintel.BASE_REL / "files") + "/"
     return file[len(staged):] if file.startswith(staged) else file
+
+
+def _defined(root: Path, words: set[str], chunks: dict[str, dict]) -> set[str]:
+    """The ``words`` that a code file of the store, no test, defines as a function, method or class."""
+    if not words:
+        return set()
+    pattern = re.compile(rf"^[ \t]*(?:async[ \t]+)?(?:def|class)[ \t]+({'|'.join(sorted(words))})\b", re.M)
+    defined = set()
+    for path in sorted({chunk["path"] for chunk in chunks.values()}):
+        if path.endswith(_CODE_FILES) and not _test_file(path):
+            try:
+                defined |= set(pattern.findall((Path(root) / path).read_text(encoding="utf-8", errors="replace")))
+            except OSError:
+                continue
+    return defined
 
 
 def _search(session, **args) -> list[tuple[str, str, str, str]]:
@@ -58,19 +75,19 @@ def _search(session, **args) -> list[tuple[str, str, str, str]]:
         offset = page["next_offset"]
 
 
-def _near(session, qualified: str) -> set[str]:
-    """The qualified names of the callers and callees of ``qualified``, one hop, page by page."""
-    near, cursor = set(), None
-    while True:
-        page = session.tool("trace_path", project=codeintel.PROJECT, function_name=qualified, direction="both",
-                            depth=1, format="json", limit=PAGE, **({"cursor": cursor} if cursor else {}))
-        for side in ("callers", "callees"):
-            for group in (page.get(side) or {}).get("groups", []):
-                prefix = group.get("qn_prefix", "")
-                near |= {f"{prefix}.{row[0]}" if prefix else row[0] for row in group["rows"]}
-        cursor = page.get("next_cursor")
-        if not page.get("has_more") or not cursor:
-            return near
+def _near(session, qualified: str) -> set[tuple[str, str, str, str]]:
+    """``(qualified name, label, file, first-last)`` of the callers and callees of ``qualified``, page by page."""
+    near = set()
+    for side, far in (("b", "a"), ("a", "b")):  # the edges into it: its callers; out of it: its callees
+        query, offset = _NEIGHBOURS.format(near=side, far=far, qualified=qualified), 0
+        while True:
+            page = session.tool("query_graph", project=codeintel.PROJECT, format="json", query=query, max_rows=PAGE,
+                                offset=offset)
+            near |= {(name, label, file, f"{first}-{last}") for name, label, file, first, last in page["rows"]}
+            offset += len(page["rows"])
+            if not page.get("has_more") or not page["rows"]:
+                break
+    return near
 
 
 def _spans(root: Path, words: list[str]) -> list[tuple[str, int, int]]:
@@ -82,25 +99,21 @@ def _spans(root: Path, words: list[str]) -> list[tuple[str, int, int]]:
         for qualified, _, label, _, _ in named:
             if label in _TRACED:
                 near |= _near(session, qualified)
-        near -= {row[0] for row in named}
-        listed, others = sorted(near), []
-        for start in range(0, len(listed), _QNS):
-            batch = [name.replace(".", r"\.") for name in listed[start:start + _QNS]]
-            others += [row for row in _search(session, qn_pattern=f"^({'|'.join(batch)})$")
-                       if row[0] in near and not _test_file(row[3])]
+    named_keys = {row[0] for row in named}
+    others = sorted(row for row in near if row[0] not in named_keys and row[1] in _SYMBOLS and not _test_file(row[2]))
     spans = []
-    for rows in (named, sorted(set(others))):
-        for _, _, _, file, lines in rows:
-            first, _, last = str(lines).partition("-")
-            if first.isdigit():
-                spans.append((_repo_path(root, file), int(first), int(last or first)))
+    for file, lines in [(row[3], row[4]) for row in named] + [(row[2], row[3]) for row in others]:
+        first, _, last = str(lines).partition("-")
+        if first.isdigit() and int(first) > 0:
+            spans.append((_repo_path(root, file), int(first), int(last or first)))
     return list(dict.fromkeys(spans))
 
 
 def route(root: Path, query: str, chunks: dict[str, dict]) -> tuple[list[dict], dict] | None:
     """The code route's hits (chunks of ``chunks``) and its facet, or None when ``query`` names no symbol."""
-    words = sorted({word for shaped in _CODE_SHAPED.findall(query) for word in _WORD.findall(shaped)})
-    if not words:  # a question of plain words asks nothing of the index: today's bundle
+    shaped = {word for form in _CODE_SHAPED.findall(query) for word in _WORD.findall(form)}
+    words = sorted(shaped | _defined(root, set(_WORD.findall(query)) - shaped, chunks))
+    if not words:  # no word names a symbol: the index is not asked, today's bundle
         return None
     index, spans, reason = Path(root) / codeintel.BASE_REL, [], None
     if not (index / "home").is_dir() or not (index / "files").is_dir():

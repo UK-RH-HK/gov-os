@@ -73,7 +73,7 @@ CALLS = {("code.src.ret.retrieve", "code.src.fus.rrf"), ("code.src.ret.search", 
 
 
 class Planted:
-    """The code-graph tool's search_graph and trace_path over the planted graph, one row a page, every call kept."""
+    """The code-graph tool's search_graph and query_graph over the planted graph, one row a page, every call kept."""
 
     def __init__(self, calls, fail=False):
         self.calls, self.fail = calls, fail
@@ -99,15 +99,13 @@ class Planted:
                       for key in keys[offset:offset + 1]]
             more = offset + 1 < len(keys)
             return {"groups": groups, "has_more": more, **({"next_offset": offset + 1} if more else {})}
-        assert tool == "trace_path"
-        key, at = args["function_name"], int(args.get("cursor") or 0)
-        near = sorted([("callers", a) for a, b in CALLS if b == key] + [("callees", b) for a, b in CALLS if a == key])
-        page = {"callers": {"groups": []}, "callees": {"groups": []}}
-        for side, other in near[at:at + 1]:
-            prefix, _, name = other.rpartition(".")
-            page[side]["groups"].append({"qn_prefix": prefix, "rows": [[name, 1]]})
-        more = at + 1 < len(near)
-        return {**page, "has_more": more, **({"next_cursor": str(at + 1)} if more else {})}
+        assert tool == "query_graph"
+        side, key = re.fullmatch(r"MATCH \(a\)-\[:CALLS\]->\(b\) WHERE (a|b)\.qualified_name = '([^']+)' RETURN .*",
+                                 args["query"]).groups()
+        near = sorted(a if side == "b" else b for a, b in CALLS if (b if side == "b" else a) == key)
+        rows = [[other, NODES[other][1], NODES[other][2], *NODES[other][3].split("-")]
+                for other in near[args["offset"]:args["offset"] + 1]]
+        return {"rows": rows, "has_more": args["offset"] + 1 < len(near)}
 
 
 def _chunk(path, first, last):
@@ -120,41 +118,59 @@ CHUNKS = {chunk["chunk_id"]: chunk for chunk in (
     _chunk("tests/test_fus.py", 1, 3))}
 
 
+SOURCES = {"src/fus.py": "def helper():\n    pass\nRRF = 60\n\n\nclass Fused:\n    pass\n\n\ndef rrf(ranks):\n    return 1\n",
+           "tests/test_ret.py": "def test_it():\n    pass\n\n\ndef heron():\n    pass\n"}
+
+
 @pytest.fixture()
 def indexed(tmp_path, monkeypatch):
     (tmp_path / codeintel.BASE_REL / "home").mkdir(parents=True)
     (tmp_path / codeintel.BASE_REL / "files").mkdir()
+    for rel, text in SOURCES.items():
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / rel).write_text(text, encoding="utf-8")
     calls = []
     monkeypatch.setattr(codeintel, "_Session", lambda _root: Planted(calls))
     return tmp_path, calls
 
 
-def test_a_symbol_is_asked_in_small_pages_and_its_spans_join_as_chunks(indexed):
+@pytest.mark.parametrize("query", ["Who calls `rrf`?", "Who calls rrf?"])
+def test_a_symbol_is_asked_in_small_pages_and_its_spans_join_as_chunks(indexed, query):
     root, calls = indexed
-    hits, facet = code_route.route(root, "Who calls `rrf`?", CHUNKS)
+    hits, facet = code_route.route(root, query, CHUNKS)
     assert facet == {"available": True, "reason": None}
     assert [hit["chunk_id"] for hit in hits] == ["src/fus.py:9", "src/fus.py:13", "src/fus.py:1", "src/ret.py:20",
                                                  "src/ret.py:40"]  # the definition, then its neighbours, no test
-    assert {tool for tool, _ in calls} == {"search_graph", "trace_path"}  # never query_graph: no whole-graph read
-    assert all(args["limit"] == code_route.PAGE <= 500 for _, args in calls)
-    assert [args["function_name"] for tool, args in calls if tool == "trace_path"] == ["code.src.fus.rrf"] * 4
+    assert {tool for tool, _ in calls} == {"search_graph", "query_graph"}
+    assert all(args.get("limit", args.get("max_rows")) == code_route.PAGE <= 500 for _, args in calls)
     assert calls[0] == ("search_graph", {"project": codeintel.PROJECT, "format": "json", "limit": code_route.PAGE,
-                                         "offset": 0, "name_pattern": "^(rrf)$"})  # only the word shaped as code
-    assert code_route.route(root, "Who calls `rrf`?", CHUNKS) == (hits, facet)  # the same answer twice
+                                         "offset": 0, "name_pattern": "^(rrf)$"})  # only the word that names a symbol
+    queried = [args["query"] for tool, args in calls if tool == "query_graph"]
+    assert queried and all("qualified_name = 'code.src.fus.rrf'" in query for query in queried)  # that one symbol
+    assert code_route.route(root, query, CHUNKS) == (hits, facet)  # the same answer twice
 
 
 def test_a_question_naming_no_symbol_gives_no_route(indexed):
     root, calls = indexed
     assert code_route.route(root, "How are the RRF ranks summed?", CHUNKS) is None  # a Variable, and case differs
-    assert code_route.route(root, "Who calls helper?", CHUNKS) is None  # a plain word, though a function's name
+    assert code_route.route(root, "harbour tide almanac", CHUNKS) is None  # plain words no code file defines
+    assert code_route.route(root, "Who keeps the heron?", CHUNKS) is None  # defined, but only in a test
     assert code_route.route(root, "?!", CHUNKS) is None
-    assert calls == []  # plain words ask nothing of the index
+    assert calls == []  # the index is not asked
 
 
 @pytest.mark.parametrize("query", ["Who calls fuse_scores?", "what does `rrf` do", "who uses rankItems"])
 def test_a_missing_index_is_named_for_a_question_shaped_as_code(tmp_path, query):
     hits, facet = code_route.route(tmp_path, query, CHUNKS)
     assert hits == [] and facet["available"] is False and "code index is missing" in facet["reason"]
+
+
+def test_a_missing_index_is_named_for_a_plain_word_a_code_file_defines(indexed):
+    root, calls = indexed
+    shutil.rmtree(root / codeintel.BASE_REL)
+    hits, facet = code_route.route(root, "Who calls rrf?", CHUNKS)
+    assert hits == [] and facet["available"] is False and "code index is missing" in facet["reason"]
+    assert calls == []
 
 
 def test_a_missing_index_leaves_a_plain_words_question_as_today(tmp_path):
