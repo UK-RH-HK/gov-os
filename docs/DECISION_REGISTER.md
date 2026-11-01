@@ -12534,3 +12534,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 |---|---|---|
 | 0.381 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-999 (W2-90b split, W2-90c filed; ten leads; batched landings; the queue's waits). Next free id: DEC-1000. |
 
+
+### DEC-1000 — W2-13's P-W2-13-3 (b), P-W2-13-1 (a) after W2-92, TD-1 residual, TD-2 (a) (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, DEC-936 item 2.5, DEC-957's rubric: P2s within the approved spec, reversible, the lead's recommendations; confidence medium-high) · **Under:** DEC-979, CAP-11, DEC-802
+- **Decision:** P-W2-13-3 (b): `hits` stays exact (W1-17's 65 cases and W2-87's 5 order cases unchanged); a separate `ranked` list carries the BM25 order; W2-13's 7 S1/S2 cases are rewritten by its test designer to read `ranked` (Rewrite-Reason, nothing lowered). P-W2-13-1 (a): the one-line fusion change in `src/gov/retrieve/retrieve.py` is W2-13's, made after W2-92 (which holds the file) lands; the path joins W2-13's ticket then. TD-1: the closure's half goes to the owner of `src/gov/closure/**` as a Wave 2 list residual. TD-2 (a): whole tokens; the trigram table to W2-32 or Wave 3.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.382 | 2026-11-01 | Orchestrator (delegated): DEC-1000 (W2-13's packages). Next free id: DEC-1001. |
+
