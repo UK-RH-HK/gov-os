@@ -77,10 +77,32 @@ def test_a_question_without_an_id_is_answered_as_before(root):
     assert _ask(root, "What does the harbour decide?")["evidence"]
 
 
-def test_with_an_id_given_the_closure_decides(root):
-    bundle = command.run(root, argparse.Namespace(query=MISSING, ticket=None, ids=[MISSING], radius=0, batch_size=None,
-                                                  bundle_budget=None, continuation=None), {})
-    assert MISSING in {gap.get("id") for gap in bundle["gaps"]}
+def _given(root, query, ids=(), ticket=None):
+    return command.run(root, argparse.Namespace(query=query, ticket=ticket, ids=list(ids), radius=0, batch_size=None,
+                                                bundle_budget=None, continuation=None), {})
+
+
+@pytest.mark.parametrize("ids, ticket", [([MISSING], None), ([], "RT-9999"), ([MISSING, "ADR-0404"], None)])
+def test_ids_and_a_ticket_that_exist_nowhere_are_the_stated_gap(root, ids, ticket):
+    bundle = _given(root, f"What does {MISSING} decide?", ids, ticket)
+    assert bundle["stopping_reason"] == "UNRESOLVED_IDS" and bundle["evidence"] == []
+    assert bundle["continuation"] is None and bundle["batches"] == [{"size": 0}]
+    assert {gap["id"] for gap in bundle["gaps"]} == {MISSING, *ids, *([ticket] if ticket else [])}
+
+
+@pytest.mark.parametrize("ids", [[MISSING, "DEC-41"], [MISSING, "resize"]], ids=["one-id-exists", "a-symbol-name"])
+def test_an_id_that_exists_or_a_symbol_name_is_retrieved_as_before(root, ids):
+    bundle = _given(root, f"What does {MISSING} decide?", ids)
+    assert bundle["evidence"] and MISSING in {gap.get("id") for gap in bundle["gaps"]}
+
+
+def test_a_store_that_is_no_database_is_a_governance_error_not_a_traceback(root, capsys):
+    from gov.cli.main import main
+
+    (root / ".gov-runtime/store.db").write_bytes(b"this is no database" * 100)
+    code = main(["retrieve", "--json", "--root", str(root), "pilot tide harbour"])
+    out, err = capsys.readouterr()
+    assert code == 1 and "Traceback" not in err and "STORE_UNREADABLE" in out, (code, out, err)
 
 
 def test_a_stale_index_decides_nothing(root):

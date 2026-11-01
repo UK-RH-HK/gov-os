@@ -3,13 +3,17 @@
 ``gov retrieve [--ticket <id>] [--id <id>]... [--radius <R>] [--batch-size <N>] [--bundle-budget <N>]
 [--continue <token>] <query>`` prints the evidence bundle of ``gov.retrieval.retrieve``. It only reads (CAP-27).
 The register's superseded and done entries are left out of it, and its ``left_out`` counts them (W2-55).
-Exit code 1: ``STORE_MISSING``, no store was loaded; ``CONTINUATION_INVALID``, the token is none.
+Exit code 1: ``STORE_MISSING``, no store was loaded; ``STORE_UNREADABLE``, the store is no database that can be read
+(W2-13: never a traceback); ``CONTINUATION_INVALID``, the token is none.
 
-The stated gap (RETR-X-02; AR-9, DEC-900, W2-13): a question asked alone (no ``--ticket``, no ``--id``) whose
-id-shaped tokens (``gov.retrieval.lexical.ids_in``) all exist nowhere, no record having one and no line of the index
-holding one as a whole token, stops with ``UNRESOLVED_IDS``, each id a gap ``UNRESOLVED`` and no evidence: nothing
-unrelated is offered in its place. When the lexical index cannot answer, or the record graph cannot be read, it is
-not decided here and the question is retrieved as before.
+The stated gap (RETR-X-02; AR-9, DEC-900, W2-13). The ids a request names are the question's id-shaped tokens
+(``gov.retrieval.lexical.ids_in``), each ``--id`` and the ``--ticket``. When it names some, every one is id-shaped,
+and every one exists nowhere (no record has it and no line of the index holds it as a whole token), the request
+stops with ``UNRESOLVED_IDS``, each id a gap ``UNRESOLVED``, no evidence and no continuation: nothing unrelated is
+offered in its place. The line is drawn at "every": when one named id exists, the request is retrieved as before
+(the closure names the missing ones as gaps beside the answer); when one is no id (an ``--id`` that is a symbol name,
+for the code index), or a ``--continue`` is given, it is retrieved as before too. When the lexical index cannot
+answer, or the record graph cannot be read, nothing is decided here and the request is retrieved as before.
 """
 
 from __future__ import annotations
@@ -29,16 +33,18 @@ def add_arguments(parser) -> None:
     parser.add_argument("query", metavar="<query>", help="the question")
 
 
-def _nowhere(root: Path, query: str) -> tuple[list[str], dict] | None:
-    """The ids the question names, when it names some and none exists anywhere, with the lexical facet's state;
-    None otherwise, or when that cannot be decided."""
+def _nowhere(root: Path, query: str, named: list[str] = ()) -> tuple[list[str], dict] | None:
+    """The ids the question and ``named`` (the ``--id`` values and the ticket) name, when they name some, all are
+    ids and none exists anywhere, with the lexical facet's state; None otherwise, or when that cannot be decided."""
     import sqlite3
 
     from gov import records
     from gov.cli.errors import GovError
     from gov.retrieval import lexical
 
-    names = lexical.ids_in(query)
+    if any(lexical.ids_in(name) != [name] for name in named):
+        return None  # a symbol name, or no id: the closure asks the code index for it
+    names = list(dict.fromkeys([*lexical.ids_in(query), *named]))
     if not names:
         return None
     try:
@@ -75,15 +81,23 @@ def _stated_gap(root: Path, query: str, names: list[str], lexical_facet: dict, a
 
 
 def run(root: Path, args, config: dict) -> dict:
+    import sqlite3
+
+    from gov.cli.errors import GovError
     from gov.decisions.register import leave_out
     from gov.retrieval.retrieve import retrieve
 
-    if args.ticket is None and not args.ids and args.continuation is None:
-        nowhere = _nowhere(Path(root), args.query)
+    if args.continuation is None:
+        nowhere = _nowhere(Path(root), args.query, [*args.ids, *([args.ticket] if args.ticket else [])])
         if nowhere is not None:
             return _stated_gap(Path(root), args.query, *nowhere, args)
-    bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
-                      batch_size=args.batch_size, bundle_budget=args.bundle_budget, continuation=args.continuation)
+    try:
+        bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
+                          batch_size=args.batch_size, bundle_budget=args.bundle_budget,
+                          continuation=args.continuation)
+    except sqlite3.DatabaseError as error:  # no bundle was made: the store itself cannot be read (W2-M071)
+        raise GovError("STORE_UNREADABLE", f"the store at {root} cannot be read: {error}",
+                       {"root": str(root), "error": str(error)}) from None
     # W2-55 (DEC-791 item 1): the register's superseded and done entries are left out, and counted
     bundle["evidence"], left_out = leave_out(root, bundle["evidence"])
     if left_out:
