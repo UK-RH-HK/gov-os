@@ -12615,3 +12615,16 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.389 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1007 (the dispatcher). Next free id: DEC-1008. |
+
+### DEC-1008 — W2-121 `gov dispatch` filed, before EXAMIN's copy and one of K9's entry criteria; starts judged by each job's peak; every heavy step in a slot (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-1007, DEC-1003, DEC-974, DEC-979 D1, DEC-954 Q1
+- **Decision:**
+  1. ACT-DISPATCHER-1: yes; the owner's operator adds the crontab line.
+  2. P1-DISPATCH-1 (a): W2-121 (`DAEO-cb2b`, `gov dispatch`, engineer, FULL) is filed, lands before EXAMIN's copy, and is one of K9's entry criteria: **the Gov OS is not adopted on EXAMIN without a dispatcher.**
+  3. **Peaks, not the moment:** a lead or a close starts at a low load and peaks later (its rebuilds and test runs), so the dispatcher measures each kind of job's peak from its history (a lead's heavy steps, a rebuild, a close's run) and starts new work only when the machine has room for its peak as well as the peaks still ahead for what is already running; every heavy step takes a heavy-job slot, so peaks stay capped whenever they come. Applied in the CTO's dispatcher now, and in W2-121's spec and KPIs.
+  4. The owner asked, before deciding P1-W2-81-LOOP, for F1 and F2 in plain English (given in the chat).
+- **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; W2-121's ticket and WBS row; K9's entry criteria in the WBS.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.390 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1008 (W2-121 filed, before EXAMIN's copy, in K9's entry criteria; peaks; every heavy step in a slot). Next free id: DEC-1009. |
