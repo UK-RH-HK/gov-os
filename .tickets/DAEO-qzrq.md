@@ -1,6 +1,6 @@
 ---
 id: DAEO-qzrq
-status: open
+status: in_progress
 deps: []
 links: [DAEO-r30l]
 created: 2026-11-01T21:35:00Z
