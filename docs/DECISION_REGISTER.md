@@ -12387,3 +12387,17 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.370 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-987 (P-W2-96-R4 (a), a third review for W2-96). Next free id: DEC-988. |
+
+### DEC-988 — The owner's answers to P1-MORNING-2026-11-01; the batch re-attributed on its own results; two root causes to fix (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; items 3 to 5 standing) · **Under:** DEC-968, DEC-973, DEC-979, DEC-959 item 1, DEC-949 · **Basis:** `packages/P1-MORNING-2026-11-01.md`, `packages/P-W2-110-4.md`
+- **Decision:**
+  1. **P1-MORNING-2026-11-01:** the missed nightly (b): no run by day; tonight's 04:00 nightly checks everything. **P-W2-110-4 (a):** W2-110 is merged now and closed after ACT 2's re-pin; its three reds are named as waiting for ACT 2. **P-W2-55-HOOK (b), then (a):** the session-start hook loads `gov context --in-force` once the backfill has marked the done entries. **P-W2-55-BACKFILL:** a product-spec pass over the in-force entries' tags first, then the owner's sample review, then the CTO applies it.
+  2. **The batch of eight:** its tickets were not the problem; the close tool's baseline was. Its tests (the 05:26 run) are not re-run: their results are re-used and only the attribution of its failing tests is done again against a correct baseline; if none is caused by the batch, all eight close.
+  3. **Root cause A, the close's baseline (fix the way of working, not the tool):** tickets were merged in pieces, round by round, and left merged but not closed for days, and the close rebuilt "without the change" by undoing old merges. From now: **test before merge, always:** W2-97's merge queue lands now (its path-map line is the CTO's to add) and is used for every merge from today; **one merge per ticket:** a ticket's rounds stay on its own branch and only its final, verified result is merged; **when a failure needs attributing, compare against the last green nightly's head,** a known state, never code made by undoing merges.
+  4. **Root cause B, the freeze:** the CTO finds why its session froze from 01:47 to 10:37 (what it was doing or waiting for, with evidence) and fixes the cause; and a **dead-man's switch**: a job outside the session, run by the crontab every 15 minutes, that pings the owner when the session has done nothing for an hour (inside the quiet hours too, if the stall passes two hours), proposed as an ACT.
+  5. **Before the handover (the owner's follow-up):** finish what is running (the batch's close by re-used results, W2-86's verification), investigate the freeze in this session while the evidence is held, record these decisions, put the rest in the handover for the fresh session to do first, start nothing else, then stand by.
+- **Where it goes (DEC-851):** this register (DEC-968's attribution marked); the prompt §0 (v3.65); the decisions-in-force list; RESUME HERE (the fresh session's first work).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.371 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-988 (P1-MORNING-2026-11-01's answers; the batch re-attributed on its results; root causes A (merge queue, one merge per ticket, the last green nightly as the baseline) and B (the freeze, a dead-man's switch ACT)). Next free id: DEC-989. |
