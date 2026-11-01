@@ -15,16 +15,23 @@ LISTED = ("references:\n"
 CHARTER = {"id": "CH-1", "type": "charter", "status": "ACTIVE", "path": "charter.md"}
 
 
-def _project(tmp_path, monkeypatch, declared, records=()):
+EMPTY = {"query": "", "supplementary": [], "dropped": [], "further_batch": [], "left_out": None}
+
+
+def _project(tmp_path, monkeypatch, declared, records=(), sources=None):
     path = tmp_path / EXTERNAL_REFERENCES_REL
     path.parent.mkdir(parents=True)
     path.write_text(LISTED, encoding="utf-8")
     (tmp_path / "charter.md").write_text("the charter\n", encoding="utf-8")
     commit(tmp_path)  # the external references are read from HEAD (DEC-552, finding 9)
-    monkeypatch.setattr(ctx, "_ticket_mandatory_ids", lambda root, ticket: list(declared))
+    sources = declared if sources is None else sources
+    deps = [rid for rid in declared if rid not in sources]
+    (tmp_path / ".tickets").mkdir()
+    (tmp_path / ".tickets" / "TK-1.md").write_text(f"---\nid: TK-1\ntitle: a ticket\nsources: {sources}\n"
+                                                   f"deps: {deps}\n---\n# TK-1\n", encoding="utf-8")
     monkeypatch.setattr(ctx, "_record_map", lambda root: {r["id"]: r for r in records})
     monkeypatch.setattr(ctx, "_supersedes_edges", lambda root: set())
-    monkeypatch.setattr(ctx, "_try_supplementary", lambda root, ticket, remaining: ([], []))
+    monkeypatch.setattr(ctx, "_try_supplementary", lambda *args: EMPTY)
     return tmp_path
 
 
@@ -40,8 +47,8 @@ def test_a_ticket_whose_declared_ids_are_all_external_is_blocked(tmp_path, monke
 
 
 def test_a_dependency_that_was_read_is_not_a_source_that_was_read(tmp_path, monkeypatch):
-    project = _project(tmp_path, monkeypatch, ["S0a-G-12", "G-10", "CH-1"], [CHARTER])
-    monkeypatch.setattr(ctx, "_ticket_source_ids", lambda root, ticket: ["S0a-G-12", "G-10"])
+    project = _project(tmp_path, monkeypatch, ["S0a-G-12", "G-10", "CH-1"], [CHARTER],
+                       sources=["S0a-G-12", "G-10"])
     with pytest.raises(GovError) as raised:
         ctx.context(project, "TK-1")
     assert (raised.value.code, raised.value.details) == ("BLOCKED", {"ticket": "TK-1", "external": ["S0a-G-12", "G-10"]})

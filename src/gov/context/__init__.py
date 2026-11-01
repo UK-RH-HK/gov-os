@@ -1,9 +1,10 @@
 """``gov context``: compiled, budgeted, hashed context packets (W1-24; CAP-15, CAP-01, CAP-38).
 
-``context(root, ticket, *, brief=False, budget=None)`` resolves the ticket's
-declared mandatory inputs from the record store, orders them by authority
-precedence, adds supplementary context from retrieval when room allows, and
-returns a deterministic packet with a sha256 hash.
+``context(root, ticket, *, brief=False, budget=None)`` reads the ticket's file once, resolves its declared mandatory
+inputs from the record store (a register entry as its own span, W2-03), orders them by authority precedence, adds
+supplementary context in batches when room allows (DEC-860), and returns a deterministic packet with a sha256 hash.
+The ticket's own text and the mandatory inputs are never shortened: where they alone pass the ceiling the context
+refuses (``CONTEXT_OVER_CEILING``, CAP-15.d, W2-04).
 """
 
 from __future__ import annotations
@@ -22,8 +23,10 @@ DEFAULT_BUDGET = 6000
 TOKEN_CHARS = 4
 BRIEF_LIMIT = 2500
 EXTERNAL_REFERENCES_REL = "governance/project/external-references.yaml"
+TICKETS_REL = ".tickets"
 NO_LONGER_STANDS = ("SUPERSEDED", "RETIRED", "REJECTED")  # DEC-568: only these say a record no longer stands
 INDEX_UNAVAILABLE = "index unavailable"
+OVER_CEILING = "CONTEXT_OVER_CEILING"
 # id forms the repository itself holds, never an outside source's (DEC-551 P-12, DEC-552 finding 9): a decision of
 # the register, a decision file, a capability and its items, a must rule, a lesson, a work-breakdown id
 _HELD_FORM = re.compile(r"DEC-\d+|ADR-\d+|CAP-\d+(\.[a-z]+)?|MR-\d+|L-\d{4,}|W\d+-\d{2,}")
@@ -34,7 +37,14 @@ def _tokens(text: str) -> int:
 
 
 def _read_record(root: Path, record: dict, ticket: str) -> tuple[str, str]:
-    """The sha256 and the text of a mandatory record's file; BLOCKED where it cannot be read (never read as empty)."""
+    """The sha256 and the text of a mandatory record: a register entry's own span and ``content_hash`` (W2-03, AR-1),
+    another record's file; BLOCKED where it cannot be read (never read as empty)."""
+    if record.get("in_register"):
+        if not record.get("span") or not record.get("content_hash"):
+            raise GovError("BLOCKED", f"mandatory input {record['id']!r}: its span of the register {record['path']} "
+                                      f"cannot be read (the store holds none)",
+                           {"ticket": ticket, "unreadable": record["id"], "file": record["path"]})
+        return record["content_hash"], record["span"]
     try:
         content = (root / record["path"]).read_bytes()
         return hashlib.sha256(content).hexdigest(), content.decode("utf-8")
@@ -55,8 +65,13 @@ def _store_query(root: Path, sql: str, params: tuple = ()) -> list:
 
 
 def _record_map(root: Path) -> dict:
-    rows = _store_query(root, "SELECT id, type, status, path FROM records")
-    return {r[0]: {"id": r[0], "type": r[1], "status": r[2], "path": r[3]} for r in rows}
+    """id -> record of the store; an entry of the register carries ``in_register``, its span and its hash."""
+    from gov import records
+    from gov.retrieval.authority import register_path
+    known = records.records(root)
+    register = register_path(known)
+    return {record["id"]: {**record, "in_register": register is not None and record["path"] == register}
+            for record in known}
 
 
 def _supersedes_edges(root: Path) -> set:
@@ -64,12 +79,22 @@ def _supersedes_edges(root: Path) -> set:
     return {(r[0], r[1]) for r in rows}
 
 
-
-def _ticket_mandatory_ids(root: Path, ticket: str) -> list:
-    from gov.tasks.tickets import frontmatter
-    front = frontmatter(root / ".tickets" / f"{ticket}.md")
-    if front is None:
+def _read_ticket(root: Path, ticket: str) -> tuple[str, str, dict]:
+    """The ticket file's path, its text and its frontmatter, from the one read of it the context makes (W2-L183)."""
+    import yaml
+    rel = f"{TICKETS_REL}/{ticket}.md"
+    try:
+        text = (root / rel).read_bytes().decode("utf-8")
+        lines = [line.rstrip() for line in text.split("\n")]
+        front = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)])) if lines[0] == "---" else None
+    except (OSError, UnicodeDecodeError, ValueError, yaml.YAMLError):
+        front = None
+    if not isinstance(front, dict):
         raise GovError("BLOCKED", f"ticket {ticket!r} not found", {"ticket": ticket})
+    return rel, text, front
+
+
+def _ticket_mandatory_ids(front: dict) -> list:
     ids, seen = [], set()
     for field in ("sources", "depends_on", "deps"):
         for item in (front.get(field) or []):
@@ -80,11 +105,19 @@ def _ticket_mandatory_ids(root: Path, ticket: str) -> list:
     return ids
 
 
-def _ticket_source_ids(root: Path, ticket: str) -> list:
+def _ticket_source_ids(front: dict) -> list:
     """The ids the ticket declares as ``sources``, its dependencies left out (W1-41)."""
-    from gov.tasks.tickets import frontmatter
-    front = frontmatter(root / ".tickets" / f"{ticket}.md") or {}
     return [str(item) for item in (front.get("sources") or [])]
+
+
+def _kpi_lines(front: dict) -> list:
+    """The ticket's KPI lines, success then failure, as its frontmatter states them."""
+    kpis = front.get("kpis")
+    if isinstance(kpis, list):
+        return [str(line) for line in kpis]
+    if not isinstance(kpis, dict):
+        return []
+    return [str(line) for kind in ("success", "failure") for line in (kpis.get(kind) or [])]
 
 
 def external_references(root: Path) -> dict:
@@ -136,7 +169,7 @@ def external_references(root: Path) -> dict:
     return listed
 
 
-def _make_item(record: dict, sha: str, reason: str) -> dict:
+def _make_item(record: dict, sha: str, reason: str, tokens: int) -> dict:
     return {
         "id": record["id"],
         "sha256": sha,
@@ -144,52 +177,33 @@ def _make_item(record: dict, sha: str, reason: str) -> dict:
         "lifecycle": record["status"],
         "constraint": sha,
         "reason": reason,
+        "tokens": tokens,
     }
 
 
-def _supplementary_query(root: Path, ticket: str) -> str:
-    from gov.tasks.tickets import frontmatter
-    front = frontmatter(root / ".tickets" / f"{ticket}.md")
-    if not front:
-        return ticket
-    title = str(front.get("title", ""))
-    words = [w for w in title.split() if len(w) > 2]
-    if words:
-        return words[0]
-    return title or ticket
-
-
-def _try_supplementary(root: Path, ticket: str, budget_remaining: int) -> tuple[list, list, dict | None]:
-    """The supplementary items, the dropped ones, and the register's superseded and done entries left out (W2-55,
-    DEC-791 item 1; None where none was)."""
+def _try_supplementary(root: Path, title: str, kpis: list, room: int, skip_paths: set, skip_entries: set) -> dict:
+    """The supplementary block (``gov.retrieval.supplementary.stack``) for ``room`` tokens; a failed lookup is one
+    entry of ``dropped``, named by its kind (W2-L180), and the block empty."""
+    from gov.retrieval import supplementary
     try:
-        from gov.decisions.register import leave_out
-        from gov.retrieval.retrieve import retrieve
-        query = _supplementary_query(root, ticket)
-        bundle = retrieve(root, query, ticket=ticket)
-        evidence, left_out = leave_out(root, bundle.get("evidence", []))
-        if not evidence:
-            return [], [], left_out
-        supplementary, dropped = [], []
-        for item in evidence:
-            text = item.get("text", "")
-            cost = _tokens(text)
-            if budget_remaining >= cost:
-                supplementary.append({
-                    "id": item.get("id", item.get("chunk_id", "")),
-                    "text": text,
-                    "path": item.get("path", ""),
-                    "tokens": cost,
-                })
-                budget_remaining -= cost
-            else:
-                dropped.append({
-                    "id": item.get("id", item.get("chunk_id", "")),
-                    "reason": "budget exceeded",
-                })
-        return supplementary, dropped, left_out
+        return supplementary.stack(root, title, kpis, room, skip_paths=skip_paths, skip_entries=skip_entries)
     except Exception as exc:
-        return [], [{"id": "supplementary", "reason": _lookup_failure(root, exc)}], None
+        reason = str(exc) if isinstance(exc, supplementary.Unavailable) else _lookup_failure(root, exc)
+        return {"query": supplementary.query(title, kpis), "supplementary": [], "further_batch": [],
+                "dropped": [{"id": "supplementary", "reason": reason}], "left_out": None}
+
+
+def _synthesis(root: Path) -> dict | None:
+    """Whether the project's synthesis notes pass their validator, and the failure codes; None without notes (W2-M134,
+    CAP-15.f)."""
+    from gov.retrieval.synthesis import NOTES_REL, validate_notes
+    if not (root / NOTES_REL).exists():
+        return None
+    try:
+        result = validate_notes(root)
+    except Exception as exc:  # notes that cannot be read are never valid
+        return {"valid": False, "codes": ["NOTES_UNREADABLE"], "reason": " ".join(str(exc).split())}
+    return {"valid": bool(result["valid"]), "codes": sorted({error["code"] for error in result["errors"]})}
 
 
 def _lookup_failure(root: Path, exc: Exception) -> str:
@@ -208,7 +222,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     root = Path(root)
     limit = budget if budget is not None else DEFAULT_BUDGET
 
-    declared_ids = _ticket_mandatory_ids(root, ticket)
+    ticket_rel, ticket_text, front = _read_ticket(root, ticket)  # the one read of the ticket (W2-L183)
+    declared_ids = _ticket_mandatory_ids(front)
     if not declared_ids:
         raise GovError("BLOCKED", f"ticket {ticket!r} declares no mandatory inputs",
                        {"ticket": ticket})
@@ -230,8 +245,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
                            {"ticket": ticket, "missing": rid})
         if rec["status"] == "SUPERSEDED":
             raise GovError("BLOCKED",
-                           f"mandatory input {rid!r} is superseded and cannot satisfy a current requirement",
-                           {"ticket": ticket, "superseded": rid})
+                           f"mandatory input {rid!r} is SUPERSEDED and cannot satisfy a current requirement",
+                           {"ticket": ticket, "superseded": rid, "status": rec["status"]})
         if rec["status"] in NO_LONGER_STANDS:  # DEC-552 finding 10: only a record that stands satisfies
             raise GovError("BLOCKED",
                            f"mandatory input {rid!r} is {rec['status']}: it no longer stands and cannot satisfy "
@@ -240,7 +255,7 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
         resolved.append(rec)
     # every source is external: no source was read, and a dependency that was read is not one (DEC-454, DEC-552);
     # a ticket that declares no source is judged on every id it declares, as before
-    sources = _ticket_source_ids(root, ticket) or declared_ids
+    sources = _ticket_source_ids(front) or declared_ids
     if not any(rec["id"] in sources for rec in resolved):
         ids = [item["id"] for item in external]
         raise GovError("BLOCKED",
@@ -273,12 +288,16 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
 
     # Build mandatory items sorted by precedence
     mandatory_items = []
-    mandatory_tokens = 0
+    mandatory_tokens = _tokens(ticket_text)  # the ticket's own text is never dropped (CAP-15.d)
     for rec in resolved:
         sha, content = _read_record(root, rec, ticket)
         mandatory_tokens += _tokens(content)
-        mandatory_items.append(_make_item(rec, sha, "declared in sources"))
+        mandatory_items.append(_make_item(rec, sha, "declared in sources", _tokens(content)))
     mandatory_items.sort(key=lambda item: PRECEDENCE_RANK.get(item["authority"], 999))
+    if mandatory_tokens > limit:  # nothing of it is shortened: the context refuses (AR-1, F-M5)
+        raise GovError(OVER_CEILING, f"ticket {ticket!r}: its own text and its mandatory inputs come to "
+                                     f"{mandatory_tokens} tokens, over the packet's ceiling of {limit} tokens",
+                       {"ticket": ticket, "limit": limit, "mandatory_tokens": mandatory_tokens})
 
     # Step 6: authority block — exclude records superseded by another mandatory record
     authority_items = []
@@ -290,52 +309,44 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
         if not superseded_by_another:
             authority_items.append(item)
 
-    budget_remaining = limit - mandatory_tokens
-    dropped: list[dict] = []
-
-    # Supplementary context
-    supplementary, supp_dropped, *left = _try_supplementary(root, ticket, max(0, budget_remaining))
-    left_out = left[0] if left else None
-    dropped.extend(supp_dropped)
+    # Supplementary context: in batches, ranked and stacked into the room the mandatory part leaves (DEC-860)
+    skip_paths = {ticket_rel} | {rec["path"] for rec in resolved if not rec.get("in_register")}
+    skip_entries = {rec["id"] for rec in resolved if rec.get("in_register")}
+    block = _try_supplementary(root, str(front.get("title", "")), _kpi_lines(front), limit - mandatory_tokens,
+                               skip_paths, skip_entries)
+    supplementary, left_out = block["supplementary"], block["left_out"]
     # one order whatever order the retrieval returned its items in (DEC-768): an entry is its id and its reason,
     # so the two decide every pair that differ; what is kept still follows the retrieval's rank
-    dropped.sort(key=lambda entry: (entry["id"], entry["reason"]))
+    dropped = sorted(block["dropped"], key=lambda entry: (entry["id"], entry["reason"]))
 
-    supp_tokens = sum(item.get("tokens", 0) for item in supplementary)
-    total_tokens = mandatory_tokens + supp_tokens
-    budget_info = {"limit": limit, "used": total_tokens}
-
-    # Deterministic hash of the packet content
-    packet_for_hash = {
-        "ticket": ticket,
-        "authority": authority_items,
-        "mandatory": mandatory_items,
-        "supplementary": supplementary,
-        "dropped": dropped,
-        "tokens": total_tokens,
-        "budget": budget_info,
-    }
-    if external:  # absent where the ticket declares none: the packet and its hash stay W1-24's
-        packet_for_hash["external"] = external
-    if left_out:  # absent where nothing was left out, so the packet and its hash stay as before (W2-55)
-        packet_for_hash["left_out"] = left_out
-    canonical =json.dumps(packet_for_hash, sort_keys=True, separators=(",", ":"))
-    packet_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    total_tokens = mandatory_tokens + sum(item["tokens"] for item in supplementary)
+    if total_tokens > limit:  # never ok over the budget, whatever a lookup returned (AR-1)
+        raise GovError(OVER_CEILING, f"ticket {ticket!r}: the packet comes to {total_tokens} tokens, over its "
+                                     f"ceiling of {limit} tokens",
+                       {"ticket": ticket, "limit": limit, "mandatory_tokens": mandatory_tokens})
 
     packet = {
         "ticket": ticket,
+        "ticket_text": ticket_text,
         "authority": authority_items,
         "mandatory": mandatory_items,
         "supplementary": supplementary,
+        "supplementary_query": block["query"],
+        "further_batch": block["further_batch"],
         "dropped": dropped,
-        "hash": packet_hash,
         "tokens": total_tokens,
-        "budget": budget_info,
+        "budget": {"limit": limit, "used": total_tokens},
     }
-    if external:
+    if external:  # absent where the ticket declares none (W1-41)
         packet["external"] = external
-    if left_out:
+    if left_out:  # absent where nothing was left out (W2-55)
         packet["left_out"] = left_out
+    synthesis = _synthesis(root)
+    if synthesis is not None:  # absent where the project holds no synthesis notes (W2-M134)
+        packet["synthesis"] = synthesis
+    # Deterministic hash of the packet content, the hash itself left out
+    canonical = json.dumps(packet, sort_keys=True, separators=(",", ":"))
+    packet["hash"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     if brief:
         summary_parts = [f"Context for {ticket}:"]
@@ -349,6 +360,9 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
             summary_parts.append(f"  - {len(dropped)} items dropped")
         if left_out:
             summary_parts.append(f"  - {left_out['count']} superseded or done register entries left out")
+        if synthesis is not None:
+            summary_parts.append("  synthesis notes: " + ("valid" if synthesis["valid"]
+                                                          else "INVALID (" + ", ".join(synthesis["codes"]) + ")"))
         summary = "\n".join(summary_parts)
         if _tokens(summary) > BRIEF_LIMIT:
             summary = summary[:BRIEF_LIMIT * TOKEN_CHARS]
