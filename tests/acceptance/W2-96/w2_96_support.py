@@ -872,7 +872,7 @@ def nested_files(kind):
 # --------------------------------------------------------------------------------------------------------------
 
 R16_SLEEP_S = 5            # R16: the nested test's sleep, long enough for a stop to land while it runs under load
-R16_TOKEN_KEY = "QZV96LEAK_R16_RUN"
+R16_RUN_VAR = "QZV96LEAK_R16_RUN"
 
 _RUN_NESTED_R16 = '''
 
@@ -914,7 +914,7 @@ def qzv96leak_nested_sleeping(wait_s=120):
                 continue
         time.sleep(0.01)
     raise AssertionError("qzv96leak: the nested test never began its sleep")
-'''.replace("@TICKET@", TICKET_ID).replace("@TOKEN_KEY@", R16_TOKEN_KEY)
+'''.replace("@TICKET@", TICKET_ID).replace("@TOKEN_KEY@", R16_RUN_VAR)
 
 
 def run_nested_r16_extra(nested, token):

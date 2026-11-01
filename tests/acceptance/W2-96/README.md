@@ -318,7 +318,7 @@ accept ended" (`gov-accept-…/tmp/pytest-of-<user>/pytest-0/<the outer test's f
 holding the marker.
 
 No earlier case changed. The support module gained, without changing what the earlier cases do: `R16_SLEEP_S`,
-`R16_TOKEN_KEY`, `run_nested_r16_extra` (the nested runner's module code), the planted kinds `r16_nested_waits`,
+`R16_RUN_VAR`, `run_nested_r16_extra` (the nested runner's module code), the planted kinds `r16_nested_waits`,
 `r16_nested_returns` and `r16_sleep_then_pass`, `R16_NESTED_FILES`, `R16_NESTED_README`, and `processes_carrying`
 and `command_line`.
 
