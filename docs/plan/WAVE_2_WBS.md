@@ -192,6 +192,7 @@ Three tracks.
 | W2-118 | A | **New (DEC-983, SMART-WORK-1 decision 3).** Interim results (`gov watch`) and the return's brief gaps checked by the subagent-stop hook; after EXAMIN's copy (`DAEO-ts4y`) | implementation | engineer | STANDARD | W2-33, W2-60b, W2-27 | 120 | DEC-983, DEC-982, DEC-952, DEC-943 |
 | W2-119 | A | **New (DEC-983, SMART-WORK-1 decision 2).** The guard's refusals counted: recorded without their text, counted by rule in `gov status`, a rule over its threshold a finding; before EXAMIN's copy (`DAEO-168f`) | implementation | engineer | FULL | W2-110 | 80 | DEC-983, DEC-982, DEC-958 |
 | W2-120 | A | **New (DEC-995, DEC-996, P-W2-11-9 (c)).** W2-11's child engineer ticket (`DAEO-i89t`, STANDARD, engineer): the skill validator refuses a brief template without the twelve-field rule (row W2-L097, moved from W2-11) and a skill whose front matter carries a permission field; after W2-11; before EXAMIN's copy. | implementation | engineer | STANDARD | W2-11 | 80 | DEC-995, DEC-996, DEC-992 |
+| W2-121 | A | **New (DEC-1007, DEC-1008, P1-DISPATCH-1 (a)).** `gov dispatch` (`DAEO-cb2b`): one pass a minute starts the ready list's next ticket when there is room for each job's peak, every heavy step in a slot, returns into an inbox, approved landings as one batch, the true status; before EXAMIN's copy (one of K9's entry criteria). | implementation | engineer | FULL | W2-20, W2-118 | 500 | DEC-1007, DEC-1008, DEC-1003 |
 | ACT 2 | — | **Milestone (DEC-954 item 6; PLAN-GROWTH-1 gap 4).** The one re-pin, an owner ACT, once memory, the roles and the three layers' foundations have landed; W2-100 and W2-101 start after it | milestone | owner | — | memory landed (K4), the roles landed (W2-33, W2-60b, W2-11), W2-104 | 0 | DEC-954 item 6 |
 | W2-55 | C | Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see (DEC-791) | implementation | engineer | STANDARD | W2-03 | 150 | DEC-791 (i) |
 | W2-56 | A | `gov launch` usable for every worker: the code-graph folder in the session's own temporary folder, the sandbox's write list limited to the ticket's paths, no placeholder in a commit (DEC-799) | implementation | engineer | FULL | W2-50, W2-05 (closes after them) | 120 | DEC-789, DEC-799 |
@@ -815,6 +816,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - the adoption proving ground passed (W2-81);
   - Wave 2-grade evidence (a clean close, the memory measure, or the proving ground) for every capability the copy relies on, not only Wave 1's record.
   - a Definition of Ready checked at claim (W2-82, `DAEO-4k3l`) and a playbook per stream in the kernel template (W2-83a, `DAEO-dy7j`) (owner, DEC-944 items 2 and 3).
+  - **the dispatcher (W2-121, `gov dispatch`) closed: the Gov OS is not adopted on EXAMIN without a dispatcher (owner, DEC-1008).**
   - **DEC-953, DEC-954 (the plan's §6):** a ticket in each of W2-81's synthetic repositories closes with `gov close` at exit 0 on a pinned release.
   - **DEC-954 Q1: gated by these criteria, never by a date.** The copy starts only when they are met:
     - memory proven: the enlarged measure at 85 % on the combined memory spec (Q9c);
@@ -843,7 +845,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 #### W2-27 EXAMIN adoption on a copy (FULL, orchestrator)
 - **Depends on, from DEC-954:**
-  - K9's entry criteria above: W2-32 (memory at 85 %), W2-60a, W2-60b, W2-11 and W2-33 (the roles landed), W2-81 (passed), W2-82, W2-83a and W2-56;
+  - K9's entry criteria above: W2-32 (memory at 85 %), W2-60a, W2-60b, W2-11 and W2-33 (the roles landed), W2-81 (passed), W2-82, W2-83a, W2-56 and W2-121 (the dispatcher, DEC-1008);
   - plus W2-26, W2-52, W2-21, W2-16 (its release installed, Q8c) and W2-88 (memory for any repository; this ticket is its live trial);
   - the deps W2-01, W2-03, W2-04, W2-05, W2-06, W2-20, W2-23, W2-49 and W2-50 stay;
   - W2-08, W2-09, W2-10, W2-18, W2-19 and W2-45 are removed.
