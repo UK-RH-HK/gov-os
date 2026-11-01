@@ -12652,3 +12652,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.393 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1011. Next free id: DEC-1012. |
+
+### DEC-1012 — A rule broken twice becomes a mechanism (standing); RESEARCH-AGENT-FAILURES-1's other practices and KPI lines listed for the owner
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** RESEARCH-AGENT-FAILURES-1 (row 9), DEC-1003, DEC-1007, DEC-979 item 2
+- **Decision:** (1) **Any rule broken twice becomes a mechanism** (a check, a hook line in the CTO's tools lane, or a dispatcher duty), within a day, mapped into the product the same day (DEC-1003). Applied at once to the two rules broken twice today: hand-run lead chains (started with a trailing `&` twice, DEC-731) — `tools/lead_chain2.sh` and `lead_chain.sh` now refuse (leads start only through the dispatcher's ready list); the return watcher not re-armed (twice) — `lead_return_watch.sh` refuses (returns arrive in the dispatcher's inbox). (2) The package's other practices and its KPI lines are listed for the owner before approval. (3) Before tonight's handover, RESUME HERE fits in one read: older material moves to an archive file RESUME HERE points to. (4) Tonight: the handover before 02:00, the sentinel started, the fresh session's test push.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.394 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1012. Next free id: DEC-1013. |
