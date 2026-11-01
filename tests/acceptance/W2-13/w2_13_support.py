@@ -6,7 +6,8 @@ raising, and makes a question about an id that exists nowhere a stated gap (RETR
 only through public interfaces:
 
 - the commands ``gov rebuild --json`` and ``gov retrieve "<question>" --json`` (the API-0002 envelope);
-- ``gov.retrieval.lexical.search(root, query, refresh=...)`` and ``chunks`` and ``parent`` (W1-17's interface);
+- ``gov.retrieval.lexical.search(root, query, refresh=...)`` and ``chunks`` and ``parent`` (W1-17's interface), and
+  the search answer's ``ranked`` list beside its ``hits`` (DEC-1000);
 - ``gov.retrieval.fusion.search(root, query, limit, refresh=..., reranker=...)`` (W1-19's interface);
 - the store file ``.gov-runtime/store.db``, read as an SQLite file only (which tables exist, what their rows hold).
 
@@ -415,6 +416,46 @@ def ranked_paths(answer):
     """The paths of the hits, each once, in the order the route ranks them (its first hit in each file)."""
     assert answer["available"], f"the lexical facet is unavailable: {answer!r}"
     return list(dict.fromkeys(hit["path"] for hit in answer["hits"]))
+
+
+def ranked_list(answer, query):
+    """The lexical route's ranking (DEC-1000): the answer's ``ranked`` list, best first, each a chunk record with at
+    least ``chunk_id``, ``path``, ``start_line``, ``end_line``, ``parent_id``, ``bm25`` (FTS5's score; absent or null
+    for a chunk only the exact route found) and ``exact``. Its form is checked; nothing else about it is assumed."""
+    assert answer["available"], f"the lexical facet is unavailable: {answer!r}"
+    ranked = answer.get("ranked")
+    assert isinstance(ranked, list), \
+        f"search's answer for {query!r} has no `ranked` list (DEC-1000); its keys: {sorted(answer)}"
+    for chunk in ranked:
+        assert isinstance(chunk, dict), f"a ranked entry is not a map: {chunk!r}"
+        for key in ("chunk_id", "path", "parent_id"):
+            assert isinstance(chunk.get(key), str) and chunk[key], f"a ranked chunk has no {key}: {chunk!r}"
+        start, end = chunk.get("start_line"), chunk.get("end_line")
+        assert isinstance(start, int) and isinstance(end, int) and 1 <= start <= end, \
+            f"a ranked chunk has no line span: {chunk!r}"
+        score = chunk.get("bm25")
+        assert score is None or (isinstance(score, (int, float)) and not isinstance(score, bool)), \
+            f"a ranked chunk's bm25 is neither a score nor null: {chunk!r}"
+        assert isinstance(chunk.get("exact"), bool), \
+            f"a ranked chunk does not say whether it holds the exact string: {chunk!r}"
+    return ranked
+
+
+def ranked_list_paths(answer, query):
+    """The paths of the ranked list, each once, best first (each file at the place of its first chunk)."""
+    return list(dict.fromkeys(chunk["path"] for chunk in ranked_list(answer, query)))
+
+
+def exact_lines(answer):
+    """The answer's ``hits`` (W1-17's exact list) as ``(path, line, text)``, in the order given."""
+    return [(hit["path"], hit["line"], hit["text"]) for hit in answer["hits"]]
+
+
+def lines_holding(needle):
+    """``(path, line, text)`` of every line of the fixture's corpus that holds ``needle`` exactly, case and all, by
+    path and line: what W1-17's ``hits`` holds for ``needle``."""
+    return sorted((rel, number, line) for rel, text in corpus().items()
+                  for number, line in enumerate(text.splitlines(), 1) if needle in line)
 
 
 def sha256(data):
