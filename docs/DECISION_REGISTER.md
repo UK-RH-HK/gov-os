@@ -12439,3 +12439,25 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.374 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-991 (the CTO's approvals by day and in the quiet hours; the safety net and the Gov OS placement to be brought as ACT-QUIET-DENY-1 and P1-ORCH-APPROVALS-1; the dead-man's switch the last net). Next free id: DEC-992. |
+
+### DEC-992 — W2-11's round 1 packages: P-W2-11-1 to 8 (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, DEC-936 item 2.5 and DEC-957's rubric: P2s, reversible, within the approved roles spec; confidence medium-high) · **Under:** DEC-957, DEC-981, DEC-834, DEC-991
+- **Decision:**
+  - **P-W2-11-5, the 16 generated copies under `.claude/`: (b), the CTO generates and commits them,** in W2-11's worktree, with `Task: DAEO-k7hz`, while no worker runs there. Option (a) (an unsandboxed worker) would still meet Claude Code's own safety check on `.claude/` paths, which a headless session refuses outright; only the CTO's session, with the owner's approval by day (DEC-991 item 2: ping, then run), can write them. Option (c) (the launcher's sandbox allowing `.claude/` when a ticket's paths name it) is a row for W2-56 or W2-60b.
+  - **P-W2-11-7 (A):** W2-11's designer accepts the placeholder form in its code-under-test case (W1-35's DEC-534 rule stands).
+  - **P-W2-11-6 (a):** the designer revises W1-35's record-frontmatter case, `Rewrite-Reason: W2-L258 (DEC-729, DEC-866)`, lowering nothing else (an older test under an approved KPI: P2, DEC-957).
+  - **P-W2-11-8 (a):** the designer makes W1-35's discovery case read the body only, `Rewrite-Reason: DEC-981, DEC-832 item 2`, lowering nothing.
+  - **P-W2-11-1:** W2-60a's reader also reads `metadata.version` (the only key rulesync carries), in W2-60a's next round.
+  - **P-W2-11-2:** the validator KPI and row W2-L097 go to an engineer in W2-11's resume, on `src/gov/check/skill_validator.py` (its ticket file gains the path).
+  - **P-W2-11-3:** DEC-808's schema fields go to W2-33 (the roles and typed handoffs).
+  - **P-W2-11-4:** the three vendored skills and openspec are versioned under their vendoring record, in W2-11's round 2.
+  - F1 to F6 ride along in the resume (DEC-802).
+
+### DEC-993 — W2-81's P-W2-81-F1: round 2 declared for the one fail-open finding (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: P2, a ticket's plan within its approved scope; confidence high) · **Under:** DEC-916, DEC-413, DEC-801 to DEC-803
+- **Context:** W2-81's review 2, the last of its declared round, failed on F1 only: a large file moved by a reviewed move into an embedded namespace is judged at its old path (FOUND_AND_HANDLED); ordinary work yes, fails open.
+- **Decision:** round 2 is declared now, before it starts, for F1 with the ride-alongs F2, F5, F11 and F12 (F9 and F13 optional), as described behaviours to a test-design batch, then the engineer, with up to two reviews in round 2 (DEC-916). Not the owner's exception for a third review.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.375 | 2026-11-01 | Orchestrator (delegated): DEC-992 (W2-11's P-W2-11-1 to 8), DEC-993 (W2-81's round 2 for F1). Next free id: DEC-994. |
