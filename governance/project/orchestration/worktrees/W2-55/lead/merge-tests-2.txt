@@ -1,0 +1,6 @@
+W2-55: merge the test designer's line-match fix (w2/W2-55-tests)
+
+Task: DAEO-arrl
+Role: orchestrator
+Implements: DEC-983, DEC-791, DEC-825, DEC-866, DEC-786, DEC-851
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

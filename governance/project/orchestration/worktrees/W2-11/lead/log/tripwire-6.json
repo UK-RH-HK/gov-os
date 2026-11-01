@@ -1,0 +1,62 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "c36ec89d0fb8",
+   "after": "f7f4fb5e1c88"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11",
+   "change": "head",
+   "before": "8d6fbd723fba",
+   "after": "fe21fcb22464"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "head",
+   "before": "3cc35cd5cca1",
+   "after": "18d082983e02"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-81/w2_81_build.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/questions/legacy-docs.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/questions/python-app-clean.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/questions/python-app.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/questions/rust-workspace.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/questions/secret-history.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/questions/typescript-monorepo.yaml"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "acceptance folder",
+   "folder": "W2-81"
+  }
+ ]
+}

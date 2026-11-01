@@ -1,0 +1,2 @@
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook
+tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder

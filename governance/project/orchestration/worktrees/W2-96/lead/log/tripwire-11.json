@@ -1,0 +1,15 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "head",
+   "before": "f8e85f531cbf",
+   "after": "b28866ba3b22"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  }
+ ]
+}

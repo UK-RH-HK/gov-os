@@ -1,0 +1,10 @@
+2026-10-31 18:48:07 W2-107 (DAEO-kiar, FULL) merges 73736f4b8440 on head 73736f4b8440
+2026-10-31 19:06:42 clone rebuilt in 1114 s
+2026-10-31 19:06:44 W2-107 selection: scoped []; 42 targets; governance left out 5
+2026-10-31 19:06:44 run scope scoped: 42 targets; core changed 0, unplaced 0
+2026-10-31 19:59:17 parallel exit 1 in 2576 s {'exit': 1, 's': 2576, 'tests': 6615, 'failures': 2, 'errors': 0, 'skipped': 2}; serial exit 0 in 576 s {'exit': 0, 's': 576, 'entries': 37, 'tests': 71, 'failures': 0, 'errors': 0, 'skipped': 0}
+2026-10-31 19:59:28 red alone: tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime
+2026-10-31 19:59:33 red alone: tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs
+2026-10-31 20:19:08 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime
+2026-10-31 20:19:39 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs
+2026-10-31 20:19:39 CLOSE REFUSED: 1 test(s) red alone, caused by this change

@@ -1,0 +1,3 @@
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+FAILED tests/acceptance/W2-66/test_w2_66_lead_verification.py::test_no_file_a_plain_run_reads_for_its_configuration_or_collection_changes
+6 failed, 1 passed in 45.91s

@@ -1,0 +1,4 @@
+W2-86 (DAEO-jsg1, STANDARD) at 01e21d630c44: pre-check passed
+W2-114 (DAEO-4eux, LITE) at e92148506d71: pre-check passed
+baseline 1f0bb5b3c516 (the nightly of 2026-10-31 (red))
+2026-11-01 12:34:06 merged W2-86, W2-114 onto c38a5b49bc86: d0a92fa91d86

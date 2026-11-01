@@ -1,0 +1,20 @@
+You are the ticket lead for ticket `DAEO-ouet` (`W2-96`, "the opaque acceptance runner, gov accept"), profile FULL, working only in the worktree `/home/usain/gov-os-worktrees/W2-96` on branch `w2/W2-96`.
+
+**This is a resume, under DEC-968 and DEC-970: read your lead checkpoint, `.gov-runtime/scratch/lead/CHECKPOINT.md`, first**, and your last return (`/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/W2-96-A5-run1.json`). `git rev-parse --short=12 HEAD` must show `549dd29b1c6f` (the orchestrator merged `w2/integrate` in: ACT-GUARD-FIX-2, DEC-968 to DEC-970, your ticket's DEC-970 edit), and `git status --short` must show nothing. Anything else: stop and return PACKAGES naming it.
+
+## What DEC-970 decided for you, and what is left
+- **P-W2-96-CMDLIST (a):** `src/gov/check/commands.py` is in your paths for one line only, `accept` in `RECORDED_GOV_COMMANDS` (W2-16, W2-20 and W2-37 hold the rest of that file). A test designer adds `accept` to W1-07's support list of recorded commands and to W1-07's and W1-32's pinned command tuples (`tests/acceptance/W1-07/`, `tests/acceptance/W1-32/`), `Rewrite-Reason: DEC-959 item 6`.
+- **PKG-1 (a):** any failed or errored case, mapped or not, fails the run (exit 3); unmapped cases are still only counted, never named. Stricter only.
+- **PKG-2 (c):** N1 is answered by PKG-1 (a). N2 (hold Ctrl-C during clean-up), N5 (unlock without recursion), N7 (keep an inherited SIGHUP ignore) and N8 (exit 128+N after a held-back signal) ride along in this resume (DEC-802).
+- **The tests first:** a test designer adds the cases PKG-1 (a) and the ride-alongs need (red first), in parallel with the engineer.
+- **Review:** FULL. This resume is a new round: a fresh reviewer (brief A3, `JUDGEMENT.md`, effort max) on what changed (PKG-1, the ride-alongs, the command line), up to two reviews in this round (DEC-916).
+- **Then:** the scoped run once; W1-07's and W1-32's command cases green.
+- **P3, left from run 1:** if the empty `tests/acceptance/.claude/.cc-writes/` folder a review's sandbox made is still there, your test designer removes it (it is in the acceptance folder; git does not show an empty folder).
+- **KPI 6** (the brief change naming `gov accept`) stays the orchestrator's at merge. Say which README map forms the reader takes (your run 1 found 19 of 70 acceptance READMEs map today).
+
+## How this resume runs (the common brief holds; these are the points that changed since your last run)
+- **The work order (DEC-963 as the common brief now states it):** a test designer works in the tests worktree (`/home/usain/gov-os-worktrees/W2-96-tests`, retrieving only from the integration branch's store); **you merge its branch** into this worktree while no worker's command runs here (the engineer's sandbox mounts the acceptance tests read-only, so it cannot); then the engineer, or a fresh one, runs the acceptance tests once, reading results only. A merge takes no `--trailer`: use a message file (`-F`).
+- **Verification (DEC-968):** the scoped set `select_tests.py` gives, run once before you return, in the close's form. Never the full suite: the nightly runs it. `verify_lock.sh` now waits for nothing (DEC-970: a scoped run does not wait for a full run's room). A case that fails and that your change did not cause (it fails on `w2/integrate` too) is named for the CTO, who deals with it at once; one your change caused is yours to fix.
+- **Installs** are refused for you; raise any as a P1. Scratch: 20 GB and 1,000,000 files and folders for you and your workers, outside the tracked tree; `TMPDIR=/tmp/gov-os-lead-W2-96`.
+- **Clean up before you return:** remove your temp folders (`/tmp/gov-os-lead-W2-96` and your workers' `/tmp/gov-launch-*` folders) and any worktree you added; if a removal is refused, name what is left. 
+- **Return:** the twelve fields, then `brief_gaps:` and `guard_refusals:` (each refusal with time, the command's form, the rule, true or false-positive, and its cost), status DONE or PACKAGES.

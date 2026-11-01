@@ -1,0 +1,15 @@
+/home/usain/gov-os-worktrees/W2-96-tests/src/gov/__init__.py
+8 E       AssertionError: the result is not the expected one
+2 E       AssertionError: exit code 0, expected 3 (R8)
+2 E       AssertionError: exit code 0, expected 3: a failing case outside the readable map
+2 E           AssertionError: gov was killed by signal 2, expected an ordinary exit with code 130 (128 plus the signal)
+2 E           AssertionError: gov accept ended (exit code 129) on signal 1, which it was started ignoring
+1 E           AssertionError: a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-1/test_r9_a_ctrl_c_during_the_cl1/given-tmp-1/gov-accept-06
+1 E           AssertionError: a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-1/test_r9_a_ctrl_c_during_the_cl2/given-tmp-1/gov-accept-k_
+1 E           AssertionError: a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-1/test_r10_a_chain_of_nested_fol0/given-tmp-1/gov-accept-49
+1 E           AssertionError: a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-1/test_r10_a_chain_of_nested_fol1/given-tmp-1/gov-accept-jx
+1 E           AssertionError: gov accept ended (exit code 143) on signal 15, which it was started ignoring
+1 E           AssertionError: gov was killed by signal 15, expected an ordinary exit with code 143 (128 plus the signal)
+1 E           AssertionError: gov was killed by signal 1, expected an ordinary exit with code 129 (128 plus the signal)
+exit 1
+23 failed, 77 passed in 103.52s (0:01:43)

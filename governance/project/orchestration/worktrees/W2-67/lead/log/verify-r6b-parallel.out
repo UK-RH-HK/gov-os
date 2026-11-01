@@ -1,0 +1,120 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+...............s........................................................ [ 86%]
+........................................................................ [ 88%]
+.....F.................................................................. [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+.......................................................................  [100%]
+=================================== FAILURES ===================================
+____________________ test_disposition_with_context_failure _____________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x73d404e57230>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw4/test_disposition_with_context_0/sand...sixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw4/test_disposition_with_context_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_disposition_with_context_failure(project, sandbox, interface):
+        """A3: if context fails, the class is NOT recorded as 'with whole-system context'.
+    
+        The output must say the context failed, and the repair ticket records the class
+        but without the context hash.
+        """
+        _project_with_finding(project)
+        project.add_decision("DEC-9003", "ACTIVE", supersedes="DEC-9004")
+        project.add_decision("DEC-9004", "ACTIVE", supersedes="DEC-9003")
+        project.commit("create contradiction", who=support.OWNER)
+        run = support.run_close(project, sandbox, TICKET,
+                                "--disposition", "defer")
+        envelope = support.envelope_of(run, interface)
+        assert envelope["ok"] is False
+        error = envelope.get("error", {})
+        full_text = json.dumps(envelope)
+        assert '"context": "whole-system"' not in full_text, \
+            "when context fails, 'context: whole-system' must NOT appear"
+        # Revised for W2-67 (I2 F2, PF2; DEC-868 item 3): the case asserted only the absence of a literal the close
+        # never writes. The two decisions supersede each other, so the ticket's context cannot be built; since W2-07
+        # the pre-close ``gov check`` finds that first and refuses at once, naming what fails. So the answer names both
+        # decisions and carries no hash, and the one repair ticket records the class and no context hash.
+        assert run.returncode == support.EXIT_CHECK_FAILED, f"expected exit code 3\n{run.describe()}"
+        text = support.error_text(error)
+>       assert "DEC-cyc1" in text and "DEC-cyc2" in text, \
+            f"the answer does not name the decisions that fail the context\n{run.describe()}"
+E       AssertionError: the answer does not name the decisions that fail the context
+E         gov close PROJ-disp --json --disposition defer
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed", "details": {"findings": ["governance check core-authority is RED at commit b24b05633989: [{\"code\": \"ACTIVE_SUPERSEDED\", \"ids\": [\"DEC-9003\"], \"paths\": [\"docs/adr/DEC-9003.md\"], \"message\": \"DEC-9003 is ACTIVE and a supersession names it as superseded\"}, {\"code\": \"ACTIVE_SUPERSEDED\", \"ids\": [\"DEC-9004\"], \"paths\": [\"docs/adr/DEC-9004.md\"], \"message\": \"DEC-9004 is ACTIVE and a supersession names it as superseded\"}, {\"code\": \"SUPERSESSION_CYCLE\", \"ids\": [\"DEC-9003\", \"DEC-9004\"], \"paths\": [\"docs/adr/DEC-9003.md\", \"docs/adr/DEC-9004.md\"], \"message\": \"the supersessions of DEC-9003, DEC-9004 form a cycle\"}]", "governance check core-graph is RED at commit b24b05633989: [{\"code\": \"DAG_CYCLE\", \"id\": \"DEC-9003\", \"message\": \"cycle detected in dependency graph involving DEC-9003\"}, {\"code\": \"DAG_CYCLE\", \"id\": \"DEC-9004\", \"message\": \"cycle detected in dependency graph involving DEC-9004\"}]", "governance check core-schema is RED at commit b24b05633989: [{\"code\": \"SCHEMA_INVALID_FIELD\", \"path\": \"docs/adr/DEC-9003.md\", \"field\": \"supersedes\", \"schema\": \"madr.schema.json\", \"at\": \"$.supersedes\", \"message\": \"docs/adr/DEC-9003.md: field 'supersedes' is refused by madr.schema.json at $.supersedes: 'DEC-9004' is not of type 'array'\"}, {\"code\": \"SCHEMA_INVALID_FIELD\", \"path\": \"docs/adr/DEC-9004.md\", \"field\": \"supersedes\", \"schema\": \"madr.schema.json\", \"at\": \"$.supersedes\", \"message\": \"docs/adr/DEC-9004.md: field 'supersedes' is refused by madr.schema.json at $.supersedes: 'DEC-9003' is not of type 'array'\"}]", "governance check family 'authority/role limits' is RED at commit b24b05633989", "governance check family 'graph integrity' is RED at commit b24b05633989", "governance check family 'schema/invariants' is RED at commit b24b05633989"], "check_commit": "b24b05633989c2ebb0d92d62bf3a9d0b0b6644bb", "red_checks": [{"id": "core-authority", "family": "authority/role limits", "severity": "hard-block", "status": "RED", "findings": [{"code": "ACTIVE_SUPERSEDED", "ids": ["DEC-9003"], "paths": ["docs/adr/DEC-9003.md"], "message": "DEC-9003 is ACTIVE and a supersession names it as superseded"}, {"code": "ACTIVE_SUPERSEDED", "ids": ["DEC-9004"], "paths": ["docs/adr/DEC-9004.md"], "message": "DEC-9004 is ACTIVE and a supersession names it as superseded"}, {"code": "SUPERSESSION_CYCLE", "ids": ["DEC-9003", "DEC-9004"], "paths": ["docs/adr/DEC-9003.md", "docs/adr/DEC-9004.md"], "message": "the supersessions of DEC-9003, DEC-9004 form a cycle"}], "provenance": {"commit": "b24b05633989c2ebb0d92d62bf3a9d0b0b6644bb", "check_version": "1.0.0", "inputs_hash": "b98a5e77e1f8c19b"}}, {"id": "core-graph", "family": "graph integrity", "severity": "hard-block", "status": "RED", "findings": [{"code": "DAG_CYCLE", "id": "DEC-9003", "message": "cycle detected in dependency graph involving DEC-9003"}, {"code": "DAG_CYCLE", "id": "DEC-9004", "message": "cycle detected in dependency graph involving DEC-9004"}], "provenance": {"commit": "b24b05633989c2ebb0d92d62bf3a9d0b0b6644bb", "check_version": "1.0.0", "inputs_hash": "2bcf0cb134e48e58"}}, {"id": "core-schema", "family": "schema/invariants", "severity": "hard-block", "status": "RED", "findings": [{"code": "SCHEMA_INVALID_FIELD", "path": "docs/adr/DEC-9003.md", "field": "supersedes", "schema": "madr.schema.json", "at": "$.supersedes", "message": "docs/adr/DEC-9003.md: field 'supersedes' is refused by madr.schema.json at $.supersedes: 'DEC-9004' is not of type 'array'"}, {"code": "SCHEMA_INVALID_FIELD", "path": "docs/adr/DEC-9004.md", "field": "supersedes", "schema": "madr.schema.json", "at": "$.supersedes", "message": "docs/adr/DEC-9004.md: field 'supersedes' is refused by madr.schema.json at $.supersedes: 'DEC-9003' is not of type 'array'"}], "provenance": {"commit": "b24b05633989c2ebb0d92d62bf3a9d0b0b6644bb", "check_version": "1.0.0", "inputs_hash": "91f9ab8dcbc9941a"}}], "red_families": ["authority/role limits", "graph integrity", "schema/invariants"], "disposition": "defer", "test_runs": [], "trailers_base": null, "accepted_history": [], "counted": false, "repair_ticket": "pro-2j07"}}}
+E         
+E         stderr:
+E         
+E       assert ('DEC-cyc1' in '{"code": "CHECK_FAILED", "message": "tests or checks failed", "details": {"findings": ["governance check core-authori...efer", "test_runs": [], "trailers_base": null, "accepted_history": [], "counted": false, "repair_ticket": "pro-2j07"}}')
+
+tests/acceptance/W1-30/test_w1_30_disposition.py:158: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+1 failed, 4965 passed, 1 skipped in 1570.68s (0:26:10)

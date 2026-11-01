@@ -1,0 +1,307 @@
+[
+ [
+  "W2-04",
+  "ready",
+  "open"
+ ],
+ [
+  "W2-05",
+  "running",
+  "lead running now"
+ ],
+ [
+  "W2-06",
+  "dependency",
+  "W2-05 (1 open)"
+ ],
+ [
+  "W2-08",
+  "dependency",
+  "W2-06 (1 open)"
+ ],
+ [
+  "W2-100",
+  "dependency",
+  "W2-104 (1 open)"
+ ],
+ [
+  "W2-101",
+  "dependency",
+  "W2-104 (1 open)"
+ ],
+ [
+  "W2-102",
+  "dependency",
+  "W2-104 (1 open)"
+ ],
+ [
+  "W2-103",
+  "dependency",
+  "W2-104, W2-11 (2 open)"
+ ],
+ [
+  "W2-104",
+  "ready",
+  "open"
+ ],
+ [
+  "W2-105",
+  "ready (queued)",
+  "in the launch chain; the load gate holds it"
+ ],
+ [
+  "W2-106",
+  "closing",
+  "in the batch of four; close refused 15:19, 11 reds traced to the batch"
+ ],
+ [
+  "W2-107",
+  "running",
+  "lead running now"
+ ],
+ [
+  "W2-108",
+  "running",
+  "returned PACKAGES: built and accepted, its scoped check held 90 min by the load gate"
+ ],
+ [
+  "W2-109",
+  "paths",
+  "shares files with W2-49"
+ ],
+ [
+  "W2-11",
+  "ready",
+  "open"
+ ],
+ [
+  "W2-110",
+  "paths",
+  "shares files with W2-67"
+ ],
+ [
+  "W2-13",
+  "dependency",
+  "W2-108 (1 open)"
+ ],
+ [
+  "W2-15a",
+  "dependency",
+  "W2-04, W2-13, W2-61h (3 open)"
+ ],
+ [
+  "W2-15b",
+  "dependency",
+  "W2-15a, W2-32, W2-88 (3 open)"
+ ],
+ [
+  "W2-16",
+  "closing",
+  "merged, not yet closed"
+ ],
+ [
+  "W2-20",
+  "paths",
+  "shares files with W2-16, W2-96"
+ ],
+ [
+  "W2-21",
+  "dependency",
+  "W2-20, W2-82 (2 open)"
+ ],
+ [
+  "W2-23",
+  "dependency",
+  "W2-52 (1 open)"
+ ],
+ [
+  "W2-24",
+  "dependency",
+  "W2-04, W2-05, W2-06, W2-08, W2-11, W2-13 ... (13 open)"
+ ],
+ [
+  "W2-25",
+  "dependency",
+  "W2-24 (1 open)"
+ ],
+ [
+  "W2-27",
+  "dependency",
+  "W2-04, W2-05, W2-06, W2-100, W2-101, W2-102 ... (39 open)"
+ ],
+ [
+  "W2-28",
+  "dependency",
+  "W2-27 (1 open)"
+ ],
+ [
+  "W2-29",
+  "dependency",
+  "W2-15b, W2-25, W2-28 (3 open)"
+ ],
+ [
+  "W2-30",
+  "dependency",
+  "W2-29 (1 open)"
+ ],
+ [
+  "W2-32",
+  "dependency",
+  "W2-15a (1 open)"
+ ],
+ [
+  "W2-33",
+  "dependency",
+  "W2-11 (1 open)"
+ ],
+ [
+  "W2-37",
+  "ready",
+  "in_progress"
+ ],
+ [
+  "W2-40",
+  "dependency",
+  "W2-21 (1 open)"
+ ],
+ [
+  "W2-46",
+  "dependency",
+  "W2-04, W2-05, W2-06, W2-08, W2-100, W2-101 ... (54 open)"
+ ],
+ [
+  "W2-47",
+  "dependency",
+  "W2-46 (1 open)"
+ ],
+ [
+  "W2-49",
+  "closing",
+  "in the batch of four; close refused 15:19, 11 reds traced to the batch"
+ ],
+ [
+  "W2-52",
+  "ready (queued)",
+  "in the launch chain; the load gate holds it"
+ ],
+ [
+  "W2-55",
+  "dependency",
+  "W2-04 (1 open)"
+ ],
+ [
+  "W2-56",
+  "ready",
+  "in_progress"
+ ],
+ [
+  "W2-60a",
+  "dependency",
+  "W2-11, W2-56 (2 open)"
+ ],
+ [
+  "W2-60b",
+  "dependency",
+  "W2-60a (1 open)"
+ ],
+ [
+  "W2-61h",
+  "ready",
+  "open (stacked on a merged, closing base, DEC-786)"
+ ],
+ [
+  "W2-67",
+  "running",
+  "lead running now"
+ ],
+ [
+  "W2-76",
+  "closing",
+  "in the batch of four; close refused 15:19, 11 reds traced to the batch"
+ ],
+ [
+  "W2-81",
+  "ready",
+  "in_progress"
+ ],
+ [
+  "W2-82",
+  "dependency",
+  "W2-60b (1 open)"
+ ],
+ [
+  "W2-83a",
+  "dependency",
+  "W2-52 (1 open)"
+ ],
+ [
+  "W2-83b",
+  "dependency",
+  "W2-83a (1 open)"
+ ],
+ [
+  "W2-84",
+  "closing",
+  "in the batch of four; close refused 15:19, 11 reds traced to the batch"
+ ],
+ [
+  "W2-86",
+  "ready",
+  "open"
+ ],
+ [
+  "W2-88",
+  "dependency",
+  "W2-52, W2-81 (2 open)"
+ ],
+ [
+  "W2-90b",
+  "dependency",
+  "W2-105 (1 open)"
+ ],
+ [
+  "W2-91",
+  "dependency",
+  "W2-86 (1 open)"
+ ],
+ [
+  "W2-92",
+  "ready",
+  "open"
+ ],
+ [
+  "W2-93",
+  "dependency",
+  "W2-81 (1 open)"
+ ],
+ [
+  "W2-94",
+  "ready",
+  "open (stacked on a merged, closing base, DEC-786)"
+ ],
+ [
+  "W2-95",
+  "running",
+  "lead running now"
+ ],
+ [
+  "W2-96",
+  "running",
+  "lead running now"
+ ],
+ [
+  "W2-97",
+  "ready",
+  "open"
+ ],
+ [
+  "W2-98",
+  "dependency",
+  "W2-104, W2-11 (2 open)"
+ ],
+ [
+  "W2-99",
+  "dependency",
+  "W2-104, W2-11 (2 open)"
+ ]
+]

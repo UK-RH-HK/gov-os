@@ -1,0 +1,15 @@
+You are the ticket lead for ticket `DAEO-zoex` (`W2-108`, "Retrieval checks the stores' freshness once per run"), profile STANDARD, a follow-up of W2-54 (`DAEO-0rfi`, closed; it stays closed), in the memory stream (DEC-969). You work only in the worktree `/home/usain/gov-os-worktrees/W2-108` on branch `w2/W2-108`.
+
+**This is run 1.** `git rev-parse --short=12 HEAD` must show `f6af39c1665b`, and `git status --short` must show nothing. Anything else: stop and return PACKAGES naming it.
+
+**Read first:** the ticket (`.tickets/DAEO-zoex.md`) whole; `governance/project/orchestration/packages/P-W2-54-LOAD-1.md` (the measured profile: 1,252 s at load 40 to 70, ~460 s of freshness checks repeated on each of 328 calls); DEC-969, DEC-968, DEC-966; `src/gov/retrieval/semantic.py` (`search`, `_status`, `_wanted`, `embedded`, `query_vector`) and `src/gov/retrieval/lexical.py` (`freshness`, `_tracked`); how `src/gov/context/context_check.py` and `src/gov/context/__init__.py` call retrieval (read only).
+
+## The decisions for this run
+- **The work order in parallel (DEC-963, the common brief's loop):** the independent test designer in `/home/usain/gov-os-worktrees/W2-108-tests` (retrieving only from the integration branch's store) and the engineer in this worktree start at the same time, from the KPIs; when TESTS-READY appears, the engineer merges the tests branch and runs them once. The tests count the freshness and status work per process (a stand-in, or a counter around the functions' public effects), check answers unchanged item for item, and check that a store rebuilt, a file changed or a head moved between two calls is seen.
+- **The engineer changes only the freshness and status functions** of `semantic.py` and `lexical.py` (W2-13 and W2-32 hold the rest of those files and of `src/gov/retrieval/`; both are open, not running). The key is the store's fingerprint and the tree's head; a key that cannot be read means check every time.
+- **Not done:** W2-54's time limits are not raised and its tests are not changed (DEC-969). The query embedding batching is not done here; the record says from the measure whether it is still needed.
+- **The measure (KPI 4):** `python3 -m gov.context.context_check` on one store (a rebuilt scratch clone under `/tmp/gov-os-lead-W2-108/`, rebuilt under `flock /tmp/gov-os-rebuild.lock`), before and after, at two measured loads (one of them 40 or more), with cProfile's time in the freshness checks and in query embedding, written by the engineer to `docs/research/W2-108-freshness-once.md`.
+- **Verification (DEC-968):** your acceptance suite and unit tests, plus `select_tests.py` once before returning (always scoped). A case that fails and that your change did not cause (it fails on `w2/integrate` too) is named for the CTO.
+- **Installs** are refused for you; raise any as a P1. Scratch: 20 GB and 1,000,000 files and folders for you and your workers, outside the tracked tree; `TMPDIR=/tmp/gov-os-lead-W2-108`.
+
+Return the twelve fields, `brief_gaps:` and `guard_refusals:`, status DONE (commits, suites, the measure's figures, whether the batching is still needed) or PACKAGES.

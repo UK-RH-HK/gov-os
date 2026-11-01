@@ -1,0 +1,3 @@
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+1 failed, 9708 passed, 1 skipped in 3160.22s (0:52:40)

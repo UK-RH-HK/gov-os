@@ -1,0 +1,5 @@
+Merge w2/W2-05-tests into w2/W2-05: the hooks-drift cases' one-source base pair (P-W2-05-DRIFT-BASE, DEC-970)
+
+Task: DAEO-0z8c
+Role: orchestrator
+Implements: DEC-970, DEC-963, DEC-710

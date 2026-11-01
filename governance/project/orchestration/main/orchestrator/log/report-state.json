@@ -1,40 +1,31 @@
 {
-  "merged_not_closed": [
-    "W2-57",
-    "W2-67",
-    "W2-77",
-    "W2-03",
-    "W2-26"
-  ],
-  "built_held": [
-    "W2-20",
-    "W2-52",
-    "W2-37",
-    "W2-49",
-    "W2-16",
-    "W2-51",
-    "W2-60a",
-    "W2-78",
-    "W2-64"
-  ],
-  "closes_next": "W2-71 CLOSED 19:14 (scoped); batch W2-57, W2-77, W2-03, W2-26 running (full, on the head before ACT 1)",
-  "examin": "gated by K9's entry criteria, not a date (DEC-954 Q1); estimate 2026-11-12, re-estimated weekly; memory at 40 % hit@5 / 60 % full evidence against 85 / 99",
-  "owner_action": "ACT ACT-1-GUARD - switch on the five-rule guard (packages/ACT-1-GUARD.md), with your named decision on the 235 live-wiring tests (a); P1 ROLES-SPEC-1 still open",
-  "last_report": "2026-10-30 19:32:33",
-  "chain_spec": "chain-2026-10-30f.txt",
-  "chain_log": "chain-2026-10-30f.log",
-  "parked": [],
-  "memory_notes": {
-    "W2-61h": "held for W2-84",
-    "W2-61": "merged 758cd53f (the measure tool); its build-phase close follows",
-    "W2-86": "quick win, goes ahead before plan approval (DEC-953 item 10)",
-    "W2-87": "lead running since 16:29 (register defect first, then authority order)",
-    "W2-15a": "ticket exists (DAEO-rd0g); needs Q-2",
-    "W2-05": "run 4 ready (W1-02 revision first)",
-    "W2-55": "brief ready; claim after the queue",
-    "W2-04": "brief ready; claim after the queue",
-    "W2-84": "fix in; serial phase and review to resume first",
-    "W2-03": "merged; closing now in the build-phase batch (DEC-953)",
-    "W2-64": "P-W2-64-1 (a) decided; run 2 waits for ACT 1 (owner, 2026-10-30), with the 10 built tickets"
-  }
+ "merged_not_closed": [
+  "W2-05",
+  "W2-55",
+  "W2-96"
+ ],
+ "built_held": [
+  "W2-20",
+  "W2-52",
+  "W2-37",
+  "W2-60a",
+  "W2-78",
+  "W2-110"
+ ],
+ "closes_next": "W2-97 landing through its own merge queue (scoped run, started 12:08); then land W2-86 + W2-114 through the queue (merge and close one step); close W2-05, W2-55, W2-96 (merged this morning) against the nightly baseline 1f0bb5b3",
+ "examin": "2026-11-14 (12-17); target 11-18; gated by K9's criteria (DEC-954 Q1); memory: hit@5 11/20, full evidence 11/20 (W2-86's measure), target 95 %, floor 85 %",
+ "owner_action": "ACT ACT-DEADMAN-1 (channel choice); ACT ACT-QUIET-DENY-1 (the quiet-hours hook); P1 P1-ORCH-APPROVALS-1 (Gov OS placement); approval for the CTO to write W2-11's 16 .claude/ copies (DEC-992)",
+ "last_report": "2026-10-30 21:36:47",
+ "chain_spec": "chain-2026-10-31f.txt",
+ "chain_log": "chain-2026-10-31f.log",
+ "parked": [],
+ "memory_notes": {
+  "W2-86": "done, landing through the queue (measure: hit@5 11/20, ranking the remaining cause)",
+  "W2-92": "next, brief being built",
+  "W2-91": "after W2-86 closes",
+  "W2-13": "next, brief being built",
+  "W2-15a": "waits for W2-04 and W2-61h",
+  "W2-32": "after W2-15a",
+  "W2-112": "after W2-32"
+ }
 }

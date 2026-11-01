@@ -1,0 +1,9 @@
+0 tests/acceptance/W1-07/test_w1_07_envelope.py::test_the_envelope_has_no_field_outside_the_interface[check] 1 passed in 33.86s
+0 tests/acceptance/W1-07/test_w1_07_read_act.py::test_no_command_writes_outside_its_act_paths[check] 1 passed in 41.25s
+1 tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace 1 failed in 0.23s
+1 tests/acceptance/W2-69/test_w2_69_unit_folder_renamed.py::test_the_unit_folder_named_secrets_is_gone 1 failed in 0.04s
+0 tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here 1 passed in 704.51s (0:11:44)
+0 tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched 1 passed in 606.80s (0:10:06)
+0 tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here 1 passed in 771.34s (0:12:51)
+1 tests/acceptance/W1-16/test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run 1 failed in 30.46s
+done

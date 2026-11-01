@@ -1,0 +1,9 @@
+disk gate open: 861 GiB free, 64805455 inodes free
+start 10:40:28 (0.529296875, 0.46435546875, 0.29638671875)
+449M	/home/usain/gov-os-worktrees/W2-86/.gov-runtime
+du: cannot access '/tmp/gov-os-lead-W2-86': No such file or directory
+3192	/home/usain/gov-os-worktrees/W2-86/.gov-runtime
+du: cannot access '/tmp/gov-os-lead-W2-86': No such file or directory
+end 11:14:22
+138M	/tmp/gov-os-lead-W2-86
+13323	/tmp/gov-os-lead-W2-86

@@ -5,9 +5,7 @@ TAG=${1:-r}
 LOG=/home/usain/gov-os-worktrees/W2-76/.gov-runtime/scratch/lead/log
 mkdir -p /tmp/gov-os-lead-W2-76
 cd /home/usain/gov-os-worktrees/W2-76 || exit 2
-until [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING ]; do sleep 60; done
-until [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING ]; do sleep 60; done
-until awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
+until python3 /home/usain/gov-os-worktrees/W2-76/.gov-runtime/scratch/lead/loadok.py; do sleep 60; done
 bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/disk_gate.sh || exit 3
 start=$(date +%s)
 echo "start $(date '+%F %T')" > "$LOG/rebuild-$TAG.summary"

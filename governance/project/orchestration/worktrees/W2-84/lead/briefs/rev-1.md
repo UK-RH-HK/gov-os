@@ -19,10 +19,10 @@ Then run `printenv GOV_ROLE GOV_TICKET` (expect `independent-auditor` and `DAEO-
 - **Memory used (DEC-836, DEC-860, DEC-859):** before reading files at random, use `gov retrieve` for what you need to know: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src python3 -m gov.cli.main retrieve "<question>" --json`. Never one giant query or context: a large question goes in batches (`--batch-size`, then `--continue <token>`), ranked and stacked within your budget. A code question uses the code-graph tool's own traversal (`trace_path`, `search_graph`, `query_graph`), small and targeted, never a load of the whole graph.
 - **No copy of this repository:** no `cp -r`, `rsync`, `git archive`, `git worktree` or `git clone` of this repository or a folder of it. A probe that needs a repository builds a temporary one in your temporary folder; worktrees and clones of that planted repository are fine.
 - Inside a launched session `.gov-runtime/freeze` shows as a placeholder device file whether or not a flag exists: conclude nothing from it.
-- **The guard's command forms (DEC-941 item 4a):** no shell variable as a write target, no here-document, no backticks, no `bash -c '…'`, no long inline `python3 -c` with braces. A probe script goes in your temporary folder (the sandbox's `TMPDIR`), written with plain shell tools if you have no Write tool (`printf` into a literal path in your temp folder), or run as `python3 -` fed from a file. A refused form is not retried in another disguise.
+- **What is under review, and the hook you run under (ACT 1, DEC-953, DEC-954, DEC-958):** you judge the product's guard, `src/gov/guard/` (the code this ticket changed), by asking it about planted calls. This repository's own hook, which guards your session, is now the five-rule hook; it is not under review, and command forms are no longer refused by it. A probe script goes in your temporary folder (the sandbox's `TMPDIR`), written with plain shell tools if you have no Write tool (`printf` into a literal path in your temp folder), or run as `python3 -` fed from a file. Any refusal by the hook you meet goes in your return, one line each: the time, the command's form (no secret or file contents), the reason it gave, whether it was a true refusal or a false positive, and the minutes it cost. A true refusal is taken; a false positive is worked round only by an equivalent form that does the same thing.
+- **Tests run no more than this (DEC-959 item 1):** you re-run no suite. The lead has run the acceptance tests and the scoped selection on this head (results below); you read the tests and the code, and you probe with planted sets.
 - **Hashes (row W2-L423's rule, DEC-911):** under `.gov-runtime/`, write commit hashes as 12 digits; never write the keywords of the gitleaks rule that takes a bare 40-hex string for a token. (In your returned probe record, `probed_commit` is the full id: the lead writes it under `docs/probes/`, not under `.gov-runtime/`.)
 - **Disk and temp (DEC-898):** your share of the lead's budget is 2 GB and 100,000 files and folders; keep the sandbox's temp folder; remove what you made as soon as it is no longer needed; give your temp folder's size in your return.
-- **The nightly and closes:** while `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING` exists, run at most a single test file at a time; while `.../orchestrator/CLOSE-RUNNING` exists, start no suite.
 - If the guard or the sandbox refuses something you needed for the probe, do not work around it: say so in your return. **Refused twice for the same call: stop and say so; no third try.**
 - You never ask or notify the owner.
 
@@ -41,6 +41,10 @@ Then run `printenv GOV_ROLE GOV_TICKET` (expect `independent-auditor` and `DAEO-
 ---
 <<DESIGN NOTE>>
 ---
+
+## The lead's results on this head
+
+LEAD-RESULTS-HERE
 
 ## What you probe for
 
@@ -91,5 +95,7 @@ proposed_decisions: <each package, with your recommendation and confidence, or "
 unresolved: <what is still open, or "none">
 recommended_next_action: <one line>
 ```
+
+Right after the twelve fields, a section headed `guard_refusals:`, one line per refusal by the hook that you met, or `guard_refusals: none`; then the guard's read refusals (DEC-849) by count, and whether you used `gov retrieve`.
 
 Refused twice for the same call: stop and say so.

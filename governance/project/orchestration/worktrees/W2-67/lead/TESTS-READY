@@ -1,0 +1,1 @@
+Run 7 (DEC-970, P-W2-67-R6-DISP (a)): w2/W2-67-tests (td-11, 0d2fc195f449) merged into w2/W2-67 as f7ca56a0 (12 digits in the log). No implementer run follows: the batch changes one acceptance assertion only; the lead's scoped run verifies it.

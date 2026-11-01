@@ -1,0 +1,30 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_no_index_file_exists_outside_gov_runtime_after_a_run ___________
+
+two = (<w1_16_support.Repo object at 0x7ac26e260bc0>, <w1_16_support.Repo object at 0x7ac26e167980>, {'default-home': {'_con...rchestrator.md', 'codeintel/files/.claude/agents/product-spec.md', 'codeintel/files/.claude/agents/research.md', ...}})
+answers = {'alpha': (Run(module='gov.codeintel', calls=(('definitions', ('alpha_only_helper',)), ('definitions', ('beta_only_hel..., ('definitions', ('beta_only_helper',)): [{'label': 'Function', 'name': 'beta_only_helper', 'path': 'lib/beta.py'}]})}
+sandbox = Sandbox(base=PosixPath('/tmp/w16-u1fhopf3'), home=PosixPath('/tmp/w16-u1fhopf3/h'), tmpdir=PosixPath('/tmp/w16-u1fhopf3/t'), runtime=PosixPath('/tmp/w16-u1fhopf3/r'), elsewhere=PosixPath('/tmp/w16-u1fhopf3/e'))
+
+    @pytest.mark.local_only
+    def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, answers, sandbox):
+        """Failure 2. Index files are SQLite files, their side files and graph dumps, wherever a child could write."""
+        alpha, beta, _ = two
+        for repo in (alpha, beta):
+            # The run that asked ``callers`` and ``dead_code`` of this repository came before (``answers``).
+            _, asked = answers[repo.root.name]
+            assert {("callers", (f"{repo.root.name}_only_helper",)), ("dead_code", ())} <= set(asked), \
+                f"{repo.root.name}: the queries this check follows were not asked: {sorted(asked)}"
+            outside = support.index_files(repo.root, skip=(".git", support.RUNTIME_REL))
+            assert not outside, f"{repo.root.name}: index files in the repository, outside .gov-runtime/: {outside}"
+            assert not (repo.root / ".codebase-memory").exists(), "the tool's persistence folder was written"
+            assert repo.status() == [], \
+                f"{repo.root.name}: the run changed the repository outside .gov-runtime/: {repo.status()}"
+        for place in sandbox.places:
+            left = support.index_files(place)
+>           assert not left, f"index files left in {place}: {left}"
+E           AssertionError: index files left in /tmp/w16-u1fhopf3/h: ['.cache/gov-os/secrets-scan.sqlite']
+E           assert not ['.cache/gov-os/secrets-scan.sqlite']
+
+tests/acceptance/W1-16/test_w1_16_home.py:160: AssertionError
+1 failed in 30.46s

@@ -1,0 +1,5 @@
+# 2026-10-31T18:16:13Z disk gate: 
+# /usr/bin/python3 -m pytest -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/home/usain/gov-os-worktrees/W2-110/.gov-runtime/scratch/lead/log/verify/serial.xml ...
+.....                                                                    [100%]
+5 passed in 17.67s
+# 2026-10-31T18:16:48Z exit 0

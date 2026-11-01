@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="8" time="927.993" timestamp="2026-10-31T01:59:40.901861+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-07.test_w1_07_help" name="test_help_answers_in_under_300_ms" time="5.231" /><testcase classname="tests.acceptance.W2-69.test_w2_69_deleted_text_after_rebuild" name="test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild" time="50.824" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[dot-from-the-project]" time="45.906" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[a-relative-path-from-its-parent]" time="44.443" /><testcase classname="tests.acceptance.W2-54.test_w2_54_sandboxed_worker" name="test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written" time="13.077"><failure message="Failed: the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)&#10;gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash&#10;exit code: 0&#10;stdout:&#10;The command was refused by a pre-tool-use hook error (missing hook file at `.claude/hooks/pretooluse.py`). Following your instructions, I have not retried or attempted to work around it.&#10;&#10;DONE&#10;&#10;stderr:">the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The command was refused by a pre-tool-use hook error (missing hook file at `.claude/hooks/pretooluse.py`). Following your instructions, I have not retried or attempted to work around it.
+
+DONE
+
+stderr:</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before" time="37.315" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit" time="164.209"><failure message="AssertionError: the check is not green on this repository&#10;  sh -c python3 -m gov.context.context_check&#10;  exit code: 1 (164.2 s)&#10;  stdout:&#10;  ERROR: DAEO-2bdu: .tickets/DAEO-2bdu.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-57hm: .tickets/DAEO-57hm.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-6icv: .tickets/DAEO-6icv.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-6y0x: .tickets/DAEO-6y0x.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-a3u2: .tickets/DAEO-a3u2.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-drhj: .tickets/DAEO-drhj.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-g87r: .tickets/DAEO-g87r.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-hgv3: .tickets/DAEO-hgv3.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-jsg1: .tickets/DAEO-jsg1.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-lxzn: .tickets/DAEO-lxzn.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-n0wb: .tickets/DAEO-n0wb.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-ouet: .tickets/DAEO-ouet.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-rpfv: .tickets/DAEO-rpfv.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-uw5h: .tickets/DAEO-uw5h.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-wi46: .tickets/DAEO-wi46.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-wq2b: .tickets/DAEO-wq2b.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  ERROR: DAEO-0mab: mandatory input 'DAEO-2bdu' not found in the store&#10;  ERROR: DAEO-ecac: mandatory input 'DEC-959' not found in the store&#10;  ERROR: DAEO-h4rh: mandatory input 'DAEO-2bdu' not found in the store&#10;  ERROR: DAEO-k7hz: mandatory input 'DEC-959' not found in the store&#10;  ERROR: DAEO-lrre: mandatory input 'DEC-959' not found in the store&#10;  ERROR: DAEO-mc6n: mandatory input 'DEC-959' not found in the store&#10;  ERROR: DAEO-nn1s: mandatory input 'DAEO-jsg1' not found in the store&#10;  ERROR: DAEO-swdu: mandatory input 'DAEO-2bdu' not found in the store&#10;  context-reproducibility: 0 ticket(s) failed, 24 error(s)&#10;  &#10;  stderr:&#10;  &#10;assert 1 == 0&#10; +  where 1 = &lt;w2_54_support.Run object at 0x70b30822ce60&gt;.returncode">code_under_test = '/home/usain/gov-os-worktrees/W2-76/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds &lt; limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+&gt;       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (164.2 s)
+E         stdout:
+E         ERROR: DAEO-2bdu: .tickets/DAEO-2bdu.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-57hm: .tickets/DAEO-57hm.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-6icv: .tickets/DAEO-6icv.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-6y0x: .tickets/DAEO-6y0x.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-a3u2: .tickets/DAEO-a3u2.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-drhj: .tickets/DAEO-drhj.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-g87r: .tickets/DAEO-g87r.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-hgv3: .tickets/DAEO-hgv3.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-jsg1: .tickets/DAEO-jsg1.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-lxzn: .tickets/DAEO-lxzn.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-n0wb: .tickets/DAEO-n0wb.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-ouet: .tickets/DAEO-ouet.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-rpfv: .tickets/DAEO-rpfv.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-uw5h: .tickets/DAEO-uw5h.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-wi46: .tickets/DAEO-wi46.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-wq2b: .tickets/DAEO-wq2b.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         ERROR: DAEO-0mab: mandatory input 'DAEO-2bdu' not found in the store
+E         ERROR: DAEO-ecac: mandatory input 'DEC-959' not found in the store
+E         ERROR: DAEO-h4rh: mandatory input 'DAEO-2bdu' not found in the store
+E         ERROR: DAEO-k7hz: mandatory input 'DEC-959' not found in the store
+E         ERROR: DAEO-lrre: mandatory input 'DEC-959' not found in the store
+E         ERROR: DAEO-mc6n: mandatory input 'DEC-959' not found in the store
+E         ERROR: DAEO-nn1s: mandatory input 'DAEO-jsg1' not found in the store
+E         ERROR: DAEO-swdu: mandatory input 'DAEO-2bdu' not found in the store
+E         context-reproducibility: 0 ticket(s) failed, 24 error(s)
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = &lt;w2_54_support.Run object at 0x70b30822ce60&gt;.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_gov_check_gives_context_reproducibility_green_here" time="566.693"><failure message="AssertionError: context-reproducibility is RED here: [{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;ERROR: DAEO-2bdu: .tickets/DAEO-2bdu.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured\nERROR: DAEO-57&quot;}]&#10;assert 'RED' == 'GREEN'&#10;  &#10;  - GREEN&#10;  + RED">gov_check_here = (&lt;w2_54_support.Run object at 0x70b30822c4d0&gt;, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': 'f285aa749c34e8f375b25118dad61b3f8259b082', 'inputs_hash': '463f39e9d3f3db79'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+&gt;       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "ERROR: DAEO-2bdu: .tickets/DAEO-2bdu.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured\nERROR: DAEO-57"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError</failure></testcase></testsuite></testsuites>

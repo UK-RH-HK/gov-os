@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="996.718" timestamp="2026-10-31T15:27:46.782304+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-57.test_w2_57_designer_read_p95" name="test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95" time="20.172"><failure message="AssertionError: p95 of a test designer's read on a branch with changes, per round (ms): 296.6, 330.4, 315.7; the bound is 100 ms&#10;assert 0.296591421822086 &lt; 0.1&#10; +  where 0.296591421822086 = min([0.296591421822086, 0.3304461110383272, 0.3157425248064101])">tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-26/test_a_test_designer_s_read_on0')
+
+    def test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95(tmp_path):
+        project, sandbox = support.designer_world(tmp_path)
+        refused = support.designer_read(project, sandbox, CHANGED)
+        assert refused.decision == "deny" and re.search(r"DEC-820 \(c\)", refused.stdout), (
+            f"the fixture is wrong: the test designer is not refused a file its ticket's branch changes, so the read "
+            f"does not take Policy 2 (c)'s path: {refused.describe()}"
+        )
+        for _ in range(WARM_UP):
+            support.designer_read(project, sandbox, ORDINARY)
+        rounds = []
+        for _ in range(ROUNDS):
+            samples = []
+            for _ in range(SAMPLES):
+                result = support.designer_read(project, sandbox, ORDINARY)
+                assert result.decision == "allow", f"the timed read was not allowed: {result.describe()}"
+                samples.append(result.seconds)
+            rounds.append(guard.p95(samples))
+            if rounds[-1] &lt; LATENCY_BOUND_S:
+                break
+&gt;       assert min(rounds) &lt; LATENCY_BOUND_S, (
+            "p95 of a test designer's read on a branch with changes, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds) + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 of a test designer's read on a branch with changes, per round (ms): 296.6, 330.4, 315.7; the bound is 100 ms
+E       assert 0.296591421822086 &lt; 0.1
+E        +  where 0.296591421822086 = min([0.296591421822086, 0.3304461110383272, 0.3157425248064101])
+
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py:52: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-15.test_w1_15_parallel_scan" name="test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder" time="9.729" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_gov_check_gives_context_reproducibility_green_here" time="966.563"><failure message="AssertionError: context-reproducibility is RED here: [{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;context-reproducibility did not end within its time limit of 600 seconds&quot;}]&#10;assert 'RED' == 'GREEN'&#10;  &#10;  - GREEN&#10;  + RED">gov_check_here = (&lt;w2_54_support.Run object at 0x7c78015a6360&gt;, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': 'cd002aabe052bb56c406819f2c09621eeef03bc5', 'inputs_hash': '6bd929b1e3a8f25b'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+&gt;       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "context-reproducibility did not end within its time limit of 600 seconds"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError</failure></testcase></testsuite></testsuites>

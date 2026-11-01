@@ -1,0 +1,10 @@
+Merge w2/W2-95-tests (DAEO-57hm): W1-30's planted path maps get one catch-all namespace (DEC-970 package 1 (a))
+
+The independent test designer's commit 5f3137b274f8 revises W1-30's planted path maps that wrote
+`namespaces: {}` to one catch-all namespace (`**`), lowering nothing (Rewrite-Reason: DEC-959 item 9).
+
+Task: DAEO-57hm
+Implements: DEC-970
+Implements: DEC-959
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

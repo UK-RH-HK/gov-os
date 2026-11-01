@@ -1,0 +1,65 @@
+2026-11-01 00:50:03 W2-106 (DAEO-0mtg, FULL) merges 0d53c56a1bfc on head be171b570263
+2026-11-01 00:50:03 W2-84 (DAEO-m1u3, FULL) merges 6d2fc62a8a24 on head be171b570263
+2026-11-01 00:50:03 W2-76 (DAEO-tgk2, STANDARD) merges 3c5f212d5cdd on head be171b570263
+2026-11-01 00:50:03 W2-49 (DAEO-ha8z, STANDARD) merges bc31d915e860 on head be171b570263
+2026-11-01 00:50:03 W2-16 (DAEO-49o5, FULL) merges 2359f6d79e3e on head be171b570263
+2026-11-01 00:50:03 W2-67 (DAEO-9nys, FULL) merges 9b03ac0b57ab,4da40b600488 on head be171b570263
+2026-11-01 00:50:03 W2-95 (DAEO-57hm, STANDARD) merges 44eccdfa8fbe on head be171b570263
+2026-11-01 00:50:03 W2-108 (DAEO-zoex, STANDARD) merges b639e05641ca,789513df655c on head be171b570263
+2026-11-01 02:05:07 clone rebuilt in 4504 s
+2026-11-01 02:05:25 W2-106 selection: scoped []; 45 targets; governance left out 2
+2026-11-01 02:05:36 W2-84 selection: scoped []; 38 targets; governance left out 4
+2026-11-01 02:05:49 W2-76 selection: scoped []; 67 targets; governance left out 3
+2026-11-01 02:06:03 W2-49 selection: scoped []; 31 targets; governance left out 5
+2026-11-01 02:06:12 W2-16 selection: scoped []; 33 targets; governance left out 10
+2026-11-01 02:06:25 W2-67 selection: scoped []; 69 targets; governance left out 11
+2026-11-01 02:06:33 W2-95 selection: scoped []; 42 targets; governance left out 2
+2026-11-01 02:06:42 W2-108 selection: scoped []; 35 targets; governance left out 2
+2026-11-01 02:06:42 run scope scoped: 79 targets; core changed 5, unplaced 0
+2026-11-01 04:15:17 parallel exit 1 in 7255 s {'exit': 1, 's': 7255, 'tests': 15511, 'failures': 12, 'errors': 6, 'skipped': 4}; serial exit 1 in 459 s {'exit': 1, 's': 459, 'entries': 8, 'tests': 21, 'failures': 9, 'errors': 0, 'skipped': 0}
+2026-11-01 04:22:01 passes alone (flaky candidate): tests/acceptance/W1-35/test_w1_35.py
+2026-11-01 04:22:37 passes alone (flaky candidate): tests/acceptance/W1-35/test_w1_35_orchestration.py
+2026-11-01 04:22:38 red alone: tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-11-01 04:22:45 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-11-01 04:22:51 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-11-01 04:22:58 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-11-01 04:23:04 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-11-01 04:23:05 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-11-01 04:23:05 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-11-01 04:23:36 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_clean_store_is_decided_green
+2026-11-01 04:23:50 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it
+2026-11-01 04:24:40 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_among_many_small_files_is_decided_by_gov_check
+2026-11-01 04:34:45 passes alone (flaky candidate): tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+2026-11-01 04:45:17 passes alone (flaky candidate): tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+2026-11-01 04:45:18 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-11-01 04:45:19 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-11-01 04:45:19 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-11-01 04:45:20 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-11-01 04:45:37 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+2026-11-01 04:45:51 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+2026-11-01 04:46:05 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+2026-11-01 04:46:47 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+2026-11-01 04:47:02 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]
+2026-11-01 04:47:16 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+2026-11-01 04:47:38 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+2026-11-01 04:47:58 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]
+2026-11-01 04:48:03 passes alone (flaky candidate): tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+2026-11-01 04:48:05 trace: 3c5f212d5cdd cannot be reverted; tracing against the head before the batch, 2a9d1a1189f3
+2026-11-01 05:13:01 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-11-01 05:13:09 cannot run without the change (exit 4): the change's: tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-11-01 05:13:18 cannot run without the change (exit 4): the change's: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-11-01 05:13:25 cannot run without the change (exit 4): the change's: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-11-01 05:13:29 cannot run without the change (exit 4): the change's: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-11-01 05:13:35 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-11-01 05:13:43 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-11-01 05:13:46 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-11-01 05:13:49 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-11-01 05:14:01 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-11-01 05:14:05 caused by the change (red 3/3 with, 0/3 without): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-11-01 05:15:01 green with the change in all 3 traced rounds (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+2026-11-01 05:16:28 red without the change too (2/3; with 1/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+2026-11-01 05:17:38 green with the change in all 6 traced rounds (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+2026-11-01 05:19:55 culprit search: W2-76: 3c5f212d5cdd cannot be reverted alone; skipped
+2026-11-01 05:23:04 culprit search: W2-67: 4da40b600488 cannot be reverted alone; skipped
+2026-11-01 05:26:09 CLOSE REFUSED: 11 test(s) red alone, caused by the batch; the culprit search could not isolate W2-76, W2-67 (refused, fail closed)
+exit 3

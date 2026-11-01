@@ -1,0 +1,243 @@
+........................................................................ [ 46%]
+.........................................................FFFFFFFFFF..... [ 93%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+_____________ test_cap_45a_record_carries_contract_v4_2_item_text ______________
+
+contract = (ContractModel(source='yaml', version='4.2', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-read...ion package', 'source': 'Contract v3 A4', 'wave': 'W2'}], 'disposition': {'class': 'KEPT'}, 'id': 'CAP-04', ...}, ...})
+
+    def test_cap_45a_record_carries_contract_v4_2_item_text(contract):
+        """DEC-750 item 5: CAP-45.a.md's title, heading and Item line are v4.2's item, in CAP-45.b.md's form."""
+        model, caps = contract
+        require_v42(model)
+        item = model.by_id().get(RECORD)
+        assert item is not None and item.cap == PARENT, f"contract.yaml has no {RECORD} under {PARENT}"
+        text = str(item.raw["item"])
+        parent_title = caps[PARENT]["title"]
+    
+        meta, body = read_record(RECORD)
+        sib_meta, sib_body = read_record(SIBLING)
+        sib = model.by_id()[SIBLING]
+    
+        assert meta.get("id") == RECORD, f"{RECORD}.md: id is {meta.get('id')!r}"
+>       assert meta.get("title") == text, (
+            f"{RECORD}.md: title {meta.get('title')!r} is not contract.yaml's item {text!r} (regenerate from v4.2)"
+        )
+E       AssertionError: CAP-45.a.md: title 'gov update: check/impact, authenticated source (signed tag), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance' is not contract.yaml's item "gov update: check/impact, authenticated source (the signed tag in W3, CAP-02.c), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance; in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3), DEC-722" (regenerate from v4.2)
+E       assert 'gov update: ...er/provenance' == 'gov update: ...(W3), DEC-722'
+E         
+E         Skipping 38 identical leading characters in diff, use -v to show
+E         - d source (the signed tag in W3, CAP-02.c), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance; in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3), DEC-722
+E         + d source (signed tag), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance
+
+tests/acceptance/W2-49/test_w2_49_records_v4_2.py:56: AssertionError
+___________ test_every_capability_record_states_the_contracts_status ___________
+
+    def test_every_capability_record_states_the_contracts_status():
+        """DEC-750 item 5: every record's frontmatter status is the status both Contract files state (ACCEPTED)."""
+        statuses = {source: contract_status(source) for source in ("yaml", "markdown")}
+        assert statuses["yaml"] == statuses["markdown"], f"the two Contract files state different statuses: {statuses}"
+        expected = statuses["yaml"]
+        assert expected == "ACCEPTED", f"the Contract states status {expected!r}, not ACCEPTED (DEC-741)"
+        paths = capability_record_paths()
+        assert paths, "docs/contract/capabilities/ holds no record"
+        wrong = {}
+        for path in paths:
+            meta, _ = frontmatter(path.read_text(encoding="utf-8"))
+            if meta.get("status") != expected:
+                wrong[path.stem] = meta.get("status")
+>       assert not wrong, (
+            f"{len(wrong)} of {len(paths)} capability records do not state the Contract's status {expected}: "
+            f"e.g. {dict(list(wrong.items())[:5])}"
+        )
+E       AssertionError: 276 of 276 capability records do not state the Contract's status ACCEPTED: e.g. {'CAP-01.a': 'PROPOSED', 'CAP-01.b': 'PROPOSED', 'CAP-01.c': 'PROPOSED', 'CAP-01.d': 'PROPOSED', 'CAP-01': 'PROPOSED'}
+E       assert not {'CAP-01': 'PROPOSED', 'CAP-01.a': 'PROPOSED', 'CAP-01.b': 'PROPOSED', 'CAP-01.c': 'PROPOSED', ...}
+
+tests/acceptance/W2-49/test_w2_49_records_v4_2.py:88: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Adoption-Role D] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Adoption Protocol v3.0', item = 'Role D', part = 'A7'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Adoption Protocol v3.0 / Role D does not state its part as Wave 2, lite, under CAP-44.f (Contract v4.2): 'Contract v4 CAP-44 covers A7 + CAP-47 (KEPT, wave W3); Independent Auditor role exists from W1 (W1-33)'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff9a7d30>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Adoption-Role F] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Adoption Protocol v3.0', item = 'Role F', part = 'A10'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Adoption Protocol v3.0 / Role F does not state its part as Wave 2, lite, under CAP-44.f (Contract v4.2): 'Contract v4 CAP-44 covers A10 + CAP-47 (KEPT, wave W3) + qualification memory oracle CAP-49'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff9a7100>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Adoption-12. D] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Adoption Protocol v3.0', item = '12. D', part = 'A7'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Adoption Protocol v3.0 / 12. D does not state its part as Wave 2, lite, under CAP-44.f (Contract v4.2): 'Contract v4 CAP-44 covers: A7 independent migration verification (W3, with CAP-47; DEC-090)'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff9a7970>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Adoption-15. F] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Adoption Protocol v3.0', item = '15. F', part = 'A10'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Adoption Protocol v3.0 / 15. F does not state its part as Wave 2, lite, under CAP-44.f (Contract v4.2): 'Contract v4 CAP-44 covers: A10 independent memory verification (W3, with CAP-47; DEC-090)'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff5c4400>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Adoption-20. Final adoption verdict] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Adoption Protocol v3.0', item = '20. Final adoption verdict'
+part = 'verdict'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Adoption Protocol v3.0 / 20. Final adoption verdict does not state its part as Wave 2, lite, under CAP-44.h (Contract v4.2): 'Contract v4 CAP-44 acceptance: verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY conditions (W3; DEC-006, DEC-090)'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff5c4a90>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Distribution-Stage A7] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Distribution Protocol v1.2', item = 'Stage A7', part = 'A7'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Distribution Protocol v1.2 / Stage A7 does not state its part as Wave 2, lite, under CAP-44.f (Contract v4.2): 'Contract v4 CAP-44 covers A7 (W3, with CAP-47; DEC-090)'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff9a71f0>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Distribution-Stage A10] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Distribution Protocol v1.2', item = 'Stage A10', part = 'A10'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Distribution Protocol v1.2 / Stage A10 does not state its part as Wave 2, lite, under CAP-44.f (Contract v4.2): 'Contract v4 CAP-44 covers A10 (W3, with CAP-47) + CAP-55 canaries'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff9a75b0>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+_ test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3[Distribution-18. Adoption acceptance] _
+
+rows = [['source_document', 'source_item', 'class', 'carried_by_or_disposition'], ['Contract v3', 'Governance OS Capability A...een the contract and the governance suite', 'OK', 'Contract v4 CAP-38 (KEPT, wave W1) + CAP-39; W1-26 gov check'], ...]
+doc = 'Distribution Protocol v1.2', item = '18. Adoption acceptance'
+part = 'verdict'
+
+    @pytest.mark.parametrize("doc, item, part", EIGHT, ids=[f"{d.split()[0]}-{i}" for d, i, _ in EIGHT])
+    def test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3(rows, doc, item, part):
+        """DEC-745 item 2: the row states its part in W2, lite, under its v4.2 item, and the rest in W3 under its item."""
+        row = find(rows, doc, item)
+        assert len(row) == 4, f"{doc} / {item}: {len(row)} columns, not 4: {row}"
+        cell = row[3]
+        pattern, lite_id, rest_id = PART[part]
+        parts = top_segments(cell)
+        w2, w3 = wave_token("W2"), wave_token("W3")
+        assert has(pattern, cell), f"{doc} / {item} no longer names its part ({part}): {cell!r}"
+>       assert any(names_id(p, lite_id) and has(r"\blite\b", p) and w2.search(p) for p in parts), (
+            f"{doc} / {item} does not state its part as Wave 2, lite, under {lite_id} (Contract v4.2): {cell!r}"
+        )
+E       AssertionError: Distribution Protocol v1.2 / 18. Adoption acceptance does not state its part as Wave 2, lite, under CAP-44.h (Contract v4.2): 'Contract v4 CAP-44 (verdict set, W3), CAP-54; DEC-006, DEC-090'
+E       assert False
+E        +  where False = any(<generator object test_source_map_row_states_its_part_lite_in_wave_2_and_the_rest_in_wave_3.<locals>.<genexpr> at 0x73e1ff9188b0>)
+
+tests/acceptance/W2-49/test_w2_49_source_map.py:99: AssertionError
+10 failed, 144 passed in 8.15s

@@ -1,53 +1,21 @@
-# DAEO-49o5 (W2-16) lead checkpoint: held after the last round (DEC-761), review passed, packages open
+# DAEO-49o5 (W2-16) lead checkpoint: run 3 (DEC-772 round) DONE, ready to merge after W2-49 and W2-52 (DEC-752)
 
 ## RESUME HERE
 
-**State:**
-- This was run 2, the last round the owner allowed (DEC-761). The order was: tests first, the engineer, a full verification, then one review of the round's change.
-- The review **passed** (rev-3). The probe record is committed at `docs/probes/DAEO-49o5/PR-DAEO-49o5-last-round.md` (commit 6f5c5cf3, probed d9035982).
-- Held before any merge (DEC-737, DEC-752). Nothing is merged, and no further round is allowed.
-- Packages are open for the owner (see the lead's return):
-  - **P-R3-1:** sources that never held a release record. DEC-761's literal rule contradicts W1-39's closed suite.
-  - **P-R3-2:** the disputed case R3-F5, which needs a test designer's recorded rewrite. Its fix is to copy into a fresh folder.
-  - **P-R3-3:** the owner branch of the role check (R3-NAMED, the reviewer's P-A).
-  - **P-R3-4:** projects installed before the first record, and plain locks written before this round (R3-F1, R3-F2, the reviewer's P-B).
-  - **P-R3-5:** refusing a shallow or history-rewritten source (R3-F4, the reviewer's P-C).
+**State (2026-10-31, about 11:30):** round 3 is complete. Head `0595237660a1` (probe record), on top of the probed head `df7a2a06e5ff`. Tree clean. Nothing more to do in this ticket; the orchestrator merges (after W2-49 and W2-52) and closes.
 
-**Branch:** `w2/W2-16`, cut from `w2/integrate` at f3d4b6f0, with W2-49's held branch merged in at 846d75e1 (DEC-752). The head is the hold checkpoint commit, on top of 6f5c5cf3.
-
-**This run's commits:**
-
+**Commits of run 3:**
 | Commit | Role | What |
 |---|---|---|
-| adbeea77 | independent-test-designer | 29 cases, plus the W1-39 and W1-32 rewrites, with Rewrite-Reason |
-| a3274643 | orchestrator | checkpoint (CP-0016) |
-| fe8612d9 | engineer | repair |
-| 861a634d | engineer | docs/releases/README |
-| d9035982 | orchestrator | checkpoint (CP-0018); probed by rev-3, pass |
-| 6f5c5cf3 | orchestrator | probe record |
-| (next) | orchestrator | hold checkpoint |
+| bb49523039c7 | engineer (eng-4, 9e7e9698) | DEC-772 item 1: build form's checks, seam `_release_test`, unit tests, docs/releases/README.md |
+| 2fa4a6da3358 | independent-test-designer (td-4, 75710576) | 28 cases; builds through the seam; role cases' build halves; R3-F5 (Rewrite-Reason DEC-772, DEC-767) |
+| 0226a4ec0944 | independent-test-designer (td-4 resumed) | P-R3-A (a): 25 build-refusal cases through the seam (Rewrite-Reason DEC-772) |
+| b023b9c17ccd | orchestrator (lead) | --no-ff merge of w2/W2-16-tests |
+| df7a2a06e5ff | engineer (eng-5, b5d4caa8) | no version refused after the code, as the build's own |
+| 0595237660a1 | orchestrator (lead) | probe record docs/probes/DAEO-49o5/PR-DAEO-49o5-round-3.md (rev-4 342c46c7, pass) |
 
-**Verification at 861a634d / d9035982** (logs in `log/verify-3/`):
-- The full rebuild exited 0, and `gov.__file__` = `/home/usain/gov-os-worktrees/W2-16/src/gov/__init__.py`.
-- Every acceptance suite is green, each run in its own process, except:
-  - W2-16: 113 passed, 1 failed (R3-F5, the disputed case, P-R3-2).
-  - W1-42: 2 failed, the accepted reds (RETR-X-02 and the governance share, DEC-757).
-  - W1-05: 1 failed under load (the switch-over latency case). Re-run alone, it gave 2 passed.
-- tests/unit: 2142 passed, 1 skipped.
-- W1-07, W1-26 and W1-32 are green (W1-32 after its recorded rewrite).
+**Verification (logs in log/verify-4/):** rebuild exit 0 twice (second at 0595237660a1, after the probe record commit); gov.__file__ = /home/usain/gov-os-worktrees/W2-16/src/gov/__init__.py; selection scoped, core_changed [], unplaced []; parallel 3999 passed, 1 skipped; serial 181 passed, 1 failed (W2-54 live sandboxed-worker case, fails alone, not ours); gov check: core-mutation RED (.tickets/DAEO-tgk2.md from w2/integrate e08717ec, not ours), two YELLOW; collect-only 17813/17815 collected, no error; trailer_gate 29/29, 0 lacking; keyword_warn 0. Red check at base: 41 failed, 19 passed, 82 errors (as stated).
 
-**What the resume lead must do:**
-1. Bring the owner's answers on P-R3-1 to P-R3-5. P-R3-2 must be resolved before close: the fix is a test designer's one-line destination change with Rewrite-Reason.
-2. After W2-49 has closed (DEC-752), and W2-01 (DEC-737), merge `w2/integrate` into this branch. The merge commit carries `Task: DAEO-49o5` and `Role: orchestrator`. Keep the merge rule (DEC-750 item 3).
-3. Run one full rebuild and every suite again. Apply the probe gate to the merge-back.
-4. After W2-20 closes (DEC-753), add the `release` line in `src/gov/check/commands.py` and W1-07's list entry (a test designer, Rewrite-Reason). W1-32's rewrite already passes once the lists record `release`.
+**Left for the orchestrator:** /tmp/gov-os-lead-W2-16 (432M, 50,079); this scratch (16M, 454) to copy (DEC-819). Tests worktree and branch removed.
 
-**Worker sessions (run 2):**
-
-| Worker | Session |
-|---|---|
-| td-3 | 83f0a391-3a6c-45d1-babb-172c540feed7 |
-| eng-3 | 86123e70-22b3-4646-abbb-7f451cdb4c16 |
-| rev-3 | 78cd2d3b-698b-4ade-a4bf-6fd3a481c39c (pass) |
-
-The run-1 sessions are in git history (CHECKPOINT at ee557d02).
+**Brief gaps:** see the return's brief_gaps.

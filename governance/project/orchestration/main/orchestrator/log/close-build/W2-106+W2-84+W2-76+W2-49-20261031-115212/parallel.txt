@@ -1,0 +1,230 @@
+49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x71331740b6f0>('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src')
+E        +    where <built-in method startswith of str object at 0x71331740b6f0> = '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src' = str(PosixPath('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:84: AssertionError
+_ test_read_merge_raises_a_public_error_for_an_unknown_commit_id[forty-hex-digits-that-name-no-object] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_publi1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_...mp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_publi1/sandbox/elsewhere'))
+helper = <function helper.<locals>._module at 0x7133115ccf40>
+case = 'forty-hex-digits-that-name-no-object'
+
+    @pytest.mark.parametrize("case", sorted(UNKNOWN_COMMITS), ids=sorted(UNKNOWN_COMMITS))
+    def test_read_merge_raises_a_public_error_for_an_unknown_commit_id(project, sandbox, helper, case):
+        """DEC-403, F3. The id has the form of a commit id and names no object of the repository."""
+        commit = UNKNOWN_COMMITS[case]
+        built = _a_merge(project, sandbox)
+        assert check_support.git(project, "rev-list", "--all").find(commit) == -1, (
+            "the fixture is wrong: the repository holds a commit with that id"
+        )
+        what = f"the commit id {commit!r}, which names no object"
+>       _refusal(helper(), str(project), commit, what)
+                 ^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _module():
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        if not callable(getattr(module, "read_merge", None)):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x71331740b6f0>('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src')
+E        +    where <built-in method startswith of str object at 0x71331740b6f0> = '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src' = str(PosixPath('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:84: AssertionError
+____ test_read_merge_raises_a_public_error_for_a_path_that_is_no_repository ____
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_publi2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_...mp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_publi2/sandbox/elsewhere'))
+helper = <function helper.<locals>._module at 0x7133115cd760>
+tmp_path = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_read_merge_raises_a_publi2')
+
+    def test_read_merge_raises_a_public_error_for_a_path_that_is_no_repository(project, sandbox, helper, tmp_path):
+        """DEC-403, F3. ``root`` is an existing directory outside every git repository."""
+        _a_merge(project, sandbox)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        elsewhere = tmp_path / "no-repository"
+        elsewhere.mkdir()
+        import subprocess
+        inside = subprocess.run(["git", "-C", str(elsewhere), "rev-parse", "--git-dir"], capture_output=True,
+                                text=True, check=False)
+        assert inside.returncode != 0, f"the fixture is wrong: {elsewhere} is inside the repository {inside.stdout!r}"
+        what = f"the directory {elsewhere}, which is no repository"
+>       _refusal(helper(), str(elsewhere), merge_commit, what)
+                 ^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:424: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _module():
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        if not callable(getattr(module, "read_merge", None)):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x71331740b6f0>('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src')
+E        +    where <built-in method startswith of str object at 0x71331740b6f0> = '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src' = str(PosixPath('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:84: AssertionError
+________________ test_the_error_read_merge_raises_is_documented ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_the_error_read_merge_rais0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_the_error_read_merge...mp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw0/test_the_error_read_merge_rais0/sandbox/elsewhere'))
+helper = <function helper.<locals>._module at 0x7133115ce8e0>
+
+    def test_the_error_read_merge_raises_is_documented(project, sandbox, helper):
+        """DEC-403, F3: "a public, documented error". One of the error's public names stands in the docstring of
+        ``read_merge`` or of the module, or the class has a docstring of its own."""
+        _a_merge(project, sandbox)
+>       module = helper()
+                 ^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:432: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _module():
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        if not callable(getattr(module, "read_merge", None)):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x71331740b6f0>('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src')
+E        +    where <built-in method startswith of str object at 0x71331740b6f0> = '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src' = str(PosixPath('/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49-20261031-115212/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py:84: AssertionError
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x778f062a0180>
+project = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw1/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x778f062a1d00>
+project = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw1/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x778f062a2200>
+project = PosixPath('/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw1/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x778f062a39c0>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-115212/pytest-of-usain/pytest-0/popen-gw1/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+56 failed, 14929 passed, 4 skipped, 4 errors in 5465.94s (1:31:05)

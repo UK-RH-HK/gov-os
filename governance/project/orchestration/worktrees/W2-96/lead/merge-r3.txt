@@ -1,0 +1,12 @@
+Merge w2/W2-96-tests into w2/W2-96: review 3's acceptance cases and the R9 premise revision (DEC-970, DEC-963)
+
+The independent test designer's two commits: review 3's cases (R14, a clean-up
+that tolerates concurrent changes; R15, linear in its entries) and run 2's R9
+two-press case tied to the clean-up (P-W2-96-R9-PREMISE (a), a P3 the lead
+decided; Rewrite-Reason in that commit). Merged by the lead, since the
+engineer's sandbox mounts the acceptance tests read-only (DEC-970).
+
+Task: DAEO-ouet
+Implements: DEC-970, DEC-963, DEC-959
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,52 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "governance/project/path-map.yaml",
+    "src/gov/retrieval/retrieve.py"
+   ]
+  }
+ ],
+ "base": "df0782fa4c4e77f7ababb1c1da392fab60838bcd",
+ "head": "51a72c7f5e27016114b5da88735b9559be5c350a",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-s9qc/CP-DAEO-s9qc-0006.md"
+ ],
+ "changed": [
+  "docs/research/W2-87-memory-measure.md",
+  "governance/project/path-map.yaml",
+  "src/gov/retrieval/authority.py",
+  "src/gov/retrieval/retrieve.py",
+  "tests/acceptance/W2-87/README.md",
+  "tests/acceptance/W2-87/conftest.py",
+  "tests/acceptance/W2-87/test_w2_87_authority.py",
+  "tests/acceptance/W2-87/test_w2_87_register.py",
+  "tests/acceptance/W2-87/w2_87_support.py",
+  "tests/unit/retrieval/test_w2_87_authority.py",
+  "tests/unit/retrieval/test_w2_87_register.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-87/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [],
+ "ignore": [],
+ "deselect": [],
+ "per_test_timeout": 900
+}

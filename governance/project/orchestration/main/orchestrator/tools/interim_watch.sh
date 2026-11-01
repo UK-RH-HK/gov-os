@@ -5,10 +5,11 @@
 # log/interim-seen.txt, and exits. Re-arm after each. The first run of a worktree marks its history seen silently.
 SEEN=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/interim-seen.txt
 touch "$SEEN"
-KEY='baseline|measure|figures|hit@5|finding|probe record|research record|the record|PACKAGE|returns? PACKAGES'
+KEY='baseline|measure|figures|hit@5|findings report|probe record|research record|the record|PACKAGE|returns? PACKAGES'
 while true; do
   for wt in /home/usain/gov-os-worktrees/*/; do
     name=$(basename "$wt")
+    case "$name" in W2-00-store*|W2-00-record|*-tests) continue ;; esac  # not leads (DEC-963 store, the record branch)
     [ -e "$wt/.git" ] || continue
     if ! grep -q "^$name " "$SEEN"; then
       for c in $(git -C "$wt" log --format=%h -50 2>/dev/null); do echo "$name $c" >> "$SEEN"; done

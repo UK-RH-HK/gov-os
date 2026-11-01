@@ -1,0 +1,23 @@
+---
+id: CP-DAEO-l78m-0005
+type: checkpoint
+status: ACTIVE
+state_class: NARRATIVE
+title: DAEO-l78m at stop
+task: DAEO-l78m
+task_status: in_progress
+trigger: stop
+next_action: Resume after stop
+created: '2026-11-01T00:29:36Z'
+inputs:
+- id: DAEO-l78m
+  version: 367de72c
+  hash: sha256:a56735a701cddf2c2e813cf0cf78bc6aa0feb0bedcdee30207c26d2f1d08737f
+head_commit: 19ec510ad2632957d883c169f44f8bd42292a928
+---
+
+# CP-DAEO-l78m-0005 — DAEO-l78m at stop
+
+## Next action
+
+Resume after stop

@@ -1,0 +1,2 @@
+2026-10-31 21:50:33 gate OPEN leads=0 load=8.2/14.9 nproc=20 have=19815168kB need=5285964kB; launching W2-108
+disk gate open: 869 GiB free, 65180050 inodes free

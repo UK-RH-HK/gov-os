@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="10" time="7.044" timestamp="2026-10-31T05:42:45.094493+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[additional-directories]" time="0.753"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['50df2a18-74ba-4c62-8b46-7b7da2f8729f.json']&#10;records after: ['50df2a18-74ba-4c62-8b46-7b7da2f8729f.json', 'e8e33c86-a3ee-4b5d-8a5a-926469cad8d6.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local0/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local0/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local0/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local0/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local0/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local0/w2-60a/home/work/worktree')
+key = 'additional-directories'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...the CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425365.524843, ended=1793425365.884648, passed=())
+words = ('LAUNCH_REFUSED', 'DEC-313')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['50df2a18-74ba-4c62-8b46-7b7da2f8729f.json']
+E       records after: ['50df2a18-74ba-4c62-8b46-7b7da2f8729f.json', 'e8e33c86-a3ee-4b5d-8a5a-926469cad8d6.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[agent]" time="0.674"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['0277c88d-d6af-42d8-b0fa-2d727069421c.json']&#10;records after: ['0277c88d-d6af-42d8-b0fa-2d727069421c.json', '8e27c383-7fe2-46c1-84a7-d178478172f9.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local1/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local1/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local1/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local1/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local1/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local1/w2-60a/home/work/worktree')
+key = 'agent'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425366.2580018, ended=1793425366.5820954, passed=())
+words = ('LAUNCH_REFUSED', 'agent')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['0277c88d-d6af-42d8-b0fa-2d727069421c.json']
+E       records after: ['0277c88d-d6af-42d8-b0fa-2d727069421c.json', '8e27c383-7fe2-46c1-84a7-d178478172f9.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[auto-compact-window]" time="0.748"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['57e79aa6-9d9c-4d50-bc72-addbf1036198.json']&#10;records after: ['57e79aa6-9d9c-4d50-bc72-addbf1036198.json', 'a09b38b6-9c98-4955-b667-05a9c8f19295.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local2/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local2/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local2/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local2/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local2/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local2/w2-60a/home/work/worktree')
+key = 'auto-compact-window'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425366.9900692, ended=1793425367.338836, passed=())
+words = ('LAUNCH_REFUSED', 'autoCompactWindow')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['57e79aa6-9d9c-4d50-bc72-addbf1036198.json']
+E       records after: ['57e79aa6-9d9c-4d50-bc72-addbf1036198.json', 'a09b38b6-9c98-4955-b667-05a9c8f19295.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[bypass-default-mode]" time="0.751"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['98b4a45a-10c7-40d7-ae11-29b56d691b39.json']&#10;records after: ['6a321b3d-1ff7-477b-a1e6-326342c78b51.json', '98b4a45a-10c7-40d7-ae11-29b56d691b39.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local3/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local3/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local3/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local3/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local3/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local3/w2-60a/home/work/worktree')
+key = 'bypass-default-mode'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425367.7340908, ended=1793425368.0978625, passed=())
+words = ('LAUNCH_REFUSED', 'DEC-313')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['98b4a45a-10c7-40d7-ae11-29b56d691b39.json']
+E       records after: ['6a321b3d-1ff7-477b-a1e6-326342c78b51.json', '98b4a45a-10c7-40d7-ae11-29b56d691b39.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[disable-all-hooks]" time="0.734"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['f8061242-cf12-4bf8-a779-2d67b33ac4c8.json']&#10;records after: ['c22109ee-2454-450e-9533-dfeb952f4056.json', 'f8061242-cf12-4bf8-a779-2d67b33ac4c8.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local4/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local4/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local4/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local4/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local4/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local4/w2-60a/home/work/worktree')
+key = 'disable-all-hooks'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...d: the CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425368.49459, ended=1793425368.8431, passed=())
+words = ('LAUNCH_REFUSED', 'disableAllHooks')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['f8061242-cf12-4bf8-a779-2d67b33ac4c8.json']
+E       records after: ['c22109ee-2454-450e-9533-dfeb952f4056.json', 'f8061242-cf12-4bf8-a779-2d67b33ac4c8.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[env-auto-compact-window]" time="0.712"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['af883d88-8b6d-4599-b026-43b91362345a.json']&#10;records after: ['59230b8a-f750-462c-b86d-01384a09fe2e.json', 'af883d88-8b6d-4599-b026-43b91362345a.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local5/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local5/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local5/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local5/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local5/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local5/w2-60a/home/work/worktree')
+key = 'env-auto-compact-window'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ... the CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425369.249569, ended=1793425369.57193, passed=())
+words = ('LAUNCH_REFUSED', 'CLAUDE_CODE_AUTO_COMPACT_WINDOW')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['af883d88-8b6d-4599-b026-43b91362345a.json']
+E       records after: ['59230b8a-f750-462c-b86d-01384a09fe2e.json', 'af883d88-8b6d-4599-b026-43b91362345a.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[model-settings-auto-compact-window]" time="0.731"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['2df6a6a0-9c23-4f18-9187-80fab2b6c82a.json']&#10;records after: ['2df6a6a0-9c23-4f18-9187-80fab2b6c82a.json', '84cdab5b-f108-4fcd-a428-7a817af70c7e.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local6/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local6/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local6/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local6/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local6/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local6/w2-60a/home/work/worktree')
+key = 'model-settings-auto-compact-window'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425369.9706013, ended=1793425370.3154414, passed=())
+words = ('LAUNCH_REFUSED', 'no launch sets a compaction threshold (DEC-838)', 'autoCompactWindow')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['2df6a6a0-9c23-4f18-9187-80fab2b6c82a.json']
+E       records after: ['2df6a6a0-9c23-4f18-9187-80fab2b6c82a.json', '84cdab5b-f108-4fcd-a428-7a817af70c7e.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch[sandbox]" time="0.718"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['64e25635-be02-405e-ab73-dc5b74456d63.json']&#10;records after: ['64e25635-be02-405e-ab73-dc5b74456d63.json', '7db378dd-4194-48dc-a5ee-6339aa628ad2.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local7/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local7/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local7/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local7/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local7/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_the_main_checkout_s_local7/w2-60a/home/work/worktree')
+key = 'sandbox'
+
+    @pytest.mark.parametrize("key", sorted(KEYS))
+    def test_the_main_checkout_s_local_settings_are_checked_for_a_worktree_launch(sandbox, project, cli, worktree, key):
+        change, words = KEYS[key]
+        s.rewrite_settings(project, change, s.LOCAL_SETTINGS_REL)
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", *words)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...he CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425370.707754, ended=1793425371.0421705, passed=())
+words = ('LAUNCH_REFUSED', 'DEC-233')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['64e25635-be02-405e-ab73-dc5b74456d63.json']
+E       records after: ['64e25635-be02-405e-ab73-dc5b74456d63.json', '7db378dd-4194-48dc-a5ee-6339aa628ad2.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_main_checkout_local_settings_that_are_not_json_refuse_a_worktree_launch" time="0.764"><failure message="AssertionError: gov launch did not refuse (exit code 0)&#10;gov launch engineer DAEO-zz6a&#10;exit code: 0&#10;stdout:&#10;&#10;stderr:&#10;&#10;CLI starts recorded: 1&#10;records before: ['083f7594-380f-46f5-89b8-7e6875c08043.json']&#10;records after: ['083f7594-380f-46f5-89b8-7e6875c08043.json', '2b57e74c-2553-468a-b00a-9efde98ff09a.json']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_main_checkout_local_setti0/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_main_checkout_local_setti0/w2-60a/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_main_checkout_local_setti0/w2-60a/home/work/repo')
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_main_checkout_local_setti0/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_main_checkout_local_setti0/w2-60a/elsewhere/claude-exit-code'))
+worktree = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_main_checkout_local_setti0/w2-60a/home/work/worktree')
+
+    def test_main_checkout_local_settings_that_are_not_json_refuse_a_worktree_launch(sandbox, project, cli, worktree):
+        s.write(project / s.LOCAL_SETTINGS_REL, "{ not json\n")
+&gt;       s.assert_refused(s.launch(sandbox, cli, s.ENGINEER, s.T, cwd=worktree), "LAUNCH_REFUSED", "settings.local.json")
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=0, stdout='', stderr=''), calls=({'argv0': ...e CLI is not a link to a versions folder"\n  }\n}\n'}, started=1793425371.4721313, ended=1793425371.8177981, passed=())
+words = ('LAUNCH_REFUSED', 'settings.local.json')
+
+    def assert_refused(result, *words):
+        """A refusal: a non-zero exit, no CLI start, no new launch record, and every word of ``words`` in what gov said
+        (case-insensitive)."""
+&gt;       assert result.run.returncode != 0, f"gov launch did not refuse (exit code 0)\n{result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov launch did not refuse (exit code 0)
+E       gov launch engineer DAEO-zz6a
+E       exit code: 0
+E       stdout:
+E       
+E       stderr:
+E       
+E       CLI starts recorded: 1
+E       records before: ['083f7594-380f-46f5-89b8-7e6875c08043.json']
+E       records after: ['083f7594-380f-46f5-89b8-7e6875c08043.json', '2b57e74c-2553-468a-b00a-9efde98ff09a.json']
+
+tests/acceptance/W2-60a/w2_60a_support.py:789: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-60a.test_w2_60a_main_checkout_and_adopted_layout" name="test_an_adopted_tree_s_role_file_is_read_from_its_kernel" time="0.290"><failure message="AssertionError: gov launch did not start exactly one session&#10;gov launch engineer DAEO-zz6a&#10;exit code: 1&#10;stdout:&#10;&#10;stderr:&#10;gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)&#10;&#10;CLI starts recorded: 0&#10;records before: []&#10;records after: []">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_an_adopted_tree_s_role_fi0/w2-60a'), ho... pycache=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_an_adopted_tree_s_role_fi0/w2-60a/pycache'))
+cli = Cli(path=PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_an_adopted_tree_s_role_fi0/w2-60a/home/.loc...'/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-53/test_an_adopted_tree_s_role_fi0/w2-60a/elsewhere/claude-exit-code'))
+
+    def test_an_adopted_tree_s_role_file_is_read_from_its_kernel(sandbox, cli):
+        project = s.make_project(sandbox, roles=(), kernel_skills=False, commit=False)
+        shutil.move(project / "template/governance/kernel/launch", project / "governance/kernel/launch")
+        shutil.rmtree(project / "template")
+        role_file = s.write(project / ADOPTED_ROLES_REL / f"{s.ENGINEER}.md", s.role_text(s.ENGINEER))
+        s.git(project, "init", "-q", "-b", "main")
+        s.git(project, "add", "-A")
+        s.git(project, "commit", "-q", "-m", "W2-60a adopted fixture project")
+        result = s.launch(sandbox, cli, s.ENGINEER, s.T)
+&gt;       s.assert_launched(result)
+
+tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Launch(run=Run(args=('gov', 'launch', 'engineer', 'DAEO-zz6a'), returncode=1, stdout='', stderr='gov launch: LAUNCH_RE...e/work/repo/.gov-runtime/launches'), before={}, after={}, started=1793425371.8509, ended=1793425372.1176655, passed=())
+
+    def assert_launched(result):
+&gt;       assert result.run.returncode == 0 and len(result.calls) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one session\n{result.describe()}")
+E       AssertionError: gov launch did not start exactly one session
+E       gov launch engineer DAEO-zz6a
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md cannot be read: the session would start without its role (DEC-826 Q1)
+E       
+E       CLI starts recorded: 0
+E       records before: []
+E       records after: []
+
+tests/acceptance/W2-60a/w2_60a_support.py:800: AssertionError</failure></testcase></testsuite></testsuites>

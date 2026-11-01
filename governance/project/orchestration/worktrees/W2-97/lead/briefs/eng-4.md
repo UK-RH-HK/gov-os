@@ -1,0 +1,9 @@
+Your lead has merged run 2's revised acceptance tests into this worktree (`/home/usain/gov-os-worktrees/W2-97/.gov-runtime/scratch/lead/TESTS-READY` names the merge, `37e4f0d92523`; head `37e4f0d92523`). This is your next batch, under the same brief and rules as before.
+
+1. Repeat step 0 (the sandbox check) and the identity check, and report them first.
+2. Run the acceptance tests once, reading results only, with your session's own temp folder (do not set `TMPDIR`): `PYTHONPATH=/home/usain/gov-os-worktrees/W2-97/src python3 -m pytest tests/acceptance/W2-97 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rA`, to the end. Never read the tests' source (DEC-820 (c)); names, results and failure messages only. DEC-732 holds word for word: **every test run and every `gov` command used for verification runs this worktree's own `src/`**: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-97/src` set **per command** (never in a session's `--settings` env); show it with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-97/src python3 -c "import gov; print(gov.__file__)"`.
+3. If every case passes: report each case's name and result, and stop; commit nothing.
+4. If a case fails: change nothing and commit nothing in this batch. Report its name and failure message, and whether you believe the tool departs from the specification (with the line) or the test is wrong (a package: the test's name, its message, the specification's line, your recommendation and confidence). Your lead decides the next batch.
+5. Leave no `pytest-of-*` or other scratch in the worktree; if one appears, name its path.
+
+Return in the twelve fields as before (labelled lines first, then any payload; refused twice for the same call, stop and say so), then the sandbox check, the acceptance results by name, `git log --oneline -3` and `git status --short`, the guard's refusals, and what your brief did not tell you.

@@ -1,0 +1,166 @@
+FFFF..                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing[SIGTERM-to-gov-while-the-nested-gov-removes] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_a_sigterm_while_a_nes0')
+form = 'SIGTERM-to-gov-while-the-nested-gov-removes'
+
+    @pytest.mark.parametrize("form", list(NESTED_FORMS))
+    def test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing(tmp_path, form):
+        """A planted test runs gov accept on a nested planted project, in a session of its own, with its own temporary
+        folder (inside the outer run's private folder) as TMPDIR; the nested test leaves MANY_FILES small files in a
+        folder of its temporary folder. SIGTERM goes to the outer gov alone while the nested gov removes its folder,
+        its pytest ended (once per moment of WIND_DOWN_DELAYS_S), or to both gov processes at once while the nested
+        test sleeps (BOTH_AT_ONCE_RACES times). Each race: exit code 143, the given TMPDIR empty, no marker anywhere,
+        the child gone. The case fails at the first race that breaks R14."""
+        kind, both = NESTED_FORMS[form]
+        nested = support.Project(tmp_path / "nested", support.nested_files(kind), support.NESTED_README)
+        outer = support.Project(tmp_path / "outer",
+                                support.second_file("run_nested", "test_qzv96leak_nested_runner",
+                                                    extra=support.run_nested_extra(nested)),
+                                support.SECOND_README)
+        delays = (0.0,) * BOTH_AT_ONCE_RACES if both else WIND_DOWN_DELAYS_S
+        for race, delay_s in enumerate(delays, 1):
+            problems, run = _nested_race(outer, nested, both, delay_s)
+            when = "to both at once" if both else f"{delay_s:.2f} s after the nested pytest ended"
+>           assert not problems, (f"race {race} of {len(delays)} (SIGTERM {when}):\n" + "\n".join(problems) + "\n"
+                                  + run.describe())
+E           AssertionError: race 2 of 10 (SIGTERM 0.03 s after the nested pytest ended):
+E             the given TMPDIR holds 2 entries after the run: ['gov-accept-qc7gbi7v', 'gov-accept-qc7gbi7v/tmp']
+E             gov exited with code 4, expected an ordinary exit with code 143 (128 plus the signal)
+E             command: gov.cli.main accept TDPL-a961 --json
+E             exit code: 4
+E             stdout: {"ok": true, "command": "accept", "result": {"ticket": "TDPL-a961", "outcome": "error", "error_kind": "crash", "lines": [], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 0, "failed": 0, "skipped": 0}}, "session": ""}
+E             
+E             stderr: 
+E           assert not ["the given TMPDIR holds 2 entries after the run: ['gov-accept-qc7gbi7v', 'gov-accept-qc7gbi7v/tmp']", 'gov exited with code 4, expected an ordinary exit with code 143 (128 plus the signal)']
+
+tests/acceptance/W2-96/test_w2_96_at_review_3.py:190: AssertionError
+_ test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing[SIGTERM-to-gov-and-the-nested-gov-at-once] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_a_sigterm_while_a_nes1')
+form = 'SIGTERM-to-gov-and-the-nested-gov-at-once'
+
+    @pytest.mark.parametrize("form", list(NESTED_FORMS))
+    def test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing(tmp_path, form):
+        """A planted test runs gov accept on a nested planted project, in a session of its own, with its own temporary
+        folder (inside the outer run's private folder) as TMPDIR; the nested test leaves MANY_FILES small files in a
+        folder of its temporary folder. SIGTERM goes to the outer gov alone while the nested gov removes its folder,
+        its pytest ended (once per moment of WIND_DOWN_DELAYS_S), or to both gov processes at once while the nested
+        test sleeps (BOTH_AT_ONCE_RACES times). Each race: exit code 143, the given TMPDIR empty, no marker anywhere,
+        the child gone. The case fails at the first race that breaks R14."""
+        kind, both = NESTED_FORMS[form]
+        nested = support.Project(tmp_path / "nested", support.nested_files(kind), support.NESTED_README)
+        outer = support.Project(tmp_path / "outer",
+                                support.second_file("run_nested", "test_qzv96leak_nested_runner",
+                                                    extra=support.run_nested_extra(nested)),
+                                support.SECOND_README)
+        delays = (0.0,) * BOTH_AT_ONCE_RACES if both else WIND_DOWN_DELAYS_S
+        for race, delay_s in enumerate(delays, 1):
+            problems, run = _nested_race(outer, nested, both, delay_s)
+            when = "to both at once" if both else f"{delay_s:.2f} s after the nested pytest ended"
+>           assert not problems, (f"race {race} of {len(delays)} (SIGTERM {when}):\n" + "\n".join(problems) + "\n"
+                                  + run.describe())
+E           AssertionError: race 1 of 3 (SIGTERM to both at once):
+E             the given TMPDIR holds 2 entries after the run: ['gov-accept-o5jfmwwe', 'gov-accept-o5jfmwwe/tmp']
+E             gov exited with code 4, expected an ordinary exit with code 143 (128 plus the signal)
+E             command: gov.cli.main accept TDPL-a961 --json
+E             exit code: 4
+E             stdout: {"ok": true, "command": "accept", "result": {"ticket": "TDPL-a961", "outcome": "error", "error_kind": "crash", "lines": [], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 0, "failed": 0, "skipped": 0}}, "session": ""}
+E             
+E             stderr: 
+E           assert not ["the given TMPDIR holds 2 entries after the run: ['gov-accept-o5jfmwwe', 'gov-accept-o5jfmwwe/tmp']", 'gov exited with code 4, expected an ordinary exit with code 143 (128 plus the signal)']
+
+tests/acceptance/W2-96/test_w2_96_at_review_3.py:190: AssertionError
+_ test_r14_processes_of_their_own_session_churning_in_the_temporary_folder_leave_the_result_as_the_tests_gave_it _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_processes_of_their_ow0')
+
+    def test_r14_processes_of_their_own_session_churning_in_the_temporary_folder_leave_the_result_as_the_tests_gave_it(
+            tmp_path):
+        """A passing planted test starts CHURNERS processes in sessions of their own, each making and removing files in
+        a new folder of its temporary folder until the clean-up removes its canary file; the run ends with no signal.
+        The result is the tests' (both lines pass, exit code 0), never a crash; the given TMPDIR is empty when gov
+        ends, and every churner has stopped. The run is made CHURN_RUNS times; the case fails at the first bad one."""
+        project = support.Project(tmp_path, support.second_file("churn_pass", "test_qzv96leak_churner",
+                                                                extra=support.CHURN), support.SECOND_README)
+        for number in range(1, CHURN_RUNS + 1):
+            try:
+                run = project.run(support.TICKET_ID)
+                problems = run.problems()   # first, so it is what gov left when it ended
+                problems += _outcome_problems(run, support.SECOND_PASSES_EXPECTED, support.EXIT_PASS)
+                churning = project.records("churning")
+                if len(churning) != support.CHURNERS or not all(_under(run, record["folder"]) for record in churning):
+                    problems.append(f"the planted test did not start its {support.CHURNERS} churners under the given "
+                                    f"TMPDIR: {churning}")
+                deadline = time.monotonic() + support.GONE_WAIT_S
+                still = [record["folder"] for record in churning
+                         if not support.pid_gone(record["pid"], max(0.0, deadline - time.monotonic()))]
+                if still:
+                    problems.append(f"churners still run after gov accept ended, their folders left: {still}")
+>               assert not problems, (f"run {number} of {CHURN_RUNS}:\n" + "\n".join(problems) + "\n"
+                                      + run.describe())
+E                                     AssertionError: run 1 of 3:
+E                                       a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_processes_of_their_ow0/given-tmp-1/gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q/qzv96leak-canary
+E                                       a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_processes_of_their_ow0/given-tmp-1/gov-accept-dl36dc_2/tmp/qzv96leak-churn-voqms2nk/qzv96leak-canary
+E                                       the given TMPDIR holds 143 entries after the run: ['gov-accept-dl36dc_2', 'gov-accept-dl36dc_2/tmp', 'gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q', 'gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q/qzv96leak-canary', 'gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q/qzv96leak-churn-89-0.txt', 'gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q/qzv96leak-churn-89-1.txt', 'gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q/qzv96leak-churn-89-10.txt', 'gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q/qzv96leak-churn-89-11.txt']
+E                                       the result is not the expected one
+E                                       expected: {"ticket": "TDPL-a961", "outcome": "pass", "error_kind": null, "lines": [{"kpi": "success-1", "outcome": "pass", "passed": 3, "failed": 0, "skipped": 0}, {"kpi": "success-2", "outcome": "pass", "passed": 1, "failed": 0, "skipped": 0}], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 4, "failed": 0, "skipped": 0}}
+E                                       got:      {"ticket": "TDPL-a961", "outcome": "error", "error_kind": "crash", "lines": [], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 0, "failed": 0, "skipped": 0}}
+E                                       churners still run after gov accept ended, their folders left: ['/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_processes_of_their_ow0/given-tmp-1/gov-accept-dl36dc_2/tmp/qzv96leak-churn-voqms2nk', '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_processes_of_their_ow0/given-tmp-1/gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q']
+E                                       command: gov.cli.main accept TDPL-a961 --json
+E                                       exit code: 4
+E                                       stdout: {"ok": true, "command": "accept", "result": {"ticket": "TDPL-a961", "outcome": "error", "error_kind": "crash", "lines": [], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 0, "failed": 0, "skipped": 0}}, "session": ""}
+E                                       
+E                                       stderr: 
+E                                     assert not ['a file left behind holds the marker: /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r14_processes_of_their_ow0...test-of-usain/pytest-3/test_r14_processes_of_their_ow0/given-tmp-1/gov-accept-dl36dc_2/tmp/qzv96leak-churn-7im4wf6q']"]
+
+tests/acceptance/W2-96/test_w2_96_at_review_3.py:218: AssertionError
+__ test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-3/test_r15_eight_thousand_empty_0')
+
+    def test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound(tmp_path):
+        """A passing planted test leaves SIBLINGS empty folders side by side in a new folder of its temporary folder:
+        both lines pass, exit code 0, the given TMPDIR empty; the whole run of gov accept ends within
+        SIBLINGS_RUN_BOUND_S, and its clean-up (from the moment the folders were made to gov's end) within
+        SIBLINGS_CLEAN_UP_BOUND_S."""
+        project = support.Project(tmp_path, support.second_file("siblings_pass", "test_qzv96leak_siblings",
+                                                                extra=support.SIBLING_FOLDERS), support.SECOND_README)
+        try:
+            run = project.run(support.TICKET_ID)
+            ended = time.monotonic()
+            problems = run.problems()   # first, so it is what gov left when it ended
+            problems += _outcome_problems(run, support.SECOND_PASSES_EXPECTED, support.EXIT_PASS)
+            siblings = project.records("siblings")
+            if not siblings or siblings[0].get("made") != support.SIBLINGS or not _under(run, siblings[0]["top"]):
+                problems.append(f"the planted test did not make its {support.SIBLINGS} folders under the given TMPDIR")
+                clean_up = None
+            else:
+                clean_up = ended - siblings[0]["at"]
+            if run.elapsed > SIBLINGS_RUN_BOUND_S:
+                problems.append(f"the run took {run.elapsed:.1f} s, more than {SIBLINGS_RUN_BOUND_S:.0f} s for "
+                                f"{support.SIBLINGS} empty sibling folders")
+            if clean_up is not None and clean_up > SIBLINGS_CLEAN_UP_BOUND_S:
+                problems.append(f"the clean-up took {clean_up:.1f} s from the folders' making to gov's end, more than "
+                                f"{SIBLINGS_CLEAN_UP_BOUND_S:.0f} s for {support.SIBLINGS} empty sibling folders")
+>           assert not problems, "\n".join(problems) + f"\nelapsed: {run.elapsed:.1f} s\n" + run.describe()
+E           AssertionError: the clean-up took 7.1 s from the folders' making to gov's end, more than 3 s for 8000 empty sibling folders
+E             elapsed: 8.0 s
+E             command: gov.cli.main accept TDPL-a961 --json
+E             exit code: 0
+E             stdout: {"ok": true, "command": "accept", "result": {"ticket": "TDPL-a961", "outcome": "pass", "error_kind": null, "lines": [{"kpi": "success-1", "outcome": "pass", "passed": 3, "failed": 0, "skipped": 0}, {"kpi": "success-2", "outcome": "pass", "passed": 1, "failed": 0, "skipped": 0}], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 4, "failed": 0, "skipped": 0}}, "session": ""}
+E             
+E             stderr: 
+E           assert not ["the clean-up took 7.1 s from the folders' making to gov's end, more than 3 s for 8000 empty sibling folders"]
+
+tests/acceptance/W2-96/test_w2_96_at_review_3.py:251: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_premise_r14_a_churner_stops_once_its_canary_is_gone_and_its_folder_then_stays_still
+PASSED tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_premise_r15_a_plain_recursive_removal_takes_the_sibling_folders_away_in_a_few_seconds
+FAILED tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing[SIGTERM-to-gov-while-the-nested-gov-removes]
+FAILED tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_r14_a_sigterm_while_a_nested_gov_accept_removes_its_folder_ends_with_143_and_leaves_nothing[SIGTERM-to-gov-and-the-nested-gov-at-once]
+FAILED tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_r14_processes_of_their_own_session_churning_in_the_temporary_folder_leave_the_result_as_the_tests_gave_it
+FAILED tests/acceptance/W2-96/test_w2_96_at_review_3.py::test_r15_eight_thousand_empty_sibling_folders_are_removed_within_the_bound
+4 failed, 2 passed in 30.76s

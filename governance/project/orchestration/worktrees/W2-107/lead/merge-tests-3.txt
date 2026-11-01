@@ -1,0 +1,6 @@
+Merge w2/W2-107-tests into w2/W2-107: W1-16's home sweep leaves out exactly the secrets scan cache (DEC-970, P-W2-107-2 (a))
+
+Task: DAEO-kiar
+Implements: DEC-970, DEC-966, DEC-939, DEC-911, DEC-285, DEC-898, DEC-968
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

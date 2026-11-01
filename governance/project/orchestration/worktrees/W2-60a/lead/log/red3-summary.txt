@@ -1,0 +1,6 @@
+1 tests/acceptance/W2-60a/test_w2_60a_main_checkout_and_adopted_layout.py exit 1
+2 tests/unit/launch/test_runs.py exit 0
+3 tests/unit/launch/test_w1_28.py exit 0
+4 tests/unit/launch/test_w1_32.py exit 0
+5 tests/acceptance/W1-30/test_w1_30_r11_declared_here.py exit 0
+6 tests/acceptance/W2-57/test_w2_57_serial_list.py exit 0

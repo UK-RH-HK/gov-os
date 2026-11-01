@@ -1,0 +1,251 @@
+en runpy>", line 198, in _ru...lt': None, 'began': 1793503110.4015737, 'ppid': 1110665, 'code': 0, 'seconds': 13.63}], fresh='zqxw5853fresh1x4105529')
+what = 'a clean store of 16777216 bytes read at 2000000 bytes a second'
+
+    def assert_green(run, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+>       assert run.returncode == 0, f"{what}: the check is not green\n{run.describe()}"
+E       AssertionError: a clean store of 16777216 bytes read at 2000000 bytes a second: the check is not green
+E         exit code: 1 after 36.3 s; gitleaks runs: 2
+E         stdout:
+E         
+E         stderr:
+E         ile "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+E             result = self.fn(*self.args, **self.kwargs)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49+W2-16+W2-67+W2-95+W2-108-20261101-005000/src/gov/secrets/__init__.py", line 589, in judge
+E             elif _scan(rules, chunks, root):
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49+W2-16+W2-67+W2-95+W2-108-20261101-005000/src/gov/secrets/__init__.py", line 276, in _scan
+E             done = subprocess.run(
+E                    ^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 550, in run
+E             stdout, stderr = process.communicate(input, timeout=timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+E             stdout, stderr = self._communicate(input, endtime, timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+E             self._check_timeout(endtime, orig_timeout, stdout, stderr)
+E           File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+E             raise TimeoutExpired(
+E         subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--report-format', 'json', '--report-path', '-', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 4.00005 seconds
+E         
+E       assert 1 == 0
+E        +  where 1 = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...lt': None, 'began': 1793503110.4015737, 'ppid': 1110665, 'code': 0, 'seconds': 13.63}], fresh='zqxw5853fresh1x4105529').returncode
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:86: AssertionError
+_____ test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+env = (PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_with_a_cana0/w2-50...5000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_with_a_cana0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_with_a...('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_with_a_cana0/w2-50/pycache'))
+
+    def test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it(env, sandbox):
+        """The canary stands across the store's exact middle byte, where a split into halves or powers of two falls."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        across = size // 2 - (len(scan.SECRET) + 2) // 2
+        scan.text_store(project / LARGE, size, {16: start, across: scan.SECRET, across + 4096: middle, size - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+>       assert_red_naming(run, LARGE, "a large store with a canary")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...lt': None, 'began': 1793503134.9115038, 'ppid': 1120124, 'code': 3, 'seconds': 13.66}], fresh='zqxw5853fresh2x4105529')
+rel = '.gov-runtime/store-large.bin', what = 'a large store with a canary'
+
+    def assert_red_naming(run, rel, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+        assert run.returncode != 0, f"{what}: the check is green\n{run.describe()}"
+>       assert run.lines_naming(rel), f"{what}: the check is red but names no {rel}\n{run.describe()}"
+E       AssertionError: a large store with a canary: the check is red but names no .gov-runtime/store-large.bin
+E         exit code: 1 after 19.1 s; gitleaks runs: 1
+E         stdout:
+E         
+E         stderr:
+E         ile "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+E             result = self.fn(*self.args, **self.kwargs)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49+W2-16+W2-67+W2-95+W2-108-20261101-005000/src/gov/secrets/__init__.py", line 589, in judge
+E             elif _scan(rules, chunks, root):
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-76+W2-49+W2-16+W2-67+W2-95+W2-108-20261101-005000/src/gov/secrets/__init__.py", line 276, in _scan
+E             done = subprocess.run(
+E                    ^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 550, in run
+E             stdout, stderr = process.communicate(input, timeout=timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+E             stdout, stderr = self._communicate(input, endtime, timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+E             self._check_timeout(endtime, orig_timeout, stdout, stderr)
+E           File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+E             raise TimeoutExpired(
+E         subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--report-format', 'json', '--report-path', '-', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 4.00005 seconds
+E         
+E       assert []
+E        +  where [] = lines_naming('.gov-runtime/store-large.bin')
+E        +    where lines_naming = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...lt': None, 'began': 1793503134.9115038, 'ppid': 1120124, 'code': 3, 'seconds': 13.66}], fresh='zqxw5853fresh2x4105529').lines_naming
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:92: AssertionError
+______ test_a_large_store_among_many_small_files_is_decided_by_gov_check _______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+env = (PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_among_many_0/w2-50...5000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_among_many_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_among_...('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw0/test_a_large_store_among_many_0/w2-50/pycache'))
+
+    def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
+        """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        small = scan.marker("smallfile")
+        block = scan.filler_block(16 * 1024, seed="small").decode()
+        for index in range(300):
+            support.write(project / scan.RUNTIME / "packets" / f"DAEO-{index:04d}" / "packet.md",
+                          f"{block[:8000]}\n{small}\n{block[8000:]}")
+        checks = project / "governance/kernel/checks"
+        checks.mkdir(parents=True, exist_ok=True)
+        (checks / "secrets-indexing.yaml").write_bytes(support.CHECK_DECLARATION.read_bytes())
+        run = scan.run_scan(sandbox, project, stand_in, markers=[*words(LARGE), small], rate=scan.SLOW_RATE,
+                            via_gov_check=True)
+        assert run.returncode is not None, f"gov check did not finish within the check's declared limit\n{run.describe()}"
+        try:
+            envelope = json.loads(run.stdout)
+        except ValueError:
+            raise AssertionError(f"gov check --json gave no JSON\n{run.describe()}") from None
+        status = [entry.get("status") for entry in _check_entries(envelope) if entry.get("id") == "secrets-indexing"]
+>       assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
+E       AssertionError: the secrets-indexing check under gov check is ['RED'], not GREEN
+E         exit code: 3 after 46.6 s; gitleaks runs: 16
+E         stdout:
+E         ibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-"}], "provenance": {"commit": "d7d41ddd0d9a7dd83d7a3ec37389ae0ff7619edc", "check_version": "1.0.0", "inputs_hash": "e3928e2e3e13144f"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "d7d41ddd0d9a7dd83d7a3ec37389ae0ff7619edc", "check_version": "1.0.0", "inputs_hash": "9ba961274f606747"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "d7d41ddd0d9a7dd83d7a3ec37389ae0ff7619edc", "check_version": "1.0.0", "inputs_hash": "5daab42ab98000fb"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "d7d41ddd0d9a7dd83d7a3ec37389ae0ff7619edc", "check_version": "1.0.0", "inputs_hash": "72e8e12817059495"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: RED
+E           skill regression: GREEN
+E         
+E       assert ['RED'] == ['GREEN']
+E         
+E         At index 0 diff: 'RED' != 'GREEN'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:227: AssertionError
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7a1aa9accf40>
+project = PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw2/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7a1aa9acf7e0>
+project = PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw2/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7a1aa9a645e0>
+project = PosixPath('/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw2/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7a1aa9a640e0>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261101-005000/pytest-of-usain/pytest-0/popen-gw2/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+12 failed, 15489 passed, 4 skipped, 6 errors in 6835.38s (1:53:55)

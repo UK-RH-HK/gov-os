@@ -1,0 +1,538 @@
+bringing up nodes...
+bringing up nodes...
+
+.........ss............................................................. [  0%]
+........................................................................ [  0%]
+........................................................................ [  1%]
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  2%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  4%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+..s..................................................................... [  6%]
+........................................................................ [  7%]
+........................................................................ [  7%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [  9%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 12%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 14%]
+.....................................................ssss............... [ 14%]
+...ss.sssssssssssssssssss............................................... [ 15%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 17%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 19%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 22%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 23%]
+..............................................................EE........ [ 24%]
+........................................................................ [ 24%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 27%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 29%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 32%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 34%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 37%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................s............................... [ 38%]
+........................................................................ [ 39%]
+........................F....FFF........................................ [ 39%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+................................................F....................... [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 42%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 44%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+..............................................................s......... [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 49%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 52%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 54%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 57%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 59%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 62%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 64%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 70%]
+.............................F....s..FF..........F...................... [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 74%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+...........................s............................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+......s................................................................. [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+........                                                                 [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+=================================== FAILURES ===================================
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x79935435d800>
+project = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...16/popen-gw1/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x79935439c180>
+project = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...16/popen-gw1/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x79935439cae0>
+project = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...16/popen-gw1/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x79935439c9a0>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw1/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7bab51724f40>
+folder = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...16/popen-gw9/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s program did not import the pin's installed package (/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-io9_v6ow/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_line_s_program_import0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:109: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'worker-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_guard_line_refuses_wh0')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_guard_line_refuses_wh0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-io9_v6ow/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'no-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-io9_v6ow/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-6816/popen-gw9/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-io9_v6ow/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-6816/popen-gw9/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-io9_v6ow'), wheel=PosixPath('/tmp/w259-pin-io9_v6ow/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-io9_v6ow/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-io9_v6ow/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+FAILED tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+9 failed, 17244 passed, 33 skipped, 2 errors in 4975.76s (1:22:55)

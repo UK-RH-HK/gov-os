@@ -1,0 +1,11 @@
+Merge w2/integrate into w2/W2-05: W2-95's path-map check and W2-107's secrets cache (DEC-971, DEC-980)
+
+The one conflict, src/gov/check/pathmap.py, keeps W2-95's code (VERSION 1.1.0, the
+utf-8/surrogateescape listing, the findings) and re-applies this ticket's git
+environment to its one git call (git_env(root, pinned=True)). W2-108's new git calls
+in src/gov/retrieval/lexical.py go through _git, which carries this ticket's git_env.
+
+Task: DAEO-0z8c
+Implements: DEC-971, DEC-980, DEC-710
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

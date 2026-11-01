@@ -1,0 +1,1603 @@
+...........sFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF........FFFFFFF [ 24%]
+FFFFFFFFFFFFFFFF...FFFFFFFFF.FFFFFFFFFFFFF.........F.................... [ 49%]
+........................................................................ [ 74%]
+..................................F..FF................................. [ 99%]
+..                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-lead.md] _
+
+rel = 'template/governance/kernel/templates/brief-lead.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop(rel):
+        text = _text(rel)
+        missing = [label for label in s.TWELVE if not re.search(rf"\b{label}\b", text)]
+>       assert not missing, f"{rel} does not name the return fields {missing}"
+E       AssertionError: template/governance/kernel/templates/brief-lead.md does not name the return fields ['task', 'work_completed', 'files_changed', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+E       assert not ['task', 'work_completed', 'files_changed', 'discoveries', 'risks', 'lessons', ...]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:24: AssertionError
+_ test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-engineer.md] _
+
+rel = 'template/governance/kernel/templates/brief-engineer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop(rel):
+        text = _text(rel)
+        missing = [label for label in s.TWELVE if not re.search(rf"\b{label}\b", text)]
+>       assert not missing, f"{rel} does not name the return fields {missing}"
+E       AssertionError: template/governance/kernel/templates/brief-engineer.md does not name the return fields ['task', 'status', 'work_completed', 'files_changed', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+E       assert not ['task', 'status', 'work_completed', 'files_changed', 'discoveries', 'risks', ...]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:24: AssertionError
+_ test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-test-designer.md] _
+
+rel = 'template/governance/kernel/templates/brief-test-designer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop(rel):
+        text = _text(rel)
+        missing = [label for label in s.TWELVE if not re.search(rf"\b{label}\b", text)]
+>       assert not missing, f"{rel} does not name the return fields {missing}"
+E       AssertionError: template/governance/kernel/templates/brief-test-designer.md does not name the return fields ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+E       assert not ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'discoveries', ...]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:24: AssertionError
+_ test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-product-spec.md] _
+
+rel = 'template/governance/kernel/templates/brief-product-spec.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop(rel):
+        text = _text(rel)
+        missing = [label for label in s.TWELVE if not re.search(rf"\b{label}\b", text)]
+>       assert not missing, f"{rel} does not name the return fields {missing}"
+E       AssertionError: template/governance/kernel/templates/brief-product-spec.md does not name the return fields ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+E       assert not ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'discoveries', ...]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:24: AssertionError
+_ test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-reviewer.md] _
+
+rel = 'template/governance/kernel/templates/brief-reviewer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop(rel):
+        text = _text(rel)
+        missing = [label for label in s.TWELVE if not re.search(rf"\b{label}\b", text)]
+>       assert not missing, f"{rel} does not name the return fields {missing}"
+E       AssertionError: template/governance/kernel/templates/brief-reviewer.md does not name the return fields ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+E       assert not ['task', 'status', 'work_completed', 'files_changed', 'evidence', 'discoveries', ...]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:24: AssertionError
+_ test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/skills/orchestration/SKILL.md] _
+
+rel = 'template/governance/kernel/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop(rel):
+        text = _text(rel)
+        missing = [label for label in s.TWELVE if not re.search(rf"\b{label}\b", text)]
+>       assert not missing, f"{rel} does not name the return fields {missing}"
+E       AssertionError: template/governance/kernel/skills/orchestration/SKILL.md does not name the return fields ['task', 'work_completed', 'files_changed', 'evidence', 'discoveries', 'risks', 'lessons', 'proposed_decisions', 'unresolved', 'recommended_next_action']
+E       assert not ['task', 'work_completed', 'files_changed', 'evidence', 'discoveries', 'risks', ...]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:24: AssertionError
+_ test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-lead.md] _
+
+rel = 'template/governance/kernel/templates/brief-lead.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_policy_2_reads_open_with_its_refusals(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-820"), f"{rel} does not cite DEC-820"
+E       AssertionError: template/governance/kernel/templates/brief-lead.md does not cite DEC-820
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-820')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:35: AssertionError
+_ test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-engineer.md] _
+
+rel = 'template/governance/kernel/templates/brief-engineer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_policy_2_reads_open_with_its_refusals(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-820"), f"{rel} does not cite DEC-820"
+E       AssertionError: template/governance/kernel/templates/brief-engineer.md does not cite DEC-820
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: engineer\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). Delete this comment from a f...uld not settle, as a package (question, why now, options, impact, reversibility,\ncost, recommendation, confidence).\n', 'DEC-820')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:35: AssertionError
+_ test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-test-designer.md] _
+
+rel = 'template/governance/kernel/templates/brief-test-designer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_policy_2_reads_open_with_its_refusals(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-820"), f"{rel} does not cite DEC-820"
+E       AssertionError: template/governance/kernel/templates/brief-test-designer.md does not cite DEC-820
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: independent test designer\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). Delete this...s ids with their tests; the red reason as you saw it;\nevery earlier test you rewrote, with its reason; any package.\n', 'DEC-820')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:35: AssertionError
+_ test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-product-spec.md] _
+
+rel = 'template/governance/kernel/templates/brief-product-spec.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_policy_2_reads_open_with_its_refusals(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-820"), f"{rel} does not cite DEC-820"
+E       AssertionError: template/governance/kernel/templates/brief-product-spec.md does not cite DEC-820
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: product-spec worker\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). Delete this comme...e result of each suite you ran; what no source settled; anything you\ncould not place or were refused, as a package.\n', 'DEC-820')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:35: AssertionError
+_ test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-reviewer.md] _
+
+rel = 'template/governance/kernel/templates/brief-reviewer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_policy_2_reads_open_with_its_refusals(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-820"), f"{rel} does not cite DEC-820"
+E       AssertionError: template/governance/kernel/templates/brief-reviewer.md does not cite DEC-820
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: reviewer (FULL tickets, read-only)\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). De.... Say also what you\nprobed and found sound. The lead passes findings to a test designer; you repair nothing (MR-4).\n', 'DEC-820')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:35: AssertionError
+_ test_policy_2_reads_open_with_its_refusals[template/governance/kernel/skills/orchestration/SKILL.md] _
+
+rel = 'template/governance/kernel/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_policy_2_reads_open_with_its_refusals(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-820"), f"{rel} does not cite DEC-820"
+E       AssertionError: template/governance/kernel/skills/orchestration/SKILL.md does not cite DEC-820
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: orchestration\nversion: "1.0.0"\ndescription: "Method for running a wave: parallel tickets under ticket le...the orchestrator names, not a mechanism; and leads are not started through the launcher, which starts workers alone.\n', 'DEC-820')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:35: AssertionError
+_ test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-lead.md] _
+
+rel = 'template/governance/kernel/templates/brief-lead.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_owners_decisions_are_recorded_by_decision_record_commits(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-861"), f"{rel} does not cite DEC-861"
+E       AssertionError: template/governance/kernel/templates/brief-lead.md does not cite DEC-861
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-861')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:49: AssertionError
+_ test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-engineer.md] _
+
+rel = 'template/governance/kernel/templates/brief-engineer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_owners_decisions_are_recorded_by_decision_record_commits(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-861"), f"{rel} does not cite DEC-861"
+E       AssertionError: template/governance/kernel/templates/brief-engineer.md does not cite DEC-861
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: engineer\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). Delete this comment from a f...uld not settle, as a package (question, why now, options, impact, reversibility,\ncost, recommendation, confidence).\n', 'DEC-861')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:49: AssertionError
+_ test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-test-designer.md] _
+
+rel = 'template/governance/kernel/templates/brief-test-designer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_owners_decisions_are_recorded_by_decision_record_commits(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-861"), f"{rel} does not cite DEC-861"
+E       AssertionError: template/governance/kernel/templates/brief-test-designer.md does not cite DEC-861
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: independent test designer\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). Delete this...s ids with their tests; the red reason as you saw it;\nevery earlier test you rewrote, with its reason; any package.\n', 'DEC-861')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:49: AssertionError
+_ test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-product-spec.md] _
+
+rel = 'template/governance/kernel/templates/brief-product-spec.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_owners_decisions_are_recorded_by_decision_record_commits(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-861"), f"{rel} does not cite DEC-861"
+E       AssertionError: template/governance/kernel/templates/brief-product-spec.md does not cite DEC-861
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: product-spec worker\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). Delete this comme...e result of each suite you ran; what no source settled; anything you\ncould not place or were refused, as a package.\n', 'DEC-861')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:49: AssertionError
+_ test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-reviewer.md] _
+
+rel = 'template/governance/kernel/templates/brief-reviewer.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_owners_decisions_are_recorded_by_decision_record_commits(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-861"), f"{rel} does not cite DEC-861"
+E       AssertionError: template/governance/kernel/templates/brief-reviewer.md does not cite DEC-861
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: reviewer (FULL tickets, read-only)\n\n<!-- For whoever fills this in (a ticket lead or the orchestrator). De.... Say also what you\nprobed and found sound. The lead passes findings to a test designer; you repair nothing (MR-4).\n', 'DEC-861')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:49: AssertionError
+_ test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/skills/orchestration/SKILL.md] _
+
+rel = 'template/governance/kernel/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", RETURN_FILES)
+    def test_the_owners_decisions_are_recorded_by_decision_record_commits(rel):
+        text = _text(rel)
+>       assert s.cites(text, "DEC-861"), f"{rel} does not cite DEC-861"
+E       AssertionError: template/governance/kernel/skills/orchestration/SKILL.md does not cite DEC-861
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: orchestration\nversion: "1.0.0"\ndescription: "Method for running a wave: parallel tickets under ticket le...the orchestrator names, not a mechanism; and leads are not started through the launcher, which starts workers alone.\n', 'DEC-861')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:49: AssertionError
+________ test_the_audit_brief_of_the_orchestration_skill_states_dec_430 ________
+
+    def test_the_audit_brief_of_the_orchestration_skill_states_dec_430():
+        texts = s.folder_texts(f"{s.SKILLS}/orchestration")
+>       assert any(s.stated(text, [r"\bDEC-430\b", r"audit"]) for text in texts.values()), (
+            "the orchestration skill states no audit brief rule with DEC-430")
+E       AssertionError: the orchestration skill states no audit brief rule with DEC-430
+E       assert False
+E        +  where False = any(<generator object test_the_audit_brief_of_the_orchestration_skill_states_dec_430.<locals>.<genexpr> at 0x72c933db3760>)
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:58: AssertionError
+____________ test_the_launcher_command_is_a_command_not_a_code_span ____________
+
+    def test_the_launcher_command_is_a_command_not_a_code_span():
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert "<launcher command>" not in text, "brief-lead.md still has the <launcher command> placeholder"
+E       AssertionError: brief-lead.md still has the <launcher command> placeholder
+E       assert '<launcher command>' not in '# Brief: ti...you wrote.\n'
+E         
+E         '<launcher command>' is contained here:
+E           ):
+E           
+E         ?       ^
+E                 <launcher command> launch <role> <ticket id> -- -p --output-format json --permission-mode acceptEdits --allowedTools <tools> --model <model> < <brief file> > <log file> 2> <error file>
+E         ?       ^      ++++++++++++++++++...
+E         
+E         ...Full output truncated (74 lines hidden), use '-vv' to show
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:66: AssertionError
+_ test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-lead.md] _
+
+rel = 'template/governance/kernel/templates/brief-lead.md'
+
+    @pytest.mark.parametrize("rel", s.BRIEF_RELS)
+    def test_the_brief_template_carries_record_frontmatter(rel):
+        schema = json.loads(s.read(f"{s.KERNEL}/schemas/common.schema.json"))
+        front, _ = s.split_frontmatter(_text(rel))
+>       assert front is not None, f"{rel} has no YAML record frontmatter"
+E       AssertionError: template/governance/kernel/templates/brief-lead.md has no YAML record frontmatter
+E       assert None is not None
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:88: AssertionError
+_ test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-engineer.md] _
+
+rel = 'template/governance/kernel/templates/brief-engineer.md'
+
+    @pytest.mark.parametrize("rel", s.BRIEF_RELS)
+    def test_the_brief_template_carries_record_frontmatter(rel):
+        schema = json.loads(s.read(f"{s.KERNEL}/schemas/common.schema.json"))
+        front, _ = s.split_frontmatter(_text(rel))
+>       assert front is not None, f"{rel} has no YAML record frontmatter"
+E       AssertionError: template/governance/kernel/templates/brief-engineer.md has no YAML record frontmatter
+E       assert None is not None
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:88: AssertionError
+_ test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-test-designer.md] _
+
+rel = 'template/governance/kernel/templates/brief-test-designer.md'
+
+    @pytest.mark.parametrize("rel", s.BRIEF_RELS)
+    def test_the_brief_template_carries_record_frontmatter(rel):
+        schema = json.loads(s.read(f"{s.KERNEL}/schemas/common.schema.json"))
+        front, _ = s.split_frontmatter(_text(rel))
+>       assert front is not None, f"{rel} has no YAML record frontmatter"
+E       AssertionError: template/governance/kernel/templates/brief-test-designer.md has no YAML record frontmatter
+E       assert None is not None
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:88: AssertionError
+_ test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-product-spec.md] _
+
+rel = 'template/governance/kernel/templates/brief-product-spec.md'
+
+    @pytest.mark.parametrize("rel", s.BRIEF_RELS)
+    def test_the_brief_template_carries_record_frontmatter(rel):
+        schema = json.loads(s.read(f"{s.KERNEL}/schemas/common.schema.json"))
+        front, _ = s.split_frontmatter(_text(rel))
+>       assert front is not None, f"{rel} has no YAML record frontmatter"
+E       AssertionError: template/governance/kernel/templates/brief-product-spec.md has no YAML record frontmatter
+E       assert None is not None
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:88: AssertionError
+_ test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-reviewer.md] _
+
+rel = 'template/governance/kernel/templates/brief-reviewer.md'
+
+    @pytest.mark.parametrize("rel", s.BRIEF_RELS)
+    def test_the_brief_template_carries_record_frontmatter(rel):
+        schema = json.loads(s.read(f"{s.KERNEL}/schemas/common.schema.json"))
+        front, _ = s.split_frontmatter(_text(rel))
+>       assert front is not None, f"{rel} has no YAML record frontmatter"
+E       AssertionError: template/governance/kernel/templates/brief-reviewer.md has no YAML record frontmatter
+E       assert None is not None
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:88: AssertionError
+_____ test_identity_through_the_settings_argument_is_not_cited_to_dec_183 ______
+
+    def test_identity_through_the_settings_argument_is_not_cited_to_dec_183():
+        loose = [x for x in s.stated(_text(s.SKILL_REL), [r"settings", r"identit"]) if s.cites(x, "DEC-183")]
+>       assert not loose, f"DEC-371 superseded DEC-183 for launched roles; still cited: {loose}"
+E       AssertionError: DEC-371 superseded DEC-183 for launched roles; still cited: ["- A worker's identity (role and ticket) goes through the settings argument, which the launcher builds for a worker and the orchestrator passes for a lead (DEC-183, DEC-371)."]
+E       assert not ["- A worker's identity (role and ticket) goes through the settings argument, which the launcher builds for a worker and the orchestrator passes for a lead (DEC-183, DEC-371)."]
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:97: AssertionError
+_____________ test_dec_486_is_not_cited_for_the_stops_short_block ______________
+
+    def test_dec_486_is_not_cited_for_the_stops_short_block():
+        loose = [x for x in s.stated(_text(s.SKILL_REL), [r"phone|short block"]) if s.cites(x, "DEC-486")]
+>       assert not loose, f"DEC-486 covers the closed count only; still cited for the block: {loose}"
+E       AssertionError: DEC-486 covers the closed count only; still cited for the block: ['- A stop is one short block, readable on a phone. The closed count is taken from the ticket files, and open tickets are given by id (DEC-486).']
+E       assert not ['- A stop is one short block, readable on a phone. The closed count is taken from the ticket files, and open tickets are given by id (DEC-486).']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:102: AssertionError
+_ test_the_judgement_rules_stand_word_for_word[template/governance/kernel/templates/brief-reviewer.md] _
+
+rel = 'template/governance/kernel/templates/brief-reviewer.md'
+
+    @pytest.mark.parametrize("rel", [f"{s.TEMPLATES}/brief-reviewer.md", f"{s.SKILLS}/audit/SKILL.md"])
+    def test_the_judgement_rules_stand_word_for_word(rel):
+        text = s.plain(_text(rel))
+        for phrase in ('"Can an honest agent hit this in ordinary work?"', '"Does it fail open or lose work?"',
+                       "Ordinary work: yes|no, because", "Consequence: fails open|loses work|other"):
+>           assert phrase.strip('"') in text, f"{rel} does not carry, word for word: {phrase}"
+E           AssertionError: template/governance/kernel/templates/brief-reviewer.md does not carry, word for word: "Can an honest agent hit this in ordinary work?"
+E           assert 'Can an honest agent hit this in ordinary work?' in '# Brief: reviewer (FULL tickets, read-only) <!-- For whoever fills this in (a ticket lead or the orchestrator). Delet...pen. Say also what you probed and found sound. The lead passes findings to a test designer; you repair nothing (MR-4).'
+E            +  where 'Can an honest agent hit this in ordinary work?' = <built-in method strip of str object at 0x72c933ecd770>('"')
+E            +    where <built-in method strip of str object at 0x72c933ecd770> = '"Can an honest agent hit this in ordinary work?"'.strip
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:112: AssertionError
+_ test_the_judgement_rules_stand_word_for_word[template/governance/kernel/skills/audit/SKILL.md] _
+
+rel = 'template/governance/kernel/skills/audit/SKILL.md'
+
+    @pytest.mark.parametrize("rel", [f"{s.TEMPLATES}/brief-reviewer.md", f"{s.SKILLS}/audit/SKILL.md"])
+    def test_the_judgement_rules_stand_word_for_word(rel):
+        text = s.plain(_text(rel))
+        for phrase in ('"Can an honest agent hit this in ordinary work?"', '"Does it fail open or lose work?"',
+                       "Ordinary work: yes|no, because", "Consequence: fails open|loses work|other"):
+>           assert phrase.strip('"') in text, f"{rel} does not carry, word for word: {phrase}"
+E           AssertionError: template/governance/kernel/skills/audit/SKILL.md does not carry, word for word: "Can an honest agent hit this in ordinary work?"
+E           assert 'Can an honest agent hit this in ordinary work?' in '--- name: audit description: Method for running an independent fidelity audit against the Contract and governing deci...e added afterwards, by the test designer only (DEC-136). ## Governing sources DEC-088, DEC-070, DEC-430, CAP-47, MR-4.'
+E            +  where 'Can an honest agent hit this in ordinary work?' = <built-in method strip of str object at 0x72c933ecd770>('"')
+E            +    where <built-in method strip of str object at 0x72c933ecd770> = '"Can an honest agent hit this in ordinary work?"'.strip
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:112: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[a checkpoint at every handover] _
+
+rule = 'a checkpoint at every handover'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state a checkpoint at every handover (DEC-837)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-837')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[brief_gaps in the return] _
+
+rule = 'brief_gaps in the return'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state brief_gaps in the return (DEC-943)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-943')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+__ test_the_lead_brief_carries_the_role_independent_rule[gov retrieve first] ___
+
+rule = 'gov retrieve first'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state gov retrieve first (DEC-836)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-836')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[retrieval in batches] __
+
+rule = 'retrieval in batches'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state retrieval in batches (DEC-860)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-860')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[small code-graph queries] _
+
+rule = 'small code-graph queries'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state small code-graph queries (DEC-859)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-859')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[the code under test per command] _
+
+rule = 'the code under test per command'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state the code under test per command (DEC-732)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-732')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[the scratch budget and TMPDIR] _
+
+rule = 'the scratch budget and TMPDIR'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state the scratch budget and TMPDIR (DEC-898)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-898')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[the work order in parallel] _
+
+rule = 'the work order in parallel'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state the work order in parallel (DEC-959)
+E       assert (False)
+E        +  where False = <function cites at 0x72c933ed4220>('# Brief: ticket lead\n\n<!-- For the orchestrator, who fills this in. Delete this comment from a filled brief.\n\nA l... does not converge, with the evidence of each iteration.\n- `LEAD_CHECKPOINT`: the path of the checkpoint you wrote.\n', 'DEC-959')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+__ test_the_kernel_states_the_distilled_decisions[closes and the report line] __
+
+group = 'closes and the report line'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state closes and the report line: ['DEC-780', 'DEC-787']
+E       assert not ['DEC-780', 'DEC-787']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+_ test_the_kernel_states_the_distilled_decisions[code under test and the probe record] _
+
+group = 'code under test and the probe record'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state code under test and the probe record: ['DEC-732', 'DEC-733']
+E       assert not ['DEC-732', 'DEC-733']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+_____ test_the_kernel_states_the_distilled_decisions[guard holes as rows] ______
+
+group = 'guard holes as rows'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state guard holes as rows: ['DEC-779']
+E       assert not ['DEC-779']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+_________ test_the_kernel_states_the_distilled_decisions[launch forms] _________
+
+group = 'launch forms'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state launch forms: ['DEC-715', 'DEC-731']
+E       assert not ['DEC-715', 'DEC-731']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+_________ test_the_kernel_states_the_distilled_decisions[parallelism] __________
+
+group = 'parallelism'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state parallelism: ['DEC-847']
+E       assert not ['DEC-847']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+___________ test_the_kernel_states_the_distilled_decisions[rebuilds] ___________
+
+group = 'rebuilds'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state rebuilds: ['DEC-719']
+E       assert not ['DEC-719']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+____ test_the_kernel_states_the_distilled_decisions[the lists only shrink] _____
+
+group = 'the lists only shrink'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state the lists only shrink: ['DEC-766', 'DEC-768']
+E       assert not ['DEC-766', 'DEC-768']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+________ test_the_kernel_states_the_distilled_decisions[the merge rule] ________
+
+group = 'the merge rule'
+
+    @pytest.mark.parametrize("group", sorted(DISTILLED))
+    def test_the_kernel_states_the_distilled_decisions(group):
+        corpus = "\n".join([*s.folder_texts(f"{s.SKILLS}/orchestration").values(), *map(_text, s.BRIEF_RELS)])
+        missing = [d for d in DISTILLED[group] if not s.cites(corpus, d)]
+>       assert not missing, f"the orchestration skill and the briefs do not state {group}: {missing}"
+E       AssertionError: the orchestration skill and the briefs do not state the merge rule: ['DEC-750', 'DEC-754', 'DEC-757']
+E       assert not ['DEC-750', 'DEC-754', 'DEC-757']
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:152: AssertionError
+_______ test_the_test_design_skill_states[ISTQB's black-box techniques] ________
+
+rule = "ISTQB's black-box techniques"
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-959
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-959')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[W2-60a's 2,980 test lines for 713 code lines are out of proportion] _
+
+rule = "W2-60a's 2,980 test lines for 713 code lines are out of proportion"
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-951
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-951')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[a test of the live repository's own state is declared as such] _
+
+rule = "a test of the live repository's own state is declared as such"
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-889
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-889')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[no copy of the whole working tree where a minimal fixture will do] _
+
+rule = 'no copy of the whole working tree where a minimal fixture will do'
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-889
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-889')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[proportion: the minimum that shows each KPI line and failure line [DEC-951 item 5]] _
+
+rule = 'proportion: the minimum that shows each KPI line and failure line [DEC-951 item 5]'
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-951
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-951')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_______ test_the_test_design_skill_states[red against the ticket's base] _______
+
+rule = "red against the ticket's base"
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-959
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-959')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[the README map of KPI lines to tests that gov accept reads] _
+
+rule = 'the README map of KPI lines to tests that gov accept reads'
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-959
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-959')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[the run-time cost a test may take and how it is measured] _
+
+rule = 'the run-time cost a test may take and how it is measured'
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-889
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-889')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+____ test_the_test_design_skill_states[the test kinds [DEC-889 item 11 c]] _____
+
+rule = 'the test kinds [DEC-889 item 11 c]'
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-889
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-889')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+_ test_the_test_design_skill_states[the work order in parallel, never reading the engineer's work [DEC-959 item 7]] _
+
+rule = "the work order in parallel, never reading the engineer's work [DEC-959 item 7]"
+
+    @pytest.mark.parametrize("rule", sorted(TEST_DESIGN))
+    def test_the_test_design_skill_states(rule):
+        decision, ideas = TEST_DESIGN[rule]
+        text = _skill("test-design")
+>       assert s.cites(text, decision), f"test-design does not cite {decision}"
+E       AssertionError: test-design does not cite DEC-959
+E       assert False
+E        +  where False = <function cites at 0x72c933ed4220>('---\nname: test-design\nversion: "1.0.0"\ndescription: Method for independent test design from specification and KPIs... fixtures are needed (CAP-38.b).\n- A report of any specification gaps found during test design (DEC-136, CAP-38.e).\n', 'DEC-959')
+E        +    where <function cites at 0x72c933ed4220> = s.cites
+
+tests/acceptance/W2-11/test_w2_11_skills.py:46: AssertionError
+____ test_the_skill_template_has_the_front_matter_and_the_sections_in_order ____
+
+    def test_the_skill_template_has_the_front_matter_and_the_sections_in_order():
+>       text = s.read(s.SKILL_TEMPLATE_REL)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/templates/skill.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/templates/skill.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+___________________ test_the_skill_template_states_its_rules ___________________
+
+    def test_the_skill_template_states_its_rules():
+>       text = s.read(s.SKILL_TEMPLATE_REL)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/templates/skill.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/templates/skill.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+_________ test_orchestration_has_the_reference_file[incident-response] _________
+
+stem = 'incident-response'
+
+    @pytest.mark.parametrize("stem", sorted(REFERENCES))
+    def test_orchestration_has_the_reference_file(stem):
+        folder = s.REPO_ROOT / s.SKILLS / "orchestration"
+        found = [p for p in folder.glob(f"**/*{stem}*.md") if len(p.relative_to(folder).parts) <= 2]
+>       assert found, f"no {stem} reference file in {s.SKILLS}/orchestration/ (one level deep)"
+E       AssertionError: no incident-response reference file in template/governance/kernel/skills/orchestration/ (one level deep)
+E       assert []
+
+tests/acceptance/W2-11/test_w2_11_skills.py:96: AssertionError
+_________ test_orchestration_has_the_reference_file[integration-queue] _________
+
+stem = 'integration-queue'
+
+    @pytest.mark.parametrize("stem", sorted(REFERENCES))
+    def test_orchestration_has_the_reference_file(stem):
+        folder = s.REPO_ROOT / s.SKILLS / "orchestration"
+        found = [p for p in folder.glob(f"**/*{stem}*.md") if len(p.relative_to(folder).parts) <= 2]
+>       assert found, f"no {stem} reference file in {s.SKILLS}/orchestration/ (one level deep)"
+E       AssertionError: no integration-queue reference file in template/governance/kernel/skills/orchestration/ (one level deep)
+E       assert []
+
+tests/acceptance/W2-11/test_w2_11_skills.py:96: AssertionError
+__________ test_orchestration_has_the_reference_file[nightly-sheriff] __________
+
+stem = 'nightly-sheriff'
+
+    @pytest.mark.parametrize("stem", sorted(REFERENCES))
+    def test_orchestration_has_the_reference_file(stem):
+        folder = s.REPO_ROOT / s.SKILLS / "orchestration"
+        found = [p for p in folder.glob(f"**/*{stem}*.md") if len(p.relative_to(folder).parts) <= 2]
+>       assert found, f"no {stem} reference file in {s.SKILLS}/orchestration/ (one level deep)"
+E       AssertionError: no nightly-sheriff reference file in template/governance/kernel/skills/orchestration/ (one level deep)
+E       assert []
+
+tests/acceptance/W2-11/test_w2_11_skills.py:96: AssertionError
+____________ test_the_qa_review_skill_states[code against the spec] ____________
+
+rule = 'code against the spec'
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+______ test_the_qa_review_skill_states[findings in JUDGEMENT's two lines] ______
+
+rule = "findings in JUDGEMENT's two lines"
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+_____ test_the_qa_review_skill_states[probes in proportion to the profile] _____
+
+rule = 'probes in proportion to the profile'
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+_______________ test_the_qa_review_skill_states[re-runs nothing] _______________
+
+rule = 're-runs nothing'
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+__________ test_the_qa_review_skill_states[severity tied to P3/P2/P1] __________
+
+rule = 'severity tied to P3/P2/P1'
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+___________ test_the_qa_review_skill_states[tests against the spec] ____________
+
+rule = 'tests against the spec'
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+__ test_the_qa_review_skill_states[trace each KPI line to its tests and code] __
+
+rule = 'trace each KPI line to its tests and code'
+
+    @pytest.mark.parametrize("rule", sorted(QA_REVIEW))
+    def test_the_qa_review_skill_states(rule):
+>       assert s.stated(_skill("qa-review"), QA_REVIEW[rule]), f"qa-review does not state: {rule}"
+                        ^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+________________ test_the_qa_review_skill_has_its_three_copies _________________
+
+    def test_the_qa_review_skill_has_its_three_copies():
+        missing = [c for c in s.COPY_ROOTS if not (s.REPO_ROOT / c / "qa-review" / "SKILL.md").is_file()]
+>       assert not missing, f"qa-review has no copy under {missing}"
+E       AssertionError: qa-review has no copy under ['.claude/skills', '.rulesync/skills', 'template/.rulesync/skills']
+E       assert not ['.claude/skills', '.rulesync/skills', 'template/.rulesync/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:121: AssertionError
+__________ test_every_copy_carries_the_kernel_skills_body[qa-review] ___________
+
+name = 'qa-review'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+>       kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+                                             ^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-11/test_w2_11_skills.py:13: in _skill
+    return s.read(f"{s.SKILLS}/{name}/SKILL.md")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'template/governance/kernel/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11-tests')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: template/governance/kernel/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+_________ test_the_skill_carries_one_version_in_all_four_places[audit] _________
+
+name = 'audit'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: audit: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.1.0', None, '1.1.0', '1.1.0']))
+E        +    where dict_values(['1.1.0', None, '1.1.0', '1.1.0']) = <built-in method values of dict object at 0x72c9339547c0>()
+E        +      where <built-in method values of dict object at 0x72c9339547c0> = {'.claude/skills': None, '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0', 'template/governance/kernel/skills': '1.1.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+________ test_the_skill_carries_one_version_in_all_four_places[change] _________
+
+name = 'change'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: change: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x72c9339a67c0>()
+E        +      where <built-in method values of dict object at 0x72c9339a67c0> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+______ test_the_skill_carries_one_version_in_all_four_places[checkpoint] _______
+
+name = 'checkpoint'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: checkpoint: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.1.0', None, '1.1.0', '1.1.0']))
+E        +    where dict_values(['1.1.0', None, '1.1.0', '1.1.0']) = <built-in method values of dict object at 0x72c933d828c0>()
+E        +      where <built-in method values of dict object at 0x72c933d828c0> = {'.claude/skills': None, '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0', 'template/governance/kernel/skills': '1.1.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[discovery] _______
+
+name = 'discovery'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: discovery: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x72c9339a45c0>()
+E        +      where <built-in method values of dict object at 0x72c9339a45c0> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_____ test_the_skill_carries_one_version_in_all_four_places[orchestration] _____
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: orchestration: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x72c9339d5200>()
+E        +      where <built-in method values of dict object at 0x72c9339d5200> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[planning] ________
+
+name = 'planning'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: planning: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x72c933979340>()
+E        +      where <built-in method values of dict object at 0x72c933979340> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[retrieval] _______
+
+name = 'retrieval'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: retrieval: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x72c933a3bb40>()
+E        +      where <built-in method values of dict object at 0x72c933a3bb40> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+______ test_the_skill_carries_one_version_in_all_four_places[test-design] ______
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: test-design: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x72c933dbcf80>()
+E        +      where <built-in method values of dict object at 0x72c933dbcf80> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-lead.md] _
+
+rel = 'template/governance/kernel/templates/brief-lead.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/templates/brief-lead.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a checkpoint at about <context limit> tokens (DEC-838, DEC-837): At about <context limit> tokens
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listing over governance/project/: name the files you need there one 
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E           the held-out list's names refused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a checkpoint at about <context limit> tokens (DEC-838, DEC-837): At ab...fused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ"]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-engineer.md] _
+
+rel = 'template/governance/kernel/templates/brief-engineer.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/templates/brief-engineer.md still teaches:
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listing over governance/project/: name the files you need there one 
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E           the held-out list's names refused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E       assert not ['a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listin...fused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ"]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-test-designer.md] _
+
+rel = 'template/governance/kernel/templates/brief-test-designer.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/templates/brief-test-designer.md still teaches:
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listing over governance/project/: name the files you need there one 
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E           the held-out list's names refused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E       assert not ['a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listin...fused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ"]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-product-spec.md] _
+
+rel = 'template/governance/kernel/templates/brief-product-spec.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/templates/brief-product-spec.md still teaches:
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listing over governance/project/: name the files you need there one 
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E           the held-out list's names refused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E       assert not ['a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listin...fused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ"]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-reviewer.md] _
+
+rel = 'template/governance/kernel/templates/brief-reviewer.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/templates/brief-reviewer.md still teaches:
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listing over governance/project/: name the files you need there one 
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E           the held-out list's names refused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ
+E       assert not ['a listing or search refusal over the governance folder or .claude/ (DEC-820): - Run no glob, no search and no listin...fused (DEC-820): - Never read, print, search, diff or copy the held-out file under governance/project/, and never typ"]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/roles/orchestrator.md] _
+
+rel = 'template/governance/kernel/roles/orchestrator.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/roles/orchestrator.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', "the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[.rulesync/subagents/orchestrator.md] _
+
+rel = '.rulesync/subagents/orchestrator.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .rulesync/subagents/orchestrator.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', "the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/.rulesync/subagents/orchestrator.md] _
+
+rel = 'template/.rulesync/subagents/orchestrator.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/.rulesync/subagents/orchestrator.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', "the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+___ test_the_file_teaches_no_superseded_rule[.claude/agents/orchestrator.md] ___
+
+rel = '.claude/agents/orchestrator.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .claude/agents/orchestrator.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', "the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/governance/kernel/skills/orchestration/SKILL.md] _
+
+rel = 'template/governance/kernel/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/governance/kernel/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - No glob, search or listing runs over the project's governance folder: files there are named one by
+E           the held-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling', "a li...-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md] _
+
+rel = '.claude/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .claude/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - No glob, search or listing runs over the project's governance folder: files there are named one by
+E           the held-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling', "a li...-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[.rulesync/skills/orchestration/SKILL.md] _
+
+rel = '.rulesync/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .rulesync/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - No glob, search or listing runs over the project's governance folder: files there are named one by
+E           the held-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling', "a li...-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[template/.rulesync/skills/orchestration/SKILL.md] _
+
+rel = 'template/.rulesync/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: template/.rulesync/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - No glob, search or listing runs over the project's governance folder: files there are named one by
+E           the held-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling', "a li...-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-0/test_the_validator_accepts_the0')
+
+    def test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields(tmp_path):
+        text = s.read(f"{s.TEMPLATES}/brief-engineer.md")
+        whole = tmp_path / "whole" / "brief-engineer.md"
+        whole.parent.mkdir()
+        whole.write_text(text, encoding="utf-8")
+        code, output = _validate(whole)
+>       assert code == 0, f"the validator refuses the brief as it stands: {output[-400:]}"
+E       AssertionError: the validator refuses the brief as it stands: {"findings": [{"code": "SKILL_NO_FRONTMATTER", "message": "no valid YAML frontmatter in /tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-0/test_the_validator_accepts_the0/whole/brief-engineer.md"}]}
+E         
+E       assert 1 == 0
+
+tests/acceptance/W2-11/test_w2_11_validator.py:33: AssertionError
+______ TestRows.test_every_clause_of_the_row_is_stated[parallel tickets] _______
+
+self = <test_w1_35_orchestration.TestRows object at 0x72c933dec650>
+row = 'parallel tickets'
+
+    @pytest.mark.parametrize("row", sorted(support.ROWS))
+    def test_every_clause_of_the_row_is_stated(self, row):
+        documents = support.corpus()
+        faults = support.row_faults(row, documents)
+>       assert not faults, (
+            f"row '{row}': a reader of {sorted(documents)} cannot find\n" + "\n".join(f"  {f}" for f in faults)
+        )
+E       AssertionError: row 'parallel tickets': a reader of ['template/governance/kernel/skills/orchestration/SKILL.md', 'template/governance/kernel/templates/brief-engineer.md', 'template/governance/kernel/templates/brief-lead.md', 'template/governance/kernel/templates/brief-product-spec.md', 'template/governance/kernel/templates/brief-reviewer.md', 'template/governance/kernel/templates/brief-test-designer.md', 'template/governance/kernel/templates/decision-package.md'] cannot find
+E           not stated: no fixed number of tickets in flight
+E           DEC-847 is not cited
+E       assert not ['not stated: no fixed number of tickets in flight', 'DEC-847 is not cited']
+
+tests/acceptance/W1-35/test_w1_35_orchestration.py:163: AssertionError
+_ TestRows.test_every_clause_of_the_row_is_stated[temp hygiene and protected files] _
+
+self = <test_w1_35_orchestration.TestRows object at 0x72c933dece60>
+row = 'temp hygiene and protected files'
+
+    @pytest.mark.parametrize("row", sorted(support.ROWS))
+    def test_every_clause_of_the_row_is_stated(self, row):
+        documents = support.corpus()
+        faults = support.row_faults(row, documents)
+>       assert not faults, (
+            f"row '{row}': a reader of {sorted(documents)} cannot find\n" + "\n".join(f"  {f}" for f in faults)
+        )
+E       AssertionError: row 'temp hygiene and protected files': a reader of ['template/governance/kernel/skills/orchestration/SKILL.md', 'template/governance/kernel/templates/brief-engineer.md', 'template/governance/kernel/templates/brief-lead.md', 'template/governance/kernel/templates/brief-product-spec.md', 'template/governance/kernel/templates/brief-reviewer.md', 'template/governance/kernel/templates/brief-test-designer.md', 'template/governance/kernel/templates/decision-package.md'] cannot find
+E           not stated: the held-out material's contents are never read
+E           DEC-820 is not cited
+E       assert not ["not stated: the held-out material's contents are never read", 'DEC-820 is not cited']
+
+tests/acceptance/W1-35/test_w1_35_orchestration.py:163: AssertionError
+_______ TestRows.test_every_clause_of_the_row_is_stated[the ticket loop] _______
+
+self = <test_w1_35_orchestration.TestRows object at 0x72c933decf20>
+row = 'the ticket loop'
+
+    @pytest.mark.parametrize("row", sorted(support.ROWS))
+    def test_every_clause_of_the_row_is_stated(self, row):
+        documents = support.corpus()
+        faults = support.row_faults(row, documents)
+>       assert not faults, (
+            f"row '{row}': a reader of {sorted(documents)} cannot find\n" + "\n".join(f"  {f}" for f in faults)
+        )
+E       AssertionError: row 'the ticket loop': a reader of ['template/governance/kernel/skills/orchestration/SKILL.md', 'template/governance/kernel/templates/brief-engineer.md', 'template/governance/kernel/templates/brief-lead.md', 'template/governance/kernel/templates/brief-product-spec.md', 'template/governance/kernel/templates/brief-reviewer.md', 'template/governance/kernel/templates/brief-test-designer.md', 'template/governance/kernel/templates/decision-package.md'] cannot find
+E           not stated: a checkpoint at every handover
+E       assert not ['not stated: a checkpoint at every handover']
+
+tests/acceptance/W1-35/test_w1_35_orchestration.py:163: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-lead.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-engineer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-test-designer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-product-spec.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/templates/brief-reviewer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_twelve_fields_come_first_payload_after_and_two_refusals_stop[template/governance/kernel/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-lead.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-engineer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-test-designer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-product-spec.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_policy_2_reads_open_with_its_refusals[template/governance/kernel/templates/brief-reviewer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_policy_2_reads_open_with_its_refusals[template/governance/kernel/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-lead.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-engineer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-test-designer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-product-spec.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/templates/brief-reviewer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_owners_decisions_are_recorded_by_decision_record_commits[template/governance/kernel/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_audit_brief_of_the_orchestration_skill_states_dec_430
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_launcher_command_is_a_command_not_a_code_span
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-lead.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-engineer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-test-designer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-product-spec.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_brief_template_carries_record_frontmatter[template/governance/kernel/templates/brief-reviewer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_identity_through_the_settings_argument_is_not_cited_to_dec_183
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_dec_486_is_not_cited_for_the_stops_short_block
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_judgement_rules_stand_word_for_word[template/governance/kernel/templates/brief-reviewer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_judgement_rules_stand_word_for_word[template/governance/kernel/skills/audit/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[a checkpoint at every handover]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[brief_gaps in the return]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[gov retrieve first]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[retrieval in batches]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[small code-graph queries]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[the code under test per command]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[the scratch budget and TMPDIR]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_lead_brief_carries_the_role_independent_rule[the work order in parallel]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[closes and the report line]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[code under test and the probe record]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[guard holes as rows]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[launch forms]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[parallelism]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[rebuilds]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[the lists only shrink]
+FAILED tests/acceptance/W2-11/test_w2_11_briefs.py::test_the_kernel_states_the_distilled_decisions[the merge rule]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[ISTQB's black-box techniques]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[W2-60a's 2,980 test lines for 713 code lines are out of proportion]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[a test of the live repository's own state is declared as such]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[no copy of the whole working tree where a minimal fixture will do]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[proportion: the minimum that shows each KPI line and failure line [DEC-951 item 5]]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[red against the ticket's base]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[the README map of KPI lines to tests that gov accept reads]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[the run-time cost a test may take and how it is measured]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[the test kinds [DEC-889 item 11 c]]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_test_design_skill_states[the work order in parallel, never reading the engineer's work [DEC-959 item 7]]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_template_has_the_front_matter_and_the_sections_in_order
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_template_states_its_rules
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_orchestration_has_the_reference_file[incident-response]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_orchestration_has_the_reference_file[integration-queue]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_orchestration_has_the_reference_file[nightly-sheriff]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[code against the spec]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[findings in JUDGEMENT's two lines]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[probes in proportion to the profile]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[re-runs nothing]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[severity tied to P3/P2/P1]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[tests against the spec]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_states[trace each KPI line to its tests and code]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_qa_review_skill_has_its_three_copies
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_every_copy_carries_the_kernel_skills_body[qa-review]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[audit]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[change]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[checkpoint]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[discovery]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[orchestration]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[planning]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[retrieval]
+FAILED tests/acceptance/W2-11/test_w2_11_skills.py::test_the_skill_carries_one_version_in_all_four_places[test-design]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-lead.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-engineer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-test-designer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-product-spec.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/templates/brief-reviewer.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/roles/orchestrator.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.rulesync/subagents/orchestrator.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/.rulesync/subagents/orchestrator.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.claude/agents/orchestrator.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/governance/kernel/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[.rulesync/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_supersession.py::test_the_file_teaches_no_superseded_rule[template/.rulesync/skills/orchestration/SKILL.md]
+FAILED tests/acceptance/W2-11/test_w2_11_validator.py::test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields
+FAILED tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRows::test_every_clause_of_the_row_is_stated[parallel tickets]
+FAILED tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRows::test_every_clause_of_the_row_is_stated[temp hygiene and protected files]
+FAILED tests/acceptance/W1-35/test_w1_35_orchestration.py::TestRows::test_every_clause_of_the_row_is_stated[the ticket loop]
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+94 failed, 195 passed, 1 skipped in 244.02s (0:04:04)

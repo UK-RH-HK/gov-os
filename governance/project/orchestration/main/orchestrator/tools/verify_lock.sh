@@ -1,30 +1,7 @@
 #!/usr/bin/env bash
-# The test lock for a lead's full run (owner, DEC-954: closes take it ahead of any lead's full run).
+# A lead's test run (owner, DEC-961, DEC-962, DEC-968, DEC-979 D1). Since DEC-968 no lead runs the full suite, so a
+# lead's run is always the scoped set. Since DEC-979 D1 (2026-10-31 23:50) it takes one of the machine's heavy-job
+# slots (heavy_slot.sh, sizes in heavy_slots.conf) and waits for one; the name is kept because every lead brief calls it.
 #   bash verify_lock.sh <the run's command and arguments>
-# While a close wants the lock (/tmp/gov-os-close-wants-lock names a live process), wait; then take
-# /tmp/gov-os-verify.lock; if a close asked for it in the meantime, give it back and wait again. The command runs
-# without the lock's descriptor, so nothing it leaves behind can keep the lock. Exits with the command's code.
-FLAG=/tmp/gov-os-close-wants-lock
-LOCK=/tmp/gov-os-verify.lock
-close_waiting() {
-  [ -e "$FLAG" ] || return 1
-  pid=$(cat "$FLAG" 2>/dev/null)
-  [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && return 0
-  return 1  # a stale flag (its close has ended) is ignored
-}
-while true; do
-  while close_waiting; do sleep 20; done
-  exec 9>>"$LOCK"
-  flock 9
-  if close_waiting; then
-    flock -u 9
-    exec 9>&-
-    sleep 20
-    continue
-  fi
-  break
-done
-"$@" 9>&-
-rc=$?
-flock -u 9
-exit $rc
+# Exits with the command's code.
+exec bash "$(cd "$(dirname "$0")" && pwd)/heavy_slot.sh" "$@"

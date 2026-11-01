@@ -1,0 +1,499 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [ 14%]
+...........................................F............................ [ 28%]
+.....................F.EEEEEEEE......................................E.. [ 42%]
+.......F...............EEEEEEEEEEEEEE................................... [ 56%]
+..................................................F..................... [ 71%]
+........................................................F............... [ 85%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[export.arxiv.org] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.python.org] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.rs] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[crates.io] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[static.crates.io] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[developer.mozilla.org] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.readthedocs.io] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_research_allowlist_refuses_a_domain_that_is_not_on_it _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_____ ERROR at setup of test_each_session_uses_a_temp_directory_of_its_own _____
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw2/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_a_research_install_succeeds_into_a_venv_inside_the_experiment_folder _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_a_research_install_outside_the_repository_fails_at_the_write_fence _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+__ ERROR at setup of test_a_research_bash_write_to_a_sibling_directory_fails ___
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[github.com] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[api.github.com] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[raw.githubusercontent.com] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[objects.githubusercontent.com] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[codeload.github.com] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[pypi.org] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[files.pythonhosted.org] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[registry.npmjs.org] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[huggingface.co] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[arxiv.org] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw0/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 succeeded. Step 2 failed with exit code 127: `bash: experiments/spikes/exp-901/probe.sh: No such file or directory`
+
+stderr:
+
+=================================== FAILURES ===================================
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Edit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Edit call for its PreToolUse hooks, per round (ms): 104.6, 102.7, 102.1; the bound is 100 ms
+E       assert 0.10206726496107876 < 0.1
+E        +  where 0.10206726496107876 = min([0.10462491307407618, 0.10271251085214317, 0.10206726496107876])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Glob call for its PreToolUse hooks, per round (ms): 127.6, 128.3, 124.7; the bound is 100 ms
+E       assert 0.12467997893691063 < 0.1
+E        +  where 0.12467997893691063 = min([0.12759158993139863, 0.12827474903315306, 0.12467997893691063])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Glob call for its PreToolUse hooks, per round (ms): 111.3, 103.3, 100.5; the bound is 100 ms
+E       assert 0.1005465961061418 < 0.1
+E        +  where 0.1005465961061418 = min([0.11128187901340425, 0.103309455094859, 0.1005465961061418])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Grep call for its PreToolUse hooks, per round (ms): 112.2, 211.2, 125.5; the bound is 100 ms
+E       assert 0.11215922306291759 < 0.1
+E        +  where 0.11215922306291759 = min([0.11215922306291759, 0.21118955686688423, 0.12552842404693365])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-90/pytest-of-usain/pytest-1/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Grep call for its PreToolUse hooks, per round (ms): 110.0, 113.0, 115.5; the bound is 100 ms
+E       assert 0.10998280299827456 < 0.1
+E        +  where 0.10998280299827456 = min([0.10998280299827456, 0.11301649711094797, 0.11550384806469083])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+5 failed, 478 passed, 23 errors in 118.79s (0:01:58)

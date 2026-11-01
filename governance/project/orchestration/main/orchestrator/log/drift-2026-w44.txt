@@ -5,3 +5,9 @@
 2026-10-30 09:02 slip: the 07:30 morning package ping went at 09:02; my 07:30 and 07:45 background waits reached the session late (it was idle). The package itself was committed at 06:49 (05009374).
 2026-10-30 12:27 slip: wrote RULES-IN-FORCE.md (untracked) into the main tree while the close queue ran; caught before the next close's gate (d) and moved to scratch. Lesson: generated files go to scratch until the queue ends.
 2026-10-30 18:41 slip: pkill -f matched its own command (the checkpoint's Never list); the ACT 1 sweep stopped and was restarted outside the lock; nothing else affected
+2026-10-30 21:45:45 five-rule hook refused build_lead_brief inline args naming the acceptance folder (orchestrator, W2-90 brief): false positive, script file used
+2026-10-30 23:22:27 slip: pgrep -f pattern matched my own shell while stopping the chain (checkpoint lesson: never pkill -f / match own command); the chain stopped, no lead or close affected
+2026-10-31 00:54:10 slip: merged w2/integrate into W2-76 while two orphaned read-only processes (gov check's retrieve_check and its reranker, parent gone) had cwd there; harmless (read-only), stopped them by pid
+2026-10-31 11:50:08 slip: close_build built broken node ids for collection errors (W1-35's two, re-run as '.py::tests...'), so they were reported 'red without the change too' unchecked; fixed (re-run the module file)
+2026-10-31 11:50:08 slip: an owner-ping at 04:05 (owner active) blocked the CTO session until 11:46: the 07:30 morning package missed, returns unread for hours; at night, hold P1s for the morning package unless an emergency
+2026-10-31 11:51:54 slip: verify_lock.sh and close_build.py made scoped runs wait for a full run's room (gate --full-run): leads held 1.5-4 h, the batch of ten 6.5 h; fixed: scoped runs wait for nothing

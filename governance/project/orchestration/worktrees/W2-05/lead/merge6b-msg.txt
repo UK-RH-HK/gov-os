@@ -1,0 +1,5 @@
+Merge w2/W2-05-tests into w2/W2-05: the acceptance case for the bisect step environment (review finding R4-1, DEC-970)
+
+Task: DAEO-0z8c
+Role: orchestrator
+Implements: DEC-970, DEC-963, DEC-710

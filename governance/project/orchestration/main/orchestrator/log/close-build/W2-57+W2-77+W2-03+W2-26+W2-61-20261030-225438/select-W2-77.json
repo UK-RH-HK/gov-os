@@ -1,0 +1,51 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "src/gov/close/nightly.py"
+   ]
+  }
+ ],
+ "base": "1eae249cba33d4ca300c56e05cdad0fc70e75d83",
+ "head": "aafd45c19725c9088b76d79d2c64bd622f7ec515",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-b6hm/CP-DAEO-b6hm-0003.md",
+  "docs/probes/DAEO-b6hm/PR-DAEO-b6hm.md"
+ ],
+ "changed": [
+  "src/gov/close/nightly.py",
+  "tests/acceptance/W2-77/README.md",
+  "tests/acceptance/W2-77/test_w2_77_batch.py",
+  "tests/acceptance/W2-77/test_w2_77_failed_removal.py",
+  "tests/acceptance/W2-77/test_w2_77_failure_line.py",
+  "tests/acceptance/W2-77/test_w2_77_hidden_worktree.py",
+  "tests/acceptance/W2-77/test_w2_77_own_clone_only.py",
+  "tests/acceptance/W2-77/test_w2_77_unchanged.py",
+  "tests/acceptance/W2-77/w2_77_support.py",
+  "tests/unit/close/test_nightly_cleanup.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-77/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [],
+ "ignore": [],
+ "deselect": [],
+ "per_test_timeout": 900
+}

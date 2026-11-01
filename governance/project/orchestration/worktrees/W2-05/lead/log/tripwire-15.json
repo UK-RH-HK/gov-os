@@ -1,0 +1,124 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "8d8a6e0ff7d1",
+   "after": "5036f64a8077"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/README.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/nightly.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/nightly_check.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/nightly_cron.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/ping_gate.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/test_nightly.sh"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "head",
+   "before": "ba807a032603",
+   "after": "3a12c208b728"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05-tests",
+   "change": "head",
+   "before": "ba807a032603",
+   "after": "d775baf9c4b9"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05-tests",
+   "change": "acceptance folder",
+   "folder": "W2-05"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108",
+   "change": "head",
+   "before": "e8f959a12e42",
+   "after": "2e694819da0f"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "head",
+   "before": "7bc8a0303e0d",
+   "after": "382e6d8fba8c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  }
+ ]
+}

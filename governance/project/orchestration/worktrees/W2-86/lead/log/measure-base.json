@@ -1,0 +1,273 @@
+{
+  "retriever": {
+    "executable": "/home/usain/.local/share/gov-os/pin-5c401220/bin/gov",
+    "version": "gov 0.1.0 (commit unknown)",
+    "gov_file": "/home/usain/.local/share/gov-os/pin-5c401220/lib/python3.12/site-packages/gov/__init__.py"
+  },
+  "root": "/home/usain/gov-os-runs/W2-86/base",
+  "commit": "9dc5288161c4",
+  "set": "memory-retrieval",
+  "part": "visible",
+  "budget": {
+    "batch_size": 10,
+    "bundle_budget": 6000,
+    "stack_budget": 24000
+  },
+  "questions": [
+    {
+      "id": "Q01",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 1,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 5,
+      "stacked_digest": "033213ecf0ed343f"
+    },
+    {
+      "id": "Q02",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 1,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "72090bd9f09d5615"
+    },
+    {
+      "id": "Q03",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 7,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "70e5c64fb156e2e2"
+    },
+    {
+      "id": "Q04",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 3,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "363a5a398bdb464d"
+    },
+    {
+      "id": "Q05",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 2,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "7341b013b469b12d"
+    },
+    {
+      "id": "Q06",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 8,
+      "pieces_found": 2,
+      "pieces_needed": 2,
+      "calls": 3,
+      "stacked_digest": "3bbdcf88685d3b38"
+    },
+    {
+      "id": "Q07",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 6,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 5,
+      "stacked_digest": "dd10f1f4410ee84c"
+    },
+    {
+      "id": "Q08",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 9,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "22bd797d45d2952d"
+    },
+    {
+      "id": "Q09",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": true,
+      "first_gold_rank": 59,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 4,
+      "stacked_digest": "16af74c5295dfe41"
+    },
+    {
+      "id": "Q10",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": false,
+      "first_gold_rank": 25,
+      "pieces_found": 1,
+      "pieces_needed": 2,
+      "calls": 2,
+      "stacked_digest": "85b88b6e32cd6f13"
+    },
+    {
+      "id": "Q11",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": false,
+      "first_gold_rank": 4,
+      "pieces_found": 1,
+      "pieces_needed": 2,
+      "calls": 2,
+      "stacked_digest": "86b1ed92770c61d2"
+    },
+    {
+      "id": "Q12",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 2,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "6ff6be540bc09bbc"
+    },
+    {
+      "id": "Q13",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": true,
+      "full_evidence": false,
+      "first_gold_rank": 6,
+      "pieces_found": 1,
+      "pieces_needed": 2,
+      "calls": 2,
+      "stacked_digest": "0e50b09a8c24bf8c"
+    },
+    {
+      "id": "Q14",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": true,
+      "full_evidence": false,
+      "first_gold_rank": 16,
+      "pieces_found": 3,
+      "pieces_needed": 9,
+      "calls": 5,
+      "stacked_digest": "0a25f624d784a263"
+    },
+    {
+      "id": "Q15",
+      "part": "visible",
+      "hit_at_5": true,
+      "in_bundle": true,
+      "full_evidence": true,
+      "first_gold_rank": 3,
+      "pieces_found": 1,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "164f8ba069acd071"
+    },
+    {
+      "id": "Q16",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": false,
+      "first_gold_rank": null,
+      "pieces_found": 0,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "50fd74b362501ac5"
+    },
+    {
+      "id": "Q17",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": false,
+      "first_gold_rank": 21,
+      "pieces_found": 1,
+      "pieces_needed": 2,
+      "calls": 2,
+      "stacked_digest": "9264e97205ef1a64"
+    },
+    {
+      "id": "Q18",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": false,
+      "first_gold_rank": null,
+      "pieces_found": 0,
+      "pieces_needed": 2,
+      "calls": 2,
+      "stacked_digest": "9015d4518d14c0a9"
+    },
+    {
+      "id": "Q19",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": false,
+      "first_gold_rank": null,
+      "pieces_found": 0,
+      "pieces_needed": 1,
+      "calls": 2,
+      "stacked_digest": "166742adb48297f9"
+    },
+    {
+      "id": "Q20",
+      "part": "visible",
+      "hit_at_5": false,
+      "in_bundle": false,
+      "full_evidence": false,
+      "first_gold_rank": 21,
+      "pieces_found": 1,
+      "pieces_needed": 2,
+      "calls": 2,
+      "stacked_digest": "726b8a89d997f8f9"
+    }
+  ],
+  "total": {
+    "questions": 20,
+    "hit_at_5": {
+      "count": 7,
+      "of": 20,
+      "percent": 35.0,
+      "floor": 85
+    },
+    "full_evidence": {
+      "count": 11,
+      "of": 20,
+      "percent": 55.0,
+      "target": 99
+    }
+  }
+}

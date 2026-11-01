@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="102" time="3.601" timestamp="2026-10-31T08:27:27.999657+00:00" hostname="Usain"><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_reads_the_rulesync_entry" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_absent_registry_is_a_reason" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_registry_without_rulesync_is_a_reason" time="0.002" /><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_unreadable_registry_is_a_reason[tools: []" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_unreadable_registry_is_a_reason[- a\n- b\n]" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_unreadable_registry_is_a_reason[tools: 3\n]" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestExpectedVersion" name="test_unreadable_registry_is_a_reason[]" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_none_when_installed_is_expected" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_other_installed_version_names_both" time="0.004" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_version_is_compared_whole" time="0.003" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_no_registry_is_a_finding_even_with_rulesync" time="0.002" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_no_binary_is_a_finding" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_rulesync_without_answer_is_a_finding" time="1.003" /><testcase classname="tests.unit.adapters.test_portability.TestVersionFinding" name="test_both_calls_at_their_limit_end_inside_the_runners_limit" time="0.012" /><testcase classname="tests.unit.adapters.test_portability.TestFindRulesync" name="test_named_binary" time="0.002" /><testcase classname="tests.unit.adapters.test_portability.TestFindRulesync" name="test_named_binary_that_is_no_file" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestSplit" name="test_blank_lines_after_frontmatter_are_dropped" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestSplit" name="test_nothing_else_is_tolerated" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestSplit" name="test_file_without_frontmatter" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_agreeing_project_has_no_finding_and_counts_what_it_compared" time="0.009" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_kernel_role_changed" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_changed" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_frontmatter_is_not_part_of_the_pair" time="0.007" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_with_other_tools_names_the_source_and_the_difference[Read, Grep, Bash, NotebookEdit-only in the source ['NotebookEdit'], only in the kernel role []]" time="0.007" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_with_other_tools_names_the_source_and_the_difference[Read, Grep-only in the source [], only in the kernel role ['Bash']]" time="0.007" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_with_other_tools_names_the_source_and_the_difference[Read, Grep, bash-only in the source ['bash'], only in the kernel role ['Bash']]" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_without_a_tools_list_is_a_finding[---\nname: engineer\n---\n\n- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n- **Network:** none.\n]" time="0.006" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_without_a_tools_list_is_a_finding[---\nname: engineer\nclaudecode:\n  tools: Read\n---\n\n- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n- **Network:** none.\n]" time="0.006" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_role_source_without_a_tools_list_is_a_finding[- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n- **Network:** none.\n]" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestKernelFindings" name="test_kernel_role_without_a_tools_field_is_a_finding" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_field_is_read_to_the_end_of_its_indented_lines_by_whole_words[- **Tools:** Read and Edit.\n]" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_field_is_read_to_the_end_of_its_indented_lines_by_whole_words[- **Tools:** Edit; Read for its report only. No installs.\n]" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_field_is_read_to_the_end_of_its_indented_lines_by_whole_words[* **Tools**: Read,\n  Edit.\n- **Network:** WebFetch runs outside the sandbox.\n]" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_field_is_read_to_the_end_of_its_indented_lines_by_whole_words[- **Tools:** Read,\n  Edit.\n\nA paragraph naming Bash.\n]" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_field_is_read_to_the_end_of_its_indented_lines_by_whole_words[- **Purpose:** uses Bash.\n- **Tools:** Read, Edit, `gov launch`, reading and NotebookEditor.\n# Write\n]" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_tool_named_on_a_continuation_line_counts" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_order_and_repetition_are_free" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_empty_list_is_compared_not_skipped" time="0.000" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_skill_body_changed_on_either_side[governance/kernel/skills/planning/SKILL.md]" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_skill_body_changed_on_either_side[.rulesync/skills/planning/SKILL.md]" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_skill_frontmatter_changed" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_supporting_file_changed" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_supporting_file_without_source" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_source_file_the_kernel_does_not_hold" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_source_skill_that_is_no_kernel_skill_is_left_alone" time="0.005" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_kernel_of_this_repository" time="0.006" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_no_kernel_is_a_finding" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestToolsDifference" name="test_empty_kernel_is_a_finding" time="0.001" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_project_holding_what_rulesync_writes" time="0.009" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_rulesync_is_given_the_project_s_sources_and_writes_nothing_in_the_project" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_no_root_rule_is_a_finding_and_nothing_is_counted[None]" time="0.003" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_no_root_rule_is_a_finding_and_nothing_is_counted[# Rules\n]" time="0.003" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_no_root_rule_is_a_finding_and_nothing_is_counted[---\nroot: false\n---\n# Rules\n]" time="0.003" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_changed_file_is_one_finding_naming_it[.claude/agents/engineer.md]" time="0.009" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_changed_file_is_one_finding_naming_it[.claude/commands/opsx/apply.md]" time="0.009" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_changed_file_is_one_finding_naming_it[.claude/settings.json]" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_changed_file_is_one_finding_naming_it[.claude/skills/planning/SKILL.md]" time="0.010" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_changed_file_is_one_finding_naming_it[CLAUDE.md]" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_missing_file_is_a_finding" time="0.013" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_settings_key_added_or_removed_by_hand[{\n  &quot;permissions&quot;: {&quot;deny&quot;: [&quot;Bash(sudo *)&quot;], &quot;allow&quot;: [&quot;WebFetch(domain:example.com)&quot;]}\n}\n]" time="0.012" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_settings_key_added_or_removed_by_hand[{\n  &quot;permissions&quot;: {&quot;deny&quot;: [&quot;Bash(sudo *)&quot;], &quot;defaultMode&quot;: &quot;bypassPermissions&quot;}\n}\n]" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_settings_key_added_or_removed_by_hand[{\n  &quot;permissions&quot;: {&quot;deny&quot;: [&quot;Bash(sudo *)&quot;]}, &quot;env&quot;: {&quot;BY_HAND&quot;: &quot;1&quot;}\n}\n]" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_settings_key_added_or_removed_by_hand[{\n  &quot;permissions&quot;: {&quot;deny&quot;: [&quot;Bash(sudo *)&quot;]}, &quot;hooks&quot;: {&quot;Notification&quot;: []}\n}\n]" time="0.010" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_settings_key_added_or_removed_by_hand[{\n  &quot;permissions&quot;: {&quot;deny&quot;: []}\n}\n]" time="0.009" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_without_a_source_is_one_finding_naming_it[.claude/agents/by-hand.md]" time="0.013" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_without_a_source_is_one_finding_naming_it[.claude/skills/by-hand/SKILL.md]" time="0.012" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_without_a_source_is_one_finding_naming_it[.claude/skills/planning/by-hand.md]" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_without_a_source_is_one_finding_naming_it[.claude/commands/by-hand.md]" time="0.016" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_without_a_source_is_one_finding_naming_it[.claude/commands/opsx/deep/by-hand.md]" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_outside_the_generated_folders_is_not_judged[.claude/settings.local.json]" time="0.014" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_outside_the_generated_folders_is_not_judged[.claude/worktrees/w/.claude/agents/by-hand.md]" time="0.016" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_outside_the_generated_folders_is_not_judged[.claude/other.json]" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_file_outside_the_generated_folders_is_not_judged[docs/by-hand.md]" time="0.014" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_failure_is_reported_with_rulesync_s_reason_and_no_file" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_long_reason_is_reported_by_its_end" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_failing_exit_is_a_failure_although_the_files_were_written" time="0.012" /><testcase classname="tests.unit.adapters.test_portability.TestGeneratedFindings" name="test_rulesync_that_writes_nothing_is_a_failure_not_a_match" time="0.009" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_generated_then_the_step_has_no_finding" time="0.013" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_settings_without_the_step_are_a_finding_and_no_path_is_carried" time="0.016" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_one_rule_lost_is_a_finding" time="0.021" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_rules_without_a_held_out_file_are_a_finding" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_the_step_writes_nothing_in_the_project" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared[{key}:\n  - &quot;{path}\n  - [\n]" time="0.020" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared[not_{key}:\n  - {path}\n]" time="0.014" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared[{key}: {path}\n]" time="0.015" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared[{key}:\n  - {path}\n  - invented/relative\n]" time="0.017" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared[{key}:\n  - {path}\n{key}:\n  - {path}\n]" time="0.013" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_folder_in_place_of_the_held_out_file_is_a_finding" time="0.014" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_generation_without_settings_is_a_finding_not_a_match" time="0.011" /><testcase classname="tests.unit.adapters.test_portability.TestHeldOutStep" name="test_main_is_not_green_and_prints_no_path" time="0.022" /><testcase classname="tests.unit.adapters.test_portability.TestMain" name="test_green_says_what_was_compared" time="0.023" /><testcase classname="tests.unit.adapters.test_portability.TestMain" name="test_other_version_stops_before_the_generated_files" time="0.013" /><testcase classname="tests.unit.adapters.test_portability.TestMain" name="test_kernel_is_compared_also_without_rulesync" time="0.012" /><testcase classname="tests.unit.adapters.test_portability.TestMain" name="test_rulesync_failure_is_not_counted_as_compared" time="0.027" /><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-conflict-resolved-by-hand-to-content-neither-parent-holds]" time="0.170"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f0968e0&gt;
+case = 'a-conflict-resolved-by-hand-to-content-neither-parent-holds'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/project'
+commit = 'adb79f71bc82984f2104fd8c2edb93a5e4e0d0d2'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-criss-cross-merge]" time="0.234"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f0a3d80&gt;
+case = 'a-criss-cross-merge'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/project'
+commit = '3a536c1d01325391a59a3a21727c4a8914be323b'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-a-branch-that-renamed-a-file]" time="0.181"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f1680e0&gt;
+case = 'a-merge-of-a-branch-that-renamed-a-file'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/project'
+commit = '78a00dc913a83bdbce0865e67aa60a48b8339128'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-an-unrelated-history]" time="0.135"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f168040&gt;
+case = 'a-merge-of-an-unrelated-history'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/project'
+commit = 'fc9c1769183b88b2b05bde77a628806d5df2c35d'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-sets-a-test-back-to-the-merged-branch-s-unchanged-content]" time="0.138"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f1687c0&gt;
+case = 'a-merge-that-sets-a-test-back-to-the-merged-branch-s-unchanged-content'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/project'
+commit = 'ec3fc85bbf12c695d927a4e095f1f31a9532a692'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-undoes-commits-through-a-new-empty-commit]" time="0.159"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f1691c0&gt;
+case = 'a-merge-that-undoes-commits-through-a-new-empty-commit'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/project'
+commit = '3318072d7ed0dae29232179e382e9217bf27a8fd'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-octopus-merge]" time="0.309"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f169760&gt;
+case = 'an-octopus-merge'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/project'
+commit = '434d2a35a37c2498f5c78a2c7addf2e56a2e98eb'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-50.test_w1_50_read_merge_helper" name="test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-ordinary-integration-merge]" time="0.191"><failure message="AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src&#10;assert False&#10; +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')&#10; +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith&#10; +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')&#10; +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__&#10; +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))">project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/sandbox/elsewhere'))
+read_merge = &lt;function read_merge.&lt;locals&gt;._read_merge at 0x70383f169f80&gt;
+case = 'an-ordinary-integration-merge'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+&gt;       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/project'
+commit = '396affe86f37bba0ccbf85766fa670593fb02351'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+&gt;       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = &lt;built-in method startswith of str object at 0x70383f096290&gt;('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where &lt;built-in method startswith of str object at 0x70383f096290&gt; = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = &lt;module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'&gt;.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError</failure></testcase></testsuite></testsuites>

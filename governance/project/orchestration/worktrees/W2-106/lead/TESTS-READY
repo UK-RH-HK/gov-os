@@ -1,0 +1,2 @@
+TESTS-READY for DAEO-0mtg (W2-106): branch w2/W2-106-tests at 091a07a70042 (tests cd96b8d4d60d; W1-38 revision 091a07a70042, Rewrite-Reason: DEC-966 item 2).
+Merge: git merge --no-ff w2/W2-106-tests (trailers Task: DAEO-0mtg, Role: engineer), then run tests/acceptance/W2-106 once, reading results only.

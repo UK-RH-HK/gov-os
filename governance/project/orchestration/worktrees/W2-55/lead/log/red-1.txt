@@ -1,0 +1,291 @@
+.FFFFFFFFFFFFF.FF.FFF...FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 94%]
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-55/docs/research/W2-55-backfill.md').is_file
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_backfill.py:48: AssertionError: the backfill proposal docs/research/W2-55-backfill.md does not exist
+E   AssertionError: the output is not one JSON envelope
+    exit 2
+    stdout: 
+    stderr: usage: gov context [-h] [--json] [--root <path>] [--session <id>]
+                       [--role <role>] [--brief] [--dry-run] [--budget BUDGET]
+                       ticket
+    gov context: error: the following arguments are required: ticket
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:245: AssertionError: the output is not one JSON envelope
+E   AssertionError: the output is not one JSON envelope
+    exit 2
+    stdout: 
+    stderr: usage: gov context [-h] [--json] [--root <path>] [--session <id>]
+                       [--role <role>] [--brief] [--dry-run] [--budget BUDGET]
+                       ticket
+    gov context: error: the following arguments are required: ticket
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:245: AssertionError: the output is not one JSON envelope
+E   AssertionError: the output is not one JSON envelope
+    exit 2
+    stdout: 
+    stderr: usage: gov context [-h] [--json] [--root <path>] [--session <id>]
+                       [--role <role>] [--brief] [--dry-run] [--budget BUDGET]
+                       ticket
+    gov context: error: the following arguments are required: ticket
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:245: AssertionError: the output is not one JSON envelope
+E   AssertionError: the output is not one JSON envelope
+    exit 2
+    stdout: 
+    stderr: usage: gov context [-h] [--json] [--root <path>] [--session <id>]
+                       [--role <role>] [--brief] [--dry-run] [--budget BUDGET]
+                       ticket
+    gov context: error: the following arguments are required: ticket
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:245: AssertionError: the output is not one JSON envelope
+E   AssertionError: the output is not one JSON envelope
+    exit 2
+    stdout: 
+    stderr: usage: gov context [-h] [--json] [--root <path>] [--session <id>]
+                       [--role <role>] [--brief] [--dry-run] [--budget BUDGET]
+                       ticket
+    gov context: error: the following arguments are required: ticket
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:245: AssertionError: the output is not one JSON envelope
+E   AssertionError: the output is not one JSON envelope
+    exit 2
+    stdout: 
+    stderr: usage: gov context [-h] [--json] [--root <path>] [--session <id>]
+                       [--role <role>] [--brief] [--dry-run] [--budget BUDGET]
+                       ticket
+    gov context: error: the following arguments are required: ticket
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:245: AssertionError: the output is not one JSON envelope
+E   AssertionError: superseded or done entries reached the bundle: ['DEC-101', 'DEC-103', 'DEC-106']
+    assert not ({'DEC-101', 'DEC-102', 'DEC-103', 'DEC-104', 'DEC-105', 'DEC-106', ...} & {'DEC-101', 'DEC-103', 'DEC-106'})
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_left_out.py:85: AssertionError: superseded or done entries reached the bundle: ['DEC-101', 'DEC-103', 'DEC-106']
+E   AssertionError: the bundle's left_out is None, not {'count': 3, 'superseded': ['DEC-101', 'DEC-106'], 'done': ['DEC-103']}
+    assert None == {'count': 3, 'done': ['DEC-103'], 'superseded': ['DEC-101', 'DEC-106']}
+     +  where None = <built-in method get of dict object at 0x7e8c52149380>('left_out')
+     +    where <built-in method get of dict object at 0x7e8c52149380> = {'batches': [{'size': 7}], 'budget': {'bundle': {'limit': 6000, 'used': 454}, 'rounds': {'limit': 1, 'used': 0}}, 'con...'DEC-108', ...}, {'batch': 1, 'chunk_id': '4a8f2ba1c213f2b339794683', 'end_line': 40, 'id': 'DEC-108', ...}, ...], ...}.get
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_left_out.py:91: AssertionError: the bundle's left_out is None, not {'count': 3, 'superseded': ['DEC-101', 'DEC-106'], 'done': ['DEC-103']}
+E   AssertionError: Q05: superseded decisions were served unmarked (F4): ['DEC-138', 'DEC-148', 'DEC-149']
+    assert not {'DEC-138', 'DEC-148', 'DEC-149'}
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_left_out.py:139: AssertionError: Q05: superseded decisions were served unmarked (F4): ['DEC-138', 'DEC-148', 'DEC-149']
+E   AssertionError: superseded or done entries reached the packet: ['DEC-101', 'DEC-103', 'DEC-106']
+    assert not ({'DEC-101', 'DEC-102', 'DEC-103', 'DEC-104', 'DEC-105', 'DEC-106', ...} & {'DEC-101', 'DEC-103', 'DEC-106'})
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_left_out.py:152: AssertionError: superseded or done entries reached the packet: ['DEC-101', 'DEC-103', 'DEC-106']
+E   AssertionError: the packet's left_out is None, not {'count': 3, 'superseded': ['DEC-101', 'DEC-106'], 'done': ['DEC-103']}
+    assert None == {'count': 3, 'done': ['DEC-103'], 'superseded': ['DEC-101', 'DEC-106']}
+     +  where None = <built-in method get of dict object at 0x7e8c521bab00>('left_out')
+     +    where <built-in method get of dict object at 0x7e8c521bab00> = {'authority': [{'authority': 'decision', 'constraint': '60bf9c2c7d7633c43d755236f49d168e8b5b578c8552a3ea653a6108a95cb4...': 6000, 'used': 1066}, 'dropped': [], 'hash': '2607437123cb6efe21deb86b118a96fc3c38efdc9e3fbd72450533080d74c6c4', ...}.get
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_left_out.py:158: AssertionError: the packet's left_out is None, not {'count': 3, 'superseded': ['DEC-101', 'DEC-106'], 'done': ['DEC-103']}
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_propagation cannot be imported: module 'gov.decisions' has no attribute 'check_propagation'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: python3 -m gov.decisions.tags did not pass a fully tagged register
+      exit 1
+      stdout: 
+      stderr: /usr/bin/python3: No module named gov.decisions.tags
+      
+    assert 1 == 0
+     +  where 1 = <w2_55_support.Answer object at 0x7e8c522cfef0>.returncode
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_tags.py:80: AssertionError: python3 -m gov.decisions.tags did not pass a fully tagged register
+E   AssertionError: the command's output does not name the entry and its finding
+      exit 1
+      stdout: 
+      stderr: /usr/bin/python3: No module named gov.decisions.tags
+      
+    assert ('DEC-104' in ('' + '/usr/bin/python3: No module named gov.decisions.tags\n'))
+     +  where '' = <w2_55_support.Answer object at 0x7e8c523563c0>.stdout
+     +  and   '/usr/bin/python3: No module named gov.decisions.tags\n' = <w2_55_support.Answer object at 0x7e8c523563c0>.stderr
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/test_w2_55_tags.py:88: AssertionError: the command's output does not name the entry and its finding
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+E   AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+/home/usain/gov-os-worktrees/W2-55/tests/acceptance/W2-55/w2_55_support.py:309: AssertionError: gov.decisions.check_tags cannot be imported: module 'gov.decisions' has no attribute 'check_tags'
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_the_proposal_has_its_three_sections
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_one_row_per_register_entry_at_the_base_in_its_order
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_every_row_has_a_domain_a_scope_a_lands_in_a_status_and_a_reason
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_an_entry_the_register_marks_superseded_is_proposed_superseded_by_its_successor
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_every_amends_and_refines_relation_is_listed_with_the_old_entrys_status_note
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_the_sample_can_be_drawn_again_and_says_what_the_owner_checks
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_the_proposal_states_how_it_was_made
+FAILED tests/acceptance/W2-55/test_w2_55_in_force.py::test_one_line_per_entry_in_force_in_register_order_beginning_with_its_id
+FAILED tests/acceptance/W2-55/test_w2_55_in_force.py::test_superseded_and_done_entries_are_left_out_with_their_count
+FAILED tests/acceptance/W2-55/test_w2_55_in_force.py::test_a_changed_entrys_line_names_what_changed_it
+FAILED tests/acceptance/W2-55/test_w2_55_in_force.py::test_the_digest_is_generated_from_the_register_not_a_hand_made_file
+FAILED tests/acceptance/W2-55/test_w2_55_in_force.py::test_no_register_named_gives_an_empty_digest
+FAILED tests/acceptance/W2-55/test_w2_55_in_force.py::test_a_named_register_that_cannot_be_read_refuses
+FAILED tests/acceptance/W2-55/test_w2_55_left_out.py::test_retrieve_leaves_out_superseded_and_done_entries
+FAILED tests/acceptance/W2-55/test_w2_55_left_out.py::test_retrieve_says_how_many_it_left_out
+FAILED tests/acceptance/W2-55/test_w2_55_left_out.py::test_lens_b_q05_serves_the_decision_in_force_and_no_superseded_one
+FAILED tests/acceptance/W2-55/test_w2_55_left_out.py::test_context_leaves_out_superseded_and_done_entries_from_the_supplementary_context
+FAILED tests/acceptance/W2-55/test_w2_55_left_out.py::test_context_says_how_many_it_left_out
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[a test, by id]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[code, by value]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[a skill, by id]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[a brief, by value]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[a non-closed ticket's KPI, by id]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[the prompt, by id]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_enforces_an_old_decision_is_found_naming_both_and_the_line[a changed entry's value]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_path_map_that_enforces_an_old_decision_is_found
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[a closed ticket is a record, not searched]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[docs/ is not searched]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[the orchestration record is not searched]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[the file cites the successor]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[kept, with its reason on the old entry]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[kept, with its reason on the new entry]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[a changed entry's id alone is no finding]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding[an id is cited as a whole word only]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_register_and_the_working_tree_are_not_searched
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_propagation_command_exits_1_and_names_the_place
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_project_with_nothing_enforcing_an_old_decision_passes
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found[W1-49 threshold (DEC-636 against DEC-838)]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found[W1-49 live session (DEC-665 against DEC-838)]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found[W1-26 planted authority defect (DEC-605)]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found[W1-22 TestCanaryRunner, first (DEC-605)]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found[W1-22 TestCanaryRunner, second (DEC-605)]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found[LEAD_CHECKPOINT taught in a template (DEC-636)]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweeps_kept_and_closed_places_give_no_finding[kept with its reason]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweeps_kept_and_closed_places_give_no_finding[a closed ticket]
+FAILED tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_changed_entrys_id_alone_in_the_sweep_is_no_finding
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_fully_tagged_register_passes
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_the_tags_command_exits_0_on_a_fully_tagged_register
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_the_tags_command_exits_1_and_names_the_entry
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_without_a_tags_line_is_named
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_tags_line_without_a_part_is_named_with_the_part[domain-- **Tags:** scope: kernel \xb7 lands in: template/governance/kernel/skills/harbour/SKILL.md]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_tags_line_without_a_part_is_named_with_the_part[scope-- **Tags:** domain: retrieval \xb7 lands in: template/governance/kernel/skills/harbour/SKILL.md]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_tags_line_without_a_part_is_named_with_the_part[lands in-- **Tags:** domain: retrieval \xb7 scope: kernel]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_domain_outside_the_closed_list_is_refused
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_scope_outside_the_two_is_refused
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_superseded_entry_naming_no_successor_is_named
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_superseded_entry_naming_a_successor_the_register_does_not_hold_is_named
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_another_supersedes_whose_status_does_not_name_it_is_named_old_first
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_another_changes_whose_status_does_not_name_it_is_named_old_first[Changes]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_another_changes_whose_status_does_not_name_it_is_named_old_first[Settles]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_another_changes_whose_status_does_not_name_it_is_named_old_first[Corrects]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_another_changes_whose_status_does_not_name_it_is_named_old_first[Reverses]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_an_entry_another_changes_whose_status_does_not_name_it_is_named_old_first[Withdraws]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_place_head_does_not_hold_is_named
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_place_only_in_the_working_tree_is_not_held_by_head
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_place_outside_where_its_scope_says_is_named[kernel-governance/project/briefs/LEAD-harbour.md]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_a_place_outside_where_its_scope_says_is_named[repository-template/governance/kernel/skills/harbour/SKILL.md]
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_none_on_an_entry_in_force_is_named
+FAILED tests/acceptance/W2-55/test_w2_55_tags.py::test_none_on_a_done_or_superseded_entry_is_no_finding
+69 failed, 7 passed in 40.95s

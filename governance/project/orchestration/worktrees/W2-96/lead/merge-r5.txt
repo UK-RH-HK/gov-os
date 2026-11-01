@@ -1,0 +1,12 @@
+Merge w2/W2-96-tests into w2/W2-96: R16's constant renamed, a gitleaks false positive that turned secrets-indexing red (DEC-987, DEC-963)
+
+The independent test designer's one commit: R16_TOKEN_KEY renamed R16_RUN_VAR
+in the W2-96 support module, its case file and README (4 lines, no value or
+expectation changed; Rewrite-Reason in that commit). gitleaks' generic-api-key
+rule took the constant's name for a key. Merged by the lead before the third
+review (DEC-987), so the review judges the final head.
+
+Task: DAEO-ouet
+Implements: DEC-987, DEC-963, DEC-911
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,30 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "4411627762ac",
+   "after": "8d8a6e0ff7d1"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/nightly/README.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/nightly/nightly.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/nightly/nightly_cron.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line added",
+   "line": " M governance/project/orchestration/nightly/ping_gate.sh"
+  }
+ ]
+}

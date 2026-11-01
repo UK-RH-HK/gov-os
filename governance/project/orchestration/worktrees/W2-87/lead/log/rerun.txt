@@ -1,0 +1,6 @@
+head | tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms | exit 0 | 11s | load 11.24 | 5 passed in 10.60s
+head | tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook | exit 0 | 23s | load 9.53 | 9 passed in 21.93s
+head | tests/acceptance/W2-54/test_w2_54_green_here.py | exit 1 | 289s | load 12.30 | 1 failed, 7 passed in 279.17s (0:04:39)
+base | tests/acceptance/W2-54/test_w2_54_green_here.py | exit 1 | 529s | load 29.20 | 1 failed, 7 passed in 506.20s (0:08:26)
+head | tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit | exit 1 | 311s | load 71.00 | 1 failed in 298.71s (0:04:58)
+base | tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit | exit 1 | 293s | load 48.77 | 1 failed in 280.41s (0:04:40)

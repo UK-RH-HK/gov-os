@@ -1,53 +1,44 @@
-# W2-49 (DAEO-ha8z) — lead checkpoint, 2026-10-17 (run 2, the apply round)
+# W2-49 (DAEO-ha8z) — lead checkpoint, 2026-10-31 (run 3 resume, DEC-953/954/957/968) — FINAL
 
 ## RESUME HERE
 
-**State:** DONE, held for the close order (DEC-737). The apply round of DEC-741 is done and verified green. Nothing is merged into `w2/integrate`; the ticket is not closed.
+**State:** run 3 done and verified green. Returned PACKAGES (P-A DEC-841, P-B DEC-825 item 3) with the branch ready to merge after W2-51 (merge order W2-51, W2-49, W2-52, W2-16). Nothing merged into `w2/integrate`; not closed. Nothing runs.
 
-- Worktree `/home/usain/gov-os-worktrees/W2-49`, branch `w2/W2-49`, cut from `w2/integrate` at `a02e3485`; `w2/integrate` merged in at `1b43c73c` (approved paths, DEC-741).
-- Branch head: the lead's hold checkpoint commit after `b9e4917e` (see `git log --oneline -8`).
+- Branch head `9fc4dcd9abb1` (`w2/W2-49`); `w2/integrate` at `c07a1115577f` is 1 commit ahead; `git merge-tree --write-tree` reports no conflict.
+- Tests worktree `W2-49-tests` and branch `w2/W2-49-tests` removed.
 
-## What the resume lead does (after W2-01 AND W2-51 have closed)
+## Run 3 commits (after `b667fdc0`)
 
-1. Merge `w2/integrate` into `w2/W2-49` with a merge commit carrying `Task: DAEO-ha8z` and `Role: orchestrator` (final trailer block). A conflict on the Contract files or the capability records goes to the orchestrator (Contract text: the owner's).
-2. A fresh independent test designer writes the tests of KPI success line 3 ("the plan validator's two-way check covers the moved parts") and the failure line ("a Contract item moved without a CIT-P line, or a CIT-P line with no change, fails the validator") against W2-51's (DAEO-egsy) Wave 2 plan validator (DEC-744); the README already names them as pending W2-51. Check them red/green as the validator stands.
-3. One full `PYTHONPATH=/home/usain/gov-os-worktrees/W2-49/src python3 -m gov.cli.main rebuild --json` (never `--no-embeddings`), in the background with an exit file, no worker running.
-4. Every suite again (`tests/acceptance/<suite>` one by one, `tests/unit`), in the background; resume-able runner at `.gov-runtime/scratch/lead/run2-suites.sh` (point its OUT folder at a new name). The full run takes > 2 h on this machine: the Bash background limit (2 h) stopped run 2's first pass at W1-41; the runner skips suites with an exit file.
-5. Never run `docs/plan/tools/validate_s1.py` (DEC-738).
-6. Then the hold again / DONE to the orchestrator, who merges and closes.
-
-**If the owner overturns the K (2) reading:** revert `7f935156` (a new commit) AND drop `tests/acceptance/W2-49/test_w2_49_capability_records.py` (designer's commit, `Rewrite-Reason:` naming the owner's decision). Nothing else imports it.
-
-## Commits on this branch in run 2 (after `1b43c73c`)
-
-| Commit | Role | What | Trailers |
+| Commit | Role | What | Implements |
 |---|---|---|---|
-| `6456e155` | independent-test-designer | 53 tests added (`test_w2_49_owner_answers.py` 45, `test_w2_49_capability_records.py` 8 = K (2) only), support readers, README (validator lines pending W2-51). No existing test rewritten. | Task, Role, Implements: DEC-722, Co-Authored-By |
-| `9921c80f` | orchestrator (lead) | `CP-DAEO-ha8z-0009` after the red check | Task, Implements: DEC-722, Role |
-| `90c4d20a` | product-spec | Contract v4.2 in `contract.yaml` and `CONTRACT_v4.md`; status ACCEPTED in both (W2-L343) | Task, Role, Implements: DEC-722, CAP-43.b, CAP-44.f, CAP-44.h, CAP-45.a, Co-Authored-By |
-| `5a6a12f5` | product-spec | the version line in all 273 capability records (273 files, 1 line each) — K (1) | Task, Role, Implements: DEC-722, DEC-614, Co-Authored-By |
-| `7f935156` | product-spec | the 8 CIT-P §8 records (CAP-43.b, CAP-44.f, CAP-44.h rewritten; CAP-43.d, CAP-44.k, CAP-44.l new; CAP-43/CAP-44 Covers) — K (2), the orchestrator's reading, own commit | Task, Role, Implements: DEC-722, DEC-614, CAP-43.b, CAP-44.f, CAP-44.h, Co-Authored-By |
-| `b9e4917e` | product-spec | `docs/changes/W2-49-CIT-E.md` (APPLIED); CIT-P frontmatter ACCEPTED + §13 "The owner's answers (DEC-741)" naming W2-52 | Task, Role, Implements: DEC-722, CAP-33, Co-Authored-By |
-| (next) | orchestrator (lead) | the hold's `gov checkpoint` record | Task, Implements: DEC-722, Role |
+| `eff292d3b5fe` | independent-test-designer (tests worktree) | 25 tests: validator line 3 + failure line (15, green by behaviour), 8 source-map rows, CAP-45.a record, record status; README | DEC-744, DEC-745, DEC-750, DEC-722 |
+| `986517dc289c` | product-spec | the eight SOURCE_MAP.csv rows (+ CIT-E line, §8 marked) | DEC-745, DEC-741 |
+| `41c12253fe4d` | product-spec | CAP-45.a.md regenerated; 276 records `status: ACCEPTED` (+ CIT-E line, §6 (f), §8 marked) | DEC-750, DEC-614 |
+| `c0e87f06c556` | orchestrator (lead) | merge of `w2/W2-49-tests` (the worker's merge was refused by its sandbox: tests folder read-only) | DEC-963, DEC-744, DEC-745, DEC-750 |
+| `9fc4dcd9abb1` | orchestrator (lead) | `CP-DAEO-ha8z-0015` | DEC-745, DEC-750, DEC-722, CAP-33, CAP-44.h, CAP-44.f, CAP-43.b |
 
-## The named read (C (i)) — made
+All carry `Task: DAEO-ha8z`; trailer_gate: 26 commits, 0 lacking, 0 bad Implements.
 
-- `docs/source/originals/GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md` ("# 20. Final adoption verdict", lines 591–613) and `docs/source/originals/GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md` ("# 18. Adoption acceptance", lines 625–644), each by exact name from `docs/SOURCES.md` lines 149–150, read once via `git show bb6ec3a8…:docs/source/<path>` after printing heading lines only. CAP-44.h lists the ten numbered (1)–(10): (3) W2; nine W3, five with a named lite part.
+## Verification (at `c0e87f06`, code unchanged after)
 
-## Verification (run 2, at `b9e4917e`)
+- `gov.__file__` = `/home/usain/gov-os-worktrees/W2-49/src/gov/__init__.py`; rebuild exit 0, `invalid: []` (lexical, semantic, codeintel recreated; waited ~50 min for the machine's rebuild lock).
+- Red check (tests worktree, base): 10 failed / 144 passed as README. Green on merge: W2-49 154 passed.
+- select_tests: scope `scoped`, core_changed [], unplaced [], why_full []; 31 targets (W2-49 OWN/OVERLAP/TEST_CHANGED, tests/unit UNIT, W1-28 COUPLING, W1-07 EVERY_CLOSE, the rest RECORD_READING incl. W1-48/, W1-42/, W1-27 doctor, W2-54 green_here).
+- Parallel run: 3658 passed, 1 skipped (govbridge import), exit 0, 17 m 48 s. Serial: 1 selected (W2-54 context green here), 1 passed, 628 s.
+- gov check: exit 3. RED mutation scope = DAEO-tgk2 (W2-76) ticket's acceptance helper paths (DEC-964; from w2/integrate `e08717ec`, not this branch); RED context reproducibility = 600 s timeout at load ~39, green alone in 490 s. YELLOW authority (old commits citing unrecorded DECs), YELLOW product traceability (openspec not on PATH). Rest GREEN.
+- validate_w2 once: PASS cit-p-moved-items (3), cit-p-lines-applied (6); FAIL wave2-tickets, contract-items-delivered (CAP-22.c, CAP-44.f), contract-items-cited-by-tests (DEC-841 items + 5 exit-7 items), triage-counts; 5 NOT RUN. Plan findings, not this ticket's lines.
+- collect-only: `17624/17626 tests collected (2 deselected) in 16.30s`, no error. keyword_warn: 0.
 
-- `gov.__file__` = `/home/usain/gov-os-worktrees/W2-49/src/gov/__init__.py`; full rebuild exit 0 (`invalid: []`; lexical, semantic, codeintel recreated).
-- `tests/acceptance/W2-49`: 129 passed. All 50 acceptance suites: 11481 passed, 30 skipped, 3 failed = W1-42's two named exceptions (RETR-X-02, the governance share; DEC-713/714) + W1-46 `test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[static.crates.io]` (curl 56, network) which passed alone (file: 36 passed). Latency cases of W1-02 and W1-05 passed in the full run. `tests/unit`: 2100 passed, 1 skipped.
-- Logs: `.gov-runtime/scratch/lead/log/run2-*`, suites under `log/run2-suites/`.
+## Left for the orchestrator
 
-## Open (for the orchestrator / owner)
+- `/tmp/gov-os-lead-W2-49` (104K, 10 inodes; rm needs a permission prompt). `.gov-runtime/scratch/ps-run2/` (12K, run 2's two scripts).
 
-- K (2) awaits the owner's confirmation; CAP-45.a's record is stale (4.1 item text, 4.2 version line) — package.
-- The eight `SOURCE_MAP.csv` rows (outside the paths) — not decided.
-- KPI line 3 and the failure line: pending W2-51.
-- W2-I017: carried, J (i), at W2-30's close (orchestrator). W2-L343: done in `90c4d20a`.
-- DEC-741 and DEC-744 not yet in this worktree's register (owner's staged batch).
-- Temporary folder left: `.gov-runtime/scratch/ps-run2/` (the apply worker's two throwaway scripts; its `rm -r` was refused; untracked; outside the lead's write area).
+## Brief gaps
+
+- Designer's Policy 2 (c) vs a spec ticket whose approved text was built in earlier rounds (read as: approved Contract and CIT-P are the spec) | this ticket's part | ~5 min (est.)
+- product-spec sandbox mounts tests/acceptance/<W2> read-only, so DEC-963's "implementer merges the tests branch" cannot run for product-spec | common brief / gov launch | ~10 min (est.)
+- git 2.43 `merge` has no `--trailer`: use `merge --no-commit` then `commit --trailer` | common brief | ~3 min (measured)
+- removing files in the lead's own TMPDIR needs a prompt (known, DEC-922) | common brief | ~1 min
 
 ## Loop count
 

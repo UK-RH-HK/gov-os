@@ -1,0 +1,10 @@
+Merge w2/W2-05-tests into w2/W2-05: the hooks comparison's exception cases (DEC-971 item 3) and W2-72's merge-tree cases on routes containment still takes (DEC-980 item 2)
+
+The independent test designer's commit aedc72140fcb: fourteen cases for the exception
+covering exactly postToolUse and postToolUseFailure, and W2-72's four fail-closed cases
+moved off a git first on PATH (DEC-802, P-B1-2). Its trailers stay on its own commit.
+
+Task: DAEO-0z8c
+Implements: DEC-971, DEC-980, DEC-963
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,106 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "src/gov/check/schema.py"
+   ]
+  }
+ ],
+ "base": "66336ffc342d093dcb76a48a5cf0ec53a6747d41",
+ "head": "0bc5a1b29f512b8d9e6e2d6d830d8a4aff1f0cd2",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-0uhh/CP-DAEO-0uhh-0003.md",
+  "docs/checkpoints/DAEO-0uhh/CP-DAEO-0uhh-0004.md"
+ ],
+ "changed": [
+  "src/gov/check/schema.py",
+  "template/governance/kernel/schemas/close.schema.json",
+  "tests/acceptance/W1-26/test_w1_26_dec436.py",
+  "tests/acceptance/W1-26/test_w1_26_installed_kernel.py",
+  "tests/acceptance/W1-30/README.md",
+  "tests/acceptance/W1-30/test_w1_30_check_blocks.py",
+  "tests/acceptance/W1-30/test_w1_30_close.py",
+  "tests/acceptance/W1-30/test_w1_30_commit_models.py",
+  "tests/acceptance/W1-30/test_w1_30_containment_places.py",
+  "tests/acceptance/W1-30/test_w1_30_context_failures.py",
+  "tests/acceptance/W1-30/test_w1_30_disposition.py",
+  "tests/acceptance/W1-30/test_w1_30_governance_checks.py",
+  "tests/acceptance/W1-30/test_w1_30_iteration.py",
+  "tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py",
+  "tests/acceptance/W1-30/test_w1_30_probe.py",
+  "tests/acceptance/W1-30/test_w1_30_probe_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_git.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_interpreter.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_probe_records.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_skips.py",
+  "tests/acceptance/W1-30/test_w1_30_r10_task_names_no_ticket.py",
+  "tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py",
+  "tests/acceptance/W1-30/test_w1_30_r12_worker_setting.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_governance_share.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_long_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_owner_decision_register.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_probe_merge.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r13_trailers_base.py",
+  "tests/acceptance/W1-30/test_w1_30_r14_probe_later_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_commits.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_escalation.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_last_step.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_probe_record.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_test_runs.py",
+  "tests/acceptance/W1-30/test_w1_30_r8_tree.py",
+  "tests/acceptance/W1-30/test_w1_30_r9_every_finding.py",
+  "tests/acceptance/W1-30/test_w1_30_r9_ticket_tool.py",
+  "tests/acceptance/W1-30/test_w1_30_receipt.py",
+  "tests/acceptance/W1-30/test_w1_30_regression_scope.py",
+  "tests/acceptance/W1-30/test_w1_30_repair_ticket.py",
+  "tests/acceptance/W1-30/test_w1_30_stale.py",
+  "tests/acceptance/W1-30/test_w1_30_test_runner.py",
+  "tests/acceptance/W1-30/test_w1_30_time_limit.py",
+  "tests/acceptance/W1-30/test_w1_30_traceability.py",
+  "tests/acceptance/W1-30/test_w1_30_watchdog.py",
+  "tests/acceptance/W2-54/README.md",
+  "tests/acceptance/W2-54/w2_54_support.py",
+  "tests/acceptance/W2-57/w2_57_list_support.py",
+  "tests/acceptance/W2-64/README.md",
+  "tests/acceptance/W2-64/test_w2_64_close_schema.py",
+  "tests/acceptance/W2-64/test_w2_64_full_validator.py",
+  "tests/acceptance/W2-64/test_w2_64_imported.py",
+  "tests/acceptance/W2-64/test_w2_64_live.py",
+  "tests/acceptance/W2-64/test_w2_64_tool_red.py",
+  "tests/acceptance/W2-64/test_w2_64_what_stays.py",
+  "tests/acceptance/W2-64/w2_64_support.py",
+  "tests/unit/check/test_check.py",
+  "tests/unit/check/test_kernel_followup.py",
+  "tests/unit/check/test_schema_close_skips.py",
+  "tests/unit/check/test_schema_shapes.py",
+  "tests/unit/check/test_schema_validator.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-64/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [],
+ "ignore": [],
+ "deselect": [],
+ "per_test_timeout": 900
+}

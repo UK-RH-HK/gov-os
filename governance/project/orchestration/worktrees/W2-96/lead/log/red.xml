@@ -1,0 +1,1283 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="44" skipped="0" tests="54" time="44.174" timestamp="2026-10-31T03:11:47.168566+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal[pass]" time="0.313"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_exit_code_and_ok_of_a0')
+kind = 'pass'
+
+    @pytest.mark.parametrize("kind", list(EXIT_CASES))
+    def test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal(tmp_path, kind):
+        files, readme, code, ok = EXIT_CASES[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+&gt;       envelope = run.envelope()
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cd936e0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal[fail]" time="0.260"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_exit_code_and_ok_of_a1')
+kind = 'fail'
+
+    @pytest.mark.parametrize("kind", list(EXIT_CASES))
+    def test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal(tmp_path, kind):
+        files, readme, code, ok = EXIT_CASES[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+&gt;       envelope = run.envelope()
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb27e0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal[error]" time="0.532"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_exit_code_and_ok_of_a2')
+kind = 'error'
+
+    @pytest.mark.parametrize("kind", list(EXIT_CASES))
+    def test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal(tmp_path, kind):
+        files, readme, code, ok = EXIT_CASES[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+&gt;       envelope = run.envelope()
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb3920&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal[refusal]" time="0.305"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_exit_code_and_ok_of_a3')
+kind = 'refusal'
+
+    @pytest.mark.parametrize("kind", list(EXIT_CASES))
+    def test_the_exit_code_and_ok_of_a_pass_a_fail_an_error_and_a_refusal(tmp_path, kind):
+        files, readme, code, ok = EXIT_CASES[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+&gt;       envelope = run.envelope()
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc11ca0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_one_failing_mapped_line_fails_the_run_with_exit_code_3[assertion]" time="0.490"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_one_failing_mapped_line_f0')
+kind = 'assertion'
+
+    @pytest.mark.parametrize("kind", list(ONE_FAILING))
+    def test_one_failing_mapped_line_fails_the_run_with_exit_code_3(tmp_path, kind):
+        files, readme, failing, unmapped, totals = ONE_FAILING[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+        expected = support.result("fail", [line("success-1", "pass", 3), failing], unmapped, totals)
+&gt;       support.assert_outcome(run, expected, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb21e0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_one_failing_mapped_line_fails_the_run_with_exit_code_3[setup-error]" time="0.244"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_one_failing_mapped_line_f1')
+kind = 'setup-error'
+
+    @pytest.mark.parametrize("kind", list(ONE_FAILING))
+    def test_one_failing_mapped_line_fails_the_run_with_exit_code_3(tmp_path, kind):
+        files, readme, failing, unmapped, totals = ONE_FAILING[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+        expected = support.result("fail", [line("success-1", "pass", 3), failing], unmapped, totals)
+&gt;       support.assert_outcome(run, expected, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb14f0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_one_failing_mapped_line_fails_the_run_with_exit_code_3[teardown-error]" time="0.365"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_one_failing_mapped_line_f2')
+kind = 'teardown-error'
+
+    @pytest.mark.parametrize("kind", list(ONE_FAILING))
+    def test_one_failing_mapped_line_fails_the_run_with_exit_code_3(tmp_path, kind):
+        files, readme, failing, unmapped, totals = ONE_FAILING[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+        expected = support.result("fail", [line("success-1", "pass", 3), failing], unmapped, totals)
+&gt;       support.assert_outcome(run, expected, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc12360&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_one_failing_mapped_line_fails_the_run_with_exit_code_3[only-skipped]" time="0.303"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_one_failing_mapped_line_f3')
+kind = 'only-skipped'
+
+    @pytest.mark.parametrize("kind", list(ONE_FAILING))
+    def test_one_failing_mapped_line_fails_the_run_with_exit_code_3(tmp_path, kind):
+        files, readme, failing, unmapped, totals = ONE_FAILING[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+        expected = support.result("fail", [line("success-1", "pass", 3), failing], unmapped, totals)
+&gt;       support.assert_outcome(run, expected, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc120f0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_one_failing_mapped_line_fails_the_run_with_exit_code_3[no-matching-case]" time="0.214"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_one_failing_mapped_line_f4')
+kind = 'no-matching-case'
+
+    @pytest.mark.parametrize("kind", list(ONE_FAILING))
+    def test_one_failing_mapped_line_fails_the_run_with_exit_code_3(tmp_path, kind):
+        files, readme, failing, unmapped, totals = ONE_FAILING[kind]
+        project = support.Project(tmp_path, files, readme)
+        run = project.run(support.TICKET_ID)
+        expected = support.result("fail", [line("success-1", "pass", 3), failing], unmapped, totals)
+&gt;       support.assert_outcome(run, expected, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc99f40&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_an_unknown_ticket_is_refused_with_accept_unknown_ticket[ticket-id]" time="0.319"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-zzzz --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_an_unknown_ticket_is_refu0')
+ticket = 'TDPL-zzzz'
+
+    @pytest.mark.parametrize("ticket", ["TDPL-zzzz", "W9-98"], ids=["ticket-id", "wbs-id"])
+    def test_an_unknown_ticket_is_refused_with_accept_unknown_ticket(tmp_path, ticket):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README)
+        run = project.run(ticket)
+&gt;       support.assert_refusal(run, support.UNKNOWN_TICKET)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc9b6b0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-zzzz --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_an_unknown_ticket_is_refused_with_accept_unknown_ticket[wbs-id]" time="0.271"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept W9-98 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_an_unknown_ticket_is_refu1')
+ticket = 'W9-98'
+
+    @pytest.mark.parametrize("ticket", ["TDPL-zzzz", "W9-98"], ids=["ticket-id", "wbs-id"])
+    def test_an_unknown_ticket_is_refused_with_accept_unknown_ticket(tmp_path, ticket):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README)
+        run = project.run(ticket)
+&gt;       support.assert_refusal(run, support.UNKNOWN_TICKET)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc114f0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept W9-98 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests[no-acceptance-tests]" time="0.287"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_ticket_without_an_accep0')
+kind = 'no-acceptance-tests'
+
+    @pytest.mark.parametrize("kind", list(NO_TESTS))
+    def test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests(tmp_path, kind):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README, acceptance=NO_TESTS[kind],
+                                  outside=(dict(support.ALPHA), support.SIMPLE_README))
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_TESTS)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cd4cf80&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests[no-path]" time="0.601"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_ticket_without_an_accep1')
+kind = 'no-path'
+
+    @pytest.mark.parametrize("kind", list(NO_TESTS))
+    def test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests(tmp_path, kind):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README, acceptance=NO_TESTS[kind],
+                                  outside=(dict(support.ALPHA), support.SIMPLE_README))
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_TESTS)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc12840&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests[missing-folder]" time="0.595"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_ticket_without_an_accep2')
+kind = 'missing-folder'
+
+    @pytest.mark.parametrize("kind", list(NO_TESTS))
+    def test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests(tmp_path, kind):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README, acceptance=NO_TESTS[kind],
+                                  outside=(dict(support.ALPHA), support.SIMPLE_README))
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_TESTS)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc13380&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests[a-file]" time="0.407"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_ticket_without_an_accep3')
+kind = 'a-file'
+
+    @pytest.mark.parametrize("kind", list(NO_TESTS))
+    def test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests(tmp_path, kind):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README, acceptance=NO_TESTS[kind],
+                                  outside=(dict(support.ALPHA), support.SIMPLE_README))
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_TESTS)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cd1ebd0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests[outside-the-root]" time="0.462"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_ticket_without_an_accep4')
+kind = 'outside-the-root'
+
+    @pytest.mark.parametrize("kind", list(NO_TESTS))
+    def test_a_ticket_without_an_acceptance_folder_inside_the_root_is_refused_with_accept_no_tests(tmp_path, kind):
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README, acceptance=NO_TESTS[kind],
+                                  outside=(dict(support.ALPHA), support.SIMPLE_README))
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_TESTS)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb3740&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_exit_codes" name="test_nothing_is_written_in_the_repository_ignored_files_included" time="0.637"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_nothing_is_written_in_the0')
+
+    def test_nothing_is_written_in_the_repository_ignored_files_included(tmp_path):
+        project = support.Project(tmp_path, support.fails_files(), support.FAILS_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.FAILS_EXPECTED, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_exit_codes.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc9bd70&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_no_leak" name="test_a_failing_run_shows_no_assertion_text_value_traceback_or_captured_output" time="0.549"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">fails = &lt;w2_96_support.Project object at 0x71b11cd1fd40&gt;
+
+    def test_a_failing_run_shows_no_assertion_text_value_traceback_or_captured_output(fails):
+        run = fails.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.FAILS_EXPECTED, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_no_leak.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb13a0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_no_leak" name="test_the_text_output_of_a_failing_run_shows_none_of_it_either" time="0.363"><failure message="AssertionError: exit code 2, expected 3&#10;  command: gov.cli.main accept TDPL-a961&#10;  exit code: 2&#10;  stdout: &#10;  stderr: usage: gov [-h] &lt;command&gt; ...&#10;  gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')&#10;  &#10;assert 2 == 3&#10; +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc10a40&gt;.returncode&#10; +  and   3 = support.EXIT_FAIL">fails = &lt;w2_96_support.Project object at 0x71b11cd1fd40&gt;
+
+    def test_the_text_output_of_a_failing_run_shows_none_of_it_either(fails):
+        run = fails.run(support.TICKET_ID, json_mode=False)
+&gt;       assert run.returncode == support.EXIT_FAIL, f"exit code {run.returncode}, expected 3\n{run.describe()}"
+E       AssertionError: exit code 2, expected 3
+E         command: gov.cli.main accept TDPL-a961
+E         exit code: 2
+E         stdout: 
+E         stderr: usage: gov [-h] &lt;command&gt; ...
+E         gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+E         
+E       assert 2 == 3
+E        +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc10a40&gt;.returncode
+E        +  and   3 = support.EXIT_FAIL
+
+tests/acceptance/W2-96/test_w2_96_at_no_leak.py:38: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_no_leak" name="test_the_tests_temporary_folders_are_made_in_the_runs_private_folder_and_removed" time="0.170"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">fails = &lt;w2_96_support.Project object at 0x71b11cd1fd40&gt;
+
+    def test_the_tests_temporary_folders_are_made_in_the_runs_private_folder_and_removed(fails):
+        run = fails.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.FAILS_EXPECTED, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_no_leak.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc13fb0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_no_leak" name="test_an_interrupted_run_stops_its_child_and_leaves_nothing" time="0.920"><failure message="AssertionError: gov accept ended (exit code 2) before a planted test recorded 'sleeping'&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_an_interrupted_run_stops_0')
+
+    def test_an_interrupted_run_stops_its_child_and_leaves_nothing(tmp_path):
+        """SIGINT to gov alone, while a planted test sleeps: the child is stopped, nothing is left, nothing shown."""
+        project = support.Project(tmp_path, support.second_file("sleep", "test_qzv96leak_sleeper"),
+                                  support.SECOND_README)
+        started = project.start(support.TICKET_ID)
+        try:
+&gt;           sleeping = started.wait_for("sleeping", support.START_WAIT_S)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_no_leak.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Started object at 0x71b11cd4d760&gt;, kind = 'sleeping'
+wait_s = 120.0
+
+    def wait_for(self, kind, wait_s):
+        """The first probe record of ``kind``; an AssertionError if gov ends first or ``wait_s`` passes."""
+        deadline = time.monotonic() + wait_s
+        while time.monotonic() &lt; deadline:
+            records = self.project.records(kind)
+            if records:
+                return records[0]
+            if self.process.poll() is not None:
+                stdout, stderr = self.process.communicate()
+&gt;               raise AssertionError(f"gov accept ended (exit code {self.process.returncode}) before a planted "
+                                     f"test recorded {kind!r}\nstdout: {stdout[-2000:]}\nstderr: {stderr[-2000:]}")
+E               AssertionError: gov accept ended (exit code 2) before a planted test recorded 'sleeping'
+E               stdout: 
+E               stderr: usage: gov [-h] &lt;command&gt; ...
+E               gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:804: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_suites_give_the_designed_outcomes_and_raw_output_holds_the_marker[common]" time="3.395" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_suites_give_the_designed_outcomes_and_raw_output_holds_the_marker[fails]" time="4.171" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_collection_errors_end_pytest_as_collection_errors[import-2]" time="4.039" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_collection_errors_end_pytest_as_collection_errors[syntax-2]" time="3.949" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_collection_errors_end_pytest_as_collection_errors[empty-5]" time="1.735" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_crashes_end_pytest_before_its_report[crash_signal--9]" time="1.506" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_planted_crashes_end_pytest_before_its_report[crash_internal-3]" time="1.286" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_decoy_library_fails_a_planted_test_when_it_comes_first" time="4.619" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_the_marker_is_nowhere_in_the_code_under_test" time="0.018" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_premises" name="test_this_readme_is_a_kpi_map_gov_accept_can_run" time="0.001" /><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_a_row_form_map_is_reported_per_kpi_line_with_its_counts" time="0.266"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">rows = &lt;w2_96_support.Project object at 0x71b11cc98620&gt;
+
+    def test_a_row_form_map_is_reported_per_kpi_line_with_its_counts(rows):
+        run = rows.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.ROWS_EXPECTED, support.EXIT_PASS)
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc8c830&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_a_heading_form_map_is_reported_per_kpi_line_with_its_counts" time="0.269"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_heading_form_map_is_rep0')
+
+    def test_a_heading_form_map_is_reported_per_kpi_line_with_its_counts(tmp_path):
+        project = support.Project(tmp_path, support.common_files(), support.HEADINGS_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.HEADINGS_EXPECTED, support.EXIT_PASS)
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc8d310&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_the_wbs_id_names_the_same_ticket" time="0.156"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept W9-61 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">rows = &lt;w2_96_support.Project object at 0x71b11cc98620&gt;
+
+    def test_the_wbs_id_names_the_same_ticket(rows):
+        run = rows.run(support.WBS_ID)
+&gt;       support.assert_outcome(run, support.ROWS_EXPECTED, support.EXIT_PASS)  # "ticket" is the ticket id
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11dd6ae70&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept W9-61 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_each_ticket_runs_its_own_declared_folder" time="0.377"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-b962 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">rows = &lt;w2_96_support.Project object at 0x71b11cc98620&gt;
+
+    def test_each_ticket_runs_its_own_declared_folder(rows):
+        run = rows.run(support.OTHER_ID)
+        expected = support.result("fail", [support.line("success-1", "fail", 0, 1)], totals=support.counts(0, 1),
+                                  ticket=support.OTHER_ID)
+&gt;       support.assert_outcome(run, expected, support.EXIT_FAIL)
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc12840&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-b962 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_the_child_runs_in_the_root_with_the_trees_own_src_first" time="0.285"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_child_runs_in_the_roo0')
+
+    def test_the_child_runs_in_the_root_with_the_trees_own_src_first(tmp_path):
+        """The planted cases pass only if they import the planted ``src/`` before the decoy the run was given."""
+        project = support.Project(tmp_path, dict(support.ALPHA), support.SIMPLE_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.SIMPLE_EXPECTED, support.EXIT_PASS)
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb35c0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_the_root_option_runs_the_named_project_from_another_folder" time="0.217"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --root /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/rows0/project --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">rows = &lt;w2_96_support.Project object at 0x71b11cc98620&gt;
+
+    def test_the_root_option_runs_the_named_project_from_another_folder(rows):
+        run = rows.run(support.TICKET_ID, "--root", str(rows.root), cwd=rows.elsewhere)
+&gt;       support.assert_outcome(run, support.ROWS_EXPECTED, support.EXIT_PASS)
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc8d820&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --root /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/rows0/project --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_report" name="test_the_text_output_gives_the_same_result_as_json" time="0.565"><failure message="AssertionError: exit code 2, expected 0&#10;  command: gov.cli.main accept TDPL-a961&#10;  exit code: 2&#10;  stdout: &#10;  stderr: usage: gov [-h] &lt;command&gt; ...&#10;  gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')&#10;  &#10;assert 2 == 0&#10; +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc8eff0&gt;.returncode&#10; +  and   0 = support.EXIT_PASS">rows = &lt;w2_96_support.Project object at 0x71b11cc98620&gt;
+
+    def test_the_text_output_gives_the_same_result_as_json(rows):
+        run = rows.run(support.TICKET_ID, json_mode=False)
+&gt;       assert run.returncode == support.EXIT_PASS, f"exit code {run.returncode}, expected 0\n{run.describe()}"
+E       AssertionError: exit code 2, expected 0
+E         command: gov.cli.main accept TDPL-a961
+E         exit code: 2
+E         stdout: 
+E         stderr: usage: gov [-h] &lt;command&gt; ...
+E         gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+E         
+E       assert 2 == 0
+E        +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc8eff0&gt;.returncode
+E        +  and   0 = support.EXIT_PASS
+
+tests/acceptance/W2-96/test_w2_96_at_report.py:77: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_a_collection_error_is_an_error_of_kind_collection_with_no_message[import]" time="0.244"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_collection_error_is_an_0')
+kind = 'import'
+
+    @pytest.mark.parametrize("kind", ["import", "syntax", "empty"])
+    def test_a_collection_error_is_an_error_of_kind_collection_with_no_message(tmp_path, kind):
+        """An import error, a syntax error, or nothing collected."""
+        project = support.Project(tmp_path, support.collection_files(kind), support.SECOND_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.error_result("collection"), support.EXIT_ERROR)
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc04650&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_a_collection_error_is_an_error_of_kind_collection_with_no_message[syntax]" time="0.271"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_collection_error_is_an_1')
+kind = 'syntax'
+
+    @pytest.mark.parametrize("kind", ["import", "syntax", "empty"])
+    def test_a_collection_error_is_an_error_of_kind_collection_with_no_message(tmp_path, kind):
+        """An import error, a syntax error, or nothing collected."""
+        project = support.Project(tmp_path, support.collection_files(kind), support.SECOND_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.error_result("collection"), support.EXIT_ERROR)
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc04ec0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_a_collection_error_is_an_error_of_kind_collection_with_no_message[empty]" time="0.287"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_collection_error_is_an_2')
+kind = 'empty'
+
+    @pytest.mark.parametrize("kind", ["import", "syntax", "empty"])
+    def test_a_collection_error_is_an_error_of_kind_collection_with_no_message(tmp_path, kind):
+        """An import error, a syntax error, or nothing collected."""
+        project = support.Project(tmp_path, support.collection_files(kind), support.SECOND_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.error_result("collection"), support.EXIT_ERROR)
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cd1eb10&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_a_timeout_is_an_error_of_kind_timeout_and_the_childs_process_group_is_killed" time="0.679"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --timeout 8 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_timeout_is_an_error_of_0')
+
+    def test_a_timeout_is_an_error_of_kind_timeout_and_the_childs_process_group_is_killed(tmp_path):
+        """A planted test starts a grandchild, then sleeps; ``--timeout 8`` ends the run."""
+        project = support.Project(tmp_path, support.second_file("sleep", "test_qzv96leak_sleeper"),
+                                  support.SECOND_README)
+        try:
+            run = project.run(support.TICKET_ID, "--timeout", str(support.TIMEOUT_OPTION_S), timeout=150)
+&gt;           support.assert_outcome(run, support.error_result("timeout"), support.EXIT_ERROR)
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc8ddf0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --timeout 8 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_a_crash_is_an_error_of_kind_crash_with_no_message[crash_signal]" time="0.257"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_crash_is_an_error_of_ki0')
+kind = 'crash_signal'
+
+    @pytest.mark.parametrize("kind", ["crash_signal", "crash_internal"])
+    def test_a_crash_is_an_error_of_kind_crash_with_no_message(tmp_path, kind):
+        """The child killed by a signal (SIGKILL), or ended with pytest's internal-error code (3) and no report."""
+        project = support.Project(tmp_path, support.second_file(kind, f"test_qzv96leak_{kind}"), support.SECOND_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.error_result("crash"), support.EXIT_ERROR)
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cbb14c0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_a_crash_is_an_error_of_kind_crash_with_no_message[crash_internal]" time="0.270"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_crash_is_an_error_of_ki1')
+kind = 'crash_internal'
+
+    @pytest.mark.parametrize("kind", ["crash_signal", "crash_internal"])
+    def test_a_crash_is_an_error_of_kind_crash_with_no_message(tmp_path, kind):
+        """The child killed by a signal (SIGKILL), or ended with pytest's internal-error code (3) and no report."""
+        project = support.Project(tmp_path, support.second_file(kind, f"test_qzv96leak_{kind}"), support.SECOND_README)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.error_result("crash"), support.EXIT_ERROR)
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc13fb0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_run_errors" name="test_the_text_form_of_a_run_error_gives_its_kind_only" time="0.253"><failure message="AssertionError: exit code 2, expected 4&#10;  command: gov.cli.main accept TDPL-a961&#10;  exit code: 2&#10;  stdout: &#10;  stderr: usage: gov [-h] &lt;command&gt; ...&#10;  gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')&#10;  &#10;assert 2 == 4&#10; +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc07890&gt;.returncode&#10; +  and   4 = support.EXIT_ERROR">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_text_form_of_a_run_er0')
+
+    def test_the_text_form_of_a_run_error_gives_its_kind_only(tmp_path):
+        project = support.Project(tmp_path, support.collection_files("import"), support.SECOND_README)
+        run = project.run(support.TICKET_ID, json_mode=False)
+&gt;       assert run.returncode == support.EXIT_ERROR, f"exit code {run.returncode}, expected 4\n{run.describe()}"
+E       AssertionError: exit code 2, expected 4
+E         command: gov.cli.main accept TDPL-a961
+E         exit code: 2
+E         stdout: 
+E         stderr: usage: gov [-h] &lt;command&gt; ...
+E         gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+E         
+E       assert 2 == 4
+E        +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc07890&gt;.returncode
+E        +  and   4 = support.EXIT_ERROR
+
+tests/acceptance/W2-96/test_w2_96_at_run_errors.py:58: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_unmapped_cases_are_counted_never_named" time="0.227"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">rows = &lt;w2_96_support.Project object at 0x71b11cc06900&gt;
+
+    def test_unmapped_cases_are_counted_never_named(rows):
+        run = rows.run(support.TICKET_ID)
+&gt;       support.assert_outcome(run, support.ROWS_EXPECTED, support.EXIT_PASS)  # unmapped: 3 passed, 1 failed
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:837: in assert_outcome
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc056a0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_an_unmapped_failure_never_changes_the_exit_code_in_text_either" time="0.217"><failure message="AssertionError: exit code 2, expected 0&#10;  command: gov.cli.main accept TDPL-a961&#10;  exit code: 2&#10;  stdout: &#10;  stderr: usage: gov [-h] &lt;command&gt; ...&#10;  gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')&#10;  &#10;assert 2 == 0&#10; +  where 2 = &lt;w2_96_support.Run object at 0x71b11cbb3d10&gt;.returncode&#10; +  and   0 = support.EXIT_PASS">rows = &lt;w2_96_support.Project object at 0x71b11cc06900&gt;
+
+    def test_an_unmapped_failure_never_changes_the_exit_code_in_text_either(rows):
+        run = rows.run(support.TICKET_ID, json_mode=False)
+&gt;       assert run.returncode == support.EXIT_PASS, f"exit code {run.returncode}, expected 0\n{run.describe()}"
+E       AssertionError: exit code 2, expected 0
+E         command: gov.cli.main accept TDPL-a961
+E         exit code: 2
+E         stdout: 
+E         stderr: usage: gov [-h] &lt;command&gt; ...
+E         gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+E         
+E       assert 2 == 0
+E        +  where 2 = &lt;w2_96_support.Run object at 0x71b11cbb3d10&gt;.returncode
+E        +  and   0 = support.EXIT_PASS
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:47: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_a_folder_without_a_readme_is_refused_with_accept_no_map" time="0.472"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_folder_without_a_readme0')
+
+    def test_a_folder_without_a_readme_is_refused_with_accept_no_map(tmp_path):
+        project = support.Project(tmp_path, support.common_files(), None)
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_MAP)
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc12150&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_a_readme_without_a_map_is_refused_with_accept_no_map[empty]" time="0.430"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_readme_without_a_map_is0')
+kind = 'empty'
+
+    @pytest.mark.parametrize("kind", list(NO_MAP_READMES))
+    def test_a_readme_without_a_map_is_refused_with_accept_no_map(tmp_path, kind):
+        project = support.Project(tmp_path, support.common_files(), NO_MAP_READMES[kind])
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_MAP)
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc8e030&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_a_readme_without_a_map_is_refused_with_accept_no_map[prose-only]" time="0.250"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_readme_without_a_map_is1')
+kind = 'prose-only'
+
+    @pytest.mark.parametrize("kind", list(NO_MAP_READMES))
+    def test_a_readme_without_a_map_is_refused_with_accept_no_map(tmp_path, kind):
+        project = support.Project(tmp_path, support.common_files(), NO_MAP_READMES[kind])
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_MAP)
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc079b0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_a_readme_without_a_map_is_refused_with_accept_no_map[rows-naming-no-line]" time="0.229"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_readme_without_a_map_is2')
+kind = 'rows-naming-no-line'
+
+    @pytest.mark.parametrize("kind", list(NO_MAP_READMES))
+    def test_a_readme_without_a_map_is_refused_with_accept_no_map(tmp_path, kind):
+        project = support.Project(tmp_path, support.common_files(), NO_MAP_READMES[kind])
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_MAP)
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc50d40&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_a_readme_without_a_map_is_refused_with_accept_no_map[heading-naming-no-line]" time="0.215"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_readme_without_a_map_is3')
+kind = 'heading-naming-no-line'
+
+    @pytest.mark.parametrize("kind", list(NO_MAP_READMES))
+    def test_a_readme_without_a_map_is_refused_with_accept_no_map(tmp_path, kind):
+        project = support.Project(tmp_path, support.common_files(), NO_MAP_READMES[kind])
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_MAP)
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc50770&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_a_readme_without_a_map_is_refused_with_accept_no_map[kpi-table-without-a-test-column]" time="0.294"><failure message="AssertionError: gov accept gave no API-0002 envelope on stdout&#10;command: gov.cli.main accept TDPL-a961 --json&#10;exit code: 2&#10;stdout: &#10;stderr: usage: gov [-h] &lt;command&gt; ...&#10;gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_a_readme_without_a_map_is4')
+kind = 'kpi-table-without-a-test-column'
+
+    @pytest.mark.parametrize("kind", list(NO_MAP_READMES))
+    def test_a_readme_without_a_map_is_refused_with_accept_no_map(tmp_path, kind):
+        project = support.Project(tmp_path, support.common_files(), NO_MAP_READMES[kind])
+        run = project.run(support.TICKET_ID)
+&gt;       support.assert_refusal(run, support.NO_MAP)
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-96/w2_96_support.py:848: in assert_refusal
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_96_support.Run object at 0x71b11cc53bc0&gt;
+
+    def envelope(self):
+        """The API-0002 envelope on stdout; an AssertionError naming the output when there is none."""
+        try:
+            envelope = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"gov accept gave no API-0002 envelope on stdout\n{self.describe()}") from None
+E           AssertionError: gov accept gave no API-0002 envelope on stdout
+E           command: gov.cli.main accept TDPL-a961 --json
+E           exit code: 2
+E           stdout: 
+E           stderr: usage: gov [-h] &lt;command&gt; ...
+E           gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+
+tests/acceptance/W2-96/w2_96_support.py:753: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-96.test_w2_96_at_unmapped_and_no_map" name="test_the_text_form_of_the_refusal_gives_its_code_and_no_raw_output" time="0.583"><failure message="AssertionError: exit code 2, expected 1&#10;  command: gov.cli.main accept TDPL-a961&#10;  exit code: 2&#10;  stdout: &#10;  stderr: usage: gov [-h] &lt;command&gt; ...&#10;  gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')&#10;  &#10;assert 2 == 1&#10; +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc508f0&gt;.returncode&#10; +  and   1 = support.EXIT_REFUSED">tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_the_text_form_of_the_refu0')
+
+    def test_the_text_form_of_the_refusal_gives_its_code_and_no_raw_output(tmp_path):
+        project = support.Project(tmp_path, support.common_files(), NO_MAP_READMES["rows-naming-no-line"])
+        run = project.run(support.TICKET_ID, json_mode=False)
+&gt;       assert run.returncode == support.EXIT_REFUSED, f"exit code {run.returncode}, expected 1\n{run.describe()}"
+E       AssertionError: exit code 2, expected 1
+E         command: gov.cli.main accept TDPL-a961
+E         exit code: 2
+E         stdout: 
+E         stderr: usage: gov [-h] &lt;command&gt; ...
+E         gov: error: argument &lt;command&gt;: invalid choice: 'accept' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'ci', 'launch', 'telemetry')
+E         
+E       assert 2 == 1
+E        +  where 2 = &lt;w2_96_support.Run object at 0x71b11cc508f0&gt;.returncode
+E        +  and   1 = support.EXIT_REFUSED
+
+tests/acceptance/W2-96/test_w2_96_at_unmapped_and_no_map.py:74: AssertionError</failure></testcase></testsuite></testsuites>

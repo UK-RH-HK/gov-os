@@ -1,0 +1,83 @@
+"""The resource gate for one more lead, measured on WSL as it is (owner, DEC-942 item 2; memory rule DEC-947). Exit 0
+if open, 1 if shut; prints one line with every figure and the reason.
+  load:   min(load1, load15) < nproc (a short peak does not hold launches; 15 minutes above nproc does, DEC-942 item 3)
+  memory: MemAvailable + what the running leads already hold >= floor + one verification run's peak (reserved once:
+          the verification lock lets one full test run happen at a time) + a working size for each running lead and
+          for the new one. The three figures are in gate-config.json, re-measured weekly.
+A line ending "memory-only" means memory alone shut the gate while the CPU was idle (load1 < nproc / 2).
+The disk gate is checked separately (disk_gate.sh)."""
+import json
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lead_mem import snapshot  # noqa: E402
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "gate-config.json")) as f:
+    cfg = json.load(f)
+floor, verify, work = cfg["floor_kb"], cfg["verification_peak_kb"], cfg["working_kb"]
+s = snapshot()
+nproc, (l1, _, l15) = s["nproc"], s["load"]
+n = len(s["leads_kb"])
+held = sum(s["leads_kb"].values())
+have = s["mem_available_kb"] + held
+
+
+def verification_in_progress():
+    """Owner, 2026-10-30 (no double counting): who holds the verification lock now, and how much its run uses.
+    Returns (kind, kB): ("none", 0); ("lead", 0) when the holder is inside a lead's tree (its memory is in `held`);
+    ("other", rss) for a close or the nightly, whose memory is already out of MemAvailable."""
+    from lead_mem import procs
+    try:
+        ino = os.stat("/tmp/gov-os-verify.lock").st_ino
+        with open("/proc/locks") as f:
+            holders = [int(l.split()[4]) for l in f if "->" not in l and l.split()[5].endswith(":%d" % ino)]
+    except (OSError, IndexError, ValueError):
+        return "none", 0
+    if not holders:
+        return "none", 0
+    ps = procs()
+    kids = {}
+    for pid, (ppid, _, _) in ps.items():
+        kids.setdefault(ppid, []).append(pid)
+    leads = {pid for pid, (_, _, cmd) in ps.items()
+             if "claude" in cmd and '"GOV_ROLE":"orchestrator","GOV_TICKET":"' in cmd}
+    q, seen = holders[0], set()
+    while q > 1 and q not in seen:
+        if q in leads:
+            return "lead", 0
+        seen.add(q)
+        q = ps.get(q, (0, 0, ""))[0]
+    total, stack = 0, [holders[0]]
+    while stack:
+        p = stack.pop()
+        total += ps.get(p, (0, 0, ""))[1]
+        stack += kids.get(p, [])
+    return "other", total
+
+
+# One verification run is reserved at its measured peak. While one runs, reserve only what it may still grow to:
+# a close's or the nightly's run already uses its memory outside MemAvailable; a lead's run is inside that lead's
+# tree, whose reservation is then the verification peak alone (the peak was measured on a whole lead tree).
+vkind, vused = verification_in_progress()
+if vkind == "other":
+    need = floor + max(0, verify - vused) + (n + 1) * work
+elif vkind == "lead":
+    need = floor + verify + n * work
+else:
+    need = floor + verify + (n + 1) * work
+load_ok = min(l1, l15) < nproc
+mem_ok = have >= need
+why = []
+if not load_ok:
+    why.append("load %.1f/%.1f >= nproc %d" % (l1, l15, nproc))
+if not mem_ok:
+    why.append("memory: available %d kB + leads' %d kB < need %d kB (floor %d, verification %s, working %d each)" % (
+        s["mem_available_kb"], held, need, floor,
+        {"other": "%d left of %d (a close or nightly run uses %d)" % (max(0, verify - vused), verify, vused),
+         "lead": "%d, inside a running lead" % verify}.get(vkind, "%d reserved" % verify), work))
+tail = " memory-only" if (load_ok and not mem_ok and l1 < nproc / 2) else ""
+print("%s leads=%d load=%.1f/%.1f nproc=%d have=%dkB need=%dkB verify=%s%s%s" % (
+    "OPEN" if load_ok and mem_ok else "SHUT", n, l1, l15, nproc, have, need, vkind,
+    (": " + "; ".join(why)) if why else "", tail))
+sys.exit(0 if load_ok and mem_ok else 1)

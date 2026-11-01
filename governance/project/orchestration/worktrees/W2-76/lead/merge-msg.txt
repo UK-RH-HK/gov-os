@@ -1,0 +1,6 @@
+Merge w2/W2-76-tests into w2/W2-76: the rebuild-lock override passed through the eight helpers (DEC-964)
+
+Task: DAEO-tgk2
+Implements: DEC-939, DEC-956, DEC-964
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

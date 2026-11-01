@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.221" timestamp="2026-10-31T08:27:22.093646+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-08.test_w1_08_path_map" name="test_every_tracked_path_matches_exactly_one_namespace" time="0.165"><failure message="AssertionError: 1 of 2604 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['governance/project/orchestration/closes/W2-71-DAEO-e8f0.md']&#10;assert not ['governance/project/orchestration/closes/W2-71-DAEO-e8f0.md']">def test_every_tracked_path_matches_exactly_one_namespace():
+        """The names come from `git ls-files`; no tracked file is opened."""
+        spaces = support.namespaces(support.load_path_map())
+        patterns = {name: [pattern for pattern in value.get("paths") or [] if isinstance(pattern, str)]
+                    for name, value in spaces.items()}
+        tracked = support.tracked_files()
+        nowhere, twice = [], []
+        for path in tracked:
+            found = [name for name, own in patterns.items() if any(support.matches(pattern, path) for pattern in own)]
+            if not found:
+                nowhere.append(path)
+            elif len(found) &gt; 1:
+                twice.append(f"{path} -&gt; {found}")
+&gt;       assert not nowhere, (f"{len(nowhere)} of {len(tracked)} tracked paths are in no namespace of "
+                             f"{support.PATH_MAP_REL}, for example {nowhere[:SHOWN]}")
+E       AssertionError: 1 of 2604 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['governance/project/orchestration/closes/W2-71-DAEO-e8f0.md']
+E       assert not ['governance/project/orchestration/closes/W2-71-DAEO-e8f0.md']
+
+tests/acceptance/W1-08/test_w1_08_path_map.py:92: AssertionError</failure></testcase></testsuite></testsuites>

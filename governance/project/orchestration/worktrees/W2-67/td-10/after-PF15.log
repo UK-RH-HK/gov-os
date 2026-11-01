@@ -1,0 +1,58 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_task_trailer_exact_match_not_substring __________________
+
+project = <w1_30_support.Project object at 0x7051901b5a30>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-yue3y1uk/claude-1000/pytest-of-usain/pytest-0/test_t...endent-test-designer-yue3y1uk/claude-1000/pytest-of-usain/pytest-0/test_task_trailer_exact_match_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
+        """KPI S1, CAP-38.c: Task: AB must not count as a commit of ticket A.
+    
+        Revised for W2-67 (I2 F2, PF15): ticket A has its checkpoint, so it is not refused for the missing checkpoint;
+        the refusal is the trailer gate's: no commit carries ``Task: A`` exactly, and AB's commit is not named as A's.
+        A and AB take ids of the kernel's ticket grammar (DEC-954), since ``gov checkpoint`` takes no other (``PROJ-a``
+        could have no checkpoint); AB is A's id with one more character in front, a ticket no case closes.
+    
+        Run 6 (DEC-954's merge): ``Task: XPROJ-tkaa`` does not hold the text ``Task: PROJ-tkaa``, so a search for A's
+        trailer never finds AB's commit and a substring match (PF15) never sees it. A commit whose ``Task:`` is A's id
+        with one more character after it, a value that names no ticket (no valid id is another's with more after it),
+        is found by that search, and must not count as A's either."""
+        # ids the ticket schema takes (DEC-954): a valid id is never another's prefix, so AB holds A inside it
+        ticket_a = "PROJ-tkaa"
+        ticket_ab = "XPROJ-tkaa"
+        task_after = f"{ticket_a}b"  # A's id with one character after it: the form PF15 can see
+        wbs_a = "W1-947"
+        wbs_ab = "W1-9471"
+        project.add_ticket(ticket_a, wbs_a)
+        project.add_ticket(ticket_ab, wbs_ab)
+        project.add_passing_test(wbs_a)
+        project.add_passing_test(wbs_ab)
+        project.write("src/example/feature_ab.py", "# feature for AB\n")
+        ab_commit = project.commit("implement AB only", who=IMPL,
+                                   trailers=(f"Task: {ticket_ab}", "Role: engineer", "Implements: CAP-01"))
+        project.write("src/example/feature_after.py", "# feature for no ticket\n")
+        after_commit = project.commit("implement a task that names no ticket", who=IMPL,
+                                      trailers=(f"Task: {task_after}", "Role: engineer", "Implements: CAP-01"))
+        support.checkpointed(project, ticket_a)
+        assert support.ticket_commits(project.root, ticket_a) == [], "the fixture is wrong: ticket A has a commit"
+        run = support.run_close(project, sandbox, ticket_a)
+        text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+>       assert re.search(rf"Task: {re.escape(ticket_a)}(?![A-Za-z0-9])", text), \
+            f"the refusal does not say that no commit carries Task: {ticket_a}\n{run.describe()}"
+E       AssertionError: the refusal does not say that no commit carries Task: PROJ-tkaa
+E         gov close PROJ-tkaa --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CONTAINMENT_FINDING", "message": "containment findings: containment: commit 1c4426ae8962: src/example/feature_after.py: committed path(s) outside allowed paths; findings are unclassed and await disposition", "details": {"findings": ["containment: commit 1c4426ae8962: src/example/feature_after.py: committed path(s) outside allowed paths"], "containment": [{"commit": "1c4426ae896276e6bd2a36f6feb2e3b32dcb3cef", "paths": ["src/example/feature_after.py"], "reason": "committed path(s) outside allowed paths"}], "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 0.67, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2, "distribution": "load"}, {"run": "regression", "form": "parallel", "seconds": 0.63, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2, "distribution": "load"}], "trailers_base": null, "accepted_history": [], "evidence": {"scope": "full", "why_full": [{"reason": "TEST_MAP_MISSING"}, {"reason": "BASE_UNKNOWN"}], "base": null, "head": "a06c56adb4920ed9d2588e2cc9e8dbbcb9227432", "tree": "0288947198e0135d66510fd20d3ad6e5cdb14a74", "changed": [], "selected": [{"target": "tests/acceptance/W1-947/", "why": [{"reason": "OWN"}]}, {"target": "tests", "why": [{"reason": "FULL"}]}], "left_out": [], "skips": [], "skip_count": 0, "failures": [], "junit_xml": [".gov-runtime/close/PROJ-tkaa/20261031T074921731808Z/01-acceptance-parallel.xml", ".gov-runtime/close/PROJ-tkaa/20261031T074921731808Z/02-regression-parallel.xml"], "per_test_timeout": 900, "distribution": "load", "tmp_path_retention_policy": "failed", "code_fingerprint": null, "records_fingerprint": null}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-ttdd"}}}
+E         
+E         stderr:
+E         
+E       assert None
+E        +  where None = <function search at 0x705191cb23e0>('Task: PROJ\\-tkaa(?![A-Za-z0-9])', '{"code": "CONTAINMENT_FINDING", "message": "containment findings: containment: commit 1c4426ae8962: src/example/featu...ingerprint": null}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-ttdd"}}')
+E        +    where <function search at 0x705191cb23e0> = re.search
+
+tests/acceptance/W1-30/test_w1_30_close.py:377: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-30/test_w1_30_close.py::test_task_trailer_exact_match_not_substring
+1 failed in 7.61s

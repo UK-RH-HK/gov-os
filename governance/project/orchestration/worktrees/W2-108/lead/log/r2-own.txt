@@ -1,0 +1,4 @@
+.........................s.........                                      [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-108/test_w2_108_unchanged.py:140: the semantic facet of /home/usain/gov-os-worktrees/W2-108 is unavailable here (stale): no embedder answers, or the store holds no current vectors
+34 passed, 1 skipped in 57.97s

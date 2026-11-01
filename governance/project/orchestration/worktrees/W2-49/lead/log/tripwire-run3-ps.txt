@@ -1,0 +1,171 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "head",
+   "before": "f6af39c1665b",
+   "after": "669748f69c76"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-108/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-108/test_w2_108_change_seen.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-108/test_w2_108_once.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-108/test_w2_108_scope.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-108/test_w2_108_unchanged.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-108/w2_108_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "acceptance folder",
+   "folder": "W2-108"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-16/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "acceptance folder",
+   "folder": "W2-16"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-49",
+   "change": "head",
+   "before": "b667fdc03ece",
+   "after": "41c12253fe4d"
+  }
+ ]
+}

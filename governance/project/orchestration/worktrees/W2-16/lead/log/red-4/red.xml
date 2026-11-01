@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="82" failures="41" skipped="0" tests="142" time="40.803" timestamp="2026-10-31T09:47:31.540589+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_doctor_refuses_a_lock_whose_manifest_hash_is_wrong" time="1.213"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_doctor_refuses_a_lock_whose_file_hash_is_wrong" time="0.720"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_doctor_refuses_an_installed_release_file_changed_added_or_removed[changed]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_doctor_refuses_an_installed_release_file_changed_added_or_removed[added]" time="0.001"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_doctor_refuses_an_installed_release_file_changed_added_or_removed[removed]" time="0.001"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_deleting_both_the_lock_and_the_answers_file_does_not_silence_the_comparison[plain template source]" time="3.965" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_deleting_both_the_lock_and_the_answers_file_does_not_silence_the_comparison[release]" time="0.002"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_editing_the_lock_manifest_together_with_a_kernel_file_does_not_give_a_match" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_copying_template_directly_gives_a_lock_or_doctor_names_the_missing_step" time="1.048" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_a_kernel_file_whose_mode_changed_is_drift_naming_it[governance/kernel/bin/tk-True]" time="0.753" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_a_kernel_file_whose_mode_changed_is_drift_naming_it[governance/kernel/hooks/stop.py-False]" time="0.799" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_an_empty_folder_added_to_the_kernel_is_drift_naming_it" time="0.899" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_a_declared_shipped_path_outside_the_kernel_is_compared" time="0.854" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_an_overlay_file_the_project_edits_is_still_not_drift" time="0.782" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_the_gov_os_repository_itself_stays_unmeasured[before any release]" time="0.934" /><testcase classname="tests.acceptance.W2-16.test_w2_16_doctor" name="test_the_gov_os_repository_itself_stays_unmeasured[holding releases]" time="0.004"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_the_same_version_from_an_older_integration_commit_is_refused[the first release's record commit]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_the_same_version_from_an_older_integration_commit_is_refused[the first release's own commit]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_the_same_version_after_its_record_was_removed_is_refused[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_the_same_version_after_its_record_was_removed_is_refused[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_the_same_version_as_an_existing_owner_tag_is_refused[lightweight tag]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_the_same_version_as_an_existing_owner_tag_is_refused[annotated tag]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_a_release_never_hashes_bytes_the_commit_does_not_hold[--assume-unchanged]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_immutability" name="test_a_release_never_hashes_bytes_the_commit_does_not_hold[--skip-worktree]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_a_project_copied_from_a_release_tag_records_the_release_version_in_its_lock" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_a_project_copied_from_a_release_tag_records_the_manifest_hash_in_its_lock" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_a_project_updated_to_a_later_release_records_that_release_in_its_lock" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_doctor_passes_on_a_project_installed_from_a_release[copied]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_doctor_passes_on_a_project_installed_from_a_release[updated]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_a_release_installed_from_an_unsigned_lightweight_tag_is_accepted" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_a_release_installed_from_an_unsigned_annotated_tag_is_accepted" time="0.011"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_copy_refuses_a_release_that_does_not_match_its_hashes[a shipped file changed]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_copy_refuses_a_release_that_does_not_match_its_hashes[a file added]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_copy_refuses_a_release_that_does_not_match_its_hashes[a shipped file removed]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_copy_refuses_a_release_that_does_not_match_its_hashes[the manifest's own hash wrong]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_copy_refuses_a_release_that_does_not_match_its_hashes[a file hash in the manifest wrong]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_update_refuses_a_release_that_does_not_match_its_hashes[a shipped file changed]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_copier_update_refuses_a_release_that_does_not_match_its_hashes[the manifest's own hash wrong]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_the_lock_task_runs_where_python3_does_not_import_gov[plain template source]" time="4.882" /><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_the_lock_task_runs_where_python3_does_not_import_gov[release]" time="0.003"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_install" name="test_every_gov_the_suite_runs_is_this_worktree_s" time="0.151" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_lock_from_a_source_with_no_release_record_is_refused_where_the_lock_records_a_release[a plain folder]" time="0.001"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_lock_from_a_source_with_no_release_record_is_refused_where_the_lock_records_a_release[a git repository with a version tag]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_lock_from_the_installed_release_s_own_source_never_makes_an_edited_kernel_pass" time="0.002"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_a_source_whose_release_records_were_removed_is_refused[copier copy]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_a_source_whose_release_records_were_removed_is_refused[copier update from 1.4.0]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_a_source_whose_release_records_were_removed_is_refused[gov release --lock-from by hand]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_a_lock_whose_release_entries_were_deleted_fails[the release entries alone]" time="0.001"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_a_lock_whose_release_entries_were_deleted_fails[and a kernel file with its lock hash edited together]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=engineer]" time="0.571" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=independent-auditor]" time="0.495" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=independent-test-designer]" time="0.628" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=product-spec]" time="0.638" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=research]" time="0.497" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=ticket-lead]" time="0.686" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=w2-16-unknown-role]" time="0.642" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE set and empty]" time="0.525" /><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=orchestrator]" time="1.812"><failure message="AssertionError: `gov release 1.4.0` was not refused although the build form is the owner's alone from a plain terminal (DEC-772), and GOV_ROLE=orchestrator, no terminal&#10;  gov release 1.4.0&#10;  exit code: 0&#10;  stdout:&#10;  {&#10;    &quot;version&quot;: &quot;1.4.0&quot;,&#10;    &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/gov-os/docs/releases/1.4.0&quot;&#10;  }&#10;  &#10;  stderr:&#10;  &#10;assert 0 != 0&#10; +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  &quot;version&quot;: &quot;1.4.0&quot;,\n  &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/gov-os/docs/releases/1.4.0&quot;\n}\n', stderr='').returncode">request = &lt;FixtureRequest for &lt;Function test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE=orchestrator]&gt;&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/sandbox/elsewhere'))
+call = ('gov release &lt;version&gt;', 'orchestrator')
+
+    @pytest.mark.parametrize("call", REFUSED_CALLS, ids=_call_id)
+    def test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner(request, sandbox, call):
+        """Engineers, auditors, test designers and every other role never cut or rewrite a release: non-zero exit, no
+        traceback, nothing written (the whole snapshot; for --lock-from, the project's lock as it was: absent).
+        `--lock-from`: the role named (or: only the orchestrator or the owner may release); the same call releases as the
+        orchestrator and as the owner (the next case).
+    
+        **Rewritten (DEC-772 item 1, which replaces DEC-761 item 1's line for the build form; Rewrite-Reason: DEC-772).**
+        The build form `gov release &lt;version&gt;` is the owner's alone, from a plain terminal: these runs (an agent's
+        session or none, no terminal) are refused for every GOV_ROLE value, `orchestrator` included, and with GOV_ROLE
+        unset, with the code RELEASE_REFUSED and a reason said in words (which one is not fixed). Its earlier positive
+        controls (`orchestrator`, unset) are refusals here; the seam's positive control replaces them
+        (`test_w2_16_owner_terminal.py::test_the_owner_in_person_builds_the_release`). The `--lock-from` half is as it
+        was."""
+        form, role = call
+        where = _where(form, request)
+        before, lock_before = support.snapshot(where), support.lock_bytes(where)
+        run = _release_in(form, where, request, sandbox, role)
+        text = run.output.lower()
+        if form == BUILD:
+            why = f"the build form is the owner's alone from a plain terminal (DEC-772), and {_role_id(role)}, no terminal"
+&gt;           _assert_refused(run, why)
+
+tests/acceptance/W2-16/test_w2_16_last_round.py:347: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  "version": "1.4.0",\n  "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/gov-os/docs/releases/1.4.0"\n}\n', stderr='')
+why = "the build form is the owner's alone from a plain terminal (DEC-772), and GOV_ROLE=orchestrator, no terminal"
+
+    def _assert_refused(run, why):
+&gt;       assert run.returncode != 0, f"`gov {' '.join(run.args)}` was not refused although {why}\n{run.describe()}"
+E       AssertionError: `gov release 1.4.0` was not refused although the build form is the owner's alone from a plain terminal (DEC-772), and GOV_ROLE=orchestrator, no terminal
+E         gov release 1.4.0
+E         exit code: 0
+E         stdout:
+E         {
+E           "version": "1.4.0",
+E           "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/gov-os/docs/releases/1.4.0"
+E         }
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  "version": "1.4.0",\n  "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every0/gov-os/docs/releases/1.4.0"\n}\n', stderr='').returncode
+
+tests/acceptance/W2-16/test_w2_16_last_round.py:77: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE unset (the owner)]" time="1.444"><failure message="AssertionError: `gov release 1.4.0` was not refused although the build form is the owner's alone from a plain terminal (DEC-772), and GOV_ROLE unset (the owner), no terminal&#10;  gov release 1.4.0&#10;  exit code: 0&#10;  stdout:&#10;  {&#10;    &quot;version&quot;: &quot;1.4.0&quot;,&#10;    &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/gov-os/docs/releases/1.4.0&quot;&#10;  }&#10;  &#10;  stderr:&#10;  &#10;assert 0 != 0&#10; +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  &quot;version&quot;: &quot;1.4.0&quot;,\n  &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/gov-os/docs/releases/1.4.0&quot;\n}\n', stderr='').returncode">request = &lt;FixtureRequest for &lt;Function test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release &lt;version&gt;-GOV_ROLE unset (the owner)]&gt;&gt;
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/sandbox/elsewhere'))
+call = ('gov release &lt;version&gt;', &lt;object object at 0x783b01d7a0f0&gt;)
+
+    @pytest.mark.parametrize("call", REFUSED_CALLS, ids=_call_id)
+    def test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner(request, sandbox, call):
+        """Engineers, auditors, test designers and every other role never cut or rewrite a release: non-zero exit, no
+        traceback, nothing written (the whole snapshot; for --lock-from, the project's lock as it was: absent).
+        `--lock-from`: the role named (or: only the orchestrator or the owner may release); the same call releases as the
+        orchestrator and as the owner (the next case).
+    
+        **Rewritten (DEC-772 item 1, which replaces DEC-761 item 1's line for the build form; Rewrite-Reason: DEC-772).**
+        The build form `gov release &lt;version&gt;` is the owner's alone, from a plain terminal: these runs (an agent's
+        session or none, no terminal) are refused for every GOV_ROLE value, `orchestrator` included, and with GOV_ROLE
+        unset, with the code RELEASE_REFUSED and a reason said in words (which one is not fixed). Its earlier positive
+        controls (`orchestrator`, unset) are refusals here; the seam's positive control replaces them
+        (`test_w2_16_owner_terminal.py::test_the_owner_in_person_builds_the_release`). The `--lock-from` half is as it
+        was."""
+        form, role = call
+        where = _where(form, request)
+        before, lock_before = support.snapshot(where), support.lock_bytes(where)
+        run = _release_in(form, where, request, sandbox, role)
+        text = run.output.lower()
+        if form == BUILD:
+            why = f"the build form is the owner's alone from a plain terminal (DEC-772), and {_role_id(role)}, no terminal"
+&gt;           _assert_refused(run, why)
+
+tests/acceptance/W2-16/test_w2_16_last_round.py:347: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  "version": "1.4.0",\n  "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/gov-os/docs/releases/1.4.0"\n}\n', stderr='')
+why = "the build form is the owner's alone from a plain terminal (DEC-772), and GOV_ROLE unset (the owner), no terminal"
+
+    def _assert_refused(run, why):
+&gt;       assert run.returncode != 0, f"`gov {' '.join(run.args)}` was not refused although {why}\n{run.describe()}"
+E       AssertionError: `gov release 1.4.0` was not refused although the build form is the owner's alone from a plain terminal (DEC-772), and GOV_ROLE unset (the owner), no terminal
+E         gov release 1.4.0
+E         exit code: 0
+E         stdout:
+E         {
+E           "version": "1.4.0",
+E           "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/gov-os/docs/releases/1.4.0"
+E         }
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  "version": "1.4.0",\n  "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_release_refuses_every1/gov-os/docs/releases/1.4.0"\n}\n', stderr='').returncode
+
+tests/acceptance/W2-16/test_w2_16_last_round.py:77: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=engineer]" time="0.003"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=independent-auditor]" time="0.003"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=independent-test-designer]" time="0.003"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=product-spec]" time="0.003"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=research]" time="0.002"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=ticket-lead]" time="0.002"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=w2-16-unknown-role]" time="0.002"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE set and empty]" time="0.002"><failure message="Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_runs_for_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE=orchestrator]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_gov_release_runs_for_the_orchestrator_and_the_owner[gov release --lock-from-GOV_ROLE unset (the owner)]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_last_round" name="test_the_suite_runs_gov_and_copier_with_gov_role_unset" time="0.003" /><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_the_owner_in_person_builds_the_release[plain-terminal-to-init]" time="0.484"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_owner_in_person_build0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_owner_in_person_build0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_owner_in_person_build0/sandbox/elsewhere'))
+ancestry = [{'cmdline': ['python3', '-m', 'gov.cli.main', 'release', '1.4.0'], 'comm': 'python3', 'exe': '/usr/bin/python3.12', '... 'bash', 'exe': '/usr/bin/bash', 'pid': 3990, ...}, {'cmdline': ['/init'], 'comm': 'init', 'exe': None, 'pid': 1, ...}]
+
+    @pytest.mark.parametrize("ancestry", (support.PLAIN_TERMINAL, support.EDITOR_TERMINAL),
+                             ids=("plain-terminal-to-init", "editor-terminal-to-systemd"))
+    def test_the_owner_in_person_builds_the_release(repo, sandbox, ancestry):
+        """A planted chain that reaches process 1 (`init`, `systemd`) with no Claude Code session in it, a
+        pseudo-terminal, the one code `RELEASE-&lt;4 digits&gt;` it shows typed back, GOV_ROLE and GOV_TICKET absent: the build
+        is what it was before this round. The record under `docs/releases/&lt;version&gt;/`, nothing else changed, no commit,
+        no tag; the result `{"version": &lt;version&gt;, "record": &lt;the record's folder&gt;}`."""
+        before_head, before_refs = support.head(repo), support.git(repo, "for-each-ref")
+&gt;       run = support.release_through_the_seam(repo, sandbox, VERSION, ancestry=ancestry)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_the_owner_in_person_builds_the_release[editor-terminal-to-systemd]" time="0.423"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_owner_in_person_build1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_owner_in_person_build1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_owner_in_person_build1/sandbox/elsewhere'))
+ancestry = [{'cmdline': ['python3', '-m', 'gov.cli.main', 'release', '1.4.0'], 'comm': 'python3', 'exe': '/usr/bin/python3.12', '...usr/bin/dash', 'pid': 3970, ...}, {'cmdline': ['/sbin/init', 'splash'], 'comm': 'systemd', 'exe': None, 'pid': 1, ...}]
+
+    @pytest.mark.parametrize("ancestry", (support.PLAIN_TERMINAL, support.EDITOR_TERMINAL),
+                             ids=("plain-terminal-to-init", "editor-terminal-to-systemd"))
+    def test_the_owner_in_person_builds_the_release(repo, sandbox, ancestry):
+        """A planted chain that reaches process 1 (`init`, `systemd`) with no Claude Code session in it, a
+        pseudo-terminal, the one code `RELEASE-&lt;4 digits&gt;` it shows typed back, GOV_ROLE and GOV_TICKET absent: the build
+        is what it was before this round. The record under `docs/releases/&lt;version&gt;/`, nothing else changed, no commit,
+        no tag; the result `{"version": &lt;version&gt;, "record": &lt;the record's folder&gt;}`."""
+        before_head, before_refs = support.head(repo), support.git(repo, "for-each-ref")
+&gt;       run = support.release_through_the_seam(repo, sandbox, VERSION, ancestry=ancestry)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_claude_code_session_among_the_ancestors_refuses_the_build[gov-launch]" time="0.464"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo0/sandbox/elsewhere'))
+shape = 'gov-launch'
+
+    @pytest.mark.parametrize("shape", sorted(support.SESSION_ANCESTRIES))
+    def test_a_claude_code_session_among_the_ancestors_refuses_the_build(repo, sandbox, shape):
+        """Reason `session`: the freeze lift's signs (DEC-409), with a terminal and the code typed back if shown."""
+&gt;       _refused(repo, sandbox, "session", shape, ancestry=support.SESSION_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_claude_code_session_among_the_ancestors_refuses_the_build[headless-p]" time="0.417"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo1/sandbox/elsewhere'))
+shape = 'headless-p'
+
+    @pytest.mark.parametrize("shape", sorted(support.SESSION_ANCESTRIES))
+    def test_a_claude_code_session_among_the_ancestors_refuses_the_build(repo, sandbox, shape):
+        """Reason `session`: the freeze lift's signs (DEC-409), with a terminal and the code typed back if shown."""
+&gt;       _refused(repo, sandbox, "session", shape, ancestry=support.SESSION_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_claude_code_session_among_the_ancestors_refuses_the_build[npm-install-shape]" time="0.586"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo2/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo2/sandbox/elsewhere'))
+shape = 'npm-install-shape'
+
+    @pytest.mark.parametrize("shape", sorted(support.SESSION_ANCESTRIES))
+    def test_a_claude_code_session_among_the_ancestors_refuses_the_build(repo, sandbox, shape):
+        """Reason `session`: the freeze lift's signs (DEC-409), with a terminal and the code typed back if shown."""
+&gt;       _refused(repo, sandbox, "session", shape, ancestry=support.SESSION_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_claude_code_session_among_the_ancestors_refuses_the_build[only-the-command-line-says-it]" time="0.496"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo3/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo3/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo3/sandbox/elsewhere'))
+shape = 'only-the-command-line-says-it'
+
+    @pytest.mark.parametrize("shape", sorted(support.SESSION_ANCESTRIES))
+    def test_a_claude_code_session_among_the_ancestors_refuses_the_build(repo, sandbox, shape):
+        """Reason `session`: the freeze lift's signs (DEC-409), with a terminal and the code typed back if shown."""
+&gt;       _refused(repo, sandbox, "session", shape, ancestry=support.SESSION_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_claude_code_session_among_the_ancestors_refuses_the_build[operator-console]" time="0.416"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo4/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo4/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_claude_code_session_amo4/sandbox/elsewhere'))
+shape = 'operator-console'
+
+    @pytest.mark.parametrize("shape", sorted(support.SESSION_ANCESTRIES))
+    def test_a_claude_code_session_among_the_ancestors_refuses_the_build(repo, sandbox, shape):
+        """Reason `session`: the freeze lift's signs (DEC-409), with a terminal and the code typed back if shown."""
+&gt;       _refused(repo, sandbox, "session", shape, ancestry=support.SESSION_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_chain_that_does_not_reach_process_1_refuses_the_build[a-first-process-that-is-a-shell]" time="0.402"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea0/sandbox/elsewhere'))
+shape = 'a-first-process-that-is-a-shell'
+
+    @pytest.mark.parametrize("shape", sorted(support.UNREADABLE_ANCESTRIES))
+    def test_a_chain_that_does_not_reach_process_1_refuses_the_build(repo, sandbox, shape):
+        """Reason `ancestry`: the chain cannot be read whole up to the system's first process (`init` or `systemd`)."""
+&gt;       _refused(repo, sandbox, "ancestry", shape, ancestry=support.UNREADABLE_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_chain_that_does_not_reach_process_1_refuses_the_build[an-entry-is-not-the-parent-of-the-one-before]" time="0.424"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea1/sandbox/elsewhere'))
+shape = 'an-entry-is-not-the-parent-of-the-one-before'
+
+    @pytest.mark.parametrize("shape", sorted(support.UNREADABLE_ANCESTRIES))
+    def test_a_chain_that_does_not_reach_process_1_refuses_the_build(repo, sandbox, shape):
+        """Reason `ancestry`: the chain cannot be read whole up to the system's first process (`init` or `systemd`)."""
+&gt;       _refused(repo, sandbox, "ancestry", shape, ancestry=support.UNREADABLE_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_chain_that_does_not_reach_process_1_refuses_the_build[nothing-could-be-read]" time="0.393"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea2/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea2/sandbox/elsewhere'))
+shape = 'nothing-could-be-read'
+
+    @pytest.mark.parametrize("shape", sorted(support.UNREADABLE_ANCESTRIES))
+    def test_a_chain_that_does_not_reach_process_1_refuses_the_build(repo, sandbox, shape):
+        """Reason `ancestry`: the chain cannot be read whole up to the system's first process (`init` or `systemd`)."""
+&gt;       _refused(repo, sandbox, "ancestry", shape, ancestry=support.UNREADABLE_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_chain_that_does_not_reach_process_1_refuses_the_build[the-chain-stops-before-the-first-process]" time="0.404"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea3/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea3/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea3/sandbox/elsewhere'))
+shape = 'the-chain-stops-before-the-first-process'
+
+    @pytest.mark.parametrize("shape", sorted(support.UNREADABLE_ANCESTRIES))
+    def test_a_chain_that_does_not_reach_process_1_refuses_the_build(repo, sandbox, shape):
+        """Reason `ancestry`: the chain cannot be read whole up to the system's first process (`init` or `systemd`)."""
+&gt;       _refused(repo, sandbox, "ancestry", shape, ancestry=support.UNREADABLE_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_a_chain_that_does_not_reach_process_1_refuses_the_build[the-sandbox-s-own-first-process]" time="0.590"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea4/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea4/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_a_chain_that_does_not_rea4/sandbox/elsewhere'))
+shape = 'the-sandbox-s-own-first-process'
+
+    @pytest.mark.parametrize("shape", sorted(support.UNREADABLE_ANCESTRIES))
+    def test_a_chain_that_does_not_reach_process_1_refuses_the_build(repo, sandbox, shape):
+        """Reason `ancestry`: the chain cannot be read whole up to the system's first process (`init` or `systemd`)."""
+&gt;       _refused(repo, sandbox, "ancestry", shape, ancestry=support.UNREADABLE_ANCESTRIES[shape])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_gov_role_set_to_any_value_refuses_the_build[GOV_ROLE=orchestrator]" time="0.564"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value0/sandbox/elsewhere'))
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", ("orchestrator", "owner", "engineer", ""),
+                             ids=lambda role: f"GOV_ROLE={role}" if role else "GOV_ROLE set and empty")
+    def test_gov_role_set_to_any_value_refuses_the_build(repo, sandbox, role):
+        """Reason `role`: GOV_ROLE in the environment, whatever its value (`orchestrator`, `owner`, the empty value)."""
+&gt;       _refused(repo, sandbox, "role", f"GOV_ROLE={role!r}", role=role)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_gov_role_set_to_any_value_refuses_the_build[GOV_ROLE=owner]" time="0.452"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value1/sandbox/elsewhere'))
+role = 'owner'
+
+    @pytest.mark.parametrize("role", ("orchestrator", "owner", "engineer", ""),
+                             ids=lambda role: f"GOV_ROLE={role}" if role else "GOV_ROLE set and empty")
+    def test_gov_role_set_to_any_value_refuses_the_build(repo, sandbox, role):
+        """Reason `role`: GOV_ROLE in the environment, whatever its value (`orchestrator`, `owner`, the empty value)."""
+&gt;       _refused(repo, sandbox, "role", f"GOV_ROLE={role!r}", role=role)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_gov_role_set_to_any_value_refuses_the_build[GOV_ROLE=engineer]" time="0.402"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value2/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value2/sandbox/elsewhere'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", ("orchestrator", "owner", "engineer", ""),
+                             ids=lambda role: f"GOV_ROLE={role}" if role else "GOV_ROLE set and empty")
+    def test_gov_role_set_to_any_value_refuses_the_build(repo, sandbox, role):
+        """Reason `role`: GOV_ROLE in the environment, whatever its value (`orchestrator`, `owner`, the empty value)."""
+&gt;       _refused(repo, sandbox, "role", f"GOV_ROLE={role!r}", role=role)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_gov_role_set_to_any_value_refuses_the_build[GOV_ROLE set and empty]" time="0.417"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value3/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value3/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_role_set_to_any_value3/sandbox/elsewhere'))
+role = ''
+
+    @pytest.mark.parametrize("role", ("orchestrator", "owner", "engineer", ""),
+                             ids=lambda role: f"GOV_ROLE={role}" if role else "GOV_ROLE set and empty")
+    def test_gov_role_set_to_any_value_refuses_the_build(repo, sandbox, role):
+        """Reason `role`: GOV_ROLE in the environment, whatever its value (`orchestrator`, `owner`, the empty value)."""
+&gt;       _refused(repo, sandbox, "role", f"GOV_ROLE={role!r}", role=role)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_gov_ticket_set_to_any_value_refuses_the_build[GOV_TICKET=DAEO-49o5]" time="0.408"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_ticket_set_to_any_val0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_ticket_set_to_any_val0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_ticket_set_to_any_val0/sandbox/elsewhere'))
+ticket = 'DAEO-49o5'
+
+    @pytest.mark.parametrize("ticket", ("DAEO-49o5", ""),
+                             ids=lambda ticket: f"GOV_TICKET={ticket}" if ticket else "GOV_TICKET set and empty")
+    def test_gov_ticket_set_to_any_value_refuses_the_build(repo, sandbox, ticket):
+        """Reason `ticket`: GOV_TICKET in the environment, whatever its value (the empty value included)."""
+&gt;       _refused(repo, sandbox, "ticket", f"GOV_TICKET={ticket!r}", ticket=ticket)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_gov_ticket_set_to_any_value_refuses_the_build[GOV_TICKET set and empty]" time="0.424"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_ticket_set_to_any_val1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_ticket_set_to_any_val1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_gov_ticket_set_to_any_val1/sandbox/elsewhere'))
+ticket = ''
+
+    @pytest.mark.parametrize("ticket", ("DAEO-49o5", ""),
+                             ids=lambda ticket: f"GOV_TICKET={ticket}" if ticket else "GOV_TICKET set and empty")
+    def test_gov_ticket_set_to_any_value_refuses_the_build(repo, sandbox, ticket):
+        """Reason `ticket`: GOV_TICKET in the environment, whatever its value (the empty value included)."""
+&gt;       _refused(repo, sandbox, "ticket", f"GOV_TICKET={ticket!r}", ticket=ticket)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_without_a_terminal_on_both_sides_the_build_refuses[pipe-in]" time="0.433"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot0/sandbox/elsewhere'))
+terminal = 'pipe-in'
+
+    @pytest.mark.parametrize("terminal", (support.PIPE_IN, support.PIPE_OUT, support.PIPES, support.NO_TERMINAL))
+    def test_without_a_terminal_on_both_sides_the_build_refuses(repo, sandbox, terminal):
+        """Reason `terminal`: piped input, an output that is no terminal, both pipes, or `/dev/null`. Whatever is shown
+        would be typed back right: the product asks `os.isatty` itself, so the seam is no way round it."""
+&gt;       _refused(repo, sandbox, "terminal", terminal, terminal=terminal)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_without_a_terminal_on_both_sides_the_build_refuses[pipe-out]" time="0.419"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot1/sandbox/elsewhere'))
+terminal = 'pipe-out'
+
+    @pytest.mark.parametrize("terminal", (support.PIPE_IN, support.PIPE_OUT, support.PIPES, support.NO_TERMINAL))
+    def test_without_a_terminal_on_both_sides_the_build_refuses(repo, sandbox, terminal):
+        """Reason `terminal`: piped input, an output that is no terminal, both pipes, or `/dev/null`. Whatever is shown
+        would be typed back right: the product asks `os.isatty` itself, so the seam is no way round it."""
+&gt;       _refused(repo, sandbox, "terminal", terminal, terminal=terminal)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_without_a_terminal_on_both_sides_the_build_refuses[pipes]" time="0.400"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot2/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot2/sandbox/elsewhere'))
+terminal = 'pipes'
+
+    @pytest.mark.parametrize("terminal", (support.PIPE_IN, support.PIPE_OUT, support.PIPES, support.NO_TERMINAL))
+    def test_without_a_terminal_on_both_sides_the_build_refuses(repo, sandbox, terminal):
+        """Reason `terminal`: piped input, an output that is no terminal, both pipes, or `/dev/null`. Whatever is shown
+        would be typed back right: the product asks `os.isatty` itself, so the seam is no way round it."""
+&gt;       _refused(repo, sandbox, "terminal", terminal, terminal=terminal)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_without_a_terminal_on_both_sides_the_build_refuses[devnull]" time="0.413"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot3/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot3/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_without_a_terminal_on_bot3/sandbox/elsewhere'))
+terminal = 'devnull'
+
+    @pytest.mark.parametrize("terminal", (support.PIPE_IN, support.PIPE_OUT, support.PIPES, support.NO_TERMINAL))
+    def test_without_a_terminal_on_both_sides_the_build_refuses(repo, sandbox, terminal):
+        """Reason `terminal`: piped input, an output that is no terminal, both pipes, or `/dev/null`. Whatever is shown
+        would be typed back right: the product asks `os.isatty` itself, so the seam is no way round it."""
+&gt;       _refused(repo, sandbox, "terminal", terminal, terminal=terminal)
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_anything_but_the_shown_code_refuses_the_build[wrong]" time="0.411"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co0/sandbox/elsewhere'))
+reply = 'wrong'
+
+    @pytest.mark.parametrize("reply", (support.WRONG, support.EMPTY_LINE, support.END_OF_INPUT))
+    def test_anything_but_the_shown_code_refuses_the_build(repo, sandbox, reply):
+        """Reason `code`: once every other check passed, one code is shown and one line read; a wrong code, an empty
+        line or the end of input refuses at once (no second prompt, no wait)."""
+&gt;       run = _refused(repo, sandbox, "code", reply, reply=reply)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_anything_but_the_shown_code_refuses_the_build[empty]" time="0.447"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co1/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co1/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co1/sandbox/elsewhere'))
+reply = 'empty'
+
+    @pytest.mark.parametrize("reply", (support.WRONG, support.EMPTY_LINE, support.END_OF_INPUT))
+    def test_anything_but_the_shown_code_refuses_the_build(repo, sandbox, reply):
+        """Reason `code`: once every other check passed, one code is shown and one line read; a wrong code, an empty
+        line or the end of input refuses at once (no second prompt, no wait)."""
+&gt;       run = _refused(repo, sandbox, "code", reply, reply=reply)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_anything_but_the_shown_code_refuses_the_build[eof]" time="0.567"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co2/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co2/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_anything_but_the_shown_co2/sandbox/elsewhere'))
+reply = 'eof'
+
+    @pytest.mark.parametrize("reply", (support.WRONG, support.EMPTY_LINE, support.END_OF_INPUT))
+    def test_anything_but_the_shown_code_refuses_the_build(repo, sandbox, reply):
+        """Reason `code`: once every other check passed, one code is shown and one line read; a wrong code, an empty
+        line or the end of input refuses at once (no second prompt, no wait)."""
+&gt;       run = _refused(repo, sandbox, "code", reply, reply=reply)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:50: in _refused
+    run = support.release_through_the_seam(repo, sandbox, VERSION, limit=support.REFUSAL_LIMIT_S, **planted)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-16/w2_16_support.py:1000: in release_through_the_seam
+    return seam_built(drive_release(root, sandbox, version, **planted)[0])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_the_code_comes_from_the_system_s_random_source" time="0.516"><failure message="AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_code_comes_from_the_s0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_code_comes_from_the_s0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_code_comes_from_the_s0/sandbox/elsewhere'))
+
+    def test_the_code_comes_from_the_system_s_random_source(repo, sandbox):
+        """Twelve calls in one process, Python's `random` seeded with 0 before each, a wrong code typed back: a code
+        drawn from that generator would be the same twelve times; from the system's source, more than one."""
+        before = support.snapshot(repo)
+        runs = support.drive_release(repo, sandbox, VERSION, reply=support.WRONG, runs=RUNS, seed=0,
+                                     limit=support.REFUSAL_LIMIT_S)
+&gt;       support.seam_built(runs[0])
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = SeamRun(status='missing', result=None, error={}, shown='', shown_before_reply='', typed=None, detail='AttributeError("module \'gov.release.command\' has no attribute \'_release_test\'")', log='')
+
+    def seam_built(run):
+        """The seam exists and takes the specification's parameters; the case fails here until it does."""
+        if run.status == MISSING:
+&gt;           raise AssertionError(
+                f"DEC-772 item 1 is not built: {RELEASE_MODULE}.{RELEASE_FUNCTION}(root, version, ancestry=None, "
+                f"terminal=None) is missing or does not take those parameters ({run.detail}). The lead's specification "
+                f"is in tests/acceptance/W2-16/README.md, \"Round 3\".")
+E           AssertionError: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".
+
+tests/acceptance/W2-16/w2_16_support.py:990: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_the_command_refuses_with_standard_input_from_dev_null" time="1.342"><failure message="AssertionError: standard input from /dev/null: `gov release 1.4.0` was not refused&#10;  gov release 1.4.0&#10;  exit code: 0&#10;  stdout:&#10;  {&#10;    &quot;version&quot;: &quot;1.4.0&quot;,&#10;    &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os/docs/releases/1.4.0&quot;&#10;  }&#10;  &#10;  stderr:&#10;  &#10;assert 0 != 0&#10; +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  &quot;version&quot;: &quot;1.4.0&quot;,\n  &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os/docs/releases/1.4.0&quot;\n}\n', stderr='').returncode">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/sandbox/elsewhere'))
+
+    def test_the_command_refuses_with_standard_input_from_dev_null(repo, sandbox):
+        """`gov release 1.4.0` as the suite runs it (GOV_ROLE and GOV_TICKET absent, standard input `/dev/null`, its
+        output a pipe): no terminal, so refused wherever the suite runs."""
+        before = support.snapshot(repo)
+        run = support.run_gov(repo, sandbox, "release", VERSION)
+&gt;       _assert_the_command_refused(repo, before, run, "standard input from /dev/null")
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:185: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os')
+before = {'files': {'.gitignore': ('a7f28052daac66dbc1406feae76a9861659d6c318da369343f6c03bb7edbbc3d', 420), 'copier.yml': ('c0...ure-readiness/templates/tasks.md\n', 'refs': 'refs/heads/w2/integrate 0cde926d2c53f3e78f8ef9e1a7bd5a8c11374760\n', ...}
+run = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  "version": "1.4.0",\n  "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os/docs/releases/1.4.0"\n}\n', stderr='')
+what = 'standard input from /dev/null'
+
+    def _assert_the_command_refused(repo, before, run, what):
+&gt;       assert run.returncode != 0, f"{what}: `gov release {VERSION}` was not refused\n{run.describe()}"
+E       AssertionError: standard input from /dev/null: `gov release 1.4.0` was not refused
+E         gov release 1.4.0
+E         exit code: 0
+E         stdout:
+E         {
+E           "version": "1.4.0",
+E           "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os/docs/releases/1.4.0"
+E         }
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\n  "version": "1.4.0",\n  "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_with_0/gov-os/docs/releases/1.4.0"\n}\n', stderr='').returncode
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:170: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_owner_terminal" name="test_the_command_refuses_on_a_terminal_under_this_suite_s_ancestry" time="1.701"><failure message="AssertionError: on a terminal, this suite's chain refusing (session): `gov release 1.4.0` was not refused&#10;  gov release 1.4.0&#10;  exit code: 0&#10;  stdout:&#10;  {&#13;&#10;    &quot;version&quot;: &quot;1.4.0&quot;,&#13;&#10;    &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os/docs/releases/1.4.0&quot;&#13;&#10;  }&#13;&#10;  &#10;  stderr:&#10;  typed back: None&#10;assert 0 != 0&#10; +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\r\n  &quot;version&quot;: &quot;1.4.0&quot;,\r\n  &quot;record&quot;: &quot;/tmp/gov-os-lead-W2-16...est-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os/docs/releases/1.4.0&quot;\r\n}\r\n', stderr='typed back: None').returncode">repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_on_a_0/sandbox/home')...sewhere=PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_on_a_0/sandbox/elsewhere'))
+
+    def test_the_command_refuses_on_a_terminal_under_this_suite_s_ancestry(repo, sandbox):
+        """`gov release 1.4.0` on a pseudo-terminal, the code typed back if one is shown, GOV_ROLE and GOV_TICKET
+        absent. Run from an agent's session the chain holds a Claude Code session (or, inside a sandbox, cannot be read
+        up to process 1): refused, nothing written. Where this suite's own chain has neither (a plain terminal, a
+        nightly run), the owner's build would be right, and the case is skipped with that reason, never passed."""
+        why = support.why_this_suite_s_ancestry_refuses()
+        if why is None:
+            pytest.skip("this suite's own chain reaches process 1 with no Claude Code session in it: from here "
+                        "`gov release` on a terminal with the code typed back is the owner's build, so no refusal can "
+                        "be asserted (DEC-772 item 1)")
+        before = support.snapshot(repo)
+        run = support.run_gov_on_a_terminal(repo, sandbox, "release", VERSION)
+&gt;       _assert_the_command_refused(repo, before, run, f"on a terminal, this suite's chain refusing ({why})")
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = PosixPath('/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os')
+before = {'files': {'.gitignore': ('a7f28052daac66dbc1406feae76a9861659d6c318da369343f6c03bb7edbbc3d', 420), 'copier.yml': ('c0...ure-readiness/templates/tasks.md\n', 'refs': 'refs/heads/w2/integrate 0cde926d2c53f3e78f8ef9e1a7bd5a8c11374760\n', ...}
+run = Run(args=('release', '1.4.0'), returncode=0, stdout='{\r\n  "version": "1.4.0",\r\n  "record": "/tmp/gov-os-lead-W2-16...est-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os/docs/releases/1.4.0"\r\n}\r\n', stderr='typed back: None')
+what = "on a terminal, this suite's chain refusing (session)"
+
+    def _assert_the_command_refused(repo, before, run, what):
+&gt;       assert run.returncode != 0, f"{what}: `gov release {VERSION}` was not refused\n{run.describe()}"
+E       AssertionError: on a terminal, this suite's chain refusing (session): `gov release 1.4.0` was not refused
+E         gov release 1.4.0
+E         exit code: 0
+E         stdout:
+E         {
+E           "version": "1.4.0",
+E           "record": "/tmp/gov-os-lead-W2-16/pytest-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os/docs/releases/1.4.0"
+E         }
+E         
+E         stderr:
+E         typed back: None
+E       assert 0 != 0
+E        +  where 0 = Run(args=('release', '1.4.0'), returncode=0, stdout='{\r\n  "version": "1.4.0",\r\n  "record": "/tmp/gov-os-lead-W2-16...est-of-usain/pytest-0/test_the_command_refuses_on_a_0/gov-os/docs/releases/1.4.0"\r\n}\r\n', stderr='typed back: None').returncode
+
+tests/acceptance/W2-16/test_w2_16_owner_terminal.py:170: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_a_release_writes_its_record_under_docs_releases_and_changes_nothing_else[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_a_release_writes_its_record_under_docs_releases_and_changes_nothing_else[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_semantic_version[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_semantic_version[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_full_commit_the_release_was_built_from[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_full_commit_the_release_was_built_from[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_lists_every_shipped_file_with_its_sha256[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_lists_every_shipped_file_with_its_sha256[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_second_release_lists_the_shipped_file_that_changed_with_its_new_hash" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_wheel_hash[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_wheel_hash[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_cli_version[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_cli_version[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_schema_versions[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_the_schema_versions[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_release_notes[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_holds_release_notes[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_s_own_hash_is_in_the_record_and_a_reader_finds_it_equal[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_manifest_s_own_hash_is_in_the_record_and_a_reader_finds_it_equal[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_from_a_tree_with_uncommitted_or_untracked_changes[a tracked file changed]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_from_a_tree_with_uncommitted_or_untracked_changes[a change staged]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_from_a_tree_with_uncommitted_or_untracked_changes[an untracked file]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_from_a_tree_with_uncommitted_or_untracked_changes[an untracked file in the template]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_from_a_commit_that_is_not_on_w2_integrate[another branch]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_from_a_commit_that_is_not_on_w2_integrate[a detached commit]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_with_a_version_that_is_not_a_semantic_version[1.4]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_with_a_version_that_is_not_a_semantic_version[1.4.0.0]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_with_a_version_that_is_not_a_semantic_version[latest]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_with_a_version_that_is_not_a_semantic_version[01.4.0]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_with_a_version_that_is_not_a_semantic_version[1.4.0-]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_with_a_version_that_is_not_a_semantic_version[1.4.x]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_no_release_without_a_version" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_building_a_release_creates_no_tag[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_building_a_release_creates_no_tag[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_building_a_release_signs_nothing[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_building_a_release_signs_nothing[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_same_version_from_another_commit_is_refused_and_its_record_left_as_it_was[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_same_version_from_another_commit_is_refused_and_its_record_left_as_it_was[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_release_holds_the_vendored_skills_version[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_release_holds_the_vendored_skills_version[second]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_release_holds_the_vendored_skills_upstream_licence[first]" time="0.000"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase><testcase classname="tests.acceptance.W2-16.test_w2_16_release" name="test_the_release_holds_the_vendored_skills_upstream_licence[second]" time="0.001"><error message="failed on setup with &quot;Failed: DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError(&quot;module 'gov.release.command' has no attribute '_release_test'&quot;)). The lead's specification is in tests/acceptance/W2-16/README.md, &quot;Round 3&quot;.&quot;">DEC-772 item 1 is not built: gov.release.command._release_test(root, version, ancestry=None, terminal=None) is missing or does not take those parameters (AttributeError("module 'gov.release.command' has no attribute '_release_test'")). The lead's specification is in tests/acceptance/W2-16/README.md, "Round 3".</error></testcase></testsuite></testsuites>

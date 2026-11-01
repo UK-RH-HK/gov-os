@@ -1,0 +1,5 @@
+control exit 0
+control record /home/usain/gov-os-runs/W2-55/records/measure-memory-retrieval-visible-20261101T042015457494Z.json
+head exit 0
+/home/usain/gov-os-runs/W2-55/records/measure-memory-retrieval-visible-20261101T043140266796Z.json
+done

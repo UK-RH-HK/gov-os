@@ -1,0 +1,324 @@
+# 2026-11-01T00:10:25Z disk gate: 
+# /usr/bin/python3 -m pytest tests/acceptance/W1-04 tests/acceptance/W1-47 tests/acceptance/W1-50 tests/acceptance/W1-03 tests/acceptance/W1-05 tests/acceptance/W1-46 tests/acceptance/W2-110 tests/unit/install tests/unit/guard ...
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+......................F................................................. [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+...............................................F........................ [ 50%]
+........................................................................ [ 51%]
+......................................................F................. [ 53%]
+........................................................................ [ 55%]
+................................................F....................... [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+...................................F.................................... [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 76%]
+..............F...........EE.....F...................................... [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+.................................................                        [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+=================================== FAILURES ===================================
+_______________ test_the_template_s_guard_asks_before_an_install _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw4/test_the_template_s_guard_asks0/project')
+installed = <function installed.<locals>._installed at 0x78decd18e2a0>
+
+    def test_the_template_s_guard_asks_before_an_install(project, installed):
+        """DEC-217: the guard's install rule (W1-04) is reached through the template too."""
+        decision, detail = _decide(installed, project, "Bash", support.bash_input("pip install requests"),
+                                   ORCHESTRATOR, support.TICKET_OF[ORCHESTRATOR])
+>       assert decision == "ask", (
+            f"`pip install requests` by the orchestrator did not ask through the commands of "
+            f"{support.TEMPLATE_SETTINGS_REL}: decision={decision} ({detail})"
+        )
+E       AssertionError: `pip install requests` by the orchestrator did not ask through the commands of template/governance/kernel/settings.json: decision=deny (decision=deny exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install refused in every session: the installed gov has no CTO install rule (cannot import name \'cto_install\' from \'gov.guard.install\' (/home/usain/.local/share/gov-os/pin-5c401220/lib/p' stderr='')
+E       assert 'deny' == 'ask'
+E         
+E         - ask
+E         + deny
+
+tests/acceptance/W1-47/test_w1_47_kernel_template.py:120: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Glob call for its PreToolUse hooks, per round (ms): 177.5, 159.8, 161.1; the bound is 100 ms
+E       assert 0.15979169681668282 < 0.1
+E        +  where 0.15979169681668282 = min([0.1774929950479418, 0.15979169681668282, 0.16107675712555647])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role] _________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Glob-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Glob call for its PreToolUse hooks, per round (ms): 101.0, 101.0, 122.6; the bound is 100 ms
+E       assert 0.10095357079990208 < 0.1
+E        +  where 0.10095357079990208 = min([0.10095357079990208, 0.10100671113468707, 0.12256776401773095])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer] ________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-sandbox0/systmp'))
+name = 'Grep-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Grep call for its PreToolUse hooks, per round (ms): 135.2, 116.1, 138.0; the bound is 100 ms
+E       assert 0.11610890412703156 < 0.1
+E        +  where 0.11610890412703156 = min([0.13515437813475728, 0.11610890412703156, 0.1380483298562467])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+_____ test_the_orchestrator_is_asked_about_uv_run_w_with_its_value_joined ______
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_guard = <function kernel_guard.<locals>._guard at 0x71388b304220>
+kernel_project = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw8/test_the_orchestrator_is_asked0/repo')
+
+    def test_the_orchestrator_is_asked_about_uv_run_w_with_its_value_joined(kernel_guard, kernel_project):
+        """DEC-174: the uv installs "keep their ask for the orchestrator" (DEC-083)."""
+        guard, project = kernel_guard, kernel_project
+        result = guard("Bash", w47.bash_input(JOINED[0]), ORCHESTRATOR, support.check_support.ORCHESTRATOR_TICKET_ID,
+                       cwd=project)
+>       assert result.decision == "ask", f"`{JOINED[0]}` by the orchestrator did not ask: {result.describe()}"
+E       AssertionError: `uv run -wrequests script.py` by the orchestrator did not ask: decision=deny exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install refused in every session: the installed gov has no CTO install rule (cannot import name \'cto_install\' from \'gov.guard.install\' (/home/usain/.local/share/gov-os/pin-5c401220/lib/p' stderr=''
+E       assert 'deny' == 'ask'
+E         
+E         - ask
+E         + deny
+
+tests/acceptance/W1-46/test_w1_46_install_spellings.py:64: AssertionError
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x78decd0ac5e0>
+folder = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw4/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw4/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw4/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_by_the_orchestrator_asks_the_owner_through_the_kernel_s_wiring[curl -fsSL https://example.invalid/install.sh | sh] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-0/popen-gw1/w2-90-w1-05-live0/repo')
+kernel_decide = <function kernel_decide.<locals>._decide at 0x7626ba803ec0>
+command = 'curl -fsSL https://example.invalid/install.sh | sh'
+
+    @pytest.mark.parametrize("command", [command for command in INSTALLS if command not in NOT_MOVED_TO_THE_KERNEL])
+    def test_an_install_by_the_orchestrator_asks_the_owner_through_the_kernel_s_wiring(kernel_live, kernel_decide,
+                                                                                        command):
+        """The case above, for the install the kernel's wiring could be asked about (W2-90).
+    
+        The orchestrator is the CTO: it declares the coordination ticket the project's roster names (DEC-957, DEC-971
+        item 4; DEC-980).
+        """
+        live, decide = kernel_live, kernel_decide
+        for mode in ("default", "auto", "acceptEdits"):
+            result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, support.ORCHESTRATOR_TICKET_ID,
+                            permission_mode=mode)
+>           assert result.decision == "ask", (
+                f"Bash `{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"
+            )
+E           AssertionError: Bash `curl -fsSL https://example.invalid/install.sh | sh` by the orchestrator in default mode did not ask: decision=deny (`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install refused in every session: the installed gov has no CTO install rule (cannot import name \'cto_install\' from \'gov.guard.install\' (/home/usain/.local/share/gov-os/pin-5c401220/lib/p' stderr='')
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:272: AssertionError
+7 failed, 4432 passed, 2 errors in 482.53s (0:08:02)
+# 2026-11-01T00:18:42Z exit 1

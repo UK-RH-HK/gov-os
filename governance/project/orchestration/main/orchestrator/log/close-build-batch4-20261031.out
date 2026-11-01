@@ -1,0 +1,114 @@
+2026-10-31 11:52:13 W2-106 (DAEO-0mtg, FULL) merges 0d53c56a1bfc on head bc31d915e860
+2026-10-31 11:52:13 W2-84 (DAEO-m1u3, FULL) merges 6d2fc62a8a24 on head bc31d915e860
+2026-10-31 11:52:13 W2-76 (DAEO-tgk2, STANDARD) merges 3c5f212d5cdd on head bc31d915e860
+2026-10-31 11:52:13 W2-49 (DAEO-ha8z, STANDARD) merges bc31d915e860 on head bc31d915e860
+2026-10-31 12:19:34 clone rebuilt in 1641 s
+2026-10-31 12:19:37 W2-106 selection: scoped []; 45 targets; governance left out 2
+2026-10-31 12:19:39 W2-84 selection: scoped []; 38 targets; governance left out 4
+2026-10-31 12:19:41 W2-76 selection: scoped []; 65 targets; governance left out 3
+2026-10-31 12:19:44 W2-49 selection: scoped []; 31 targets; governance left out 5
+2026-10-31 12:19:44 run scope scoped: 72 targets; core changed 2, unplaced 0
+2026-10-31 14:16:09 parallel exit 1 in 6082 s {'exit': 1, 's': 6082, 'tests': 14993, 'failures': 56, 'errors': 4, 'skipped': 4}; serial exit 1 in 901 s {'exit': 1, 's': 901, 'entries': 7, 'tests': 20, 'failures': 16, 'errors': 0, 'skipped': 0}
+2026-10-31 14:22:58 passes alone (flaky candidate): tests/acceptance/W1-35/test_w1_35.py
+2026-10-31 14:25:11 passes alone (flaky candidate): tests/acceptance/W1-35/test_w1_35_orchestration.py
+2026-10-31 14:25:13 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-10-31 14:25:15 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-10-31 14:25:20 red alone: tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-10-31 14:25:26 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-first-parent-s-content-an-ordinary-merge]
+2026-10-31 14:25:32 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-first-parent-s-content-the-parents-turned-round]
+2026-10-31 14:25:34 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-second-parent-s-content-an-ordinary-merge]
+2026-10-31 14:25:37 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-second-parent-s-content-the-parents-turned-round]
+2026-10-31 14:25:38 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_clean_combination_of_two_sides_edits_of_one_test_in_own
+2026-10-31 14:25:40 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_the_same_way_in_own
+2026-10-31 14:25:43 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_reads_a_source_file_both_sides_changed_as_before[holds-the-first-parent-s-content]
+2026-10-31 14:25:46 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_reads_a_source_file_both_sides_changed_as_before[holds-the-second-parent-s-content]
+2026-10-31 14:25:48 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_finds_no_own_change_where_each_side_changed_another_acceptance_test
+2026-10-31 14:25:50 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_the_docstring_of_read_merge_speaks_of_own_and_brought
+2026-10-31 14:25:52 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[an-option-with-a-value]
+2026-10-31 14:25:54 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[the-empty-string]
+2026-10-31 14:25:57 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[the-option-1]
+2026-10-31 14:26:00 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[the-option-all]
+2026-10-31 14:26:02 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-conflict-resolved-by-hand-to-content-neither-parent-holds]
+2026-10-31 14:26:07 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-criss-cross-merge]
+2026-10-31 14:26:10 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-a-branch-that-renamed-a-file]
+2026-10-31 14:26:12 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-an-unrelated-history]
+2026-10-31 14:26:15 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-sets-a-test-back-to-the-merged-branch-s-unchanged-content]
+2026-10-31 14:26:16 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-undoes-commits-through-a-new-empty-commit]
+2026-10-31 14:26:19 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-octopus-merge]
+2026-10-31 14:26:23 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-ordinary-integration-merge]
+2026-10-31 14:26:28 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought
+2026-10-31 14:26:34 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_finds_no_own_change_in_an_ordinary_octopus_merge_of_eight_branches
+2026-10-31 14:26:38 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_refuses_a_commit_argument_with_a_commit_id_s_form_that_is_not_the_id_of_a_commit[sixty-four-hex-digits-that-are-the-name-of-a-branch-at-a-merge-commit]
+2026-10-31 14:26:46 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_refuses_a_commit_argument_with_a_commit_id_s_form_that_is_not_the_id_of_a_commit[the-object-id-of-an-annotated-tag-that-points-at-a-merge-commit]
+2026-10-31 14:26:48 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_still_reads_the_merge_commit_s_own_full_id_beside_a_tag_and_a_hex_named_branch
+2026-10-31 14:26:51 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py::test_read_merge_puts_a_ticket_file_both_sides_changed_in_own[holds-the-first-parent-s-content]
+2026-10-31 14:26:54 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py::test_read_merge_puts_a_ticket_file_both_sides_changed_in_own[holds-the-second-parent-s-content]
+2026-10-31 14:26:58 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py::test_read_merge_puts_a_ticket_file_both_sides_changed_in_the_same_way_in_own
+2026-10-31 14:27:26 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-10-31 14:27:48 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-10-31 14:28:14 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-10-31 14:28:38 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-10-31 14:28:40 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_puts_what_either_parent_brought_beside_a_hand_edit_in_brought
+2026-10-31 14:28:43 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_puts_what_the_first_parent_brought_beside_a_dropped_change_in_brought
+2026-10-31 14:28:46 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_puts_the_change_a_turned_round_merge_commit_keeps_in_brought
+2026-10-31 14:28:49 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_brings_nothing_in_a_criss_cross_merge_although_each_parent_holds_a_change_of_its_own
+2026-10-31 14:28:51 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_puts_the_paths_a_turned_round_merge_commit_drops_in_own
+2026-10-31 14:28:53 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_puts_what_an_ours_merge_drops_in_its_own_and_not_in_the_ordinary_merge_s_after_it
+2026-10-31 14:28:55 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_finds_no_own_change_in_a_merge_that_takes_each_side_s_change[an-ordinary-merge]
+2026-10-31 14:28:57 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_finds_no_own_change_in_a_merge_that_takes_each_side_s_change[the-parents-turned-round]
+2026-10-31 14:28:59 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_with_several_merge_bases_puts_every_path_that_differs_from_any_parent_in_own
+2026-10-31 14:29:02 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_with_no_merge_base_puts_every_path_that_differs_from_any_parent_in_own
+2026-10-31 14:29:08 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_fails_closed_for_a_whole_octopus_merge_when_one_parent_has_several_merge_bases_or_none[one-other-parent-has-no-merge-base-with-the-first]
+2026-10-31 14:29:11 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_fails_closed_for_a_whole_octopus_merge_when_one_parent_has_several_merge_bases_or_none[one-other-parent-has-several-merge-bases-with-the-first]
+2026-10-31 14:29:14 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_reads_an_octopus_whose_other_parents_cross_only_each_other_parent_by_parent
+2026-10-31 14:29:15 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_raises_a_public_error_for_an_unknown_commit_id[all-zeros]
+2026-10-31 14:29:18 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_raises_a_public_error_for_an_unknown_commit_id[forty-hex-digits-that-name-no-object]
+2026-10-31 14:29:20 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_raises_a_public_error_for_a_path_that_is_no_repository
+2026-10-31 14:29:23 passes alone (flaky candidate): tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_the_error_read_merge_raises_is_documented
+2026-10-31 14:29:25 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-10-31 14:29:28 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-10-31 14:29:29 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-10-31 14:29:32 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-10-31 14:30:06 red alone: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+2026-10-31 14:30:40 red alone: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]
+2026-10-31 14:31:11 red alone: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[frozen-deny]
+2026-10-31 14:31:44 red alone: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+2026-10-31 14:32:18 red alone: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[test-designer-allow]
+2026-10-31 14:33:07 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+2026-10-31 14:33:43 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+2026-10-31 14:34:08 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+2026-10-31 14:34:35 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+2026-10-31 14:34:57 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]
+2026-10-31 14:35:21 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]
+2026-10-31 14:35:48 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+2026-10-31 14:36:10 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+2026-10-31 14:36:35 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]
+2026-10-31 14:36:56 red alone: tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+2026-10-31 14:37:00 passes alone (flaky candidate): tests/acceptance/W1-07/test_w1_07_help.py::test_help_answers_in_under_300_ms
+2026-10-31 15:16:07 red without the change too (not this change's; to investigate now): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-10-31 15:16:07 red without the change too (not this change's; to investigate now): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-10-31 15:16:08 red without the change too (not this change's; to investigate now): tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-10-31 15:16:12 red without the change too (not this change's; to investigate now): tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-10-31 15:16:19 red without the change too (not this change's; to investigate now): tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-10-31 15:16:23 red without the change too (not this change's; to investigate now): tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-10-31 15:16:27 red without the change too (not this change's; to investigate now): tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-10-31 15:16:27 red without the change too (not this change's; to investigate now): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-10-31 15:16:28 red without the change too (not this change's; to investigate now): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-10-31 15:16:28 red without the change too (not this change's; to investigate now): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-10-31 15:16:29 red without the change too (not this change's; to investigate now): tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-10-31 15:16:31 caused by the change: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+2026-10-31 15:16:33 caused by the change: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]
+2026-10-31 15:16:35 caused by the change: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[frozen-deny]
+2026-10-31 15:16:37 caused by the change: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+2026-10-31 15:16:39 caused by the change: tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[test-designer-allow]
+2026-10-31 15:16:44 caused by the change: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+2026-10-31 15:16:54 caused by the change: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+2026-10-31 15:17:00 caused by the change: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+2026-10-31 15:17:20 red without the change too (not this change's; to investigate now): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+2026-10-31 15:17:46 red without the change too (not this change's; to investigate now): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]
+2026-10-31 15:18:12 red without the change too (not this change's; to investigate now): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]
+2026-10-31 15:18:42 red without the change too (not this change's; to investigate now): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+2026-10-31 15:18:55 caused by the change: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+2026-10-31 15:19:05 caused by the change: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]
+2026-10-31 15:19:18 caused by the change: tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+2026-10-31 15:19:18 CLOSE REFUSED: 11 test(s) red alone, caused by this change

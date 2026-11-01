@@ -1,0 +1,9 @@
+W2-11 (DAEO-k7hz): merge the independent test designer's round-1 acceptance tests (DEC-963)
+
+The tests worktree's branch w2/W2-11-tests (tests/acceptance/W2-11/ and the W1-35 revisions under
+DEC-820, DEC-847, DEC-838 and DEC-837) merged into the ticket's branch between the implementer's batches.
+
+Task: DAEO-k7hz
+Implements: DEC-963, DEC-959, CAP-33
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

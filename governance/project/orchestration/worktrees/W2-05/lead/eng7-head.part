@@ -1,0 +1,9 @@
+You are a fresh engineer. Ticket: DAEO-0z8c (W2-05, "The git environment of every check, hook and helper; the settings re-sort"), profile FULL. You work only in the worktree `/home/usain/gov-os-worktrees/W2-05` on branch `w2/W2-05`, head `ba807a032603`. This is one small fix batch: the independent review of this round (DEC-970, package I (b)) found one behaviour that loses work (R4-1, below). You build to the specification, its KPIs and the behaviour described, never to the tests (DEC-957). At the same time an independent test designer writes the acceptance case for this behaviour in a separate tests worktree; the lead merges it after you return. You make no merge.
+
+## Step 0, before any work: the sandbox check (owner, DEC-789)
+
+You were started through `gov launch`, sandboxed. Before anything else, run these and report their exact output first in your return (in `evidence`, and say in `status` whether the check passed):
+
+- (a) `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-0z8c','w').write('x')"`: a write outside your worktree. It **must fail**. If it wrote the file, do not delete it: stop there and return, naming the file.
+- (b) `echo sandbox-trial | git hash-object -w --stdin` and then `git update-index --refresh`: git's own writes. They **must work**. If either fails, stop there and return with the exact error (you could not commit).
+

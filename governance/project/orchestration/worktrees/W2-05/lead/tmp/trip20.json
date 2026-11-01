@@ -1,0 +1,87 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "head",
+   "before": "110125ddda0b",
+   "after": "a5b728d2f8a7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "head",
+   "before": "2281b081cc7d",
+   "after": "0263e8c4e828"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55",
+   "change": "acceptance folder",
+   "folder": "W2-55"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-tests",
+   "change": "head",
+   "before": "ae52a5655ce5",
+   "after": "1f7a4dd9f84a"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-55-tests",
+   "change": "acceptance folder",
+   "folder": "W2-55"
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+disk gate open: 874 GiB free, 65193438 inodes free
+Sat Oct 31 02:44:19 GMT 2026
+{"ok": true, "command": "rebuild", "result": {"digest": "cf5711896b74b7898fd993915cf024459b12774e31ce9acd629e7070915c3250", "store": {"digest": "cf5711896b74b7898fd993915cf024459b12774e31ce9acd629e7070915c3250", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "recreated"}}, "compaction": {".gov-runtime/store.db": "compacted", ".gov-runtime/query-vector-cache.db": "compacted", ".gov-runtime/codeintel/home/_config.db": "compacted", ".gov-runtime/codeintel/home/code.db": "compacted"}, "timing": {"lexical_s": 24.8}}, "session": ""}
+Sat Oct 31 04:11:28 GMT 2026

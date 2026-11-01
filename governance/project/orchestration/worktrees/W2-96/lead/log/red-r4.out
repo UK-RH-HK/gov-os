@@ -1,0 +1,7 @@
+/home/usain/gov-os-worktrees/W2-96-tests/src/gov/__init__.py
+1 E           AssertionError: race 3 of 10 (SIGTERM 0.06 s after the nested pytest ended):
+1 E           AssertionError: race 1 of 3 (SIGTERM to both at once):
+1 E                                     AssertionError: run 1 of 3:
+1 E           AssertionError: the clean-up took 6.8 s from the folders' making to gov's end, more than 3 s for 8000 empty sibling folders
+exit 1
+4 failed, 102 passed in 89.78s (0:01:29)

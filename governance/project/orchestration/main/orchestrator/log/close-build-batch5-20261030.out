@@ -1,0 +1,18 @@
+2026-10-30 22:54:39 head pinned by CLOSE-HEAD to aafd45c19725
+2026-10-30 22:54:39 W2-57 (DAEO-cy5o, FULL) merges 6f7ace353a6a,4904a60f420d,57e363c589f4 on head aafd45c19725
+2026-10-30 22:54:39 W2-77 (DAEO-b6hm, FULL) merges 490fd5756700 on head aafd45c19725
+2026-10-30 22:54:39 W2-03 (DAEO-ym8a, STANDARD) merges a8eaf26e84f5 on head aafd45c19725
+2026-10-30 22:54:39 W2-26 (DAEO-2ds6, STANDARD) merges 816f764f36b8 on head aafd45c19725
+2026-10-30 22:54:39 W2-61 (DAEO-iw1f, STANDARD) merges 758cd53f4ced on head aafd45c19725
+2026-10-30 23:28:57 clone rebuilt in 2057 s
+2026-10-30 23:28:57 W2-57 selection: full [{"reason": "SHARED_CORE", "paths": ["src/gov/close/command.py", "src/gov/close/serial.py"]}]; 2 targets; governance left out 8
+2026-10-30 23:28:58 W2-77 selection: full [{"reason": "SHARED_CORE", "paths": ["src/gov/close/nightly.py"]}]; 2 targets; governance left out 2
+2026-10-30 23:28:58 W2-03 selection: full [{"reason": "SHARED_CORE", "paths": ["src/gov/check/citations.py", "src/gov/records/queries.py", "src/gov/store/loader.py"]}]; 2 targets; governance left out 4
+2026-10-30 23:28:59 W2-26 selection: full [{"reason": "UNPLACED", "paths": ["docs/research/EXP-003/examin/README.md", "docs/research/EXP-003/examin/raw/clone.txt", "docs/research/EXP-003/examin/raw/direct-calls.txt", "docs/research/EXP-003/ex; 1 targets; governance left out 2
+2026-10-30 23:29:02 W2-61 selection: scoped []; 34 targets; governance left out 1
+2026-10-30 23:29:02 run scope full
+2026-10-31 01:31:11 parallel exit 1 in 6015 s {'exit': 1, 's': 6015, 'tests': 17091, 'failures': 4, 'errors': 3, 'skipped': 31}; serial exit 0 in 1313 s {'exit': 0, 's': 1313, 'entries': 48, 'tests': 104, 'failures': 0, 'errors': 0, 'skipped': 0}
+2026-10-31 01:31:14 red alone: tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace
+2026-10-31 01:42:23 red alone: tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+2026-10-31 01:42:27 red alone: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]
+2026-10-31 01:42:32 red alone: tests/acceptance/W2-61/test_w2_61_visible_half.py::test_every_source_exists_at_head_and_every_heading_is_found_there

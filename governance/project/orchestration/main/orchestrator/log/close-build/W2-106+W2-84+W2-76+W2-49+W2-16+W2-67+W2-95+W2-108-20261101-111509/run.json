@@ -1,0 +1,399 @@
+{
+ "tickets": [
+  "W2-106",
+  "W2-84",
+  "W2-76",
+  "W2-49",
+  "W2-16",
+  "W2-67",
+  "W2-95",
+  "W2-108"
+ ],
+ "started": "2026-11-01 11:15:09",
+ "reused": "log/close-build/W2-106+W2-84+W2-76+W2-49+W2-16+W2-67+W2-95+W2-108-20261101-005000",
+ "head": "be171b570263",
+ "rebuild_s": 4504,
+ "scope": "scoped",
+ "why_full": [],
+ "selected": [
+  "tests/acceptance/W2-106/",
+  "tests/unit",
+  "tests/acceptance/W1-30/",
+  "tests/acceptance/W1-49/",
+  "tests/acceptance/W1-38/",
+  "tests/acceptance/W1-15/",
+  "tests/acceptance/W2-65/",
+  "tests/acceptance/W2-62/",
+  "tests/acceptance/W1-47/",
+  "tests/acceptance/W1-29/",
+  "tests/acceptance/W1-05/",
+  "tests/acceptance/W1-28/",
+  "tests/acceptance/W1-46/",
+  "tests/acceptance/W1-50/",
+  "tests/acceptance/W2-59/",
+  "tests/acceptance/W2-90/",
+  "tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
+  "tests/acceptance/W1-07/test_w1_07_envelope.py",
+  "tests/acceptance/W1-07/test_w1_07_read_act.py",
+  "tests/acceptance/W1-07/test_w1_07_registry.py",
+  "tests/acceptance/W1-06/test_w1_06_approvals.py",
+  "tests/acceptance/W1-08/test_w1_08_path_map.py",
+  "tests/acceptance/W1-27/test_w1_27_path_compliance.py",
+  "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py",
+  "tests/acceptance/W2-54/test_w2_54_green_here.py",
+  "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+  "tests/acceptance/W1-49/test_w1_49_threshold.py",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths",
+  "tests/acceptance/W1-48/",
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py",
+  "tests/acceptance/W1-42/",
+  "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+  "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails",
+  "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph",
+  "tests/acceptance/W2-02/test_w2_02_green_here.py",
+  "tests/acceptance/W1-08/test_w1_08_ticket.py",
+  "tests/acceptance/W1-08/test_w1_08_probe.py",
+  "tests/acceptance/W1-06/test_w1_06_install_approvals.py",
+  "tests/acceptance/W1-07/test_w1_07_config.py",
+  "tests/acceptance/W1-07/test_w1_07_config_details.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_r5.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_r6.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_r7.py",
+  "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py",
+  "tests/acceptance/W2-84/",
+  "tests/acceptance/W2-58/",
+  "tests/acceptance/W1-45/",
+  "tests/acceptance/W1-27/",
+  "tests/acceptance/W1-02/",
+  "tests/acceptance/W2-76/",
+  "tests/acceptance/W1-41/",
+  "tests/acceptance/W2-54/",
+  "tests/acceptance/W2-107/",
+  "tests/acceptance/W2-69/",
+  "tests/acceptance/W1-07/",
+  "tests/acceptance/W2-50/",
+  "tests/acceptance/W1-13/",
+  "tests/acceptance/W1-25/",
+  "tests/acceptance/W1-26/",
+  "tests/acceptance/W1-31/",
+  "tests/acceptance/W1-32/",
+  "tests/acceptance/W1-33/",
+  "tests/acceptance/W1-35/",
+  "tests/acceptance/W1-39/",
+  "tests/acceptance/W2-01/",
+  "tests/acceptance/W2-07/",
+  "tests/acceptance/W2-16/",
+  "tests/acceptance/W2-53/",
+  "tests/acceptance/W2-57/",
+  "tests/acceptance/W2-66/",
+  "tests/acceptance/W2-68/",
+  "tests/acceptance/W2-77/",
+  "tests/acceptance/W2-49/",
+  "tests/acceptance/W2-02/",
+  "tests/acceptance/W2-95/",
+  "tests/acceptance/W2-108/",
+  "tests/acceptance/W1-17/",
+  "tests/acceptance/W1-19/"
+ ],
+ "core_changed": [
+  "src/gov/check/pathmap.py",
+  "src/gov/guard/reads.py",
+  "src/gov/retrieval/lexical.py",
+  "src/gov/retrieval/semantic.py",
+  "tests/conftest.py"
+ ],
+ "unplaced": [],
+ "gate_wait_s": 0,
+ "parallel": {
+  "exit": 1,
+  "s": 7255,
+  "tests": 15511,
+  "failures": 12,
+  "errors": 6,
+  "skipped": 4
+ },
+ "serial": {
+  "exit": 1,
+  "s": 459,
+  "entries": 8,
+  "tests": 21,
+  "failures": 9,
+  "errors": 0,
+  "skipped": 0
+ },
+ "tests_s": 0,
+ "trace_base": "the known state 1f0bb5b3c516 (given with --base)",
+ "trace": {
+  "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "Failed"
+   ],
+   "failure_without": [
+    "Failed"
+   ]
+  },
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "Failed"
+   ],
+   "failure_without": [
+    "Failed"
+   ]
+  },
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  },
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]": {
+   "rounds": 3,
+   "red_with": 3,
+   "red_without": 3,
+   "without_exit": null,
+   "failure_with": [
+    "AssertionError"
+   ],
+   "failure_without": [
+    "AssertionError"
+   ]
+  }
+ },
+ "flaky_candidates": [
+  "tests/acceptance/W1-35/test_w1_35.py",
+  "tests/acceptance/W1-35/test_w1_35_orchestration.py",
+  "tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_clean_store_is_decided_green",
+  "tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it",
+  "tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_among_many_small_files_is_decided_by_gov_check",
+  "tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here",
+  "tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]",
+  "tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95"
+ ],
+ "unowned_reds": [
+  "tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]",
+  "tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]",
+  "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]",
+  "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]",
+  "tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]",
+  "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]",
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]",
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository",
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket",
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]"
+ ],
+ "reds": [],
+ "wall_s": 2195,
+ "verdict": "CLOSED (build-phase close, DEC-953)",
+ "items": [
+  {
+   "w2": "W2-106",
+   "ticket": "DAEO-0mtg",
+   "profile": "FULL",
+   "merge": "0d53c56a1bfc",
+   "merges": [
+    "0d53c56a1bfcecb3abb6c8bf99d1505c2eb2c58e"
+   ],
+   "review": [
+    "docs/probes/DAEO-0mtg/PR-DAEO-0mtg.md"
+   ],
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-84",
+   "ticket": "DAEO-m1u3",
+   "profile": "FULL",
+   "merge": "6d2fc62a8a24",
+   "merges": [
+    "6d2fc62a8a24544f576dc0158a4c242bdc467acb"
+   ],
+   "review": [
+    "docs/probes/DAEO-m1u3/PR-DAEO-m1u3.md"
+   ],
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-76",
+   "ticket": "DAEO-tgk2",
+   "profile": "STANDARD",
+   "merge": "3c5f212d5cdd",
+   "merges": [
+    "3c5f212d5cdd29d7ce914a04c731a83f8029e4d3"
+   ],
+   "review": "not required (STANDARD)",
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-49",
+   "ticket": "DAEO-ha8z",
+   "profile": "STANDARD",
+   "merge": "bc31d915e860",
+   "merges": [
+    "bc31d915e8601f98ec55292c2dc551d48c6d32b4"
+   ],
+   "review": "not required (STANDARD)",
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-16",
+   "ticket": "DAEO-49o5",
+   "profile": "FULL",
+   "merge": "2359f6d79e3e",
+   "merges": [
+    "2359f6d79e3e7fef29047abb3384a1e55f147291"
+   ],
+   "review": [
+    "docs/probes/DAEO-49o5/PR-DAEO-49o5-last-round.md",
+    "docs/probes/DAEO-49o5/PR-DAEO-49o5-round-3.md"
+   ],
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-67",
+   "ticket": "DAEO-9nys",
+   "profile": "FULL",
+   "merge": "9b03ac0b57ab,4da40b600488",
+   "merges": [
+    "9b03ac0b57aba7a0ecf6309a105c29b183cd257c",
+    "4da40b600488f5b6ea70285ddd8b77f026518d68"
+   ],
+   "review": [
+    "docs/probes/DAEO-9nys/PR-DAEO-9nys-run3.md",
+    "docs/probes/DAEO-9nys/PR-DAEO-9nys-run6.md",
+    "docs/probes/DAEO-9nys/PR-DAEO-9nys-run7.md",
+    "docs/probes/DAEO-9nys/PR-DAEO-9nys.md"
+   ],
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-95",
+   "ticket": "DAEO-57hm",
+   "profile": "STANDARD",
+   "merge": "44eccdfa8fbe",
+   "merges": [
+    "44eccdfa8fbe5c9c4296a5b33bf7b923093f4034"
+   ],
+   "review": "not required (STANDARD)",
+   "gitleaks": "clean"
+  },
+  {
+   "w2": "W2-108",
+   "ticket": "DAEO-zoex",
+   "profile": "STANDARD",
+   "merge": "b639e05641ca,789513df655c",
+   "merges": [
+    "b639e05641ca691569d1c446bcbecfb6c7e17589",
+    "789513df655c3739b7db5427cb088f7f97485a34"
+   ],
+   "review": "not required (STANDARD)",
+   "gitleaks": "clean"
+  }
+ ]
+}

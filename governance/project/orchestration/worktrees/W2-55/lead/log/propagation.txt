@@ -1,0 +1,5 @@
+ENFORCES_SUPERSEDED: tests/acceptance/W2-07/README.md:170 cites DEC-876: it still enforces DEC-876, superseded by DEC-880
+ENFORCES_SUPERSEDED: tests/acceptance/W2-07/test_w2_07_decision_records.py:129 cites DEC-876: it still enforces DEC-876, superseded by DEC-880
+ENFORCES_SUPERSEDED: tests/acceptance/W2-07/w2_07_support.py:72 cites DEC-876: it still enforces DEC-876, superseded by DEC-880
+ENFORCES_SUPERSEDED: tests/acceptance/W2-07/w2_07_support.py:80 cites DEC-876: it still enforces DEC-876, superseded by DEC-880
+supersession propagation: 4 finding(s)

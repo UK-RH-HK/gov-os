@@ -1,0 +1,10 @@
+W2-110: merge the older install cases' revision (w2/W2-110-tests, DEC-980)
+
+The independent test designer's revision of W1-04, W1-47, W1-50, W1-03, W1-05 and W1-46: each fixture project
+gets a roster whose coordination_ticket names its orchestrator ticket, which keeps their asks; the cases of an
+orchestrator subagent in a worker's session flip to refused (DEC-980 item 1, P-W2-110-1 (a)).
+
+Task: DAEO-3r1j
+Implements: DEC-980, DEC-971, DEC-957
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

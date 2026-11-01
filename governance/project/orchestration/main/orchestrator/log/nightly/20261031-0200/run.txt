@@ -1,0 +1,32 @@
+2026-10-31 02:00:06 nightly night: estimate {"estimate_s": 5467, "parallel_s": 2911, "serial_s": 1116, "setup_s": 942, "effective_workers": 7.05, "margin": 1.1, "runs": ["history", "history", "history"]}
+latest start 03:28
+head 1f0bb5b3c516
+clone rebuilt
+the gate had no room for a full run by the latest start: started anyway (DEC-961); gate: SHUT full-run leads=8 load=62.3/47.4 nproc=20 have=21755300kB need=27672108kB: load 62.3/47.4 >= nproc 20; memory: available 14795928 kB + leads' 6959372 kB < need 27672108 kB (floor 3145728, 8 running lead(s) at 17121888, the new full run 7404492)
+gate: SHUT full-run leads=8 load=62.3/47.4 nproc=20 have=21755300kB need=27672108kB: load 62.3/47.4 >= nproc 20; memory: available 14795928 kB + leads' 6959372 kB < need 27672108 kB (floor 3145728, 8 running lead(s) at 17121888, the new full run 7404492)
+parallel exit 1 in 5345 s: 9 failed, 17244 passed, 33 skipped, 2 errors in 4975.76s (1:22:55)
+serial exit 1 in 3400 s: 9 failed, 173 passed, 1 warning in 3135.96s (0:52:15)
+red-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]: 1 error in 0.02s
+red-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]: 1 error in 0.03s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]: 1 failed in 0.19s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository: 1 failed in 0.19s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket: 1 failed in 0.19s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]: 1 failed in 0.17s
+red-alone tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]: 1 failed in 0.18s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]: 1 failed in 3.64s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]: 1 failed in 3.43s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]: 1 failed in 3.36s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]: 1 failed in 3.33s
+passes-alone tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]
+passes-alone tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]
+passes-alone tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+passes-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+passes-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+passes-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+passes-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+red-alone tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written: 1 failed in 7.91s
+red-alone tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95: 1 failed in 836.74s (0:13:56)
+verdict: red 13
+duration: estimate 5467 s, actual 14838 s (setup 3973 s, lock wait 1154 s)
+clone kept for the diagnosis: /home/usain/gov-os-runs/W2-00/nightly/20261031-0200
+2026-10-31 06:11:38 done

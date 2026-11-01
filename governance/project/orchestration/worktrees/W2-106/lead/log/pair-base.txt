@@ -1,0 +1,412 @@
+........................................................................ [ 70%]
+......................FFFFFFFF                                           [100%]
+=================================== FAILURES ===================================
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-conflict-resolved-by-hand-to-content-neither-parent-holds] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f0968e0>
+case = 'a-conflict-resolved-by-hand-to-content-neither-parent-holds'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat0/project'
+commit = 'adb79f71bc82984f2104fd8c2edb93a5e4e0d0d2'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-criss-cross-merge] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f0a3d80>
+case = 'a-criss-cross-merge'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat1/project'
+commit = '3a536c1d01325391a59a3a21727c4a8914be323b'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-a-branch-that-renamed-a-file] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f1680e0>
+case = 'a-merge-of-a-branch-that-renamed-a-file'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat2/project'
+commit = '78a00dc913a83bdbce0865e67aa60a48b8339128'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-an-unrelated-history] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f168040>
+case = 'a-merge-of-an-unrelated-history'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat3/project'
+commit = 'fc9c1769183b88b2b05bde77a628806d5df2c35d'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-sets-a-test-back-to-the-merged-branch-s-unchanged-content] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f1687c0>
+case = 'a-merge-that-sets-a-test-back-to-the-merged-branch-s-unchanged-content'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat4/project'
+commit = 'ec3fc85bbf12c695d927a4e095f1f31a9532a692'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-undoes-commits-through-a-new-empty-commit] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f1691c0>
+case = 'a-merge-that-undoes-commits-through-a-new-empty-commit'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat5/project'
+commit = '3318072d7ed0dae29232179e382e9217bf27a8fd'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-octopus-merge] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f169760>
+case = 'an-octopus-merge'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat6/project'
+commit = '434d2a35a37c2498f5c78a2c7addf2e56a2e98eb'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+_ test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-ordinary-integration-merge] _
+
+project = PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/sandbox/home...where=PosixPath('/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/sandbox/elsewhere'))
+read_merge = <function read_merge.<locals>._read_merge at 0x70383f169f80>
+case = 'an-ordinary-integration-merge'
+
+    @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
+    def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
+            project, sandbox, read_merge, case):
+        """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+        ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+        nothing."""
+        shape = HISTORIES[case](project, sandbox)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+        support.run(project, sandbox, shape.command)
+        support.assert_shape(project, shape, before)
+        merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
+        left = check_support.state(project, support.WATCHED)
+        findings = check_support.finding_lines(project)
+    
+>       reading = read_merge(str(project), merge_commit)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = '/tmp/gov-os-lead-W2-106/pytest-of-usain/pytest-26/test_read_merge_says_which_pat7/project'
+commit = '396affe86f37bba0ccbf85766fa670593fb02351'
+
+    def _read_merge(root, commit):
+        try:
+            module = importlib.import_module(MODULE)
+        except ImportError as exc:
+            pytest.fail(f"the helper that reads a merge (DEC-398) cannot be imported: `import {MODULE}` fails: "
+                        f"{exc}", pytrace=False)
+        helper = getattr(module, "read_merge", None)
+        if not callable(helper):
+            pytest.fail(f"{MODULE} has no function `read_merge` (DEC-398)", pytrace=False)
+>       assert str(module.__file__).startswith(str(SOURCES)), (
+            f"`{MODULE}` was imported from {module.__file__}, not from this repository's {SOURCES}"
+        )
+E       AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-106-tests/src
+E       assert False
+E        +  where False = <built-in method startswith of str object at 0x70383f096290>('/home/usain/gov-os-worktrees/W2-106-tests/src')
+E        +    where <built-in method startswith of str object at 0x70383f096290> = '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'.startswith
+E        +      where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = str('/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py')
+E        +        where '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py' = <module 'gov.guard.containment_merge' from '/home/usain/gov-os-worktrees/W2-106-tests/tests/unit/adapters/../../../src/gov/guard/containment_merge.py'>.__file__
+E        +    and   '/home/usain/gov-os-worktrees/W2-106-tests/src' = str(PosixPath('/home/usain/gov-os-worktrees/W2-106-tests/src'))
+
+tests/acceptance/W1-50/test_w1_50_read_merge_helper.py:86: AssertionError
+8 failed, 94 passed in 3.61s

@@ -1,0 +1,12 @@
+Merge w2/W2-96-tests into w2/W2-96: review 4's W1 cases, no process of the run outlives gov accept (DEC-987, DEC-963)
+
+The independent test designer's commit: two cases in the harness's form
+(R16: a stop of the outer gov alone while a nested own-session run sleeps,
+and a planted test that does not wait for its nested run), red on the head.
+Merged by the lead, since the engineer's sandbox mounts the acceptance tests
+read-only (DEC-963).
+
+Task: DAEO-ouet
+Implements: DEC-987, DEC-963, DEC-959
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

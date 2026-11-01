@@ -1,0 +1,3 @@
+head=aa4a4a9ef53e start=2026-10-31T15:27:42+00:00 tmp_before_inodes=61066 basefolders_before=2
+peak_inodes=164625 peak_kb=1253440
+parallel exit=1 seconds=1761 end=2026-10-31T15:57:05+00:00 tmp_after_inodes=40785 tmp_after=354M basefolders=5

@@ -1,0 +1,33 @@
+bringing up nodes...
+bringing up nodes...
+
+..................................................F..................... [ 37%]
+........................................................................ [ 74%]
+..................................................                       [100%]
+=================================== FAILURES ===================================
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7ea22dc1d620>
+folder = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-26/popen-gw6/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...26/popen-gw6/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-26/popen-gw6/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+1 failed, 193 passed in 14.77s

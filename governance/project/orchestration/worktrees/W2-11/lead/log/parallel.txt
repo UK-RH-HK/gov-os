@@ -1,0 +1,594 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+.....F.................................................................. [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+...............................F....................F..FFF.............. [ 16%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+.......................................................F................ [ 21%]
+............s..................................F........................ [ 22%]
+........................FFFFFFFFFFFFFF.........F.....F.................. [ 23%]
+.F...................................................................... [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+............s........................................................... [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+____ TestSpecificationWorkOrder.test_work_order_correct_sequence_discovery _____
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_35.TestSpecificationWorkOrder object at 0x74a5a19f0c50>
+skill_texts = {'change': ({'description': 'Method for taking a Gov OS change through evidence, proposal, independent review and owne...ces\n\nCAP-24.b, CAP-38.b, CAP-38.e, MR-3, DEC-136, DEC-221, DEC-430, DEC-820, DEC-889, DEC-951, DEC-959, DEC-963.\n')}
+
+    def test_work_order_correct_sequence_discovery(self, skill_texts):
+        _, _, full_text = skill_texts["discovery"]
+        text_lower = full_text.lower()
+        positions = []
+        for step in self.SPEC_ORDER:
+            pos = text_lower.find(step)
+            if pos >= 0:
+                positions.append((step, pos))
+        for i in range(len(positions) - 1):
+            step_a, pos_a = positions[i]
+            step_b, pos_b = positions[i + 1]
+>           assert pos_a < pos_b, (
+                f"discovery: '{step_a}' appears after '{step_b}' — "
+                f"violates DEC-103 work order"
+            )
+E           AssertionError: discovery: 'scenario' appears after 'data' — violates DEC-103 work order
+E           assert 599 < 41
+
+tests/acceptance/W1-35/test_w1_35.py:367: AssertionError
+______ test_the_definition_agrees_with_its_kernel_role_file[orchestrator] ______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_the_definition_agrees_with_its_kernel_role_file(role):
+        """Generated from the role file: the same labelled fields, each with the same text."""
+        source = support.fields(support.read_committed(support.role_file_rel(role)))
+        generated = support.fields(_definition(role))
+        assert source, f"{support.role_file_rel(role)} has no labelled field"
+        assert sorted(generated) == sorted(source), (
+            f"{support.agent_rel(role)} and {support.role_file_rel(role)} do not have the same fields: "
+            f"{sorted(set(generated) ^ set(source))}"
+        )
+        differing = [label for label in source if generated[label] != source[label]]
+>       assert not differing, f"{support.agent_rel(role)} differs from its role file in {differing}"
+E       AssertionError: .claude/agents/orchestrator.md differs from its role file in ['handoff format', 'permission classes']
+E       assert not ['handoff format', 'permission classes']
+
+tests/acceptance/W1-33/test_w1_33_agent_definitions.py:69: AssertionError
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x71eae03c19e0>
+project = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-1/popen-gw5/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x71eae03ac7c0>
+project = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-1/popen-gw5/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x71eae03acea0>
+project = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-1/popen-gw5/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x71eae03ad300>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+_______ TestBriefTemplates.test_no_brief_is_named_like_a_record_template _______
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+self = <test_w1_35_orchestration.TestBriefTemplates object at 0x74a5a164c3e0>
+
+    def test_no_brief_is_named_like_a_record_template(self):
+        """W1-08 validates a templates file as a record when its name holds one of these words."""
+        taken = {name: [word for word in support.RECORD_TEMPLATE_WORDS if word in name.lower()]
+                 for name in support.BRIEFS.values()}
+        assert not any(taken.values()), f"brief names that W1-08 reads as record templates: {taken}"
+        for kind in support.BRIEFS:
+            front, _ = support.split_frontmatter(support.read(support.brief_rel(kind)))
+>           assert not (front or {}).get("type"), (
+                f"{support.brief_rel(kind)} has a record frontmatter (type: {front.get('type')}); a brief is "
+                f"not a record"
+            )
+E           AssertionError: template/governance/kernel/templates/brief-test-designer.md has a record frontmatter (type: brief); a brief is not a record
+E           assert not 'brief'
+E            +  where 'brief' = <built-in method get of dict object at 0x74a59b675580>('type')
+E            +    where <built-in method get of dict object at 0x74a59b675580> = ({'id': 'BRIEF-<ticket id>-independent-test-designer', 'profile': '<profile>', 'role': 'independent-test-designer', 'sources': ['CAP-37', 'MR-3', 'DEC-096', 'DEC-136', 'DEC-182', 'DEC-221', ...], ...}).get
+
+tests/acceptance/W1-35/test_w1_35_orchestration.py:311: AssertionError
+_ test_the_lead_brief_carries_the_role_independent_rule[the code under test per command] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rule = 'the code under test per command'
+
+    @pytest.mark.parametrize("rule", sorted(LEAD_RULES))
+    def test_the_lead_brief_carries_the_role_independent_rule(rule):
+        decision, ideas = LEAD_RULES[rule]
+        text = _text(f"{s.TEMPLATES}/brief-lead.md")
+>       assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+E       AssertionError: brief-lead.md does not state the code under test per command (DEC-732)
+E       assert (True and [])
+E        +  where True = <function cites at 0x71eae1cc3ec0>('---\nid: BRIEF-<ticket id>-lead\ntype: brief\nstatus: ACTIVE\nstate_class: NARRATIVE\ntitle: "Brief: ticket lead for ... it did (DEC-836); the\n  read refusals you and your workers met; which workers ran sandboxed; your scratch figures.\n', 'DEC-732')
+E        +    where <function cites at 0x71eae1cc3ec0> = s.cites
+E        +  and   [] = <function stated at 0x71eae1cc13a0>('---\nid: BRIEF-<ticket id>-lead\ntype: brief\nstatus: ACTIVE\nstate_class: NARRATIVE\ntitle: "Brief: ticket lead for ... it did (DEC-836); the\n  read refusals you and your workers met; which workers ran sandboxed; your scratch figures.\n', ['PYTHONPATH'])
+E        +    where <function stated at 0x71eae1cc13a0> = s.stated
+
+tests/acceptance/W2-11/test_w2_11_briefs.py:135: AssertionError
+________________ test_the_qa_review_skill_has_its_three_copies _________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_qa_review_skill_has_its_three_copies():
+        missing = [c for c in s.COPY_ROOTS if not (s.REPO_ROOT / c / "qa-review" / "SKILL.md").is_file()]
+>       assert not missing, f"qa-review has no copy under {missing}"
+E       AssertionError: qa-review has no copy under ['.claude/skills']
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:121: AssertionError
+_________ test_every_copy_carries_the_kernel_skills_body[test-design] __________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the test-design copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+________ test_every_copy_carries_the_kernel_skills_body[orchestration] _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the orchestration copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+____________ test_every_copy_carries_the_kernel_skills_body[audit] _____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'audit'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+                  if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+>       assert not differ, f"the {name} copies under {differ} differ from the kernel source"
+E       AssertionError: the audit copies under ['.claude/skills'] differ from the kernel source
+E       assert not ['.claude/skills']
+
+tests/acceptance/W2-11/test_w2_11_skills.py:129: AssertionError
+__________ test_every_copy_carries_the_kernel_skills_body[qa-review] ___________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'qa-review'
+
+    @pytest.mark.parametrize("name", ["test-design", "orchestration", "audit", "qa-review"])
+    def test_every_copy_carries_the_kernel_skills_body(name):
+        kernel = s.plain(s.split_frontmatter(_skill(name))[1])
+        differ = [c for c in s.COPY_ROOTS
+>                 if s.plain(s.split_frontmatter(s.read(f"{c}/{name}/SKILL.md"))[1]) != kernel]
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+_________ test_the_skill_carries_one_version_in_all_four_places[audit] _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'audit'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: audit: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.2.0', None, '1.2.0', '1.2.0']))
+E        +    where dict_values(['1.2.0', None, '1.2.0', '1.2.0']) = <built-in method values of dict object at 0x71eae03f00c0>()
+E        +      where <built-in method values of dict object at 0x71eae03f00c0> = {'.claude/skills': None, '.rulesync/skills': '1.2.0', 'template/.rulesync/skills': '1.2.0', 'template/governance/kernel/skills': '1.2.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+________ test_the_skill_carries_one_version_in_all_four_places[change] _________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'change'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: change: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x71eae0483c00>()
+E        +      where <built-in method values of dict object at 0x71eae0483c00> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+______ test_the_skill_carries_one_version_in_all_four_places[checkpoint] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'checkpoint'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: checkpoint: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.1.0', None, '1.1.0', '1.1.0']))
+E        +    where dict_values(['1.1.0', None, '1.1.0', '1.1.0']) = <built-in method values of dict object at 0x71eae03a9e80>()
+E        +      where <built-in method values of dict object at 0x71eae03a9e80> = {'.claude/skills': None, '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0', 'template/governance/kernel/skills': '1.1.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[discovery] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'discovery'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: discovery: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x71eae04806c0>()
+E        +      where <built-in method values of dict object at 0x71eae04806c0> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_____ test_the_skill_carries_one_version_in_all_four_places[orchestration] _____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'orchestration'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: orchestration: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.1.0', None, '1.1.0', '1.1.0']))
+E        +    where dict_values(['1.1.0', None, '1.1.0', '1.1.0']) = <built-in method values of dict object at 0x71eae03a49c0>()
+E        +      where <built-in method values of dict object at 0x71eae03a49c0> = {'.claude/skills': None, '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0', 'template/governance/kernel/skills': '1.1.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[planning] ________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'planning'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: planning: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x71eae03b8c00>()
+E        +      where <built-in method values of dict object at 0x71eae03b8c00> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[qa-review] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'qa-review'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+>           front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-11/test_w2_11_skills.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = '.claude/skills/qa-review/SKILL.md'
+root = PosixPath('/home/usain/gov-os-worktrees/W2-11')
+
+    def read(rel, root=REPO_ROOT):
+        file = Path(root) / rel
+>       assert file.is_file(), f"{rel} does not exist"
+               ^^^^^^^^^^^^^^
+E       AssertionError: .claude/skills/qa-review/SKILL.md does not exist
+
+tests/acceptance/W2-11/w2_11_support.py:41: AssertionError
+_______ test_the_skill_carries_one_version_in_all_four_places[retrieval] _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'retrieval'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: retrieval: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.0.0', None, '1.0.0', '1.0.0']))
+E        +    where dict_values(['1.0.0', None, '1.0.0', '1.0.0']) = <built-in method values of dict object at 0x71eae0483c00>()
+E        +      where <built-in method values of dict object at 0x71eae0483c00> = {'.claude/skills': None, '.rulesync/skills': '1.0.0', 'template/.rulesync/skills': '1.0.0', 'template/governance/kernel/skills': '1.0.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+______ test_the_skill_carries_one_version_in_all_four_places[test-design] ______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+name = 'test-design'
+
+    @pytest.mark.parametrize("name", [n for n in s.kernel_skill_names() if n != "adopt"])
+    def test_the_skill_carries_one_version_in_all_four_places(name):
+        versions = {}
+        for base in (s.SKILLS, *s.COPY_ROOTS):
+            front, _ = s.split_frontmatter(s.read(f"{base}/{name}/SKILL.md"))
+            assert front is not None, f"{base}/{name}/SKILL.md has no front matter"
+            versions[base] = _version(front) if base != ".claude/skills" else (front.get("metadata") or {}).get("version")
+            if base == ".claude/skills":
+                extra = set(front) - s.CLAUDE_SKILL_KEYS
+                assert not extra, f".claude/skills/{name}: keys rulesync does not write: {sorted(extra)}"
+>       assert all(versions.values()), f"{name}: no version in {[b for b, v in versions.items() if not v]}"
+E       AssertionError: test-design: no version in ['.claude/skills']
+E       assert False
+E        +  where False = all(dict_values(['1.1.0', None, '1.1.0', '1.1.0']))
+E        +    where dict_values(['1.1.0', None, '1.1.0', '1.1.0']) = <built-in method values of dict object at 0x71eae0928800>()
+E        +      where <built-in method values of dict object at 0x71eae0928800> = {'.claude/skills': None, '.rulesync/skills': '1.1.0', 'template/.rulesync/skills': '1.1.0', 'template/governance/kernel/skills': '1.1.0'}.values
+
+tests/acceptance/W2-11/test_w2_11_skills.py:149: AssertionError
+___ test_the_file_teaches_no_superseded_rule[.claude/agents/orchestrator.md] ___
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = '.claude/agents/orchestrator.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .claude/agents/orchestrator.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', "the held-out list's names refused (DEC-820): - READ_REPO, RUN_TESTS: allowed. The guard refuses any call that names a held-out path (DEC-162)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_file_teaches_no_superseded_rule[.claude/skills/orchestration/SKILL.md] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = '.claude/skills/orchestration/SKILL.md'
+
+    @pytest.mark.parametrize("rel", s.supersession_files())
+    def test_the_file_teaches_no_superseded_rule(rel):
+        found = s.superseded_teachings(s.read(rel))
+>       assert not found, f"{rel} still teaches:\n" + "\n".join(f"  {f}" for f in found)
+E       AssertionError: .claude/skills/orchestration/SKILL.md still teaches:
+E           LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT
+E           a fixed ceiling of tickets in flight (DEC-847): stated ceiling
+E           a listing or search refusal over the governance folder or .claude/ (DEC-820): - No glob, search or listing runs over the project's governance folder: files there are named one by
+E           the held-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525).
+E       assert not ['LEAD_CHECKPOINT (DEC-838): LEAD_CHECKPOINT', 'a fixed ceiling of tickets in flight (DEC-847): stated ceiling', "a li...-out list's names refused (DEC-820): - The settings file and the held-out file are never read, by any role (DEC-525)."]
+
+tests/acceptance/W2-11/test_w2_11_supersession.py:19: AssertionError
+_ test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_validator_accepts_the0')
+
+    def test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields(tmp_path):
+        text = s.read(f"{s.TEMPLATES}/brief-engineer.md")
+        whole = tmp_path / "whole" / "brief-engineer.md"
+        whole.parent.mkdir()
+        whole.write_text(text, encoding="utf-8")
+        code, output = _validate(whole)
+>       assert code == 0, f"the validator refuses the brief as it stands: {output[-400:]}"
+E       AssertionError: the validator refuses the brief as it stands: }, {"code": "SKILL_MISSING_FIELD", "message": "required field 'description' missing in /tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_validator_accepts_the0/whole/brief-engineer.md"}, {"code": "SKILL_BODY_TOO_LONG", "message": "body is 2782 tokens (max 2500) in /tmp/gov-os-lead-W2-11/pytest-of-usain/pytest-1/popen-gw5/test_the_validator_accepts_the0/whole/brief-engineer.md"}]}
+E         
+E       assert 1 == 0
+
+tests/acceptance/W2-11/test_w2_11_validator.py:33: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+25 failed, 5108 passed, 2 skipped in 1844.96s (0:30:44)

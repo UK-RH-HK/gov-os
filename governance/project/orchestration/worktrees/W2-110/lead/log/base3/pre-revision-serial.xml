@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="14" time="145.296" timestamp="2026-11-01T00:51:37.618652+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-02.test_w1_02_guard_hook" name="test_decision_p95_is_under_100_ms[engineer-allow-from-ticket-frontmatter]" time="32.341"><failure message="AssertionError: p95 decision time per round (ms): 351.9, 347.7, 345.6; the bound is 100 ms&#10;assert 0.3455880251713097 &lt; 0.1&#10; +  where 0.3455880251713097 = min([0.3519150670617819, 0.3476917580701411, 0.3455880251713097])">project = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-29/test_decision_p95_is_under_1000/project')
+write = &lt;function write.&lt;locals&gt;._write at 0x77274c598360&gt;
+name = 'engineer-allow-from-ticket-frontmatter'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] &lt; LATENCY_BOUND_S:
+                break
+&gt;       assert min(rounds) &lt; LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 351.9, 347.7, 345.6; the bound is 100 ms
+E       assert 0.3455880251713097 &lt; 0.1
+E        +  where 0.3455880251713097 = min([0.3519150670617819, 0.3476917580701411, 0.3455880251713097])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-02.test_w1_02_guard_hook" name="test_decision_p95_is_under_100_ms[engineer-deny-outside-the-ticket]" time="29.707"><failure message="AssertionError: p95 decision time per round (ms): 300.0, 332.5, 330.4; the bound is 100 ms&#10;assert 0.29997411207295954 &lt; 0.1&#10; +  where 0.29997411207295954 = min([0.29997411207295954, 0.3324986780062318, 0.33036283985711634])">project = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-29/test_decision_p95_is_under_1001/project')
+write = &lt;function write.&lt;locals&gt;._write at 0x77274c599da0&gt;
+name = 'engineer-deny-outside-the-ticket'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] &lt; LATENCY_BOUND_S:
+                break
+&gt;       assert min(rounds) &lt; LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 300.0, 332.5, 330.4; the bound is 100 ms
+E       assert 0.29997411207295954 &lt; 0.1
+E        +  where 0.29997411207295954 = min([0.29997411207295954, 0.3324986780062318, 0.33036283985711634])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-02.test_w1_02_guard_hook" name="test_decision_p95_is_under_100_ms[frozen-deny]" time="22.182"><failure message="AssertionError: p95 decision time per round (ms): 282.9, 251.9, 224.7; the bound is 100 ms&#10;assert 0.22468953696079552 &lt; 0.1&#10; +  where 0.22468953696079552 = min([0.2828528848476708, 0.2519303720910102, 0.22468953696079552])">project = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-29/test_decision_p95_is_under_1002/project')
+write = &lt;function write.&lt;locals&gt;._write at 0x77274c59a200&gt;, name = 'frozen-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] &lt; LATENCY_BOUND_S:
+                break
+&gt;       assert min(rounds) &lt; LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 282.9, 251.9, 224.7; the bound is 100 ms
+E       assert 0.22468953696079552 &lt; 0.1
+E        +  where 0.22468953696079552 = min([0.2828528848476708, 0.2519303720910102, 0.22468953696079552])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-02.test_w1_02_guard_hook" name="test_decision_p95_is_under_100_ms[no-role-deny]" time="17.301"><failure message="AssertionError: p95 decision time per round (ms): 173.5, 210.2, 222.3; the bound is 100 ms&#10;assert 0.17351772682741284 &lt; 0.1&#10; +  where 0.17351772682741284 = min([0.17351772682741284, 0.21020330511964858, 0.2222524129319936])">project = PosixPath('/tmp/gov-os-lead-W2-110/pytest-of-usain/pytest-29/test_decision_p95_is_under_1003/project')
+write = &lt;function write.&lt;locals&gt;._write at 0x77274c59a660&gt;
+name = 'no-role-deny'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+    def test_decision_p95_is_under_100_ms(project, write, name):
+        """Wall-clock time of the hook process, start to exit, as the harness waits for it.
+    
+        p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
+        up to three rounds, so a single stall of the machine does not fail the KPI.
+        """
+        role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+        if frozen:
+            support.set_freeze(project)
+        for _ in range(LATENCY_WARM_UP):
+            write(project, relpath, role, ticket)
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result = write(project, relpath, role, ticket)
+                assert result.decision == expected, (
+                    f"the timed call was not decided as expected ({expected}): {result.describe()}"
+                )
+                samples.append(result.seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] &lt; LATENCY_BOUND_S:
+                break
+&gt;       assert min(rounds) &lt; LATENCY_BOUND_S, (
+            "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 decision time per round (ms): 173.5, 210.2, 222.3; the bound is 100 ms
+E       assert 0.17351772682741284 &lt; 0.1
+E        +  where 0.17351772682741284 = min([0.17351772682741284, 0.21020330511964858, 0.2222524129319936])
+
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-02.test_w1_02_guard_hook" name="test_decision_p95_is_under_100_ms[test-designer-allow]" time="7.620" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]" time="8.625" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]" time="3.349" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]" time="2.825" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]" time="3.381" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]" time="2.804" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]" time="2.569" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]" time="6.836" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]" time="2.694" /><testcase classname="tests.acceptance.W1-05.test_w1_05_live_hooks" name="test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]" time="2.702" /></testsuite></testsuites>

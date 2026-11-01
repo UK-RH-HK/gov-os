@@ -1,0 +1,292 @@
+.................................. [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+...................................................................F.... [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 74%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 88%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 93%]
+..................................................s..................... [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+...........................................EEE.......................... [ 96%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+...........................                                              [100%]
+==================================== ERRORS ====================================
+__ ERROR at setup of test_gov_check_gives_context_reproducibility_green_here ___
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+fixturedef = <FixtureDef argname='gov_check_here' scope='session' baseid='tests/acceptance/W2-54'>
+request = <SubRequest 'gov_check_here' for <Function test_gov_check_gives_context_reproducibility_green_here>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+/home/usain/.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/conftest.py:98: in gov_check_here
+    return support.green_here_check()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-54/w2_54_support.py:766: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+argv = ['/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\nsys.argv[0] = 'gov'\nsys.exit(_m.main())\n", 'check', '--json']
+
+    def run(argv, *, cwd, env, timeout):
+        started = time.monotonic()
+        try:
+            done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"{' '.join(map(str, argv))} did not end within {timeout:.0f} s") from None
+E           AssertionError: /usr/bin/python3 -c import sys
+E           import gov.cli.main as _m
+E           sys.argv[0] = 'gov'
+E           sys.exit(_m.main())
+E            check --json did not end within 1800 s
+
+tests/acceptance/W2-54/w2_54_support.py:245: AssertionError
+________ ERROR at setup of test_gov_check_gives_core_schema_green_here _________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26+W2-61-20261030-225438/src/gov/__init__.py'
+
+    @pytest.fixture(scope="session")
+    def gov_check_here(code_under_test):
+        """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+        inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+        runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+        store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+>       return support.green_here_check()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/conftest.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/w2_54_support.py:766: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+argv = ['/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\nsys.argv[0] = 'gov'\nsys.exit(_m.main())\n", 'check', '--json']
+
+    def run(argv, *, cwd, env, timeout):
+        started = time.monotonic()
+        try:
+            done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"{' '.join(map(str, argv))} did not end within {timeout:.0f} s") from None
+E           AssertionError: /usr/bin/python3 -c import sys
+E           import gov.cli.main as _m
+E           sys.argv[0] = 'gov'
+E           sys.exit(_m.main())
+E            check --json did not end within 1800 s
+
+tests/acceptance/W2-54/w2_54_support.py:245: AssertionError
+__________ ERROR at setup of test_the_w1_43_audit_report_is_untouched __________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26+W2-61-20261030-225438/src/gov/__init__.py'
+
+    @pytest.fixture(scope="session")
+    def gov_check_here(code_under_test):
+        """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+        inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+        runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+        store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+>       return support.green_here_check()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/conftest.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/w2_54_support.py:766: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+argv = ['/usr/bin/python3', '-c', "import sys\nimport gov.cli.main as _m\nsys.argv[0] = 'gov'\nsys.exit(_m.main())\n", 'check', '--json']
+
+    def run(argv, *, cwd, env, timeout):
+        started = time.monotonic()
+        try:
+            done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"{' '.join(map(str, argv))} did not end within {timeout:.0f} s") from None
+E           AssertionError: /usr/bin/python3 -c import sys
+E           import gov.cli.main as _m
+E           sys.argv[0] = 'gov'
+E           sys.exit(_m.main())
+E            check --json did not end within 1800 s
+
+tests/acceptance/W2-54/w2_54_support.py:245: AssertionError
+=================================== FAILURES ===================================
+____________ test_every_tracked_path_matches_exactly_one_namespace _____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_tracked_path_matches_exactly_one_namespace():
+        """The names come from `git ls-files`; no tracked file is opened."""
+        spaces = support.namespaces(support.load_path_map())
+        patterns = {name: [pattern for pattern in value.get("paths") or [] if isinstance(pattern, str)]
+                    for name, value in spaces.items()}
+        tracked = support.tracked_files()
+        nowhere, twice = [], []
+        for path in tracked:
+            found = [name for name, own in patterns.items() if any(support.matches(pattern, path) for pattern in own)]
+            if not found:
+                nowhere.append(path)
+            elif len(found) > 1:
+                twice.append(f"{path} -> {found}")
+>       assert not nowhere, (f"{len(nowhere)} of {len(tracked)} tracked paths are in no namespace of "
+                             f"{support.PATH_MAP_REL}, for example {nowhere[:SHOWN]}")
+E       AssertionError: 1 of 2526 tracked paths are in no namespace of governance/project/path-map.yaml, for example ['governance/project/orchestration/closes/W2-71-DAEO-e8f0.md']
+E       assert not ['governance/project/orchestration/closes/W2-71-DAEO-e8f0.md']
+
+tests/acceptance/W1-08/test_w1_08_path_map.py:92: AssertionError
+_ test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/] _
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+tracked = ['.claude/agents/engineer.md', '.claude/agents/independent-auditor.md', '.claude/agents/independent-test-designer.md', '.claude/agents/orchestrator.md', '.claude/agents/product-spec.md', '.claude/agents/research.md', ...]
+place = 'governance/project/orchestration/'
+
+    @pytest.mark.parametrize("place", RECORD_PLACES)
+    def test_every_record_of_each_of_dec_891_s_places_is_record_only(test_map, tracked, place):
+        records = _patterns(test_map, "record_only")
+        files = [p for p in tracked if p.startswith(place) and not p.endswith(CODE_SUFFIXES)
+                 and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))]
+        assert files, f"the fixture is wrong: no tracked record under {place}"
+        unplaced = [p for p in files if not _placed(records, p)]
+>       assert not unplaced, f"records of {place} the record-only list leaves out: {unplaced[:20]}"
+E       AssertionError: records of governance/project/orchestration/ the record-only list leaves out: ['governance/project/orchestration/packages/ACT-1-GUARD.hooks.patch']
+E       assert not ['governance/project/orchestration/packages/ACT-1-GUARD.hooks.patch']
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:257: AssertionError
+______ test_every_source_exists_at_head_and_every_heading_is_found_there _______
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_source_exists_at_head_and_every_heading_is_found_there():
+        faults = []
+        for path in _files():
+            for source in _entries(_load(path)):
+                text = _at_head(source["path"])
+                if text is None:
+                    faults.append(f"{path.name}: {source['path']} is not a file at HEAD")
+                    continue
+                heading = source.get("heading")
+                if heading is not None and not _heading_found(text, str(heading)):
+                    faults.append(f"{path.name}: heading {heading!r} is not a line of {source['path']}")
+                lines = source.get("lines")
+                if lines is not None:
+                    ok = (isinstance(lines, list) and len(lines) == 2 and all(isinstance(n, int) for n in lines)
+                          and 1 <= lines[0] <= lines[1] <= len(text.splitlines()))
+                    if not ok:
+                        faults.append(f"{path.name}: lines {lines!r} are not a span of {source['path']}")
+>       assert not faults, "\n".join(faults)
+E       AssertionError: q07.yaml: heading '| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket | 0 | AR-1 … AR-10 |' is not a line of docs/plan/WAVE_2_WBS.md
+E       assert not ["q07.yaml: heading '| W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket | 0 | AR-1 … AR-10 |' is not a line of docs/plan/WAVE_2_WBS.md"]
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:126: AssertionError
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/close/W2-57+W2-77+W2-03+W2-26+W2-61-20261030-225438/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+>       done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+argv = ['sh', '-c', 'python3 -m gov.context.context_check']
+
+    def run(argv, *, cwd, env, timeout):
+        started = time.monotonic()
+        try:
+            done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"{' '.join(map(str, argv))} did not end within {timeout:.0f} s") from None
+E           AssertionError: sh -c python3 -m gov.context.context_check did not end within 630 s
+
+tests/acceptance/W2-54/w2_54_support.py:245: AssertionError
+=========================== short test summary info ============================
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_history.py:17: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_history.py:223: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:62: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:68: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [13] tests/acceptance/W1-01/test_w1_01_settings_deny.py:82: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [7] tests/acceptance/W1-01/test_w1_01_settings_deny.py:88: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_settings_deny.py:94: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+4 failed, 17053 passed, 31 skipped, 3 errors in 5761.47s (1:36:01)

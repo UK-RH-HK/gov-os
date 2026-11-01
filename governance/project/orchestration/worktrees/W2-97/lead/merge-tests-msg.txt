@@ -1,0 +1,6 @@
+Merge w2/W2-97-tests: the independent acceptance tests for W2-97 (DAEO-wq2b)
+
+Task: DAEO-wq2b
+Role: orchestrator
+Implements: DEC-963, DEC-959
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

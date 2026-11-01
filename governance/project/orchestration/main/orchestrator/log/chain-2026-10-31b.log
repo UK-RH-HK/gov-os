@@ -1,0 +1,4 @@
+2026-10-31 01:33:47 W2-106 waits: SHUT leads=1 load=41.3/39.4 nproc=20 have=18442456kB need=8157560kB: load 41.3/39.4 >= nproc 20
+2026-10-31 01:34:50 W2-106 waits: SHUT leads=1 load=38.5/39.2 nproc=20 have=18526516kB need=8076224kB: load 38.5/39.2 >= nproc 20
+2026-10-31 01:35:52 W2-106 waits: SHUT leads=1 load=47.1/40.0 nproc=20 have=17627144kB need=7797564kB: load 47.1/40.0 >= nproc 20
+2026-10-31 01:36:56 W2-106 waits: SHUT leads=1 load=63.4/41.9 nproc=20 have=18468328kB need=9537312kB: load 63.4/41.9 >= nproc 20

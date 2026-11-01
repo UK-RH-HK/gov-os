@@ -9,9 +9,10 @@ It runs the product's own selection (gov.close.select.plan, W2-66) unchanged, wi
 
 Run with the tree's own src first on PYTHONPATH (DEC-732):
     PYTHONPATH=<tree>/src python3 select_tests.py <tree> <W2 id> <ticket id> [--merge <commit>] [--base <commit>]
-Prints one JSON object: scope ("scoped" or "full"), why_full, base, the governance paths left out, the change that
-counted, the selected suites with their reasons, and pytest_options (--ignore/--deselect to add to `pytest tests`).
-"full" means the change touched shared core code (or something unplaceable): then run the full suite."""
+Prints one JSON object: scope ("scoped"), core_changed and unplaced (what the product would have run in full for),
+base, the governance paths left out, the change that counted, the selected suites with their reasons, and
+pytest_options (--ignore/--deselect to add to `pytest tests`). There is no "full" any more (DEC-968): the full suite
+runs only in the nightly. Exit 2 with scope "refused" when the selection cannot be made (fix the cause)."""
 import argparse
 import json
 import subprocess
@@ -74,7 +75,37 @@ def main():
 
     select.changed = changed
     select.base = lambda root_: since
+
+    # DEC-968 (owner, 2026-10-31): the full suite runs only in the nightly. No lead, close or merge runs it, core
+    # changes included: they run the scoped set, the ticket's own suite and every suite the selection says the change
+    # can reach. So the product's two shortcuts to "everything" are taken out here, and only here:
+    #   - shared core (SHARED_CORE): a core file reaches what its normal rules reach (the tickets whose paths hold
+    #     it, test helpers, couplings), plus the unit tests and the every-close and record-reading suites;
+    #   - a file nothing places (UNPLACED): named in `unplaced`, reaching nothing beyond those same suites.
+    # Any other reason for "everything" (an unreadable test map, an unknown base, an unresolved target) stops the
+    # selection with exit 2: nothing runs blind.
+    load_map = select.load_map
+    extra_record = []
+
+    def load_map_scoped(root_):
+        m, why = load_map(root_)
+        if m is not None:
+            m = dict(m, shared_core=[], record_only=list(m.get("record_only") or []) + extra_record)
+        return m, why
+
+    select.load_map = load_map_scoped
     scope = select.plan(root, a.wbs, ticket=a.ticket)
+    unplaced = [p for w in scope.get("why_full", []) if w.get("reason") == "UNPLACED" for p in w.get("paths", [])]
+    if scope["scope"] == "full" and unplaced:  # place them as reaching nothing beyond the always-run suites
+        extra_record.extend(unplaced)
+        scope = select.plan(root, a.wbs, ticket=a.ticket)
+    if scope["scope"] == "full":
+        print(json.dumps({"scope": "refused", "why": scope.get("why_full", []),
+                          "note": "DEC-968: no full run outside the nightly; fix the cause"}, indent=1))
+        raise SystemExit(2)
+    # what the product would have run in full for, kept as evidence
+    shared = list((test_map or {}).get("shared_core") or [])
+    core = [p for p in scope.get("changed", []) if any(select.match(p, c) for c in shared)]
 
     # The product's plan leaves the ticket's own acceptance suite out (gov close runs it in a phase of its own); one
     # run at every level must include it, so it is not ignored here (W2-85's finding, 2026-10-30).
@@ -87,7 +118,8 @@ def main():
         opts.append(f"--deselect={node}")
         if node.startswith("tests/"):
             opts.append(f"--deselect={node[len('tests/'):]}")
-    print(json.dumps({"scope": scope["scope"], "why_full": scope.get("why_full", []), "base": since,
+    print(json.dumps({"scope": scope["scope"], "why_full": [], "core_changed": core, "unplaced": unplaced,
+                      "base": since,
                       "head": scope.get("head"), "governance_left_out": sorted(set(left_out)),
                       "changed": scope.get("changed", []), "selected": scope.get("selected", []),
                       "pytest_options": opts, "ignore": scope.get("ignore", []),

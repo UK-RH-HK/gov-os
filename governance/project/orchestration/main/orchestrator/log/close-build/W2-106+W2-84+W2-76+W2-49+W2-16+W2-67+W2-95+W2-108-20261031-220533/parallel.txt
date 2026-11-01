@@ -1,0 +1,232 @@
+/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/venv/bin/python: can't open file '/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu'), wheel=PosixPath('/tmp/gov-os-close-2026...v/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu'), wheel=PosixPath('/tmp/gov-os-close-2026...v/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/venv/bin/python: can't open file '/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu'), wheel=PosixPath('/tmp/gov-os-close-2026...v/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-close-20261031-220533/w259-pin-elzku0wu/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+______ test_a_large_store_among_many_small_files_is_decided_by_gov_check _______
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+env = (PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_a_large_store_among_many_0/w2-50...0533/pytest-of-usain/pytest-0/popen-gw5/test_a_large_store_among_many_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_a_large_store_among_...('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw5/test_a_large_store_among_many_0/w2-50/pycache'))
+
+    def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
+        """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        small = scan.marker("smallfile")
+        block = scan.filler_block(16 * 1024, seed="small").decode()
+        for index in range(300):
+            support.write(project / scan.RUNTIME / "packets" / f"DAEO-{index:04d}" / "packet.md",
+                          f"{block[:8000]}\n{small}\n{block[8000:]}")
+        checks = project / "governance/kernel/checks"
+        checks.mkdir(parents=True, exist_ok=True)
+        (checks / "secrets-indexing.yaml").write_bytes(support.CHECK_DECLARATION.read_bytes())
+        run = scan.run_scan(sandbox, project, stand_in, markers=[*words(LARGE), small], rate=scan.SLOW_RATE,
+                            via_gov_check=True)
+        assert run.returncode is not None, f"gov check did not finish within the check's declared limit\n{run.describe()}"
+        try:
+            envelope = json.loads(run.stdout)
+        except ValueError:
+            raise AssertionError(f"gov check --json gave no JSON\n{run.describe()}") from None
+        status = [entry.get("status") for entry in _check_entries(envelope) if entry.get("id") == "secrets-indexing"]
+>       assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
+E       AssertionError: the secrets-indexing check under gov check is ['RED'], not GREEN
+E         exit code: 3 after 45.4 s; gitleaks runs: 118
+E         stdout:
+E         ibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/usain/gov-os-runs/W2-00/close/W2-106+W2-84+W2-"}], "provenance": {"commit": "53c2f45c5895d3bd5e35587b9bf54eec8ce963b0", "check_version": "1.0.0", "inputs_hash": "d7aad35a2e17d8bd"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "53c2f45c5895d3bd5e35587b9bf54eec8ce963b0", "check_version": "1.0.0", "inputs_hash": "70b2131c948a2693"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "53c2f45c5895d3bd5e35587b9bf54eec8ce963b0", "check_version": "1.0.0", "inputs_hash": "4c854c4c6789d224"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "53c2f45c5895d3bd5e35587b9bf54eec8ce963b0", "check_version": "1.0.0", "inputs_hash": "799f6c5c9c2f53a9"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: RED
+E           skill regression: GREEN
+E         
+E       assert ['RED'] == ['GREEN']
+E         
+E         At index 0 diff: 'RED' != 'GREEN'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:227: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7f03ed15ef20>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw6/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x730bcc1c7560>
+project = PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw0/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw0/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw0/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x730bcc211b20>
+project = PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw0/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw0/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw0/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x730bcc2123e0>
+project = PosixPath('/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw0/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-0/popen-gw0/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-close-20261031-220533/pytest-of-usain/pytest-0/popen-gw0/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+10 failed, 15491 passed, 4 skipped, 6 errors in 5617.93s (1:33:37)

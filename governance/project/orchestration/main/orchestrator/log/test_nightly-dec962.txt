@@ -1,0 +1,1 @@
+PASS: nightly.sh N1-N8, nightly_cron.sh C1-C3, nightly_check.sh K1-K8, ping_gate.sh G1-G6, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3

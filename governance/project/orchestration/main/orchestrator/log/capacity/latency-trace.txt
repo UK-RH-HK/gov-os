@@ -1,0 +1,6 @@
+round 1 with load 14.54: 8 failed, 3 passed in 152.58s (0:02:32)
+round 1 without load 30.43: 11 passed in 34.37s
+round 2 with load 19.55: 11 passed in 40.62s
+round 2 without load 21.79: 11 passed in 49.99s
+round 3 with load 21.51: 1 failed, 10 passed in 41.88s
+round 3 without load 18.64: 5 failed, 6 passed in 131.93s (0:02:11)

@@ -1,0 +1,5 @@
+tree 0dfac9d6695f load 15.92 24.58 27.31
+/home/usain/gov-os-worktrees/W2-110/src/gov/__init__.py
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+1 failed, 13 passed in 46.45s
+end load 17.11 23.44 26.78

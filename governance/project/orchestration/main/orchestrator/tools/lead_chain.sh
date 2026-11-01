@@ -7,8 +7,7 @@
 ORCH=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator
 running() { pgrep -f -c 'GOV_ROLE":"orchestrator","GOV_TICKET' ; }
 held() {
-  [ -e "$ORCH/CLOSE-PENDING" ] && { echo "a close is pending"; return 0; }
-  now=$(date +%H%M); [ "$now" -ge 0030 ] && [ "$now" -lt 0530 ] && { echo "the night window"; return 0; }
+  # DEC-961: no hold for a waiting close and no night window; the gate's capacity alone decides.
   gate=$(python3 "$ORCH/tools/gate_check.py") || { echo "$gate"; return 0; }
   return 1
 }

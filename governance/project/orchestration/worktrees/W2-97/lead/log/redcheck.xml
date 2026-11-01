@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="18" skipped="0" tests="18" time="4.316" timestamp="2026-10-31T22:35:18.142571+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-97.test_w2_97_batch" name="test_a_batch_gives_one_merged_result_and_one_run_on_the_union" time="0.212"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac60891c0&gt;
+
+    def test_a_batch_gives_one_merged_result_and_one_run_on_the_union(q):
+        q.plant()
+        t1 = q.ticket(901, {"app/c.txt": "ok\n", "tests/test_c.py": S.reads_ok("c")})
+        t2 = q.ticket(902, {"app/d.txt": "ok\n", "tests/test_d.py": S.reads_ok("d")})
+        h1 = q.code_moves_on()
+        q.configure_select(targets={t1.name: ["tests/test_c.py"], t2.name: ["tests/test_d.py"]})
+&gt;       q.submit(t1, t2)
+
+tests/acceptance/W2-97/test_w2_97_batch.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac60891c0&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_batch_gives_one_merged_0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_batch" name="test_a_red_batch_ejects_only_its_culprit_and_lands_the_rest_tested" time="0.228"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7e450&gt;
+
+    def test_a_red_batch_ejects_only_its_culprit_and_lands_the_rest_tested(q):
+        q.plant()
+        good = q.ticket(901, {"app/c.txt": "ok\n", "tests/test_c.py": S.reads_ok("c")})
+        culprit = q.ticket(902, {"app/a.txt": "broken\n"})  # turns tests/test_a.py red
+        h1 = q.code_moves_on()
+&gt;       q.submit(good, culprit)
+
+tests/acceptance/W2-97/test_w2_97_batch.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7e450&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_red_batch_ejects_only_i0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_batch" name="test_a_red_no_single_ticket_explains_ejects_the_whole_batch" time="0.257"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7f3e0&gt;
+
+    def test_a_red_no_single_ticket_explains_ejects_the_whole_batch(q):
+        # Red while app/c.txt or app/d.txt exists: taking out any one ticket leaves it red.
+        q.plant({"tests/test_pair.py": S.red_if_any("pair", ["app/c.txt", "app/d.txt"])})
+        tickets = [q.ticket(901, {"app/e.txt": "ok\n"}), q.ticket(902, {"app/c.txt": "x\n"}),
+                   q.ticket(903, {"app/d.txt": "x\n"})]
+        h1 = q.code_moves_on()
+&gt;       q.submit(*tickets)
+
+tests/acceptance/W2-97/test_w2_97_batch.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7f3e0&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_red_no_single_ticket_ex0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_batch" name="test_a_ticket_bringing_another_ticket_s_commits_fails_the_batch_closed" time="0.253"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7d730&gt;
+
+    def test_a_ticket_bringing_another_ticket_s_commits_fails_the_batch_closed(q):
+        q.plant()
+        good = q.ticket(901, {"app/e.txt": "ok\n"})
+        # W2-902's approved commit brings a commit of another ticket's (Task: DAEO-other), then its own red change.
+        mixed = q.ticket(902, {"app/a.txt": "broken\n"}, before=[({"app/x.txt": "other\n"}, "DAEO-other")])
+        h1 = q.code_moves_on()
+&gt;       q.submit(good, mixed)
+
+tests/acceptance/W2-97/test_w2_97_batch.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7d730&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_ticket_bringing_another0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_batch" name="test_a_conflicting_ticket_is_ejected_and_the_rest_go_on" time="0.193"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac608bf50&gt;
+
+    def test_a_conflicting_ticket_is_ejected_and_the_rest_go_on(q):
+        q.plant()
+        good = q.ticket(901, {"app/e.txt": "ok\n"})
+        clash = q.ticket(902, {"app/notes.txt": "ticket\n"})
+        h1 = q.code_moves_on()  # changes app/notes.txt too: W2-902 does not merge cleanly
+&gt;       q.submit(good, clash)
+
+tests/acceptance/W2-97/test_w2_97_batch.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac608bf50&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_conflicting_ticket_is_e0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_entry" name="test_only_an_approved_ticket_enters" time="0.162"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7fda0&gt;
+
+    def test_only_an_approved_ticket_enters(q):
+        q.plant()
+        h1 = q.code_moves_on()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+    
+&gt;       refused = q.approve(t.name)
+                  ^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-97/test_w2_97_entry.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:314: in approve
+    return self.tool("approve", "--queue", str(self.queue), "--ticket", name, "--by", by)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7fda0&gt;, timeout = 600
+args = ('approve', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_only_an_approved_ticket_e0/queue', '--ticket', 'W2-901', '--by', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_entry" name="test_green_advances_to_the_very_merge_commit_tested" time="0.138"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7e420&gt;
+
+    def test_green_advances_to_the_very_merge_commit_tested(q):
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()  # the head moved on since the ticket was cut: the merged code differs from the lead's
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_entry.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7e420&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_green_advances_to_the_ver0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_entry" name="test_a_second_run_while_one_holds_the_lock_exits_4" time="0.184"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7e570&gt;
+
+    def test_a_second_run_while_one_holds_the_lock_exits_4(q):
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_entry.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7e570&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_second_run_while_one_ho0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_moved" name="test_a_head_moved_under_test_is_re_merged_and_re_tested" time="0.225"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac6058ce0&gt;
+
+    def test_a_head_moved_under_test_is_re_merged_and_re_tested(q):
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+        q.configure_tests(move={"repo": str(q.repo), "path": "app/late.txt", "text": "late\n",
+                                "subject": "lands while the candidate is under test"})
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_moved.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac6058ce0&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_head_moved_under_test_i0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_once" name="test_code_identical_to_the_lead_s_is_skipped_with_its_reason" time="0.182"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5f4d220&gt;
+
+    def test_code_identical_to_the_lead_s_is_skipped_with_its_reason(q):
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        # Only a governance record lands on the integration branch after the ticket was cut: the merged code is the lead's.
+        h1 = q.integrate_commit({"governance/project/orchestration/notes.md": "a record\n"}, "a record commit")
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_once.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5f4d220&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_code_identical_to_the_lea0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_once" name="test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing[prepare-failed]" time="0.130"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5f4dc70&gt;, case = 'prepare-failed'
+
+    @pytest.mark.parametrize("case", sorted(CANNOT))
+    def test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing(q, case):
+        how = CANNOT[case]
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_once.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5f4dc70&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_step_that_cannot_be_don0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_once" name="test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing[run-did-not-complete]" time="0.115"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5ebc9e0&gt;
+case = 'run-did-not-complete'
+
+    @pytest.mark.parametrize("case", sorted(CANNOT))
+    def test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing(q, case):
+        how = CANNOT[case]
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_once.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5ebc9e0&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_step_that_cannot_be_don1/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_once" name="test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing[selection-refused]" time="0.167"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5f4c740&gt;, case = 'selection-refused'
+
+    @pytest.mark.parametrize("case", sorted(CANNOT))
+    def test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing(q, case):
+        how = CANNOT[case]
+        q.plant()
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_once.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5f4c740&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_step_that_cannot_be_don2/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_record" name="test_each_advance_writes_the_record_the_close_cites" time="0.209"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5f4e0f0&gt;
+
+    def test_each_advance_writes_the_record_the_close_cites(q):
+        q.plant()
+        t1 = q.ticket(901, {"app/c.txt": "ok\n", "tests/test_c.py": S.reads_ok("c")})
+        t2 = q.ticket(902, {"app/d.txt": "ok\n", "tests/test_d.py": S.reads_ok("d")})
+        h1 = q.code_moves_on()
+        q.configure_select(targets={t1.name: ["tests/test_c.py"], t2.name: ["tests/test_d.py"]},
+                           core_changed=["src/gov/stand_in_core.py"], unplaced=["misc/stand_in_unplaced.txt"])
+&gt;       q.submit(t1, t2)
+
+tests/acceptance/W2-97/test_w2_97_record.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5f4e0f0&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_each_advance_writes_the_r0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_red" name="test_red_ejects_the_ticket_and_the_head_stays" time="0.198"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac6058320&gt;
+
+    def test_red_ejects_the_ticket_and_the_head_stays(q):
+        q.plant()
+        t = q.ticket(901, {"app/a.txt": "broken\n"})  # turns tests/test_a.py red
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_red.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac6058320&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_red_ejects_the_ticket_and0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_red" name="test_a_red_that_passes_alone_is_a_flaky_candidate" time="0.177"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac603fe60&gt;
+
+    def test_a_red_that_passes_alone_is_a_flaky_candidate(q):
+        q.plant({"tests/test_flaky.py": S.red_once("flaky", q.tmp / "flaky-marker")})
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_red.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac603fe60&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_red_that_passes_alone_i0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_red" name="test_a_red_not_the_batch_s_does_not_stop_the_advance" time="0.154"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac6089250&gt;
+
+    def test_a_red_not_the_batch_s_does_not_stop_the_advance(q):
+        q.plant({"tests/test_known_red.py": S.always_red("known_red")})
+        t = q.ticket(901, {"app/e.txt": "ok\n"})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_red.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac6089250&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_red_not_the_batch_s_doe0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-97.test_w2_97_red" name="test_a_failing_test_the_ticket_added_is_the_ticket_s" time="0.160"><failure message="AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)">q = &lt;w2_97_support.Planted object at 0x7d2ac5e7ec00&gt;
+
+    def test_a_failing_test_the_ticket_added_is_the_ticket_s(q):
+        q.plant()
+        t = q.ticket(901, {"tests/test_added.py": S.always_red("added")})
+        h1 = q.code_moves_on()
+&gt;       q.submit(t)
+
+tests/acceptance/W2-97/test_w2_97_red.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-97/w2_97_support.py:318: in submit
+    done = self.enqueue(t)
+           ^^^^^^^^^^^^^^^
+tests/acceptance/W2-97/w2_97_support.py:310: in enqueue
+    return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;w2_97_support.Planted object at 0x7d2ac5e7ec00&gt;, timeout = 600
+args = ('enqueue', '--queue', '/tmp/gov-os-lead-W2-97/pytest-of-usain/pytest-0/test_a_failing_test_the_ticket0/queue', '--ticket', 'W2-901', '--task', ...)
+
+    def tool(self, *args, timeout=RUN_TIMEOUT_S):
+&gt;       assert TOOL.is_file(), f"the merge queue does not exist on this tree: {TOOL} (W2-97 not built)"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the merge queue does not exist on this tree: /home/usain/gov-os-worktrees/W2-97-tests/governance/project/orchestration/tools/merge_queue.py (W2-97 not built)
+
+tests/acceptance/W2-97/w2_97_support.py:305: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,8 @@
+tree 0aa2854bb6ba load 19.60 22.22 25.94
+/tmp/gov-os-lead-W2-110/base-0aa/src/gov/__init__.py
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+14 failed, 2 errors in 74.97s (0:01:14)
+tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+4 failed, 10 passed in 145.28s (0:02:25)
+end load 28.32 29.03 28.13

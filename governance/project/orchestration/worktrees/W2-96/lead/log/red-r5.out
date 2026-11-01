@@ -1,0 +1,28 @@
+.....................................................................FF. [ 66%]
+.....................................                                    [100%]
+=================================== FAILURES ===================================
+E   AssertionError: race 1 of 2 (SIGTERM to gov alone while the nested test sleeps):
+      2 processes of the run still run once gov accept ended: 2499562 /usr/bin/python3 -m gov.cli.main accept TDPL-a961 --json; 2499578 /usr/bin/python3 -B -m pytest /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_r16_a_sigterm_to_gov_alon0/nested/project/tests/acceptance/W9-61 --rootdir=/t
+      the given TMPDIR holds 6 entries 9.0 s after gov accept ended (it held none when gov ended): ['gov-accept-5kkwvtra', 'gov-accept-5kkwvtra/tmp', 'gov-accept-5kkwvtra/tmp/pytest-of-usain', 'gov-accept-5kkwvtra/tmp/pytest-of-usain/pytest-0', 'gov-accept-5kkwvtra/tmp/pytest-of-usain/pytest-0/test_qzv96leak_r16_waits0', 'gov-accept-5kkwvtra/tmp/pytest-of-usain/pytest-0/test_qzv96leak_r16_waits0/qzv96leak-given-1']
+      a name left in the given TMPDIR after gov ended holds the marker
+      command: gov.cli.main accept TDPL-a961 --json
+      exit code: 143
+      stdout: 
+      stderr: 
+    assert not ['2 processes of the run still run once gov accept ended: 2499562 /usr/bin/python3 -m gov.cli.main accept TDPL-a961 --...t-0/test_qzv96leak_r16_waits0/qzv96leak-given-1']", 'a name left in the given TMPDIR after gov ended holds the marker']
+/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-96/test_w2_96_at_review_4.py:198: AssertionError: race 1 of 2 (SIGTERM to gov alone while the nested test sleeps):
+E   AssertionError: race 1 of 2 (the planted test did not wait for its nested run):
+      2 processes of the run still run once gov accept ended: 2502973 /usr/bin/python3 -m gov.cli.main accept TDPL-a961 --json; 2503009 /usr/bin/python3 -B -m pytest /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-0/test_r16_a_test_that_leaves_a_0/nested/project/tests/acceptance/W9-61 --rootdir=/t
+      the given TMPDIR holds 6 entries 8.6 s after gov accept ended (it held none when gov ended): ['gov-accept-t8h9mqpg', 'gov-accept-t8h9mqpg/tmp', 'gov-accept-t8h9mqpg/tmp/pytest-of-usain', 'gov-accept-t8h9mqpg/tmp/pytest-of-usain/pytest-0', 'gov-accept-t8h9mqpg/tmp/pytest-of-usain/pytest-0/test_qzv96leak_r16_returns0', 'gov-accept-t8h9mqpg/tmp/pytest-of-usain/pytest-0/test_qzv96leak_r16_returns0/qzv96leak-given-1']
+      a name left in the given TMPDIR after gov ended holds the marker
+      command: gov.cli.main accept TDPL-a961 --json
+      exit code: 0
+      stdout: {"ok": true, "command": "accept", "result": {"ticket": "TDPL-a961", "outcome": "pass", "error_kind": null, "lines": [{"kpi": "success-1", "outcome": "pass", "passed": 3, "failed": 0, "skipped": 0}, {"kpi": "success-2", "outcome": "pass", "passed": 1, "failed": 0, "skipped": 0}], "unmapped": {"passed": 0, "failed": 0, "skipped": 0}, "totals": {"passed": 4, "failed": 0, "skipped": 0}}, "session": ""}
+      
+      stderr: 
+    assert not ['2 processes of the run still run once gov accept ended: 2502973 /usr/bin/python3 -m gov.cli.main accept TDPL-a961 --...0/test_qzv96leak_r16_returns0/qzv96leak-given-1']", 'a name left in the given TMPDIR after gov ended holds the marker']
+/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-96/test_w2_96_at_review_4.py:226: AssertionError: race 1 of 2 (the planted test did not wait for its nested run):
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_r16_a_sigterm_to_gov_alone_while_a_nested_run_sleeps_leaves_no_process_and_nothing_later
+FAILED tests/acceptance/W2-96/test_w2_96_at_review_4.py::test_r16_a_test_that_leaves_a_nested_run_going_passes_and_leaves_no_process_and_nothing_later
+2 failed, 107 passed in 162.01s (0:02:42)

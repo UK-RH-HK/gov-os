@@ -1,0 +1,63 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "tests/conftest.py"
+   ]
+  }
+ ],
+ "base": "e08717ec6e52ac797ad16b05812fc34dfad92427",
+ "head": "f285aa749c34e8f375b25118dad61b3f8259b082",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-tgk2/CP-DAEO-tgk2-0003.md",
+  "docs/checkpoints/DAEO-tgk2/CP-DAEO-tgk2-0007.md"
+ ],
+ "changed": [
+  "src/gov/rebuild/command.py",
+  "src/gov/rebuild/watch.py",
+  "tests/acceptance/W1-07/w1_07_support.py",
+  "tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py",
+  "tests/acceptance/W1-27/w1_27_support.py",
+  "tests/acceptance/W1-30/w1_30_support.py",
+  "tests/acceptance/W1-41/w1_41_support.py",
+  "tests/acceptance/W2-50/w2_50_support.py",
+  "tests/acceptance/W2-54/w2_54_support.py",
+  "tests/acceptance/W2-69/w2_69_support.py",
+  "tests/acceptance/W2-76/README.md",
+  "tests/acceptance/W2-76/conftest.py",
+  "tests/acceptance/W2-76/test_w2_76_fail_closed.py",
+  "tests/acceptance/W2-76/test_w2_76_machine_lock.py",
+  "tests/acceptance/W2-76/test_w2_76_timings.py",
+  "tests/acceptance/W2-76/test_w2_76_unchanged.py",
+  "tests/acceptance/W2-76/test_w2_76_watchdog.py",
+  "tests/acceptance/W2-76/w2_76_holder.py",
+  "tests/acceptance/W2-76/w2_76_support.py",
+  "tests/conftest.py",
+  "tests/unit/rebuild/test_w2_76_lock_override.py",
+  "tests/unit/rebuild/test_w2_76_watch.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-76/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [],
+ "ignore": [],
+ "deselect": [],
+ "per_test_timeout": 900
+}

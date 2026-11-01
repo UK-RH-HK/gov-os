@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_the_unit_folder_named_secrets_is_gone __________________
+
+    def test_the_unit_folder_named_secrets_is_gone():
+>       assert not OLD.exists(), (
+            f"{OLD.relative_to(support.REPO_ROOT)} still exists: a test package named secrets shadows the standard "
+            f"library's secrets wherever that is imported first")
+E       AssertionError: tests/unit/secrets still exists: a test package named secrets shadows the standard library's secrets wherever that is imported first
+E       assert not True
+E        +  where True = exists()
+E        +    where exists = PosixPath('/home/usain/gov-os-worktrees/W2-107/tests/unit/secrets').exists
+
+tests/acceptance/W2-69/test_w2_69_unit_folder_renamed.py:35: AssertionError
+1 failed in 0.04s

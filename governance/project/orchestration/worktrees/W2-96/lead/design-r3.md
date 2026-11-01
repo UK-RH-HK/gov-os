@@ -1,0 +1,6 @@
+# W2-96 design note, run 2, review 3's addendum (behaviour only)
+
+The design note, R1 to R7 and run 2's R8 to R13 still hold; where they differ, this holds.
+
+- **R14 (the clean-up tolerates concurrent changes; review 3's V1).** The private folder is removed in every path even when a process the run cannot stop (one a test started in a session of its own, such as a nested `gov accept`) changes it meanwhile, or removes it first: an entry already gone is passed over, a folder found not empty is emptied again, and no single entry stops the removal of the rest (a bounded number of passes, then whatever error remains is passed over too). A run stopped by SIGINT, SIGTERM or SIGHUP still ends with 128 plus the signal (R12) whatever the clean-up met; a run that was not stopped is reported as its results say, never turned into `crash` by an entry another process removed. Nothing of the run stays in the caller's `TMPDIR`. Depth still never matters (R10), and the three signals are still held during the clean-up (R9).
+- **R15 (the clean-up's time grows with the entries; review 3's V2, riding along).** Removing a folder whose thousands of sibling folders sit side by side takes time in proportion to the number of entries, not its square: 8,000 empty sibling folders are removed in a few seconds at most, comparable to a plain recursive removal.

@@ -1,0 +1,176 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+..........................s............................................. [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+..........................F............................................. [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+..........................F............................................. [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+................................................................s....... [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+...............................................................          [100%]
+=================================== FAILURES ===================================
+______ test_a_large_store_among_many_small_files_is_decided_by_gov_check _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+env = (PosixPath('/tmp/gov-os-close-20261031-202743/pytest-of-usain/pytest-0/popen-gw4/test_a_large_store_among_many_0/w2-50...2743/pytest-of-usain/pytest-0/popen-gw4/test_a_large_store_among_many_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/gov-os-close-20261031-202743/pytest-of-usain/pytest-0/popen-gw4/test_a_large_store_among_...('/tmp/gov-os-close-20261031-202743/pytest-of-usain/pytest-0/popen-gw4/test_a_large_store_among_many_0/w2-50/pycache'))
+
+    def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
+        """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
+        project, stand_in = env
+        declaration = short_limit(sandbox)
+        size = scan.SCALED_LARGE_SIZE
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, size, {16: start, size // 2 + 4096: middle, size - 64: end})
+        small = scan.marker("smallfile")
+        block = scan.filler_block(16 * 1024, seed="small").decode()
+        for index in range(300):
+            support.write(project / scan.RUNTIME / "packets" / f"DAEO-{index:04d}" / "packet.md",
+                          f"{block[:8000]}\n{small}\n{block[8000:]}")
+        checks = project / "governance/kernel/checks"
+        checks.mkdir(parents=True, exist_ok=True)
+        (checks / "secrets-indexing.yaml").write_bytes(support.CHECK_DECLARATION.read_bytes())
+        run = scan.run_scan(sandbox, project, stand_in, markers=[*words(LARGE), small], rate=scan.SLOW_RATE,
+                            via_gov_check=True)
+        assert run.returncode is not None, f"gov check did not finish within the check's declared limit\n{run.describe()}"
+        try:
+            envelope = json.loads(run.stdout)
+        except ValueError:
+            raise AssertionError(f"gov check --json gave no JSON\n{run.describe()}") from None
+        status = [entry.get("status") for entry in _check_entries(envelope) if entry.get("id") == "secrets-indexing"]
+>       assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
+E       AssertionError: the secrets-indexing check under gov check is ['RED'], not GREEN
+E         exit code: 3 after 39.0 s; gitleaks runs: 194
+E         stdout:
+E         ibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/usain/gov-os-runs/W2-00/close/W2-107-20261031-"}], "provenance": {"commit": "921062e696b6889c19574490c018498197df372e", "check_version": "1.0.0", "inputs_hash": "6173c478830db7cb"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "921062e696b6889c19574490c018498197df372e", "check_version": "1.0.0", "inputs_hash": "ecbdcc40b3e7e875"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "921062e696b6889c19574490c018498197df372e", "check_version": "1.0.0", "inputs_hash": "fd585e28a843d338"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "921062e696b6889c19574490c018498197df372e", "check_version": "1.0.0", "inputs_hash": "7c8284abc861c4e8"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: RED
+E           skill regression: GREEN
+E         
+E       assert ['RED'] == ['GREEN']
+E         
+E         At index 0 diff: 'RED' != 'GREEN'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:227: AssertionError
+________ test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs ________
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs():
+        """Read from the sources: a whole-tree copy that takes no root parameter cannot be run on a synthetic root."""
+        unchecked = sorted(function.label for function in check.whole_tree_copiers() if not function.runnable)
+>       assert not unchecked, (
+            f"these functions copy the whole tree of the repository and cannot be run by the check: {unchecked}. "
+            f"Make each a module-level function with a parameter `root={check.ROOT_NAME}` that leaves "
+            f"{check.HELD_OUT_REL} out by its path, or limit it to named paths (DEC-385)."
+        )
+E       AssertionError: these functions copy the whole tree of the repository and cannot be run by the check: ['W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket']. Make each a module-level function with a parameter `root=REPO_ROOT` that leaves governance/project/held-out.yaml out by its path, or limit it to named paths (DEC-385).
+E       assert not ['W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket']
+
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py:72: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+2 failed, 6611 passed, 2 skipped in 2455.19s (0:40:55)

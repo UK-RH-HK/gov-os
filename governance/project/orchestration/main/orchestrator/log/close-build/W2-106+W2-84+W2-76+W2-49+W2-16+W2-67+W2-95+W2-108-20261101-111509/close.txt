@@ -1,0 +1,74 @@
+2026-11-01 11:15:09 re-using W2-106+W2-84+W2-76+W2-49+W2-16+W2-67+W2-95+W2-108-20261101-005000: its clone, selection and test results (only the attribution is done again)
+2026-11-01 11:15:10 W2-106 (DAEO-0mtg, FULL) merges 0d53c56a1bfc on head be171b570263
+2026-11-01 11:15:10 W2-84 (DAEO-m1u3, FULL) merges 6d2fc62a8a24 on head be171b570263
+2026-11-01 11:15:10 W2-76 (DAEO-tgk2, STANDARD) merges 3c5f212d5cdd on head be171b570263
+2026-11-01 11:15:10 W2-49 (DAEO-ha8z, STANDARD) merges bc31d915e860 on head be171b570263
+2026-11-01 11:15:10 W2-16 (DAEO-49o5, FULL) merges 2359f6d79e3e on head be171b570263
+2026-11-01 11:15:10 W2-67 (DAEO-9nys, FULL) merges 9b03ac0b57ab,4da40b600488 on head be171b570263
+2026-11-01 11:15:10 W2-95 (DAEO-57hm, STANDARD) merges 44eccdfa8fbe on head be171b570263
+2026-11-01 11:15:10 W2-108 (DAEO-zoex, STANDARD) merges b639e05641ca,789513df655c on head be171b570263
+2026-11-01 11:15:10 run scope scoped: 79 targets; core changed 5, unplaced 0
+2026-11-01 11:18:21 passes alone (flaky candidate): tests/acceptance/W1-35/test_w1_35.py
+2026-11-01 11:18:46 passes alone (flaky candidate): tests/acceptance/W1-35/test_w1_35_orchestration.py
+2026-11-01 11:18:46 red alone: tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-11-01 11:18:50 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-11-01 11:18:53 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-11-01 11:18:56 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-11-01 11:19:00 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-11-01 11:19:00 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-11-01 11:19:00 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-11-01 11:19:32 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_clean_store_is_decided_green
+2026-11-01 11:19:49 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it
+2026-11-01 11:20:19 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_among_many_small_files_is_decided_by_gov_check
+2026-11-01 11:25:47 passes alone (flaky candidate): tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here
+2026-11-01 11:31:02 passes alone (flaky candidate): tests/acceptance/W2-54/test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched
+2026-11-01 11:31:02 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-11-01 11:31:03 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-11-01 11:31:03 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-11-01 11:31:04 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-11-01 11:31:11 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer]
+2026-11-01 11:31:16 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer]
+2026-11-01 11:31:20 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role]
+2026-11-01 11:31:24 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]
+2026-11-01 11:31:29 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[NotebookEdit-engineer]
+2026-11-01 11:31:33 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+2026-11-01 11:31:38 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role]
+2026-11-01 11:31:45 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Write-engineer]
+2026-11-01 11:31:48 passes alone (flaky candidate): tests/acceptance/W2-57/test_w2_57_designer_read_p95.py::test_a_test_designer_s_read_on_a_branch_with_changes_is_decided_under_100_ms_at_p95
+2026-11-01 11:31:49 trace: against the known state 1f0bb5b3c516
+2026-11-01 11:49:33 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-11-01 11:50:02 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-11-01 11:50:30 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-11-01 11:50:58 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-11-01 11:51:22 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-11-01 11:51:24 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-11-01 11:51:26 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-11-01 11:51:29 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-11-01 11:51:36 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-11-01 11:51:39 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-11-01 11:51:42 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-11-01 11:51:45 tk close DAEO-0mtg: Updated DAEO-0mtg -> closed
+2026-11-01 11:51:45 commit: 23bef3db W2-106 (DAEO-0mtg): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-106
+2026-11-01 11:51:45 tk close DAEO-m1u3: Updated DAEO-m1u3 -> closed
+2026-11-01 11:51:45 commit: a4d69f7f W2-84 (DAEO-m1u3): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-84
+2026-11-01 11:51:45 tk close DAEO-tgk2: Updated DAEO-tgk2 -> closed
+2026-11-01 11:51:45 commit: 2900760c W2-76 (DAEO-tgk2): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-76
+2026-11-01 11:51:45 tk close DAEO-ha8z: Updated DAEO-ha8z -> closed
+2026-11-01 11:51:45 commit: f95a7860 W2-49 (DAEO-ha8z): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-49
+2026-11-01 11:51:45 tk close DAEO-49o5: Updated DAEO-49o5 -> closed
+2026-11-01 11:51:45 commit: b7e0801f W2-16 (DAEO-49o5): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-16
+2026-11-01 11:51:45 tk close DAEO-9nys: Updated DAEO-9nys -> closed
+2026-11-01 11:51:45 commit: 7fcd2517 W2-67 (DAEO-9nys): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-67
+2026-11-01 11:51:45 tk close DAEO-57hm: Updated DAEO-57hm -> closed
+2026-11-01 11:51:45 commit: 041b2786 W2-95 (DAEO-57hm): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-95
+2026-11-01 11:51:45 tk close DAEO-zoex: Updated DAEO-zoex -> closed
+2026-11-01 11:51:45 commit: 127235b2 W2-108 (DAEO-zoex): closed on the 10 practices (DEC-953)
+2026-11-01 11:51:45 CLOSED W2-108
+2026-11-01 11:51:45 done; wall 2195 s

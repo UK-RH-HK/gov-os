@@ -1,0 +1,3 @@
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+8 failed, 3942 passed, 2 skipped in 3227.55s (0:53:47)

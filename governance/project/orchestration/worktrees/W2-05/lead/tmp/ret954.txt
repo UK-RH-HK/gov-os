@@ -1,0 +1,157 @@
+I'm returning **PACKAGES**: the FULL review passed and is committed, but the scoped verification never ran. The machine's memory gate held it past 90 minutes (DEC-943), and four packages need decisions before W2-05 can merge.
+
+task: W2-05 (DAEO-0z8c) resume under DEC-953/954/957/968: the W1-02 revision, engineer batch 2, `gov checkpoint`, the FULL review, the scoped verification.
+status: PACKAGES. The review passed and its record is committed. The scoped verification never ran: the memory gate in `verify_lock.sh` held it from 07:50 to 09:21, and an earlier attempt waited from 05:43. Packages I and H block the merge; R3-1 and DRIFT-BASE do not block it.
+work_completed:
+- **Stray file:** a short test-designer session (td6) judged `tests/acceptance/W2-05/test_zz_scratch_b1.py` not to be real work (a docstring, 0 tests) and removed it with no commit. `rm` hit a permission prompt; its one allowed fallback, `os.remove` from a script, worked.
+- **W1-02 revision (td7), in the tests worktree, run beside the engineer (DEC-963):** the 14 cases are green. The look-up cases are refused at about 15.7 s by its 15 s limit, through `.git/config` made a named pipe. The cases for DEC-580's 20 s deadline use the pending-calls pipe and keep their 19 s lower bound. I merged it here myself because the engineer had already ended. I skipped the fresh implementer that would only run the tests: my check and the scoped run cover it (DEC-959 item 1).
+- **Engineer batch 2:** done as briefed.
+  - The helper gains `git_binary`; containment now runs git by the same absolute path as the guard's look-up and refuses when no git is found (P-B1-2).
+  - The close's calls go through the helper. Its test runs, probes and collection run get no `GIT_*` variable of the caller and pinned configuration. Its commits stay unpinned, so who authors them is unchanged.
+  - Rows 39 to 41 (W2-03's files) and the nightly's calls (W2-77's): only each call's environment changed. `cli/main.py`'s `_version` is now pinned.
+  - The sweep record has 65 rows, and every held file is marked "after <ticket> merges".
+  - Both batch-2 acceptance cases now pass.
+- **Repair batch, the one allowed (td8, test design, DEC-906):**
+  - My check on `018a0a33587c`, outside the sandbox: 5 W1-02 cases red. They still slowed the hook through a `git` first on `PATH`, which containment no longer runs.
+  - td8 rebuilt those 5 on allowed routes and removed the `PATH` stand-in from W1-02's support.
+  - It also rebuilt W2-05's "order of the hooks" case from a fixed source: the case had read the repository's `postToolUse`, which ACT 1 removed.
+  - No expectation was lowered. W1-02 whole: 3,655 passed in its sandbox.
+- **Review:** I stopped the first launch after about six minutes, before any finding, because the repair was about to change the head. The second launch judged **pass** at `ecbdf689f283`.
+- **Checkpoints and record:** `gov checkpoint` records CP-0023 and CP-0024 committed. Two rebuilds: the first was made before the repair merge, which left the index stale, so I rebuilt again at `ecbdf689`. `gov check` ran twice. The probe record is committed.
+files_changed:
+- **src and template (batch 2):** `src/gov/util/gitenv.py`, `guard/decide.py`, `guard/containment.py`, `close/repo.py`, `close/batch.py`, `close/tool.py`, `close/traceability.py`, `close/command.py`, `close/nightly.py`, `decisions/checker.py`, `store/loader.py`, `cli/main.py`, `check/runner.py`, `check/audit_validator.py`, `check/claims.py`, `check/pathmap.py`, `checkpoint/record.py`, `telemetry/counter.py`, `status/command.py`, `closure/__init__.py`.
+- **Unit tests and sweep:** `tests/unit/gitenv/test_batch2.py`, `docs/research/AR-2-git-sweep.md`.
+- **Acceptance (test designers):** `tests/acceptance/W1-02/{README.md, w1_02_deadline_support.py, test_w1_02_deadline.py, test_w1_02_deadline_in_time.py, test_w1_02_unknown_tools_failure.py}` and `tests/acceptance/W2-05/{README.md, test_w2_05_hooks_source.py}`.
+- **Lead:** `docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0023.md`, `CP-DAEO-0z8c-0024.md`, `docs/probes/DAEO-0z8c/PR-DAEO-0z8c.md`.
+- **Under `src/gov/close/**`, `guard/**`, `store/**` and `decisions/**` (run-4 item 8):** close `batch.py`, `command.py`, `nightly.py`, `repo.py`, `tool.py`, `traceability.py`; guard `containment.py`, `decide.py`; `store/loader.py`; `decisions/checker.py`. W2-03's, W2-57's and W2-77's probes judged these files, so their closes come before this merge (DEC-895).
+evidence:
+- **Head:** `93859f1f621e`, tree clean.
+- **Commits** (all with `Task: DAEO-0z8c`):
+  - Engineer (`Role: engineer`, `Implements: DEC-804, DEC-777, DEC-802, DEC-580, DEC-710, DEC-951`): `55586fded9de`, `147bed88be33`, `adb61a23cf83`, `0ff79288c72e`. The last one's body opens with "W2-M161:", which git also reads as a trailer paragraph; the real trailers are intact.
+  - Test designer (`Role: independent-test-designer`):
+    - `a8b9cd07e1ae`: `Implements: DEC-951, DEC-783, DEC-580`, `Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160`.
+    - `8383bea1da69`: `Implements: DEC-951, DEC-802, DEC-953, DEC-906`, with two `Rewrite-Reason:` lines (P-B1-2; ACT 1).
+  - Lead (`Role: orchestrator`, `Implements: DEC-951, DEC-710, DEC-953`): merges `018a0a33587c` and `da8e9bfc86c2`; checkpoints `f217353e59fa` and `ecbdf689f283`; probe record `93859f1f621e`, committed alone.
+- **trailer_gate:** "DAEO-0z8c: 31 commits, 31 judged, 0 lacking, 0 Implements item(s) not a decision or Contract id that resolves".
+- **keyword_warn:** 0 files.
+- **Code under test:** `gov.__file__` is `/home/usain/gov-os-worktrees/W2-05/src/gov/__init__.py`.
+- **Rebuilds:** rebuild 1, exit 0, 04:54 to 05:24 at `f217353e`. Rebuild 2, exit 0, waited on W2-67's rebuild lock from 06:13 and ended about 07:24.
+- **Selection** (at `ecbdf689`): scope `scoped`; `core_changed` 16 files (check `audit_validator`, `claims`, `pathmap`, `runner`; `cli/main`; close `batch`, `command`, `nightly`, `repo`, `tool`, `traceability`; guard `containment`, `decide`; `retrieval/lexical`; `store/loader`; `tasks/tickets`); `unplaced` none; 70 targets; reasons OWN, OVERLAP, TEST_CHANGED, COUPLING, EVERY_CLOSE, RECORD_READING, UNIT.
+- **Probe record:** `docs/probes/DAEO-0z8c/PR-DAEO-0z8c.md`, judgement pass, probed_commit `ecbdf689f283cab6b7068cdd2b93d46f449d8058`.
+- **Workers:** all six ran through `gov launch`, sandboxed (none needed the code graph). Each passed its sandbox check and returned all twelve fields.
+- **Tripwires 7 to 12:** in this worktree and the tests worktree, only the changes each brief allowed. The main tree's head moved, and W2-105, W2-106 and W2-107 changed: those were other sessions'.
+- **Hooks:** no `pre-commit` file before any commit.
+- **Scratch:** `/tmp/gov-os-lead-W2-05` 237M and 30,833 inodes; `.gov-runtime` 425M and 3,420 inodes. The orchestrator should remove the first; I cannot (permission prompt).
+tests:
+- **My check, outside the sandbox, at `018a0a33`:** W1-02's three deadline files: 42 passed, 5 failed (the 5 the repair fixed).
+- **td8 (sandboxed, at `f217353e`'s code):**
+  - the deadline files plus `hooks_source`: 56 passed, 1 failed (package H);
+  - W1-02 whole: 3,655 passed;
+  - W2-05: 41 passed, 7 failed (H, plus 6 that fail only in the sandbox: five retrieval-regression cases with no embedder, and the code-index case with a read-only daemon folder).
+- **td7 (sandboxed):** W1-02 green apart from the load-sensitive `test_decision_p95_is_under_100_ms`.
+- **eng5 (sandboxed):**
+  - unit: close 477, check 134, guard 1069, containment 114, decisions 33, store 20, cli 14, adapters 94, all green; gitenv 29 passed, 1 failed (H);
+  - `tests/unit` with pinned configuration: 4 failed (H, plus 3 in `tests/unit/containment/test_dec_572_lift.py`, package I).
+- **`gov check` at `ecbdf689`:**
+  - first run, on the stale store: red adapter-portability, index-freshness and recovery-rebuild;
+  - second run, after rebuild 2: red adapter-portability (H), and context-reproducibility and retrieval-regression, both "did not end within its time limit of 600 seconds" at load 60 to 148 (green in the first run);
+  - yellow core-decision-citations (older commits cite DEC-942, 937 and 921) and openspec-validate (not on PATH).
+- **Not run:** the scoped parallel and serial runs (held). Collect-only: lifted (DEC-868 in DEC-953's list). The plan validator was not run (DEC-738 item 2). DEC-906's W1-01 known red was not observed, because no run was made.
+discoveries:
+- The engineer's containment change (P-B1-2) broke 5 W1-02 cases that still slowed the hook through a `PATH` git. Nobody had foreseen it; the one repair batch fixed it.
+- ACT 1 (`6c36c7b5`) took `postToolUse` and `postToolUseFailure` out of `.rulesync/hooks.jsonc`; the template keeps them. DEC-805's comparison is therefore red over this repository (H).
+- The W2-M161 case plants a trace setting in the person's `~/.gitconfig`, so the close's test runs must be pinned. The person's `~/.gitconfig` sets `user.name`, `user.email` and `init.defaultbranch`, which pinned runs no longer see (I).
+- From the review: R3-1, R3-2 and R3-3 (see `proposed_decisions`), and package I's bisect addition.
+- The scratch draft of the probe record keeps the id at 12 digits (row W2-L423's rule); the committed copy has the full id.
+- The register lacks DEC-961, 963, 966, 967 and 968; I followed the brief's text of them.
+- List rows:
+  - W2-L160: done in batch 1 (the look-up) and batch 2 (containment).
+  - W2-M161: done, with package I open.
+  - W2-M281: done, with H open.
+  - W2-L109, W2-M012, W2-M105, W2-M113, W2-M231: done in earlier runs, not re-checked in this run.
+risks:
+- **Merging as it stands:** tonight's nightly and every close run their tests pinned. The 3 containment unit tests go red, plus an unmeasured number of acceptance cases that commit without an identity of their own or rely on the default branch name (I). Adapter-portability stays red in every `gov check` (H).
+- **R3-1 when W2-08 lands:** a declared check that reads what is staged sees nothing under `commit -a` and `commit -- <path>`.
+- The deadline windows (19 to 26 s, 14.5 to 21 s) are tight at a load above 100.
+lessons:
+- Brief a lead's W1-02-style "slow step" revisions against the whole batch's changes, not only the code already built.
+- On this machine, budget hours for `verify_lock.sh` when 5 to 8 leads are running.
+- Launched sessions and the lead cannot `rm` (a permission prompt); write the file over instead.
+- A sandboxed `git status` shows `/dev/null` placeholder files at the worktree root; they are not real.
+proposed_decisions:
+- **Package I: pinned close and nightly test runs drop the person's git identity** (P2: shared code, every stream; blocks the merge).
+  - Context: W2-M161 asks for "a sanitised environment and pinned git configuration" for every subprocess of a close, and the case requires the test runs pinned.
+  - What happened: `_started` now gives every test run `GIT_CONFIG_GLOBAL=/dev/null` and `GIT_CONFIG_NOSYSTEM=1`. Tests that commit without their own identity, or that rely on `init.defaultBranch`, fail under `gov close` and the nightly. Three unit tests are measured; the acceptance suites are not. The nightly's bisect runs unpinned, so it would blame the wrong commit or none.
+  - Why it matters: closes and the nightly turn red. That fails closed, not open.
+  - Options:
+    - (a) Keep as built; other tickets' owners make their tests hermetic. Cost unknown, many streams touched.
+    - (b) Keep the runs pinned, but give `GIT_CONFIG_GLOBAL` a generated file holding only the person's `user.name`, `user.email` and `init.defaultBranch` (lowest precedence, so trace settings stay out and the case stays green), and pin the nightly's bisect the same way. About 30 to 40 lines plus unit tests: one engineer batch and a short review, about 2 to 3 hours.
+    - (c) Unpin the test runs and re-baseline the case. This lowers W2-M161's KPI.
+  - Recommendation: (b), confidence medium-high. Classification: I yes/other.
+  - Blocks: the merge, not the review. Waiting keeps W2-08 and F-A's fix waiting.
+- **Package H: ACT 1 against DEC-805 item 2** (P2: changes how a standing decision applies; blocks a green `gov check` and the merge).
+  - Context: DEC-805 compares the template's hooks source with the repository's, and expected this repository to be green once the template carried the missing matcher.
+  - What happened: ACT 1 removed two events from the repository's source only. `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources` and `test_this_repository_s_two_hooks_sources_agree` are red, and adapter-portability is red in every `gov check`.
+  - Why it matters: under DEC-953 this gate is lifted for this repository's own development, but the red shows in every run.
+  - Options:
+    - (a) Add a temporary exception to the check for the events ACT 1 lifted, plus a test-designer revision. About 1 to 2 hours.
+    - (b) Drop the two events from the template too. That deletes product, against DEC-953.
+    - (c) Name the two cases as known reds while the lift lasts.
+  - Recommendation: (c) now, then (a) if the lift lasts. Confidence medium. Classification: H yes/other.
+  - Blocks: the merge, until the orchestrator says which.
+- **P-W2-05-R3-1: P-1 and a declared check that reads what is staged** (P1: the owner's P-1; feature-gated, DEC-803).
+  - What happened: under `commit -a` and `commit -- <path>`, the default index the check gets shows nothing staged.
+  - Options:
+    - (a) Apply now: also hand the check git's own index under a separate name.
+    - (b) Make it an entry criterion of W2-08, designed as (a), and correct the sentence in the sweep and the helper now.
+    - (c) Re-baseline: document the limit.
+  - Recommendation: (b), confidence high on the behaviour, medium on the routing. Classification: R3-1 yes/fails open (feature-gated).
+  - Blocks: W2-08's start, not W2-05's merge.
+- **P-W2-05-DRIFT-BASE** (P3/P2):
+  - What happened: since ACT 1, the matcher-drift case passes because of an event difference, not the matcher.
+  - Option and cost: a small test-designer edit (build the base pair from one source); no expectation lowered.
+  - Recommendation: do it in the next W2-05 resume; confidence high. Classification: yes/other.
+  - Blocks: nothing.
+- **Rows for the Wave 3 hardening pass or W2-08:**
+  - R3-2: the pinned look-up misses a freeze when git refuses another owner's repository (no/fails open).
+  - R3-3 (answers P-W1-02-CHILD): a hanging git in the Bash bookkeeping is recorded, not passed, but its child is left running (no/other).
+- **V: the verification was held** (the run itself is done; this is a report). The memory gate in `verify_lock.sh` held the run from 07:50 to 09:21, and earlier from 05:43. Waiting costs W2-05's merge.
+  - Options: (a) the CTO's resume runs `verify5.sh parallel F`, then `serial F`, then `rerun5.sh` when the gate opens; (b) authorise running without the wrapper (DEC-968 says "may").
+  - Recommendation: (a), confidence high.
+unresolved:
+- Packages I, H, R3-1 and DRIFT-BASE.
+- The scoped verification.
+- `/tmp/gov-os-lead-W2-05` (237M), for the orchestrator to remove.
+recommended_next_action: Decide I and H. Then resume W2-05 from `.gov-runtime/scratch/lead/CHECKPOINT.md`: run the scoped verification (`verify5.sh parallel F`, `serial F`, `rerun5.sh`); if I (b) is chosen, run one engineer batch and a review of that work before it.
+
+guard_refusals:
+- ~02:40 | eng5: a pytest run of W2-05 piped through `ls`, `sed` and `awk` | "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)" | false-positive | ~2 min; it used the brief's own run form.
+- ~05:00 | lead: `wc`, `grep` and `head` of `tests/acceptance/serial-only.txt` plus a `python3 -c` | the same reason | false-positive | ~2 min; I used the Read tool.
+- ~05:59 | rev3b: a compound shell probe of `git bisect run` in its temp folder | "a reviewer or auditor runs only commands whose writes can be read…" | false-positive (its writes went only to its temp folder) | ~5 min; it re-ran the probe as a Python file. It bears only on package I's bisect addition.
+- Not the hook, permission prompts: `rm` refused to td6, eng5 (twice), td7, rev3b and the lead (twice, with one compound command); here-documents and `$TMPDIR` in compound commands refused to td7 and eng5. Read refusals (DEC-849): 0, for the lead and every worker.
+
+Memory (DEC-836): every brief told its worker to use `gov retrieve`.
+- td6: did not use it (not needed).
+- td7: once; it hung (the sandbox blocks the embedder).
+- eng5: did not use it (it says so).
+- td8: once, late; no implementation path was served (P-R1).
+- rev3b: once; `FACET_UNAVAILABLE`.
+
+brief_gaps:
+- The stray file is in this worktree, but DEC-963 puts the test designer in the tests worktree, whose sandbox cannot write here, so it needed a separate session | common brief | ~10 min (est.)
+- A sandboxed `git status` shows `/dev/null` placeholder files, so exact-status checks report false differences | brief templates | ~2 min
+- `rm` is a permission prompt for launched sessions and the lead | tool | ~5 min
+- The run-4 W1-02 behaviours didn't foresee that P-B1-2's containment change would break the Bash-bookkeeping cases | this ticket's part | ~1.5 h (the repair batch)
+- ACT 1's hooks change against DEC-805 item 2 and its case was unforeseen | this ticket's part / decision | ~20 min
+- W2-M161's pinned test runs against the person's identity were unforeseen | this ticket's part / decision | ~30 min
+- `verify_lock.sh`'s memory gate held a scoped run with a core change for 90+ minutes; when to bypass it is unstated beyond "may" | common brief / tool | ~150 min
+- The rebuild-lock queue (W2-67) held rebuild 2 for about 55 minutes | tool | ~55 min
+- `select_tests.py` returns `per_test_timeout: 900`, which the brief's run form has no slot for | common brief | ~2 min
+- `gov check`'s families with a time limit time out under load | tool | ~5 min
+- DEC-961, 963, 966, 967 and 968 are missing from the worktree's register | ticket / brief | ~1 min
+
+Learning metrics:
+- KPI disputes: 0. False findings: 0. Iterations: converged.
+- Acceptance tests rewritten after implementation began: W1-02, 14 cases (DEC-951) plus 5 cases (DEC-802, P-B1-2); W2-05's order case (ACT 1). No new cases were added after implementation.
+- Lines against the estimate of 130 to 180: src and template +100/−50; acceptance +595/−143; unit and sweep +339/−67.
+- Lead checkpoint: `/home/usain/gov-os-worktrees/W2-05/.gov-runtime/scratch/lead/CHECKPOINT.md`.

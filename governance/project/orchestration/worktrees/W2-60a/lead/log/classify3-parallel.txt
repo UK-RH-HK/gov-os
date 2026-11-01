@@ -1,0 +1,116 @@
+301 class (i): role file without its lines {'tests/acceptance/W1-46': 211, 'tests/acceptance/W1-32': 14, 'tests/acceptance/W1-33': 3, 'tests/acceptance/W1-50': 10, 'tests/acceptance/W1-38': 5, 'tests/acceptance/W1-28': 58}
+56 other {'tests/acceptance/W1-05': 2, 'tests/acceptance/W1-32': 2, 'tests/acceptance/W1-50': 47, 'tests/acceptance/W1-33': 4, 'tests/acceptance/W2-60a': 1}
+11 W2-90 (ACT 1 live wiring) {'tests/acceptance/W1-46': 5, 'tests/acceptance/W1-28': 2, 'tests/acceptance/W2-59': 4}
+--- other
+error tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+      failed on setup with "Failed: the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash"
+error tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+      failed on setup with "Failed: the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash"
+failed tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written[stderr-reader-gone-7]
+      AssertionError: gov launch did not start exactly one worker session (0 recorded)
+failed tests/acceptance/W1-32/test_w1_32_added_cases.py::test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written[stderr-reader-gone-0]
+      AssertionError: gov launch did not start exactly one worker session (0 recorded)
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-first-parent-s-content-an-ordinary-merge]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-first-parent-s-content-the-parents-turned-round]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-second-parent-s-content-an-ordinary-merge]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_own_whichever_side_s_content_the_merge_commit_holds[holds-the-second-parent-s-content-the-parents-turned-round]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_clean_combination_of_two_sides_edits_of_one_test_in_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_puts_a_test_both_sides_changed_in_the_same_way_in_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_reads_a_source_file_both_sides_changed_as_before[holds-the-first-parent-s-content]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_reads_a_source_file_both_sides_changed_as_before[holds-the-second-parent-s-content]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py::test_read_merge_finds_no_own_change_where_each_side_changed_another_acceptance_test
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_puts_what_either_parent_brought_beside_a_hand_edit_in_brought
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_puts_what_the_first_parent_brought_beside_a_dropped_change_in_brought
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_puts_the_change_a_turned_round_merge_commit_keeps_in_brought
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_brought.py::test_read_merge_brings_nothing_in_a_criss_cross_merge_although_each_parent_holds_a_change_of_its_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_puts_the_paths_a_turned_round_merge_commit_drops_in_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_puts_what_an_ours_merge_drops_in_its_own_and_not_in_the_ordinary_merge_s_after_it
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_finds_no_own_change_in_a_merge_that_takes_each_side_s_change[an-ordinary-merge]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_finds_no_own_change_in_a_merge_that_takes_each_side_s_change[the-parents-turned-round]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_with_several_merge_bases_puts_every_path_that_differs_from_any_parent_in_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_with_no_merge_base_puts_every_path_that_differs_from_any_parent_in_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_fails_closed_for_a_whole_octopus_merge_when_one_parent_has_several_merge_bases_or_none[one-other-parent-has-no-merge-base-with-the-first]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_fails_closed_for_a_whole_octopus_merge_when_one_parent_has_several_merge_bases_or_none[one-other-parent-has-several-merge-bases-with-the-first]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_reads_an_octopus_whose_other_parents_cross_only_each_other_parent_by_parent
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_raises_a_public_error_for_an_unknown_commit_id[all-zeros]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_raises_a_public_error_for_an_unknown_commit_id[forty-hex-digits-that-name-no-object]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_raises_a_public_error_for_a_path_that_is_no_repository
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_the_error_read_merge_raises_is_documented
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_the_docstring_of_read_merge_speaks_of_own_and_brought
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[an-option-with-a-value]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[the-empty-string]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[the-option-1]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_every_parent.py::test_read_merge_refuses_a_commit_argument_that_is_no_commit_id[the-option-all]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-conflict-resolved-by-hand-to-content-neither-parent-holds]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-criss-cross-merge]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-a-branch-that-renamed-a-file]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-of-an-unrelated-history]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-sets-a-test-back-to-the-merged-branch-s-unchanged-content]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[a-merge-that-undoes-commits-through-a-new-empty-commit]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-octopus-merge]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_read_merge_helper.py::test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought[an-ordinary-integration-merge]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_finds_no_own_change_in_an_ordinary_octopus_merge_of_eight_branches
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_refuses_a_commit_argument_with_a_commit_id_s_form_that_is_not_the_id_of_a_commit[sixty-four-hex-digits-that-are-the-name-of-a-branch-at-a-merge-commit]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_refuses_a_commit_argument_with_a_commit_id_s_form_that_is_not_the_id_of_a_commit[the-object-id-of-an-annotated-tag-that-points-at-a-merge-commit]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_still_reads_the_merge_commit_s_own_full_id_beside_a_tag_and_a_hex_named_branch
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+      AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pyt
+failed tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+      AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-54/pop
+failed tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+      AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytes
+failed tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+      AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-54/popen
+failed tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py::test_read_merge_puts_a_ticket_file_both_sides_changed_in_own[holds-the-first-parent-s-content]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py::test_read_merge_puts_a_ticket_file_both_sides_changed_in_own[holds-the-second-parent-s-content]
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W1-50/test_w1_50_ticket_file_changed_on_both_sides.py::test_read_merge_puts_a_ticket_file_both_sides_changed_in_the_same_way_in_own
+      AssertionError: `gov.guard.containment_merge` was imported from /home/usain/gov-os-worktrees/W2-60a/tests/unit/adapters/../../../src/gov/guard/containment_merge.py, not from this repository's /home/usain/gov-os-worktrees/W2-60a/src
+failed tests/acceptance/W2-60a/test_w2_60a_no_compaction_threshold.py::test_a_compaction_threshold_in_the_caller_s_environment_does_not_reach_the_session
+      AssertionError: the caller's CLAUDE_CODE_AUTO_COMPACT_WINDOW reached the session's process environment (W2-56's cleaned environment)

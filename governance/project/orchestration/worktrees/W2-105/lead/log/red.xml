@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="22" skipped="0" tests="47" time="36.563" timestamp="2026-10-31T03:19:16.903533+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_templates_source_binds_the_install[npm install -g ccusage]" time="0.002"><failure message="AssertionError: template/.rulesync/permissions.jsonc still gives a rule that binds `npm install -g ccusage`: [('bash', 'npm install*', 'deny')]. rulesync makes it a rule of every project generated from the template, and the CTO's session can never ask the owner (DEC-966 item 1)&#10;assert not [('bash', 'npm install*', 'deny')]">command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_no_rule_of_the_templates_source_binds_the_install(command):
+        """Whatever its value: rulesync generates ``Bash(&lt;pattern&gt;)`` from each ``bash`` rule of the source."""
+        found = _sorted((category, pattern, value) for category, pattern, value in support.template_source_rules()
+                        if category == "bash"
+                        and support.matching_rule([f"Bash({pattern})"], command, support.REPO_ROOT))
+&gt;       assert not found, (
+            f"{support.SOURCE_REL} still gives a rule that binds `{command}`: {found}. rulesync makes it a rule of every "
+            f"project generated from the template, and the CTO's session can never ask the owner (DEC-966 item 1)"
+        )
+E       AssertionError: template/.rulesync/permissions.jsonc still gives a rule that binds `npm install -g ccusage`: [('bash', 'npm install*', 'deny')]. rulesync makes it a rule of every project generated from the template, and the CTO's session can never ask the owner (DEC-966 item 1)
+E       assert not [('bash', 'npm install*', 'deny')]
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:47: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_templates_source_binds_the_install[pip install requests]" time="0.001"><failure message="AssertionError: template/.rulesync/permissions.jsonc still gives a rule that binds `pip install requests`: [('bash', 'pip install*', 'deny')]. rulesync makes it a rule of every project generated from the template, and the CTO's session can never ask the owner (DEC-966 item 1)&#10;assert not [('bash', 'pip install*', 'deny')]">command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_no_rule_of_the_templates_source_binds_the_install(command):
+        """Whatever its value: rulesync generates ``Bash(&lt;pattern&gt;)`` from each ``bash`` rule of the source."""
+        found = _sorted((category, pattern, value) for category, pattern, value in support.template_source_rules()
+                        if category == "bash"
+                        and support.matching_rule([f"Bash({pattern})"], command, support.REPO_ROOT))
+&gt;       assert not found, (
+            f"{support.SOURCE_REL} still gives a rule that binds `{command}`: {found}. rulesync makes it a rule of every "
+            f"project generated from the template, and the CTO's session can never ask the owner (DEC-966 item 1)"
+        )
+E       AssertionError: template/.rulesync/permissions.jsonc still gives a rule that binds `pip install requests`: [('bash', 'pip install*', 'deny')]. rulesync makes it a rule of every project generated from the template, and the CTO's session can never ask the owner (DEC-966 item 1)
+E       assert not [('bash', 'pip install*', 'deny')]
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:47: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-deny]" time="5.304"><failure message="AssertionError: permissions.deny of the generated .claude/settings.json holds Bash(npm install*), which binds `npm install -g ccusage`: Claude Code refuses the install before the guard is asked (DEC-966 item 1, DEC-172)&#10;assert 'Bash(npm install*)' is None">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+command = 'npm install -g ccusage', kind = 'deny'
+
+    @pytest.mark.parametrize("kind", support.RULE_LISTS)
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_no_rule_of_the_generated_settings_binds_the_install(settings, live, command, kind):
+        """``deny``: the KPI line itself. ``ask`` and ``allow``: removed, not moved (W1-47's reading of DEC-172): a
+        settings rule there would decide the install beside the guard's install rule."""
+        rule = support.settings_rule_for(settings, kind, command, live)
+&gt;       assert rule is None, (
+            f"permissions.{kind} of the generated {support.SETTINGS_REL} holds {rule}, which binds `{command}`"
+            + (": Claude Code refuses the install before the guard is asked (DEC-966 item 1, DEC-172)"
+               if kind == "deny" else ": the guard's install rule no longer decides the install alone (DEC-172)")
+        )
+E       AssertionError: permissions.deny of the generated .claude/settings.json holds Bash(npm install*), which binds `npm install -g ccusage`: Claude Code refuses the install before the guard is asked (DEC-966 item 1, DEC-172)
+E       assert 'Bash(npm install*)' is None
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:59: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-ask]" time="0.000" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_generated_settings_binds_the_install[npm install -g ccusage-allow]" time="0.000" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-deny]" time="0.001"><failure message="AssertionError: permissions.deny of the generated .claude/settings.json holds Bash(pip install*), which binds `pip install requests`: Claude Code refuses the install before the guard is asked (DEC-966 item 1, DEC-172)&#10;assert 'Bash(pip install*)' is None">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+command = 'pip install requests', kind = 'deny'
+
+    @pytest.mark.parametrize("kind", support.RULE_LISTS)
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_no_rule_of_the_generated_settings_binds_the_install(settings, live, command, kind):
+        """``deny``: the KPI line itself. ``ask`` and ``allow``: removed, not moved (W1-47's reading of DEC-172): a
+        settings rule there would decide the install beside the guard's install rule."""
+        rule = support.settings_rule_for(settings, kind, command, live)
+&gt;       assert rule is None, (
+            f"permissions.{kind} of the generated {support.SETTINGS_REL} holds {rule}, which binds `{command}`"
+            + (": Claude Code refuses the install before the guard is asked (DEC-966 item 1, DEC-172)"
+               if kind == "deny" else ": the guard's install rule no longer decides the install alone (DEC-172)")
+        )
+E       AssertionError: permissions.deny of the generated .claude/settings.json holds Bash(pip install*), which binds `pip install requests`: Claude Code refuses the install before the guard is asked (DEC-966 item 1, DEC-172)
+E       assert 'Bash(pip install*)' is None
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:59: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-ask]" time="0.000" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_rule_of_the_generated_settings_binds_the_install[pip install requests-allow]" time="0.000" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[npm install -g ccusage]" time="0.220"><failure message="AssertionError: the install did not reach the guard's install rule and was not asked (DEC-966 item 1, DEC-957): `npm install -g ccusage` by orchestrator on DAEO-zz91 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['ask'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;ask&quot;, &quot;permissionDecisionReason&quot;: &quot;install command requires owner approval (tool registry record required): npm install -g ccusage&quot;}}' stderr='']&#10;assert False&#10; +  where False = Asked(command='npm install -g ccusage', who='orchestrator on DAEO-zz91 (default mode)', deny_rule='Bash(npm install*)'...n&quot;: &quot;install command requires owner approval (tool registry record required): npm install -g ccusage&quot;}}', stderr=''),)).asked_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard(settings, live, sandbox,
+                                                                                             command):
+        """The CTO's session (the orchestrator role on its coordination ticket): no settings rule decides, the call
+        reaches the guard's install rule, and the guard's program answers ``ask``, in each permission mode."""
+        for mode in support.PERMISSION_MODES:
+            asked = support.ask(live, settings, sandbox, command, support.ORCHESTRATOR, permission_mode=mode)
+&gt;           assert asked.asked_by_the_guard, (
+                f"the install did not reach the guard's install rule and was not asked (DEC-966 item 1, DEC-957): "
+                f"{asked.describe()}"
+            )
+E           AssertionError: the install did not reach the guard's install rule and was not asked (DEC-966 item 1, DEC-957): `npm install -g ccusage` by orchestrator on DAEO-zz91 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['ask'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "ask", "permissionDecisionReason": "install command requires owner approval (tool registry record required): npm install -g ccusage"}}' stderr='']
+E           assert False
+E            +  where False = Asked(command='npm install -g ccusage', who='orchestrator on DAEO-zz91 (default mode)', deny_rule='Bash(npm install*)'...n": "install command requires owner approval (tool registry record required): npm install -g ccusage"}}', stderr=''),)).asked_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:77: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard[pip install requests]" time="0.189"><failure message="AssertionError: the install did not reach the guard's install rule and was not asked (DEC-966 item 1, DEC-957): `pip install requests` by orchestrator on DAEO-zz91 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['ask'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;ask&quot;, &quot;permissionDecisionReason&quot;: &quot;install command requires owner approval (tool registry record required): pip install requests&quot;}}' stderr='']&#10;assert False&#10; +  where False = Asked(command='pip install requests', who='orchestrator on DAEO-zz91 (default mode)', deny_rule='Bash(pip install*)', ...son&quot;: &quot;install command requires owner approval (tool registry record required): pip install requests&quot;}}', stderr=''),)).asked_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_an_install_by_the_orchestrator_on_its_coordination_ticket_is_asked_by_the_guard(settings, live, sandbox,
+                                                                                             command):
+        """The CTO's session (the orchestrator role on its coordination ticket): no settings rule decides, the call
+        reaches the guard's install rule, and the guard's program answers ``ask``, in each permission mode."""
+        for mode in support.PERMISSION_MODES:
+            asked = support.ask(live, settings, sandbox, command, support.ORCHESTRATOR, permission_mode=mode)
+&gt;           assert asked.asked_by_the_guard, (
+                f"the install did not reach the guard's install rule and was not asked (DEC-966 item 1, DEC-957): "
+                f"{asked.describe()}"
+            )
+E           AssertionError: the install did not reach the guard's install rule and was not asked (DEC-966 item 1, DEC-957): `pip install requests` by orchestrator on DAEO-zz91 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['ask'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "ask", "permissionDecisionReason": "install command requires owner approval (tool registry record required): pip install requests"}}' stderr='']
+E           assert False
+E            +  where False = Asked(command='pip install requests', who='orchestrator on DAEO-zz91 (default mode)', deny_rule='Bash(pip install*)', ...son": "install command requires owner approval (tool registry record required): pip install requests"}}', stderr=''),)).asked_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:77: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[engineer-npm install -g ccusage]" time="0.225"><failure message="AssertionError: the install by engineer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by engineer on DAEO-zz90 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'engineer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='npm install -g ccusage', who='engineer on DAEO-zz90 (default mode)', deny_rule='Bash(npm install*)', ot...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'engineer', command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by engineer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by engineer on DAEO-zz90 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'engineer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='npm install -g ccusage', who='engineer on DAEO-zz90 (default mode)', deny_rule='Bash(npm install*)', ot...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[engineer-pip install requests]" time="0.230"><failure message="AssertionError: the install by engineer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by engineer on DAEO-zz90 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'engineer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='pip install requests', who='engineer on DAEO-zz90 (default mode)', deny_rule='Bash(pip install*)', othe...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'engineer', command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by engineer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by engineer on DAEO-zz90 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'engineer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='pip install requests', who='engineer on DAEO-zz90 (default mode)', deny_rule='Bash(pip install*)', othe...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[independent-test-designer-npm install -g ccusage]" time="0.195"><failure message="AssertionError: the install by independent-test-designer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by independent-test-designer on DAEO-zz90 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'independent-test-designer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='npm install -g ccusage', who='independent-test-designer on DAEO-zz90 (default mode)', deny_rule='Bash(n...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'independent-test-designer', command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by independent-test-designer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by independent-test-designer on DAEO-zz90 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'independent-test-designer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='npm install -g ccusage', who='independent-test-designer on DAEO-zz90 (default mode)', deny_rule='Bash(n...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[independent-test-designer-pip install requests]" time="0.228"><failure message="AssertionError: the install by independent-test-designer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by independent-test-designer on DAEO-zz90 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'independent-test-designer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='pip install requests', who='independent-test-designer on DAEO-zz90 (default mode)', deny_rule='Bash(pip...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'independent-test-designer', command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by independent-test-designer was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by independent-test-designer on DAEO-zz90 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'independent-test-designer\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='pip install requests', who='independent-test-designer on DAEO-zz90 (default mode)', deny_rule='Bash(pip...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[independent-auditor-npm install -g ccusage]" time="0.160"><failure message="AssertionError: the install by independent-auditor was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by independent-auditor on DAEO-zz93 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'independent-auditor\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='npm install -g ccusage', who='independent-auditor on DAEO-zz93 (default mode)', deny_rule='Bash(npm ins...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'independent-auditor', command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by independent-auditor was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by independent-auditor on DAEO-zz93 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'independent-auditor\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='npm install -g ccusage', who='independent-auditor on DAEO-zz93 (default mode)', deny_rule='Bash(npm ins...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[independent-auditor-pip install requests]" time="0.163"><failure message="AssertionError: the install by independent-auditor was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by independent-auditor on DAEO-zz93 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'independent-auditor\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='pip install requests', who='independent-auditor on DAEO-zz93 (default mode)', deny_rule='Bash(pip insta...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'independent-auditor', command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by independent-auditor was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by independent-auditor on DAEO-zz93 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'independent-auditor\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='pip install requests', who='independent-auditor on DAEO-zz93 (default mode)', deny_rule='Bash(pip insta...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[product-spec-npm install -g ccusage]" time="0.190"><failure message="AssertionError: the install by product-spec was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by product-spec on DAEO-zz92 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'product-spec\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='npm install -g ccusage', who='product-spec on DAEO-zz92 (default mode)', deny_rule='Bash(npm install*)'...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'product-spec', command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by product-spec was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `npm install -g ccusage` by product-spec on DAEO-zz92 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'product-spec\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='npm install -g ccusage', who='product-spec on DAEO-zz92 (default mode)', deny_rule='Bash(npm install*)'...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_by_another_role_is_refused_by_the_guard[product-spec-pip install requests]" time="0.219"><failure message="AssertionError: the install by product-spec was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by product-spec on DAEO-zz92 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'product-spec\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='pip install requests', who='product-spec on DAEO-zz92 (default mode)', deny_rule='Bash(pip install*)', ...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+role = 'product-spec', command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    @pytest.mark.parametrize("role", support.OTHER_ROLES)
+    def test_an_install_by_another_role_is_refused_by_the_guard(settings, live, sandbox, role, command):
+        """Refused, and refused by the guard: no settings deny rule refused first, and the guard's own program wrote the
+        refusal. A settings rule is not the guard (DEC-172), and an ``ask`` or an allowance is a failure (KPI failure 2)."""
+        asked = support.ask(live, settings, sandbox, command, role)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install by {role} was not refused by the guard (DEC-957 item 3: every session but the CTO's is "
+            f"refused by the guard's install rule): {asked.describe()}"
+        )
+E       AssertionError: the install by product-spec was not refused by the guard (DEC-957 item 3: every session but the CTO's is refused by the guard's install rule): `pip install requests` by product-spec on DAEO-zz92 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'product-spec\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='pip install requests', who='product-spec on DAEO-zz92 (default mode)', deny_rule='Bash(pip install*)', ...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:89: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[npm install -g ccusage]" time="0.178"><failure message="AssertionError: the install in a session without a role was not refused by the guard: `npm install -g ccusage` by no-role (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'none\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='npm install -g ccusage', who='no-role (default mode)', deny_rule='Bash(npm install*)', other_rules={'as...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_an_install_in_a_session_without_a_role_is_refused_by_the_guard(settings, live, sandbox, command):
+        """Another session that is not the CTO's: one started with no ``GOV_ROLE``."""
+        asked = support.ask(live, settings, sandbox, command, support.NO_ROLE)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install in a session without a role was not refused by the guard: {asked.describe()}"
+        )
+E       AssertionError: the install in a session without a role was not refused by the guard: `npm install -g ccusage` by no-role (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'none\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='npm install -g ccusage', who='no-role (default mode)', deny_rule='Bash(npm install*)', other_rules={'as...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:99: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_an_install_in_a_session_without_a_role_is_refused_by_the_guard[pip install requests]" time="0.175"><failure message="AssertionError: the install in a session without a role was not refused by the guard: `pip install requests` by no-role (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'none\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='pip install requests', who='no-role (default mode)', deny_rule='Bash(pip install*)', other_rules={'ask'...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_an_install_in_a_session_without_a_role_is_refused_by_the_guard(settings, live, sandbox, command):
+        """Another session that is not the CTO's: one started with no ``GOV_ROLE``."""
+        asked = support.ask(live, settings, sandbox, command, support.NO_ROLE)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the install in a session without a role was not refused by the guard: {asked.describe()}"
+        )
+E       AssertionError: the install in a session without a role was not refused by the guard: `pip install requests` by no-role (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'none\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='pip install requests', who='no-role (default mode)', deny_rule='Bash(pip install*)', other_rules={'ask'...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:99: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[npm install -g ccusage]" time="0.175"><failure message="AssertionError: the research install outside experiments/spikes/exp-901 was not refused by the guard: `npm install -g ccusage` by research on DAEO-zz97 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'research\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='npm install -g ccusage', who='research on DAEO-zz97 (default mode)', deny_rule='Bash(npm install*)', ot...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard(settings, live, sandbox, command):
+        """Research on its ticket, started in the project's root: outside its experiment folder (DEC-163), its install is
+        the guard's to refuse, as every other worker's."""
+        asked = support.ask(live, settings, sandbox, command, support.RESEARCH)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the research install outside {support.EXPERIMENT_REL} was not refused by the guard: {asked.describe()}"
+        )
+E       AssertionError: the research install outside experiments/spikes/exp-901 was not refused by the guard: `npm install -g ccusage` by research on DAEO-zz97 (default mode): settings deny rule Bash(npm install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'research\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='npm install -g ccusage', who='research on DAEO-zz97 (default mode)', deny_rule='Bash(npm install*)', ot...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:109: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard[pip install requests]" time="0.249"><failure message="AssertionError: the research install outside experiments/spikes/exp-901 was not refused by the guard: `pip install requests` by research on DAEO-zz97 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h=&quot;$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py&quot;; python3 &quot;$h&quot;; r=$?; case $r in 0|2) exit $r;; esac; echo &quot;gov hook: $h ended with exit $r (it could not run or crashed); refused&quot; &gt;&amp;2; exit 2` exit=0 stdout='{&quot;hookSpecificOutput&quot;: {&quot;hookEventName&quot;: &quot;PreToolUse&quot;, &quot;permissionDecision&quot;: &quot;deny&quot;, &quot;permissionDecisionReason&quot;: &quot;install by role \'research\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}' stderr='']&#10;assert (False)&#10; +  where False = Asked(command='pip install requests', who='research on DAEO-zz97 (default mode)', deny_rule='Bash(pip install*)', othe...d: only the orchestrator may propose installs, and research may install inside its experiment folder&quot;}}', stderr=''),)).refused_by_the_guard">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+live = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-live0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/w2-105-sandbox0/systmp'))
+command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", INSTALLS)
+    def test_a_research_install_outside_its_experiment_folder_is_refused_by_the_guard(settings, live, sandbox, command):
+        """Research on its ticket, started in the project's root: outside its experiment folder (DEC-163), its install is
+        the guard's to refuse, as every other worker's."""
+        asked = support.ask(live, settings, sandbox, command, support.RESEARCH)
+&gt;       assert asked.refused_by_the_guard and "ask" not in asked.answers, (
+            f"the research install outside {support.EXPERIMENT_REL} was not refused by the guard: {asked.describe()}"
+        )
+E       AssertionError: the research install outside experiments/spikes/exp-901 was not refused by the guard: `pip install requests` by research on DAEO-zz97 (default mode): settings deny rule Bash(pip install*) (the harness never asks the hook); the guard's own answer: ['deny'] [`h="$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"; python3 "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" &gt;&amp;2; exit 2` exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "install by role \'research\' denied: only the orchestrator may propose installs, and research may install inside its experiment folder"}}' stderr='']
+E       assert (False)
+E        +  where False = Asked(command='pip install requests', who='research on DAEO-zz97 (default mode)', deny_rule='Bash(pip install*)', othe...d: only the orchestrator may propose installs, and research may install inside its experiment folder"}}', stderr=''),)).refused_by_the_guard
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:109: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_the_comparison_base_gives_the_two_install_rules" time="1.057" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_the_templates_source_is_its_base_less_the_two_install_rules" time="0.005"><failure message="AssertionError: template/.rulesync/permissions.jsonc must give the 4 rules of 74d83913a86b less the two install rules (2 rules); it gives 4. Still there or added: [('bash', 'npm install*', 'deny'), ('bash', 'pip install*', 'deny')]; missing: []&#10;assert ({('bash', 'np.../**', 'deny')} == {('bash', 'su.../**', 'deny')}&#10;  &#10;  Extra items in the left set:&#10;  ('bash', 'npm install*', 'deny')&#10;  ('bash', 'pip install*', 'deny')&#10;  Use -v to get more diff)">def test_the_templates_source_is_its_base_less_the_two_install_rules():
+        before, after = support.base_source_rules(), support.template_source_rules()
+        expected = before - support.INSTALL_SOURCE_RULES
+&gt;       assert after == expected and len(after) == len(before) - 2, (
+            f"{support.SOURCE_REL} must give the {len(before)} rules of {support.BASE_COMMIT} less the two install rules "
+            f"({len(expected)} rules); it gives {len(after)}. Still there or added: {_sorted(after - expected)}; "
+            f"missing: {_sorted(expected - after)}"
+        )
+E       AssertionError: template/.rulesync/permissions.jsonc must give the 4 rules of 74d83913a86b less the two install rules (2 rules); it gives 4. Still there or added: [('bash', 'npm install*', 'deny'), ('bash', 'pip install*', 'deny')]; missing: []
+E       assert ({('bash', 'np.../**', 'deny')} == {('bash', 'su.../**', 'deny')}
+E         
+E         Extra items in the left set:
+E         ('bash', 'npm install*', 'deny')
+E         ('bash', 'pip install*', 'deny')
+E         Use -v to get more diff)
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:135: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_other_rule_of_the_templates_source_is_added_removed_or_changed" time="0.004" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_the_generated_rules_are_the_base_rules_less_the_two_install_rules" time="0.001"><failure message="AssertionError: the generated .claude/settings.json must hold the 4 rules generated from the base less the two install deny rules (2); it holds 4. Still there or added: {('deny', 'Bash(npm install*)'): 1, ('deny', 'Bash(pip install*)'): 1}; missing: {}&#10;assert (Counter({('de...ets/**)'): 1}) == Counter({('de...ets/**)'): 1})&#10;  &#10;  Omitting 2 identical items, use -vv to show&#10;  Left contains 2 more items:&#10;  {('deny', 'Bash(npm install*)'): 1, ('deny', 'Bash(pip install*)'): 1}&#10;  Use -v to get more diff)">settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+base_settings = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+
+    def test_the_generated_rules_are_the_base_rules_less_the_two_install_rules(settings, base_settings):
+        before, after = support.generated_rules(base_settings), support.generated_rules(settings)
+        expected = before - support.INSTALL_GENERATED_RULES
+&gt;       assert after == expected and sum(after.values()) == sum(before.values()) - 2, (
+            f"the generated {support.SETTINGS_REL} must hold the {sum(before.values())} rules generated from the base "
+            f"less the two install deny rules ({sum(expected.values())}); it holds {sum(after.values())}. Still there or "
+            f"added: {dict(after - expected)}; missing: {dict(expected - after)}"
+        )
+E       AssertionError: the generated .claude/settings.json must hold the 4 rules generated from the base less the two install deny rules (2); it holds 4. Still there or added: {('deny', 'Bash(npm install*)'): 1, ('deny', 'Bash(pip install*)'): 1}; missing: {}
+E       assert (Counter({('de...ets/**)'): 1}) == Counter({('de...ets/**)'): 1})
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Left contains 2 more items:
+E         {('deny', 'Bash(npm install*)'): 1, ('deny', 'Bash(pip install*)'): 1}
+E         Use -v to get more diff)
+
+tests/acceptance/W2-105/test_w2_105_install_block.py:156: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_no_other_generated_rule_is_added_removed_or_changed" time="0.001" /><testcase classname="tests.acceptance.W2-105.test_w2_105_install_block" name="test_sudo_is_still_denied_by_the_generated_settings" time="0.001" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheRuleIsGone" name="test_the_templates_source_holds_no_edit_rule_on_the_acceptance_test_folder" time="0.002" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheRuleIsGone" name="test_the_generated_settings_hold_no_deny_rule_on_the_acceptance_test_folder" time="1.594" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheRuleIsGone" name="test_the_generated_settings_hold_no_rule_of_a_write_tool_on_the_folder_in_any_list" time="1.094" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestEveryOtherRuleStays" name="test_the_templates_source_gives_the_four_other_rules_and_nothing_else" time="0.002"><failure message="AssertionError: beside the test-folder rule, template/.rulesync/permissions.jsonc must give the ticket-folder edit rule and the sudo rule, and no other (DEC-966 item 1: no install rule); missing: [], not expected: [('bash', 'npm install*', 'deny'), ('bash', 'pip install*', 'deny')]&#10;assert {('bash', 'np.../**', 'deny')} == {('bash', 'su.../**', 'deny')}&#10;  &#10;  Extra items in the left set:&#10;  ('bash', 'npm install*', 'deny')&#10;  ('bash', 'pip install*', 'deny')&#10;  Use -v to get more diff">self = &lt;test_w1_38_test_folder_rule.TestEveryOtherRuleStays object at 0x7c9171190920&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/test_the_templates_source_give0')
+
+    def test_the_templates_source_gives_the_four_other_rules_and_nothing_else(self, tmp_path):
+        """Since DEC-966 item 1 the other rules are two: the ticket-folder edit rule and the sudo rule (the id is
+        DEC-664's round's)."""
+        others = {rule for rule in _source_rules() if not _on_the_folder(rule, tmp_path)}
+&gt;       assert others == OTHER_SOURCE_RULES, (
+            f"beside the test-folder rule, {SOURCE_REL} must give the ticket-folder edit rule and the sudo rule, "
+            f"and no other (DEC-966 item 1: no install rule); missing: {sorted(OTHER_SOURCE_RULES - others)}, "
+            f"not expected: {sorted(others - OTHER_SOURCE_RULES)}"
+        )
+E       AssertionError: beside the test-folder rule, template/.rulesync/permissions.jsonc must give the ticket-folder edit rule and the sudo rule, and no other (DEC-966 item 1: no install rule); missing: [], not expected: [('bash', 'npm install*', 'deny'), ('bash', 'pip install*', 'deny')]
+E       assert {('bash', 'np.../**', 'deny')} == {('bash', 'su.../**', 'deny')}
+E         
+E         Extra items in the left set:
+E         ('bash', 'npm install*', 'deny')
+E         ('bash', 'pip install*', 'deny')
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:295: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestEveryOtherRuleStays" name="test_the_four_other_deny_rules_are_still_generated_and_nothing_else" time="1.115"><failure message="AssertionError: beside a rule on the acceptance-test folder, .claude/settings.json generated from the template's sources must hold the ticket-folder Edit rule and the sudo rule as deny rules, each once, and no other permission rule (DEC-966 item 1: no install rule); it holds {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}&#10;assert {'deny': ['Ba...tickets/**)']} == {'deny': ['Ba...tickets/**)']}&#10;  &#10;  Differing items:&#10;  {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']} != {'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}&#10;  Use -v to get more diff">self = &lt;test_w1_38_test_folder_rule.TestEveryOtherRuleStays object at 0x7c9171190c20&gt;
+generated_project = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/test_the_four_other_deny_rules0/project')
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-105/pytest-of-usain/pytest-0/test_the_four_other_deny_rules0')
+
+    @needs_rulesync
+    def test_the_four_other_deny_rules_are_still_generated_and_nothing_else(self, generated_project, tmp_path):
+        """Since DEC-966 item 1 the other deny rules are two: ``Bash(sudo *)`` and ``Edit(.tickets/**)`` (the id is
+        DEC-664's round's)."""
+        settings = support.load_settings(generated_project)
+        permissions = settings.get("permissions")
+        assert isinstance(permissions, dict), f"{GENERATED_REL} holds no `permissions` map"
+        on_the_folder = {entry.split(": ", 1)[1] for entry in
+                         _write_rules_on_the_folder(settings, generated_project, tmp_path / "home")}
+        others = {kind: sorted(rule for rule in rules if rule not in on_the_folder)
+                  for kind, rules in permissions.items()}
+        others = {kind: rules for kind, rules in others.items() if rules}
+&gt;       assert others == OTHER_GENERATED_RULES, (
+            f"beside a rule on the acceptance-test folder, {GENERATED_REL} generated from the template's sources "
+            f"must hold the ticket-folder Edit rule and the sudo rule as deny rules, each once, and no other "
+            f"permission rule (DEC-966 item 1: no install rule); it holds {others}"
+        )
+E       AssertionError: beside a rule on the acceptance-test folder, .claude/settings.json generated from the template's sources must hold the ticket-folder Edit rule and the sudo rule as deny rules, each once, and no other permission rule (DEC-966 item 1: no install rule); it holds {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}
+E       assert {'deny': ['Ba...tickets/**)']} == {'deny': ['Ba...tickets/**)']}
+E         
+E         Differing items:
+E         {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']} != {'deny': ['Bash(sudo *)', 'Edit(.tickets/**)']}
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_test_folder_rule.py:313: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestEveryOtherRuleStays" name="test_the_generated_settings_still_close_the_ticket_folder" time="1.219" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder" time="1.879" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_the_test_designer_is_still_refused_outside_the_folder" time="1.840" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_every_other_role_is_refused_a_write_under_the_folder[engineer]" time="1.703" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_every_other_role_is_refused_a_write_under_the_folder[product-spec]" time="1.762" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_every_other_role_is_refused_a_write_under_the_folder[research]" time="1.804" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_every_other_role_is_refused_a_write_under_the_folder[independent-auditor]" time="1.874" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_every_other_role_is_refused_a_write_under_the_folder[orchestrator]" time="1.630" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestTheGuardInAProjectMadeFromTheTemplate" name="test_the_engineer_is_let_through_inside_its_ticket" time="1.281" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate" name="test_the_launchers_settings_close_the_folder_for_every_other_role[engineer]" time="1.597" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate" name="test_the_launchers_settings_close_the_folder_for_every_other_role[product-spec]" time="2.024" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate" name="test_the_launchers_settings_close_the_folder_for_every_other_role[independent-auditor]" time="1.661" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate" name="test_the_launchers_settings_leave_the_folder_to_the_test_designer" time="1.463" /><testcase classname="tests.acceptance.W1-38.test_w1_38_test_folder_rule.TestALaunchedSessionInAProjectMadeFromTheTemplate" name="test_no_settings_of_a_launched_test_designer_close_the_folder" time="1.617" /></testsuite></testsuites>

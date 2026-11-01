@@ -1,0 +1,707 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  0%]
+.........................................EE............................. [  1%]
+........................................................................ [  2%]
+........................................................................ [  3%]
+........................................................................ [  3%]
+......................................................................s. [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+..F...FFF............................................................... [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+.........................F.............................................. [ 20%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+...........F..F....F........FF.......................................... [ 40%]
+........................................................................ [ 41%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 53%]
+.................................F.....s.FF......F...................... [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+............................................s........................... [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+.............EE......................................................... [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+..................F..................................................... [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+.............................................................s.......... [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+..........................................                               [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+________ ERROR at setup of test_gov_check_gives_core_schema_green_here _________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+fixturedef = <FixtureDef argname='gov_check_here' scope='session' baseid='tests/acceptance/W2-54'>
+request = <SubRequest 'gov_check_here' for <Function test_gov_check_gives_core_schema_green_here>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/conftest.py:98: in gov_check_here
+    return support.green_here_check()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-54/w2_54_support.py:777: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+tests/acceptance/W2-54/w2_54_support.py:246: in run
+    done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+/usr/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2115: in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.PollSelector object at 0x7a2b3b4b68d0>, timeout = 1800000
+
+    def select(self, timeout=None):
+        # This is shared between poll() and epoll().
+        # epoll() has a different signature and handling of timeout parameter.
+        if timeout is None:
+            timeout = None
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # poll() has a resolution of 1 millisecond, round away from
+            # zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3)
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>900.0s) from pytest-timeout.
+
+/usr/lib/python3.12/selectors.py:415: Failed
+---------------------------- Captured stdout setup -----------------------------
+~~~~~~~~~~~~~~~~~~~~~ Stack of <unknown> (134326259807936) ~~~~~~~~~~~~~~~~~~~~~
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 411, in _perform_spawn
+    reply.run()
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 341, in run
+    self._result = func(*args, **kwargs)
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 1160, in _thread_receiver
+    msg = Message.from_io(io)
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 567, in from_io
+    header = io.read(9)  # type 1, channel 4, payload 4
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 534, in read
+    data = self._read(numbytes - len(buf))
+__________ ERROR at setup of test_the_w1_43_audit_report_is_untouched __________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-96/src/gov/__init__.py'
+
+    @pytest.fixture(scope="session")
+    def gov_check_here(code_under_test):
+        """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+        inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+        runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+        store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+>       return support.green_here_check()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/conftest.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/w2_54_support.py:777: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+tests/acceptance/W2-54/w2_54_support.py:246: in run
+    done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+/usr/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2115: in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.PollSelector object at 0x7a2b3b4b68d0>, timeout = 1800000
+
+    def select(self, timeout=None):
+        # This is shared between poll() and epoll().
+        # epoll() has a different signature and handling of timeout parameter.
+        if timeout is None:
+            timeout = None
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # poll() has a resolution of 1 millisecond, round away from
+            # zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3)
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>900.0s) from pytest-timeout.
+
+/usr/lib/python3.12/selectors.py:415: Failed
+=================================== FAILURES ===================================
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7d95fcbb11c0>
+project = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-4/popen-gw9/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7d95fcbb34c0>
+project = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-4/popen-gw9/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7d95fcbb3e20>
+project = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-4/popen-gw9/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7d95fcb64220>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+________ test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs ________
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs():
+        """Read from the sources: a whole-tree copy that takes no root parameter cannot be run on a synthetic root."""
+        unchecked = sorted(function.label for function in check.whole_tree_copiers() if not function.runnable)
+>       assert not unchecked, (
+            f"these functions copy the whole tree of the repository and cannot be run by the check: {unchecked}. "
+            f"Make each a module-level function with a parameter `root={check.ROOT_NAME}` that leaves "
+            f"{check.HELD_OUT_REL} out by its path, or limit it to named paths (DEC-385)."
+        )
+E       AssertionError: these functions copy the whole tree of the repository and cannot be run by the check: ['W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket']. Make each a module-level function with a parameter `root=REPO_ROOT` that leaves governance/project/held-out.yaml out by its path, or limit it to named paths (DEC-385).
+E       assert not ['W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket']
+
+tests/acceptance/W1-28/test_w1_28_fixture_copies.py:72: AssertionError
+__________________ test_the_two_whole_tree_fixtures_are_found __________________
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_two_whole_tree_fixtures_are_found():
+        """A fixture that was renamed, or that the reading no longer finds, is not silently dropped from this check."""
+        missing = sorted(KNOWN - {function.label for function in WHOLE_TREE})
+        assert not missing, f"the reading of the sources no longer finds these whole-tree fixtures: {missing}"
+        unrunnable = sorted(function.label for function in WHOLE_TREE if not function.runnable)
+>       assert not unrunnable, f"these whole-tree copies cannot be run on a synthetic root: {unrunnable}"
+E       AssertionError: these whole-tree copies cannot be run on a synthetic root: ['W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket']
+E       assert not ['W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket']
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:81: AssertionError
+_ test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_whole_tree_fixture_stri0')
+
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_whole_tree_fixture_strips_the_held_out_deny_rules(function, tmp_path):
+        source = _source(tmp_path / "source")
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+source = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_whole_tree_fixture_stri0/source')
+destination = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_whole_tree_fixture_stri0/produced')
+
+    def run_copier(function, source, destination):
+        """Call the copier with ``source`` as the repository root; the folder it filled."""
+        callable_ = load(function)
+        required = [name for name, parameter in inspect.signature(callable_).parameters.items()
+                    if parameter.default is inspect.Parameter.empty
+                    and parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)]
+        assert len(required) == 1, (
+            f"{function.label} takes {required} without a default: this check calls a copier as "
+>           f"`copier(<destination>, {function.root_parameters[0]}=<synthetic root>)`"
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       IndexError: tuple index out of range
+
+tests/acceptance/W1-28/w1_28_copy_check.py:262: IndexError
+_ test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_whole_tree_fixture_keep0')
+
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file(function, tmp_path):
+        """Only those rules go: the other deny rules in their order, the allow rules, the hooks and the environment."""
+>       produced = check.run_copier(function, _source(tmp_path / "source"), tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+source = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_whole_tree_fixture_keep0/source')
+destination = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_whole_tree_fixture_keep0/produced')
+
+    def run_copier(function, source, destination):
+        """Call the copier with ``source`` as the repository root; the folder it filled."""
+        callable_ = load(function)
+        required = [name for name, parameter in inspect.signature(callable_).parameters.items()
+                    if parameter.default is inspect.Parameter.empty
+                    and parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)]
+        assert len(required) == 1, (
+            f"{function.label} takes {required} without a default: this check calls a copier as "
+>           f"`copier(<destination>, {function.root_parameters[0]}=<synthetic root>)`"
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       IndexError: tuple index out of range
+
+tests/acceptance/W1-28/w1_28_copy_check.py:262: IndexError
+_ test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket-no-permissions] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+settings = {'hooks': {}}
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_settings_file_with_noth0')
+
+    @pytest.mark.parametrize("settings", ({"hooks": {}}, {"permissions": {"allow": ["Read(./docs/**)"]}}),
+                             ids=("no-permissions", "no-deny-list"))
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is(function, settings, tmp_path):
+        source = _source(tmp_path / "source", settings)
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+source = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_settings_file_with_noth0/source')
+destination = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_settings_file_with_noth0/produced')
+
+    def run_copier(function, source, destination):
+        """Call the copier with ``source`` as the repository root; the folder it filled."""
+        callable_ = load(function)
+        required = [name for name, parameter in inspect.signature(callable_).parameters.items()
+                    if parameter.default is inspect.Parameter.empty
+                    and parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)]
+        assert len(required) == 1, (
+            f"{function.label} takes {required} without a default: this check calls a copier as "
+>           f"`copier(<destination>, {function.root_parameters[0]}=<synthetic root>)`"
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       IndexError: tuple index out of range
+
+tests/acceptance/W1-28/w1_28_copy_check.py:262: IndexError
+_ test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket-no-deny-list] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+settings = {'permissions': {'allow': ['Read(./docs/**)']}}
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_settings_file_with_noth1')
+
+    @pytest.mark.parametrize("settings", ({"hooks": {}}, {"permissions": {"allow": ["Read(./docs/**)"]}}),
+                             ids=("no-permissions", "no-deny-list"))
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is(function, settings, tmp_path):
+        source = _source(tmp_path / "source", settings)
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-108/test_w2_108_scope.py'), name='test...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+source = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_settings_file_with_noth1/source')
+destination = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw6/test_a_settings_file_with_noth1/produced')
+
+    def run_copier(function, source, destination):
+        """Call the copier with ``source`` as the repository root; the folder it filled."""
+        callable_ = load(function)
+        required = [name for name, parameter in inspect.signature(callable_).parameters.items()
+                    if parameter.default is inspect.Parameter.empty
+                    and parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)]
+        assert len(required) == 1, (
+            f"{function.label} takes {required} without a default: this check calls a copier as "
+>           f"`copier(<destination>, {function.root_parameters[0]}=<synthetic root>)`"
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       IndexError: tuple index out of range
+
+tests/acceptance/W1-28/w1_28_copy_check.py:262: IndexError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s program did not import the pin's installed package (/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_line_s_program_import0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:109: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'worker-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_guard_line_refuses_wh0')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_guard_line_refuses_wh0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'no-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw8/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct'), wheel=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-v...pt3vhct/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-96/w259-pin-vpt3vhct/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7d95fca60720>
+folder = PosixPath('/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...-4/popen-gw9/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-96/pytest-of-usain/pytest-4/popen-gw9/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+SKIPPED [1] tests/acceptance/W2-66/test_w2_66_live_test_map.py:466: the path map no longer holds test_inputs (the orchestrator's edit is done)
+15 failed, 9451 passed, 4 skipped, 4 errors in 4169.68s (1:09:29)

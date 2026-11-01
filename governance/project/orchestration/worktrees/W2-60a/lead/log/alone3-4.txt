@@ -1,0 +1,10 @@
+EE                                                                       [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] _
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] _
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+=========================== short test summary info ============================
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2 errors in 0.03s

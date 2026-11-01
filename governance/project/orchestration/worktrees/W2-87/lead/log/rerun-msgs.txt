@@ -1,0 +1,12 @@
+== head (exit 1, load 44.98)
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+2 failed, 7 passed in 744.46s (0:12:24)
+== base (exit 1, load 58.34)
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+2 failed, 7 passed in 981.53s (0:16:21)

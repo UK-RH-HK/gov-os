@@ -1,0 +1,54 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "tests/conftest.py"
+   ]
+  }
+ ],
+ "base": "658864ed5c9b195fc7dc13fd17f144b68f12f760",
+ "head": "1fbd43d5be59a056ab09e4e8ca4aa918c668ae6b",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-tgk2/CP-DAEO-tgk2-0003.md"
+ ],
+ "changed": [
+  "src/gov/rebuild/command.py",
+  "src/gov/rebuild/watch.py",
+  "tests/acceptance/W2-76/README.md",
+  "tests/acceptance/W2-76/conftest.py",
+  "tests/acceptance/W2-76/test_w2_76_fail_closed.py",
+  "tests/acceptance/W2-76/test_w2_76_machine_lock.py",
+  "tests/acceptance/W2-76/test_w2_76_timings.py",
+  "tests/acceptance/W2-76/test_w2_76_unchanged.py",
+  "tests/acceptance/W2-76/test_w2_76_watchdog.py",
+  "tests/acceptance/W2-76/w2_76_holder.py",
+  "tests/acceptance/W2-76/w2_76_support.py",
+  "tests/conftest.py",
+  "tests/unit/rebuild/test_w2_76_lock_override.py",
+  "tests/unit/rebuild/test_w2_76_watch.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-76/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [],
+ "ignore": [],
+ "deselect": [],
+ "per_test_timeout": 900
+}

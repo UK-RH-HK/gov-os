@@ -1,0 +1,754 @@
+.FFF....FF.FFFFFFFFFFFFFFFFF                                             [100%]
+=================================== FAILURES ===================================
+___ test_w2_95_adopted_repository_names_each_unplaced_and_doubly_placed_path ___
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_adopted_repository_0')
+
+    def test_w2_95_adopted_repository_names_each_unplaced_and_doubly_placed_path(tmp_path):
+        # The refactor missed vendor/ and notes/, and placed app/core/legacy/ in two namespaces.
+        refactor = dict(REFACTORED)
+        del refactor["third-party"], refactor["history"]
+        refactor["legacy"] = ["app/core/legacy/**"]
+        repo = s.Planted(tmp_path, ADOPTED_FILES, s.mapping_form(refactor))
+        expected = {
+            "vendor/lib/thing.c": [],
+            "notes/2019/meeting.txt": [],
+            "app/core/legacy/old_engine.py": ["legacy", "product"],
+        }
+    
+        declared = repo.declared()
+        assert declared.findings is not None, declared.describe()
+>       assert declared.code != 0, "an adopted repository with paths in none or two is green:\n" + declared.describe()
+E       AssertionError: an adopted repository with paths in none or two is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8c02f00>.code
+
+tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py:74: AssertionError
+__ test_w2_95_adopted_repository_kept_valid_a_new_unplaced_file_turns_it_red ___
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_adopted_repository_1')
+
+    def test_w2_95_adopted_repository_kept_valid_a_new_unplaced_file_turns_it_red(tmp_path):
+        repo = s.Planted(tmp_path, ADOPTED_FILES, s.mapping_form(REFACTORED))
+        assert repo.declared().code == 0
+        repo.add("docs/new.md")
+        declared = repo.declared()
+>       assert declared.code != 0, "a newly tracked path in no namespace is green:\n" + declared.describe()
+E       AssertionError: a newly tracked path in no namespace is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca9b87680>.code
+
+tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py:95: AssertionError
+___ test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none ____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_gov_check_family_is0')
+
+    def test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none(tmp_path):
+        repo = s.Planted(tmp_path, ["README.md", "src/main.py"], s.mapping_form({"code": ["src/**"]}))
+        result = repo.gov_check()
+        check = _gov_pathmap(result)
+>       assert check.get("status") != "GREEN", "a path in no namespace is reported green:\n" + str(check)
+E       AssertionError: a path in no namespace is reported green:
+E         {'id': 'core-pathmap', 'family': 'path-map compliance', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'unknown', 'check_version': '1.0.0', 'inputs_hash': 'e240bd2e3e3af27c'}}
+E       assert 'GREEN' != 'GREEN'
+E        +  where 'GREEN' = <built-in method get of dict object at 0x70cca8a91840>('status')
+E        +    where <built-in method get of dict object at 0x70cca8a91840> = {'family': 'path-map compliance', 'findings': [], 'id': 'core-pathmap', 'provenance': {'check_version': '1.0.0', 'commit': 'unknown', 'inputs_hash': 'e240bd2e3e3af27c'}, ...}.get
+
+tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py:105: AssertionError
+____________ test_w2_95_paths_in_none_and_in_two_are_named[mapping] ____________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_paths_in_none_and_i0')
+form = 'mapping'
+
+    @pytest.mark.parametrize("form", sorted(FORMS))
+    def test_w2_95_paths_in_none_and_in_two_are_named(tmp_path, form):
+        repo = s.Planted(tmp_path, FILES, FORMS[form](NONE_AND_TWO))
+        result = repo.declared()
+>       _assert_red(result, {"README.md": [], "docs/guide.md": [], "src/app/main.py": ["code", "app"]})
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8aac2f0>
+expected = {'README.md': [], 'docs/guide.md': [], 'src/app/main.py': ['code', 'app']}
+
+    def _assert_red(result, expected):
+        """The check is red and names each path of ``expected`` with the namespaces it matched."""
+        assert result.findings is not None, "the output is not JSON:\n" + result.describe()
+>       assert result.code != 0, "a path in no namespace or in two is reported green:\n" + result.describe()
+E       AssertionError: a path in no namespace or in two is reported green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8aac2f0>.code
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:35: AssertionError
+__________ test_w2_95_star_at_the_root_matches_only_root_files[list] ___________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_star_at_the_root_ma0')
+form = 'list'
+
+    @pytest.mark.parametrize("form", sorted(FORMS))
+    def test_w2_95_star_at_the_root_matches_only_root_files(tmp_path, form):
+        # `*` stays inside one folder: it takes README.md and nothing under src/ or docs/.
+        namespaces = {"root": ["*"], "code": ["src/**"], "docs": ["docs/**"], "governance": ["governance/**"]}
+        repo = s.Planted(tmp_path, FILES, FORMS[form](namespaces))
+        result = repo.declared()
+>       assert result.code == 0, f"{form} form: `*` at the root crossed into a folder:\n" + result.describe()
+E       AssertionError: list form: `*` at the root crossed into a folder:
+E         exit 1
+E         stdout: [
+E           {
+E             "code": "PATH_MULTIPLE_NAMESPACES",
+E             "path": "docs/guide.md",
+E             "namespaces": [
+E               "root",
+E               "docs"
+E             ],
+E             "message": "docs/guide.md matches 2 namespaces: root, docs"
+E           },
+E           {
+E             "code": "PATH_MULTIPLE_NAMESPACES",
+E             "path": "governance/project/path-map.yaml",
+E             "namespaces": [
+E               "root",
+E               "governance"
+E             ],
+E             "message": "governance/project/path-map.yaml matches 2 namespaces: root, governance"
+E           },
+E           {
+E             "code": "PATH_MULTIPLE_NAMESPACES",
+E             "path": "src/app/deep/util.py",
+E             "namespaces": [
+E               "root",
+E               "code"
+E             ],
+E             "message": "src/app/deep/util.py matches 2 namespaces: root, code"
+E           },
+E           {
+E             "code": "PATH_MULTIPLE_NAMESPACES",
+E             "path": "src/app/main.py",
+E             "namespaces": [
+E               "root",
+E               "code"
+E             ],
+E             "message": "src/app/main.py matches 2 namespaces: root, code"
+E           }
+E         ]
+E         
+E         stderr: 
+E       assert 1 == 0
+E        +  where 1 = <w2_95_support.Declared object at 0x70cca8c00e30>.code
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:72: AssertionError
+_________ test_w2_95_star_alone_leaves_files_in_folders_unplaced[list] _________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_star_alone_leaves_f0')
+form = 'list'
+
+    @pytest.mark.parametrize("form", sorted(FORMS))
+    def test_w2_95_star_alone_leaves_files_in_folders_unplaced(tmp_path, form):
+        # Only `*`: the files in folders match no namespace and are named.
+        repo = s.Planted(tmp_path, FILES, FORMS[form]({"root": ["*"]}))
+        result = repo.declared()
+>       _assert_red(
+            result,
+            {"src/app/main.py": [], "src/app/deep/util.py": [], "docs/guide.md": [], s.PATH_MAP: []},
+        )
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8aad8e0>
+expected = {'docs/guide.md': [], 'governance/project/path-map.yaml': [], 'src/app/deep/util.py': [], 'src/app/main.py': []}
+
+    def _assert_red(result, expected):
+        """The check is red and names each path of ``expected`` with the namespaces it matched."""
+        assert result.findings is not None, "the output is not JSON:\n" + result.describe()
+>       assert result.code != 0, "a path in no namespace or in two is reported green:\n" + result.describe()
+E       AssertionError: a path in no namespace or in two is reported green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8aad8e0>.code
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:35: AssertionError
+_______ test_w2_95_star_alone_leaves_files_in_folders_unplaced[mapping] ________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_star_alone_leaves_f1')
+form = 'mapping'
+
+    @pytest.mark.parametrize("form", sorted(FORMS))
+    def test_w2_95_star_alone_leaves_files_in_folders_unplaced(tmp_path, form):
+        # Only `*`: the files in folders match no namespace and are named.
+        repo = s.Planted(tmp_path, FILES, FORMS[form]({"root": ["*"]}))
+        result = repo.declared()
+>       _assert_red(
+            result,
+            {"src/app/main.py": [], "src/app/deep/util.py": [], "docs/guide.md": [], s.PATH_MAP: []},
+        )
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8aae510>
+expected = {'docs/guide.md': [], 'governance/project/path-map.yaml': [], 'src/app/deep/util.py': [], 'src/app/main.py': []}
+
+    def _assert_red(result, expected):
+        """The check is red and names each path of ``expected`` with the namespaces it matched."""
+        assert result.findings is not None, "the output is not JSON:\n" + result.describe()
+>       assert result.code != 0, "a path in no namespace or in two is reported green:\n" + result.describe()
+E       AssertionError: a path in no namespace or in two is reported green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8aae510>.code
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:35: AssertionError
+_______ test_w2_95_star_inside_a_folder_does_not_cross_into_a_subfolder ________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_star_inside_a_folde0')
+
+    def test_w2_95_star_inside_a_folder_does_not_cross_into_a_subfolder(tmp_path):
+        # `src/app/*` takes src/app/main.py only; src/app/deep/util.py is in no namespace.
+        namespaces = {"app": ["src/app/*"], "docs": ["docs/**"], "governance": ["governance/**"], "root": ["README.md"]}
+        repo = s.Planted(tmp_path, FILES, s.mapping_form(namespaces))
+        result = repo.declared()
+>       _assert_red(result, {"src/app/deep/util.py": []})
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8a5f710>
+expected = {'src/app/deep/util.py': []}
+
+    def _assert_red(result, expected):
+        """The check is red and names each path of ``expected`` with the namespaces it matched."""
+        assert result.findings is not None, "the output is not JSON:\n" + result.describe()
+>       assert result.code != 0, "a path in no namespace or in two is reported green:\n" + result.describe()
+E       AssertionError: a path in no namespace or in two is reported green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8a5f710>.code
+
+tests/acceptance/W2-95/test_w2_95_namespaces.py:35: AssertionError
+_ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[list_entry_a_string] __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno0')
+case = 'list_entry_a_string'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8d4fda0>
+words = ('namespace', 'entry', 'entries', 'paths'), case = 'list_entry_a_string'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+        assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+        assert result.stdout.strip(), f"{case}: not green but no finding on stdout:\n" + result.describe()
+        assert result.findings, f"{case}: no finding as JSON on stdout:\n" + result.describe()
+        # A per-path finding ("README.md matches no namespace in path-map.yaml") does not name the cause.
+        about_map = [
+            json.dumps(f)
+            for f in result.findings
+            if not (isinstance(f, dict) and f.get("code") in (s.NO_NAMESPACE, s.MULTIPLE_NAMESPACES))
+        ]
+>       assert about_map, f"{case}: no finding about the path map itself, only per-path findings:\n" + result.describe()
+E       AssertionError: list_entry_a_string: no finding about the path map itself, only per-path findings:
+E         exit 1
+E         stdout: [
+E           {
+E             "code": "PATH_NO_NAMESPACE",
+E             "path": "README.md",
+E             "message": "README.md matches no namespace in path-map.yaml"
+E           },
+E           {
+E             "code": "PATH_NO_NAMESPACE",
+E             "path": "governance/project/path-map.yaml",
+E             "message": "governance/project/path-map.yaml matches no namespace in path-map.yaml"
+E           },
+E           {
+E             "code": "PATH_NO_NAMESPACE",
+E             "path": "src/app/main.py",
+E             "message": "src/app/main.py matches no namespace in path-map.yaml"
+E           }
+E         ]
+E         
+E         stderr: 
+E       assert []
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:66: AssertionError
+_ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[mapping_entry_a_list] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno1')
+case = 'mapping_entry_a_list'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8a36ba0>
+words = ('namespace', 'entry', 'entries', 'paths')
+case = 'mapping_entry_a_list'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: mapping_entry_a_list: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8a36ba0>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+_ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[mapping_entry_paths_a_string] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno2')
+case = 'mapping_entry_paths_a_string'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8aad340>
+words = ('namespace', 'entry', 'entries', 'paths')
+case = 'mapping_entry_paths_a_string'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: mapping_entry_paths_a_string: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8aad340>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+_ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[mapping_entry_without_paths] _
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno3')
+case = 'mapping_entry_without_paths'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8aaf8f0>
+words = ('namespace', 'entry', 'entries', 'paths')
+case = 'mapping_entry_without_paths'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: mapping_entry_without_paths: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8aaf8f0>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+_ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[namespaces_a_number] __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno4')
+case = 'namespaces_a_number'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8aaf6e0>
+words = ('namespaces',), case = 'namespaces_a_number'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: namespaces_a_number: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8aaf6e0>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+_ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[namespaces_a_string] __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno5')
+case = 'namespaces_a_string'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8a5c080>
+words = ('namespaces',), case = 'namespaces_a_string'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: namespaces_a_string: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8a5c080>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+____ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[no_namespaces] _____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno6')
+case = 'no_namespaces'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8ae3080>
+words = ('namespaces',), case = 'no_namespaces'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+        assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+        assert result.stdout.strip(), f"{case}: not green but no finding on stdout:\n" + result.describe()
+        assert result.findings, f"{case}: no finding as JSON on stdout:\n" + result.describe()
+        # A per-path finding ("README.md matches no namespace in path-map.yaml") does not name the cause.
+        about_map = [
+            json.dumps(f)
+            for f in result.findings
+            if not (isinstance(f, dict) and f.get("code") in (s.NO_NAMESPACE, s.MULTIPLE_NAMESPACES))
+        ]
+>       assert about_map, f"{case}: no finding about the path map itself, only per-path findings:\n" + result.describe()
+E       AssertionError: no_namespaces: no finding about the path map itself, only per-path findings:
+E         exit 1
+E         stdout: [
+E           {
+E             "code": "PATH_NO_NAMESPACE",
+E             "path": "README.md",
+E             "message": "README.md matches no namespace in path-map.yaml"
+E           },
+E           {
+E             "code": "PATH_NO_NAMESPACE",
+E             "path": "governance/project/path-map.yaml",
+E             "message": "governance/project/path-map.yaml matches no namespace in path-map.yaml"
+E           },
+E           {
+E             "code": "PATH_NO_NAMESPACE",
+E             "path": "src/app/main.py",
+E             "message": "src/app/main.py matches no namespace in path-map.yaml"
+E           }
+E         ]
+E         
+E         stderr: 
+E       assert []
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:66: AssertionError
+_______ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[not_utf8] _______
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno7')
+case = 'not_utf8'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8ae3f20>
+words = ('read', 'permission', 'access', 'utf', 'decod', 'encod')
+case = 'not_utf8'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+        assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+>       assert result.stdout.strip(), f"{case}: not green but no finding on stdout:\n" + result.describe()
+E       AssertionError: not_utf8: not green but no finding on stdout:
+E         exit 1
+E         stdout: 
+E         stderr: Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/home/usain/gov-os-worktrees/W2-95-tests/src/gov/check/pathmap.py", line 81, in <module>
+E             results = check(root)
+E                       ^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-95-tests/src/gov/check/pathmap.py", line 41, in check
+E             data = yaml.safe_load(path_map_file.read_text(encoding="utf-8"))
+E                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1030, in read_text
+E             return f.read()
+E                    ^^^^^^^^
+E           File "<frozen codecs>", line 322, in decode
+E         UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 33: invalid start byte
+E         
+E       assert ''
+E        +  where '' = <built-in method strip of str object at 0xb3c3f0>()
+E        +    where <built-in method strip of str object at 0xb3c3f0> = ''.strip
+E        +      where '' = <w2_95_support.Declared object at 0x70cca8ae3f20>.stdout
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:58: AssertionError
+___ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[top_level_a_list] ___
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno8')
+case = 'top_level_a_list'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8ae1790>
+words = ('map', 'mapping', 'object', 'dict', 'top'), case = 'top_level_a_list'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: top_level_a_list: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8ae1790>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+__ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[top_level_a_string] __
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno9')
+case = 'top_level_a_string'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8ae2e40>
+words = ('map', 'mapping', 'object', 'dict', 'top'), case = 'top_level_a_string'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: top_level_a_string: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8ae2e40>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+___ test_w2_95_path_map_that_cannot_be_judged_is_a_finding[unparsable_yaml] ____
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_that_canno10')
+case = 'unparsable_yaml'
+
+    @pytest.mark.parametrize("case", sorted(CASES))
+    def test_w2_95_path_map_that_cannot_be_judged_is_a_finding(tmp_path, case):
+        data, words = CASES[case]
+        repo = s.Planted(tmp_path, FILES, path_map_bytes=data)
+>       _assert_finding_naming_cause(repo.declared(), words, case)
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8c00d70>
+words = ('yaml', 'pars', 'syntax', 'invalid'), case = 'unparsable_yaml'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: unparsable_yaml: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8c00d70>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+___________ test_w2_95_path_map_without_read_permission_is_a_finding ___________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_path_map_without_re0')
+
+    @pytest.mark.skipif(hasattr(os, "geteuid") and os.geteuid() == 0, reason="root reads any file")
+    def test_w2_95_path_map_without_read_permission_is_a_finding(tmp_path):
+        repo = s.Planted(
+            tmp_path, FILES, s.mapping_form({"code": ["src/**"], "root": ["*"], "governance": ["governance/**"]})
+        )
+        pm = repo.root / s.PATH_MAP
+        pm.chmod(0)
+        try:
+            result = repo.declared()
+        finally:
+            pm.chmod(0o644)
+>       _assert_finding_naming_cause(result, UNREADABLE, "no read permission")
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8ae1fa0>
+words = ('read', 'permission', 'access', 'utf', 'decod', 'encod')
+case = 'no read permission'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: no read permission: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8ae1fa0>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+______ test_w2_95_missing_path_map_under_governance_project_is_a_finding _______
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_missing_path_map_un0')
+
+    def test_w2_95_missing_path_map_under_governance_project_is_a_finding(tmp_path):
+        # The repository has governance/project/ (with a tracked file) and so declares a path map there.
+        repo = s.Planted(tmp_path, FILES + ["governance/project/README.md"])
+        assert not (repo.root / s.PATH_MAP).exists()
+>       _assert_finding_naming_cause(repo.declared(), MISSING, "missing path map")
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = <w2_95_support.Declared object at 0x70cca8ae1ca0>
+words = ('missing', 'not found', 'no such', 'absent', 'does not exist', 'not exist')
+case = 'missing path map'
+
+    def _assert_finding_naming_cause(result, words, case):
+        """Not green, and a finding about the path map itself (not a per-path finding) names the file and the cause."""
+>       assert result.code != 0, f"{case}: the path map cannot be judged, yet the check is green:\n" + result.describe()
+E       AssertionError: missing path map: the path map cannot be judged, yet the check is green:
+E         exit 0
+E         stdout: 
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = <w2_95_support.Declared object at 0x70cca8ae1ca0>.code
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:57: AssertionError
+___________ test_w2_95_missing_path_map_is_never_green_in_gov_check ____________
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-95/pytest-of-usain/pytest-0/test_w2_95_missing_path_map_is0')
+
+    def test_w2_95_missing_path_map_is_never_green_in_gov_check(tmp_path):
+        repo = s.Planted(tmp_path, FILES + ["governance/project/README.md"])
+        result = repo.gov_check()
+        assert result.envelope is not None, "gov check --json printed no JSON:\n" + result.describe()
+        check = result.pathmap()
+        if result.envelope.get("ok") is False:
+            # The command refused the project as a whole: not green, and it must say why.
+            assert PM_NAME in str(result.envelope.get("error")), result.describe()
+            return
+        assert check is not None, "core-pathmap is not in gov check's result:\n" + result.describe()
+>       assert check.get("status") != "GREEN", "a missing path map is reported green:\n" + result.describe()
+E       AssertionError: a missing path map is reported green:
+E         exit 0
+E         stdout: {"ok": true, "command": "check", "result": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "GREEN", "family": "path-map compliance", "check_count": 1}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "YELLOW", "family": "adapter/model portability", "check_count": 0, "reason": "no registered check"}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "core-pathmap", "family": "path-map compliance", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "unknown", "check_version": "1.0.0", "inputs_hash": "e240bd2e3e3af27c"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "unknown", "check_version": "1.0.0", "inputs_hash": "182d217cd50c64e8"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "unknown", "check_version": "1.0.0", "inputs_hash": "2d1fbfec11564bb0"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "unknown", "check_version": "1.0.0", "inputs_hash": "2d2b7191368fdc5a"}}]}, "session": ""}
+E         
+E         stderr: families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: GREEN
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert 'GREEN' != 'GREEN'
+E        +  where 'GREEN' = <built-in method get of dict object at 0x70cca8ac8c80>('status')
+E        +    where <built-in method get of dict object at 0x70cca8ac8c80> = {'family': 'path-map compliance', 'findings': [], 'id': 'core-pathmap', 'provenance': {'check_version': '1.0.0', 'commit': 'unknown', 'inputs_hash': 'e240bd2e3e3af27c'}, ...}.get
+
+tests/acceptance/W2-95/test_w2_95_path_map_faults.py:113: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_names_each_unplaced_and_doubly_placed_path
+FAILED tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py::test_w2_95_adopted_repository_kept_valid_a_new_unplaced_file_turns_it_red
+FAILED tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py::test_w2_95_gov_check_family_is_not_green_on_a_mapping_form_path_in_none
+FAILED tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_paths_in_none_and_in_two_are_named[mapping]
+FAILED tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_at_the_root_matches_only_root_files[list]
+FAILED tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_alone_leaves_files_in_folders_unplaced[list]
+FAILED tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_alone_leaves_files_in_folders_unplaced[mapping]
+FAILED tests/acceptance/W2-95/test_w2_95_namespaces.py::test_w2_95_star_inside_a_folder_does_not_cross_into_a_subfolder
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[list_entry_a_string]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[mapping_entry_a_list]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[mapping_entry_paths_a_string]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[mapping_entry_without_paths]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[namespaces_a_number]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[namespaces_a_string]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[no_namespaces]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[not_utf8]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[top_level_a_list]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[top_level_a_string]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_that_cannot_be_judged_is_a_finding[unparsable_yaml]
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_path_map_without_read_permission_is_a_finding
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_missing_path_map_under_governance_project_is_a_finding
+FAILED tests/acceptance/W2-95/test_w2_95_path_map_faults.py::test_w2_95_missing_path_map_is_never_green_in_gov_check
+22 failed, 6 passed in 2.16s

@@ -1,0 +1,230 @@
+{
+ "base": {
+  "roles": {
+   "files": 6,
+   "chunks": 19,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "hooks": {
+   "files": 6,
+   "chunks": 90,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "skills (kernel, incl. superpowers/vendored.yaml)": {
+   "files": 24,
+   "chunks": 214,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "vendor": {
+   "files": 15,
+   "chunks": 139,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "skills/superpowers/<skill>/": {
+   "files": 14,
+   "chunks": 138,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "bin": {
+   "files": 1,
+   "chunks": 46,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "template/.rulesync": {
+   "files": 44,
+   "chunks": 529,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "template (all)": {
+   "files": 167,
+   "chunks": 1262,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "all": {
+   "files": 2632,
+   "chunks": 55591,
+   "chunks_with_vectors": 50672
+  }
+ },
+ "head": {
+  "roles": {
+   "files": 6,
+   "chunks": 19,
+   "chunks_with_vectors": 19,
+   "files_with_vectors": 6
+  },
+  "hooks": {
+   "files": 6,
+   "chunks": 90,
+   "chunks_with_vectors": 90,
+   "files_with_vectors": 6
+  },
+  "skills (kernel, incl. superpowers/vendored.yaml)": {
+   "files": 24,
+   "chunks": 214,
+   "chunks_with_vectors": 76,
+   "files_with_vectors": 10
+  },
+  "vendor": {
+   "files": 15,
+   "chunks": 139,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "skills/superpowers/<skill>/": {
+   "files": 14,
+   "chunks": 138,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "bin": {
+   "files": 1,
+   "chunks": 46,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "template/.rulesync": {
+   "files": 44,
+   "chunks": 529,
+   "chunks_with_vectors": 0,
+   "files_with_vectors": 0
+  },
+  "template (all)": {
+   "files": 167,
+   "chunks": 1262,
+   "chunks_with_vectors": 410,
+   "files_with_vectors": 93
+  },
+  "all": {
+   "files": 2635,
+   "chunks": 55625,
+   "chunks_with_vectors": 51114
+  }
+ },
+ "vector_diff": {
+  "paths": 96,
+  "gained": [
+   "template/.copier-answers.yml.jinja",
+   "template/.github/workflows/ci.yml.jinja",
+   "template/.gitignore",
+   "template/.gitleaks.toml",
+   "template/governance/kernel/canaries/lexical.yaml",
+   "template/governance/kernel/canaries/semantic.yaml",
+   "template/governance/kernel/checks/adapter-portability.yaml",
+   "template/governance/kernel/checks/audit-reproducibility.yaml",
+   "template/governance/kernel/checks/context-reproducibility.yaml",
+   "template/governance/kernel/checks/core-authority.yaml",
+   "template/governance/kernel/checks/core-claims.yaml",
+   "template/governance/kernel/checks/core-commands.yaml",
+   "template/governance/kernel/checks/core-decision-citations.yaml",
+   "template/governance/kernel/checks/core-graph.yaml",
+   "template/governance/kernel/checks/core-mutation.yaml",
+   "template/governance/kernel/checks/core-pathmap.yaml",
+   "template/governance/kernel/checks/core-schema.yaml",
+   "template/governance/kernel/checks/fresh-agent-reconstruction.yaml",
+   "template/governance/kernel/checks/index-freshness.yaml",
+   "template/governance/kernel/checks/product-traceability-trailers.yaml",
+   "template/governance/kernel/checks/recovery-rebuild.yaml",
+   "template/governance/kernel/checks/retrieval-regression.yaml",
+   "template/governance/kernel/checks/secrets-indexing.yaml",
+   "template/governance/kernel/checks/skill-regression-a.yaml",
+   "template/governance/kernel/checks/skill-regression-b1.yaml",
+   "template/governance/kernel/checks/skill-regression-orchestration.yaml",
+   "template/governance/kernel/hooks/posttooluse.py",
+   "template/governance/kernel/hooks/precompact.py",
+   "template/governance/kernel/hooks/pretooluse.py",
+   "template/governance/kernel/hooks/sessionstart.py",
+   "template/governance/kernel/hooks/stop.py",
+   "template/governance/kernel/hooks/subagentstop.py",
+   "template/governance/kernel/launch/research-allowlist.yaml",
+   "template/governance/kernel/roles/engineer.md",
+   "template/governance/kernel/roles/independent-auditor.md",
+   "template/governance/kernel/roles/independent-test-designer.md",
+   "template/governance/kernel/roles/orchestrator.md",
+   "template/governance/kernel/roles/product-spec.md",
+   "template/governance/kernel/roles/research.md",
+   "template/governance/kernel/schemas/adoption-verdict.schema.json",
+   "template/governance/kernel/schemas/audit-report.schema.json",
+   "template/governance/kernel/schemas/capability.schema.json",
+   "template/governance/kernel/schemas/change-execution-record.schema.json",
+   "template/governance/kernel/schemas/change-impact-proposal.schema.json",
+   "template/governance/kernel/schemas/checkpoint.schema.json",
+   "template/governance/kernel/schemas/close.schema.json",
+   "template/governance/kernel/schemas/common.schema.json",
+   "template/governance/kernel/schemas/decision-package.schema.json",
+   "template/governance/kernel/schemas/failure.schema.json",
+   "template/governance/kernel/schemas/lesson.schema.json",
+   "template/governance/kernel/schemas/madr.schema.json",
+   "template/governance/kernel/schemas/path-map.schema.json",
+   "template/governance/kernel/schemas/plan.schema.json",
+   "template/governance/kernel/schemas/probe.schema.json",
+   "template/governance/kernel/schemas/register-entry.schema.json",
+   "template/governance/kernel/schemas/research.schema.json",
+   "template/governance/kernel/schemas/specification.schema.json",
+   "template/governance/kernel/schemas/test-map.schema.json",
+   "template/governance/kernel/schemas/ticket.schema.json",
+   "template/governance/kernel/schemas/tool-registry.schema.json",
+   "template/governance/kernel/settings.json",
+   "template/governance/kernel/skills/adopt/SKILL.md",
+   "template/governance/kernel/skills/audit/SKILL.md",
+   "template/governance/kernel/skills/change/SKILL.md",
+   "template/governance/kernel/skills/checkpoint/SKILL.md",
+   "template/governance/kernel/skills/discovery/SKILL.md",
+   "template/governance/kernel/skills/orchestration/SKILL.md",
+   "template/governance/kernel/skills/planning/SKILL.md",
+   "template/governance/kernel/skills/retrieval/SKILL.md",
+   "template/governance/kernel/skills/superpowers/vendored.yaml",
+   "template/governance/kernel/skills/test-design/SKILL.md",
+   "template/governance/kernel/templates/brief-engineer.md",
+   "template/governance/kernel/templates/brief-lead.md",
+   "template/governance/kernel/templates/brief-product-spec.md",
+   "template/governance/kernel/templates/brief-reviewer.md",
+   "template/governance/kernel/templates/brief-test-designer.md",
+   "template/governance/kernel/templates/checkpoint.md",
+   "template/governance/kernel/templates/decision-package.md",
+   "template/governance/kernel/templates/decision-record.md",
+   "template/governance/kernel/templates/failure.md",
+   "template/governance/kernel/templates/lesson.md",
+   "template/governance/kernel/templates/research.md",
+   "template/governance/kernel/templates/ticket.md",
+   "template/governance/project/path-map.yaml",
+   "template/governance/project/test-map.yaml",
+   "template/lefthook.yml.jinja",
+   "template/openspec/config.yaml",
+   "template/openspec/schemas/feature-readiness/schema.yaml",
+   "template/openspec/schemas/feature-readiness/templates/design.md",
+   "template/openspec/schemas/feature-readiness/templates/proposal.md",
+   "template/openspec/schemas/feature-readiness/templates/readiness.yaml",
+   "template/openspec/schemas/feature-readiness/templates/spec.md",
+   "template/openspec/schemas/feature-readiness/templates/tasks.md",
+   "tests/acceptance/W2-86/README.md",
+   "tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py",
+   "tests/unit/retrieval/test_w2_86_kernel_template_namespaces.py"
+  ],
+  "lost": [],
+  "outside_template": [
+   "tests/acceptance/W2-86/README.md",
+   "tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py",
+   "tests/unit/retrieval/test_w2_86_kernel_template_namespaces.py"
+  ]
+ },
+ "lexical_paths_only_in_one": [
+  "tests/acceptance/W2-86/README.md",
+  "tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py",
+  "tests/unit/retrieval/test_w2_86_kernel_template_namespaces.py"
+ ],
+ "lexical_files_changed": [
+  "governance/project/path-map.yaml",
+  "tests/acceptance/W2-86/README.md",
+  "tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py",
+  "tests/unit/retrieval/test_w2_86_kernel_template_namespaces.py"
+ ]
+}

@@ -1,0 +1,40 @@
+settings = {'permissions': {'allow': ['Read(./docs/**)']}}
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_a_settings_file_with_noth1')
+
+    @pytest.mark.parametrize("settings", ({"hooks": {}}, {"permissions": {"allow": ["Read(./docs/**)"]}}),
+                             ids=("no-permissions", "no-deny-list"))
+    @pytest.mark.parametrize("function", WHOLE_TREE, ids=lambda function: function.label)
+    def test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is(function, settings, tmp_path):
+        source = _source(tmp_path / "source", settings)
+>       produced = check.run_copier(function, source, tmp_path / "produced")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = Function(path=PosixPath('/home/usain/gov-os-worktrees/W2-108/tests/acceptance/W2-108/test_w2_108_scope.py'), name='tes...anged_by_this_ticket', root_parameters=(), top_level=True, copies=False, lists_whole_tree=False, whole_tree_route=True)
+source = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_a_settings_file_with_noth1/source')
+destination = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_a_settings_file_with_noth1/produced')
+
+    def run_copier(function, source, destination):
+        """Call the copier with ``source`` as the repository root; the folder it filled."""
+        callable_ = load(function)
+        required = [name for name, parameter in inspect.signature(callable_).parameters.items()
+                    if parameter.default is inspect.Parameter.empty
+                    and parameter.kind in (parameter.POSITIONAL_ONLY, parameter.POSITIONAL_OR_KEYWORD)]
+        assert len(required) == 1, (
+            f"{function.label} takes {required} without a default: this check calls a copier as "
+>           f"`copier(<destination>, {function.root_parameters[0]}=<synthetic root>)`"
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       IndexError: tuple index out of range
+
+tests/acceptance/W1-28/w1_28_copy_check.py:262: IndexError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs
+FAILED tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_the_two_whole_tree_fixtures_are_found
+FAILED tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket]
+FAILED tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket]
+FAILED tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket-no-permissions]
+FAILED tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W2-108/test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket-no-deny-list]
+6 failed, 26 passed in 17.88s

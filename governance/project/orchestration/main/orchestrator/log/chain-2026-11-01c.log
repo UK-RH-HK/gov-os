@@ -1,0 +1,7 @@
+2026-11-01 00:41:43 W2-97 waits: SHUT leads=6 load=33.8/27.6 nproc=20 have=18674968kB need=18127380kB: load 33.8/27.6 >= nproc 20
+2026-11-01 00:42:46 W2-97 waits: SHUT leads=6 load=36.9/28.2 nproc=20 have=21092024kB need=18127380kB: load 36.9/28.2 >= nproc 20
+2026-11-01 00:43:48 W2-97 waits: SHUT leads=6 load=37.3/28.8 nproc=20 have=20987300kB need=18127380kB: load 37.3/28.8 >= nproc 20
+2026-11-01 00:44:51 W2-97 waits: SHUT leads=6 load=33.4/29.1 nproc=20 have=21571568kB need=18127380kB: load 33.4/29.1 >= nproc 20
+2026-11-01 00:45:54 starting W2-97 (DAEO-wq2b), 6 lead(s) running
+2026-11-01 00:48:00 starting W2-114 (DAEO-4eux), 7 lead(s) running
+2026-11-01 00:50:04 chain done

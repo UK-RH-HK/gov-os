@@ -13,6 +13,8 @@ if len(sys.argv) > 2 and sys.argv[1] == "--settings":  # python3 guard4_check.py
     PROJECT = sys.argv[2]
     LINE = json.load(open(PROJECT + "/.claude/settings.json"))["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
     ROOT = PROJECT  # the planted paths are the tested tree's own
+elif len(sys.argv) > 1:  # python3 guard4_check.py <hook path>: a candidate hook, run against the main tree
+    HOOK = sys.argv[1]
 PY = open(os.path.expanduser("~/.local/bin/gov")).readline()[2:].strip()
 HELD = ROOT + "/governance/project/held-out.yaml"
 
@@ -92,6 +94,38 @@ CASES = [
     ("lifted CronCreate", "orchestrator", "CronCreate", {"cron": "0 7 * * *", "prompt": "x"}, "allow"),
     ("lifted general-purpose subagent write", "orchestrator", "Write",
      {"file_path": "/tmp/gov-guard4-z.txt", "content": "x"}, "allow"),
+    # DEC-958: the false refusals of 2026-10-30 (read-only commands naming the acceptance tests; a reviewer's reads)
+    ("dec958 engineer runs its acceptance tests", "engineer", "Bash",
+     {"command": "PYTHONPATH=src python3 -m pytest -q tests/acceptance/W2-76"}, "allow"),
+    ("dec958 lead lists acceptance folders", "orchestrator@DAEO-0uhh", "Bash",
+     {"command": "ls tests/acceptance/W2-54/ tests/acceptance/W1-30/"}, "allow"),
+    ("dec958 lead greps acceptance through a pipe", "orchestrator@DAEO-0uhh", "Bash",
+     {"command": "grep -rln wbs_id tests/acceptance/W1-30/ | head -20"}, "allow"),
+    ("dec958 lead greps a conftest with an alternation", "orchestrator@DAEO-8lmb", "Bash",
+     {"command": "grep -n 'settings.json\\|hooks.jsonc' tests/acceptance/W1-05/conftest.py"}, "allow"),
+    ("dec958 CTO builds a brief naming the acceptance path", "orchestrator", "Bash",
+     {"command": "python3 tools/build_lead_brief.py p.md o.md PATHS=tests/acceptance/W2-90/**"}, "allow"),
+    ("dec958 auditor runs git log", "independent-auditor", "Bash", {"command": "git log --oneline -3"}, "allow"),
+    ("dec958 auditor runs the tests", "independent-auditor", "Bash",
+     {"command": "python3 -m pytest -q tests/unit/guard"}, "allow"),
+    ("dec958 engineer inline python writes acceptance", "engineer", "Bash",
+     {"command": "python3 -c 'open(\"tests/acceptance/W2-64/t.py\", \"w\").write(\"x\")'"}, "deny"),
+    ("fix2 lead import check then lists acceptance", "orchestrator@DAEO-0z8c", "Bash",
+     {"command": "PYTHONPATH=src python3 -c \"import gov; print(gov.__file__)\"; ls tests/acceptance/W2-05/"}, "allow"),
+    ("fix2 lead import check then greps acceptance", "orchestrator@DAEO-57hm", "Bash",
+     {"command": "python3 -c 'import gov' && grep -rn x tests/acceptance/W2-95/ | head"}, "allow"),
+    ("fix2 engineer inline python writes acceptance after a cd", "engineer", "Bash",
+     {"command": "cd /tmp && python3 -c 'open(\"tests/acceptance/W2-64/t.py\", \"w\")'"}, "deny"),
+    ("fix2 engineer perl -i on acceptance", "engineer", "Bash",
+     {"command": "perl -i -pe s/a/b/ tests/acceptance/W2-64/t.py"}, "deny"),
+    ("fix2 unbalanced quotes naming acceptance", "engineer", "Bash",
+     {"command": "python3 -c 'open(\"tests/acceptance/x\" ; ls"}, "deny"),
+    ("dec958 engineer tee into acceptance", "engineer", "Bash",
+     {"command": "echo x | tee tests/acceptance/W2-64/t.py"}, "deny"),
+    ("dec958 engineer sed -i acceptance", "engineer", "Bash",
+     {"command": "sed -i s/a/b/ tests/acceptance/W2-64/t.py"}, "deny"),
+    ("dec958 engineer cp into acceptance", "engineer", "Bash",
+     {"command": "cp /tmp/x.py tests/acceptance/W2-64/t.py"}, "deny"),
 ]
 
 ok = True

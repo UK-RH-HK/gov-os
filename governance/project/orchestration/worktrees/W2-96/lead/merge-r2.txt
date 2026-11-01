@@ -1,0 +1,11 @@
+Merge w2/W2-96-tests into w2/W2-96: run 2's acceptance cases and the command lists (DEC-970, DEC-963)
+
+The independent test designer's two commits: accept recorded in W1-07's and
+W1-32's command lists (Rewrite-Reason: DEC-959 item 6), and run 2's cases for
+gov accept (R8 to R12; Rewrite-Reason: DEC-970). Merged by the lead, since the
+engineer's sandbox mounts the acceptance tests read-only (DEC-970).
+
+Task: DAEO-ouet
+Implements: DEC-970, DEC-963, DEC-959
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

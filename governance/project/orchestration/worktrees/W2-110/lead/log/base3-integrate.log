@@ -1,0 +1,8 @@
+tree be171b570263 load 17.11 23.44 26.78
+/tmp/gov-os-lead-W2-110/base-integrate/src/gov/__init__.py
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+11 failed, 3 passed, 2 errors in 33.34s
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+2 failed, 12 passed in 77.07s (0:01:17)
+end load 19.60 22.22 25.94

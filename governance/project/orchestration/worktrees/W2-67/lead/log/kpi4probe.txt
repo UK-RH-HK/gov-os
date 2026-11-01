@@ -1,0 +1,10 @@
+1 tests/acceptance/W1-30/test_w1_30_test_runner.py exit=0 result=1 passed in 2.22s bases=
+2 tests/acceptance/W1-30/test_w1_30_r10_interpreter.py exit=0 result=2 passed in 8.71s bases=
+3 tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py exit=0 result=12 passed in 41.73s bases=
+4 tests/acceptance/W1-30/test_w1_30_r11_declared_here.py exit=0 result=50 passed in 3.28s bases=
+5 tests/unit/close/test_follow_up.py exit=0 result=12 passed in 2.45s bases=
+6 tests/unit/close/test_evidence.py exit=0 result=3 passed in 0.48s bases=
+7 tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py exit=0 result=19 passed in 5.18s bases=
+8 tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py exit=0 result=13 passed in 1.97s bases=
+9 tests/acceptance/W1-27/test_w2_67_temp_folders.py exit=0 result=5 passed in 0.93s bases=
+done

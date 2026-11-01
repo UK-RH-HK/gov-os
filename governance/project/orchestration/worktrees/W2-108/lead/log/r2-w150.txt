@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /home/usain/gov-os-worktrees/W2-108
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.13.0, xdist-3.8.0, timeout-2.4.0, testmon-2.2.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_the_two_whole_tree_fixtures_are_found PASSED [ 10%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W1-05/w1_05_support.py::copy_working_tree] PASSED [ 20%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_strips_the_held_out_deny_rules[W1-07/w1_07_support.py::copy_working_tree] PASSED [ 30%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W1-05/w1_05_support.py::copy_working_tree] PASSED [ 40%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_whole_tree_fixture_keeps_the_rest_of_the_settings_file[W1-07/w1_07_support.py::copy_working_tree] PASSED [ 50%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W1-05/w1_05_support.py::copy_working_tree-no-permissions] PASSED [ 60%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W1-05/w1_05_support.py::copy_working_tree-no-deny-list] PASSED [ 70%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W1-07/w1_07_support.py::copy_working_tree-no-permissions] PASSED [ 80%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_a_settings_file_with_nothing_to_strip_is_copied_as_it_is[W1-07/w1_07_support.py::copy_working_tree-no-deny-list] PASSED [ 90%]
+tests/acceptance/W1-50/test_w1_50_freeze_fixture_settings.py::test_the_check_catches_a_copy_that_keeps_the_rules PASSED [100%]
+
+- generated xml file: /home/usain/gov-os-worktrees/W2-108/.gov-runtime/scratch/lead/log/r2-w150.xml -
+============================== 10 passed in 3.47s ==============================

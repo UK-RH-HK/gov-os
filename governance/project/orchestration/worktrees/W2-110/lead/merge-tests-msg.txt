@@ -1,0 +1,9 @@
+W2-110: merge the acceptance tests (w2/W2-110-tests)
+
+The independent test designer's suite for a product's CTO-only install rule (DEC-971 item 4, DEC-957),
+written in parallel with the engineer from the KPIs (DEC-959 item 7, DEC-963).
+
+Task: DAEO-3r1j
+Implements: DEC-971, DEC-957
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="16" time="2.639" timestamp="2026-10-31T08:41:09.760389+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_only_the_test_designer_may_write_the_acceptance_tests[orchestrator]" time="0.183" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_only_the_test_designer_may_write_the_acceptance_tests[product-spec]" time="0.063" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]" time="0.063"><failure message="AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr=&quot;/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory&quot;">guard = &lt;function guard.&lt;locals&gt;._guard at 0x7f1ed4053060&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+&gt;           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...in/pytest-79/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+&gt;       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_only_the_test_designer_may_write_the_acceptance_tests[engineer]" time="0.080" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_only_the_test_designer_may_write_the_acceptance_tests[independent-auditor]" time="0.070" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_the_orchestrator_may_write_anywhere_else_in_the_repository" time="0.074"><failure message="AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr=&quot;/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory&quot;">guard = &lt;function guard.&lt;locals&gt;._guard at 0x7f1ed40f0860&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+&gt;           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...in/pytest-79/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+&gt;       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_the_auditor_writes_only_the_report_path_of_its_own_ticket" time="0.105"><failure message="AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr=&quot;/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory&quot;">guard = &lt;function guard.&lt;locals&gt;._guard at 0x7f1ed40f0ea0&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+&gt;       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...in/pytest-79/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+&gt;       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]" time="0.069"><failure message="AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr=&quot;/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory&quot;&#10;assert 'deny' == 'ask'&#10;  &#10;  - ask&#10;  + deny">guard = &lt;function guard.&lt;locals&gt;._guard at 0x7f1ed4051440&gt;
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+&gt;           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/gov-os-lead-W2-60a/pytest-of-usain/pytest-79/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[product-spec]" time="0.075" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[independent-test-designer]" time="0.072" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[engineer]" time="0.080" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[independent-auditor]" time="0.081" /><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_the_launcher_gives_the_role_an_empty_network_profile[engineer]" time="0.365"><failure message="AssertionError: gov launch did not start exactly one worker session (0 recorded)&#10;gov launch engineer DAEO-zz90&#10;exit code: 1&#10;stdout:&#10;&#10;stderr:&#10;gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'&#10;&#10;CLI starts recorded: []">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f1ed40514e0&gt;, role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.EMPTY_PROFILE_ROLES)
+    def test_the_launcher_gives_the_role_an_empty_network_profile(launch, role):
+        result = launch(role)
+&gt;       assert launch_support.allowed_domains(result.settings()) == [], (
+                                              ^^^^^^^^^^^^^^^^^
+            f"the settings built for {role} allow hosts: {launch_support.allowed_domains(result.settings())}"
+        )
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-46/w1_46_support.py:372: in settings
+    entries = self.session()["settings"]
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'engineer', 'DAEO-zz90'), returncode=1, stdout='', stderr="gov launch: LAUNCH_REFUSED: ...te/governance/kernel/roles/engineer.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'\n", seconds=0.0), calls=())
+
+    def session(self):
+        """The one worker session the launcher started."""
+        assert not self.bare, f"the launcher started a bare `claude` found on PATH (DEC-205)\n{self.describe()}"
+&gt;       assert len(self.sessions) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one worker session ({len(self.sessions)} recorded)\n{self.describe()}"
+        )
+E       AssertionError: gov launch did not start exactly one worker session (0 recorded)
+E       gov launch engineer DAEO-zz90
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/engineer.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'
+E       
+E       CLI starts recorded: []
+
+tests/acceptance/W1-46/w1_46_support.py:365: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_the_launcher_gives_the_role_an_empty_network_profile[independent-test-designer]" time="0.370"><failure message="AssertionError: gov launch did not start exactly one worker session (0 recorded)&#10;gov launch independent-test-designer DAEO-zz90&#10;exit code: 1&#10;stdout:&#10;&#10;stderr:&#10;gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'&#10;&#10;CLI starts recorded: []">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f1ed4052de0&gt;
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.EMPTY_PROFILE_ROLES)
+    def test_the_launcher_gives_the_role_an_empty_network_profile(launch, role):
+        result = launch(role)
+&gt;       assert launch_support.allowed_domains(result.settings()) == [], (
+                                              ^^^^^^^^^^^^^^^^^
+            f"the settings built for {role} allow hosts: {launch_support.allowed_domains(result.settings())}"
+        )
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-46/w1_46_support.py:372: in settings
+    entries = self.session()["settings"]
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'independent-test-designer', 'DAEO-zz90'), returncode=1, stdout='', stderr="gov launch:...nel/roles/independent-test-designer.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'\n", seconds=0.0), calls=())
+
+    def session(self):
+        """The one worker session the launcher started."""
+        assert not self.bare, f"the launcher started a bare `claude` found on PATH (DEC-205)\n{self.describe()}"
+&gt;       assert len(self.sessions) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one worker session ({len(self.sessions)} recorded)\n{self.describe()}"
+        )
+E       AssertionError: gov launch did not start exactly one worker session (0 recorded)
+E       gov launch independent-test-designer DAEO-zz90
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-test-designer.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'
+E       
+E       CLI starts recorded: []
+
+tests/acceptance/W1-46/w1_46_support.py:365: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_the_launcher_gives_the_role_an_empty_network_profile[independent-auditor]" time="0.393"><failure message="AssertionError: gov launch did not start exactly one worker session (0 recorded)&#10;gov launch independent-auditor DAEO-zz94&#10;exit code: 1&#10;stdout:&#10;&#10;stderr:&#10;gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'&#10;&#10;CLI starts recorded: []">launch = &lt;function launch.&lt;locals&gt;._launch at 0x7f1ed404c180&gt;
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.EMPTY_PROFILE_ROLES)
+    def test_the_launcher_gives_the_role_an_empty_network_profile(launch, role):
+        result = launch(role)
+&gt;       assert launch_support.allowed_domains(result.settings()) == [], (
+                                              ^^^^^^^^^^^^^^^^^
+            f"the settings built for {role} allow hosts: {launch_support.allowed_domains(result.settings())}"
+        )
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-46/w1_46_support.py:372: in settings
+    entries = self.session()["settings"]
+              ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Launch(run=Run(args=('launch', 'independent-auditor', 'DAEO-zz94'), returncode=1, stdout='', stderr="gov launch: LAUNC...ce/kernel/roles/independent-auditor.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'\n", seconds=0.0), calls=())
+
+    def session(self):
+        """The one worker session the launcher started."""
+        assert not self.bare, f"the launcher started a bare `claude` found on PATH (DEC-205)\n{self.describe()}"
+&gt;       assert len(self.sessions) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov launch did not start exactly one worker session ({len(self.sessions)} recorded)\n{self.describe()}"
+        )
+E       AssertionError: gov launch did not start exactly one worker session (0 recorded)
+E       gov launch independent-auditor DAEO-zz94
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       gov launch: LAUNCH_REFUSED: the role file template/governance/kernel/roles/independent-auditor.md has no line '- **Version:** &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;'
+E       
+E       CLI starts recorded: []
+
+tests/acceptance/W1-46/w1_46_support.py:365: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-33.test_w1_33_guard_and_launcher" name="test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker[orchestrator]" time="0.376" /></testsuite></testsuites>

@@ -1,0 +1,156 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "f32e26efb102",
+   "after": "63cea85af38b"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/briefs/LEAD-w2-common.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/DECISIONS-IN-FORCE.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/orchestration/nightly/nightly.sh"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/prompts/w2-orchestrator.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": "?? governance/project/orchestration/packages/HOLDS-REVIEW-1.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-00-store",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-76",
+   "change": "head",
+   "before": "ef26e1a15057",
+   "after": "1fbd43d5be59"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-76",
+   "change": "acceptance folder",
+   "folder": ".claude"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "head",
+   "before": "a6c3eca87ac6",
+   "after": "c491c5d8c521"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-28/test_w1_28_launch_product_spec.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-47/test_w1_47_failed_commands.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-49/test_w1_49_registration.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-50/test_w1_50_freeze_launcher.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-59/test_w2_59_hook_lines.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-65/test_w2_65_hook_lines.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-90/w2_90_kernel_wiring.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-90",
+   "change": "acceptance folder",
+   "folder": "W2-90"
+  }
+ ]
+}

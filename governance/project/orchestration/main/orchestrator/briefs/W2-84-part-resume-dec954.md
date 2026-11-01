@@ -1,0 +1,27 @@
+You are the ticket lead for ticket `DAEO-m1u3` (`W2-84`, "the hidden-set refusal in every tree"), profile FULL, working only in the worktree `/home/usain/gov-os-worktrees/W2-84` on branch `w2/W2-84`.
+
+**This is a resume, under DEC-953, DEC-954 and DEC-957: read your lead checkpoint, `.gov-runtime/scratch/lead/CHECKPOINT.md`, first.** `git rev-parse --short=12 HEAD` must show `@@HEAD@@` (the orchestrator merged `w2/integrate` in: ACT 1's five-rule guard, DEC-953 to DEC-957, W2-90 filed), and `git status --short` must show nothing. Anything else: stop and return PACKAGES naming it.
+
+**Your decided scope is in your older part,** `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/briefs/W2-84-part-run1b.md`: read it whole for its texts (behaviours, checks, who runs beside you). This part holds wherever the two differ.
+
+## What is left
+
+- **Why first:** memory's critical path. W2-61h, the hidden half of the measure, waits on your merge (DEC-950).
+- **State:** the fix is in at code head `c0f35c87fd8a`; its own suites and the parallel phase were green before the merge. The orchestrator has now merged `w2/integrate` in (93 commits; check `git diff --stat c0f35c87fd8a HEAD -- src/gov/guard tests/unit/guard` and say what came in).
+- **What is left:**
+  1. **Verification** (below): `src/gov/guard` is shared core, so the selection will say `full`; run it once under `verify_lock.sh`. W1-05's latency cases under load: re-run alone, report both.
+  2. **The FULL review** with your filled `briefs/rev-1.md` (JUDGEMENT.md word for word, `--effort max`, read-only, sandboxed), on the final head. It asks above all whether any route lets a measured session read a hidden part in any tree: an absolute path, another worktree, a run clone, a symlink, git's object store. It judges the product's guard (`src/gov/guard/`); this repository's own hook is now the five-rule hook (ACT 1), which is not under review.
+  3. Commit the probe record only when it passes. A fail-open finding: one test batch, one engineer, the runs, review 2 (DEC-413).
+
+**What no longer applies (DEC-953; `governance/project/orchestration/LIFTED-BY-DEC953.md`), wherever the older part or your checkpoint says otherwise:** the merge step where the orchestrator has done it; the pre-close gate and `gov close` with its probe gate; fresh probes because a merge made a review stale (there is no staleness rule; a review is needed only where none has passed, or for new work); the trailer gate as a refusal (trailers are still written); the ratchet lists; the night window, the 01:00 cut-off, the `NIGHTLY-RUNNING` and `CLOSE-PENDING` holds and the 90-minute rule; the wait-based park. Test designers and engineers run at `--effort high`; only reviewers at `--effort max` (DEC-957). The guard is five rules now (ACT 1): command forms are no longer refused.
+
+**Verify (DEC-953 item 4, the common brief's step):** your own acceptance suite and unit tests, then the selection, `PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/select_tests.py /home/usain/gov-os-worktrees/W2-84 W2-84 DAEO-m1u3`; the full suite only when its scope is `full`, and then once, under `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/verify_lock.sh <command>` (closes take the lock first). Rebuild once first, under `flock /tmp/gov-os-rebuild.lock`, never `--no-embeddings`. A red in your files that fails alone is yours; one that passes alone is a flaky candidate, named. **Known reds you do not own** (named, left): the 235 live-wiring cases ACT 1 turned red, until W2-90 lands (`/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/briefs/W2-90-cases.txt`); W1-42's accepted reds; latency cases under load (W1-02, W1-05), re-run alone; DEC-919's W2-66 case naming a new conftest.
+
+**Installs:** the guard refuses them for you and your workers; raise any as a P1 in your return. **Scratch:** 20 GB and 1,000,000 files and folders for you and your workers, outside the tracked tree; `TMPDIR=/tmp/gov-os-lead-W2-84`; clean as you go, report `du -sh` and `du -s --inodes` in `evidence`, and name anything left for the orchestrator. **Repair:** at most one batch; a second, a fix outside your paths, or a red in another ticket's code: PACKAGES with its cost in lines and hours. **Finish what is listed and nothing new** (DEC-946 item 6).
+
+**Estimate:** about 2 to 3 hours.
+
+**Return:** the twelve fields first, as labelled lines; status DONE (each step's counts, the selection's scope and reasons, the probe record where one is due; ready to merge) or PACKAGES (each in six parts, with your recommendation and confidence, saying what it blocks).
+
+
+**DEC-968 (owner, 2026-10-31), overriding anything above about a full run:** never run the full suite, whatever your change, core included: the nightly runs it once a day. Your verification is the scoped set `select_tests.py` gives (always `scoped` now; for a core change it names `core_changed` and selects every suite the change can reach), run once before you return, in the close's form. A case that fails there and that your change did not cause (it fails on `w2/integrate` too) is named in your return for the CTO to deal with at once; one your change caused is yours to fix. Exit 2 from the selection (scope `refused`): return PACKAGES with its reasons.

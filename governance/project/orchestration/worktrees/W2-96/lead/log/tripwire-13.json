@@ -1,0 +1,115 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": " M src/gov/guard/install.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": " M template/governance/kernel/hooks/pretooluse.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110",
+   "change": "status line added",
+   "line": "?? tests/unit/guard/test_w2_110_cto_install.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-110/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-110/test_w2_110_cto_asked.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-110/test_w2_110_fail_closed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-110/test_w2_110_others_refused.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-110/test_w2_110_unchanged.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-110-tests",
+   "change": "acceptance folder",
+   "folder": "W2-110"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-tests",
+   "change": "head",
+   "before": "588e43ae11ff",
+   "after": "c348af6bc9ae"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-96-tests",
+   "change": "acceptance folder",
+   "folder": "W2-96"
+  }
+ ]
+}

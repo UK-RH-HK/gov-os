@@ -1,0 +1,8 @@
+Merge the W2-16 round 3 acceptance cases (DEC-772, DEC-767)
+
+The independent test designer's commits 2fa4a6da3358 and 0226a4ec0944 from w2/W2-16-tests (DEC-963), merged by the lead because the engineer had ended before they were ready.
+
+Task: DAEO-49o5
+Implements: DEC-772, DEC-767, CAP-43.b
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

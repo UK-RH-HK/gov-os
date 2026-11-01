@@ -1,0 +1,63 @@
+
+## What you read
+
+- The decisions in `docs/DECISION_REGISTER.md`: DEC-970 (its W2-05 line; "`GOV_CONFIG_GLOBAL`" there means git's `GIT_CONFIG_GLOBAL`), DEC-710, DEC-804 (item 3, P-1), DEC-580, DEC-135; the ticket's KPI lines in `.tickets/DAEO-0z8c.md`.
+- `src/gov/util/gitenv.py` (`runner_env`, `program_env`), `src/gov/close/command.py` `_started`, `src/gov/close/nightly.py` (`_alone`, `_BISECT_STEP`, `_bisect`, `night`), the sweep record's rows for `nightly.py` (row 55 and its neighbours) in `docs/research/AR-2-git-sweep.md`, and `tests/unit/gitenv/test_runner_env.py`.
+
+## The finding (R4-1, as a behaviour; high: loses work)
+
+**What was done:** a throwaway project, its main tree on one branch, a `main` branch checked out nowhere; a green night, then commits of which one turns a test red. The red test runs git in a temporary folder of its own (`git init`, commits, a branch, a checkout or a merge) with the environment it inherits. `night` finds the red, `_alone` runs it alone (red), and `_bisect` bisects it with `git bisect run` over the commits since the last green night.
+
+**What happened:** `_alone`'s run gave the test only the run's three `GIT_*` variables, and nothing moved. But `git bisect run` itself exports `GIT_DIR` (the night clone's git directory), `GIT_EXEC_PATH` and `GIT_PREFIX` to the command it runs, so the step's pytest and the test under it inherited them. The test's `git init` re-initialised the clone instead of making its own repository; its commits and checkouts acted on the clone and, through it, on the project: `main` moved onto a foreign commit, a foreign branch appeared, once the person's own commit fell off `main`, and `_bisect` named a commit outside the project's history. Batch 2's form did the same. The unit test of `_bisect` stands in for `subprocess.run`, so it cannot see what git adds.
+
+**What should happen (the KPIs, P-1, DEC-970):** each bisect step's test runs in exactly the environment `_started` gives a test run (`runner_env`'s: no `GIT_*` variable but `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_NOSYSTEM` and `GIT_NO_LAZY_FETCH`, the generated file included); so its git in a folder of its own acts only there; the project's branches, HEAD and reflogs are as they were; the first bad commit named is the project's.
+
+## What to do
+
+1. **Fix the step:** the process `git bisect run` starts must give the tests it runs exactly the run's environment, whatever git adds (`GIT_DIR`, `GIT_EXEC_PATH`, `GIT_PREFIX`, `GIT_WORK_TREE` or any other `GIT_*`), except the run's three. For example, the step removes every `GIT_*` variable but those three before it starts pytest, or it is handed the run's environment explicitly. The step still runs in the clone's folder and judges the commit git checked out there. `bisect start`, `run` and `reset` themselves keep the environment this round gave them (pinned through `runner_env`, as DEC-970 says); change only what the step's tests get. Fail closed (DEC-580): if the step cannot set its environment, it reports the commit as untestable or bad, never good.
+2. **Builder tests** in `tests/unit/gitenv/` (written first, seen red): one that runs a **real** `git bisect run` through `_bisect` over a throwaway repository whose red test runs git in a folder of its own with its inherited environment and records the `GIT_*` names it saw; it requires no `GIT_*` name but the three, every branch and HEAD of the throwaway project unchanged, and the first bad commit the one that made the test red. Keep it within a minute or so.
+3. **The sweep record:** row 55 (and the helper section if it names the step) says what the step's tests now get and why (R4-1). Counts stay true.
+
+Proportion (DEC-135): nothing beyond this. The review's low findings (a checkout filter in the person's configuration stopping a pinned `bisect start`; a Latin-1 name; SIGTERM leaving the generated folder; no writable temporary folder) are rows, not this batch's.
+
+## Verify before you return (once, after your last commit)
+
+- `PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -m pytest tests/unit/gitenv -q -p no:cacheprovider` and `tests/unit/close` (file by file if long) the same way. Expected: green except package H's `test_this_repository_s_two_hooks_sources_agree` (the owner's).
+- The acceptance tests, once, names and results only, never with `-x`, in file groups that each end within 10 minutes:
+
+      PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -m pytest tests/acceptance/W2-05/<files> -v --tb=no -rN -p no:cacheprovider
+
+  Expected in the sandbox: as before your change (41 passed; red only package H's `test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources`, the five retrieval-regression cases with no embedder, and the code-index case with its read-only daemon folder). The test designer's new case is not merged yet. Report every case's state.
+
+## Commit
+
+Before each commit, check that `/home/usain/Dynamic-Agentic-Engineering-OS/.git/hooks` holds no `pre-commit` file (only `*.sample` files); if one is there, do not commit, and say so. Never `--no-verify`, never `core.hooksPath`. Stage only the files you changed, by name (never `git add -A` or `git add .`: placeholder files show in this sandbox). One commit; trailers in the final block, `Implements:` holding decision ids only (DEC-927 item 2):
+
+    git commit -m "W2-05 (DAEO-0z8c): the bisect step's tests get only the run's environment (review finding R4-1)" --trailer "Task: DAEO-0z8c" --trailer "Role: engineer" --trailer "Implements: DEC-970, DEC-710, DEC-804, DEC-580" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+
+Do not start the commit message's body with a row id followed by a colon (git reads such a paragraph as trailers). After the commit, run `git log --oneline -2`, `git log -1 --format=%B` and `git status --short` and quote them.
+
+## Return
+
+Your commit; what the step's environment is now and how (a line or two); the unit test's form and its red before the fix; every suite you ran with its counts and every red case by name; lines added and removed in `src/`, `docs/` and tests; the `gov retrieve` questions you asked; the read refusals you met; any package. Put these in the fields below.
+
+One message, your last, complete in itself. **The twelve fields come first, each as a labelled line** (label at the start of a line, a colon, at least one word; "none" where there is nothing), and any machine-readable payload after them:
+
+```
+task: <what you were asked to do, in one line>
+status: <DONE | PACKAGES | ESCALATION | ESCALATION_BLOCKED | LAUNCH_BLOCKED | AUTH_REQUIRED, and one line of why>
+work_completed: <what was done>
+files_changed: <each path, or "none">
+evidence: <commits with their trailers, logs, command outputs that show it>
+tests: <each suite run, with its counts, or "none run">
+discoveries: <what you found that was not known, or "none">
+risks: <what could go wrong with what was done, or "none">
+lessons: <what the next worker should know, or "none">
+proposed_decisions: <each package, with your recommendation and confidence, or "none">
+unresolved: <what is still open, or "none">
+recommended_next_action: <one line>
+```
+
+Put the sandbox check's result (a) and (b) first in `evidence`. After the twelve fields, a section `guard_refusals:` (one line per refusal, or `none`) and the count of read refusals.
+
+Refused twice for the same call: stop and say so.

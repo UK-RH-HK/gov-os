@@ -1,0 +1,106 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-05",
+   "change": "head",
+   "before": "ecbdf689f283",
+   "after": "93859f1f621e"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-106",
+   "change": "head",
+   "before": "c2c99e6c084f",
+   "after": "9525808dc766"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-106-tests",
+   "change": "tree disappeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-108-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "head",
+   "before": "2c8cfc7ae7ee",
+   "after": "bb49523039c7"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16",
+   "change": "status line added",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-16-tests",
+   "change": "tree appeared"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-49-tests",
+   "change": "head",
+   "before": "b667fdc03ece",
+   "after": "eff292d3b5fe"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-49-tests",
+   "change": "acceptance folder",
+   "folder": "W2-49"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-84",
+   "change": "head",
+   "before": "02636753062d",
+   "after": "e3096fae6b0f"
+  }
+ ]
+}

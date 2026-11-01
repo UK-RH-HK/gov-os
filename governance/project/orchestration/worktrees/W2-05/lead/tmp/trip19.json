@@ -1,0 +1,30 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-114",
+   "change": "status line added",
+   "line": " M tests/acceptance/W1-28/test_w1_28_fixture_copies.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-114",
+   "change": "acceptance folder",
+   "folder": "W1-28"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "head",
+   "before": "0a2608e40388",
+   "after": "3004f33024f9"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-97",
+   "change": "head",
+   "before": "fb9b7e4ce06c",
+   "after": "56180d9f1ab3"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-97-tests",
+   "change": "tree appeared"
+  }
+ ]
+}

@@ -19,6 +19,8 @@ You are the ticket lead for ticket `@@ID@@` (`W2-86`, "The kernel template is em
   - full evidence 12 of 20 (60 %, against the owner's target of 99 %);
   - in the bundle 14 of 20.
 
+- **Since then, W2-87's authority order (merged and closed 2026-10-31):** hit@5 11 of 20 (55 %), full evidence 11 of 20 (55 %), in the bundle 15 of 20 (W2-87's re-measure at `cffef92c8534`). Your control run at `@@HEAD@@` includes it.
+
   Q18 and Q19 miss because their governing sources have no vectors: `template/governance/kernel/hooks/precompact.py` and the role files.
 - **The cause is the path map, not the indexer.** `path-map.yaml:91` says `embedded, except vendored code`. The indexer embeds only the exact value `embedded` (`semantic.py:216`), and DEC-388 reads any other value as not embedded (fail closed). DEC-388 named the fix: the vendored paths get their own namespace, so the rest of `template/**` can say `embedded`. Nothing in the code changes.
 
@@ -38,7 +40,7 @@ You are the ticket lead for ticket `@@ID@@` (`W2-86`, "The kernel template is em
   - **Not embedded: the generated adapter copies,** `template/.rulesync/**`, in a new namespace. The root's `.rulesync/**` and `.claude/**` are already not embedded, and the copies would put each kernel skill in the index twice.
   - **Every new namespace** carries every field `kernel-template` has, with `embedding_policy: not embedded` written exactly.
   - **Exactly one namespace for every tracked path under `template/`** (the header's rule). So `kernel-template`'s patterns are narrowed (`**` crosses folders, `*` stays inside one), never left overlapping.
-- **Tests first, minimal and in proportion** (DEC-951 item 5). A fresh independent test designer (launched sandboxed, `--effort high`; its brief must not set `TMPDIR`) writes `tests/acceptance/W2-86/`. Three cases and a short README, about 100 lines in all:
+- **Tests, minimal and in proportion** (DEC-951 item 5), **in parallel with the engineer** (the common brief's work order, DEC-963): a fresh independent test designer (launched sandboxed from the `W2-86-tests` worktree, `--effort high`; its brief must not set `TMPDIR`; its retrieval from the integration branch's store) writes `tests/acceptance/W2-86/`. Three cases and a short README, about 100 lines in all:
   1. Every tracked file under `template/` (by `git ls-files`) is in exactly one namespace. The indexer's selection takes the role files, the hooks, the kernel skills and every other file but the vendored set and `template/.rulesync/**`, and takes none of those. Drive the selection as the semantic route applies it, over a planted table of chunk paths in a temporary folder. No embedder and no rebuild.
   2. Every namespace's `embedding_policy` is `embedded` or `not embedded`, exactly.
   3. For every tracked path outside `template/`, the selection's verdict is the same under this worktree's path map as under the path map at `@@HEAD@@` (`git show`). The README names that base.
@@ -51,25 +53,24 @@ You are the ticket lead for ticket `@@ID@@` (`W2-86`, "The kernel template is em
   - no value but the two;
   - no change to the indexer's code.
 - **Running beside you:**
-  - **W2-78** (`DAEO-v4is`) moves the ratchet lists out of the path map by the owner's ACT, and **W2-87** adds one top-level block to it. Both are other lines of the same file; whichever merges second merges back.
+  - **W2-87's** `retrieval_authority` block is merged; **W2-78** is parked. Other tickets edit other lines of the path map only by a merge back.
   - **W2-19** holds `path-map.schema.json`. **W2-23** holds `template/governance/project/path-map.yaml`.
-  - **W2-76** holds `src/gov/rebuild/**`.
+  - **W2-76** (closing) and **W2-107** (running) hold `src/gov/rebuild/**`.
+  - **W2-95** (running) holds `src/gov/check/pathmap.py`, the check that reads your namespaces: run it, never edit it.
   - **W2-32 and W2-13** hold `src/gov/retrieval/**` and `tests/unit/retrieval/**`. They are open; write only new `test_w2_86*` files there.
   - **W2-61** holds `src/gov/retrieval/measure.py`: you run it, never edit it.
-  - **W2-84** holds `src/gov/guard/reads.py`.
+  - **W2-84** (closing) holds `src/gov/guard/reads.py`.
 
   Do not touch their files. If your change needs one, return PACKAGES.
 - **The re-measure, in your own session** (inside the sandbox gov embeds on the CPU, so a sandboxed worker's figures prove nothing):
-  - **Gate: W2-61's measure must be on `w2/integrate`.** Check with `git -C /home/usain/Dynamic-Agentic-Engineering-OS log --oneline -1 w2/integrate -- src/gov/retrieval/measure.py`.
-    - **If it names no commit, skip the re-measure.** Return DONE, and state that the re-measure is the orchestrator's after W2-61 merges.
-    - **If it names a commit, follow W2-61's §8,** with these places:
+  - **W2-61's measure is on `w2/integrate`** (merged and closed). Follow W2-61's §8, with these places:
   1. **Three clones by exact path,** each `git clone --no-hardlinks /home/usain/Dynamic-Agentic-Engineering-OS <path>` and checked out detached:
      - `/home/usain/gov-os-runs/W2-86/head` at the engineer's path-map commit;
      - `/home/usain/gov-os-runs/W2-86/base` at `@@HEAD@@` (the control);
      - `/home/usain/gov-os-runs/W2-86/measure` at `w2/integrate`'s head (the measure's code and the visible set).
 
      Nothing goes under `.gov-runtime/` or in the main tree.
-  2. **The stores, in `head` and `base`, built by the pinned gov:** `env -u PYTHONPATH -u GOV_TICKET flock /tmp/gov-os-rebuild.lock gov rebuild --json`. Run it after the load and disk gates, and never while `CLOSE-RUNNING` or `NIGHTLY-RUNNING` exists. Never `--no-embeddings`. The change is data, so the pinned gov is the code that reads it.
+  2. **The stores, in `head` and `base`, built by the pinned gov:** `env -u PYTHONPATH -u GOV_TICKET flock /tmp/gov-os-rebuild.lock gov rebuild --json`. Run it after the disk gate. Never `--no-embeddings`. The change is data, so the pinned gov is the code that reads it.
      - Record each rebuild's `digest`.
      - Record, from each store, the chunks with vectors under `template/governance/kernel/roles/`, `hooks/` and `skills/`, and under the vendored set and `template/.rulesync/`.
      - Record the paths whose vector set differs between `base` and `head`.
@@ -79,15 +80,11 @@ You are the ticket lead for ticket `@@ID@@` (`W2-86`, "The kernel template is em
   4. **The record** (a fresh engineer batch, from your outputs) goes in `docs/research/W2-86-memory-measure.md`, in W2-61's form. It holds:
      - the commits and the pinned gov's version;
      - both figures together, always: hit@5 against 85, full evidence against 99 %, and the in-the-bundle count;
-     - for the head, the control and W2-61's baseline (8, 12 and 14 of 20 at `23079f92a6fa`), side by side, in total and per question, with Q18 and Q19 named;
+     - for the head, the control, W2-87's figures (11, 11 and 15 of 20 at `cffef92c8534`) and W2-61's baseline (8, 12 and 14 of 20 at `23079f92a6fa`), side by side, in total and per question, with Q18 and Q19 named;
      - the vector counts and the vector diff.
 
      Leave the clones in place for the orchestrator. Give their paths, `du -sh` and `du -s --inodes` in your return.
-- **Verification:** in full, in the close's form (the path map is shared core), under the lock, with the retention option and the disk gate first.
-  - **The nightly (owner, DEC-933, DEC-936):** while `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING` exists (from 02:00 most nights), you and your workers run no suite, no full run and no rebuild. Wait, and go on the moment it is gone.
-  - **Closes:** while `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING` exists, start no worker, no suite and no rebuild.
-  - **The 01:00 cut-off (owner, DEC-939 item 6):** from about 01:00, start no full verification run that `nightly_estimate.py estimate` says cannot finish before 02:00.
-  - **Locks:** every full run goes under `flock /tmp/gov-os-verify.lock`, and every rebuild under `flock /tmp/gov-os-rebuild.lock` (DEC-939 item 2).
+- **Verification: scoped (DEC-968), in the close's form,** as the common brief's step 4 says: the selection tool's set (quote its scope and reasons); the full suite runs only in the nightly. The disk gate first; every rebuild under `flock /tmp/gov-os-rebuild.lock`.
   - **Look hardest at:**
     - `gov check --json` on this worktree's code: the path-map, config and schema families green;
     - `gov doctor`: no "no namespace is embedded";
@@ -98,10 +95,10 @@ You are the ticket lead for ticket `@@ID@@` (`W2-86`, "The kernel template is em
 
 ## This run's order
 
-1. Tests first (the test designer), then **check red yourself.**
-2. The engineer: the namespace block.
+1. The test designer and the engineer in parallel (the common brief's work order); merge the tests branch; **check cases 1 and 2 red at `@@HEAD@@` and green on the engineer's commit yourself.**
+2. The engineer's namespace block, judged against the spec and the ticket's KPIs, not the tests.
 3. The re-measure (or its gate's skip), then the engineer's record batch.
-4. Verify in full.
+4. Verify (scoped).
 5. **Return** DONE or PACKAGES.
    - DONE means the branch is ready to merge. Give the figures beside the baseline and the control, or say that the re-measure is the orchestrator's.
    - Name as a row the residual this ticket leaves: an `embedding_policy` outside the two values is still read silently as not embedded outside adoption (a warning belongs to W2-76's or W2-22's files).
@@ -109,7 +106,7 @@ You are the ticket lead for ticket `@@ID@@` (`W2-86`, "The kernel template is em
 **Estimate:** about 25 lines of path map and about 100 of tests; about 6 hours:
 - the tests and the engineer, about 1.5 hours;
 - two rebuilds with embeddings and two measures, about 2.5 hours;
-- the full run, about 95 minutes.
+- the scoped run, about 60 to 90 minutes at today's load.
 
 If your session nears its end first, write your checkpoint and return PACKAGES naming what is left; a fresh lead resumes from the checkpoint.
 

@@ -1,0 +1,21 @@
+ M tests/acceptance/W1-05/conftest.py
+ M tests/acceptance/W1-05/test_w1_05_live_hooks.py
+ M tests/acceptance/W1-05/test_w1_05_role_subagents.py
+ M tests/acceptance/W1-28/test_w1_28_launch_product_spec.py
+ M tests/acceptance/W1-46/conftest.py
+ M tests/acceptance/W1-46/test_w1_46_hard_links_mv_and_install.py
+ M tests/acceptance/W1-46/test_w1_46_install_spellings.py
+ M tests/acceptance/W1-46/test_w1_46_links_and_cp_targets.py
+ M tests/acceptance/W1-46/test_w1_46_live_sessions.py
+ M tests/acceptance/W1-46/test_w1_46_options_after_the_destination.py
+ M tests/acceptance/W1-46/test_w1_46_research_installs.py
+ M tests/acceptance/W1-46/test_w1_46_research_role.py
+ M tests/acceptance/W1-46/test_w1_46_role_settings.py
+ M tests/acceptance/W1-46/test_w1_46_runtime_and_ln.py
+ M tests/acceptance/W1-47/test_w1_47_failed_commands.py
+ M tests/acceptance/W1-49/test_w1_49_registration.py
+ M tests/acceptance/W1-50/test_w1_50_freeze_launcher.py
+ M tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py
+ M tests/acceptance/W2-59/test_w2_59_hook_lines.py
+ M tests/acceptance/W2-65/test_w2_65_hook_lines.py
+?? tests/acceptance/W2-90/

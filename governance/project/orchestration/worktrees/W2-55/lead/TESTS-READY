@@ -1,0 +1,2 @@
+W2-55 acceptance tests merged: fe6ea93b0f3d (merge of w2/W2-55-tests at ae52a5655ce5), 76 tests under tests/acceptance/W2-55/.
+Red check on the base with the tests (lead, 2026-11-01): 69 failed, 7 passed, 0 errors, for the README's reasons.

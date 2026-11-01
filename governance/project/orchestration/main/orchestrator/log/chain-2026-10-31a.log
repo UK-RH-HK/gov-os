@@ -1,0 +1,26 @@
+2026-10-31 00:54:45 W2-76 waits: SHUT leads=2 load=45.7/73.3 nproc=20 have=14319260kB need=9566436kB: load 45.7/73.3 >= nproc 20
+2026-10-31 00:55:49 W2-76 waits: SHUT leads=2 load=44.4/71.5 nproc=20 have=14724576kB need=9566436kB: load 44.4/71.5 >= nproc 20
+2026-10-31 00:56:52 W2-76 waits: SHUT leads=2 load=43.6/69.7 nproc=20 have=14242260kB need=9867672kB: load 43.6/69.7 >= nproc 20
+2026-10-31 00:57:55 W2-76 waits: SHUT leads=2 load=42.5/68.0 nproc=20 have=14706596kB need=9566436kB: load 42.5/68.0 >= nproc 20
+2026-10-31 00:58:57 W2-76 waits: SHUT leads=2 load=54.6/67.4 nproc=20 have=14534284kB need=9566436kB: load 54.6/67.4 >= nproc 20
+2026-10-31 01:00:01 W2-76 waits: SHUT leads=2 load=54.2/66.7 nproc=20 have=14178252kB need=9566436kB: load 54.2/66.7 >= nproc 20
+2026-10-31 01:01:04 W2-76 waits: SHUT leads=2 load=46.7/65.2 nproc=20 have=14952164kB need=9566436kB: load 46.7/65.2 >= nproc 20
+2026-10-31 01:02:08 W2-76 waits: SHUT leads=2 load=36.2/63.2 nproc=20 have=16374056kB need=9566436kB: load 36.2/63.2 >= nproc 20
+2026-10-31 01:03:11 starting W2-76 (DAEO-tgk2), 2 lead(s) running
+2026-10-31 01:15:50 W2-96 waits: SHUT leads=1 load=37.2/37.0 nproc=20 have=17430756kB need=7426200kB: load 37.2/37.0 >= nproc 20
+2026-10-31 01:16:53 W2-96 waits: SHUT leads=1 load=43.1/37.7 nproc=20 have=17543416kB need=7426200kB: load 43.1/37.7 >= nproc 20
+2026-10-31 01:17:57 W2-96 waits: SHUT leads=1 load=45.6/38.4 nproc=20 have=17505748kB need=7426200kB: load 45.6/38.4 >= nproc 20
+2026-10-31 01:19:01 W2-96 waits: SHUT leads=1 load=41.9/38.7 nproc=20 have=18043036kB need=7426200kB: load 41.9/38.7 >= nproc 20
+2026-10-31 01:20:04 W2-96 waits: SHUT leads=1 load=35.0/38.1 nproc=20 have=19814968kB need=7917296kB: load 35.0/38.1 >= nproc 20
+2026-10-31 01:21:06 W2-96 waits: SHUT leads=1 load=42.0/38.6 nproc=20 have=20153712kB need=8165872kB: load 42.0/38.6 >= nproc 20
+2026-10-31 01:22:10 W2-96 waits: SHUT leads=1 load=43.6/39.0 nproc=20 have=20067580kB need=8143084kB: load 43.6/39.0 >= nproc 20
+2026-10-31 01:23:14 W2-96 waits: SHUT leads=1 load=44.7/39.4 nproc=20 have=20168460kB need=8310960kB: load 44.7/39.4 >= nproc 20
+2026-10-31 01:24:17 W2-96 waits: SHUT leads=1 load=33.6/38.7 nproc=20 have=19499668kB need=7585544kB: load 33.6/38.7 >= nproc 20
+2026-10-31 01:25:21 W2-96 waits: SHUT leads=1 load=25.3/37.5 nproc=20 have=19505692kB need=7426200kB: load 25.3/37.5 >= nproc 20
+2026-10-31 01:26:25 W2-96 waits: SHUT leads=1 load=27.8/36.9 nproc=20 have=19654228kB need=8330132kB: load 27.8/36.9 >= nproc 20
+2026-10-31 01:27:29 W2-96 waits: SHUT leads=1 load=40.7/37.7 nproc=20 have=19595444kB need=7426200kB: load 40.7/37.7 >= nproc 20
+2026-10-31 01:28:32 W2-96 waits: SHUT leads=1 load=45.3/38.3 nproc=20 have=19859964kB need=8439164kB: load 45.3/38.3 >= nproc 20
+2026-10-31 01:29:34 W2-96 waits: SHUT leads=1 load=42.3/38.5 nproc=20 have=18992936kB need=7426200kB: load 42.3/38.5 >= nproc 20
+2026-10-31 01:30:38 W2-96 waits: SHUT leads=1 load=42.5/38.8 nproc=20 have=19763516kB need=8121444kB: load 42.5/38.8 >= nproc 20
+2026-10-31 01:31:42 W2-96 waits: SHUT leads=1 load=41.7/39.0 nproc=20 have=18520084kB need=8264128kB: load 41.7/39.0 >= nproc 20
+2026-10-31 01:32:46 W2-96 waits: SHUT leads=1 load=43.4/39.3 nproc=20 have=18843688kB need=7964784kB: load 43.4/39.3 >= nproc 20

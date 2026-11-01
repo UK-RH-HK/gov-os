@@ -1,0 +1,8 @@
+Merge w2/integrate into w2/W2-64: the widened ticket (b3888162), DEC-953, DEC-954, DEC-958 and the common brief
+
+Run 2 (resume) of W2-64 under the owner's answer (a) to P-W2-64-1 (DEC-954).
+
+Task: DAEO-0uhh
+Implements: DEC-872, DEC-844, DEC-890
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

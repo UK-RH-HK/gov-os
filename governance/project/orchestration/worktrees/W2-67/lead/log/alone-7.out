@@ -1,0 +1,108 @@
+.EE....                                                                  [100%]
+==================================== ERRORS ====================================
+________ ERROR at setup of test_gov_check_gives_core_schema_green_here _________
+
+fixturedef = <FixtureDef argname='gov_check_here' scope='session' baseid='tests/acceptance/W2-54'>
+request = <SubRequest 'gov_check_here' for <Function test_gov_check_gives_core_schema_green_here>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/conftest.py:98: in gov_check_here
+    return support.green_here_check()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-54/w2_54_support.py:777: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+tests/acceptance/W2-54/w2_54_support.py:246: in run
+    done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+/usr/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2115: in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.PollSelector object at 0x7d439ddbec90>, timeout = 1800000
+
+    def select(self, timeout=None):
+        # This is shared between poll() and epoll().
+        # epoll() has a different signature and handling of timeout parameter.
+        if timeout is None:
+            timeout = None
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # poll() has a resolution of 1 millisecond, round away from
+            # zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3)
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>900.0s) from pytest-timeout.
+
+/usr/lib/python3.12/selectors.py:415: Failed
+__________ ERROR at setup of test_the_w1_43_audit_report_is_untouched __________
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-67/src/gov/__init__.py'
+
+    @pytest.fixture(scope="session")
+    def gov_check_here(code_under_test):
+        """``gov check --json`` on this tree, once for the session. Rewrite-Reason: W2-L429 (DEC-937, README "W2-75"):
+        inside a close (GOV_CLOSE_CHECK_RESULT set) the envelope of gate (b)'s ``gov check`` that the close hands its
+        runs, and no ``gov check`` is started; outside a close one ``gov check --json`` in this worktree, against the
+        store the lead built (about six minutes). A missing or broken result fails the cases naming the file."""
+>       return support.green_here_check()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/conftest.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-54/w2_54_support.py:777: in green_here_check
+    done = run([sys.executable, "-c", _GOV, "check", "--json"], cwd=REPO_ROOT, env=worktree_env(),
+tests/acceptance/W2-54/w2_54_support.py:246: in run
+    done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+/usr/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2115: in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.PollSelector object at 0x7d439ddbec90>, timeout = 1800000
+
+    def select(self, timeout=None):
+        # This is shared between poll() and epoll().
+        # epoll() has a different signature and handling of timeout parameter.
+        if timeout is None:
+            timeout = None
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # poll() has a resolution of 1 millisecond, round away from
+            # zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3)
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>900.0s) from pytest-timeout.
+
+/usr/lib/python3.12/selectors.py:415: Failed
+5 passed, 1 deselected, 2 errors in 901.31s (0:15:01)

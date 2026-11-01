@@ -1,0 +1,64 @@
+{
+ "scope": "full",
+ "why_full": [
+  {
+   "reason": "SHARED_CORE",
+   "paths": [
+    "src/gov/check/citations.py",
+    "src/gov/records/queries.py",
+    "src/gov/store/loader.py"
+   ]
+  }
+ ],
+ "base": "e6695c3025fae147186ec4c25b35e7051ba5eb2e",
+ "head": "aafd45c19725c9088b76d79d2c64bd622f7ec515",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0002.md",
+  "docs/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0004.md",
+  "docs/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0008.md",
+  "docs/checkpoints/DAEO-ym8a/CP-DAEO-ym8a-0010.md"
+ ],
+ "changed": [
+  "src/gov/check/citations.py",
+  "src/gov/decisions/checker.py",
+  "src/gov/records/queries.py",
+  "src/gov/store/loader.py",
+  "tests/acceptance/W1-26/README.md",
+  "tests/acceptance/W1-26/test_w1_26_decision_citations.py",
+  "tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py",
+  "tests/acceptance/W2-03/README.md",
+  "tests/acceptance/W2-03/conftest.py",
+  "tests/acceptance/W2-03/test_w2_03_code_under_test.py",
+  "tests/acceptance/W2-03/test_w2_03_entry_records.py",
+  "tests/acceptance/W2-03/test_w2_03_failure.py",
+  "tests/acceptance/W2-03/test_w2_03_grammar.py",
+  "tests/acceptance/W2-03/test_w2_03_not_records.py",
+  "tests/acceptance/W2-03/w2_03_support.py",
+  "tests/unit/check/test_citations.py",
+  "tests/unit/decisions/test_canonical.py",
+  "tests/unit/records/test_records.py",
+  "tests/unit/store/test_register_entries.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-03/",
+   "why": [
+    {
+     "reason": "OWN"
+    }
+   ]
+  },
+  {
+   "target": "tests",
+   "why": [
+    {
+     "reason": "FULL"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [],
+ "ignore": [],
+ "deselect": [],
+ "per_test_timeout": 900
+}

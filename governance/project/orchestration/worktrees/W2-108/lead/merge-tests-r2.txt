@@ -1,0 +1,10 @@
+Merge w2/W2-108-tests: the W2-54 scope test in DEC-385's form (DEC-977)
+
+The skip message of test_w2_108_scope.py::test_w2_54_is_not_changed_by_this_ticket
+no longer pairs the repository root with a route's words, so W1-28's
+whole-tree copy check and W1-50's fixture cases no longer count it as a copy.
+
+Task: DAEO-zoex
+Implements: DEC-385, DEC-977
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

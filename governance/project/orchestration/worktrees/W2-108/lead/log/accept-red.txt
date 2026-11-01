@@ -1,0 +1,239 @@
+/tmp/gov-os-lead-W2-108/measure/src/gov/__init__.py
+..........FFFFFFF........s.                                              [100%]
+=================================== FAILURES ===================================
+__________________ test_lexical_freshness_is_worked_out_once ___________________
+
+planted = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project')
+driver = <w2_108_support.Driver object at 0x7f9b64df3b60>
+embedder = <w2_108_support.OllamaStandIn object at 0x7f9b64df96d0>
+
+    def test_lexical_freshness_is_worked_out_once(planted, driver, embedder):
+        calls = driver.run(planted, [S.lexical_freshness() for _ in range(N)], host=embedder.host)
+        assert all(value == {"status": S.FRESH, "stale": []} for value in calls.values()), calls.values()
+        assert S.work_of(calls[0])[0] >= 1, "the first call did no listing at all: the count sees nothing\n" \
+            + S.describe_effects(calls)
+>       assert_no_later_listing(calls)
+
+tests/acceptance/W2-108/test_w2_108_once.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+calls = [{'effects': [{'git': ['-C', '/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project...0/project', 'hash-object', '--stdin-paths']}], 'error': None, 'op': 'call', 'value': {'stale': [], 'status': 'fresh'}}]
+first = 1, what = 'call'
+
+    def assert_no_later_listing(calls, first=1, what="call"):
+        repeated = [(number, listing) for number, listing, _ in later_work(calls, first) if listing]
+>       assert not repeated, (
+            f"the freshness check was worked out again in later {what}s of the same process, on an unchanged store and "
+            f"tree (call number, listing/hashing git commands): {repeated}\n{S.describe_effects(calls)}")
+E       AssertionError: the freshness check was worked out again in later calls of the same process, on an unchanged store and tree (call number, listing/hashing git commands): [(2, 2), (3, 2), (4, 2), (5, 2)]
+E         call 1: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project hash-object --stdin-paths']
+E         call 2: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project hash-object --stdin-paths']
+E         call 3: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project hash-object --stdin-paths']
+E         call 4: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project hash-object --stdin-paths']
+E         call 5: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_freshness_is_work0/project hash-object --stdin-paths']
+E       assert not [(2, 2), (3, 2), (4, 2), (5, 2)]
+
+tests/acceptance/W2-108/test_w2_108_once.py:28: AssertionError
+__________________ test_lexical_search_checks_freshness_once ___________________
+
+planted = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project')
+driver = <w2_108_support.Driver object at 0x7f9b64e66d20>
+embedder = <w2_108_support.OllamaStandIn object at 0x7f9b64df96d0>
+
+    def test_lexical_search_checks_freshness_once(planted, driver, embedder):
+        steps = [S.lexical_search(S.QUESTIONS[number % len(S.QUESTIONS)]) for number in range(N)]
+        calls = driver.run(planted, steps, host=embedder.host)
+        assert all(value["state"] == S.AVAILABLE for value in calls.values()), calls.values()
+>       assert_no_later_listing(calls)
+
+tests/acceptance/W2-108/test_w2_108_once.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+calls = [{'effects': [{'git': ['-C', '/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project...lves and ropes, which mentions the amber lantern protocol once, in passing.'}], 'reason': None, 'state': 'AVAILABLE'}}]
+first = 1, what = 'call'
+
+    def assert_no_later_listing(calls, first=1, what="call"):
+        repeated = [(number, listing) for number, listing, _ in later_work(calls, first) if listing]
+>       assert not repeated, (
+            f"the freshness check was worked out again in later {what}s of the same process, on an unchanged store and "
+            f"tree (call number, listing/hashing git commands): {repeated}\n{S.describe_effects(calls)}")
+E       AssertionError: the freshness check was worked out again in later calls of the same process, on an unchanged store and tree (call number, listing/hashing git commands): [(2, 2), (3, 2), (4, 2), (5, 2)]
+E         call 1: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project hash-object --stdin-paths']
+E         call 2: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project hash-object --stdin-paths']
+E         call 3: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project hash-object --stdin-paths']
+E         call 4: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project hash-object --stdin-paths']
+E         call 5: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_lexical_search_checks_fre0/project hash-object --stdin-paths']
+E       assert not [(2, 2), (3, 2), (4, 2), (5, 2)]
+
+tests/acceptance/W2-108/test_w2_108_once.py:28: AssertionError
+___________________ test_semantic_status_is_worked_out_once ____________________
+
+planted = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project')
+driver = <w2_108_support.Driver object at 0x7f9b64e67fe0>
+embedder = <w2_108_support.OllamaStandIn object at 0x7f9b64df96d0>
+
+    def test_semantic_status_is_worked_out_once(planted, driver, embedder):
+        steps = [S.semantic_search(S.QUESTIONS[number % len(S.QUESTIONS)]) for number in range(N)]
+        calls = driver.run(planted, steps, host=embedder.host)
+        assert all(value["state"] == S.AVAILABLE for value in calls.values()), calls.values()
+        assert S.work_of(calls[0])[1] >= 1, "the first call read no path map: the count sees nothing\n" \
+            + S.describe_effects(calls)
+>       assert_no_later_listing(calls)
+
+tests/acceptance/W2-108/test_w2_108_once.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+calls = [{'effects': [{'git': ['-C', '/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project...rent_id': '78c4347c1a41f45b76c83d66', 'path': 'app/pool.py', 'start_line': 1}], 'reason': None, 'state': 'AVAILABLE'}}]
+first = 1, what = 'call'
+
+    def assert_no_later_listing(calls, first=1, what="call"):
+        repeated = [(number, listing) for number, listing, _ in later_work(calls, first) if listing]
+>       assert not repeated, (
+            f"the freshness check was worked out again in later {what}s of the same process, on an unchanged store and "
+            f"tree (call number, listing/hashing git commands): {repeated}\n{S.describe_effects(calls)}")
+E       AssertionError: the freshness check was worked out again in later calls of the same process, on an unchanged store and tree (call number, listing/hashing git commands): [(2, 2), (3, 2), (4, 2), (5, 2)]
+E         call 1: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project hash-object --stdin-paths']
+E         call 2: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project hash-object --stdin-paths']
+E         call 3: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project hash-object --stdin-paths']
+E         call 4: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project hash-object --stdin-paths']
+E         call 5: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_semantic_status_is_worked0/project hash-object --stdin-paths']
+E       assert not [(2, 2), (3, 2), (4, 2), (5, 2)]
+
+tests/acceptance/W2-108/test_w2_108_once.py:28: AssertionError
+____________________ test_retrieve_checks_both_stores_once _____________________
+
+planted = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project')
+driver = <w2_108_support.Driver object at 0x7f9b64e5ca70>
+embedder = <w2_108_support.OllamaStandIn object at 0x7f9b64df96d0>
+
+    def test_retrieve_checks_both_stores_once(planted, driver, embedder):
+        steps = [S.retrieve(S.QUESTIONS[number % len(S.QUESTIONS)]) for number in range(N)]
+        calls = driver.run(planted, steps, host=embedder.host)
+        for value in calls.values():
+            assert value["facets"]["lexical"]["available"] and value["facets"]["semantic"]["available"], value["facets"]
+>       assert_no_later_listing(calls)
+
+tests/acceptance/W2-108/test_w2_108_once.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+calls = [{'effects': [{'open': '/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project/gover...': [], 'merge': {'candidates': 7, 'dropped': [], 'duplicates': 4, 'reranked': False}, 'stopping_reason': 'SATURATED'}}]
+first = 1, what = 'call'
+
+    def assert_no_later_listing(calls, first=1, what="call"):
+        repeated = [(number, listing) for number, listing, _ in later_work(calls, first) if listing]
+>       assert not repeated, (
+            f"the freshness check was worked out again in later {what}s of the same process, on an unchanged store and "
+            f"tree (call number, listing/hashing git commands): {repeated}\n{S.describe_effects(calls)}")
+E       AssertionError: the freshness check was worked out again in later calls of the same process, on an unchanged store and tree (call number, listing/hashing git commands): [(2, 4), (3, 4), (4, 4), (5, 4)]
+E         call 1: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths']
+E         call 2: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths']
+E         call 3: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths']
+E         call 4: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths']
+E         call 5: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_retrieve_checks_both_stor0/project hash-object --stdin-paths']
+E       assert not [(2, 4), (3, 4), (4, 4), (5, 4)]
+
+tests/acceptance/W2-108/test_w2_108_once.py:28: AssertionError
+___________________ test_every_kind_of_call_shares_one_check ___________________
+
+planted = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project')
+driver = <w2_108_support.Driver object at 0x7f9b64e5ea50>
+embedder = <w2_108_support.OllamaStandIn object at 0x7f9b64df96d0>
+
+    def test_every_kind_of_call_shares_one_check(planted, driver, embedder):
+        """The answers are shared between the entry points: the freshness worked out for one is reused by the others."""
+        steps = [S.lexical_freshness(), S.lexical_search(S.PHRASE), S.semantic_search(S.QUESTIONS[1]),
+                 S.retrieve(S.QUESTIONS[2]), S.retrieve(S.PHRASE), S.semantic_search(S.QUESTIONS[2]),
+                 S.lexical_search(S.QUESTIONS[3]), S.lexical_freshness()]
+        calls = driver.run(planted, steps, host=embedder.host)
+        calls.values()
+        hashing = sum(1 for result in calls for argv in S.listing_work(result["effects"])
+                      if S.subcommand(argv)[0] in S.HASHING)
+        listing = sum(S.work_of(result)[0] for result in calls) - hashing
+>       assert hashing <= 2 and listing <= 2, (
+            f"{len(steps)} calls on one unchanged store and tree listed the tracked files {listing} times and hashed them "
+            f"{hashing} times; once per store (the lexical index, the vectors) is at most twice\n"
+            f"{S.describe_effects(calls)}")
+E       AssertionError: 8 calls on one unchanged store and tree listed the tracked files 10 times and hashed them 10 times; once per store (the lexical index, the vectors) is at most twice
+E         call 1: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 2: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 3: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 4: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 5: 4 listing/hashing git command(s), 2 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 6: 2 listing/hashing git command(s), 1 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 7: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E         call 8: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_every_kind_of_call_shares0/project hash-object --stdin-paths']
+E       assert (10 <= 2)
+
+tests/acceptance/W2-108/test_w2_108_once.py:79: AssertionError
+_______ test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once ________
+
+planted = PosixPath('/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project')
+driver = <w2_108_support.Driver object at 0x7f9b64da9700>
+embedder = <w2_108_support.OllamaStandIn object at 0x7f9b64df96d0>
+
+    def test_an_unchanged_tree_with_an_uncommitted_edit_is_checked_once(planted, driver, embedder):
+        """An edit made before the process starts is part of the tree it sees: unchanged between its calls, it is
+        checked once, and every call reports the index stale as it is."""
+        S.write(planted, S.BAKERY, "# Bakery\n\nThe bakery is closed for the winter.\n")
+        calls = driver.run(planted, [S.lexical_freshness() for _ in range(N)] + [S.lexical_search(S.PHRASE)],
+                           host=embedder.host)
+        assert all(value == {"status": S.STALE, "stale": [S.BAKERY]} for value in calls.values()[:N]), calls.values()
+        assert S.facet(calls.values()[N]) == (False, S.UNAVAILABLE, S.STALE)
+>       assert_no_later_listing(calls)
+
+tests/acceptance/W2-108/test_w2_108_once.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+calls = [{'effects': [{'git': ['-C', '/tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project...call', 'value': {'available': False, 'facet': 'lexical', 'hits': [], 'reason': 'stale', 'state': 'FACET_UNAVAILABLE'}}]
+first = 1, what = 'call'
+
+    def assert_no_later_listing(calls, first=1, what="call"):
+        repeated = [(number, listing) for number, listing, _ in later_work(calls, first) if listing]
+>       assert not repeated, (
+            f"the freshness check was worked out again in later {what}s of the same process, on an unchanged store and "
+            f"tree (call number, listing/hashing git commands): {repeated}\n{S.describe_effects(calls)}")
+E       AssertionError: the freshness check was worked out again in later calls of the same process, on an unchanged store and tree (call number, listing/hashing git commands): [(2, 2), (3, 2), (4, 2), (5, 2), (6, 2)]
+E         call 1: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project hash-object --stdin-paths']
+E         call 2: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project hash-object --stdin-paths']
+E         call 3: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project hash-object --stdin-paths']
+E         call 4: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project hash-object --stdin-paths']
+E         call 5: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project hash-object --stdin-paths']
+E         call 6: 2 listing/hashing git command(s), 0 path-map read(s); git: ['-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project ls-files -z', '-C /tmp/gov-os-lead-W2-108/pytest-of-usain/pytest-0/test_an_unchanged_tree_with_an0/project hash-object --stdin-paths']
+E       assert not [(2, 2), (3, 2), (4, 2), (5, 2), (6, 2)]
+
+tests/acceptance/W2-108/test_w2_108_once.py:28: AssertionError
+_________________ test_this_repositorys_store_is_checked_once __________________
+
+repo_store = PosixPath('/home/usain/gov-os-worktrees/W2-108')
+driver = <w2_108_support.Driver object at 0x7f9b64e5f890>
+
+    def test_this_repositorys_store_is_checked_once(repo_store, driver):
+        """On the store of the worktree the tests run in: four retrieval calls, one check."""
+        steps = [S.retrieve(question) for question in S.REPO_QUESTIONS]
+        calls = driver.run(repo_store, steps, env=S.repo_env(driver))
+        calls.values()
+        assert S.work_of(calls[0])[0] >= 1, S.describe_effects(calls)
+>       assert_no_later_listing(calls)
+
+tests/acceptance/W2-108/test_w2_108_once.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+calls = [{'effects': [{'open': '/home/usain/gov-os-worktrees/W2-108/governance/project/path-map.yaml'}, {'git': ['-C', '/home/...merge': {'candidates': 0, 'dropped': [], 'duplicates': 0, 'reranked': False}, 'stopping_reason': 'FACET_UNAVAILABLE'}}]
+first = 1, what = 'call'
+
+    def assert_no_later_listing(calls, first=1, what="call"):
+        repeated = [(number, listing) for number, listing, _ in later_work(calls, first) if listing]
+>       assert not repeated, (
+            f"the freshness check was worked out again in later {what}s of the same process, on an unchanged store and "
+            f"tree (call number, listing/hashing git commands): {repeated}\n{S.describe_effects(calls)}")
+E       AssertionError: the freshness check was worked out again in later calls of the same process, on an unchanged store and tree (call number, listing/hashing git commands): [(2, 4), (3, 4), (4, 4)]
+E         call 1: 4 listing/hashing git command(s), 1 path-map read(s); git: ['-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths', '-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths']
+E         call 2: 4 listing/hashing git command(s), 1 path-map read(s); git: ['-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths', '-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths']
+E         call 3: 4 listing/hashing git command(s), 1 path-map read(s); git: ['-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths', '-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths']
+E         call 4: 4 listing/hashing git command(s), 1 path-map read(s); git: ['-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths', '-C /home/usain/gov-os-worktrees/W2-108 ls-files -z', '-C /home/usain/gov-os-worktrees/W2-108 hash-object --stdin-paths']
+E       assert not [(2, 4), (3, 4), (4, 4)]
+
+tests/acceptance/W2-108/test_w2_108_once.py:28: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-108/test_w2_108_unchanged.py:140: the semantic facet of /home/usain/gov-os-worktrees/W2-108 is unavailable here (stale): no embedder answers, or the store holds no current vectors
+7 failed, 19 passed, 1 skipped in 67.53s (0:01:07)

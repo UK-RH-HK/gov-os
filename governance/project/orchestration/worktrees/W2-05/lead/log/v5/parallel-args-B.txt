@@ -1,0 +1,2 @@
+tests/acceptance/W1-02
+tests/acceptance/W2-05

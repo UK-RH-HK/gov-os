@@ -1,0 +1,8 @@
+head=90d41204d412 start=2026-10-31T08:09:23+00:00 load=13.37
+gov_file=/home/usain/gov-os-worktrees/W2-67/src/gov/__init__.py
+cbm_entries_before=17691
+exit=0 end=2026-10-31T08:10:19+00:00
+result: 5 passed in 48.29s
+cbm_entries_after=17691
+added: 
+removed: 0

@@ -1,40 +1,41 @@
-# Lead checkpoint — DAEO-siiz (W2-52), 2026-10-19 (run 2)
+# Lead checkpoint — DAEO-siiz (W2-52), 2026-10-31 (run 4, resume under DEC-953/954/957/968)
 
-## State
+## State: PACKAGES (P-8: the one write into `.claude/` cannot be made by a non-interactive worker)
 
-- Branch `w2/W2-52`, head `a21f06a7` (the probe record). Probed head `643aeeef` (CP-DAEO-siiz-0008, "held, stacked on W2-49 (DEC-786): merge W2-49's close and w2/integrate, re-verify"). Stacked on the held W2-49 (`w2/W2-49` at `19d45246`, merged as `29bef106`).
-- Status: **held, stacked on W2-49 (DEC-786)**. The loop ended green and the probe passed, with one package open: **P-6**. adapter-portability is RED because `.claude/skills/adopt/SKILL.md`, rulesync's generated output, was not regenerated from the changed `.rulesync/skills/adopt/SKILL.md`. That file is outside the paths, and DEC-800 says to leave it alone.
+- Branch `w2/W2-52`, head `d1ba2dfd2054` (unchanged, clean), then `3bb8b25f24b1` (CP-DAEO-siiz-0014, this lead). Step 1 checks: DEC-941 heading 1, ticket path line 1.
+- `w2/W2-49` at `b667fdc03…`: no own commits since `19d452461125` (only w2/integrate merges): no merge needed. Re-check before the reviewer.
+- adapter-portability: one finding, GENERATED_DIFFERS `.claude/skills/adopt/SKILL.md` (44 generated files compared). Three engineers confirmed by `cmp` that rulesync 24.0.0 would change that file only (43 identical, none missing; `.claude/settings.json` left out: its held-out deny entry is added by the check's own step, DEC-635).
 
-## Commits of this run
+## The three engineer attempts (none wrote anything; no commit)
 
-- `f6317639` ticket file, allowed paths widened by DEC-800 (orchestrator).
-- `0baae787` `command.STAGES` A7 and A10, the docstring list, the two synced skill copies (engineer eng-3, old launch form; Task DAEO-siiz, Role engineer, Implements DEC-741).
-- `643aeeef` CP-DAEO-siiz-0008 (orchestrator).
-- `a21f06a7` probe record `docs/probes/DAEO-siiz/PR-DAEO-siiz.md`, judgement pass (orchestrator).
+- eng-4 (`gov launch`, sandboxed, session 59a0ba2e-2e49-40a2-9ece-baf7cff070ae): sandbox `denyWithinAllow` makes `.claude/skills` read-only: `cp` "Read-only file system", twice. Tripwire 5: no change.
+- eng-5 (old form, not sandboxed, session d01f051f-2e51-409b-9d50-022197cf3a28): Claude Code's sensitive-path protection: "requested permissions to edit … which is a sensitive file", twice. Tripwire 6: changes only in W2-107's trees (its head moved, its tests worktree removed): not ours.
+- eng-6 (old form, `--allowedTools "Write(//…/.claude/skills/adopt/SKILL.md)" "Edit(//…)"`, session a83da885-09e5-48fb-84e7-8f0a4830db77): Write refused: "requested permissions to write to … but you haven't granted it yet". Tripwire 7: no change.
+- No fourth form tried (DEC-409, AR-6). The remaining ways (bypassPermissions, rulesync writing in place in the worktree, an interactive approval) loosen or route round Claude Code's `.claude/` protection: P1, the owner's.
 
-## Suites at 0baae787/643aeeef (logs in runs2/)
+## Done meanwhile
 
-- Rebuild ok (digest 71dcabc5…). `gov.__file__` = `/home/usain/gov-os-worktrees/W2-52/src/gov/__init__.py`.
-- All 53 acceptance suites green, except:
-  - W1-42: 2 failed, RETR-X-02 and the governance share (accepted_reds).
-  - W1-19: the warm p95 case failed under load (8.7 s) and passed alone (78 s).
-- W2-52: 65 passed. `tests/unit`: 2146 passed, 1 skipped.
-- `gov check`:
-  - RED: adapter-portability (P-6), context-reproducibility (60 s limit, W2-54's), core-schema (the W1-43 audit report's `type`, W2-54's).
-  - YELLOW: core-decision-citations (staged decisions DEC-755, DEC-757, DEC-762, DEC-800), openspec-validate (openspec not on PATH), authority/role limits, product traceability.
+- select_tests.py: exit 0, scope `scoped`, core_changed [], unplaced [], 35 targets (saved /tmp/gov-os-lead-W2-52/select.json).
+- collect-only: "17678/17680 tests collected (2 deselected) in 40.21s", no error.
+- trailer_gate: "DAEO-siiz: 16 commits, 16 judged, 0 lacking, 0 Implements item(s) not a decision or Contract id that resolves".
+- keyword_warn: 0 files.
 
-## Residuals (DEC-802: ride along at the resume, no separate round)
+## What a resume does (once P-8 is decided)
 
-- P-6: regenerate `.claude/skills/adopt/SKILL.md` with rulesync from `.rulesync/skills/adopt/SKILL.md`. This needs the owner to widen the paths.
-- F-1: A10 does not re-check A8's dependency proof or its rule imports. A row for W2-28 or the Wave 3 hardening pass.
-- F-2: `stages.py` `run()` has a two-line A7/A10 branch. The owner confirms it is "the A7 and A10 routing" of DEC-800.
-- F-3: A7 checks where files are, not their content, and a gate's record does not notice later drift. A row for W2-28.
+1. Put the regenerated file in place by the decided route (one engineer, `Role: engineer`, `Implements: DEC-814`); `cmp` with rulesync's output; portability check exit 0.
+2. Rebuild (flock, full), gov.__file__, select_tests.py again, the scoped parallel + serial runs in the close's form, gov check (adapter-portability green), collect-only, trailer_gate, keyword_warn.
+3. W2-49 re-check; reviewer (effort max, read-only) on the regenerated skill vs its source and the stage records; `docs/probes/DAEO-siiz/PR-DAEO-siiz-run3.md` only on pass; gov checkpoint.
 
-## What the resume lead does
+## Scratch left
 
-1. After W2-49 closes: merge W2-49's closed state and `w2/integrate` into this branch, with merge commits carrying `Task: DAEO-siiz` and `Role: orchestrator` (merge rule DEC-750 item 3, DEC-754 item 4).
-2. If P-6 is decided (a): a fresh engineer regenerates `.claude/skills/adopt/SKILL.md` (rulesync) inside the widened path.
-3. One full rebuild, every suite again (one pytest process each), `tests/unit`, and `gov check`. adapter-portability must be green.
-4. A gov checkpoint, then a fresh probe of the resumed head and its probe record.
+- `/tmp/gov-os-lead-W2-52`: 924K, 137 inodes (two engineer temp folders holding rulesync output with a `.claude/` folder: `tmp.vpTHSVuhUS`, `tmp.3PC508ti1t`; rm refused by the same protection), plus select.json. Earlier runs: `/tmp/tmp.5Zrjbt9w4E`, `/tmp/w2-52-probe-NPHQxG` (see return).
 
-Tripwire snapshots: tripwire-before-3.json (eng-3), tripwire-before-4.json (rev-1); compares in tripwire-compare-3.txt and tripwire-compare-4.txt.
+## Brief gaps
+
+- `gov launch`'s engineer sandbox makes `.claude/skills/` read-only, so DEC-814's one file cannot be written sandboxed | common brief / tool (gov launch) | ~10 min
+- Claude Code's own `.claude/` protection refuses a non-interactive write even unsandboxed and with an explicit path allow rule | this ticket's part (DEC-814's route) | ~25 min
+- eng-4 reported `/tmp/gov-os-lead-W2-52` read-only in the sandbox | common brief (scratch) | ~2 min
+
+## Guard refusals (five-rule hook)
+
+- none (all refusals were the sandbox's or Claude Code's permission layer)

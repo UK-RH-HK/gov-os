@@ -1,0 +1,9 @@
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook  # serial: latency: p95 of the live hook's decision under 100 ms (DEC-149)
+tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder  # serial: latency: the check on 60 small files and one large SQLite store within 15 s
+tests/acceptance/W1-46/test_w1_46_live_sessions.py  # nightly: live-session: launched engineer and research sessions; the host cases need the network
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays  # nightly: live-session: launches a real worker session
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path  # nightly: live-session: launches a real worker session
+tests/acceptance/W1-49/test_w1_49_live_session.py  # nightly: live-session: a real session is compacted
+tests/acceptance/W2-62/test_w2_62_live_resume.py  # nightly: live-session: a real session is resumed from its section
+tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py  # nightly: live-session: a real haiku worker started through gov launch
+tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here  # nightly: real-model: gov check over this repository's tickets, each context built through this machine's embedder and reranker, gives context-reproducibility green

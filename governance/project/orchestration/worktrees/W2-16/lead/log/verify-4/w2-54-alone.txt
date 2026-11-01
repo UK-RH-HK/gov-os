@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The command was refused due to a hook error.
+
+DONE
+
+stderr:
+
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written
+1 failed in 6.97s

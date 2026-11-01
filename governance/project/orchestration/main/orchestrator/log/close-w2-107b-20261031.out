@@ -1,0 +1,12 @@
+2026-10-31 20:27:44 W2-107 (DAEO-kiar, FULL) merges fab23f52931c,73736f4b8440 on head fab23f52931c
+2026-10-31 20:39:42 clone rebuilt in 717 s
+2026-10-31 20:39:44 W2-107 selection: scoped []; 42 targets; governance left out 5
+2026-10-31 20:39:44 run scope scoped: 42 targets; core changed 0, unplaced 0
+2026-10-31 21:30:06 parallel exit 1 in 2456 s {'exit': 1, 's': 2456, 'tests': 6615, 'failures': 2, 'errors': 0, 'skipped': 2}; serial exit 0 in 565 s {'exit': 0, 's': 565, 'entries': 37, 'tests': 71, 'failures': 0, 'errors': 0, 'skipped': 0}
+2026-10-31 21:30:35 passes alone (flaky candidate): tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py::test_a_large_store_among_many_small_files_is_decided_by_gov_check
+2026-10-31 21:30:41 red alone: tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs
+2026-10-31 21:49:38 red without the change too (3/3; with 3/3); not this change's (unless the revert itself breaks it), to investigate now: tests/acceptance/W1-28/test_w1_28_fixture_copies.py::test_every_whole_tree_copy_is_made_by_a_fixture_the_check_runs
+2026-10-31 21:49:38 tk close DAEO-kiar: Updated DAEO-kiar -> closed
+2026-10-31 21:49:39 commit: bbdf4374 W2-107 (DAEO-kiar): closed on the 10 practices (DEC-953)
+2026-10-31 21:49:39 CLOSED W2-107
+2026-10-31 21:49:39 done; wall 4914 s

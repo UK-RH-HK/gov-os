@@ -1,0 +1,4 @@
+1 tests/acceptance/W1-50/test_w1_50_acceptance_test_changed_on_both_sides.py exit 0
+2 tests/acceptance/W1-50/test_w1_50_read_merge_brought.py exit 0
+3 tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py exit 1
+4 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner exit 1

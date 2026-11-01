@@ -1,0 +1,13 @@
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook
+tests/acceptance/W2-57/test_w2_57_designer_read_p95.py
+tests/acceptance/W1-07/test_w1_07_help.py::test_help_answers_in_under_300_ms
+tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder
+tests/acceptance/W1-46/test_w1_46_live_sessions.py
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path
+tests/acceptance/W1-25/test_w1_25_live_session.py
+tests/acceptance/W1-49/test_w1_49_live_session.py
+tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+tests/acceptance/W2-54/test_w2_54_query_vector.py::test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before
+tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here

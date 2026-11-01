@@ -1,0 +1,41 @@
+
+## What you read
+
+- The decisions in `docs/DECISION_REGISTER.md`: DEC-710, DEC-804 (item 3), DEC-580, DEC-135; row W2-M161 in `docs/plan/WAVE_2_LIST.md` (a trace setting the person planted reaches no child git call of `gov close`); the ticket's KPI lines in `.tickets/DAEO-0z8c.md`.
+- `src/gov/util/gitenv.py` (the module docstring: `pinned` is "for the calls that only read, where a setting there (`trace2.eventTarget`) could write or change an answer"), `src/gov/retrieval/lexical.py` (`_git` and its four callers: `_tracked`'s `ls-files -z` and `hash-object --stdin-paths`; W2-108's `_tree`, merged from the integration branch at `d1533bf30a10`: `rev-parse HEAD --git-path index` and `ls-files -z`, run by `_checked`, the freshness key every `gov check`, `gov retrieve` and `gov close` works out), row 24 of `docs/research/AR-2-git-sweep.md`, and the unit tests in `tests/unit/gitenv/`.
+
+## The red (the failing output, as the lead's verification gave it)
+
+`tests/acceptance/W2-05/test_w2_05_planted.py::test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment`, red at `110125ddda0b`, in the full scoped run and again alone, in the close's environment:
+
+    AssertionError: gov close with planted trace variables and a trace setting (W2-M161): a child git call wrote the planted trace target(s) ['user-config-trace2']
+
+The case runs `gov close` on a throwaway project whose person has `[trace2] eventTarget = <a file>` in `~/.gitconfig` (and trace variables planted in the environment). The lead read the trace file it left: three git processes wrote it, all from the lexical index's `_git`: `git -C <project> rev-parse HEAD --git-path index` (twice) and `git -C <project> ls-files -z` (once). They run under `git_env(root)`, unpinned, so the person's global configuration is read and its trace target written. These calls came with W2-108's freshness key (merged here at `d1533bf30a10`); the same case was green in the last round, before that merge. The round's reviewer found the same thing by probe (R6-2: a person's global `trace2.eventTarget` gets 20 events from the lexical index's calls; the path-map check's pinned call wrote none).
+
+## What should happen (the KPIs, W2-M161, gitenv's own rule)
+
+No git call the lexical index makes reads the system's or the person's configuration where a setting there could write or change an answer: under `gov close`, `gov check`, `gov retrieve` and `gov rebuild` a person's `trace2.eventTarget` (or any other trace setting in `~/.gitconfig`, the XDG file or the system file) is never written by them. The answers stay the same: the freshness key, the listing and the blob ids the index records are what they are now for an ordinary project. An inherited `GIT_INDEX_FILE` of the root's own git directory is still kept (as `git_env(root)` keeps it).
+
+## What to do
+
+1. **Fix:** the lexical index's git calls that only read run pinned (`git_env(root, pinned=True)`), as gitenv's rule says. Judge `hash-object --stdin-paths` on its merits: it also only reads (no `-w`), but its answer can depend on the repository's own attributes and filters; the repository's own configuration is still read when pinned, so say in your return whether pinning it changes any blob id for an ordinary project and why you chose as you did. Proportion (DEC-135): nothing beyond this; no change to `_checked`'s logic or W2-108's key.
+2. **Builder tests** in `tests/unit/gitenv/` (written first, seen red): a throwaway repository and a person's `~/.gitconfig` (a `HOME` of the test's own) with `trace2.eventTarget` naming a file; the lexical index's freshness key, listing and a refresh of a small project write nothing to it; the answers are those of an unpinned run; an inherited `GIT_INDEX_FILE` of the root's own git directory is still used.
+3. **The sweep record** row 24: what the lexical index's calls now get and why (W2-M161, W2-108's calls, R6-2). Counts stay true.
+
+## Verify before you return (once, after your last commit)
+
+- `PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -m pytest tests/unit/gitenv tests/unit/retrieval -q -p no:cacheprovider`. Expected: all green (one skip for a missing `govbridge` module is known).
+- The acceptance case above, once, name and result only: `PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -m pytest "tests/acceptance/W2-05/test_w2_05_planted.py::test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment" -v --tb=no -rN -p no:cacheprovider`. Then `tests/acceptance/W2-05/test_w2_05_planted.py` whole and `tests/acceptance/W2-108/` the same way (names and results only). Expected: green.
+
+## Commit
+
+Before each commit, check that `/home/usain/Dynamic-Agentic-Engineering-OS/.git/hooks` holds no `pre-commit` file (only `*.sample` files); if one is there, do not commit, and say so. Never `--no-verify`, never `core.hooksPath`. Stage only the files you changed, by name (never `git add -A` or `git add .`: placeholder files show in this sandbox). One commit; trailers in the final block, `Implements:` holding decision ids only (DEC-927 item 2):
+
+    git commit -m "W2-05 (DAEO-0z8c): the lexical index's read-only git calls run pinned, W2-108's freshness calls among them (W2-M161)" --trailer "Task: DAEO-0z8c" --trailer "Role: engineer" --trailer "Implements: DEC-710, DEC-804, DEC-980" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+
+Do not start the commit message's body with a row id followed by a colon (git reads such a paragraph as trailers). After the commit, run `git log --oneline -2`, `git log -1 --format=%B` and `git status --short` and quote them.
+
+## Return
+
+Your commit; which calls are now pinned and why, and your judgement on `hash-object`; each unit test and its red before the fix; every suite you ran with its counts and every red case by name; lines added and removed in `src/`, `docs/` and tests; the `gov retrieve` questions you asked; the read refusals you met; any package. Put these in the fields below.
+

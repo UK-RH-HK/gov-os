@@ -1,0 +1,30 @@
+You are the ticket lead for ticket `DAEO-0z8c` (`W2-05`, "The git environment of every check, hook and helper; the settings re-sort"), profile FULL, working only in the worktree `/home/usain/gov-os-worktrees/W2-05` on branch `w2/W2-05`.
+
+**This is a resume, under DEC-953, DEC-954 and DEC-957: read your lead checkpoint, `.gov-runtime/scratch/lead/CHECKPOINT.md`, first.** `git rev-parse --short=12 HEAD` must show `@@HEAD@@` (the orchestrator merged `w2/integrate` in: ACT 1's five-rule guard, DEC-953 to DEC-957, W2-90 filed), and `git status --short` must show one line only, `?? tests/acceptance/W2-05/test_zz_scratch_b1.py`. That file is expected: a stray (a docstring, no test) left by an earlier test designer. Your test designer removes it in its batch (or commits it, if it is real work); never you or the engineer. Anything else: stop and return PACKAGES naming it.
+
+**Your decided scope is in your older part,** `/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/briefs/W2-05-part-run4.md`: read it whole for its texts (behaviours, checks, who runs beside you). This part holds wherever the two differ.
+
+## What is left
+
+- **The answer in force:** DEC-951 item 2 (P-B1-1 (a)): a short test-designer revision of W1-02's deadline support, then W2-05 resumes.
+- **What is left, from the run-4 part (its steps 3, 4, 6 and 7, with their texts):**
+  1. **The W1-02 revision** by a fresh independent test designer, in `tests/acceptance/W1-02/` only, the behaviours exactly as the run-4 part's step 3 gives them, `Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160`. It also removes the stray file above.
+  2. **Engineer batch 2:** `eng5-work-DRAFT.md` with the run-4 part's step-4 corrections (`@@B1@@` is `8b8a3baa347a`; `src/gov/guard/reads.py` is W2-84's: never changed, listed "after W2-84 merges"; W2-03's and W2-77's rows routed now).
+  3. **Not yours, though `src/gov/**/*.py` is in your paths:** `src/gov/rebuild/**` (W2-76, running), `src/gov/retrieval/**` (W2-87, running), `src/gov/launch/launcher.py`, `role.py`, `record.py` (W2-60a), `src/gov/resources/**` (W2-20), `src/gov/impact/**` (W2-37), `src/gov/release/**` and `src/gov/lock/**` (W2-16): list their git calls in the sweep as "after <ticket> merges", change nothing there.
+  4. **`gov checkpoint`,** committed before the review.
+  5. **The FULL review** (none has passed for this work yet): the run-4 part's step 7, `--effort max`, read-only, sandboxed; commit the probe record only if it passes.
+
+**What no longer applies (DEC-953; `governance/project/orchestration/LIFTED-BY-DEC953.md`), wherever the older part or your checkpoint says otherwise:** the merge step where the orchestrator has done it; the pre-close gate and `gov close` with its probe gate; fresh probes because a merge made a review stale (there is no staleness rule; a review is needed only where none has passed, or for new work); the trailer gate as a refusal (trailers are still written); the ratchet lists; the night window, the 01:00 cut-off, the `NIGHTLY-RUNNING` and `CLOSE-PENDING` holds and the 90-minute rule; the wait-based park. Test designers and engineers run at `--effort high`; only reviewers at `--effort max` (DEC-957). The guard is five rules now (ACT 1): command forms are no longer refused.
+
+**Verify (DEC-953 item 4, the common brief's step):** your own acceptance suite and unit tests, then the selection, `PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/select_tests.py /home/usain/gov-os-worktrees/W2-05 W2-05 DAEO-0z8c`; the full suite only when its scope is `full`, and then once, under `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/verify_lock.sh <command>` (closes take the lock first). Rebuild once first, under `flock /tmp/gov-os-rebuild.lock`, never `--no-embeddings`. A red in your files that fails alone is yours; one that passes alone is a flaky candidate, named. **Known reds you do not own** (named, left): the 235 live-wiring cases ACT 1 turned red, until W2-90 lands (`/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/briefs/W2-90-cases.txt`); W1-42's accepted reds; latency cases under load (W1-02, W1-05), re-run alone; DEC-919's W2-66 case naming a new conftest.
+
+**Installs:** the guard refuses them for you and your workers; raise any as a P1 in your return. **Scratch:** 20 GB and 1,000,000 files and folders for you and your workers, outside the tracked tree; `TMPDIR=/tmp/gov-os-lead-W2-05`; clean as you go, report `du -sh` and `du -s --inodes` in `evidence`, and name anything left for the orchestrator. **Repair:** at most one batch; a second, a fix outside your paths, or a red in another ticket's code: PACKAGES with its cost in lines and hours. **Finish what is listed and nothing new** (DEC-946 item 6).
+
+**Estimate:** about 7 to 8 hours.
+
+**Return:** the twelve fields first, as labelled lines; status DONE (each step's counts, the selection's scope and reasons, the probe record where one is due; ready to merge) or PACKAGES (each in six parts, with your recommendation and confidence, saying what it blocks).
+
+- **W2-107 (DEC-967) holds `src/gov/secrets/__init__.py` and `src/gov/secrets/cache.py`:** your paths name `src/gov/**/*.py`, but do not change those two files; if your work needs them, return PACKAGES.
+
+
+**DEC-968 (owner, 2026-10-31), overriding anything above about a full run:** never run the full suite, whatever your change, core included: the nightly runs it once a day. Your verification is the scoped set `select_tests.py` gives (always `scoped` now; for a core change it names `core_changed` and selects every suite the change can reach), run once before you return, in the close's form. A case that fails there and that your change did not cause (it fails on `w2/integrate` too) is named in your return for the CTO to deal with at once; one your change caused is yours to fix. Exit 2 from the selection (scope `refused`): return PACKAGES with its reasons.
