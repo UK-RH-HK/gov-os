@@ -3,6 +3,8 @@ name: discovery
 description: >-
   Method for discovery, research, experiments and decision packages during
   specification work.
+metadata:
+  version: 1.0.0
 ---
 # Discovery
 
