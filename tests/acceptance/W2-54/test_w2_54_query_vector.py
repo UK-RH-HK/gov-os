@@ -118,16 +118,42 @@ def test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet(
 @STAND_IN
 def test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary(
         box, embedder, tmp_path):
-    """*Red.* The context-reproducibility check, run as its declaration says, over a project with three tickets,
-    the stand-in behind every context: green. Today it prints ``FAIL: <ticket>: <hash> != <hash>``."""
+    """*Red.* The embedder whose vectors vary is behind every process. Each ticket's title, asked through ``gov
+    retrieve`` in a process of its own, then again after the others, reaches the embedder after other texts and gets
+    one bundle every time. The context-reproducibility check, run as its declaration says over the three tickets,
+    is green, and its contexts send the embedder nothing.
+
+    Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005. The check's contexts no longer reach the
+    embedder (W2-04's addendum: ``gov context`` sends nothing to an embedder), so the premise "the check's contexts
+    reached the embedder" moves to ``gov retrieve``, the read that does, and is held as round 2 holds a read: one
+    question, one bundle, whatever was asked before. The check stays green over several tickets. Today the check's
+    contexts send the embedder their questions."""
     project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
+    env = S.embed_env(box, embedder)
+    titles = list(S.QUESTION_TICKETS.values())
+    bundles = collections.defaultdict(list)
+    before = len(embedder.embedded())
+    for title in titles + titles[::-1]:
+        done = S.gov(box, "retrieve", "--json", "--root", project, title, env=env)
+        assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
+        bundles[title].append(done.envelope()["result"])
+    sent = embedder.embedded()[before:]
+    assert all(embedder.asked_for(title) >= 1 for title in titles) and \
+        any(a != b for a, b in zip(sent, sent[1:])), \
+        f"the premise: the questions did not reach the embedder one after another: {[text[-40:] for text in sent]}"
+    for title, found in bundles.items():
+        assert found[0].get("evidence") and found[0]["facets"].get("semantic", {}).get("available") is True, \
+            f"the premise: gov retrieve {title!r} gave no semantic answer: {found[0].get('facets')}"
+        assert len({S.canonical(bundle) for bundle in found}) == 1, \
+            f"one question, two bundles in one store: {title!r}"
     before = len(embedder.embedded())
     done = S.run(["sh", "-c", S.yaml.safe_load(
         (S.REPO_ROOT / S.CONTEXT_DECLARATION_REL).read_text(encoding="utf-8"))["command"]],
-        cwd=project, env=S.embed_env(box, embedder), timeout=S.CHECK_TIMEOUT_S)
-    assert len(embedder.embedded()) > before, "the premise: the check's contexts never reached the embedder"
+        cwd=project, env=env, timeout=S.CHECK_TIMEOUT_S)
     assert done.returncode == 0 and "FAIL" not in done.stdout, \
         f"two computations of a ticket's context in one store give two hashes\n{done.describe()}"
+    assert len(embedder.embedded()) == before, \
+        f"the check's contexts sent the embedder {len(embedder.embedded()) - before} texts"
 
 
 # ---- 3. a stored vector is never taken for another key ------------------------------------------------------------
