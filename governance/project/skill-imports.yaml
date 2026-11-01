@@ -1,0 +1,14 @@
+# The skill-import record (W2-104, DEC-959 item 5).
+#
+# One entry per skill imported from another collection (Anthropic's or another source):
+#   name             the skill's front-matter name
+#   source           where it comes from (a collection and a link)
+#   version          the version imported
+#   licence          the licence it is offered under
+#   licence_verdict  the licence's verdict for this use: "allowed", or why not
+#   adopted          true only once `gov skilleval <skill> --adopt` has adopted it
+#
+# The rule: an import is adopted only when its source, version and licence are recorded, its licence_verdict is
+# "allowed", and its three scenarios pass in the same run; `gov skilleval --adopt` refuses otherwise and leaves
+# the entry adopted: false. No import has been adopted yet.
+imports: []
