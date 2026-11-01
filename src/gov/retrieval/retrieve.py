@@ -1,7 +1,8 @@
 """``gov retrieve``: one cited evidence bundle with one stopping reason (W1-21; DEC-080, DEC-419, DEC-422–425).
 
-``retrieve`` asks the lexical and the semantic route, closes over a ticket or ids with ``gov.closure``, merges the
-three by chunk hash, drops what the store says is superseded or must-not-cite (DEC-329, G-19, DEC-423), reranks
+``retrieve`` asks the lexical and the semantic route, closes over a ticket, ids or the records the question names
+(``graph_route``) with ``gov.closure``, asks the code index for the symbols it names (``code_route``), merges them
+by chunk hash, drops what the store says is superseded or must-not-cite (DEC-329, G-19, DEC-423), reranks
 the rest once (DP-9) and expands a child hit to its parent within the bundle budget (DEC-091, DP-3). It only
 reads (DEC-322).
 
@@ -23,7 +24,7 @@ import yaml
 from gov import closure as closures
 from gov import records
 from gov.cli.errors import GovError
-from gov.retrieval import authority, lexical, semantic
+from gov.retrieval import authority, code_route, graph_route, lexical, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import rerank
 
@@ -127,9 +128,11 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     routes = {name: answer["hits"] for name, answer in answers.items()}
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
     closure_gaps, start = [], [*([ticket] if ticket else []), *ids]
+    depth = closures.depth_of_radius(radius if start else min(radius, 1))  # W2-92: a question's records at R0 or R1
+    start += [rid for rid in graph_route.start_ids(root, query, known) if rid not in start]  # W2-92: the record route
     reached = set()
     if start:
-        closed = closures.closure(root, start, closures.depth_of_radius(radius))
+        closed = closures.closure(root, start, depth)
         reached = {item["id"] for item in closed["closure"]}
         routes[CLOSURE] = [chunk for chunk in chunks.values()
                            if (record_of.get(chunk["path"]) if chunk["path"] != register
@@ -137,6 +140,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         answered = closed["facets"]["code"] != "unavailable"
         facets[CLOSURE] = {"available": answered, "reason": None if answered else NO_CODE_INDEX}
         closure_gaps += closed["gaps"]
+    coded = code_route.route(root, query, chunks)  # W2-92: the code route; None when the question names no symbol
+    if coded is not None:
+        routes[code_route.FACET], facets[code_route.FACET] = coded
 
     fused = rrf(routes)
     fused = order.fused(fused, chunks)  # W2-87: lifted by authority before the cut (DEC-952, DEC-860)
