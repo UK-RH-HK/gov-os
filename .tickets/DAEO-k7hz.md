@@ -18,6 +18,7 @@ depends_on:
 - DAEO-g0ip
 allowed_paths:
 - template/governance/kernel/templates/brief-*.md
+- src/gov/check/skill_validator.py
 - template/governance/kernel/skills/orchestration/**
 - template/governance/kernel/skills/audit/**
 - .claude/skills/orchestration/**
