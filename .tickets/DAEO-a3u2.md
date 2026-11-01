@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: [DAEO-jsg1]
 allowed_paths:
+- tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py
 - governance/project/path-map.yaml
 - tests/unit/retrieval/test_w2_91*
 - docs/changes/W2-91-evidence.md
@@ -23,7 +24,7 @@ kpis:
   success:
   - 'After a rebuild with the embedder, the tracked root files (CLAUDE.md, README.md, AGENTS.md and the rest the root-files namespace holds), every tracked file under governance/** and every tracked file under schemas/** have vectors; the count of chunks with vectors under each is recorded from the clone''s store [DEC-957, DEC-954 Q9c, CAP-10.a]'
   - 'What stays out stays out: fixtures/** (the hidden half), .claude/** and .rulesync/** (generated copies), template/.rulesync/** and the vendored parts W2-86 placed, and cli/** (the old carried code) have no vector; schemas/** gets a namespace of its own so cli/** keeps not embedded [DEC-957, DEC-388, DEC-820 (d)]'
-  - 'The restricted overlay stays restricted: governance/** keeps sensitivity restricted and export_policy denied; the ticket shows, from the code, that the indexer reads embedding_policy only and the export path still refuses the overlay, with a planted export case; embedding it changes no export or sharing rule [DEC-957, DEC-856, DEC-887]'
+  - 'The restricted overlay stays restricted: governance/** keeps sensitivity restricted and export_policy denied, and the ticket shows from the code that the indexer reads embedding_policy only (narrowed by DEC-1013, P-W2-91-TD-1 (a): no export path exists yet; an export command that refuses denied is Wave 3 row W3-P18) [DEC-694, DEC-388, DEC-1013]'
   - 'The path map states it in its two valid values only, every tracked path matches exactly one namespace, and the indexer''s code is not changed [DEC-694, DEC-388]'
   - 'Nothing else moves: for every tracked path outside the newly embedded sets, the embedding verdict is the same at the head as at the base; the vector sets differ only by the newly embedded files [DEC-381]'
   - 'W2-61''s measure is re-run on the visible half, control at the base and the head, both figures together (hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 %, full evidence against 99 %) and the in-the-bundle count, per question, beside the last measure, in docs/changes/W2-91-evidence.md [DEC-957, DEC-833, DEC-860]'
