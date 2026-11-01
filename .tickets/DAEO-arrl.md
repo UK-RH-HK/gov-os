@@ -1,6 +1,6 @@
 ---
 id: DAEO-arrl
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-29T15:55:50Z
@@ -30,6 +30,7 @@ kpis:
   - 'The backfill is a proposal in docs/research/W2-55-backfill.md: every entry''s proposed tags with the reason for each, the 120 amends and refines that DEC-825 left for this ticket included, and a sample drawn for the owner''s review; nothing is applied to the register before the owner accepts it [DEC-791 item 1, DEC-825 item 4]'
   - 'Supersession propagates: a check fails when anything (a test, code, a skill, a brief, a ticket''s KPI, the prompt, the path map) still enforces a superseded or changed decision without a recorded reason; each superseded entry''s status line names the entry that replaced it, and every place that cites or enforces the old one is updated or listed with its reason in the register. Its first fixture is the sweep of 2026-10-20 (governance/project/orchestration/packages/SWEEP-2026-10-20.md): W1-49''s two window cases and W2-59''s three earlier cases are found [DEC-866]'
   - 'W2-61''s 20-question measure is run again after the merge and reported beside its baseline, both figures together [DEC-941, DEC-833 item 3]'
+  - '`gov context --in-force` prints the digest of the decisions in force (one line each, superseded and done ones left out), generated from the register, and the kernel''s session-start hook loads it with RESUME HERE where the project turns that on (the hook''s injection is the owner''s CIT-P question, DEC-952 item 5) [DEC-953 item 7, DEC-983, DEC-982]'
   failure:
   - An entry with no domain, status or scope fails the decisions validator, naming it.
   - A superseded entry that still reaches an agent's context fails a test.
@@ -44,6 +45,7 @@ sources:
 - DEC-851
 - DEC-833
 - DEC-941
+- DEC-983
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-55/
@@ -58,3 +60,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-55), from P-W2-37 (owner, DEC-791 item 1
 - **Why:** the register is about 244,000 tokens (783 entries when DEC-791 was decided). Superseded and amended entries are not marked as such, and nothing says which decisions are kernel-wide; agents see all of it (the quality-control check, 2026-10-18). Lens B F4: the superseded filter does nothing for register decisions, which fails open for any agent relying on memory.
 - **Place:** keystone 4, block B of the re-plan (DEC-941): W2-61's baseline first, then W2-03 (`DAEO-ym8a`, which owns `src/gov/decisions/**` and `src/gov/records/**`) closes, then W2-55. It shares `src/gov/context/**` with W2-04 and `src/gov/retrieve/**` with W2-13: it runs after them, or stacked under DEC-786.
 - **Paths:** `src/gov/context/**` and `src/gov/retrieve/**` for the decisions filter only. The backfill is a proposal in `docs/research/W2-55-backfill.md`; the register itself (`docs/DECISION_REGISTER.md`) is not in the paths, and the accepted backfill is applied by the orchestrator after the owner's acceptance.
+
+**DEC-983 (the owner's order, SMART-WORK-1):** W2-55 runs before W2-115 (the smart close): its KPI 5 ("supersession propagates") finds the tests, code, skills and KPIs that still enforce a superseded or changed decision before the close is rebuilt on them. It also gives the digest of the decisions in force (its last success KPI).
