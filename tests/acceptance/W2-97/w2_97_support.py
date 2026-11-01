@@ -307,7 +307,7 @@ class Planted:
                               cwd=str(self.tmp), timeout=timeout)
 
     def enqueue(self, t, commit=None):
-        return self.tool("enqueue", "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
+        return self.tool("enqueue", "--repo", str(self.repo), "--queue", str(self.queue), "--ticket", t.name, "--task", t.task,
                          "--branch", t.branch, "--commit", commit or t.commit)
 
     def approve(self, name, by="CTO"):
