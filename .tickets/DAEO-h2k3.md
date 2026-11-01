@@ -1,19 +1,19 @@
 ---
 id: DAEO-h2k3
-status: open
+status: in_progress
 deps: [DAEO-m1u3]
 links: []
 created: 2026-10-29T15:55:50Z
 type: task
 priority: 1
-assignee: independent-auditor
+assignee: independent-test-designer
 external-ref: W2-61h
 tags: [wave-2, audit, evaluation, held-out, standard, keystone-4]
 wbs_id: W2-61h
 title: 'W2-61''s enlarged set: 28 new memory questions with their gold sources, 24 hidden and 4 visible, by an independent session'
 class: audit
 state_class: AUTHORITATIVE
-role: independent-auditor
+role: independent-test-designer
 depends_on: [DAEO-m1u3]
 allowed_paths:
 - fixtures/evaluation/memory-retrieval/hidden/**
