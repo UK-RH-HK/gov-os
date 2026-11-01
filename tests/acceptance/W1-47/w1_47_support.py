@@ -40,6 +40,7 @@ the real path: the wired copy leaves the committed absolute ``Read`` rules out.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -313,10 +314,42 @@ def installed_environment(project, sandbox, role=None, ticket=None):
     the ``gov`` package is installed. Nothing is installed by a test, so the
     package is put on Python's path instead; a command that sets its own
     ``PYTHONPATH`` (this repository's ``src``) finds no ``gov`` there.
+
+    Revised (W2-90b, Rewrite-Reason: DEC-953 item 2; W2-106's P2 in DEC-970): the template's guard lines are pinned
+    (W2-106, DEC-822). They find the installed gov at ``$HOME/.local/bin/gov``, else on ``PATH``, and start their
+    program with the interpreter its first line names, with ``-E``, which ignores ``PYTHONPATH``. So the sandbox's
+    home is given the editable install's ``gov`` too (``install_editable_gov``), as ``pip install --user -e`` leaves
+    it; without it the lines ran the owner's pin found on ``PATH``, not this worktree's code (DEC-732).
     """
+    install_editable_gov(sandbox.home)
     env = live_support.command_environment(project, sandbox, role, ticket)
     env["PYTHONPATH"] = str(REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL)
     return env
+
+
+EDITABLE_PYTHON = os.path.realpath(sys.executable)   # the interpreter an editable install's script names
+
+
+def install_editable_gov(home):
+    """This worktree's ``gov`` as an editable install leaves it in ``home`` (DEC-605): a path file naming this
+    worktree's package folder in the home's user site folder, and the ``gov`` script at ``<home>/.local/bin/gov``
+    whose first line names this interpreter. Written once per home."""
+    home = Path(home)
+    script = home / ".local" / "bin" / "gov"
+    if script.is_file():
+        return script
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C.UTF-8"}
+    site = subprocess.run([EDITABLE_PYTHON, "-c", "import site; print(site.getusersitepackages())"],
+                          capture_output=True, text=True, env=env, check=True).stdout.strip()
+    assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
+    Path(site).mkdir(parents=True, exist_ok=True)
+    (Path(site) / "gov-of-this-worktree.pth").write_text(
+        str(REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL) + "\n", encoding="utf-8")
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(f"#!{EDITABLE_PYTHON}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
+                      encoding="utf-8")
+    script.chmod(0o755)
+    return script
 
 
 def run_registered(project, settings, sandbox, event, tool_name, tool_input, role=None, ticket=None,

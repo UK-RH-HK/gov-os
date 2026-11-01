@@ -110,20 +110,141 @@ def copy_project(base, destination):
     return destination
 
 
-def install_gov_for(home):
-    """Make this worktree's ``gov`` package importable for ``python3`` run with ``HOME=home``.
+EDITABLE_PYTHON = os.path.realpath(sys.executable)   # the interpreter the editable install's script names
 
-    A path file in the user site folder of that home, as an editable install leaves one: the kernel's hook line
-    starts its program with the ``python3`` first on ``PATH``, and a product has the package installed.
+
+def install_gov_for(home):
+    """Make this worktree's ``gov`` package the installed one for a hook line run with ``HOME=home``.
+
+    A path file in the user site folder of that home, as an editable install leaves one: a product has the package
+    installed. Revised (W2-90b, Rewrite-Reason: DEC-953 item 2, W2-106's P2 in DEC-970): the editable install's
+    ``gov`` script is written too, at ``<home>/.local/bin/gov``, its first line naming this interpreter, as
+    ``pip install --user -e`` leaves it (DEC-605; W1-38's ``make_session_sandbox`` since W2-106). The template's
+    guard lines are pinned (W2-106, DEC-822): they find the installed gov there, else on ``PATH``, and start their
+    program with the interpreter its first line names, with ``-E`` (which keeps the user site folder, so the path
+    file gives this worktree's package). Without the script they find the ``gov`` on the runner's ``PATH`` (on this
+    machine the owner's pin, which imports its own package, not this worktree's: DEC-732). The four lifecycle lines
+    still start the ``python3`` first on ``PATH`` (DEC-608, DEC-917); the path file is written for it too.
     """
     home = Path(home)
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C.UTF-8"}
-    site = subprocess.run(["python3", "-c", "import site; print(site.getusersitepackages())"], capture_output=True,
-                          text=True, env=env, check=True).stdout.strip()
-    assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
-    Path(site).mkdir(parents=True, exist_ok=True)
-    (Path(site) / PTH_NAME).write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
+    for python in dict.fromkeys((EDITABLE_PYTHON, "python3")):
+        site = subprocess.run([python, "-c", "import site; print(site.getusersitepackages())"], capture_output=True,
+                              text=True, env=env, check=True).stdout.strip()
+        assert site.startswith(str(home) + os.sep), f"the user site folder {site} is not under the stand-in home {home}"
+        Path(site).mkdir(parents=True, exist_ok=True)
+        (Path(site) / PTH_NAME).write_text(str(REPO_ROOT / "src") + "\n", encoding="utf-8")
+    script = home / ".local" / "bin" / "gov"
+    script.parent.mkdir(parents=True, exist_ok=True)
+    script.write_text(f"#!{EDITABLE_PYTHON}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
+                      encoding="utf-8")
+    script.chmod(0o755)
     return home
+
+
+def gov_the_pinned_line_imports(home, project):
+    """The ``gov.__file__`` the interpreter a pinned hook line starts would import, with ``HOME=home``: the line's
+    own look-up (``$HOME/.local/bin/gov``, else ``gov`` on ``PATH``, its first line), then that interpreter with
+    ``-E``. Used to show a harness home runs this worktree's code (DEC-732)."""
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C.UTF-8",
+           "CLAUDE_PROJECT_DIR": str(project)}
+    line = ('g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || exit 3; read -r p < "$g"; '
+            'p="${p#\'#!\'}"; "$p" -E -c "import gov; print(gov.__file__)"')
+    done = subprocess.run(["sh", "-c", line], capture_output=True, text=True, env=env, cwd=str(project), check=False)
+    return done.stdout.strip()
+
+
+# --------------------------------------------------------------------------
+# The template's hook lines, read where the kernel keeps them (W2-90b, DEC-965 item 4)
+# --------------------------------------------------------------------------
+
+KERNEL_GUARD_EVENTS = ("preToolUse", "postToolUse", "postToolUseFailure")   # the three pinned lines (W2-106)
+TEMPLATE_HOOKS_REL = "template/governance/kernel/hooks"                      # the programs, as the template has them
+_SETTINGS_EVENTS = {"PreToolUse": "preToolUse", "PostToolUse": "postToolUse",
+                    "PostToolUseFailure": "postToolUseFailure"}
+
+
+def _read_jsonc(path):
+    text = Path(path).read_text(encoding="utf-8")
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return json.loads("\n".join(line for line in text.splitlines() if not line.lstrip().startswith("//")))
+
+
+def template_hook_entries(events=KERNEL_GUARD_EVENTS):
+    """``(event, index, entry)`` for every command entry of ``template/.rulesync/hooks.jsonc`` on ``events``: the
+    kernel's hook lines as a product's ``.rulesync/`` holds them (Copier copies the file unchanged; W2-59's
+    seven-lines case and W2-106's in-step cases read the generated copy)."""
+    source = _read_jsonc(REPO_ROOT / TEMPLATE_HOOK_SOURCE_REL)
+    return [(event, index, entry) for event, entries in (source.get("hooks") or {}).items() if event in events
+            for index, entry in enumerate(entries or []) if isinstance(entry, dict) and entry.get("type") == "command"]
+
+
+def template_settings_commands(events=KERNEL_GUARD_EVENTS):
+    """``(event, index, command)`` for every hook command of ``template/governance/kernel/settings.json`` on
+    ``events`` (the event named as the rulesync source names it): the kernel's shipped settings."""
+    settings = json.loads((REPO_ROOT / TEMPLATE_SETTINGS_REL).read_text(encoding="utf-8"))
+    found = []
+    for name, entries in (settings.get("hooks") or {}).items():
+        event = _SETTINGS_EVENTS.get(name)
+        if event not in events:
+            continue
+        commands = [hook["command"] for entry in entries or [] if isinstance(entry, dict)
+                    for hook in entry.get("hooks") or [] if isinstance(hook, dict)
+                    and hook.get("type") == "command" and isinstance(hook.get("command"), str)]
+        found.extend((event, index, command) for index, command in enumerate(commands))
+    return found
+
+
+def runs_a_kernel_program(command):
+    """Whether a hook line starts its program where a product has the kernel: ``governance/kernel/hooks/``."""
+    return any(f"{prefix}/{KERNEL_HOOKS_REL}/" in command for prefix in ("$CLAUDE_PROJECT_DIR", "${CLAUDE_PROJECT_DIR}"))
+
+
+def kernel_hook_copies():
+    """The kernel's hook programs, each a single named file of this worktree, placed where a product has them."""
+    return {f"{KERNEL_HOOKS_REL}/{path.name}": path for path in sorted((REPO_ROOT / TEMPLATE_HOOKS_REL).glob("*.py"))}
+
+
+def _w2_59_support():
+    if str(_TESTS / "W2-59") not in sys.path:
+        sys.path.insert(0, str(_TESTS / "W2-59"))
+    import w2_59_support   # noqa: E402
+
+    return w2_59_support
+
+
+def w2_59_hook_project(entry, base, markers, *, with_src):
+    """W2-59's ``hook_project`` for one line: the kernel's layout (programs at ``governance/kernel/hooks/``) for a
+    template line, W2-59's own (``template/governance/kernel/hooks/``) for this repository's lifecycle lines."""
+    support = _w2_59_support()
+    if not runs_a_kernel_program(entry["command"]):
+        return support.hook_project(base, markers, with_src=with_src)
+    files = {"README.md": "w259 hook project\n"}
+    if with_src:
+        files.update(support.tree_gov_files(markers))
+    return support.make_repository(base, files, kernel_hook_copies())
+
+
+def w2_59_worker_project(entry, base, markers, *, src_in_project):
+    """W2-59's ``worker_project`` for one line, in the layout the line looks in (as ``w2_59_hook_project``)."""
+    support = _w2_59_support()
+    if not runs_a_kernel_program(entry["command"]):
+        return support.worker_project(base, markers, src_in_project=src_in_project)
+    base = Path(base)
+    files = {"README.md": "w259 worker project\n"}
+    if src_in_project:
+        files.update(support.worker_import_path_files(markers))
+        project = support.make_repository(base / "project", files, kernel_hook_copies())
+        return project, project / "src"
+    project = support.make_repository(base / "project", files, kernel_hook_copies())
+    elsewhere = base / "inherited"
+    for rel, text in support.worker_import_path_files(markers).items():
+        path = elsewhere / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    return project, elsewhere / "src"
 
 
 # --------------------------------------------------------------------------
