@@ -7,29 +7,40 @@ items not stacked for lack of room, beginning with the first that did not fit, a
 nothing was left. A supplementary lookup failure is named in ``dropped`` by its kind (W2-L180).
 
 The ledger (README, "The planted projects") has 48 matching pages, every fourth one large, and room for all of them
-at the default ceiling. One batch is what one call of the retrieval's public entry returns (README, package P-1);
-the ``log`` stand-in records each call.
+at the default ceiling. One batch is one of the context's own lookups of ranked evidence, and the packet shows each
+under ``supplementary_batches`` (the addendum's S7a, DEC-1005, deciding run 1's package P-1): ``items`` (the ``{id,
+path}`` it read, in rank order) and ``limit`` (the most it could read). Round 2 reads the batches there; no stand-in
+wraps the retrieval's entry, which the context no longer reaches.
 
-Red reasons, today: one retrieval call gives at most 20 items, so most pages are never stacked; an item that does not
-fit is skipped and a smaller one below it is stacked; the packet has no ``further_batch``. The lookup failure case
-passes today (W2-L180 was fixed in W1-24's follow-up).
+Red reasons, today: the packet has no ``supplementary_batches`` and no ``further_batch``; one retrieval call gives at
+most 20 items, so most pages are never stacked; an item that does not fit is skipped and a smaller one below it is
+stacked. The lookup failure case passes today for the naming (W2-L180 was fixed in W1-24's follow-up).
 """
 
 from __future__ import annotations
 
 import sqlite3
 
+import pytest
+
 import w2_04_support as s
 
 
-def _full(api, ledger, mode=None):
-    api.reset_log()
-    env = api.env(mode=mode) if mode else None
-    return api.gov(ledger.root, s.LEDGER_TICKET, env=env).packet
+def _full(api, ledger):
+    return api.gov(ledger.root, s.LEDGER_TICKET).packet
 
 
 def _all_pages():
     return [f"docs/ledger/page-{number:02d}.md" for number in range(s.LEDGER_PAGES)]
+
+
+def _stacked(packet):
+    return [(item["id"], item["path"]) for item in packet[s.K_SUPPLEMENTARY]]
+
+
+def _room(packet):
+    """The room the ceiling leaves after the ticket's text and the mandatory inputs, in the packet's own figures."""
+    return packet[s.K_BUDGET]["limit"] - (packet[s.K_TOKENS] - s.supplementary_tokens(packet))
 
 
 def test_with_room_for_all_every_matching_item_is_stacked_in_rank_order(retrieval_api, ledger):
@@ -45,14 +56,29 @@ def test_with_room_for_all_every_matching_item_is_stacked_in_rank_order(retrieva
 
 
 def test_when_room_is_left_after_one_batch_the_next_batch_is_taken(retrieval_api, ledger):
-    packet = _full(retrieval_api, ledger, mode="log")
-    calls = retrieval_api.calls()
-    assert calls, "the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called"
-    one_batch = max(len(call["out"]) for call in calls)
-    stacked = s.ledger_paths(packet[s.K_SUPPLEMENTARY])
-    assert len(calls) >= 2 and len(stacked) > one_batch, (
-        f"{len(calls)} retrieval call(s), the largest returning {one_batch} items, and {len(stacked)} pages stacked: "
-        f"the stack holds no more than one batch although room is left")
+    """Rewrite-Reason: DEC-1005 (P-W2-04-2 (A)). Room for every page (the case above): the batches are taken until the
+    evidence ends. Every batch but the last read as many items as its limit (one that read fewer ended the evidence,
+    so nothing was left to take); the last read fewer than its limit, or none; every item the batches read is
+    stacked, in their order; so the stack holds more than one batch whenever the matching evidence passes one batch.
+    No batch reads more items than the room has tokens (each item costs at least one): never one giant query."""
+    packet = _full(retrieval_api, ledger)
+    taken = s.batches(packet)
+    read, stacked = s.read_items(packet), _stacked(packet)
+    assert taken, f"room for every page, yet `{s.K_BATCHES}` names no batch: {taken}"
+    sizes = [(len(entry["items"]), entry["limit"]) for entry in taken]
+    assert all(read_ == limit for read_, limit in sizes[:-1]), (
+        f"a batch read fewer items than its limit and yet another was taken (items, limit): {sizes}")
+    assert sizes[-1][0] < sizes[-1][1], (
+        f"room is left and the last batch read its limit, yet no next batch was taken (items, limit): {sizes}")
+    assert stacked == read, (f"room for everything, yet the stack is not every item the batches read, in order:\n"
+                             f"read {len(read)}: {read[:4]}...\nstacked {len(stacked)}: {stacked[:4]}...")
+    if len(read) > taken[0]["limit"]:
+        assert len(taken) >= 2 and len(stacked) > max(limit for _, limit in sizes), (
+            f"the evidence passes one batch (limit {taken[0]['limit']}, {len(read)} items) and the room holds it, "
+            f"yet the stack holds no more than one batch: {sizes}")
+    room = _room(packet)
+    assert all(limit <= room for _, limit in sizes), \
+        f"a batch could read more items than the room has tokens ({room}): {sizes}"
 
 
 def _ranked(packet):
@@ -106,20 +132,75 @@ def test_further_batch_begins_with_the_first_item_that_did_not_fit_in_rank_order
 
 
 def test_further_batch_is_at_most_one_batch_long(retrieval_api, ledger):
+    """Rewrite-Reason: DEC-1005 (P-W2-04-2 (A)). Under the tight budget, read through ``supplementary_batches``: the
+    stack is the first items of the batches' items, in order; ``further_batch`` begins with the first ranked item that
+    was not stacked, continues in the batches' order, holds no stacked item, and is no longer than the largest
+    batch's limit."""
     full = _full(retrieval_api, ledger)
     _, _, budget = _tight_budget(full)
-    retrieval_api.reset_log()
 
-    packet = retrieval_api.gov(ledger.root, s.LEDGER_TICKET, "--budget", budget,
-                               env=retrieval_api.env(mode="log")).packet
+    packet = retrieval_api.gov(ledger.root, s.LEDGER_TICKET, "--budget", budget).packet
 
-    calls = retrieval_api.calls()
-    assert calls, "the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called"
-    one_batch = max(len(call["out"]) for call in calls)
+    taken = s.batches(packet)
+    read, stacked = s.read_items(packet), _stacked(packet)
+    assert taken, f"`{s.K_BATCHES}` names no batch, yet items are stacked: {stacked[:4]}"
+    one_batch = max(entry["limit"] for entry in taken)
+    assert stacked == read[:len(stacked)], (f"the stack is not the first items the batches read, in order:\n"
+                                            f"stacked {stacked}\nread    {read[:len(stacked) + 2]}")
     further = packet.get(s.K_FURTHER)
     assert isinstance(further, list) and 0 < len(further) <= one_batch, \
         f"`{s.K_FURTHER}` holds {further if not isinstance(further, list) else len(further)} items; one batch is " \
         f"at most {one_batch}"
+    pairs = [(item["id"], item["path"]) for item in further]
+    assert pairs == read[len(stacked):len(stacked) + len(pairs)], (
+        f"`{s.K_FURTHER}` is not the ranked items from the first that was not stacked, in the batches' order:\n"
+        f"{pairs}\nread after the stack: {read[len(stacked):len(stacked) + len(pairs)]}")
+    assert not set(stacked) & set(pairs), f"`{s.K_FURTHER}` holds stacked items: {sorted(set(stacked) & set(pairs))}"
+
+
+def _small_ledger(tmp_path):
+    return s.build_project(tmp_path / "repo", s.ledger_files(pages=4))
+
+
+@pytest.mark.parametrize("shape", ("room for all", "a tight budget", "no index", "a damaged index"))
+def test_supplementary_batches_is_present_and_of_its_form(retrieval_api, ledger, tmp_path, shape):
+    """The addendum's S7a and "The packet's keys" (DEC-1005). Every packet built carries the keys it carried before
+    this ticket and exactly four more, ``supplementary_batches`` among them: a list of ``{items, limit}``, the items
+    ``{id, path}`` with ``len(items) <= limit``; the ``supplementary`` block is, item for item, the first items of the
+    batches' items; it is part of the packet, so two builds give the same one. Where the lookup found nothing or
+    failed, it is an empty list or the entries the context did take, and a failure is named in ``dropped``."""
+    if shape in ("room for all", "a tight budget"):
+        root = ledger.root
+        args = () if shape == "room for all" else ("--budget", _tight_budget(_full(retrieval_api, ledger))[2])
+    else:
+        project = _small_ledger(tmp_path)
+        if shape == "no index":
+            retrieval_api.build(project.root, index=False)
+        else:
+            retrieval_api.build(project.root)
+            connection = sqlite3.connect(project.root / s.STORE_REL)
+            try:
+                connection.execute("DROP TABLE lexical_chunk")
+                connection.commit()
+            finally:
+                connection.close()
+        root, args = project.root, ()
+
+    packet = retrieval_api.gov(root, s.LEDGER_TICKET, *args).packet
+
+    assert set(packet) == set(s.KEYS_BEFORE) | set(s.KEYS_ADDED), (
+        f"the packet's keys are not those it carried before and the four the addendum adds: "
+        f"{sorted(set(packet) ^ (set(s.KEYS_BEFORE) | set(s.KEYS_ADDED)))} differ")
+    read, stacked = s.read_items(packet), _stacked(packet)
+    assert stacked == read[:len(stacked)], \
+        f"an item of `{s.K_SUPPLEMENTARY}` is not among the batches' items in order: {stacked[:4]} / {read[:4]}"
+    if shape in ("no index", "a damaged index"):
+        assert stacked == [] and packet[s.K_FURTHER] == [], (stacked, packet[s.K_FURTHER])
+    if shape == "a damaged index":
+        assert packet[s.K_DROPPED], f"the lookup failed and `{s.K_DROPPED}` names nothing: {packet[s.K_BATCHES]}"
+    again = retrieval_api.gov(root, s.LEDGER_TICKET, *args).packet
+    assert again[s.K_BATCHES] == packet[s.K_BATCHES] and again[s.K_HASH] == packet[s.K_HASH], \
+        f"two builds give two `{s.K_BATCHES}` or two hashes"
 
 
 def test_a_lookup_failure_is_named_in_dropped_by_its_kind(retrieval_api, tmp_path):

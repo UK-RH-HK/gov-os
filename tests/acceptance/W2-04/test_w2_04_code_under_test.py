@@ -10,7 +10,7 @@ import w2_04_support as s
 
 
 def test_the_processes_the_suite_starts_run_this_trees_code(api):
-    for env in (api.env(), api.env(mode="log", watch=(s.SRC, "gov/__init__.py"))):
+    for env in (api.env(), api.env(mode="semantic-live", watch=(s.SRC, "gov/__init__.py"))):
         done = subprocess.run([sys.executable, "-c", "import gov; print(gov.__file__)"], env=env,
                               capture_output=True, text=True, cwd=str(api.workdir / "elsewhere"), timeout=60)
         assert done.returncode == 0, done.stderr
