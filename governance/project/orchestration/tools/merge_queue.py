@@ -30,6 +30,7 @@ from pathlib import Path
 ORCH_TOOLS = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools")
 WORK = Path.home() / "gov-os-runs/W2-00/merge-queue"
 REBUILD_LOCK = "/tmp/gov-os-rebuild.lock"
+REBUILD_SLOT = ORCH_TOOLS / "rebuild_slot.sh"  # DEC-1001 (d): a rebuild in a heavy-job slot, a lock of its own tree
 SLOT = ORCH_TOOLS / "verify_lock.sh"  # a heavy-job slot (DEC-979 D1, DEC-983): waits for one, exits with the run's code
 NODE = "/home/usain/.nvm/versions/node/v22.23.3/bin"
 MAP_REL = "governance/project/test-map.yaml"
@@ -136,18 +137,62 @@ def match(path, pattern):
     return bool(re.match("^" + ".*".join(segs) + (".*" if pattern.endswith("**") else "") + "$", path))
 
 
-def record_places(root):
-    """The test map's record_only list (block or flow form), read without YAML; none when it cannot be read."""
+WARM_KEEP = ("store.db", "codeintel", "query-vector-cache.db", "secrets-clean.json")  # the rebuild's own stores
+MARK = "queue-fresh.json"  # in .git/: the fingerprint of a fresh clone's config and exclude file
+
+
+def fingerprint(clone):
+    """What a warm clone must still match from when it was made: its .git/config and .git/info/exclude."""
+    out = {}
+    for rel in ("config", "info/exclude"):
+        f = Path(clone) / ".git" / rel
+        out[rel] = f.read_text(encoding="utf-8", errors="replace") if f.is_file() else None
+    return out
+
+
+def write_mark(clone):
+    (Path(clone) / ".git" / MARK).write_text(json.dumps(fingerprint(clone)), encoding="utf-8")
+
+
+def read_mark(clone):
+    try:
+        return json.loads((Path(clone) / ".git" / MARK).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None  # a clone without the mark is never reused
+
+
+def scrub(clone):
+    """A warm clone made as clean as a fresh one, but for the rebuild's stores (review of 2026-11-01): every git hook a
+    run installed removed, and everything under .gov-runtime but the stores (store.db*, codeintel/,
+    query-vector-cache.db*, secrets-clean.json) removed. False when anything cannot be removed."""
+    try:
+        hooks = Path(clone) / ".git" / "hooks"
+        for h in (hooks.iterdir() if hooks.is_dir() else []):
+            if not h.name.endswith(".sample"):
+                shutil.rmtree(h) if h.is_dir() and not h.is_symlink() else h.unlink()
+        rt = Path(clone) / ".gov-runtime"
+        for item in (rt.iterdir() if rt.is_dir() else []):
+            if any(item.name == k or item.name.startswith(k + "-") or item.name.startswith(k + ".") for k in WARM_KEEP) \
+                    and (item.name != "codeintel" or item.is_dir()):
+                continue
+            shutil.rmtree(item) if item.is_dir() and not item.is_symlink() else item.unlink()
+        return True
+    except OSError:
+        return False
+
+
+def map_list(root, key):
+    """A top-level list of the test map (block or flow form), read without YAML; none when it cannot be read."""
     try:
         lines = (Path(root) / MAP_REL).read_text(encoding="utf-8").splitlines()
     except (OSError, UnicodeDecodeError):
         return []
     found, inside = [], False
     for line in lines:
-        flow = re.match(r"^record_only:\s*\[(.*)\]\s*$", line)
+        flow = re.match(r"^" + re.escape(key) + r":\s*\[(.*)\]\s*$", line)
         if flow:
             return [x.strip().strip("'\"") for x in flow.group(1).split(",") if x.strip()]
-        if re.match(r"^record_only:\s*$", line):
+        if re.match(r"^" + re.escape(key) + r":\s*$", line):
             inside = True
         elif inside:
             item = re.match(r"^\s+-\s+(.+?)\s*$", line)
@@ -158,8 +203,31 @@ def record_places(root):
     return found
 
 
-def failing(xml_paths, where, targets):
-    """The failing test ids (path::name) of JUnit files, paths relative to `where`. pytest names a case by its path
+def record_places(root):
+    """The test map's record_only list (block or flow form), read without YAML; none when it cannot be read."""
+    return map_list(root, "record_only")
+
+
+RECORD_SUFFIXES = (".md", ".txt", ".patch", ".log", ".jsonl")  # an allowlist (review of 2026-11-01): nothing else
+
+
+def record_only_change(names, places):
+    """DEC-1001 (a): whether every changed path is a record: one of the test map's record_only places, or a governance
+    path (briefs, prompts, the orchestration record, .gov-runtime) ending in a record suffix (.md, .txt, .patch, .log,
+    .jsonl). Any other file (scripts, configuration, .conf, .yaml, no suffix) is not, and an empty change is not one."""
+    if not names:
+        return False
+    for n in names:
+        if any(match(n, p) for p in places):
+            continue
+        if any(match(n, p) for p in GOVERNANCE) and n.endswith(RECORD_SUFFIXES):
+            continue
+        return False
+    return True
+
+
+def failing_cases(xml_paths, where, targets):
+    """The failing cases (path::name, their failure kinds) of JUnit files, paths relative to `where`. pytest names a case by its path
     relative to its rootdir, which without an ini file is the targets' common folder: each folder from there up to
     `where` is tried for the file the dotted classname names."""
     where = Path(where)
@@ -184,12 +252,36 @@ def failing(xml_paths, where, targets):
             if case.find("failure") is None and case.find("error") is None:
                 continue
             if case.get("file"):
-                out.append(f"{case.get('file')}::{case.get('name')}")
+                node = f"{case.get('file')}::{case.get('name')}"
             elif case.get("classname"):
-                out.append(locate(case.get("classname").split("."), case.get("name")))
+                node = locate(case.get("classname").split("."), case.get("name"))
             else:  # a collection error: pytest names the module (dotted) in `name`
-                out.append(locate(case.get("name", "").split("."), None))
-    return list(dict.fromkeys(out))
+                node = locate(case.get("name", "").split("."), None)
+            out.append((node, case_kinds(case)))
+    return out
+
+
+def failing(xml_paths, where, targets):
+    """The failing test ids (path::name) of JUnit files, paths relative to `where` (failing_cases' nodes, once each)."""
+    return list(dict.fromkeys(node for node, _ in failing_cases(xml_paths, where, targets)))
+
+
+def case_kinds(case):
+    """One JUnit testcase's failure kinds (the exception types its failure or error names, a bare `assert` counted as
+    AssertionError), as a set."""
+    found = set()
+    for el in [case.find("failure"), case.find("error")]:
+        if el is None:
+            continue
+        msg = el.get("message") or ""
+        inner = re.search(r'failed on \w+ with "(.*)', msg, re.S)
+        msg = inner.group(1) if inner else msg
+        if re.match(r"\s*assert\b", msg):  # pytest gives a bare assert's message without its type
+            found.add("AssertionError")
+            continue
+        m = re.match(r"\s*([A-Za-z_][\w.]*)\s*(:|$)", msg)
+        found.add(m.group(1) if m else el.tag)
+    return found
 
 
 def failure_kinds(xml_paths):
@@ -203,17 +295,7 @@ def failure_kinds(xml_paths):
         except (OSError, ET.ParseError):
             continue
         for case in cases:
-            for el in [case.find("failure"), case.find("error")]:
-                if el is None:
-                    continue
-                msg = el.get("message") or ""
-                inner = re.search(r'failed on \w+ with "(.*)', msg, re.S)
-                msg = inner.group(1) if inner else msg
-                if re.match(r"\s*assert\b", msg):  # pytest gives a bare assert's message without its type
-                    found.add("AssertionError")
-                    continue
-                m = re.match(r"\s*([A-Za-z_][\w.]*)\s*(:|$)", msg)
-                found.add(m.group(1) if m else el.tag)
+            found |= case_kinds(case)
     return sorted(found)
 
 
@@ -289,7 +371,7 @@ class Queue:
         self.ref = f"refs/heads/{a.integration}"
         self.rounds = a.rounds
         self.ejected, self.handled, self.n, self.with_rc = [], set(), 0, {}
-        self.log = self.work = self.clone = self.alt = self.base = None
+        self.log = self.work = self.clone = self.alt = self.base = self._base_record = None
         name = sh(["git", "-C", str(self.repo), "config", "user.name"]).stdout.strip()
         email = sh(["git", "-C", str(self.repo), "config", "user.email"]).stdout.strip()
         self.ident = ["-c", f"user.name={name or 'orchestrator'}", "-c", f"user.email={email or 'orchestrator@localhost'}"]
@@ -349,9 +431,38 @@ class Queue:
 
     # -- the trees
     def fresh(self, name):
-        path = self.work / name
-        if not path.exists() and sh(["git", "clone", "-q", "--no-hardlinks", str(self.repo), str(path)]).returncode:
+        """A clean clone to work in. With --warm (DEC-1001 (b)), the clone of that name kept from earlier runs, its
+        stores kept so the rebuild is incremental, once it proves healthy (its origin is this repository, a fetch, a
+        forced checkout and a clean all work); a clone that does not is set aside in this run's work folder (removed
+        with it) and a fresh one made in its place."""
+        if not self.a.warm:
+            path = self.work / name
+            if not path.exists() and sh(["git", "clone", "-q", "--no-hardlinks", str(self.repo), str(path)]).returncode:
+                raise Stop(f"the clean clone of {self.repo} failed")
+            return path
+        warm = Path(self.a.warm).expanduser().resolve()
+        warm.mkdir(parents=True, exist_ok=True)
+        path = warm / name
+        if path.exists():
+            url = sh(["git", "-C", str(path), "remote", "get-url", "origin"]).stdout.strip()
+            healthy = (url and Path(url).resolve() == self.repo and fingerprint(path) == read_mark(path)
+                       and not sh(["git", "-C", str(path), "fetch", "-q", "origin"]).returncode
+                       and not sh(["git", "-C", str(path), "checkout", "-q", "--force", "--detach", "HEAD"]).returncode
+                       and not sh(["git", "-C", str(path), "clean", "-ffdxq", "-e", ".gov-runtime"]).returncode
+                       and scrub(path))
+            if healthy:
+                self.note(f"warm clone {name} reused ({path}); its stores kept, the rest of .gov-runtime cleared")
+                return path
+            aside = self.work / f"broken-{name}"
+            try:
+                path.rename(aside)
+                self.note(f"warm clone {name} could not be reset; set aside, a fresh one made")
+            except OSError:
+                path = warm / f"{name}-{self.work.name}"
+                self.note(f"warm clone {name} could not be reset or set aside; a fresh one at {path}")
+        if sh(["git", "clone", "-q", "--no-hardlinks", str(self.repo), str(path)]).returncode:
             raise Stop(f"the clean clone of {self.repo} failed")
+        write_mark(path)
         return path
 
     def build(self, where, head, entries):
@@ -385,7 +496,8 @@ class Queue:
 
     def prepared(self, where):
         cmd = shlex.split(self.a.prepare_cmd) if self.a.prepare_cmd else \
-            ["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"]
+            (["env", f"GOV_REBUILD_PYTHON={sys.executable}", "bash", str(REBUILD_SLOT), str(where)] if REBUILD_SLOT.is_file()
+             else ["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"])
         r = sh(cmd, cwd=where, env=self.env(where))
         (self.log / f"prepare-{where.name}.txt").write_text(r.stdout[-4000:] + r.stderr[-4000:], encoding="utf-8")
         return r.returncode == 0
@@ -490,7 +602,8 @@ class Queue:
             raise Stop(f"the test run did not complete (exit {rc}; JUnit files {[str(j) for j in junits]})")
         if rc == 1 and not reds:
             raise Stop("the test run was red with no failing test named in its JUnit file")
-        out = {"selection": {"targets": targets, "core_changed": sorted({p for s in sels for p in s.get("core_changed") or []}),
+        out = {"kinds": {n: sorted(k) for n, k in failing_cases(junits, self.clone, targets)} if rc == 1 else {},
+               "selection": {"targets": targets, "core_changed": sorted({p for s in sels for p in s.get("core_changed") or []}),
                              "unplaced": sorted({p for s in sels for p in s.get("unplaced") or []})},
                "counts": counts, "flaky": [], "unowned": [], "owned": [], "with_rc": {}}
         for node in reds:
@@ -500,12 +613,25 @@ class Queue:
                 self.note(f"flaky candidate (passes alone, decides nothing): {node}")
         reds = [n for n in reds if out["with_rc"][n] != 0]
         out["trace_base"] = self.base or head
+        where = f"the baseline {self.base[:12]}" if self.base else "the head without the batch"
+        need = []
+        for node in reds:
+            # DEC-1001 (c): the baseline nightly's own record clears a red without a baseline build when it holds the
+            # case red alone with the same failure; else (no record, not red alone there, another failure) the trace.
+            known = self.base_known(node)
+            if known is not None and same_failure(self.kinds(self.clone, node), known):
+                out["unowned"].append(node)
+                out.setdefault("cleared_by_results", []).append(node)
+                self.note(f"red alone, red alone at {where} in its nightly's record with the same failure "
+                          f"({sorted(known)}): unowned (no baseline build): {node}")
+            else:
+                need.append(node)
+        reds = need
         if reds:
             self.alt = self.fresh("alt")
             # DEC-988, DEC-989: with --base, a red is traced against a known state (the last nightly with a verdict,
             # its reds known), never against code made by undoing merges; without it, the head without the batch.
             self.build(self.alt, self.base or head, [])
-            where = f"the baseline {self.base[:12]}" if self.base else "the head without the batch"
             if not self.prepared(self.alt):
                 raise Stop(f"the prepare command failed on {where}")
             for node in reds:
@@ -518,32 +644,58 @@ class Queue:
                         self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
                 out[verdict].append(node)
                 self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
-            if self.base and (out["owned"] or out["unowned"]):
-                # The head without the batch decides the rest (code that exists; nothing is undone). A red the
-                # baseline had stays cleared only if that head has it too, the same way: else the batch broke again
-                # what a later merge had fixed (review of 2026-11-01). A red the baseline did not clear that the head
-                # has too, the same way, came from a merge already on the branch since the baseline: nothing
-                # advances and nobody is ejected; the CTO investigates at once (DEC-968, DEC-989). Fail closed.
-                self.build(self.alt, head, [])
-                if not self.prepared(self.alt):
-                    raise Stop("the prepare command failed on the head without the batch")
+        if self.base and (out["owned"] or out["unowned"]):
+            self.alt = self.alt or self.fresh("alt")
+            # The head without the batch decides the rest (code that exists; nothing is undone). A red the
+            # baseline had stays cleared only if that head has it too, the same way: else the batch broke again
+            # what a later merge had fixed (review of 2026-11-01). A red the baseline did not clear that the head
+            # has too, the same way, came from a merge already on the branch since the baseline: nothing
+            # advances and nobody is ejected; the CTO investigates at once (DEC-968, DEC-989). Fail closed.
+            self.build(self.alt, head, [])
+            if not self.prepared(self.alt):
+                raise Stop("the prepare command failed on the head without the batch")
 
-                def on_head(n):
-                    return red_alone(lambda: self.alone(self.alt, n), self.rounds) and \
-                        same_failure(self.kinds(self.alt, n), self.kinds(self.clone, n))
-                for n in list(out["unowned"]):
-                    if not on_head(n):
-                        out["unowned"].remove(n)
-                        out["owned"].append(n)
-                        self.note(f"red at the baseline but not, the same way, on the head without the batch: the "
-                                  f"batch's: {n}")
-                since = [n for n in out["owned"] if on_head(n)]
-                if since:
-                    rest = [n for n in out["owned"] if n not in since]
-                    raise Stop(f"red since the baseline {self.base[:12]}, already on {head[:12]} without the batch "
-                               f"(not this batch's; investigate at once, DEC-968, DEC-989): {', '.join(since)}"
-                               + (f"; also red, the batch's: {', '.join(rest)}" if rest else ""))
+            def on_head(n):
+                return red_alone(lambda: self.alone(self.alt, n), self.rounds) and \
+                    same_failure(self.kinds(self.alt, n), self.kinds(self.clone, n))
+            for n in list(out["unowned"]):
+                if not on_head(n):
+                    out["unowned"].remove(n)
+                    out["owned"].append(n)
+                    self.note(f"red at the baseline but not, the same way, on the head without the batch: the "
+                              f"batch's: {n}")
+            since = [n for n in out["owned"] if on_head(n)]
+            if since:
+                rest = [n for n in out["owned"] if n not in since]
+                raise Stop(f"red since the baseline {self.base[:12]}, already on {head[:12]} without the batch "
+                           f"(not this batch's; investigate at once, DEC-968, DEC-989): {', '.join(since)}"
+                           + (f"; also red, the batch's: {', '.join(rest)}" if rest else ""))
         return out
+
+    def base_known(self, node):
+        """DEC-1001 (c): the failure kinds the baseline nightly's own record gives this case when that nightly had it
+        red alone (its run file's `red-alone <case>:` line) and its JUnit names the failure; None when either is
+        missing, unreadable, or the case is not there (the trace then runs, fail closed)."""
+        if not (self.base and getattr(self.a, "base_results", None) and getattr(self.a, "base_run", None)):
+            return None
+        if self._base_record is None:
+            self._base_record = {}
+            try:
+                text = Path(self.a.base_run).read_text(encoding="utf-8")
+                if not re.search(r"^head " + re.escape(self.base[:12]) + r"\b", text, re.M):
+                    self.note(f"the nightly's run file is not for the baseline {self.base[:12]}; the trace runs")
+                    return None
+                alone = {m.group(1) for m in re.finditer(r"^red-alone (.+?): \d+ \w+", text, re.M)}  # ids may hold spaces
+                xmls = sorted(Path(self.a.base_results).glob("*.xml"))
+                if alone and xmls:
+                    for n, k in failing_cases(xmls, self.clone, ["tests"]):
+                        if n in alone and k:
+                            self._base_record.setdefault(n, set()).update(k)
+            except (OSError, UnicodeDecodeError, ET.ParseError) as exc:
+                self.note(f"the baseline nightly's record cannot be read ({exc.__class__.__name__}); the trace runs")
+                self._base_record = {}
+        k = self._base_record.get(node)
+        return sorted(k) if k else None
 
     def kinds(self, where, node):
         """The failure's exception types for one case run alone (the same-failure rule)."""
@@ -636,28 +788,83 @@ class Queue:
                         return
                     pending = self.culprits(head, merged, out["owned"])
                     continue
-            if self.head() != head:  # KPI 6: never advanced onto a head it was not tested on
+            light = None
+            while self.head() != head:  # KPI 6: never advanced onto a head it was not tested on
                 moves += 1
-                self.note(f"{self.ref} moved while under test; merged again onto the new head ({moves})")
                 if moves >= HEAD_TRIES:
                     raise Stop(f"{self.ref} moved during each of {HEAD_TRIES} attempts")
-                pending = [e for e, _ in merged]
-                continue
-            self.advance(head, result)
-            rec = self.q / "records" / f"{result[:12]}.json"
-            write_json(rec, {"head": result, "base": head, "skipped": skipped,
-                             "tickets": [{"ticket": e["ticket"], "task": e["task"], "commit": e["commit"], "merge": m}
-                                         for e, m in merged],
-                             "selection": out["selection"] if out else {"targets": [], "core_changed": [], "unplaced": []},
-                             "counts": out["counts"] if out else None, "flaky": out["flaky"] if out else [],
-                             "unowned": out["unowned"] if out else [], "ejected": list(self.ejected),
-                             "trace_base": out["trace_base"] if out else None,
-                             "log": str(self.log), "started": started, "finished": now()})
-            for e, m in merged:
-                write_json(self.q / "landed" / f"{e['ticket']}.json", dict(e, merge=m, record=str(rec), landed_at=now()))
-                (self.q / "approved" / f"{e['ticket']}.json").unlink(missing_ok=True)
-            self.note(f"ADVANCED {self.ref} {head[:12]} -> {result[:12]}; record {rec}")
-            return
+                new = self.head()
+                step = self.light_rerun(head, new, merged, out) if out is not None else None
+                if step is None:
+                    self.note(f"{self.ref} moved while under test; merged again onto the new head ({moves})")
+                    break
+                light = dict({k: v for k, v in step.items() if k != "merged"}, previous=light)
+                head, merged, result = new, step["merged"], step["result"]
+            else:
+                self.advance(head, result)
+                self._landed(head, result, merged, skipped, out, light, started)
+                return
+            pending = [e for e, _ in merged]
+            continue
+
+    def light_rerun(self, old, new, merged, out):
+        """DEC-1001 (a): the head moved while under test. When it moved only by records (record_only_change), the same
+        approved commits are merged onto the new head and only the record-reading tests (the test map's
+        record_reading and every_close lists) run again on the result; the rest of the selection stands. Returns the
+        new merges and result, or None for a full re-run (a code change, a merge that differs, no list, a prepare that
+        fails, a run that does not complete, or a red that is not one this batch's run already cleared)."""
+        names = [n for n in sh(["git", "-C", str(self.repo), "-c", "core.quotePath=false", "diff", "-z",
+                                "--no-renames", "--name-only", old, new]).stdout.split("\0") if n]
+        if not record_only_change(names, record_places(self.clone)):
+            return None
+        entries = [e for e, _ in merged]
+        merged2, failed = self.build(self.clone, new, entries)
+        if failed or len(merged2) != len(entries):
+            return None
+        result = merged2[-1][1]
+        targets = list(dict.fromkeys(map_list(self.clone, "record_reading") + map_list(self.clone, "every_close")))
+        targets = [t for t in targets if (self.clone / t.split("::")[0]).exists()]
+        if not targets:
+            self.note("the head moved by records only, but the record-reading tests cannot be named: a full re-run")
+            return None
+        if not self.prepared(self.clone):
+            return None
+        rc, junits = self.tests(self.clone, "run", targets)
+        try:
+            if rc not in (0, 1) or not junits:
+                raise ValueError
+            cases = failing_cases(junits, self.clone, targets) if rc == 1 else []
+            reds = list(dict.fromkeys(n for n, _ in cases))
+            counts = totals(junits)
+        except (OSError, ValueError, ET.ParseError):
+            return None
+        known = out.get("kinds") or {}
+        cleared = set(out.get("unowned") or [])
+        if rc == 1 and (not reds or any(n not in cleared or not same_failure(sorted(k), known.get(n) or [])
+                                        for n, k in cases)):
+            self.note(f"the record-reading re-run is red ({', '.join(reds) or 'unnamed'}): a full re-run")
+            return None
+        self.note(f"{self.ref} moved by records only ({len(names)} path(s)); merged again onto {new[:12]}: "
+                  f"{result[:12]}; the record-reading tests re-run: {counts}")
+        return {"merged": merged2, "result": result, "from": old, "to": new, "paths": names, "targets": targets,
+                "counts": counts, "reds": reds}
+
+    def _landed(self, head, result, merged, skipped, out, light, started):
+        """The record of an advance and the landed entries (KPI 1)."""
+        rec = self.q / "records" / f"{result[:12]}.json"
+        write_json(rec, {"head": result, "base": head, "skipped": skipped,
+                         "tickets": [{"ticket": e["ticket"], "task": e["task"], "commit": e["commit"], "merge": m}
+                                     for e, m in merged],
+                         "selection": out["selection"] if out else {"targets": [], "core_changed": [], "unplaced": []},
+                         "counts": out["counts"] if out else None, "flaky": out["flaky"] if out else [],
+                         "unowned": out["unowned"] if out else [], "ejected": list(self.ejected),
+                         "trace_base": out["trace_base"] if out else None,
+                         "record_rerun": light, "cleared_by_results": (out or {}).get("cleared_by_results", []),
+                         "log": str(self.log), "started": started, "finished": now()})
+        for e, m in merged:
+            write_json(self.q / "landed" / f"{e['ticket']}.json", dict(e, merge=m, record=str(rec), landed_at=now()))
+            (self.q / "approved" / f"{e['ticket']}.json").unlink(missing_ok=True)
+        self.note(f"ADVANCED {self.ref} {head[:12]} -> {result[:12]}; record {rec}")
 
     def run(self):
         started = now()
@@ -691,6 +898,14 @@ def run(a):
         print("merge queue: another run holds the queue's lock; nothing done", file=sys.stderr)
         return 4
     q = Queue(a, queue)
+    if getattr(a, "warm", None):  # one run at a time uses the warm clones, whichever queue folder it serves
+        Path(a.warm).expanduser().mkdir(parents=True, exist_ok=True)
+        warm_lock = open(Path(a.warm).expanduser() / "warm.lock", "a")
+        try:
+            fcntl.flock(warm_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            print("merge queue: another run holds the warm clones' lock; nothing done", file=sys.stderr)
+            return 4
     try:
         return q.run()
     except Stop as why:
@@ -723,6 +938,9 @@ def main(argv=None):
     r.add_argument("--select-cmd")
     r.add_argument("--prepare-cmd")
     r.add_argument("--rounds", type=int, default=3)
+    r.add_argument("--warm", help="keep the work clones here between runs, their stores kept (DEC-1001 (b))")
+    r.add_argument("--base-results", help="the baseline nightly's JUnit folder (DEC-1001 (c)); with --base-run")
+    r.add_argument("--base-run", help="the baseline nightly's run file, whose `red-alone <case>:` lines it reads")
     r.add_argument("--base", help="the known state reds are traced against: the last nightly with a verdict until a "
                                   "green one after ACT 1, then the last green one (DEC-989); default the head")
     a = ap.parse_args(argv)

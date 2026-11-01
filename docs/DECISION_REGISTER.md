@@ -12520,3 +12520,67 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.380 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-998 (Claude-only dead-man's switch; Remote Control and a test push at every CTO session start). Next free id: DEC-999. |
+
+### DEC-999 — Speed: W2-90b split from W2-105 and ACT 2; ten leads; batched landings; the queue's waits cut (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-979 (order), DEC-847 and DEC-942 (no fixed number of leads), DEC-988, DEC-989 · **Changes:** W2-90b's dependency on W2-105
+- **Decision:**
+  1. **W2-90b is split so it does not wait for ACT 2:** every case that does not depend on W2-105 or W2-110 is fixed now (W1-33's four, W2-54's one, and any other that only needs its fixtures to carry the new hook file); only the cases that truly need W2-105 or W2-110 wait for them, in W2-90c (`DAEO-fu3n`, filed). W2-105 and W2-90b go to the front.
+  2. **Start every ready ticket now, up to the machine's capacity, aiming for 10 leads running;** for every ready ticket not started, the CTO tells the owner why (dependency, file overlap, ordering rule).
+  3. **Close in batches:** every ticket ready to land goes into the queue together, not one or two at a time.
+  4. The CTO reports what makes the queue wait and the quickest safe way to cut it.
+- **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; W2-90b's and W2-90c's ticket files and WBS rows.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.381 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-999 (W2-90b split, W2-90c filed; ten leads; batched landings; the queue's waits). Next free id: DEC-1000. |
+
+
+### DEC-1000 — W2-13's P-W2-13-3 (b), P-W2-13-1 (a) after W2-92, TD-1 residual, TD-2 (a) (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, DEC-936 item 2.5, DEC-957's rubric: P2s within the approved spec, reversible, the lead's recommendations; confidence medium-high) · **Under:** DEC-979, CAP-11, DEC-802
+- **Decision:** P-W2-13-3 (b): `hits` stays exact (W1-17's 65 cases and W2-87's 5 order cases unchanged); a separate `ranked` list carries the BM25 order; W2-13's 7 S1/S2 cases are rewritten by its test designer to read `ranked` (Rewrite-Reason, nothing lowered). P-W2-13-1 (a): the one-line fusion change in `src/gov/retrieve/retrieve.py` is W2-13's, made after W2-92 (which holds the file) lands; the path joins W2-13's ticket then. TD-1: the closure's half goes to the owner of `src/gov/closure/**` as a Wave 2 list residual. TD-2 (a): whole tokens; the trigram table to W2-32 or Wave 3.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.382 | 2026-11-01 | Orchestrator (delegated): DEC-1000 (W2-13's packages). Next free id: DEC-1001. |
+
+
+### DEC-1001 — The queue's waits cut: record-only head moves, warm clones, the nightly's results as the baseline; the one-rebuild lock ended (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-999 item 4, DEC-988, DEC-989, DEC-979 D1, DEC-983 · **Changes:** DEC-962's "one store rebuild at a time" and DEC-971 item 5 (the week's measurement ends early); DEC-939 item 2
+- **Decision:**
+  1. **(a)** When `w2/integrate` moved during a queue run only by records, the queue re-merges onto the new head and still re-runs the record-reading tests (those that read the register, tickets and other records); it skips only the rest. Any code in the move: the full re-run as before.
+  2. **(b)** The queue keeps its clones warm between runs (incremental rebuilds).
+  3. **(c)** The baseline's verdict on a red is read from the nightly's own results where they hold it (the same failure); otherwise traced as before; the check on the head without the batch stays.
+  4. **(d)** The one-rebuild-at-a-time lock ends now: rebuilds share the three heavy-job slots with test runs (each tree its own rebuild lock, so two rebuilds of one tree still exclude each other). First one rebuild's memory is measured so the gate stays honest. The first day is watched: if rebuilds side by side fail again (the code graph, gitleaks), the lock goes back and the owner is told.
+- **Where it goes (DEC-851):** this register; the prompt §0 and §15 (the rebuild rule); the decisions-in-force list; RESUME HERE; the common lead brief (the rebuild command); the tools README.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.383 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1001 (the queue's waits cut; the one-rebuild lock ended for the heavy-job slots). Next free id: DEC-1002. |
+
+
+### DEC-1002 — W2-60a's round 4 declared; W2-115's KPIs 4 and 6 to DEC-988/989; W2-61h by the test designer; W2-91's evidence path (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: P2s within the approved spec, reversible; confidence medium-high) · **Under:** DEC-916, DEC-988, DEC-989, DEC-996 (A, B), DEC-992 (P-W2-11-1)
+- **Decision:** (1) W2-60a's round 4 is declared before it starts (its round 3 was declared the last under DEC-951 item 4; DEC-992's P-W2-11-1 and DEC-996's role-defaults KPI add work): up to two reviews in it. (2) W2-115's KPIs 4 and 6 (a batch's culprit found by taking merges out) are revised to DEC-988/989 (attribution against the known baseline; a culprit isolated before anything lands, as the merge queue does) before W2-115 starts. (3) W2-61h's role and assignee become the independent test designer (DEC-996 B: it authors the evaluation set). (4) W2-91's measurement record moves to `docs/changes/W2-91-evidence.md` (DEC-996 A).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.384 | 2026-11-01 | Orchestrator (delegated): DEC-1002. Next free id: DEC-1003. |
+
+
+### DEC-1003 — Every practice the CTO adopts in its own tools is mapped into the product's tickets the same day (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-982 (the smart way of working is the product's), DEC-983 (SMART-WORK-1), DEC-979 item 2 (the tools lane) · **Changes:** DEC-982's "a practice built only in your tools is a gap to name" becomes a same-day mapping
+- **Decision:** (1) Today's four queue changes (DEC-1001 (a) to (d)) reach the Gov OS: each mapped, as SMART-WORK-1 did, to the product ticket that should carry it (W2-115, W2-117, W2-20 or W2-76 as fits), with its KPI change, as proposals for the owner (`packages/SMART-WORK-2.md`). (2) **Standing:** every new practice the CTO adopts in its own tools is mapped into the product's tickets the same day, as a KPI change proposal, so the smart way of working never lives only in the CTO's tools; the daily document lists each with its proposal.
+- **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; the lighter lane's rule (DEC-979 item 2).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.385 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1003 (same-day mapping of the CTO's practices into the product). Next free id: DEC-1004. |
+
+
+### DEC-1004 — SMART-WORK-2 approved; each KPI change applied when its ticket next runs; W2-20 carries DEC-1001 (d)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`) · **Under:** DEC-1003, DEC-1001, DEC-1002
+- **Decision:** every KPI change in `packages/SMART-WORK-2.md` as proposed (W2-117: record-only head moves, warm clones, merge and close in one step; W2-115: records select the record-reading suites, S4 and S6 replaced, a warm close clone; W2-20: rebuilds in the slots with a per-tree lock, `src/gov/rebuild/watch.py` in its paths; Wave 3 row W3-P16), each applied to its ticket file when that ticket next runs. (d) is a P2: W2-20 carries DEC-1001; W2-76 stays closed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.386 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1004 (SMART-WORK-2 approved). Next free id: DEC-1005. |

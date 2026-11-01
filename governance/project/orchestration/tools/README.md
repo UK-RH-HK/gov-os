@@ -135,3 +135,22 @@ the baseline and closes each ticket that lands in the same step.
   `assistant` entry is over 60 minutes old (2 hours in the quiet hours), naming a tool call left waiting. Channels:
   a Windows toast, a headless `claude -p` PushNotification, the pings log.
 - Tests: `tests/unit/orchestration/test_cto_safety_nets.py`, `tests/unit/orchestration/test_merge_queue_base.py`.
+
+### The queue's speed-ups (DEC-1001; reviewed 2026-11-01, PASS on the second round)
+
+- **A records-only head move:** if `w2/integrate` moved during a run only by record files (an allowlist: `.md`, `.txt`,
+  `.patch`, `.log`, `.jsonl` under the governance patterns, plus the test map's `record_only` places), the same commits
+  are merged onto the new head and only the test map's `record_reading` and `every_close` lists re-run; a red there is
+  accepted only if this batch already cleared it, with the same failure. Any other file in the move: the full re-run.
+- **`--warm <dir>`:** the `merged` and `alt` clones are kept between runs (`warm.lock`, one run at a time). A clone is
+  reused only if its origin is this repository, its `.git/config` and `.git/info/exclude` match the mark written when
+  it was made, and the fetch, forced checkout, `clean -ffdxq` and scrub succeed; the scrub keeps only the rebuild's
+  stores (`store.db*`, `codeintel/`, `query-vector-cache.db*`, `secrets-clean.json`) and removes test-installed hooks.
+  Otherwise a fresh clone.
+- **`--base-results <JUnit dir>` and `--base-run <run.txt>`:** a red is cleared from the nightly's own record when that
+  run names the baseline head, lists the case red alone, and its failure kinds match; else today's trace. The check on
+  the head without the batch always runs.
+- **Rebuilds** (the default prepare command, and `close_build.py`): `.gov-runtime/scratch/orchestrator/tools/rebuild_slot.sh
+  <tree>` takes a heavy-job slot and rebuilds with a lock of the tree's own (`GOV_REBUILD_LOCK`), so rebuilds of
+  different trees run side by side, at most as many as there are slots.
+- `land.py` passes `--warm` and the baseline nightly's record. Tests: `tests/unit/orchestration/test_merge_queue_speed.py`.
