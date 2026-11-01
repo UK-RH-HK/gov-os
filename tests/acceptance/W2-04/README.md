@@ -2,7 +2,9 @@
 
 A fresh independent test designer (MR-3) wrote these tests before the implementation, in the tests worktree, from the ticket's seven success KPI lines and its failure line, CAP-15 and CAP-15.a to CAP-15.g, DEC-860, W2-03's register entries, and the list rows W2-H034, W2-L088, W2-L180, W2-L183, W2-L219, W2-M126, W2-M134, W2-M215, W2-M228, W2-M239, W2-M294 and W2-M330 (with their source lines in `governance/project/bootstrap.md`). They follow the specification of run 1 (S1 to S10), the text the engineer has. The profile is FULL: each KPI line's success and failure, and the edge cases the rows name.
 
-**56 cases in 10 files.** At the base (`847616af`, this tree's `src/` equal to `w2/integrate`): **35 failed, 19 passed, 2 skipped**, about 30 s.
+**56 cases in 10 files** in run 1. At the base (`847616af`, this tree's `src/` equal to `w2/integrate`): **35 failed, 19 passed, 2 skipped**, about 30 s.
+
+**Round 2 (DEC-1005; "Round 2", at the end): 61 cases in 10 files.** Four cases were revised and five added. At the base (`d2ff95b2`): **40 failed, 19 passed, 2 skipped** (the same 19 pass, and every added case is red).
 
 ## How the suite runs, and the code it runs (DEC-732)
 
@@ -15,6 +17,7 @@ From the root of the tree that holds the suite:
   - `gov context <ticket> --json [--budget N] [--brief] [--dry-run]`, as `python3 -m gov.cli.main context … --json --root <project>`, run from a folder outside the project. The cases read its envelope and its exit code.
   - `gov.context.context(root, ticket, …)`, called in a child process through a small driver. The driver also calls `gov.store.load`, `gov.records.records` (an entry's `span` and `content_hash`), `gov.retrieval.lexical.refresh` and `gov.retrieval.synthesis.validate_notes`.
   - The context-reproducibility check: `python3 -m gov.context.context_check`, run in the project root.
+  - Round 2: `gov retrieve <query> --json --root <project>` (`Api.retrieve`), the read that reaches the semantic route.
 - **Nothing is written in this tree.** Every project is a temporary git repository built from nothing under pytest's `tmp_path`. Two of this tree's files are read, each a single named file: the path map, which is rewritten with one namespace and no authority block, and `template/.gitleaks.toml`. Two cases `git clone` a temporary project, never this repository.
 - **Deterministic, no network.** Fixed authors and dates. `HOME` is empty, so no reranker and no embedder venv. The embedder's address is a dead local port. No vector is built. `HF_HUB_OFFLINE` is set. Every child process has a time limit (300 s).
 - **gitleaks.** The cases that build a lexical index skip without `gitleaks` on PATH, because its secret filter is needed (DEC-287). This machine has it.
@@ -38,9 +41,18 @@ The lexical route matches a line's exact text. So in the ledger, every page hold
 A `sitecustomize.py` sits in a temporary folder that is put first on `PYTHONPATH`, only for the processes of the cases that ask for it. Each stand-in is on only where its variable is set.
 
 - **`watch`** (`W204_WATCH`): an audit hook (`sys.addaudithook`) counts two things in the `gov context` process: every `open` of the ticket file, and every child process whose arguments name it. At exit it prints `W204-READS [...]` on stderr. This is S9, observed from outside the code. In a project without a lexical index, nothing but the context reads the ticket file (the retrieval reads only the files of its evidence).
-- **`log`** (`W204_MODE=log`): wraps the retrieval's public entry `gov.retrieval.retrieve.retrieve`, as W2-54's stand-in does. It calls the real entry, returns the real bundle, and logs each call (query, ticket, `batch_size`, continued or not, the items in and out). One call is one batch (package P-1).
-- **`ties-reversed`**: as `log`, but within each group of evidence items with identical text (a tie) the items are returned in reverse order, in the same places.
-- **`semantic-live`**: as `log`, and the semantic route's search, `gov.retrieval.semantic.search`, answers. It says it is available and returns hits for the chunks of `W204_SEMANTIC_PATH`, a note no lexical query finds. This is a live semantic index, deterministic and without a network.
+- **`semantic-live`** (`W204_MODE=semantic-live`): the semantic route's search, `gov.retrieval.semantic.search`, answers. It says it is available and returns hits for the chunks of `W204_SEMANTIC_PATH`, a note no lexical query finds. This is a live semantic index, deterministic and without a network. Each question it is asked is logged (`semantic.jsonl`), so a case sees whether a process asked the semantic route anything.
+- **Removed in round 2:** `log` and `ties-reversed`, which wrapped the retrieval's public entry. Under P-W2-04-2 (A) the context no longer reaches that entry. One batch is one of the context's own lookups, shown in the packet's `supplementary_batches`.
+
+## Orders produced from outside (round 2)
+
+The tie case no longer reorders anything inside a process. It builds the orders the project, the store and the process could give:
+
+- **The project's files** are written in another order into another project. The same files, the same fixed dates and identity, and so the same commit.
+- **The store's rows** come in another order (`Api.build_in_order`). The named files are set aside outside the project and the lexical index is refreshed. Then each file is put back in the given order, with a refresh after it, so its chunks get later rowids. The tree and the commit end as the project's own, and the index is fresh.
+- **The process:** other hash seeds (`PYTHONHASHSEED` 0, 1, 4099), each computation in a process of its own.
+
+The fixture holds its premise. `row_order` reads the temporary store's `lexical_chunk` rowids (the order a reader that names no order gets) and shows the same rows in another order. The tied rows come in two other orders: reversed, and in the order the files were written (tie-d, tie-b, tie-a, tie-c).
 
 ## KPI lines and rows → tests, and why each is red today
 
@@ -53,6 +65,7 @@ A `sitecustomize.py` sits in a temporary folder that is put first on `PYTHONPATH
 | `test_a_large_ticket_whose_total_fits_is_served_whole` | A ticket of about 4,000 tokens is served whole under the default ceiling. | red: no `ticket_text` |
 | `test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole` (3: default ceiling, `--budget` with room for half the supplementary items, `--budget` with room for none) | Each packet holds its ceiling. The mandatory input and the whole ticket text stay. Only the supplementary block shrinks. With no room, `tokens` is the mandatory size exactly. | red: no `ticket_text` |
 | `test_the_function_holds_the_ceiling_as_the_command_does` | `gov.context.context` gives the command's packet and hash. | red: no `ticket_text` |
+| `test_a_dependency_ticket_is_counted_by_its_front_matter_so_a_large_body_still_fits` (round 2, the addendum's S1) | The dependency `TK-W204-DEP` has a body of about 38,000 tokens. The ticket that names it in `deps` is `ok: true`, holds the default ceiling, and its text is whole. The dependency keeps its file's sha256. A change to the dependency's body alone (commit, reload) leaves `tokens` unchanged and moves its sha256 to the new file's. A change that lengthens its KPI line by about 200 tokens raises `tokens`, so the KPI lines are counted. | red: no `ticket_text` (the base is `ok: true` with the dependency counted whole, over the ceiling) |
 
 `assert_holds_its_ceiling` (support) is applied to every `ok: true` packet in the suite. It checks `ticket_text` whole, `tokens == budget.used`, `tokens <= budget.limit`, and `tokens` ≥ the ticket's text + the supplementary items.
 
@@ -86,8 +99,8 @@ A `sitecustomize.py` sits in a temporary folder that is put first on `PYTHONPATH
 | `test_two_builds_in_two_processes_give_one_hash` | Two commands give one packet (W2-M330: across processes, with an index). | **green** |
 | `test_two_stores_rebuilt_from_one_commit_give_one_hash` | Two clones, each indexed and loaded, give the first project's hash. | **green** |
 | `test_tied_items_are_ordered_by_path_then_id` | The four tied items are in `(path, id)` order. | **green**: the lexical route ranks by path |
-| `test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them` | Under `ties-reversed`, the tied items stay in `(path, id)` order and the packet hash is the `log` run's. | red: the packet follows the retrieval's order (tie-d, tie-c, tie-b, tie-a) |
-| `test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers` | Under `semantic-live`, the packet hash is the one with the semantic route unavailable. | red: the gulls note enters the supplementary block |
+| `test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them` (round 2) | Orders from outside ("Orders produced from outside"): (a) the same files written in reverse into another project at the same commit, its rows inserted in reverse path order; (b) a clone whose tied rows come last in the order the files were written. Each runs under three hash seeds. Every packet is the first one, hash included. The tied items stand in `(path, id)` order in the stack and in the batches' rank order. The first packet holds its ceiling. | red: no `ticket_text` and no `supplementary_batches`. A throwaway probe outside the tree ran the fixture on the base: the same commit, the rows in other orders, and the base's packet the same under each (its lexical route sorts by path) |
+| `test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers` (round 2) | The premise is seen through `gov retrieve`: with `semantic-live` it finds the gulls note, without it not. `gov context` with the stand-in live gives the packet and hash it gives with the route unavailable. The note stands nowhere in the packet, and the context asked the semantic route nothing. The packet holds its ceiling. | red: no `ticket_text`; behind it, the gulls note enters the supplementary block and the context asks the semantic route |
 | `test_with_a_live_local_embedder_the_packet_is_the_same` (`local_only`) | Vectors are built with a live local embedder. The packet with the embedder answering equals the packet with it unreachable. | skipped: `W204_LIVE_HOME` is not set |
 | `test_the_check_is_never_green_on_a_stale_store_and_red_on_a_fresh_one` | The store is built, then the next commit retires the ticket's source. On the stale store the check exits non-zero and names the stale store (`stale`, `unmeasured`) or the ticket. After the reload it is red. | red: `context-reproducibility: green` on the stale store, exit 1 after the reload |
 
@@ -111,11 +124,12 @@ A `sitecustomize.py` sits in a temporary folder that is put first on `PYTHONPATH
 | Test | Holds | Today |
 |---|---|---|
 | `test_with_room_for_all_every_matching_item_is_stacked_in_rank_order` | All 48 pages are stacked, in rank order (path), and `further_batch == []`. | red: no `ticket_text`. 18 pages: one call gives at most 20 items. |
-| `test_when_room_is_left_after_one_batch_the_next_batch_is_taken` | With `log`: at least two calls, and more pages stacked than the largest call returned. | red: 1 call of 20 items, 18 pages stacked |
+| `test_when_room_is_left_after_one_batch_the_next_batch_is_taken` (round 2) | Read through `supplementary_batches`, with room for every page. Every batch but the last read its `limit` (one that read fewer ended the evidence, so nothing was left to take). The last read fewer than its limit, or none. The stack is every item the batches read, in their order. When the evidence passes the first batch's limit, there are at least two batches and more stacked than the largest limit. No limit exceeds the room's tokens (each item costs at least one). | red: no `supplementary_batches` |
 | `test_with_less_room_the_stack_stops_at_the_first_item_that_does_not_fit` | From the full stack, it takes the first item k that has a smaller item ranked below it. The budget holds the items above k and is one token short of k. The stack is exactly the items above k: nothing ranked below k. | red: an item ranked below k is stacked (greedy fill) |
 | `test_further_batch_begins_with_the_first_item_that_did_not_fit_in_rank_order` | `further_batch` is a list of `{id, path}`. It begins with item k, is the ranked items from k on, and holds no stacked item. | red: no `further_batch` |
-| `test_further_batch_is_at_most_one_batch_long` | With `log`: `0 < len(further_batch) <=` the largest call's item count. | red: no `further_batch` |
+| `test_further_batch_is_at_most_one_batch_long` (round 2) | Under the tight budget, read through `supplementary_batches`. The stack is the first items the batches read. `0 < len(further_batch) <=` the largest `limit`. It begins with the first ranked item not stacked, continues in the batches' order, and holds no stacked item. | red: no `supplementary_batches` |
 | `test_a_lookup_failure_is_named_in_dropped_by_its_kind` | A damaged index (its chunk table dropped) is named in `dropped` as `index unavailable`, and nothing is stacked. | **green** (W2-L180, fixed in W1-24's follow-up) |
+| `test_supplementary_batches_is_present_and_of_its_form` (round 2; 4: room for all, a tight budget, no index, a damaged index) | The addendum's S7a and "The packet's keys". The packet's keys are the eight it carried before and exactly the four added. `supplementary_batches` is a list of `{items: [{id, path}], limit}` with `len(items) <= limit` and `limit >= 1`. `supplementary` is the first items of the batches' items. With no index or a damaged one, nothing is stacked or left. With a damaged one, `dropped` names the failure. Two builds give the same batches and hash. | red: the four keys are absent |
 
 ### Rows W2-M228 and W2-L219 (S8): the check's shapes: `test_w2_04_context_check.py`
 
@@ -167,7 +181,14 @@ Deselect with `-m "not local_only"`.
 - **R3. "Marked not read"** is any map in the packet with that `id` and `"read": false`. An entry shown as read with its own `content_hash` (its span read from the store) is not an unread record. The working tree's register being gone does not make the store's span unreadable.
 - **R4. The mandatory size** in the refusal's message is `details.mandatory_tokens`, printed as a number. The cases require it to be more than the ceiling only where the mandatory inputs alone are. Whether it includes the ticket's text is not fixed.
 
-## Packages
+## Packages (run 1; each decided, "Round 2")
+
+**Decided:**
+
+- **P-1:** (A) of P-W2-04-2, DEC-1005. One batch is one of the context's own lookups, shown under `supplementary_batches`; not a call of the retrieval's entry.
+- **P-2:** (b), by the lead. A reproduced `CONTEXT_OVER_CEILING` is named on a `REFUSED:` line; any other difference or error stays red.
+- **P-3:** (a), by the lead. Items left for lack of room are in `dropped` ("budget exceeded") and in `further_batch`.
+- **P-4:** a split outside this ticket; no case.
 
 **P-1. What one batch is.** "The stack holds more than one batch" and "further_batch is at most one batch long" (S7) need a batch size, and the specification leaves the size to the implementation.
 - *Why now:* two cases (`…the_next_batch_is_taken`, `…at_most_one_batch_long`) read one call of the retrieval's public entry as one batch.
@@ -206,7 +227,7 @@ Deselect with `-m "not local_only"`.
   - (b) Give a specification line, and the test designer adds a case.
 - *Recommendation:* (a), or (b) with one line. *Confidence:* low.
 
-## Earlier tests this specification affects (named, not revised)
+## Earlier tests this specification affects (run 1: named, not revised; round 2 revised them, "Round 2")
 
 W1-24's cases are **not revised**: none is contradicted. Under the new count, the tightest one, `test_w1_24_pressure.py::test_supplementary_is_dropped_before_mandatory_inputs` (`TK-W24-PRESS` at `--budget 200`), is the ticket's 66 tokens plus its mandatory 126, which makes 192 and still fits.
 
@@ -228,3 +249,33 @@ At risk, depending on the implementation:
 - `tests/acceptance/W2-54/test_w2_54_dropped_order.py::test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing` compares the supplementary block with the last retrieval call's items. With batches (S7), the stack holds the items of several calls.
 - `tests/acceptance/W2-55/test_w2_55_left_out.py`, the `gov context` cases. Its tickets have no KPI lines, and their title begins with the word the old lookup asked for (`vermilion`). Under S6 the query is built from the title (and the KPI lines). A query that is the whole title as one phrase finds none of the register's entries, because the lexical route matches a line's exact text.
 - `tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here`: see P-2.
+
+## Round 2 (DEC-1005, 2026-11-01): the revision batch
+
+A fresh independent test designer revised the suite from the specification and its addendum (DEC-1005, delegated by the CTO, deciding P-W2-04-2 (A) and P-W2-04-3 (b)). Every commit carries `Rewrite-Reason: W2-04's KPIs 2 and 4 (CAP-15.d, DEC-860), DEC-1005`. No expectation is lowered: each revised case asserts at least what it did, observed where the addendum puts it.
+
+### What changed in this folder
+
+| case | why | what it guards now |
+|---|---|---|
+| `test_w2_04_batches.py::test_when_room_is_left_after_one_batch_the_next_batch_is_taken` | P-1 decided as (A): the context no longer reaches the retrieval's entry, so `log` saw nothing | the batches' own rules, through `supplementary_batches` (KPI 7 table) |
+| `test_w2_04_batches.py::test_further_batch_is_at_most_one_batch_long` | the same | `further_batch` against the batches' items and their largest `limit` |
+| `test_w2_04_reproducible.py::test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them` | the same: `ties-reversed` saw nothing | ties in `(path, id)` order and one packet, whatever order the files, the store and the process give |
+| `test_w2_04_reproducible.py::test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers` | the semantic-free block (P-W2-04-2 (A)) | the premise through `gov retrieve`; one packet; the note never in it; no semantic question from `gov context` |
+| **added** `test_w2_04_ceiling.py::test_a_dependency_ticket_is_counted_by_its_front_matter_so_a_large_body_still_fits` | the addendum's S1 (P-W2-04-3 (b)) | a dependency counted by its front matter (KPI 1 table) |
+| **added** `test_w2_04_batches.py::test_supplementary_batches_is_present_and_of_its_form` (4) | the addendum's S7a and "The packet's keys" | the key's presence and form, and the packet's key set |
+| `test_w2_04_code_under_test.py` | `log` is gone | the same check, with `semantic-live` in front |
+
+**S1 as amended, read against the rest of the suite.** Only the audit shape plants a dependency (DAEO-gjjf). Its case asserts "fits or refuses" and no count, so no case was counted whole. `assert_holds_its_ceiling` counts the ticket's own text and the supplementary items, never a dependency.
+
+### Readings taken in round 2
+
+- **R5. "Every batch but the last read its limit."** A batch that read fewer items than its limit ended the evidence, so no further batch had anything to take. With room for everything the last batch reads fewer than its limit, or none.
+- **R6. "The stack holds more than one batch"** is required when the matching evidence passes the first batch's limit. A limit at or above the evidence (48 pages and more) gives one batch, and the case then holds only the rules. A limit is bounded only by the room's tokens: each item costs at least one, so no batch reads more items than the room has tokens.
+- **R7. `further_batch` is among the items the batches read.** Naming what is next means reading it, and a read is a batch the context took (S7a: "one entry per batch the context took").
+- **R8. "The context asked the semantic route nothing."** The real semantic search embeds its question, so a context that calls it sends an embedder text. The stand-in's log stands in for the embedder's.
+
+### Earlier suites revised in round 2
+
+- **W2-54:** `tests/acceptance/W2-54/README.md`, "W2-04 (DEC-1005)". `test_w2_54_dropped_order.py` (14 cases) and the three embedder cases changed.
+- **W1-41:** `tests/acceptance/W1-41/README.md`, "Rewrite (W2-04, DEC-1005)". Two cases changed.

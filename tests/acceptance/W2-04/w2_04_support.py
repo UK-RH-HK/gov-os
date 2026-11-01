@@ -53,6 +53,7 @@ BLOCKED = "BLOCKED"
 K_TICKET_TEXT = "ticket_text"
 K_QUERY = "supplementary_query"
 K_FURTHER = "further_batch"
+K_BATCHES = "supplementary_batches"   # the addendum's S7a (DEC-1005): one entry per batch the context took
 K_SUPPLEMENTARY = "supplementary"
 K_MANDATORY = "mandatory"
 K_DROPPED = "dropped"
@@ -61,6 +62,10 @@ K_TOKENS = "tokens"
 K_BUDGET = "budget"
 DETAILS = ("ticket", "limit", "mandatory_tokens")
 INDEX_UNAVAILABLE = "index unavailable"
+# The keys of a packet before this ticket (W1-24's eight), and the four the addendum adds (DEC-1005, "The packet's
+# keys"); ``external``, ``left_out`` and ``synthesis`` stand only where the project gives them cause.
+KEYS_BEFORE = ("ticket", "authority", "mandatory", "supplementary", "dropped", "hash", "tokens", "budget")
+KEYS_ADDED = (K_TICKET_TEXT, K_QUERY, K_FURTHER, K_BATCHES)
 EMPTY_SHA = hashlib.sha256(b"").hexdigest()
 
 
@@ -232,8 +237,9 @@ def build_project(root, files, register_text=None):
 # --------------------------------------------------------------------------
 
 _HOOK = r'''
-"""W2-04's stand-ins (acceptance tests only): what a process opens, the retrieval's calls and order, a live semantic
-route. Each is on only where its environment variable is set."""
+"""W2-04's stand-ins (acceptance tests only): what a process opens, and a live semantic route. Each is on only where
+its environment variable is set. (Round 2, DEC-1005: no stand-in wraps the retrieval's entry any more; the context's
+own lookups are seen in the packet, ``supplementary_batches``.)"""
 import atexit
 import json
 import os
@@ -259,53 +265,26 @@ if _WATCH:
     sys.addaudithook(_audit)
     atexit.register(lambda: sys.stderr.write("\nW204-READS " + json.dumps(_reads) + "\n"))
 
-_MODE, _LOG = os.environ.get("W204_MODE"), os.environ.get("W204_LOG")
-if _MODE and _LOG:
-    import gov.retrieval.retrieve as _entry
+_MODE = os.environ.get("W204_MODE")
+if _MODE == "semantic-live":
+    # A live semantic index, deterministic and without a network: the semantic route's search says it is available
+    # and answers every question with the chunks of W204_SEMANTIC_PATH, a note no lexical query finds. Every
+    # embedder request is counted (W204_LOG), so a case sees whether a process sent the embedder anything.
+    import gov.retrieval.lexical as _lexical
+    import gov.retrieval.semantic as _semantic
 
-    _real = _entry.retrieve
+    _only, _LOG = os.environ.get("W204_SEMANTIC_PATH", ""), os.environ.get("W204_LOG")
 
-    def _ties_reversed(items):
-        """The items in the same places, except that each group of items with the same text (a tie) is reversed."""
-        groups = {}
-        for index, item in enumerate(items):
-            groups.setdefault(item.get("text"), []).append(index)
-        out = list(items)
-        for places in groups.values():
-            for place, source in zip(places, reversed(places)):
-                out[place] = items[source]
-        return out
+    def search(root, query, refresh=True):
+        if _LOG:
+            with open(os.path.join(_LOG, "semantic.jsonl"), "a", encoding="utf-8") as handle:
+                handle.write(json.dumps({"pid": os.getpid(), "query": query}) + "\n")
+        hits = [{"chunk_id": chunk["chunk_id"], "path": chunk["path"], "start_line": chunk["start_line"],
+                 "end_line": chunk["end_line"], "parent_id": chunk.get("parent_id"), "distance": 0.125}
+                for chunk in _lexical.chunks(root) if chunk["path"] == _only]
+        return {"available": True, "facet": _semantic.FACET, "state": "AVAILABLE", "reason": None, "hits": hits}
 
-    def retrieve(*args, **kwargs):
-        bundle = _real(*args, **kwargs)
-        evidence = list(bundle.get("evidence") or [])
-        out = dict(bundle)
-        if _MODE == "ties-reversed":
-            out["evidence"] = _ties_reversed(evidence)
-        line = {"pid": os.getpid(), "query": args[1] if len(args) > 1 else kwargs.get("query"),
-                "ticket": kwargs.get("ticket"), "batch_size": kwargs.get("batch_size"),
-                "continued": kwargs.get("continuation") is not None,
-                "in": [[item.get("id"), item.get("path")] for item in evidence],
-                "out": [[item.get("id"), item.get("path")] for item in out["evidence"]]}
-        with open(os.path.join(_LOG, "calls.jsonl"), "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(line) + "\n")
-        return out
-
-    _entry.retrieve = retrieve
-
-    if _MODE == "semantic-live":
-        import gov.retrieval.lexical as _lexical
-        import gov.retrieval.semantic as _semantic
-
-        _only = os.environ.get("W204_SEMANTIC_PATH", "")
-
-        def search(root, query, refresh=True):
-            hits = [{"chunk_id": chunk["chunk_id"], "path": chunk["path"], "start_line": chunk["start_line"],
-                     "end_line": chunk["end_line"], "parent_id": chunk.get("parent_id"), "distance": 0.125}
-                    for chunk in _lexical.chunks(root) if chunk["path"] == _only]
-            return {"available": True, "facet": _semantic.FACET, "state": "AVAILABLE", "reason": None, "hits": hits}
-
-        _semantic.search = search
+    _semantic.search = search
 '''
 
 
@@ -333,6 +312,25 @@ for call in json.loads(sys.stdin.read()):
                               "message": str(getattr(exc, "message", exc)),
                               "details": getattr(exc, "details", None)}})
 print("\n" + json.dumps(out, default=repr))
+'''
+
+# The ordered build (``Api.build_in_order``): the files of argv[3] set aside, then put back one at a time in that
+# order, the lexical index refreshed after each, then the store loaded. Only public functions are called.
+_ORDERED_BUILD = r'''
+import json, os, sys
+from pathlib import Path
+import gov.retrieval.lexical as lexical
+import gov.store as store
+
+root, held, order = Path(sys.argv[1]), Path(sys.argv[2]), json.loads(sys.argv[3])
+for rel in order:
+    (held / rel).parent.mkdir(parents=True, exist_ok=True)
+    os.replace(root / rel, held / rel)
+lexical.refresh(root)
+for rel in order:
+    os.replace(held / rel, root / rel)
+    lexical.refresh(root)
+store.load(root)
 '''
 
 
@@ -413,14 +411,15 @@ class Api:
         found.update(extra)
         return found
 
-    # ---- the retrieval stand-in's log
+    # ---- the semantic stand-in's log
 
     def reset_log(self):
         shutil.rmtree(self.workdir / "log", ignore_errors=True)
         (self.workdir / "log").mkdir()
 
-    def calls(self):
-        path = self.workdir / "log" / "calls.jsonl"
+    def semantic_calls(self):
+        """The questions the ``semantic-live`` stand-in was asked since the last reset."""
+        path = self.workdir / "log" / "semantic.jsonl"
         if not path.is_file():
             return []
         return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
@@ -454,6 +453,28 @@ class Api:
     def load(self, root):
         (loaded,) = self.batch([("gov.store", "load", root, (), {})])
         assert "value" in loaded, f"gov.store.load refused: {loaded}"
+
+    def build_in_order(self, root, order):
+        """The lexical index and the store of ``root``, with the index's rows written file by file in ``order``: each
+        file of ``order`` is set aside (outside the project), the index is refreshed, then each is put back in its
+        place and the index refreshed again, so its chunks are inserted after those of the files before it. The tree
+        and the commit are the project's own at the end (README, "Orders produced from outside")."""
+        held = Path(root).parent / f"{Path(root).name}-held"
+        done = subprocess.run([sys.executable, "-c", _ORDERED_BUILD, str(root), str(held), json.dumps(list(order))],
+                              env=self.env(), cwd=str(self.workdir / "elsewhere"), capture_output=True, text=True,
+                              timeout=CALL_TIMEOUT_S)
+        assert done.returncode == 0, f"the ordered build of {root} failed:\n{done.stderr[-4000:]}"
+        shutil.rmtree(held, ignore_errors=True)
+
+    def retrieve(self, root, query, env=None):
+        """``gov retrieve <query> --json --root <root>``, from a folder outside the project: its envelope."""
+        argv = [sys.executable, "-m", "gov.cli.main", "retrieve", query, "--json", "--root", str(root)]
+        try:
+            done = subprocess.run(argv, cwd=str(self.workdir / "elsewhere"), env=env or self.env(),
+                                  capture_output=True, text=True, timeout=CALL_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+            raise AssertionError(f"gov retrieve {query!r} did not end within {CALL_TIMEOUT_S:.0f} s") from None
+        return Answer(["gov", "retrieve", query], done)
 
     def records(self, root):
         """``id -> record`` of the store's records (``gov.records.records``)."""
@@ -556,3 +577,36 @@ def assert_refused_over_ceiling(answer, ticket_id, limit):
 
 def ids_paths(items):
     return [(item.get("id"), item.get("path")) for item in items]
+
+
+def batches(packet):
+    """The packet's ``supplementary_batches`` (the addendum's S7a), held to their form: a list, one entry per batch
+    the context took; each entry ``items``, a list of ``{"id", "path"}``, and ``limit``, a whole number of at least
+    one and at least ``len(items)``."""
+    found = packet.get(K_BATCHES)
+    assert isinstance(found, list), f"the packet has no list `{K_BATCHES}`: {found!r}"
+    for number, entry in enumerate(found, 1):
+        assert isinstance(entry, dict) and isinstance(entry.get("items"), list), \
+            f"`{K_BATCHES}` entry {number} is no map with a list `items`: {entry!r}"
+        assert all(isinstance(item, dict) and {"id", "path"} <= set(item) for item in entry["items"]), \
+            f"`{K_BATCHES}` entry {number} holds an item that is no `{{id, path}}`: {entry['items'][:4]}"
+        limit = entry.get("limit")
+        assert isinstance(limit, int) and not isinstance(limit, bool) and limit >= max(1, len(entry["items"])), \
+            f"`{K_BATCHES}` entry {number}: limit {limit!r} for {len(entry['items'])} items"
+    return found
+
+
+def read_items(packet):
+    """The batches' items taken together, in the order taken: ``[(id, path), ...]`` (the rank order, S7a)."""
+    return [(item["id"], item["path"]) for entry in batches(packet) for item in entry["items"]]
+
+
+def row_order(root):
+    """The paths of the lexical index's chunks of ``root`` in the order the store holds its rows (its rowids): the
+    order a reader that names no order gets them in. Read from the store file, which only the fixture writes."""
+    import sqlite3
+    connection = sqlite3.connect((Path(root) / STORE_REL).resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        return [path for (path,) in connection.execute("SELECT path FROM lexical_chunk ORDER BY rowid")]
+    finally:
+        connection.close()
