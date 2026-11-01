@@ -1,7 +1,8 @@
 """KPI 3 (DEC-959 item 1, DEC-968): tests run no more than this. The run is skipped when the merged code is what the
 lead tested (the same tree for the code paths, the governance records left out), with its recorded reason; any other
 code difference gets one run (test_w2_97_entry.py's green case counts it). A step that cannot be done moves nothing
-and ejects nothing (exit 4, the entries kept)."""
+and ejects nothing (exit 4, the entries kept). The full suite never runs here, only in the nightly (DEC-983): a
+selection that answers scope ``full`` is a step that cannot be done."""
 
 from __future__ import annotations
 
@@ -60,4 +61,24 @@ def test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing(q, case):
     assert q.names("ejected") == [], f"{case}: a ticket was ejected for a step that could not be done"
     assert q.names("landed") == [] and q.names("records") == [], f"{case}: something landed"
     assert q.entry("approved", t.name) is not None, f"{case}: the approved entry was not kept"
+    S.assert_main_unmoved(q)
+
+
+def test_a_full_selection_is_never_run(q):
+    # DEC-983 (KPI 3): the full suite never runs here, only in the nightly. A selection that answers scope "full",
+    # targets and all, cannot be used: a step that cannot be done (exit 4, nothing run, moved, ejected or landed).
+    q.plant()
+    t = q.ticket(901, {"app/e.txt": "ok\n"})
+    h1 = q.code_moves_on()
+    q.submit(t)
+    q.configure_select(full=True)
+
+    done = q.run()
+    assert done.returncode == 4, f"a selection that answers the full suite: {S.said(done)}"
+    assert "full" in done.stderr.lower(), f"the reason on stderr does not name the full answer: {done.stderr!r}"
+    assert q.test_calls() == [], f"a full selection was run: {len(q.test_calls())} test call(s)"
+    assert q.head() == h1, "a full selection moved the integration branch"
+    assert q.names("ejected") == [], "a ticket was ejected for a full selection"
+    assert q.names("landed") == [] and q.names("records") == [], "something landed on a full selection"
+    assert q.entry("approved", t.name) is not None, "the approved entry was not kept"
     S.assert_main_unmoved(q)

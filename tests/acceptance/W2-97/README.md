@@ -4,8 +4,14 @@ Ticket `DAEO-wq2b` (W2-97), profile STANDARD. Written by the independent test de
 ticket's KPI lines and the lead's specification (the tool's public interface), with DEC-959 item 1, DEC-968,
 DEC-979 item 3, DEC-962, DEC-848, DEC-953 item 4 and ROLES-RESEARCH-1 §4 (c) and §5.3 item 5. The implementation was
 not read. Proportion (DEC-951 item 5, STANDARD): every KPI line's success and failure, and the key edge cases the
-specification names (a flaky red that passes alone, a red that is not the batch's, a fail-closed batch). 17 test
-functions, 18 cases, a few seconds each.
+specification names (a flaky red that passes alone, a red that is not the batch's, a fail-closed batch). 18 test
+functions, 19 cases, a few seconds each.
+
+**Run 2 (DEC-985, DEC-983; a fresh test designer, after the implementation began, DEC-491):** the enqueue helper
+passes `--repo` (P-W2-97-ENQ-1 (b), `Rewrite-Reason: P-W2-97-ENQ-1`); the KPI lines below take DEC-983's wording
+(DEC-866) and one case is added for KPI 3's new text, `test_a_full_selection_is_never_run`
+(`Rewrite-Reason: DEC-983`). No case asserted the old rules (a shared test lock, or the full suite on a change to the
+core): the lock case is the queue's own one-writer lock, which stays, so no assertion was revised for them.
 
 ## How the suite runs the tool (DEC-732)
 
@@ -41,7 +47,8 @@ functions, 18 cases, a few seconds each.
     file), `block` (waits for a release file: the lock case), `move` (on its first batch run, commits onto
     `w2/integrate` in the planted repository: the head moves under test);
   - the **selection** (`--select-cmd "<python> stub_select.py"`) prints `select_tests.py`'s JSON object, with
-    targets per ticket (default `tests`), `core_changed` and `unplaced`; `refuse` makes it exit 2 with scope
+    targets per ticket (default `tests`), `core_changed` and `unplaced`; `full` answers scope `full` (with its
+    targets, exit 0: the answer a selection gives for the full suite); `refuse` makes it exit 2 with scope
     `refused`;
   - the **prepare command** is `true`, or `false` for the case where it fails.
 - `--work` and `--queue` are always under `tmp_path`. No test touches this repository's branches, its stores,
@@ -60,9 +67,9 @@ the new head.
 
 | KPI line | Tests |
 |---|---|
-| S1. Entry only with approval; `--no-ff` merge onto the current head in a clean clone; one run; on green, `--ff-only` to that same merge commit (the commit tested is the commit landed) | `test_w2_97_entry.py`: `test_only_an_approved_ticket_enters`, `test_green_advances_to_the_very_merge_commit_tested`, `test_a_second_run_while_one_holds_the_lock_exits_4` (one writer) |
+| S1. Entry only with approval; `--no-ff` merge onto the current head in a clean clone; the scoped set run once on that merged result in a heavy-job slot (DEC-979), or freely until the slots run (DEC-962, DEC-983, DEC-982); on green, `--ff-only` to that same merge commit (the commit tested is the commit landed). **The heavy-job slot has no acceptance case** (see "Gaps") | `test_w2_97_entry.py`: `test_only_an_approved_ticket_enters`, `test_green_advances_to_the_very_merge_commit_tested`, `test_a_second_run_while_one_holds_the_lock_exits_4` (one writer) |
 | S2. On red the branch does not move; ejected with the failing tests' names and the log path; a red that passes alone is a flaky candidate, named, deciding nothing | `test_w2_97_red.py`: `test_red_ejects_the_ticket_and_the_head_stays`, `test_a_red_that_passes_alone_is_a_flaky_candidate`, `test_a_red_not_the_batch_s_does_not_stop_the_advance` (DEC-968), `test_a_failing_test_the_ticket_added_is_the_ticket_s` |
-| S3. One run per batch; skipped when the merged code is the lead's (governance left out), with the reason recorded; no full run | `test_w2_97_once.py`: `test_code_identical_to_the_lead_s_is_skipped_with_its_reason`, `test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing[selection-refused, run-did-not-complete, prepare-failed]`; one run on a code difference: `test_green_advances_to_the_very_merge_commit_tested`; the run is the selection's union and no more: `test_a_batch_gives_one_merged_result_and_one_run_on_the_union` |
+| S3. The scoped set once per batch on the merged result; skipped when the merged code is the lead's (governance left out), with the reason recorded; the full suite never runs here, only in the nightly (DEC-968, DEC-983, DEC-982) | `test_w2_97_once.py`: `test_code_identical_to_the_lead_s_is_skipped_with_its_reason`, `test_a_step_that_cannot_be_done_moves_nothing_and_ejects_nothing[selection-refused, run-did-not-complete, prepare-failed]`; the full suite never: `test_a_full_selection_is_never_run` (a selection answering scope `full` is not run: exit 4, no test call, nothing moved, ejected or landed, the entry kept); one run on a code difference: `test_green_advances_to_the_very_merge_commit_tested`; the run is the selection's union and no more: `test_a_batch_gives_one_merged_result_and_one_run_on_the_union` |
 | S4. One head, one merged result, one run; a red batch searched by ticket, the good ones advance, the culprit ejected | `test_w2_97_batch.py`: `test_a_batch_gives_one_merged_result_and_one_run_on_the_union`, `test_a_red_batch_ejects_only_its_culprit_and_lands_the_rest_tested`, `test_a_red_no_single_ticket_explains_ejects_the_whole_batch`, `test_a_ticket_bringing_another_ticket_s_commits_fails_the_batch_closed`, `test_a_conflicting_ticket_is_ejected_and_the_rest_go_on` |
 | S5. Each advance writes the record the close cites (head, tickets, selection, counts, time) | `test_w2_97_record.py`: `test_each_advance_writes_the_record_the_close_cites`; the record's `flaky`, `unowned`, `ejected` and `skipped` fields in the red, once and batch cases |
 | S6. A head that moves under test: re-merged and re-tested, never advanced onto a head it was not tested on | `test_w2_97_moved.py`: `test_a_head_moved_under_test_is_re_merged_and_re_tested` |
@@ -80,8 +87,16 @@ first call of the tool (after its planted repository is built):
 
 Seen on 2026-10-31 in the tests worktree: `18 failed in 1.15s`, all 18 with that line.
 
+**Run 2 (2026-11-01, on the engineer's implementation):** `test_a_full_selection_is_never_run` is red (the tool as
+it stands runs a `full` selection); the other 18 cases are green.
+
 ## Gaps and points the specification leaves open (tested only as far as it fixes them)
 
+- **KPI 1's heavy-job slot (DEC-983, DEC-979 D1): no acceptance case covers it.** Only the production default run
+  goes through the slots (`verify_lock.sh`); a `--test-cmd` stand-in replaces the whole run command, slot included,
+  and is run as given, so through the stand-ins the slot is not observable, and a default run would reach this
+  machine's own slots and suites. What remains of the old rule is tested: there is no shared test lock, and the
+  queue's own one-writer lock (`test_a_second_run_while_one_holds_the_lock_exits_4`) stays.
 - **F4 (a close that re-runs the queue's tests):** the close (`close_build.py`) is the CTO's untracked tool and not
   in this ticket's `allowed_paths`; nothing in the queue's interface can show whether a close cites the record. The
   suite tests what a close needs to cite: the record keyed by the new head, its counts, and the landed files that
