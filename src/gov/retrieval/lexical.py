@@ -29,6 +29,7 @@ from gov.config.loader import PROJECT_DIR
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
+from gov.util.gitenv import git_env
 
 FACET = "lexical"
 # Carried: porter unicode61, with '_' a token character so a snake_case identifier stays one token.
@@ -60,8 +61,11 @@ _LISTED: dict = {}  # resolved root -> ((head, index stamp), ``ls-files -z``): t
 
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> bytes:
+    # Every call only reads (``rev-parse``, ``ls-files``, ``hash-object`` without ``-w``): pinned, so a trace setting
+    # of the system's or the person's never writes and no setting there changes a blob id (W2-M161, R6-2).
     try:
-        return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True, check=True).stdout
+        return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True, check=True,
+                              env=git_env(root, pinned=True)).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         reason = " ".join(getattr(exc, "stderr", b"").decode("utf-8", "replace").split()) or str(exc)
         raise GovError("INDEX_GIT_FAILED", f"git {args[0]} failed in {root}: {reason}", {"root": str(root)}) from None

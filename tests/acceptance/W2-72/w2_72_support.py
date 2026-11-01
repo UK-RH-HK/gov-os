@@ -978,60 +978,188 @@ def assert_moved_shape(project, shape, before, merge_id):
 
 
 # --------------------------------------------------------------------------
-# A merge-tree run that cannot run: a ``git`` earlier on PATH
+# A merge-tree run that cannot run: the folder containment takes git from (DEC-802 P-B1-2)
 # --------------------------------------------------------------------------
+#
+# Rewrite-Reason: DEC-802 (P-B1-2): containment takes git by absolute path from the system's own folders, the
+# module-level tuple ``gov.util.gitenv.GIT_DIRS`` read at each call, never by name from the inherited ``PATH``.
+# A ``git`` first on ``PATH`` (the seam these cases had, ``failing_merge_tree``) is no longer started, so it is
+# gone. The process that runs the check now names, in ``GIT_DIRS``, a folder holding a ``git`` of the case's own:
+#
+# - ``a-fatal-error``: a recording git that passes every call to the real git by its absolute path. The failure is
+#   the real git's: the merge base's blob of the test is taken out of the object store, so ``git merge-tree
+#   --write-tree`` answers ``fatal: unable to read blob object <id>`` and 128 (measured, git 2.43.0);
+# - ``a-git-without-write-tree``: a stand-in that answers ``merge-tree --write-tree`` with 129 and a usage line,
+#   as a git older than 2.38 answers, and passes every other call to the real git by its absolute path.
+#
+# Either way the ``git`` logs each ``merge-tree`` call it answered, with the exit code and git's ``fatal:`` (or
+# ``error:``) line on stderr, past any ``hint:`` (or the stand-in's usage line), so a case shows that its check met
+# the failing merge-tree and nothing else.
+
+# name: the exit code the check's ``git merge-tree --write-tree`` gets
+CANNOT_RUN = {
+    "a-fatal-error": 128,              # the real git: the merge base's blob of the test is missing
+    "a-git-without-write-tree": 129,   # the stand-in: a git older than 2.38
+}
+NOTHING_FAILING = "nothing-failing"    # the control: the recording git, every object there
+ANSWERS = {**CANNOT_RUN, NOTHING_FAILING: 0}
+USAGE = "usage: git merge-tree <base-tree> <branch1> <branch2>"
+GIT_DIRS_ENV = "W2_72_GIT_DIRS"        # read by the hook process's ``sitecustomize`` (``GitSeam.hook_environment``)
+
+# Put first on the PostToolUse hook's PYTHONPATH (as W1-03's ``clock`` puts its own): before the hook runs, the
+# helper's folder list names the case's folder alone; a line in ``installed.log`` says so, or why it could not.
+_SITECUSTOMIZE = '''"""W2-72: containment in this process takes git from the folder W2_72_GIT_DIRS names (DEC-802 P-B1-2)."""
+import os as _os
+
+_FOLDERS = _os.environ.get("W2_72_GIT_DIRS")
+if _FOLDERS:
+    _LOG = _os.path.join(_FOLDERS.split(_os.pathsep)[0], "installed.log")
+    try:
+        import gov.util.gitenv as _gitenv
+        _gitenv.GIT_DIRS = tuple(_FOLDERS.split(_os.pathsep))
+        _LINE = "GIT_DIRS=%r in process %d, gov.util.gitenv from %s" % (
+            _gitenv.GIT_DIRS, _os.getpid(), _gitenv.__file__)
+    except Exception as _error:   # the case reports it: the log of answered calls stays empty
+        _LINE = "not set in process %d: %r" % (_os.getpid(), _error)
+    with open(_LOG, "a", encoding="utf-8") as _out:
+        _out.write(_LINE + "\\n")
+'''
+
+
+def _real_git():
+    """The real git, by its absolute path (the one this test process runs)."""
+    real = shutil.which("git")
+    assert real and os.path.isabs(real), "no real git on PATH"
+    return real
+
 
 @dataclass(frozen=True)
-class FailingMergeTree:
-    """A directory holding a ``git`` that fails the ``merge-tree`` subcommand and passes every other call to the
-    real git; each refused call adds one line to ``log``."""
-    directory: Path
-    log: Path
+class Answered:
+    """One ``merge-tree`` call the case's ``git`` answered."""
     exit_code: int
-
-    def path_variable(self):
-        return f"{self.directory}{os.pathsep}{os.environ.get('PATH', '')}"
-
-    def refused(self):
-        """The refused ``merge-tree`` calls so far, one line each."""
-        return self.log.read_text(encoding="utf-8").splitlines() if self.log.is_file() else []
+    stderr: str     # the first ``fatal:`` or ``error:`` line on stderr (else its first line, in brackets)
+    words: str      # the call's words
 
 
-# name: (exit code, what the refused call prints on stderr)
-CANNOT_RUN = {
-    "a-fatal-error": (128, "fatal: git merge-tree cannot run here (W2-72 acceptance test)"),
-    "a-git-without-write-tree": (129, "usage: git merge-tree <base-tree> <branch1> <branch2>"),
-}
+@dataclass(frozen=True)
+class GitSeam:
+    """A folder holding the ``git`` the process that runs the check takes (``gov.util.gitenv.GIT_DIRS``)."""
+    directory: Path
+    log: Path       # one line per ``merge-tree`` call answered: exit code, its stderr line (``Answered``), words
+    exit_code: int  # what the case's ``git merge-tree --write-tree`` answers
+
+    def answered(self):
+        """The ``merge-tree`` calls answered so far."""
+        if not self.log.is_file():
+            return []
+        out = []
+        for line in self.log.read_text(encoding="utf-8").splitlines():
+            code, stderr, words = line.split("\t", 2)
+            out.append(Answered(int(code), stderr, words))
+        return out
+
+    def installed(self):
+        """What the hook process's ``sitecustomize`` wrote: the folder list it set, or why it could not."""
+        path = self.directory / "installed.log"
+        return path.read_text(encoding="utf-8").strip() if path.is_file() else "(no line: sitecustomize never ran)"
+
+    def hook_environment(self):
+        """The PostToolUse hook's ``PYTHONPATH`` and the variable its ``sitecustomize`` reads: the hook's
+        containment takes git from this folder alone."""
+        site = self.directory.parent / f"{self.directory.name}-site"
+        site.mkdir(exist_ok=True)
+        (site / "sitecustomize.py").write_text(_SITECUSTOMIZE, encoding="utf-8")
+        return {"PYTHONPATH": os.pathsep.join([str(site), str(SOURCES)]), GIT_DIRS_ENV: str(self.directory)}
 
 
-def failing_merge_tree(directory, case):
-    """Write the failing ``git`` into ``directory`` (a new, empty folder) and return it."""
-    exit_code, message = CANNOT_RUN[case]
-    real = shutil.which("git")
-    assert real and Path(real).resolve() != (Path(directory) / "git").resolve(), "no real git on PATH"
+def git_seam(directory, case):
+    """Write the case's ``git`` into ``directory`` (a new, empty folder) and return it. ``a-fatal-error`` and
+    ``nothing-failing``: a recording git that passes every call to the real git; ``a-git-without-write-tree``: a
+    stand-in that answers ``merge-tree --write-tree`` with 129 and a usage line and passes every other call to the
+    real git."""
+    exit_code = ANSWERS[case]
+    real, cat = _real_git(), shutil.which("cat")
+    assert cat and os.path.isabs(cat), "no cat on PATH"
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=False)
-    log = directory / "refused-merge-tree-calls.log"
+    log = directory / "answered-merge-tree-calls.log"
+    q = shlex.quote
+    if exit_code == 129:
+        answer = (
+            "    case \" $* \" in *\" --write-tree \"*)\n"
+            f"      printf '129\\t%s\\t%s\\n' {q(USAGE)} \"$*\" >> {q(str(log))}\n"
+            f"      echo {q(USAGE)} >&2\n"
+            "      exit 129 ;;\n"
+            "    esac\n")
+    else:
+        answer = (
+            f"    out={q(str(directory))}/out.$$ err={q(str(directory))}/err.$$\n"
+            f"    {q(real)} \"$@\" > \"$out\" 2> \"$err\"\n"
+            "    code=$?\n"
+            "    first=''\n"
+            "    while IFS= read -r line; do\n"   # git's own `fatal:` or `error:` line, past any `hint:`
+            "      case \"$line\" in fatal:*|error:*) first=$line; break ;; esac\n"
+            "      [ -n \"$first\" ] || first=\"($line)\"\n"
+            "    done < \"$err\"\n"
+            f"    printf '%s\\t%s\\t%s\\n' \"$code\" \"$first\" \"$*\" >> {q(str(log))}\n"
+            f"    {q(cat)} \"$out\"\n"
+            f"    {q(cat)} \"$err\" >&2\n"
+            "    exit \"$code\"\n")
     script = directory / "git"
     script.write_text(
         "#!/bin/sh\n"
         "for word in \"$@\"; do\n"
         "  if [ \"$word\" = merge-tree ]; then\n"
-        f"    printf '%s\\n' \"$*\" >> {shlex.quote(str(log))}\n"
-        f"    echo {shlex.quote(message)} >&2\n"
-        f"    exit {exit_code}\n"
+        + answer +
         "  fi\n"
         "done\n"
-        f"exec {shlex.quote(real)} \"$@\"\n", encoding="utf-8")
+        f"exec {q(real)} \"$@\"\n", encoding="utf-8")
     script.chmod(0o755)
-    return FailingMergeTree(directory, log, exit_code)
+    return GitSeam(directory, log, exit_code)
 
 
-def judge_in_a_process(root, commit_ids, environment):
+def remove_the_merge_base_s_blob(root, merge_id, path):
+    """Take the blob of ``path`` at the merge base of ``merge_id``'s two parents out of the object store, so that
+    the real ``git merge-tree --write-tree`` of the two parents fails (``fatal:``, 128). The blob is held by no
+    tree of the merge commit or of its parents, so no other git call of the check needs it. Returns its id."""
+    parents = parents_of(root, merge_id)
+    bases = merge_bases(root, *parents)
+    assert len(parents) == 2 and len(bases) == 1, (
+        f"the fixture is wrong: the merge commit has the parents {parents} and the merge bases {bases}"
+    )
+    held = content_at(root, bases[0], path)
+    assert held is not None, f"the fixture is wrong: the merge base holds no {path}"
+    blob = held.split()[2]
+    for commit_id in (merge_id, *parents):
+        listing = git_run(root, "ls-tree", "-r", commit_id)
+        assert listing.returncode == 0 and blob not in listing.stdout, (
+            f"the fixture is wrong: {commit_id[:12]}'s tree holds the merge base's blob {blob[:12]} of {path}"
+        )
+    loose = Path(root) / ".git" / "objects" / blob[:2] / blob[2:]
+    assert loose.is_file(), f"the fixture is wrong: the blob {blob[:12]} is not a loose object at {loose}"
+    loose.unlink()
+    assert git_run(root, "cat-file", "-e", blob).returncode != 0, f"the blob {blob[:12]} is still readable"
+    merged = git_run(root, *MERGE_TREE, *parents)
+    assert merged.returncode == 128 and "fatal:" in merged.stderr and blob in merged.stderr, (
+        f"the fixture is wrong: with the blob {blob[:12]} gone, the real `git merge-tree --write-tree` answers "
+        f"{merged.returncode}: {merged.stderr.strip()!r}"
+    )
+    return blob
+
+
+def judge_in_a_process(root, commit_ids, environment=None, git_dirs=None):
     """``judge_commits(root, commit_ids)`` in a new Python process of this repository's ``src`` with
-    ``environment`` over a caller-free environment. Returns [(commit, sorted paths, reason)]."""
+    ``environment`` over a caller-free environment. With ``git_dirs`` (folders), that process first sets
+    ``gov.util.gitenv.GIT_DIRS`` to them, so containment takes git from there (DEC-802 P-B1-2). Returns
+    [(commit, sorted paths, reason)]."""
+    seam = (
+        "import gov.util.gitenv as gitenv\n"
+        f"assert gitenv.__file__.startswith({str(SOURCES)!r}), gitenv.__file__\n"
+        f"gitenv.GIT_DIRS = {tuple(str(folder) for folder in git_dirs)!r}\n"
+    ) if git_dirs else ""
     program = (
         "import json, sys\n"
+        + seam +
         "from gov.guard.containment import judge_commits\n"
         "import gov.guard.containment as module\n"
         f"assert module.__file__.startswith({str(SOURCES)!r}), module.__file__\n"
@@ -1042,7 +1170,7 @@ def judge_in_a_process(root, commit_ids, environment):
            if key not in (check_support.ROLE_ENV, check_support.TICKET_ENV, "CLAUDE_PROJECT_DIR")}
     env.update({"PYTHONPATH": str(SOURCES), "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
                 "PYTHONDONTWRITEBYTECODE": "1"})
-    env.update(environment)
+    env.update(environment or {})
     proc = subprocess.run([sys.executable, "-c", program, str(root), *commit_ids], capture_output=True, text=True,
                           env=env, timeout=120, check=False)
     return proc
@@ -1095,14 +1223,17 @@ def project(hook, guard_hook, tmp_path):
 
 @pytest.fixture()
 def call(sandbox):
-    """``call(project, command, role, ticket, check_environment=None)`` -> (result, state after).
+    """``call(project, command, role, ticket, check_environment=None, before_the_check=None)`` -> (result, state
+    after).
 
     One whole Bash call that moves ``HEAD`` on the same branch and leaves a clean tree: the PreToolUse hook,
     the command for real, the PostToolUse hook (the containment check). ``state after`` is taken between the
     command and the check. ``check_environment`` replaces variables of the check's environment only.
+    ``before_the_check`` (no arguments) runs after ``state after`` is taken and before the check; it moves no
+    ref, index entry or file of the working tree.
     """
 
-    def _call(project, command, role, ticket, check_environment=None):
+    def _call(project, command, role, ticket, check_environment=None, before_the_check=None):
         seen = len(check_support.finding_lines(project))
         before = check_support.head(project)
         the_call = check_support.script_call(sandbox, command)
@@ -1116,6 +1247,8 @@ def call(sandbox):
         assert left[0][0] != before[0], f"the fixture command `{command}` did not move HEAD"
         assert left[0][1] == before[1], f"the fixture command `{command}` left the branch {before[1]!r}"
         assert left[1] == "", f"the fixture command `{command}` left uncommitted changes:\n{left[1]}"
+        if before_the_check is not None:
+            before_the_check()
         result = check_support.run_check(project, the_call, sandbox, role=role, ticket=ticket, bash=bash, seen=seen,
                                          environment=check_environment)
         return result, left

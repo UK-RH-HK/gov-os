@@ -13,6 +13,7 @@ from pathlib import Path
 import yaml
 
 from gov.close.history import BASE_KEY  # DEC-482: with a base, only the commits after it are judged
+from gov.util.gitenv import git_env
 
 
 def _frontmatter(path: Path) -> dict | None:
@@ -47,7 +48,7 @@ def _closed_tickets(root: Path) -> list[dict]:
 def _read_trailers(root: Path, sha: str) -> dict[str, list[str]]:
     result = subprocess.run(
         ["git", "-C", str(root), "log", "-1", "--format=%(trailers)", sha],
-        capture_output=True, text=True,
+        capture_output=True, text=True, env=git_env(root, pinned=True),
     )
     if result.returncode != 0:
         raise RuntimeError(f"git log (trailers) failed for {sha[:12]}: {result.stderr.strip()[:200]}")
@@ -73,7 +74,7 @@ def _commits_for_ticket(root: Path, ticket_id: str) -> list[dict]:
     result = subprocess.run(
         ["git", "-C", str(root), "log", "HEAD", "--format=%H",
          f"--grep=Task: {ticket_id}"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, env=git_env(root, pinned=True),
     )
     if result.returncode != 0:
         raise RuntimeError(f"git log failed for ticket {ticket_id}: {result.stderr.strip()[:200]}")

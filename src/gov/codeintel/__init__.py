@@ -28,6 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from gov.secrets import indexable, path_holds_secret
+from gov.util.gitenv import git_env
 
 TOOL = "codebase-memory-mcp"
 BASE_REL = ".gov-runtime/codeintel"
@@ -69,7 +70,8 @@ def _daemon_dir(root: Path) -> Path:
 def _checked(root: Path) -> Path:
     """``root`` resolved. Raises unless it is the top level of a git repository and its home is under it."""
     root = Path(root).resolve()
-    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True,
+                         env=git_env(root))
     if top.returncode != 0 or Path(top.stdout.removesuffix("\n")).resolve() != root:
         raise RuntimeError(f"{root} is not the top level of a git repository: no code index there")
     if home(root).resolve() != root / BASE_REL / "home":  # a link on the way would put the index somewhere else
@@ -80,11 +82,12 @@ def _checked(root: Path) -> Path:
 def _env(root: Path, tool: str) -> dict:
     """The environment of a start of the binary: the repository's home and the repository's daemon directory.
 
-    Both are set here whatever the caller's environment holds; the rest of that environment is passed on.
+    Both are set here whatever the caller's environment holds; the rest of that environment is passed on, less the
+    inherited ``GIT_*`` variables (``git_env``: the tool starts git in the project, AR-2).
     The tool's loopback UI is turned off in that home first (DEC-362).
     """
     root = _checked(root)
-    env = {**os.environ, "CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
+    env = {**git_env(root),"CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
     # A daemon reads the setting of its home when it starts, and an index builds the home anew: set at every start.
     if subprocess.run([TOOL, "config", "set", "ui_enabled", "false"], capture_output=True, text=True,
                       stdin=subprocess.DEVNULL, env=env).returncode != 0:
@@ -181,7 +184,7 @@ def index(root: Path) -> None:
         shutil.rmtree(base)
     _graph.cache_clear()
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-                            capture_output=True, text=True, check=True).stdout
+                            capture_output=True, text=True, check=True, env=git_env(root)).stdout
     allowed = indexable(root, [rel for rel in listed.split("\0") if rel])
     with ThreadPoolExecutor() as pool:  # the index stores paths: a path that holds a secret stays out (DEC-339)
         named = list(pool.map(lambda rel: path_holds_secret(root, rel), allowed))

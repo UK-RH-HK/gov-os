@@ -1,0 +1,71 @@
+"""The CTO's two safety nets (DEC-991): the quiet-hours PermissionRequest hook and the dead-man's switch. Planted
+inputs only: no real transcript, queue, notifier or cron is touched."""
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+TOOLS = Path(__file__).resolve().parents[3] / "governance/project/orchestration/tools"
+HOOK, DEADMAN = TOOLS / "permission_request.py", TOOLS / "deadman.py"
+
+
+def hook(clock, stdin, queue):
+    env = dict(os.environ, GOV_QUIET_NOW=clock, GOV_QUIET_QUEUE=str(queue))
+    return subprocess.run([sys.executable, str(HOOK)], input=stdin, capture_output=True, text=True, env=env)
+
+
+def test_the_hook_refuses_and_queues_inside_the_quiet_hours_only(tmp_path):
+    q = tmp_path / "q.jsonl"
+    call = json.dumps({"tool_name": "Bash", "tool_input": {"command": "rm -rf /tmp/x"}})
+    for clock in ("02:00", "03:00", "07:29"):
+        r = hook(clock, call, q)
+        out = json.loads(r.stdout)["hookSpecificOutput"]
+        assert r.returncode == 0 and out["hookEventName"] == "PermissionRequest"
+        assert out["decision"]["behavior"] == "deny" and "DEC-991" in out["decision"]["message"]
+    for clock in ("01:59", "07:30", "12:00", "23:59"):
+        r = hook(clock, call, q)
+        assert r.returncode == 0 and r.stdout.strip() == ""  # the normal prompt appears
+    lines = [json.loads(x) for x in q.read_text().splitlines()]
+    assert [x["quiet"] for x in lines] == [True] * 3 + [False] * 4 and lines[0]["what"] == "rm -rf /tmp/x"
+
+
+def test_the_hook_still_refuses_at_night_on_bad_input_or_an_unwritable_queue(tmp_path):
+    r = hook("03:00", "not json", tmp_path / "missing-dir" / "q.jsonl")
+    assert json.loads(r.stdout)["hookSpecificOutput"]["decision"]["behavior"] == "deny"
+
+
+def transcript(path, entries):
+    path.write_text("\n".join(json.dumps(e) for e in entries) + "\n")
+
+
+def deadman(projects, now, tmp_path):
+    env = dict(os.environ, HOME=str(tmp_path))  # its state and log stay in the real scratch; --dry sends nothing
+    r = subprocess.run([sys.executable, str(DEADMAN), "--dry", "--projects", str(projects), "--now", now],
+                       capture_output=True, text=True, env=env)
+    return json.loads(r.stdout.strip().splitlines()[-1])
+
+
+def test_the_switch_names_a_tool_call_waiting_since_its_time(tmp_path):
+    p = tmp_path / "proj"
+    p.mkdir()
+    transcript(p / "s.jsonl", [
+        {"type": "assistant", "timestamp": "2026-11-01T01:40:00Z", "message": {"content": [{"type": "text"}]}},
+        {"type": "assistant", "timestamp": "2026-11-01T01:46:20Z",
+         "message": {"content": [{"type": "tool_use", "name": "Bash"}]}},
+        {"type": "queue-operation", "timestamp": "2026-11-01T04:22:00Z"}])
+    late = deadman(p, "2026-11-01 04:00", tmp_path)
+    assert late["verdict"] == "ALERT" and late["pending_tool"] == "Bash"
+    assert deadman(p, "2026-11-01 03:00", tmp_path)["verdict"] == "alive"  # quiet hours: only past 2 hours
+
+
+def test_the_switch_counts_a_tool_result_as_an_answered_call_and_alerts_by_day_after_an_hour(tmp_path):
+    p = tmp_path / "proj"
+    p.mkdir()
+    transcript(p / "s.jsonl", [
+        {"type": "assistant", "timestamp": "2026-11-01T12:00:00Z",
+         "message": {"content": [{"type": "tool_use", "name": "Bash"}]}},
+        {"type": "user", "timestamp": "2026-11-01T12:00:05Z", "message": {"content": [{"type": "tool_result"}]}}])
+    assert deadman(p, "2026-11-01 12:59", tmp_path)["verdict"] == "alive"
+    late = deadman(p, "2026-11-01 13:01", tmp_path)
+    assert late["verdict"] == "ALERT" and late["pending_tool"] is None

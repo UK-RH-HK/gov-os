@@ -66,8 +66,12 @@ def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project
     excused while the lists lack it (DEC-753); the case passes unchanged once they record it. The purpose is
     kept: any other command ``gov`` offers that the lists do not record still fails it, a recorded command gone
     from ``gov --help`` still fails it, and the module command is still none of ``gov``'s.
+
+    Revised for DEC-970 (W2-96, P-W2-96-CMDLIST (a); a recorded rewrite, DEC-959 item 6): ``accept`` is recorded,
+    so the recorded ``gov`` commands are four, not the three of the case's name, which W1-32's README map names
+    and so stays as it is.
     """
-    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"ci", "launch", "telemetry"}, RECORDED
+    assert set(RECORDED) - set(EXCUSED_UNTIL_RECORDED) == {"accept", "ci", "launch", "telemetry"}, RECORDED
     assert tuple(NO_GOV_COMMAND) == ("lock",)
     run = support.gov(empty_project, sandbox, "--help")
     commands = _commands(run)

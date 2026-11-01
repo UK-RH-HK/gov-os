@@ -983,21 +983,30 @@ def _started(root: Path, cmd: list[str], env: dict, timeout: int | None = None):
     """``cmd`` run to its end in the project's folder, in a process group of its own: its exit code and what it
     printed. At the time limit the whole group is ended before ``subprocess.TimeoutExpired`` is raised, so no
     worker of a parallel run lives on to write into the project (DEC-555); so it is when this command is
-    itself ended."""
+    itself ended.
+
+    ``env`` as the helper gives a program that may start git elsewhere (P-1, W2-M161): the tests start git in
+    folders of their own, so no ``GIT_*`` variable of the caller reaches them (DEC-500), no index and no trace
+    among them, and the system's git configuration is not read; of the person's, only ``user.name``,
+    ``user.email`` and ``init.defaultBranch`` reach them, in a file made for the run and removed when it ends
+    (``runner_env``, DEC-970); everything else of ``env`` is kept."""
     import os
     import signal
 
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=str(root),
-                               env=env, start_new_session=True)
-    try:
-        stdout, stderr = process.communicate(timeout=timeout)
-    except BaseException:
+    from gov.util.gitenv import runner_env
+
+    with runner_env(base={key: value for key, value in env.items() if not key.startswith("GIT_")}) as run_env:
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=str(root),
+                                   env=run_env, start_new_session=True)
         try:
-            os.killpg(process.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-        process.wait()
-        raise
+            stdout, stderr = process.communicate(timeout=timeout)
+        except BaseException:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait()
+            raise
     return subprocess.CompletedProcess(cmd, process.returncode, stdout, stderr)
 
 

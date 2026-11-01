@@ -10,7 +10,11 @@ project of its own (``w1_02_deadline_support``; the module's hook processes run
 side by side and the module waits once, about four seconds):
 
 - **a step that is slow and ends before the deadline** (the first program the
-  hook starts takes four seconds) changes nothing: an allowed call is allowed
+  hook starts takes four seconds: for the Read and the Write, the freeze
+  look-up's real git waiting on the repository's configuration, since W2-L160;
+  for the Bash call, its bookkeeping before the decision, waiting on a named pipe
+  the case lets go after four seconds, since the ticket's batch 2 gave that
+  bookkeeping git by absolute path) changes nothing: an allowed call is allowed
   and its bookkeeping is done, a refused one is refused with the reason it has
   without the slow step;
 - **a refusal reached in time** is never the deadline's answer;
@@ -38,18 +42,27 @@ import pytest
 import w1_02_deadline_support as deadline
 
 Call = deadline.Call
-SHORT = (deadline.SHORT_STEP_S,)
 TINY_FIELDS = deadline.limit_fields(deadline.TINY)
 TINY_ENV = deadline.limit_environment(deadline.TINY)
 TINY_FILES = deadline.files_that_name_a_limit(deadline.TINY)
 
+# Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160. A Read and a Write start no program from the search
+# path since W2-L160: their slow step is the freeze look-up's real git, which waits four seconds on the repository's
+# configuration (was: a stand-in first on the search path). The Bash call's bookkeeping then still started its
+# programs from the search path, and kept its stand-in, until the ticket's batch 2 (below).
+# Rewrite-Reason: DEC-802 (P-B1-2); W2-L160. Since the ticket's batch 2 the Bash bookkeeping starts git by absolute path
+# too, and no stand-in on the search path reaches it: the Bash call's slow step is its bookkeeping before the decision,
+# which waits on a named pipe among the pending calls that the case lets go four seconds after the input (was: a
+# stand-in first on the search path, sleeping four seconds on its first start).
+SLOW_BOOKKEEPING = dict(prepare=deadline.a_pipe_among_the_pending_calls, release_after=deadline.SHORT_STEP_S)
 SLOW_AND_ALLOWED = (
-    Call("a-Bash-call-by-an-engineer", "Bash", deadline.bash(), deadline.ENGINEER, sleeps=SHORT),
+    Call("a-Bash-call-by-an-engineer", "Bash", deadline.bash(), deadline.ENGINEER, **SLOW_BOOKKEEPING),
     Call("a-Read-by-a-session-with-no-role", "Read", deadline.read_of(deadline.OUTSIDE_TICKET_REL),
-         deadline.NO_ROLE, sleeps=SHORT),
+         deadline.NO_ROLE, config_after=deadline.SHORT_STEP_S),
 )
 SLOW_AND_REFUSED = Call("a-slow-Write-by-an-engineer-outside-its-ticket", "Write",
-                        deadline.write_to(deadline.OUTSIDE_TICKET_REL), deadline.ENGINEER, sleeps=SHORT)
+                        deadline.write_to(deadline.OUTSIDE_TICKET_REL), deadline.ENGINEER,
+                        config_after=deadline.SHORT_STEP_S)
 REFUSED_AT_ONCE = (
     Call("a-Write-by-an-engineer-outside-its-ticket", "Write", deadline.write_to(deadline.OUTSIDE_TICKET_REL),
          deadline.ENGINEER),
@@ -76,9 +89,12 @@ TINY_LIMIT = (
     Call("a-Write-by-the-orchestrator-with-a-tiny-limit-named", "Write",
          lambda project: {**deadline.write_to(deadline.OUTSIDE_TICKET_REL)(project), **TINY_FIELDS},
          deadline.ORCHESTRATOR, top=TINY_FIELDS, env=TINY_ENV, prepare=TINY_FILES),
+    # Rewrite-Reason: DEC-802 (P-B1-2); W2-L160: the slow step is the bookkeeping's pipe, let go after four seconds
+    # (was: the stand-in on the search path).
     Call("a-Bash-call-by-an-engineer-with-a-tiny-limit-named-and-a-slow-step", "Bash",
-         {**deadline.bash(), **TINY_FIELDS}, deadline.ENGINEER, sleeps=SHORT, top=TINY_FIELDS, env=TINY_ENV,
-         prepare=TINY_FILES),
+         {**deadline.bash(), **TINY_FIELDS}, deadline.ENGINEER, top=TINY_FIELDS, env=TINY_ENV,
+         prepare=deadline.each_of(TINY_FILES, deadline.a_pipe_among_the_pending_calls),
+         release_after=deadline.SHORT_STEP_S),
 )
 EVERY_CALL = SLOW_AND_ALLOWED + (SLOW_AND_REFUSED,) + REFUSED_AT_ONCE + FAILING + INPUT_LEFT_OPEN + TINY_LIMIT
 
@@ -97,7 +113,11 @@ def prompt(hook, tmp_path_factory):
 def _assert_answered_in_time(outcome, what, slow):
     assert outcome.answered, f"{what}: {outcome.describe()}"
     if slow:
-        assert outcome.stand_in_starts >= 1, f"{what}: the hook did not start the stand-in program"
+        # Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160: the slow step is the configuration. DEC-802
+        # (P-B1-2): or the bookkeeping's pipe, let go by the case (was: or the stand-in, gone from the support).
+        assert outcome.config_served >= 1 or outcome.released, (
+            f"{what}: the hook neither waited on the repository's configuration nor on a pipe of its bookkeeping"
+        )
         assert outcome.result.seconds >= deadline.SHORT_STEP_S, (
             f"{what} was answered before its slow step could have ended: {outcome.describe()}"
         )

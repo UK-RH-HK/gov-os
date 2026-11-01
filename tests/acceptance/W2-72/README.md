@@ -42,7 +42,7 @@ PYTHONPATH=/home/usain/gov-os-worktrees/W2-72/src python3 -m pytest tests/accept
 
 | File | What it holds |
 |---|---|
-| `w2_72_support.py` | The histories (one builder per merge), the guards from git's own answers (`assert_shape`, `git_s_own_merge`), the failing `git` of the fail-closed cases, `judge_in_a_process`, and the fixtures: the hooks, the throw-away project, `call` (one Bash call between the two hooks; `check_environment` replaces variables of the PostToolUse hook's environment only), `judge` and `read_merge` |
+| `w2_72_support.py` | The histories (one builder per merge), the guards from git's own answers (`assert_shape`, `git_s_own_merge`), the fail-closed cases' `git` (`git_seam`, in the folder `gov.util.gitenv.GIT_DIRS` names) and the removal of the merge base's blob (`remove_the_merge_base_s_blob`), `judge_in_a_process`, and the fixtures: the hooks, the throw-away project, `call` (one Bash call between the two hooks; `check_environment` replaces variables of the PostToolUse hook's environment only; `before_the_check` runs between the command and the check), `judge` and `read_merge` |
 | `test_w2_72_clean_merge_of_an_acceptance_file.py` | KPI 1 |
 | `test_w2_72_file_that_differs_from_git_s_merge.py` | KPI 2, every shape except merge-tree that cannot run |
 | `test_w2_72_merge_tree_that_cannot_run.py` | KPI 2, fail closed |
@@ -126,26 +126,58 @@ Each runs these nine cases:
 
 ### KPI 2: a merge-tree run that cannot run gives no allowance (fail closed)
 
-`test_w2_72_merge_tree_that_cannot_run.py`, 4 tests, **all red now**.
+`test_w2_72_merge_tree_that_cannot_run.py`, 4 tests. They were red before the implementation. Since DEC-802
+(P-B1-2) they are on new routes (see "The fail-closed cases on routes containment still takes" below).
 
-**The seam.** `failing_merge_tree` writes a `git` script into the test's own temporary folder, and that folder is
-put first on `PATH`:
+**The seam** (`Rewrite-Reason: DEC-802 (P-B1-2)`). Containment takes git by absolute path from the system's own
+folders (`/usr/bin`, `/bin`, `/usr/local/bin`, `/opt/homebrew/bin`, in that order: the tuple
+`gov.util.gitenv.GIT_DIRS`, read at each call), never by name from the inherited `PATH`. So the process that runs the
+check names, in `GIT_DIRS`, a folder holding a `git` of the case's own (`git_seam`). That `git` answers in one of two
+ways:
 
-- any call whose words hold `merge-tree` is refused, and every other call goes to the real git unchanged;
-- it is refused either as `a-fatal-error` (exit 128, a `fatal:` line) or as `a-git-without-write-tree` (exit 129,
-  a usage line, as a git older than 2.38 answers);
-- each refused call appends one line to a log file next to the script.
+- `a-fatal-error`: **the real git fails.** The merge base's blob of the test is taken out of the object store
+  (`remove_the_merge_base_s_blob`), so `git merge-tree --write-tree` of the two parents answers `fatal: unable to
+  read blob object <id>` and 128 (measured, git 2.43.0). The folder's `git` only records: it passes every call to
+  the real git by its absolute path. No tree of the merge commit or of its parents holds that blob, so no other git
+  call of the check needs it. `merge-base`, `diff-tree`, `log -c --raw`, `status` and `ls-files` were measured
+  working without it. The removal asserts, before the check runs, that the blob was a loose object, that it is
+  now unreadable, and that the real merge-tree now answers 128 naming it;
+- `a-git-without-write-tree`: **a stand-in** answers `merge-tree --write-tree` with 129 and a usage line, as a git
+  older than 2.38 answers, and passes every other call to the real git by its absolute path.
 
-The history is the clean combination of KPI 1, which without the seam is no change of the test.
+Either way the folder's `git` appends a line to its log for each `merge-tree` call it answered: the exit code, git's
+`fatal:` (or `error:`) line past any `hint:` (or the stand-in's usage line), and the call's words.
 
-| Test | Expected | Red now because |
-|---|---|---|
-| `test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run` | with the failing `git` on the PostToolUse hook's `PATH` only (the call itself and the PreToolUse hook use the real git): the log holds at least one refused `merge-tree` call, and the test is flagged in a finding for the merge commit | the log is empty: today's check asks no `merge-tree`. The flag is already there |
-| `test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run` | `judge_commits` in a new process of this `src/` with the failing `git` first on `PATH`: the log holds at least one refused call; the process exits 0; one finding, for the merge commit, names the test | the log is empty. The finding is already there |
+How each process gets the folder:
 
-**How each case shows that the check met the failure.** The log of refused calls must hold at least one line
-written while the check under test ran, either the PostToolUse hook or the judging process. A check that never asks
-git's own merge leaves it empty and the case fails, since it would show nothing about failing closed.
+- **the live check:** only the PostToolUse hook's process. A `sitecustomize.py` first on its `PYTHONPATH` (as W1-03's
+  `clock` puts its own) imports `gov.util.gitenv` from this worktree's `src/` and sets `GIT_DIRS` to the folder,
+  before the hook runs. It writes one line to `installed.log` saying so, or why it could not. The call itself and the
+  PreToolUse hook use the real git. For `a-fatal-error`, the blob is taken out after the call's command (the merge)
+  and before the check (`call(..., before_the_check=...)`), with `assert_shape` run first, while git's own merge still
+  runs;
+- **`judge_commits`:** a new Python process of this `src/` sets `GIT_DIRS` to the folder before it imports
+  containment, and asserts that `gov.util.gitenv` came from this `src/`.
+
+The history is the clean combination of KPI 1, which with git's own merge there is no change of the test.
+
+| Test | Expected |
+|---|---|
+| `test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run` | the log holds at least one `merge-tree --write-tree` call, each answered as the case fails it; the test is flagged in a finding for the merge commit, and nothing moved |
+| `test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run` | first the control (new): through a recording `git` with nothing failing, `judge_commits` asks git's own merge (answered 0) and returns no finding (KPI 1). Then, with merge-tree failing: the log holds at least one `merge-tree --write-tree` call, each answered as the case fails it; the process exits 0; one finding, for the merge commit, names the test |
+
+**How each case shows that the check met the failing merge-tree, and nothing else.** The case's `git` logs only the
+`merge-tree` calls the check under test made through it, so the log is empty unless the check took git from the
+folder `GIT_DIRS` names and asked git's own merge. Every logged call must be a `--write-tree` call answered as the
+case fails it:
+
+- `a-fatal-error`: 128, with a `fatal:` line that names the blob the case took out
+  (`fatal: unable to read blob object <id>`), so the failure is the real git's, on that blob;
+- `a-git-without-write-tree`: 129, with the usage line.
+
+An empty log fails the case: it would show nothing about failing closed. For the live check, the message also quotes
+the hook process's `installed.log`. In the judge cases the control's log shows that the same route reaches
+containment when nothing fails, and that no finding comes without the failure.
 
 `judge_commits` runs in a new process so that nothing a module resolved earlier in the run, such as a path to
 git, gets past the seam. "The path stays caught" is read as a finding that names the path. A `ContainmentError`
@@ -311,3 +343,41 @@ merge, so none is revised.
 
 - `conftest.py` folded into the support module: its fixtures and helpers into `w2_72_support.py`, the import path it set up into the top of each test module. Rewrite-Reason: DEC-880 (W2-66's KPI 12 case). No expectation changed.
 - Review 1's batch: 20 tests added after the implementation, from the ticket's first review (F1 to F4). These are three new modules and helpers at the end of `w2_72_support.py`'s merge section (`bash_call`, the two-call histories, the rename and directory histories, and `assert_moved_shape`). The first batch's cases, helpers and expectations are unchanged. Rewrite-Reason: DEC-918.
+- The four fail-closed cases moved onto routes containment still takes. Rewrite-Reason: DEC-802 (P-B1-2). See the next section.
+
+## The fail-closed cases on routes containment still takes (DEC-980 item 2, 2026-11-01)
+
+`Rewrite-Reason: DEC-802 (P-B1-2): containment takes git by absolute path, so a git first on PATH no longer
+reaches merge-tree`. Package P-W2-05-W2-72 (a), decided by DEC-980 item 2. Written by a fresh independent test
+designer of ticket `DAEO-0z8c` (W2-05) on `w2/W2-05-tests`, from W2-05's head `d1533bf30a10`. No implementation
+file of W2-05 was read. The merge rule was read on `w2/integrate` (`git show w2/integrate:src/gov/guard/containment.py`).
+The folder list and its use are as W2-05's lead states them: `gov.util.gitenv.GIT_DIRS`, read at each call.
+
+- **Why.** W2-05 (W2-L160, DEC-802 P-B1-2) makes containment run git by absolute path from the system's own
+  folders, never by name from the inherited `PATH`. The `git` these cases put first on `PATH` was then never
+  started. On `d1533bf30a10` all four were red: "never ran `git merge-tree` while it could not run ... the log of
+  refused calls is empty". They pass on `w2/integrate`, which still takes git from `PATH`.
+- **Now.** The routes above: the folder named in `GIT_DIRS` for the process that runs the check; for
+  `a-fatal-error`, the real git failing on the merge base's missing blob; for `a-git-without-write-tree`, the
+  stand-in's 129. The `git` first on `PATH` (`failing_merge_tree`, `FailingMergeTree`) is removed from the support,
+  since no case uses it.
+- **Held as before:** the four ids; the failing merge-tree met by the check under test (now: answered as the case
+  fails it, with git's own `fatal:` line naming the missing blob, or the usage line); the test still flagged in a
+  finding for the merge commit, with nothing moved (the live check); `judge_commits` exits 0 with one finding, for
+  the merge commit, naming the test. **Added:** the judge cases' control (nothing failing: merge-tree answered 0, no
+  finding).
+- **On `w2/integrate`'s code as it stands** (no `gov.util.gitenv`) the four are expected red, not run here: the
+  judging process cannot import the module, and the hook's `sitecustomize` records that it could not set the
+  list. They hold W2-05's code onward, where containment takes git from `GIT_DIRS`, and are to merge with it.
+- **The mutation check** (a scratch plugin, not committed). Withholding the case's `git` from the process that runs
+  the check, the judge cases' control kept, all four fail at `_assert_met`: "never ran `git merge-tree` through the
+  git of the-check-s-git ... the log of answered calls is empty". In the live `a-fatal-error` case the blob was still
+  missing and the real git still failed. So the log, not the outcome, is what shows that the failing merge-tree was
+  met.
+
+| Case | At `d1533bf30a10`, before (seen) | After (seen, same head) |
+|---|---|---|
+| `test_the_live_check_still_flags_the_file_when_git_merge_tree_cannot_run[a-fatal-error]` | **red:** the log of refused calls is empty | **green:** one call logged, `128`, `fatal: unable to read blob object <id>` (the removed blob); flagged |
+| `...[a-git-without-write-tree]` | **red:** the same | **green:** one call logged, `129`, the usage line; flagged |
+| `test_judge_commits_still_finds_the_file_when_git_merge_tree_cannot_run[a-fatal-error]` | **red:** the same | **green:** control `0` and `[]`; one call logged, `128`, naming the blob; one finding naming the test |
+| `...[a-git-without-write-tree]` | **red:** the same | **green:** control `0` and `[]`; one call logged, `129`; one finding naming the test |
