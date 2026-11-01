@@ -15,6 +15,7 @@ import pytest
 
 import w2_81_build as build
 import w2_81_judge as judge
+import w2_81_questions as questions
 import w2_81_standin as standin
 
 ALL = set(judge.CAPABILITIES)
@@ -205,3 +206,63 @@ def test_a_control_in_a_held_namespace_that_is_not_embedded_is_clean(ground, tmp
         model["index"][path] = False  # in the lexical index, without vectors
         result = _result(_judge(built_repo, model, tmp_path / str(n)), control["id"])
         assert result["status"] == judge.CLEAN, result["evidence"]
+
+
+# --------------------------------------------------------------------------
+# Round 2b (DEC-997). 6. A store without a vector table; 7. a template with an error
+# --------------------------------------------------------------------------
+
+def test_a_store_without_a_vector_table_is_read_as_no_vectors(ground, tmp_path):
+    """Item 6: gov rebuild without its embedder leaves the lexical tables only; the judge reads no vectors, and the
+    lexical checks still run: a control left out of the lexical index is FLAGGED, the large files are judged."""
+    built_repo = ground["legacy-docs"]
+    model = standin.perfect(built_repo)
+    model["index_without_vector_table"] = True
+    control = built_repo.manifest["controls"][0]
+    model["index"].pop(control["paths"][0])
+    judgement = _judge(built_repo, model, tmp_path)
+    assert _result(judgement, control["id"])["status"] == judge.FLAGGED
+    assert all(c["status"] == judge.CLEAN for c in judgement["controls"] if c["id"] != control["id"])
+    for entry in built_repo.manifest["planted"]:
+        if entry["kind"] == "large-file":
+            assert _result(judgement, entry["id"])["status"] == judge.FOUND, entry["id"]
+    assert judge.read_index(tmp_path / "adopted")[0]["semantic"] == set()
+
+
+FORMS = {"attribute": "{product.upper}", "missing-attribute": "{product.nothing}", "index": "{product[x]}",
+         "conversion": "{product!z}", "format": "{product:>>9x}", "positional": "{0}", "unmatched": "{product"}
+
+
+@pytest.mark.parametrize("where", ["question", "gold_answer", "source", "forbidden"])
+@pytest.mark.parametrize("form", sorted(FORMS))
+def test_a_template_with_an_error_is_refused_naming_its_id_only(ground, form, where):
+    """Item 7: a template uses the form {name} only; any other form or error is a QuestionError naming the id."""
+    built_repo = ground["rust-workspace"]
+    template = FORMS[form]
+    item = {"id": "rust-workspace-h99", "category": "what-value", "question": "Which frame size applies?",
+            "gold_answer": "the revised one", "sources": [{"path": "Cargo.toml", "holds": "[workspace]"}],
+            "forbidden": ["{stale}"]}
+    if where == "source":
+        item["sources"] = [{"path": f"Cargo{template}.toml", "holds": "[workspace]"}]
+    elif where == "forbidden":
+        item["forbidden"] = [f"docs/{template}.md"]
+    else:
+        item[where] = f"Quartzite {template}"
+    with pytest.raises(questions.QuestionError) as refused:
+        questions.resolve({"form": questions.FORM, "repository": "rust-workspace", "questions": [item]},
+                          built_repo.manifest, built_repo.root, "hidden")
+    message = str(refused.value)
+    assert message.startswith("rust-workspace-h99: "), message
+    for word in ("Quartzite", template, built_repo.manifest["facts"]["product"]):
+        assert word not in message
+
+
+def test_a_forbidden_citation_whose_fact_is_missing_is_still_dropped(ground):
+    """The clean variant's reading stays: a forbidden citation naming a fact the repository lacks is dropped."""
+    built_repo = ground["python-app-clean"]
+    item = {"id": "python-app-clean-h99", "category": "what-value", "question": "Which spec governs?",
+            "gold_answer": "the one", "sources": [{"path": "README.md", "holds": "Governing specs:"}],
+            "forbidden": ["{stale}"]}
+    asked = questions.resolve({"form": questions.FORM, "repository": "python-app-clean", "questions": [item]},
+                              built_repo.manifest, built_repo.root, "hidden")
+    assert asked[0].forbidden == []

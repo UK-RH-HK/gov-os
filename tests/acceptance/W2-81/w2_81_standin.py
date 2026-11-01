@@ -150,11 +150,14 @@ def render(model, built, dest, beside):
         store.parent.mkdir(parents=True, exist_ok=True)
         connection = sqlite3.connect(store)
         connection.executescript("CREATE TABLE lexical_chunk (id INTEGER PRIMARY KEY, chunk_id TEXT UNIQUE, path TEXT, "
-                                 "text TEXT); CREATE TABLE semantic_vector (chunk_id TEXT PRIMARY KEY, embedding BLOB);")
+                                 "text TEXT);")
+        vectors_table = not model.get("index_without_vector_table")  # gov rebuild without its embedder makes none
+        if vectors_table:
+            connection.execute("CREATE TABLE semantic_vector (chunk_id TEXT PRIMARY KEY, embedding BLOB)")
         for n, (rel, vector) in enumerate(sorted(model["index"].items())):
             connection.execute("INSERT INTO lexical_chunk (chunk_id, path, text) VALUES (?, ?, ?)",
                                (f"c{n}", rel, model.get("index_text", {}).get(rel, rel)))
-            if vector:
+            if vector and vectors_table:
                 connection.execute("INSERT INTO semantic_vector VALUES (?, ?)", (f"c{n}", b"\0" * 16))
         connection.commit()
         connection.close()
@@ -168,7 +171,7 @@ _GOV = """#!/bin/sh
 d="$0.d"
 case "$1" in
   retrieve)
-    h=$(printf %s "$2" | sha256sum | cut -c1-64)
+    h=$(printf '%s\n%s' "${PWD##*/}" "$2" | sha256sum | cut -c1-64)  # its repository (the folder it runs in)
     if [ -f "$d/$h.json" ]; then cat "$d/$h.json"; else cat "$d/none.json"; fi ;;
   close) exit "$(cat "$d/close_exit")" ;;
   adopt) exit "$(cat "$d/adopt_exit")" ;;
@@ -177,8 +180,10 @@ esac
 """
 
 
-def question_key(text):
-    return hashlib.sha256(text.encode()).hexdigest()
+def question_key(repository, text):
+    """A question's key: its repository and its text, so two repositories asking the same text are answered apart
+    (the runner runs ``gov retrieve`` in the repository's own folder, whose name the stand-in reads)."""
+    return hashlib.sha256(f"{repository}\n{text}".encode()).hexdigest()
 
 
 def write_gov(folder, name="gov", ranking=None, close_exit=0, adopt_exit=0):
@@ -203,15 +208,36 @@ def write_gov(folder, name="gov", ranking=None, close_exit=0, adopt_exit=0):
     return exe
 
 
-def ranking_for(asked, order="gold"):
-    """A known ranking for resolved questions: ``gold`` puts each gold source first; ``forbidden`` puts a forbidden
-    citation first (where the question has one), then the gold; ``none`` returns nothing useful."""
+def ranking_for(repository, asked, order="gold"):
+    """A known ranking for one repository's resolved questions: ``gold`` puts each gold source first; ``forbidden``
+    puts a forbidden citation first (where the question has one), then the gold; ``none`` returns nothing useful."""
     out = {}
     for q in asked:
         gold = [{"path": p, "start_line": line, "end_line": line, "text": "evidence"} for p, line, _ in q.sources]
         bad = [{"path": p, "start_line": 1, "end_line": 1, "text": "planted"} for p in q.forbidden[:1]]
-        out[question_key(q.question)] = {"gold": gold, "forbidden": bad + gold, "none": []}[order]
+        out[question_key(repository, q.question)] = {"gold": gold, "forbidden": bad + gold, "none": []}[order]
     return out
+
+
+def write_hidden_stand_in(folder, count=10):
+    """A stand-in hidden half in a case's own folder (never the real one): for each repository, ``count`` questions
+    in the visible form, made from the visible half's templates with texts of their own."""
+    import yaml
+
+    import w2_81_questions as questions
+
+    folder = gitlib.outside_this_repository(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    for name, data in questions.sets_in(questions.VISIBLE).items():
+        made = []
+        for n in range(count):
+            item = data["questions"][n % len(data["questions"])]
+            made.append({**item, "id": f"{name}-h{n + 1:02d}",
+                         "question": f"Stand-in hidden question {n + 1}: {item['question']}",
+                         "gold_answer": f"Stand-in hidden answer {n + 1}: {item['gold_answer']}"})
+        (folder / f"{name}.yaml").write_text(yaml.safe_dump({"form": questions.FORM, "repository": name,
+                                                             "questions": made}, sort_keys=False), encoding="utf-8")
+    return folder
 
 
 def mutant(model):

@@ -31,11 +31,17 @@ RUNNER = Path(runner.__file__)
 SMALL = 4096  # the large files' size in these cases
 
 
-NO_HIDDEN = Path(os.devnull) / "no-hidden-half"  # not a folder: a case never falls back to the real hidden half
+def _no_hidden_questions(folder):
+    """An empty hidden folder beside the run folder: a case never falls back to the real hidden half (and a --hidden
+    that names no folder is refused, round 2 item 3)."""
+    empty = Path(folder).parent / "no-hidden-questions"
+    empty.mkdir(parents=True, exist_ok=True)
+    return empty
 
 
 def _options(folder, mode="read", **more):
-    more.setdefault("hidden", NO_HIDDEN)
+    if "hidden" not in more:
+        more["hidden"] = _no_hidden_questions(folder)
     argv = ["--folder", str(folder), "--mode", mode, "--large-size", str(SMALL)]
     for key, value in more.items():
         for one in value if isinstance(value, list) else [value]:
@@ -57,26 +63,30 @@ def _removed_after(tmp_path):
 
 @pytest.fixture(scope="module")
 def ready_run(tmp_path_factory):
-    """A run folder built with a fresh seed, adopted by the stand-in in place, and stand-in govs beside it."""
+    """A run folder built with a fresh seed, adopted by the stand-in in place, a stand-in hidden half (10 questions
+    per repository) and stand-in govs beside it, answering each repository from its own answers."""
     base = tmp_path_factory.mktemp("w2-81-runner")
     folder, tools = base / "run", base / "tools"
-    runner.run(_options(folder, "build"))
+    hidden = standin.write_hidden_stand_in(base / "hidden-stand-in")
+    sets = questions.sets_in(hidden)
+    runner.run(_options(folder, "build", hidden=hidden))
     _, repos = runner._read_back(folder)
     good, bad = {}, {}
     for name, repo in repos.items():
         standin.render(standin.perfect(repo), repo, repo.root, folder / "outputs" / name)
         asked = questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
-                                  "visible")
-        good.update(standin.ranking_for(asked, "gold"))
-        bad.update(standin.ranking_for(asked, "forbidden"))
+                                  "visible") + questions.resolve(sets[name], repo.manifest, repo.root, "hidden")
+        good.update(standin.ranking_for(name, asked, "gold"))
+        bad.update(standin.ranking_for(name, asked, "forbidden"))
     govs = {"good": standin.write_gov(tools, "gov-good", good),
             "forbidden": standin.write_gov(tools, "gov-forbidden", bad),
             "close-fails": standin.write_gov(tools, "gov-close-fails", good, close_exit=3)}
-    yield {"folder": folder, "repos": repos, "govs": govs, "base": base}
+    yield {"folder": folder, "repos": repos, "govs": govs, "base": base, "hidden": hidden}
     shutil.rmtree(gitlib.outside_this_repository(base))
 
 
 def _read(ready_run, built=ALL, **more):
+    more.setdefault("hidden", ready_run["hidden"])
     options = _options(ready_run["folder"], "read", **more)
     return runner.run(options, built=built)
 
@@ -96,6 +106,9 @@ def test_all_handled_and_both_figures_met_is_ready(ready_run):
     assert report["verdict"] == judge.READY, report["reasons"]
     saved = json.loads((ready_run["folder"] / "report.json").read_text())
     assert saved["verdict"] == judge.READY and saved["seed"] == report["seed"]
+    assert saved["hidden_half"] == "present and asked in 6 of 6 repositories"
+    assert all(saved["repositories"][n]["hidden_half"] == {"questions": 10, "asked": 10, "needed": 10,
+                                                           "present": True} for n in runner.EXPECTED)
     for name in runner.EXPECTED:
         repo = saved["repositories"][name]
         assert repo["figures"]["hit_at_5"] == 100.0 and repo["figures"]["stacked_share"] == 100.0, name
@@ -168,7 +181,7 @@ def test_the_command_prints_the_verdict_and_never_a_secret(ready_run):
     env = {**os.environ, "PYTHONPATH": str(gitlib.REPO_ROOT / "src")}
     env.pop("GOV_DEV" + "_TIERS", None)
     done = subprocess.run([sys.executable, str(RUNNER), "--folder", str(ready_run["folder"]), "--mode", "read",
-                           "--gov", str(ready_run["govs"]["good"]), "--hidden", str(NO_HIDDEN)],
+                           "--gov", str(ready_run["govs"]["good"]), "--hidden", str(ready_run["hidden"])],
                           capture_output=True, text=True, env=env)
     assert done.returncode == 1 and done.stdout.startswith("NOT_READY (seed "), (done.returncode, done.stdout)
     refused = subprocess.run([sys.executable, str(RUNNER), "--folder", str(RUNNER.parent / "w2-81-run"),
@@ -219,7 +232,21 @@ def _hidden_stand_in(folder):
          "steps": [{"message": "Handover notes", "write": {"notes/handover.txt": "token: {value}\n"}},
                    {"message": "Handover notes, without the token", "write": {"notes/handover.txt": "token: ask\n"}}],
          "evidence": {"path": "notes/handover.txt", "form": "forge-token", "added_in": "{commit:1}",
-                      "removed_in": "{commit:2}"}}]}), encoding="utf-8")
+                      "removed_in": "{commit:2}"}},
+        {"id": "o1", "repository": "python-app", "kind": "orphaned-test", "variant": "rates-module-removed",
+         "paths": ["tests/test_quarry_rates.py", "src/{fact:product}/quarry_rates.py"],
+         "steps": [{"message": "Quarry rates", "write": {
+             "src/{fact:product}/quarry_rates.py": "def quarry_rate():\n    return 3\n",
+             "tests/test_quarry_rates.py": "from {fact:product}.quarry_rates import quarry_rate\n\n\n"
+                                           "def test_quarry_rate():\n    assert quarry_rate() == 3\n"}},
+                   {"message": "Inline the quarry rates", "remove": ["src/{fact:product}/quarry_rates.py"]}],
+         "evidence": {"test": "tests/test_quarry_rates.py", "subject": "src/{fact:product}/quarry_rates.py",
+                      "definition": "def quarry_rate", "used_as": "from {fact:product}.quarry_rates import quarry_rate",
+                      "removed_in": "{commit:2}"}},
+        {"id": "l1", "repository": "rust-workspace", "kind": "large-file", "variant": "frame-capture",
+         "paths": ["captures/frames-capture.bin"],
+         "steps": [{"message": "A frame capture", "write": {"captures/frames-capture.bin": "f" * 6000}}],
+         "evidence": {"path": "captures/frames-capture.bin", "size": 6000}}]}), encoding="utf-8")
     return folder
 
 
@@ -234,6 +261,7 @@ def test_the_hidden_half_is_read_from_the_folder_given_and_never_shown(tmp_path,
     assert secret["evidence"]["rule"] == "github-pat" and len(secret["evidence"]["added_in"]) == 12
     assert repos["legacy-docs"].secrets, "the variant's secret is held in memory"
     gov = standin.write_gov(tmp_path / "tools", "gov", {})
+    (folder / "repos" / "python-app" / "tests" / "test_quarry_rates.py").unlink()  # an adoption deleted it
     report = runner.run(_options(folder, "read", gov=gov, hidden=hidden))
     ids = [q["id"] for q in report["repositories"]["rust-workspace"]["figures"]["per_question"]]
     assert "rust-workspace-h01" in ids
@@ -253,8 +281,22 @@ def test_the_hidden_half_is_read_from_the_folder_given_and_never_shown(tmp_path,
         for word in ("docs/frames/frame-limits.md", "notes/handover.txt", "front-matter-status", "token-in-notes",
                      "Frame limits", "Handover notes", "Maximum frame: 512", "frame-limits"):
             assert word not in text, f"{name} shows a hidden variant's {word!r}"
-    for label in ("hidden variant #1 (f1)", "hidden variant #2 (s1)"):
+    for label in ("hidden variant #1 (f1)", "hidden variant #2 (s1)", "hidden variant #3 (o1)",
+                  "hidden variant #4 (l1)"):
         assert label in shown["report.json"] and label in shown["report.md"], label
+    # round 2b, item 4: a visible entry's evidence names a hidden variant's file as that variant's file
+    for name, text in shown.items():
+        for word in ("test_quarry_rates", "quarry_rates.py", "quarry_rate", "rates-module-removed",
+                     "frames-capture", "frame-capture"):
+            assert word not in text, f"{name} shows a hidden variant's {word!r}"
+    visible = next(p for p in report["repositories"]["python-app"]["judgement"]["planted"]
+                   if p["id"] == "python-app.orphaned-test.module-removed")
+    assert any("hidden variant #3 (o1)'s file" in str(s["record"]) + str(s["said"]) for s in visible["evidence"])
+    # round 2b, item 5: no "not measured" line where only a hidden variant would need one
+    assert report["repositories"]["rust-workspace"]["judgement"]["not_measured"] == []
+    rust_section = shown["report.md"].split("## rust-workspace")[1].split("\n## ")[0]
+    assert "Not measured" not in rust_section and "within the budget" not in rust_section
+    assert report["repositories"]["legacy-docs"]["judgement"]["not_measured"], "the visible large files' line stays"
 
 
 def test_the_markdown_report_says_what_the_json_says_is_not_measured(ready_run):
@@ -267,3 +309,113 @@ def test_the_markdown_report_says_what_the_json_says_is_not_measured(ready_run):
     assert said, "the JSON report names what is not measured"
     for item in said:
         assert item in markdown, f"the markdown report drops: {item}"
+
+
+# --------------------------------------------------------------------------
+# Round 2b (DEC-997): a secret anywhere in the run folder; the measurement half required; a template's error
+# --------------------------------------------------------------------------
+
+PLACES = ("outputs/summary.md", "outputs/secret-history.log", "session-notes.md", "run.json",
+          "repos/python-app/NOTES.md")
+
+
+@pytest.mark.parametrize("place", PLACES)
+def test_a_secret_written_anywhere_in_the_run_folder_is_mishandled(ready_run, place):
+    """Item 2: every file the adopting session can write in the run folder is compared with every held value."""
+    folder, govs = ready_run["folder"], ready_run["govs"]
+    repo = ready_run["repos"]["secret-history"]
+    entry = next(e for e in repo.manifest["planted"] if e["kind"] == "secret")
+    held = repo.secrets[0]
+    target = folder / place
+    before = target.read_bytes() if target.exists() else None
+    try:
+        if place == "run.json":
+            record = json.loads(before)
+            target.write_text(held.line(json.dumps({**record, "session_note": "{value}"})))
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(held.line("summary of the adoption: found {value}\n"))
+        report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1")
+    finally:
+        if before is None:
+            target.unlink()
+        else:
+            target.write_bytes(before)
+    assert report["reasons"] == [f"secret-history: {entry['id']} is MISHANDLED"], report["reasons"]
+    judged = next(p for p in report["repositories"]["secret-history"]["judgement"]["planted"]
+                  if p["id"] == entry["id"])
+    named = [s["record"] for s in judged["evidence"] if s["status"] == judge.MISHANDLED]
+    assert any(place in str(r) for r in named), named
+    for name in ("report.json", "report.md", "run.log"):
+        assert_absent(held, (folder / name).read_text(), f"the runner's {name}")
+
+
+def test_a_hidden_folder_that_does_not_exist_is_refused(ready_run, tmp_path, capfd):
+    """Item 3: a --hidden that names no existing folder is refused (exit 2), in build and in read mode."""
+    missing = tmp_path / "no-such-hidden-folder"
+    for argv in (["--folder", str(tmp_path / "run"), "--mode", "build", "--large-size", str(SMALL)],
+                 ["--folder", str(ready_run["folder"]), "--mode", "read"]):
+        assert runner.main(argv + ["--hidden", str(missing)]) == 2
+        out, err = capfd.readouterr()
+        assert err.startswith("refused: --hidden names no existing folder"), err
+        assert str(missing) not in out + err
+    assert not (tmp_path / "run" / "repos").exists()
+
+
+@pytest.mark.parametrize("how", ["no-hidden-questions", "wrong-extension", "nine-questions"])
+def test_a_repository_without_its_measurement_half_is_not_ready_naming_it(ready_run, tmp_path, capfd, how):
+    """Item 3: a repository whose hidden half yields fewer than 10 hidden questions is not counted present; READY
+    needs the half present and asked in every repository; the reports and the command line say so."""
+    govs, hidden = ready_run["govs"], tmp_path / "hidden"
+    shutil.copytree(ready_run["hidden"], hidden)
+    names = list(runner.EXPECTED) if how == "no-hidden-questions" else ["rust-workspace"]
+    if how == "no-hidden-questions":
+        for path in hidden.glob("*.yaml"):
+            path.unlink()
+    elif how == "wrong-extension":
+        (hidden / "rust-workspace.yaml").rename(hidden / "rust-workspace.yml")
+    else:
+        data = yaml.safe_load((hidden / "rust-workspace.yaml").read_text())
+        data["questions"] = data["questions"][:9]
+        (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
+    report = _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1", hidden=hidden)
+    asked = 9 if how == "nine-questions" else 0
+    wanted = [f"{n}: the measurement (hidden) half is not present and asked: {asked} hidden questions asked, at "
+              f"least 10 needed" for n in names]
+    assert report["verdict"] == judge.NOT_READY and report["reasons"] == wanted, report["reasons"]
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    assert saved["repositories"]["rust-workspace"]["hidden_half"]["present"] is False
+    assert saved["hidden_half"] == f"absent in {len(names)} of 6 repositories"
+    markdown = (ready_run["folder"] / "report.md").read_text()
+    assert all(reason in markdown for reason in wanted) and f"hidden half absent in {len(names)} of 6" in markdown
+    code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden),
+                        "--gov", str(govs["good"])])
+    out, _ = capfd.readouterr()
+    assert code == 1 and f"hidden half: absent in {len(names)} of 6 repositories" in out, out
+
+
+TEMPLATE_FORMS = {"attribute": "{product.upper}", "missing-attribute": "{product.nothing}", "index": "{product[x]}",
+                  "conversion": "{product!z}", "format": "{product:>>9x}", "positional": "{0}",
+                  "unmatched": "{product"}
+
+
+@pytest.mark.parametrize("where", ["question", "forbidden"])
+@pytest.mark.parametrize("form", sorted(TEMPLATE_FORMS))
+def test_a_hidden_template_with_an_error_is_refused_naming_its_id(ready_run, tmp_path, capfd, form, where):
+    """Item 7: any error filling a hidden template is refused as `refused: <id>: <reason>` with exit 2."""
+    hidden = tmp_path / "hidden"
+    shutil.copytree(ready_run["hidden"], hidden)
+    data = yaml.safe_load((hidden / "rust-workspace.yaml").read_text())
+    template = TEMPLATE_FORMS[form]
+    if where == "question":
+        data["questions"][0]["question"] = f"Quartzite question about {template}?"
+    else:
+        data["questions"][0]["forbidden"] = [f"docs/quartzite/{template}.md"]
+    (hidden / "rust-workspace.yaml").write_text(yaml.safe_dump(data))
+    code = runner.main(["--folder", str(ready_run["folder"]), "--mode", "read", "--hidden", str(hidden)])
+    out, err = capfd.readouterr()
+    assert code == 2, (code, out, err)
+    assert err.startswith(f"refused: {data['questions'][0]['id']}: "), err
+    product = ready_run["repos"]["rust-workspace"].manifest["facts"]["product"]
+    for word in ("Quartzite", "quartzite", template, product):
+        assert word not in out + err, f"the refusal shows {word!r}"

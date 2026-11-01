@@ -699,15 +699,19 @@ def _apply_one(built, number, variant, seed, manifests_root):
         if form not in FORMS:
             raise AssertionError(f"variant {where}: a secret names its form, one of {', '.join(FORMS)}")
         held = make_secret(form, seed, f"{target.name}:hidden:{variant['id']}")
-    hashes = []
+    hashes, touched = [], set()
     for step in variant["steps"]:
         for rel, content in (step.get("write") or {}).items():
+            rel = _put(str(rel), hashes, facts, where)
+            touched.add(rel)
             content = _put(str(content), hashes, facts, where)
             content = held.line(content) if held is not None else content
             place = outside_this_repository(target.root / rel)
             place.parent.mkdir(parents=True, exist_ok=True)
             place.write_text(content, encoding="utf-8")
         for rel in step.get("remove") or []:
+            rel = _put(str(rel), hashes, facts, where)
+            touched.add(rel)
             (target.root / rel).unlink()
         run_git(target.root, "add", "-A")
         run_git(target.root, "commit", "-q", "-m", str(step.get("message") or f"Change {number}"),
@@ -726,6 +730,7 @@ def _apply_one(built, number, variant, seed, manifests_root):
         "id": f"{target.name}.{variant['kind']}.hidden-{variant['id']}", "kind": variant["kind"],
         "variant": str(variant["variant"]), "shape": data["shape"], "hidden": True,
         "number": number, "hidden_id": _ident(variant),  # how the report names it (README, "The hidden half's form")
+        "hidden_files": sorted(touched),  # its own files: a visible entry's evidence never names them
         "paths": _put(variant["paths"], hashes, facts, where), "commits": [h[:12] for h in hashes],
         "detectable_by": manifest_form.DETECTABLE_BY[variant["kind"]],
         "correct_handling": manifest_form.CORRECT_HANDLING[variant["kind"]], "evidence": evidence})

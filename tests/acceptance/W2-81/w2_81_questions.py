@@ -18,6 +18,7 @@ source whose fact is missing, or whose line is not in the built HEAD, makes the 
 
 from __future__ import annotations
 
+import string
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -66,11 +67,26 @@ def sets_in(folder):
     return {path.stem: load_set(path) for path in sorted(Path(folder).glob("*.yaml"))}
 
 
+class MissingFact(QuestionError):
+    """A template names a fact the repository does not have (a forbidden citation of it is dropped)."""
+
+
 def _fill(template, facts, qid):
+    """A template filled with the repository's facts. Only the form ``{name}`` is allowed; any other form (attribute
+    or index access, a conversion, a format, a positional field, an unmatched brace) and any error of the formatter
+    is a QuestionError naming the question's id and the error's kind, never the template's text or a fact's value."""
+    text = str(template)
     try:
-        return str(template).format_map(facts)
-    except (KeyError, IndexError, ValueError):
-        raise QuestionError(f"{qid}: a template names a fact the repository does not have") from None
+        for _literal, name, spec, conversion in string.Formatter().parse(text):
+            if name is not None and (not name.isidentifier() or spec or conversion):
+                raise QuestionError(f"{qid}: a template uses a form other than {{name}}")
+        return text.format_map(facts)
+    except QuestionError:
+        raise
+    except KeyError:
+        raise MissingFact(f"{qid}: a template names a fact the repository does not have") from None
+    except Exception as exc:  # noqa: BLE001 - whatever the formatter refuses is refused, by its kind only
+        raise QuestionError(f"{qid}: a template cannot be filled ({type(exc).__name__})") from None
 
 
 def resolve(question_set, manifest, root, part):
@@ -100,8 +116,8 @@ def resolve(question_set, manifest, root, part):
         forbidden = []
         for template in item.get("forbidden") or []:
             try:
-                forbidden.append(str(template).format_map(facts))
-            except KeyError:
+                forbidden.append(_fill(template, facts, qid))
+            except MissingFact:
                 continue  # a planted source this repository does not have
         resolved.append(Question(qid, part, item["category"], _fill(item["question"], facts, qid),
                                  _fill(item["gold_answer"], facts, qid), sources, forbidden))

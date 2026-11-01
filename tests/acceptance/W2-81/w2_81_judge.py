@@ -246,13 +246,17 @@ def read_index(root):
         connection = sqlite3.connect(f"file:{path}?mode=ro&immutable=1", uri=True)
         try:
             lexical = {row[0] for row in connection.execute("SELECT path FROM lexical_chunk")}
+            tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+            # gov rebuild without its embedder leaves the lexical tables and no vector table: no vectors, not
+            # an unreadable index (the lexical checks still run)
             semantic = {row[0] for row in connection.execute(
-                "SELECT c.path FROM lexical_chunk c JOIN semantic_vector v ON v.chunk_id = c.chunk_id")}
+                "SELECT c.path FROM lexical_chunk c JOIN semantic_vector v ON v.chunk_id = c.chunk_id")} \
+                if "semantic_vector" in tables else set()
         finally:
             connection.close()
     except sqlite3.Error:
         return None, "unreadable"
-    return {"lexical": lexical, "semantic": semantic}, ""
+    return {"lexical": lexical, "semantic": semantic, "vector_table": "semantic_vector" in tables}, ""
 
 
 def blob_id(data):
@@ -304,6 +308,18 @@ def adoption_history(root, head):
     return objects
 
 
+def run_files(folder):
+    """Every file the adopting session can write in the run folder, outside any ``.git`` folder: the whole
+    ``outputs/`` tree, every repository's working tree and the run folder's own files. Returns (files, unreadable)."""
+    files, unreadable = [], []
+    for here, dirs, names in os.walk(folder):
+        dirs[:] = sorted(d for d in dirs if d != ".git")
+        for name in sorted(names) + [d for d in dirs if (Path(here) / d).is_symlink()]:
+            path = Path(here) / name
+            (unreadable if path.is_symlink() or not path.is_file() else files).append(path)
+    return files, unreadable
+
+
 def output_files(root, beside):
     """Every output file: the working tree outside .git, and the folder beside it. Returns (files, unreadable)."""
     files, unreadable = [], []
@@ -328,8 +344,8 @@ def output_files(root, beside):
 class _View:
     """The outputs of one adoption, read once."""
 
-    def __init__(self, root, beside, head=None):
-        self.root, self.beside, self.head = Path(root), beside, head
+    def __init__(self, root, beside, head=None, run_folder=None):
+        self.root, self.beside, self.head, self.run_folder = Path(root), beside, head, run_folder
         self.records = {stage: read_record(root, record_name(stage), stage) for stage in STAGES}
         self.findings_state, self.findings = read_findings(root)
         self.spaces, self.map_why = read_path_map(root)
@@ -530,6 +546,11 @@ def _misleading_name(case, view, ev, path, built):
 
 def _secret(case, view, ev, built, held, verdict):
     files, unreadable = output_files(view.root, view.beside)
+    if view.run_folder is not None:  # what the session wrote beside every repository, and in the run folder itself
+        more, more_unreadable = run_files(view.run_folder)
+        seen = {p.resolve() for p in files + unreadable}
+        files += [p for p in more if p.resolve() not in seen]
+        unreadable += [p for p in more_unreadable if p.resolve() not in seen]
     if held is None:
         case.add(MISSED, None, None, "no value was given to compare the outputs with")
     else:
@@ -582,10 +603,11 @@ def _secret(case, view, ev, built, held, verdict):
 
 
 def _rel(path, view):
-    for base in (view.root, Path(view.beside) if view.beside else None):
+    for label, base in (("repository", view.root), ("beside", Path(view.beside) if view.beside else None),
+                        ("run", Path(view.run_folder) if view.run_folder else None)):
         if base is not None:
             try:
-                return f"{'beside' if base != view.root else 'repository'}:{Path(path).relative_to(base).as_posix()}"
+                return f"{label}:{Path(path).relative_to(base).as_posix()}"
             except ValueError:
                 pass
     return str(path)
@@ -722,11 +744,12 @@ def _control(view, control):
     return {"id": control["id"], "kind": control["kind"], "status": FLAGGED if seen else CLEAN, "evidence": seen}
 
 
-def judge_repository(manifest, root, beside=None, secrets=(), built=None):
-    """The judgement of one repository's adoption outputs. ``secrets``: the builder's Held values."""
+def judge_repository(manifest, root, beside=None, secrets=(), built=None, run_folder=None):
+    """The judgement of one repository's adoption outputs. ``secrets``: the builder's Held values. ``run_folder``:
+    the run folder, whose every file (outside ``.git``) is compared with each held value too."""
     manifest_form.validate(manifest)
     built = built_today() if built is None else set(built)
-    view = _View(root, beside, manifest["head"])
+    view = _View(root, beside, manifest["head"], run_folder)
     verdict_record = view.records["VERDICT"]
     verdict = verdict_record.data.get("verdict") if verdict_record.state == "PRESENT" else None
     secrets = list(secrets)
@@ -766,13 +789,33 @@ def judge_repository(manifest, root, beside=None, secrets=(), built=None):
             stages[stage] = {"status": record.state, "record": record.rel}
     if "findings" not in built:
         stages["findings"] = {"status": NOT_BUILT, "record": FINDINGS, "capability": CAPABILITIES["findings"][0]}
+    controls = [_control(view, c) for c in manifest["controls"]]
+    _withhold_hidden_files(manifest, planted + controls)
     return {"repository": manifest["repository"], "seed": manifest["seed"], "planted": planted,
-            "controls": [_control(view, c) for c in manifest["controls"]], "stages": stages,
+            "controls": controls, "stages": stages,
             "not_built": sorted({s["field"] for p in planted for s in p["evidence"] if s["status"] == NOT_BUILT}
                                 | {k for k, v in stages.items() if v["status"] == NOT_BUILT}),
             "not_measured": sorted({f"{e['kind']}: {NOT_MEASURED[e['kind']]}" for e in manifest["planted"]
-                                    if e["kind"] in NOT_MEASURED}),
+                                    if e["kind"] in NOT_MEASURED and not e.get("hidden")}),  # visible entries only
             "adoption_verdict": verdict}
+
+
+def _withhold_hidden_files(manifest, results):
+    """A visible entry's evidence names a hidden variant's own file as that variant's file, by number and id only."""
+    names = {}
+    for entry in manifest["planted"]:
+        if entry.get("hidden"):
+            label = f"hidden variant #{entry.get('number', '?')} ({entry.get('hidden_id', '?')})'s file"
+            names.update({rel: label for rel in entry.get("hidden_files") or []})
+    if not names:
+        return
+    order = sorted(names, key=len, reverse=True)
+    for result in results:
+        for seen in result.get("evidence") or []:
+            for key in ("record", "said", "field"):
+                if isinstance(seen.get(key), str):
+                    for rel in order:
+                        seen[key] = seen[key].replace(rel, names[rel])
 
 
 def _public(entry, result):
@@ -815,7 +858,7 @@ def overall(judgements, figures, expected):
     return {"verdict": NOT_READY if reasons else READY, "reasons": reasons, "repositories": judgements}
 
 
-def judge(cases, figures, expected, built=None):
+def judge(cases, figures, expected, built=None, run_folder=None):
     """The whole judgement, failing closed: ``cases`` is a list of (manifest or its path, root, beside, secrets).
 
     Any error is an ERROR result, never READY; no secret value is ever in the result (checked in memory)."""
@@ -825,7 +868,7 @@ def judge(cases, figures, expected, built=None):
         for manifest, root, beside, secrets in cases:
             if not isinstance(manifest, dict):
                 manifest = manifest_form.load(manifest)
-            judgements.append(judge_repository(manifest, root, beside, secrets, built))
+            judgements.append(judge_repository(manifest, root, beside, secrets, built, run_folder))
         result = overall(judgements, figures, expected)
         text = json.dumps(result, sort_keys=True)
     except Exception as exc:  # noqa: BLE001 - whatever stops the judge is an error, never a pass

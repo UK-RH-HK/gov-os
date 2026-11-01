@@ -9,7 +9,6 @@ builds sharing a manifests folder; 10 the large files' budget clause, not measur
 from __future__ import annotations
 
 import json
-import os
 import shutil
 from pathlib import Path
 
@@ -24,7 +23,11 @@ import w2_81_standin as standin
 from w2_81_secret import assert_absent
 
 ALL = set(judge.CAPABILITIES)
-NO_HIDDEN = Path(os.devnull) / "no-hidden-half"
+def _no_hidden_questions(tmp_path):
+    """An empty hidden folder of the case's own: never the real hidden half."""
+    empty = tmp_path / "no-hidden-questions"
+    empty.mkdir(exist_ok=True)
+    return empty
 
 
 @pytest.fixture(autouse=True)
@@ -338,22 +341,24 @@ def test_a_build_refuses_a_manifests_folder_that_holds_manifests(tmp_path):
     shared = tmp_path / "shared"
     (shared / "manifests").mkdir(parents=True)
     (shared / "manifests" / "python-app.json").write_text("{}")
-    with pytest.raises(runner.RunnerError):
+    with pytest.raises(runner.RunnerError) as refused:
         runner.run(runner.parse(["--folder", str(tmp_path / "second"), "--mode", "build", "--manifests", str(shared),
-                                 "--large-size", "4096", "--hidden", str(NO_HIDDEN)]))
+                                 "--large-size", "4096", "--hidden", str(_no_hidden_questions(tmp_path))]))
+    assert "already holds manifests" in str(refused.value)
     assert not (tmp_path / "second" / "repos").exists()
 
 
 def test_read_mode_refuses_manifests_that_are_not_the_runs(tmp_path):
     folder = tmp_path / "run"
     runner.run(runner.parse(["--folder", str(folder), "--mode", "build", "--seed", "9", "--large-size", "4096",
-                             "--hidden", str(NO_HIDDEN)]))
+                             "--hidden", str(_no_hidden_questions(tmp_path))]))
     path = folder / "manifests" / "rust-workspace.json"
     data = json.loads(path.read_text())
     data["seed"] = 10  # another run's build wrote this folder
     path.write_text(json.dumps(data))
     with pytest.raises(runner.RunnerError) as refused:
-        runner.run(runner.parse(["--folder", str(folder), "--mode", "read", "--hidden", str(NO_HIDDEN)]))
+        runner.run(runner.parse(["--folder", str(folder), "--mode", "read", "--hidden",
+                                 str(_no_hidden_questions(tmp_path))]))
     assert "rust-workspace" in str(refused.value)
 
 

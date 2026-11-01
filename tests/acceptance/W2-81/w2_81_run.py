@@ -16,8 +16,10 @@
   with ``--gov`` in each repository, then as ``read``.
 - The report: ``<folder>/report.json`` and ``<folder>/report.md``; a log of steps, ``<folder>/run.log``.
 
-The hidden half is read only from ``--hidden``, or from the default hidden folder when that exists. Its questions
-are named by id only; its texts and answers are in no report, log or output. The secrets' values are drawn from the
+The hidden half is read only from ``--hidden``, or from the default hidden folder when that exists; a ``--hidden``
+that names no existing folder is refused. READY needs it present and asked in every repository: at least
+``HIDDEN_NEEDED`` (10) hidden questions each. Its questions are named by id only, and its variants by number and id;
+its texts and answers are in no report, log or output. The secrets' values are drawn from the
 seed in memory and are in no report, log or output either (checked before anything is written). The runner writes
 nothing in this repository, never reads the workbench and never uses the dev-tier variable.
 """
@@ -46,6 +48,9 @@ from w2_81_secret import make_secret  # noqa: E402
 EXPECTED = (*build.SHAPES, build.CLEAN)
 BATCH_SIZE, BUNDLE_BUDGET, STACK_BUDGET, TOKEN_CHARS = 10, 6000, 24000, 4  # as gov.retrieval.measure (DEC-860)
 DEFAULT_STAGES = ("A0", "A1", "A2")
+# The measurement half's size: at least 10 hidden questions per repository (docs/plan/WAVE_2_WBS.md, the card
+# "W2-81's held-out half", its first KPI). A repository with fewer is not counted present (README, "The runner").
+HIDDEN_NEEDED = 10
 
 
 class RunnerError(Exception):
@@ -99,7 +104,9 @@ def held_secrets(manifest):
 
 
 def _hidden(options):
-    folder = Path(options.hidden) if options.hidden else questions.HIDDEN_DEFAULT
+    if options.hidden and not Path(options.hidden).expanduser().is_dir():
+        raise RunnerError("--hidden names no existing folder: the measurement half cannot be read")
+    folder = Path(options.hidden).expanduser() if options.hidden else questions.HIDDEN_DEFAULT
     if not folder.is_dir():
         return None, [], {}
     variants = []
@@ -242,13 +249,17 @@ def run(options, built=None):
                 log(f"adopt {name} {stage}: exit {done.returncode}")
                 if done.returncode != 0:
                     break
-    hidden_folder, _, hidden_sets = _hidden(options)
-    scores = []
+    _, _, hidden_sets = _hidden(options)
+    scores, hidden = [], {}
     for name, repo in repos.items():
         asked = questions.resolve(questions.load_set(questions.VISIBLE / f"{name}.yaml"), repo.manifest, repo.root,
                                   "visible")
-        if name in hidden_sets:
-            asked += questions.resolve(hidden_sets[name], repo.manifest, repo.root, "hidden")
+        secret_half = questions.resolve(hidden_sets[name], repo.manifest, repo.root, "hidden") \
+            if name in hidden_sets else []
+        asked += secret_half
+        count = len(secret_half)
+        hidden[name] = {"questions": count, "asked": count if options.gov else 0, "needed": HIDDEN_NEEDED,
+                        "present": bool(options.gov) and count >= HIDDEN_NEEDED}
         follow_moves(asked, judge.reviewed_moves(repo.root))
         answers = {q.id: _ask(options.gov, repo.root, q, env, log) for q in asked} if options.gov else {}
         scores.append(score.score_repository(name, asked, answers) if options.gov
@@ -265,9 +276,12 @@ def run(options, built=None):
         closes[name] = {"run": True, "ticket": tickets[name], "exit": done.returncode}
         log(f"close {name} {tickets[name]}: exit {done.returncode}")
     cases = [(repo.manifest, repo.root, folder / "outputs" / name, repo.secrets) for name, repo in repos.items()]
-    judged = judge.judge(cases, score.figures(scores), EXPECTED, built)
+    judged = judge.judge(cases, score.figures(scores), EXPECTED, built, run_folder=folder)
     reasons = list(judged["reasons"])
     for name in EXPECTED:
+        if not hidden[name]["present"]:
+            reasons.append(f"{name}: the measurement (hidden) half is not present and asked: {hidden[name]['asked']} "
+                           f"hidden questions asked, at least {HIDDEN_NEEDED} needed")
         close = closes[name]
         if not close["run"]:
             reasons.append(f"{name}: gov close was not run")
@@ -278,12 +292,13 @@ def run(options, built=None):
     verdict = judged["verdict"] if judged["verdict"] == judge.ERROR else (judge.NOT_READY if reasons else judge.READY)
     by_name = {j["repository"]: j for j in judged.get("repositories", [])}
     report = {"form": "w2-81-report/1", "mode": options.mode, "seed": record["seed"], "verdict": verdict,
-              "reasons": reasons, "hidden_half": "present" if hidden_folder else "absent",
+              "reasons": reasons, "hidden_half": _hidden_summary(hidden),
               "gov": options.gov, "pinned_gov": options.pinned_gov,
               "repositories": {name: {"judgement": by_name.get(name), "figures": next(
                   ({k: s[k] for k in ("questions", "hit_at_5", "stacked_share", "per_question")}
                    for s in scores if s["repository"] == name), None),
                   "not_built": (by_name.get(name) or {}).get("not_built"), "close": closes[name],
+                  "hidden_half": hidden[name],
                   "stages_run": stage_runs.get(name, [])} for name in EXPECTED}}
     text = json.dumps(report, indent=2, sort_keys=True)
     markdown = _markdown(report)
@@ -295,6 +310,14 @@ def run(options, built=None):
     (folder / "report.md").write_text(markdown, encoding="utf-8")
     _write_log(folder, log, reasons)
     return report
+
+
+def _hidden_summary(hidden):
+    """The measurement half in one line: present and asked in how many repositories of all."""
+    present = sum(1 for h in hidden.values() if h["present"])
+    if present == len(hidden):
+        return f"present and asked in {present} of {len(hidden)} repositories"
+    return f"absent in {len(hidden) - present} of {len(hidden)} repositories"
 
 
 def _write_log(folder, log, reasons):
@@ -311,13 +334,21 @@ def _markdown(report):
         j, f = repo["judgement"] or {}, repo["figures"] or {}
         rows += ["", f"## {name}", "", f"hit@5 {f.get('hit_at_5')} (floor {score.HIT_AT_5_FLOOR:g}); stacked share "
                  f"{f.get('stacked_share')} (target {score.STACKED_SHARE_TARGET:g}); {f.get('questions')} questions; "
-                 f"gov close: {repo['close']}; not built: {', '.join(repo['not_built'] or []) or 'none'}", "",
+                 f"gov close: {repo['close']}; not built: {', '.join(repo['not_built'] or []) or 'none'}; "
+                 f"hidden half: {_hidden_line(repo.get('hidden_half'))}", "",
                  "| Planted problem | Status | Evidence |", "|---|---|---|"]
         rows += [f"| `{p['id']}` | {p['status']} | {p['evidence'][0]['said']} |" for p in j.get("planted", [])]
         rows += [""] + [f"Not measured: {item}" for item in j.get("not_measured") or []]  # the JSON's own words
         rows += ["", "| Control | Status |", "|---|---|"]
         rows += [f"| `{c['id']}` | {c['status']} |" for c in j.get("controls", [])]
     return "\n".join(rows) + "\n"
+
+
+def _hidden_line(half):
+    if not half:
+        return "not read"
+    state = "present and asked" if half["present"] else "not present"
+    return f"{state} ({half['asked']} hidden questions asked, at least {half['needed']} needed)"
 
 
 def parse(argv):
@@ -341,7 +372,10 @@ def main(argv=None):
     except (RunnerError, gitlib.InsideThisRepository, questions.QuestionError) as refused:
         print(f"refused: {refused}", file=sys.stderr)
         return 2
-    print(f"{report['verdict'] if 'verdict' in report else 'BUILT'} (seed {report['seed']})")
+    if "verdict" not in report:
+        print(f"BUILT (seed {report['seed']})")
+        return 0
+    print(f"{report['verdict']} (seed {report['seed']}; hidden half: {report.get('hidden_half', 'not read')})")
     return 0 if report.get("verdict", judge.READY) == judge.READY else 1
 
 

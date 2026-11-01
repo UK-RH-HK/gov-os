@@ -39,6 +39,7 @@ Measured on 2026-10-31, on a machine shared with other leads:
 | batch 3 | 140 | 53 to 60 s | 17 s |
 | batch 4 | 183 | 28 to 66 s | 16 s |
 | batch 5 | 218 | 39 s | 16 s |
+| batch 6 | 271 | 36 s | 10 s |
 
 Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
@@ -330,7 +331,7 @@ judge) must stay as the build left it:
 | superseded plan | linked to its successor, out of default results, never deleted | A2 `artefacts[].class: superseded` with `superseded_by` = the successor | A3 gives it MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE or DELETE_FROM_ACTIVE_TREE; it is classed `current`; **the successor is classed historical, superseded, dead, legacy or stale**; **the successor is proposed in A3 for DELETE_FROM_ACTIVE_TREE or RETIRE** (read from A3 today, whatever is built, as the superseded plan's own proposal is) | NOT_BUILT (A2-content-class); the A3 proposals are judged today |
 | misleading name | classed by content and references; a rename only as a governed batch after A5 | A2 `artefacts[].class`: `live` for the old-named live file, `dead` for the current-named dead one | the live one is retired or deleted in A3; it is classed the other way | NOT_BUILT (A2-content-class) |
 | orphaned test | reported as a finding naming the test and its missing subject; never deleted or silently skipped | a finding `kind: orphaned-test`, `test` = the test, `subject` = the subject (path, `path::function`, or its definition) | **anything that keeps it from running or being collected**: the test file changed in any way (an import skip, an expected-failure mark, a rename out of collection, `x`-prefixed or to-do tests, an always-false `cfg`), or **any other file in the test's own folder** new, changed or gone (no list: whatever its name), or a test-runner configuration file in a folder above it new, changed or gone: `conftest.py`, `pytest.ini`, `.pytest.ini`, `pytest.toml`, `.pytest.toml`, `pyproject.toml`, `setup.cfg`, `tox.ini`, `noxfile.py`, `package.json`, `Cargo.toml`, `build.rs`, `go.mod`, `go.work`, and the families `vitest.config*`, `vitest.workspace*`, `vitest.projects*`, `vite.config*` (`.ts`, `.mts`, `.js`, `.mjs`, `.cts`, `.cjs`: vitest reads a Vite config when a package has no vitest config), `jest.config*`, `tsconfig*`, `karma.conf*`, `.mocharc*`, `pytest.*`, `.pytest.*` (pytest 9 reads `pytest.toml`, `.pytest.toml` and `.pytest.ini`); A3 retires or deletes it | NOT_BUILT (findings) |
-| secret | found in history; path, 12-digit commit and rule only; behind the owner's gate; NOT_ADOPTED_HEALTHY while open | a finding `kind: secret`, `path`, `commit` = the manifest's `added_in`, `rule`, `state: OPEN`, `human_gate: owner`, and no other field than `id, type, kind, state, human_gate, paths, path, commit, rule, status, state_class` | **its own value** (each planted secret is checked against its own value, drawn from the seed and its salt, so two secrets of one form are told apart) is in any output: every file of the working tree outside `.git`, every file beside it, any of their names, or **any object the adoption added to the repository's history after the build's HEAD, on any ref or reflog**; the finding holds another field; it is not open behind the owner's gate; **the lite verdict is anything but NOT_ADOPTED_HEALTHY while the finding is open** | NOT_BUILT (findings); the value checks run today |
+| secret | found in history; path, 12-digit commit and rule only; behind the owner's gate; NOT_ADOPTED_HEALTHY while open | a finding `kind: secret`, `path`, `commit` = the manifest's `added_in`, `rule`, `state: OPEN`, `human_gate: owner`, and no other field than `id, type, kind, state, human_gate, paths, path, commit, rule, status, state_class` | **its own value** (each planted secret is checked against its own value, drawn from the seed and its salt, so two secrets of one form are told apart) is in any output: every file of the working tree outside `.git`, every file beside it, any of their names, or **any object the adoption added to the repository's history after the build's HEAD, on any ref or reflog**, or (when the runner judges, which passes its run folder) **any file of the run folder outside a `.git` folder**: the whole `outputs/` tree (a cross-repository summary or a log named after a repository at its root included), every repository's working tree, and the run folder's own files (`run.json`, notes); a match is named by its place, `run:<path>`, never the value; the finding holds another field; it is not open behind the owner's gate; **the lite verdict is anything but NOT_ADOPTED_HEALTHY while the finding is open** | NOT_BUILT (findings); the value checks run today |
 | legacy document | classed and extracted or retired as A8 states | A8 `documents[]: {path, disposition: extracted, into: <a record in the tree>}` or `{path, disposition: retired}`, as the manifest's `handling` says | it is given the other disposition | NOT_BUILT (A8-documents) |
 | large file | classed and kept out of the semantic index, **where the file now is** | in its place: A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db`. **Moved by a reviewed MOVE or RENAME** (its target holding it as built): the same three facts read **at the target**, its namespace being the one the path map's `namespaces[].paths` patterns give the target now (the adoption tool's own matcher, `gov.adopt.project.classify`), and its presence in the lexical index named in the evidence | it has semantic vectors, or its namespace is embedded, **at the target when it moved** (the evidence names the target) | **built**: judged today |
 
@@ -351,8 +352,13 @@ read. With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY
   scorer's forbidden citations.
 - "Within the budget" for the large files is **not measured today**. No budget for the index is stated anywhere the
   judge could read one: the path map's schema has no such field, `gov rebuild` records none, and the Contract gives
-  none. Each judgement of a repository with large files says so in its `not_measured` list. When a budget is stated,
-  the judge is to read it there.
+  none. Each judgement of a repository with visible large files says so in its `not_measured` list (computed
+  from the visible entries only, so a hidden large-file variant in a repository with no visible one shows no
+  such line: the clause is the same for every large file, and this README states it for all of them). When a
+  budget is stated, the judge is to read it there.
+- **A store without a vector table** (`gov rebuild` without its embedder makes the lexical tables only) is read as
+  no vectors, not as an unreadable index: the lexical checks still run on `lexical_chunk` (a control left out of
+  it is FLAGGED) and the large files are judged with no vectors.
 
 ### The provisional form of what is not built
 
@@ -457,6 +463,18 @@ now. Each is NOT_READY, or the judgement's status, as stated:
 | 6 | A hidden variant is named in the reports by its number and id only | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` (its JSON, markdown and log hold none of the stand-in variants' paths, names or texts, and each label `hidden variant #<n> (<id>)`) |
 | 7 | A control in a held namespace that is not embedded: the reading is CLEAN (a decision; it passed on the head too) | `test_a_control_in_a_held_namespace_that_is_not_embedded_is_clean` |
 
+**The third review's findings (round 2b, DEC-997).** Each case failed on the head before it (`226d47b8d5d7`) and passes now, unless it says otherwise:
+
+| # | Behaviour | Cases |
+|---|---|---|
+| 1 | The runner's READY case no longer depends on its fresh seed: the stand-in `gov` answers each repository from its own answers | the runner module at 50 seeds in a row (1000 to 1049, through a probe plugin outside the suite that fixes the seed the module draws), all 36 cases passing at each; 17 of those seeds made the two Python repositories ask a question of the same text, and at seed 1001 the head's READY case failed (`python-app: the figure stacked_share is 90.9, below its floor of 99`). No other case draws a fresh seed |
+| 2 | A secret's value anywhere in the run folder is MISHANDLED, named by its place | `test_a_secret_written_anywhere_in_the_run_folder_is_mishandled`: `outputs/summary.md`, `outputs/secret-history.log`, `session-notes.md`, `run.json`, another repository's working tree (5) |
+| 3 | The measurement half is required | `test_a_hidden_folder_that_does_not_exist_is_refused` (build and read mode); `test_a_repository_without_its_measurement_half_is_not_ready_naming_it`: no hidden questions, another extension, nine questions (3), each named in the reasons, both reports and the command line; the READY case checks the hidden half's line |
+| 4 | A visible entry's evidence names a hidden variant's file by number and id | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`: a hidden orphaned test beside the visible one, deleted by the adoption |
+| 5 | No "not measured" line where only a hidden variant would need one | the same case: a hidden large file in the Rust workspace |
+| 6 | A store without a vector table is read as no vectors | `test_a_store_without_a_vector_table_is_read_as_no_vectors` |
+| 7 | A template with an error is refused naming its id | `test_a_hidden_template_with_an_error_is_refused_naming_its_id` (7 forms in a question and in a forbidden citation, through the command; the 4 question forms the head's formatter already refused passed there too), `test_a_template_with_an_error_is_refused_naming_its_id_only` (7 forms in 4 places at the resolver; 13 passed on the head), and `test_a_forbidden_citation_whose_fact_is_missing_is_still_dropped` (the kept reading) |
+
 **The judge's own mutation check (scratch run, 2026-10-31, not committed).** Six mutants of the judge were run
 against these self-tests in one process. Five were killed:
 
@@ -528,7 +546,7 @@ hold no secret. `w2_81_questions.resolve` then:
 - finds each source's line in the built HEAD (the manifest's `head`);
 - drops a forbidden citation whose fact the repository does not have (the clean variant plants nothing).
 
-A source whose fact is missing, or whose text is not at HEAD, is a `QuestionError` naming the question's id only.
+A source whose fact is missing, or whose text is not at HEAD, is a `QuestionError` naming the question's id only. **A template uses the form `{name}` only:** attribute or index access, a conversion, a format, a positional field, an unmatched brace or any other error of the formatter, in a question, gold answer, source or forbidden citation, is a `QuestionError` naming the id and the error's kind, never the template's text or a fact's value; the command refuses it as `refused: <id>: <reason>` (exit 2). A forbidden citation naming a fact the repository lacks is still dropped.
 
 **The questions:**
 
@@ -602,8 +620,8 @@ The manifest is then written again. The judge and the stand-ins treat a variant 
 planted problem.
 
 **What the runner shows of it.** The runner reads the hidden half only from `--hidden`, or from that folder when it
-exists. The report and the log name hidden questions by id only, and **a hidden variant by its number and id only**: `hidden variant #<n> (<id>)`, its number being its place in `variants.yaml`. Its kind, variant name, paths and texts are withheld; its evidence keeps each status (and the capability of a NOT_BUILT) and says `withheld: a hidden variant`. The self-tests never read that folder: they pass a
-stand-in hidden half written in their own temporary folder, or a path that is no folder
+exists. **A `--hidden` that names no existing folder is refused** (`refused: --hidden names no existing folder: ...`, exit 2), in every mode. **The measurement half is required:** a repository's hidden half is counted present only when it yields at least 10 hidden questions (the companion card's first KPI, `docs/plan/WAVE_2_WBS.md`: `w2_81_run.HIDDEN_NEEDED`) and they are asked (`--gov` given). A question file with another extension than `.yaml` yields none. A repository without it is named in the verdict's reasons (`<repository>: the measurement (hidden) half is not present and asked: <n> hidden questions asked, at least 10 needed`), in the JSON report (`hidden_half` per repository, with its counts, and a one-line summary at the top), in the markdown report and on the command line (`<verdict> (seed <n>; hidden half: present and asked in 6 of 6 repositories)` or `absent in <k> of 6 repositories`), and READY needs it in every repository. The report and the log name hidden questions by id only, and **a hidden variant by its number and id only**: `hidden variant #<n> (<id>)`, its number being its place in `variants.yaml`. Its kind, variant name, paths and texts are withheld; its evidence keeps each status (and the capability of a NOT_BUILT) and says `withheld: a hidden variant`. **A visible entry's evidence never names a hidden variant's file either:** the hook records each variant's own files (`hidden_files`, the paths its steps wrote or removed, placeholders filled), and the judge names any of them in visible evidence as `hidden variant #<n> (<id>)'s file`. The self-tests never read that folder: they pass a
+stand-in hidden half written in their own temporary folder (`standin.write_hidden_stand_in`: 10 questions per repository made from the visible templates with texts of their own), or an empty folder of their own
 (`test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`). They check that a stand-in hidden question's text and answer are in
 no report, log, file of the run folder, or output.
 
@@ -643,7 +661,8 @@ holds the seed, the hidden half's presence, and the verdict with every reason. T
 **The verdict.** READY needs everything the judge's READY needs, and in every repository:
 
 - `gov close` was run and exited 0;
-- no stage the runner ran failed.
+- no stage the runner ran failed;
+- the measurement (hidden) half is present and asked (see "What the runner shows of it").
 
 A close not run, a non-zero close, or a failed stage is NOT_READY naming it.
 
@@ -661,8 +680,9 @@ A close not run, a non-zero close, or a failed stage is NOT_READY naming it.
 self-tests use a stand-in `gov` that exits 0, or 3.
 
 **Its self-tests** (`test_w2_81_runner.py`) use stand-ins: the perfect adoption model written in place, and a
-POSIX-shell `gov` that answers `retrieve` from a known ranking keyed by the question's hash, so its files never hold
-a question's text, and exits as told for `close` and `adopt`. They check:
+POSIX-shell `gov` that answers `retrieve` from a known ranking keyed by **the repository and** the question's hash
+(the repository is the folder it runs in), so two repositories asking a question of the same text are answered
+apart and the result does not depend on the seed, and its files never hold a question's text, and exits as told for `close` and `adopt`. They check:
 
 - READY with everything handled and both figures met;
 - NOT_READY for a failing close, a close not run, a forbidden citation first, no retrieval, and today's code;
@@ -729,5 +749,6 @@ folder.
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
 | **Review (batch 4)** Items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |
+| **Round 2b (DEC-997)** Items 1 to 7 of "The third review's findings": 1 (S10, F5: no flaky case), 2 (S4, F3), 3 (S6, S7, F2), 4 and 5 (S7, F4), 6 (S5, S6), 7 (S7, F4) | `test_w2_81_runner.py` (the cases named there), `test_w2_81_round2.py` (the store and template cases) |
 | **Round 2 (DEC-993)** Items 1 to 7 above: 1 and 2 (S3, S6, F1), 3 (S3, F1), 4 (S10, F5), 5 (S3, S9), 6 (S7, F4), 7 (S5) | `test_w2_81_round2.py` (all), and in `test_w2_81_runner.py` the `_removed_after` fixture, `test_the_markdown_report_says_what_the_json_says_is_not_measured` and `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` |
 | **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |
