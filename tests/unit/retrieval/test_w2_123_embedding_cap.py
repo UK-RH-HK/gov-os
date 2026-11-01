@@ -165,6 +165,33 @@ def test_an_unreadable_value_refuses_the_start_and_names_the_key(stage, capsys, 
     assert restart["restarted"] is False and key in restart["reason"] and stage.runs() == []
 
 
+@pytest.mark.parametrize("start", [ollama.ensure_available, ollama.ensure_query_available])
+@pytest.mark.parametrize("missing", ["named", "nowhere"])
+def test_no_executable_found_gives_the_result_of_w1_18_without_settings(stage, capsys, start, missing):
+    env = {**stage.env, "PATH": str(stage.home)}
+    if missing == "named":
+        env["GOV_OLLAMA_BIN"] = str(stage.home / "missing")
+    else:
+        del env["GOV_OLLAMA_BIN"]
+    result = start(timeout_s=1, env=env)
+    assert result == {"available": False, "started": False, "facet": "semantic", "state": "FACET_UNAVAILABLE",
+                      "warning": ollama.WARNING}
+    assert capsys.readouterr().err.count(ollama.WARNING) == 1
+
+
+def test_an_executable_that_cannot_start_still_states_its_settings(stage):
+    stage.program.chmod(0o644)  # there, but not executable: a start attempted, not one without an executable
+    result = ollama.ensure_available(timeout_s=1, env=stage.env)
+    assert (result["available"], result["started"], result["state"]) == (False, False, "FACET_UNAVAILABLE")
+    assert result["settings"] == {"parallel": 1, "cpus": _highest(8), "nice": 10, "source": "default"}
+
+
+def test_an_unreadable_value_comes_before_a_missing_executable(stage):
+    stage.gate({"embedding_servers": {"shared": {"nice": -1}}})
+    result = ollama.ensure_available(timeout_s=1, env={**stage.env, "GOV_OLLAMA_BIN": str(stage.home / "missing")})
+    assert (result["state"], result["settings"]) == ("CONFIG_INVALID", None)
+
+
 class _Endpoint:
     """An in-process stand-in /api/embed: ``answer(text)`` gives the vector, or None for an answer without one."""
 

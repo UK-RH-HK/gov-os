@@ -209,6 +209,8 @@ def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True,
                              preexec_fn=_capped(settings))
             started = True
+        except FileNotFoundError:  # the executable named is not there: it is not found
+            executable = None
         except (OSError, subprocess.SubprocessError):  # a cap that cannot be set is no start
             pass
         while started and not available and time.monotonic() < deadline:
@@ -218,8 +220,10 @@ def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
         return {"available": True, "started": started, "facet": FACET, "state": "AVAILABLE", "warning": None,
                 "settings": settings}
     print(WARNING, file=sys.stderr)
-    return {"available": False, "started": started, "facet": FACET, "state": "FACET_UNAVAILABLE",
-            "warning": WARNING, "settings": settings}
+    result = {"available": False, "started": started, "facet": FACET, "state": "FACET_UNAVAILABLE",
+              "warning": WARNING}
+    # No executable found, so nothing could start and there are no settings of a start to state (W1-18's result).
+    return {**result, "settings": settings} if executable else result
 
 
 def query_host(env=None) -> str:
