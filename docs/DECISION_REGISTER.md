@@ -12510,3 +12510,13 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.379 | 2026-11-01 | Orchestrator (delegated): DEC-997 (W2-81's batch 6 and second review). Next free id: DEC-998. |
+
+### DEC-998 — The dead-man's switch through the Claude app alone; Remote Control checked at every session start (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-994 item 1, DEC-991, DEC-945 · **Changes:** DEC-994 item 1 (channel (b) by cron failed: a headless session has no Remote Control link)
+- **Context:** push tests 1 to 3 (headless `claude -p`, cron-like) were refused "terminal active" every time; test 4 from the CTO's live session reached the owner's phone; the day's earlier misses were the presence rule (pushes skipped while the owner is focused on the connected terminal), not a broken link.
+- **Decision:** (1) Claude only: no ntfy, no other app, no email. (2) The owner turns on "Push when actions required" in `/config` (a push for every permission prompt and question of a Remote Control session). (3) **Every fresh CTO session, at its start:** confirm its Remote Control link is live and send one test push; and write its session id to `log/cto-session.txt` (the switch watches that session). (4) The dead-man's switch must work through the Claude app alone: the CTO assesses a Claude-only way (a small sentinel session with Remote Control that sleeps on a background check and pushes only when the CTO's session has stalled) and brings it with its cost and risks (ACT-SENTINEL-1).
+- **Where it goes (DEC-851):** this register; the prompt §1 (the start-of-session steps) and §0; the decisions-in-force list; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.380 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-998 (Claude-only dead-man's switch; Remote Control and a test push at every CTO session start). Next free id: DEC-999. |
