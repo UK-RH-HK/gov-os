@@ -12668,3 +12668,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.395 | 2026-11-01 | Orchestrator (delegated): DEC-1013. Next free id: DEC-1014. |
+
+### DEC-1014 — RESEARCH-AGENT-FAILURES-1 adopted; SIZING-1 option 0 (W2-122, W2-123 at the front); a landing never waits for an unrelated close (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-1012, DEC-1003, DEC-974, DEC-968, DEC-1011
+- **Decision:** (1) The package's 9 practices, all approved (claims only through the dispatcher's readiness check; the status block generated from files; the remaining watchers into dispatcher passes; the dispatcher watches the sentinel's heartbeat; the checkpoint under 300 lines with RESUME HERE first, older blocks archived at each handover; a tool change carries its before-and-after measurement; on fail-open FULL tickets the second review uses a different model or effort, and a lead's agreement is not corroboration on a verification P2; the moderator's triage before any round is declared; net ticket growth in the daily document, over 5 % of the remaining plan in a week a re-plan package). (2) Its 15 KPI lines approved, each applied when its ticket next runs (`packages/SMART-WORK-4.md`), with the owner's condition on W2-115's quarantine: **a quarantined test is never left on a list; it is fixed at once or escalated, like any red (DEC-968).** (3) The two Wave 3 rows (W3-P19 canaries, W3-P20 an audit sample of the orchestrator's commits). (4) SIZING-1 option 0: W2-122 (`DAEO-blwa`, seeded rebuilds: the integration store the warm base for every new worktree and close copy, refreshed after every landing) and W2-123 (`DAEO-qzrq`, parallel requests on the embedding server, the 8-core cap checked not to become the limit) filed, at the front of the queue; the 28 GB WSL change not now. (5) A landing never waits for a close it does not conflict with: a mechanism in the dispatcher.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.396 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1014. Next free id: DEC-1015. |
