@@ -12566,3 +12566,13 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 |---|---|---|
 | 0.384 | 2026-11-01 | Orchestrator (delegated): DEC-1002. Next free id: DEC-1003. |
 
+
+### DEC-1003 — Every practice the CTO adopts in its own tools is mapped into the product's tickets the same day (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-982 (the smart way of working is the product's), DEC-983 (SMART-WORK-1), DEC-979 item 2 (the tools lane) · **Changes:** DEC-982's "a practice built only in your tools is a gap to name" becomes a same-day mapping
+- **Decision:** (1) Today's four queue changes (DEC-1001 (a) to (d)) reach the Gov OS: each mapped, as SMART-WORK-1 did, to the product ticket that should carry it (W2-115, W2-117, W2-20 or W2-76 as fits), with its KPI change, as proposals for the owner (`packages/SMART-WORK-2.md`). (2) **Standing:** every new practice the CTO adopts in its own tools is mapped into the product's tickets the same day, as a KPI change proposal, so the smart way of working never lives only in the CTO's tools; the daily document lists each with its proposal.
+- **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; the lighter lane's rule (DEC-979 item 2).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.385 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1003 (same-day mapping of the CTO's practices into the product). Next free id: DEC-1004. |
+
