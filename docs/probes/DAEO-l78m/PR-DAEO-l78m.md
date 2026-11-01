@@ -6,7 +6,7 @@ implementer_session: 9c2f47ad-6ef7-4454-ac3e-6408fad47084
 reviewer_wrote_nothing: true
 commissioned_by: orchestrator
 judged_by: orchestrator
-judgement: pass
+judgement: superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)
 probed_commit: 5af07405778255e865d5c38cff1f8244a5ca7d9e
 ---
 
