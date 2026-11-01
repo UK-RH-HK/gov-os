@@ -1,6 +1,6 @@
 ---
 id: DAEO-k7hz
-status: open
+status: in_progress
 deps: [DAEO-g0ip]
 links: []
 created: 2026-10-16T16:35:11Z
@@ -31,6 +31,11 @@ allowed_paths:
 - template/.rulesync/skills/orchestration/**
 - .rulesync/skills/audit/**
 - template/.rulesync/skills/audit/**
+- .claude/skills/*/SKILL.md
+- .rulesync/skills/*/SKILL.md
+- template/.rulesync/skills/*/SKILL.md
+- template/governance/kernel/skills/*/SKILL.md
+- template/governance/kernel/skills/test-design/SKILL.md
 - template/governance/kernel/skills/test-design/**
 - .claude/skills/test-design/**
 - .rulesync/skills/test-design/**
@@ -56,6 +61,10 @@ kpis:
   - 'One skill template (`template/governance/kernel/templates/skill.md`): front matter (name, version, third-person description of what and when), When / not when, Inputs, Steps as a checklist, Done when, Output and handover, Escalation (P3/P2/P1/Emergency), Never, Sources at the end; the body under about 150 lines with reference files one level deep; three test scenarios written before the text; an imported skill adopted only licence-checked and passing its three scenarios [DEC-959 item 5, ROLES-RESEARCH-1 §2]'
   - 'test-design gains the work order in parallel (the designer works from the spec beside the engineer, never reading its work), red against the ticket''s base, ISTQB''s black-box techniques (equivalence partitions, boundary values, decision tables, state transitions), the proportion rule, and the README map of KPI lines to tests in the form gov accept reads [DEC-959 items 6 and 7, ROLES-RESEARCH-1 §2.6]'
   - 'orchestration gains three reference files: integration-queue (the merge queue''s enqueue, test, advance or eject, record), nightly-sheriff (re-run the red alone, bisect, fix small or P1) and incident-response (stop, contain, P1, a live handoff, a blameless note); and a new qa-review skill for the QA engineer (trace each KPI line to its tests and code; tests against the spec; code against the spec; probes in proportion to the profile; findings in JUDGEMENT.md''s two lines; severity tied to P3/P2/P1; re-runs nothing) [DEC-959 items 1 and 3, ROLES-RESEARCH-1 §5.3 items 3 and 4]'
+  - 'The kernel''s lead brief template carries a `brief_gaps:` section (gap, where it belongs, its cost) after the twelve fields, and the orchestration skill states that the gaps are fixed in the template within the week (DEC-943, ROLES-SPEC-1 G14) [DEC-983, DEC-982]'
+  - 'The orchestration skill states the anti-drift kit: a fresh orchestrator session every morning from a handover (checkpoint, RESUME HERE, the decisions in force), the digest loaded at start, every rule written into its five places (DEC-851) [DEC-952 item 6, DEC-953 item 7, DEC-983, DEC-982]'
+  - 'The orchestration skill states scope control: a new ticket in the WBS goes to the owner as a P1 with a recommendation before it is filed; leads name a needed ticket in their return and never file one [DEC-974, DEC-983, DEC-982]'
+  - 'The test-design skill states that a timing test measures the work under test (its process''s CPU time, or against a quiet reference beside it), never the wall time of a loaded machine, at the same bound [DEC-979 item 1 D2, DEC-983, DEC-982]'
   failure:
   - The skill validator refuses a brief without the twelve-field rule.
   - A template, skill or role file that still teaches LEAD_CHECKPOINT, a listing refusal or a fixed ceiling fails a test [DEC-866].
@@ -74,6 +83,7 @@ sources:
 - DEC-943
 - DEC-957
 - DEC-959
+- DEC-983
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-11/
@@ -112,3 +122,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-11), as approved (DEC-729). The list row
   - The five brief templates carry record frontmatter [W2-L258], and loose citations are fixed [W2-L256].
   - **The test-design skill (DEC-889 item 11 c; lens H finding 10):** it states the test kinds (unit, acceptance, live or harness, dev-tier, load-sensitive, repository-state), the run-time cost a test may take and how it is measured, that a test never copies the whole working tree where a minimal fixture will do, and that a test asserting the live repository's own state is declared as such (the record-reading set).
 - **KPIs, failure:** the skill validator refuses a brief without the twelve-field rule.
+
+**DEC-981 (ROLES-SPEC-1 G13, round 1):** the version line of every skill's `SKILL.md` (the kernel's source and its generated copies under `.claude/skills/`, `.rulesync/skills/` and `template/.rulesync/skills/`) is in this ticket's paths for that line only; **not the adopt skill's** while W2-52 (`DAEO-siiz`) holds it (it gets its version line when W2-52 merges); nothing else in those files changes. The role file stays limited to DEC-866's sweep sentences (W2-33 holds the rest).
+
+**DEC-983 (SMART-WORK-1, round 2):** the last four success KPIs (brief gaps, the anti-drift kit, scope control, timing tests) are round 2's, not round 1's. For the fourth, the test-design skill's `SKILL.md` body (`template/governance/kernel/skills/test-design/SKILL.md` and its generated copies) is in this ticket's paths for that one section.

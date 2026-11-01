@@ -14,6 +14,10 @@ the last run are in "Round 8".
 env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs
 ```
 
+W2-67 (DAEO-9nys) revised the 13 first-round cases lens I2 found weak, and brought row W2-L420's docstrings to
+DEC-868 and DEC-908: each case's planted fault, its red and green runs and its Rewrite-Reason are in
+`README-W2-67.md`.
+
 ## How the tests run
 
 - Through public interfaces only: the `gov close` command line (W1-07's console-script
@@ -1332,8 +1336,8 @@ A project without a path map, or whose path map names neither key, closes as tod
 and no command is added; nothing in W1-07's or W1-32's suite holds anything against it (W1-07 runs
 `gov close` only for a ticket that does not exist; W1-32 runs no close).
 
-Note for the lead: the path map must hold `namespaces` (the loader requires the key), so the one
-line is added to a path map a project already has; the kernel's schema file for the path map
+Note for the lead: the path map must hold `namespaces` (the loader requires the key; the suite's
+projects write one catch-all namespace, `paths: ["**"]`, below), so the one line is added to a path map a project already has; the kernel's schema file for the path map
 (`template/governance/kernel/schemas/path-map.schema.json`) does not name the two keys, as it
 does not name DEC-479's two. This repository's own line for P-3 is `close_timeout: 7200`.
 
@@ -1363,7 +1367,13 @@ the product's command line.
 ### The projects of this suite (rewritten, reason "defect found by the parallel trial")
 
 `support.Project` now writes `governance/project/path-map.yaml` into every temporary project, in
-its first commit: `namespaces: {}` and `close_workers: 2` (`support.SUITE_WORKERS`). So every
+its first commit: one catch-all namespace (`namespaces: {all: {paths: ['**']}}`) and
+`close_workers: 2` (`support.SUITE_WORKERS`). The namespace was empty (`namespaces: {}`) until
+W2-95 made `core-pathmap` judge every tracked path: a path in no namespace is a finding of
+path-map compliance (hard-block), so every case would have failed for a reason that is not its
+subject. `**` places every path in exactly one namespace and lowers nothing (DEC-970, DEC-959
+item 9); the same holds for the path maps of rounds 15 and 16 (`r15.policies_text` and the cases
+that write their own). So every
 close of this suite starts two workers for a parallel run, not as many as the machine gives. Two,
 not one: the parallel form stays what round 11's cases hold (a worker's name, more than one
 worker), and none of them needs a number of its own; none contradicts the setting.
@@ -1371,7 +1381,7 @@ worker), and none of them needs a number of its own; none contradicts the settin
 values.
 
 Until the setting is built the line changes nothing of a close: the loader accepts the path map
-(an empty `namespaces`, a top-level key it does not know), no commit of a ticket's range touches
+(one namespace with `paths` alone, a top-level key it does not know), no commit of a ticket's range touches
 it, and the cases of round 11 pass with it (below).
 
 One existing file was rewritten for it, with the same reason and in a commit of its own: the two

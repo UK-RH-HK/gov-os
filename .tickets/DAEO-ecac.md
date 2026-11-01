@@ -34,6 +34,7 @@ kpis:
   - 'The launcher''s set of launchable roles (today the fixed WORKER_ROLES and OWN_TICKET_ROLES tuples in launcher.py) is read from the kernel''s role files, so a new role is a file, not a code change; a role file that is missing or unreadable refuses the launch; the five roles launch exactly as before [DEC-946 (W3-P09), DEC-826 Q1]'
   - 'A role named in a ticket but with no role file is refused at launch, naming the role [DEC-946 (W3-P09)]'
   - '`qa-engineer` is a known role: it is in the guard''s KNOWN_ROLES (`src/gov/guard/decide.py`, that set only) and in the reviewer set the session record and launcher read, so a QA engineer is held to rule 5 (it writes only its findings report); this repository''s own hook''s reviewer line is prepared beside it as an owner ACT, not changed here [DEC-959 item 3, DEC-953 item 2]'
+  - '`gov launch` refuses a second writing session in a worktree that has one live (read from the session records), naming it; a reviewer or the QA engineer, which write only their reports, are not counted; `gov launch --tests-worktree` makes a ticket''s tests worktree on its own branch from the ticket''s head [DEC-847, DEC-963, DEC-983, DEC-982]'
   failure:
   - A fixed list of launchable roles left in code.
   - A value the log does not hold reported as measured; a zero for not measured; log text in a record.
@@ -52,6 +53,7 @@ sources:
 - DEC-954
 - DEC-957
 - DEC-959
+- DEC-983
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-60b/
