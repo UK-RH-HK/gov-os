@@ -3,13 +3,16 @@
 ``start_ids`` finds in a question the ids of records (``DEC-n``, ``CAP-n``, a ticket's id), a W2 id resolved to its
 ticket, and record titles, so that the record closure joins the fusion without ``--ticket`` or ``--id``. Only ids and
 titles the record store holds become start ids: a question that names no record gives none, and today's bundle. A
-title is found whole, by word, in any case. Everything is sorted. It only reads.
+title is a register entry's in the store, or the ``title`` of the frontmatter that declares the record; it is found
+whole, by word, in any case. Everything is sorted. It only reads.
 """
 
 from __future__ import annotations
 
 import re
 from pathlib import Path
+
+import yaml
 
 TOKEN = re.compile(r"[A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*")
 W2_ID = re.compile(r"W2-[0-9]+[a-z]?")
@@ -18,20 +21,36 @@ TASK = "task"
 _WBS = re.compile(r"^(?:wbs_id|external-ref):\s*['\"]?(W2-[0-9]+[a-z]?)['\"]?\s*$", re.MULTILINE)
 
 
+def _front(root: Path, path: str) -> str:
+    """The frontmatter text of the file at ``path``, empty when it has none or cannot be read."""
+    try:
+        text = (root / path).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    return text[4:text.find("\n---", 4)] if text.startswith("---\n") else ""
+
+
 def _wbs_ids(root: Path, known: list[dict]) -> dict[str, str]:
     """``W2 id -> ticket id`` of every ticket of the store whose file names one."""
     tickets = {}
     for record in sorted(known, key=lambda record: record["id"]):
-        if record["type"] != TASK:
-            continue
-        try:
-            text = (root / record["path"]).read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        front = text[4:text.find("\n---", 4)] if text.startswith("---\n") else ""
-        for wbs in sorted(set(_WBS.findall(front))):
-            tickets.setdefault(wbs, record["id"])
+        if record["type"] == TASK:
+            for wbs in sorted(set(_WBS.findall(_front(root, record["path"])))):
+                tickets.setdefault(wbs, record["id"])
     return tickets
+
+
+def _title(root: Path, record: dict) -> str:
+    """The record's title: a register entry's from the store, any other record's from its file's frontmatter."""
+    if record.get("title"):
+        return record["title"]
+    try:
+        front = yaml.safe_load(_front(root, record["path"]))
+    except yaml.YAMLError:
+        return ""
+    if not isinstance(front, dict) or front.get("id") != record["id"] or not isinstance(front.get("title"), str):
+        return ""
+    return front["title"]
 
 
 def _named(query: str) -> set[str]:
@@ -53,7 +72,7 @@ def start_ids(root: Path, query: str, known: list[dict]) -> list[str]:
         found |= {tickets[token] for token in w2 if token in tickets}
     words = " ".join(query.split()).casefold()
     for record in known:
-        title = " ".join((record.get("title") or "").split()).casefold()
+        title = " ".join(_title(Path(root), record).split()).casefold()
         if title and re.search(rf"(?<!\w){re.escape(title)}(?!\w)", words):
             found.add(record["id"])
     return sorted(found)

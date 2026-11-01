@@ -52,6 +52,14 @@ def test_only_ids_and_titles_the_store_holds_become_start_ids(tickets, query, ex
     assert graph_route.start_ids(tickets, query, KNOWN) == expected
 
 
+def test_a_records_title_is_read_from_the_frontmatter_that_declares_it(tickets):
+    (tickets / "docs/contract").mkdir(parents=True)
+    (tickets / "docs/contract/CAP-12.md").write_text(
+        "---\nid: CAP-12\ntype: capability\ntitle: Code intelligence\n---\n# x\n", encoding="utf-8")
+    assert graph_route.start_ids(tickets, "what does code   intelligence answer?", KNOWN) == ["CAP-12"]
+    assert graph_route.start_ids(tickets, "what about intelligence?", KNOWN) == []  # a title is found whole
+
+
 # The planted code graph: qualified name -> (name, label, file, lines); and the calls between them.
 NODES = {"code.src.fus.rrf": ("rrf", "Function", "src/fus.py", "10-14"),
          "code.tests.test_fus.rrf": ("rrf", "Function", "tests/test_fus.py", "1-3"),
@@ -123,20 +131,24 @@ def indexed(tmp_path, monkeypatch):
 
 def test_a_symbol_is_asked_in_small_pages_and_its_spans_join_as_chunks(indexed):
     root, calls = indexed
-    hits, facet = code_route.route(root, "Who calls rrf?", CHUNKS)
+    hits, facet = code_route.route(root, "Who calls `rrf`?", CHUNKS)
     assert facet == {"available": True, "reason": None}
     assert [hit["chunk_id"] for hit in hits] == ["src/fus.py:9", "src/fus.py:13", "src/fus.py:1", "src/ret.py:20",
                                                  "src/ret.py:40"]  # the definition, then its neighbours, no test
     assert {tool for tool, _ in calls} == {"search_graph", "trace_path"}  # never query_graph: no whole-graph read
     assert all(args["limit"] == code_route.PAGE <= 500 for _, args in calls)
     assert [args["function_name"] for tool, args in calls if tool == "trace_path"] == ["code.src.fus.rrf"] * 4
-    assert code_route.route(root, "Who calls rrf?", CHUNKS) == (hits, facet)  # the same answer twice
+    assert calls[0] == ("search_graph", {"project": codeintel.PROJECT, "format": "json", "limit": code_route.PAGE,
+                                         "offset": 0, "name_pattern": "^(rrf)$"})  # only the word shaped as code
+    assert code_route.route(root, "Who calls `rrf`?", CHUNKS) == (hits, facet)  # the same answer twice
 
 
 def test_a_question_naming_no_symbol_gives_no_route(indexed):
-    root, _ = indexed
+    root, calls = indexed
     assert code_route.route(root, "How are the RRF ranks summed?", CHUNKS) is None  # a Variable, and case differs
+    assert code_route.route(root, "Who calls helper?", CHUNKS) is None  # a plain word, though a function's name
     assert code_route.route(root, "?!", CHUNKS) is None
+    assert calls == []  # plain words ask nothing of the index
 
 
 @pytest.mark.parametrize("query", ["Who calls fuse_scores?", "what does `rrf` do", "who uses rankItems"])

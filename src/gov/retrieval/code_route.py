@@ -1,15 +1,17 @@
 """The code route of a plain question: the symbols it names, their callers and callees (W2-92; DEC-957, CAP-12).
 
-``route`` asks the code index for each word of the question that is the name of a function, method or class there,
-with the code-graph tool's own traversal (DEC-859): ``search_graph`` for the definitions, ``trace_path`` one hop both
+``route`` asks the code index for each word of the question shaped as code (``_CODE_SHAPED``: in backticks, called,
+or with an underscore or a capital inside it) that is the name of a function, method or class there, with the
+code-graph tool's own traversal (DEC-859): ``search_graph`` for the definitions, ``trace_path`` one hop both
 ways for the callers and callees, ``search_graph`` by qualified name for their spans. Every answer is a small page
 (``PAGE`` rows, far under the tool's cap), followed by its continuation; nothing loads the whole graph. A span is a
 file of the index's staged copy, given back as the repository's path, and joins the fusion as the store's lexical
 chunks that cover it. As the tool's ``trace_path`` does by default, test files are left out.
 
-A question that names no symbol gives no route and no facet: today's bundle. A missing or unreadable code index gives
-the facet unavailable with its reason, and no hit, for a question with a word shaped as code (``_CODE_SHAPED``):
-without the index no other word is known to be a symbol. The other routes still answer (DEC-957, DEC-860).
+A question of plain words asks nothing of the index: a plain word that happens to name a symbol (``close``, ``load``)
+is no question about code, and a search for every word is no targeted answer. A question that names no symbol gives
+no route and no facet: today's bundle. A missing or unreadable code index gives the facet unavailable with its
+reason, and no hit, for a question with a word shaped as code. The other routes still answer (DEC-957, DEC-860).
 Everything is sorted. It only reads: it builds no index.
 """
 
@@ -97,8 +99,8 @@ def _spans(root: Path, words: list[str]) -> list[tuple[str, int, int]]:
 
 def route(root: Path, query: str, chunks: dict[str, dict]) -> tuple[list[dict], dict] | None:
     """The code route's hits (chunks of ``chunks``) and its facet, or None when ``query`` names no symbol."""
-    words = sorted(set(_WORD.findall(query)))
-    if not words:
+    words = sorted({word for shaped in _CODE_SHAPED.findall(query) for word in _WORD.findall(shaped)})
+    if not words:  # a question of plain words asks nothing of the index: today's bundle
         return None
     index, spans, reason = Path(root) / codeintel.BASE_REL, [], None
     if not (index / "home").is_dir() or not (index / "files").is_dir():
@@ -108,8 +110,8 @@ def route(root: Path, query: str, chunks: dict[str, dict]) -> tuple[list[dict], 
             spans = _spans(root, words)
         except (RuntimeError, OSError, LookupError, TypeError, ValueError) as error:
             reason = f"the code index is unreadable: {codeintel.TOOL} did not answer ({error})"
-    if reason is not None:  # without an answer, only a word shaped as code is known to name a symbol
-        return ([], {"available": False, "reason": reason}) if _CODE_SHAPED.search(query) else None
+    if reason is not None:
+        return [], {"available": False, "reason": reason}
     if not spans:
         return None
     by_path: dict[str, list[dict]] = {}
