@@ -1,0 +1,5 @@
+Merge w2/W2-04-tests into w2/W2-04: W2-04's acceptance tests (independent test designer, DEC-963)
+
+Task: DAEO-u4oz
+Implements: CAP-15.d, DEC-860
+Role: orchestrator

@@ -1,0 +1,8 @@
+Merge w2/W2-04-tests into w2/W2-04: round 2's acceptance tests (independent test designer, DEC-963, DEC-1005)
+
+W2-54's 17 cases and W1-41's 2 revised in this ticket, and W2-04's own suite re-read (one batch shown in
+supplementary_batches; a dependency counted by its front matter), each commit with its Rewrite-Reason.
+
+Task: DAEO-u4oz
+Implements: CAP-15.d, DEC-860
+Role: orchestrator

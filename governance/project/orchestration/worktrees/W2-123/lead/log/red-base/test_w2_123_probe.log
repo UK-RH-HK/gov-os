@@ -1,0 +1,25 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_probe.py:15: AttributeError: module 'gov.retrieval.ollama' has no attribute 'probe'
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_states_the_servers_health_from_one_embedding[healthy]
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_states_the_servers_health_from_one_embedding[slow]
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_states_the_servers_health_from_one_embedding[hung-no-answer]
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_states_the_servers_health_from_one_embedding[hung-no-vector]
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_states_down_and_starts_nothing
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_of_the_query_server_asks_the_query_address
+FAILED tests/acceptance/W2-123/test_w2_123_probe.py::test_the_probe_with_an_unreadable_value_sends_nothing
+7 failed in 0.64s

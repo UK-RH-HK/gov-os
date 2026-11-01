@@ -18,6 +18,8 @@ while true; do
     for c in $(git -C "$wt" log --format=%h -20 2>/dev/null); do
       grep -qxF "$name $c" "$SEEN" && continue
       echo "$name $c" >> "$SEEN"
+      # a commit already on w2/integrate came in by a merge (the CTO's own records): not a lead's result
+      git -C "$wt" merge-base --is-ancestor "$c" w2/integrate 2>/dev/null && continue
       subj=$(git -C "$wt" log -1 --format=%s "$c")
       if echo "$subj" | grep -Eqi "$KEY"; then
         echo "$(date '+%F %T') $name $c $subj"

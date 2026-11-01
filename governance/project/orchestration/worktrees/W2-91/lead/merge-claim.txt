@@ -1,0 +1,8 @@
+W2-91: merge w2/integrate for the ticket's claim (status in_progress; record at docs/changes/W2-91-evidence.md)
+
+The launcher and the guard read the ticket from this worktree; the claim commit 9861958e is on w2/integrate after this branch's base.
+
+Task: DAEO-a3u2
+Implements: DEC-957,DEC-954,DEC-388,DEC-694
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

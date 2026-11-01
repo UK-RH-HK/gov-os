@@ -1,0 +1,6 @@
+Merge w2/W2-13-tests: the seven ranked-route cases read ranked (independent test designer, 15e235d637bc; DEC-1000, P-W2-13-3 (b))
+
+Task: DAEO-zqvn
+Implements: DEC-725, DEC-900, DEC-963
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

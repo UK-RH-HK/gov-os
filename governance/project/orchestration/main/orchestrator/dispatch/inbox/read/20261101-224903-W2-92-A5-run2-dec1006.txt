@@ -1,0 +1,7 @@
+log: W2-92-A5-run2-dec1006.json
+W2: W2-92
+status: PACKAGES. P-W2-92-1 (a), as decided and built, makes DEC-423's must-not-cite guard fail open when the record graph is missing: W1-21's `test_without_a_record_graph_no_superseded_record_is_cited_as_current` is red. Everything else is done and verified.
+
+task: W2-92 (DAEO-n0wb) run 2 under DEC-1006: apply P-W2-92-1 to 4 (a), re-measure against the kept control, rebuild, scoped run, gov check, return DONE with the head.
+status: PACKAGES. P-W2-92-1 (a), as decided and built, makes DEC-423's must-not-cite guard fail open when the record graph is missing: W1-21's `test_without_a_record_graph_no_superseded_record_is_cited_as_current` is red. Everything else is done and verified.
+work_completed: P-2: f1's expected set is now the planted files that hold `w92_leaf` (leaf.py and middle.py). P-3: a plain word joins the code route only when the question 

@@ -1,0 +1,12 @@
+hit@5: 0.0 (baseline: 80.0)
+forbidden: 0 (baseline: 2)
+  callers-impact: 0.0%
+  current-vs-superseded: 0.0%
+  decisions: 0.0%
+  deletable: 0.0%
+  failed-approaches: 0.0%
+  history: 0.0%
+  stale-evidence: 0.0%
+  tests: 0.0%
+  where-defined: 0.0%
+  why: 0.0%

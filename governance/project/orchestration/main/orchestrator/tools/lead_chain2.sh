@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# RETIRED (DEC-1012, the owner's "a rule broken twice becomes a mechanism"): leads start only through the dispatcher's
+# ready list (dispatch/ready.txt, DEC-1007); hand-run chains were started with a trailing & twice (DEC-731). Override
+# only for a test: GOV_CHAIN_OVERRIDE=1.
+[ "${GOV_CHAIN_OVERRIDE:-}" = 1 ] || { echo "lead_chain2.sh is retired: add the ticket to .gov-runtime/scratch/orchestrator/dispatch/ready.txt (DEC-1012)" >&2; exit 2; }
 # Starts queued ticket leads in order with no fixed ceiling (owner, DEC-942): each start waits until the measured
 # gate is open (tools/gate_check.py), no ticket is ready to close and waiting for its close to start (CLOSE-PENDING,
 # item 4), and it is not between 00:30 and 05:30 (item 5). Each lead is started detached (setsid -f), so stopping

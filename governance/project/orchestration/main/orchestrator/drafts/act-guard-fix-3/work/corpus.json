@@ -1,0 +1,1253 @@
+[
+ {
+  "i": 0,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e.jsonl",
+  "key": "toolu_0153M9hvvUPeSMgwH2uBjmF5",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && python3 tools/build_lead_brief.py briefs/W2-90-part-run1.md briefs/W2-90-A5-run1.md ID=DAEO-8lmb W2=W2-90 PROFILE=LIT",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && python3 tools/build_lead_brief.py briefs/W2-90-part-run1.md briefs/W2-90-A5-run1.md ID=DAEO-8lmb W2=W2-90 PROFILE=LITE \"PATHS=the 19 files named in the ticket, tests/acceptance/W1-05/conftest.py, tests/acceptance/W1-46/conftest.py, tests/acceptance/W2-90/**\" ROWS=none \"SOURCES=DEC-957, DEC-953, DEC-954, DEC-955, DEC-906\" \"IMPL=DEC-957, DEC-953\" \"EST=a test revision of 235 cases in 19 files, about 2 to 3 hours\" && grep -c \"@@\" briefs/W2-90-A5-run1.md; ls *.spec log/*.spec 2>/dev/null | tail -3; cat tools/launch_when_gate_opens.sh | head -30",
+   "description": "Build W2-90 lead brief; inspect launch script"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 1,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-90",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1.jsonl",
+  "key": "toolu_01T6aiSYVZdmAuMWqnWmSgg5",
+  "tool": "Bash",
+  "form": "grep -n \"settings.json\\|hooks.jsonc\\|CLAUDE_PROJECT_DIR\\|REPO_ROOT\\s*=\\|REPO\\s*=\\|ROOT\\s*=\" tests/acceptance/W1-05/conftest.py tests/acceptance/W1-46/conftest.py tests/acceptance/W1-05/test_w1_05_live",
+  "input": {
+   "command": "grep -n \"settings.json\\|hooks.jsonc\\|CLAUDE_PROJECT_DIR\\|REPO_ROOT\\s*=\\|REPO\\s*=\\|ROOT\\s*=\" tests/acceptance/W1-05/conftest.py tests/acceptance/W1-46/conftest.py tests/acceptance/W1-05/test_w1_05_live_hooks.py tests/acceptance/W1-46/test_w1_46_live_sessions.py tests/acceptance/W1-46/test_w1_46_research_installs.py tests/acceptance/W2-59/test_w2_59_hook_lines.py tests/acceptance/W1-47/test_w1_47_failed_commands.py | head -60; sed -n 1,60p tests/acceptance/W1-39/w1_39_support.py",
+   "description": "Survey how the target tests read live settings"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-90",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 2,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/f39d149a-1ce7-4a7b-b9c1-3182f86cd2e6.jsonl",
+  "key": "toolu_015ifgPFnji9vhha62q2js1c",
+  "tool": "Bash",
+  "form": "grep -rln \"wbs_id\" tests/acceptance/W1-30/ | head -20; grep -rn \"DEC-earlier\" tests/acceptance/ | head -5; ls tests/acceptance/W2-54/; grep -rn \"wbs_id\" tests/acceptance/W2-57/*.py | head -3",
+  "input": {
+   "command": "grep -rln \"wbs_id\" tests/acceptance/W1-30/ | head -20; grep -rn \"DEC-earlier\" tests/acceptance/ | head -5; ls tests/acceptance/W2-54/; grep -rn \"wbs_id\" tests/acceptance/W2-57/*.py | head -3",
+   "description": "Locate the fixtures named in the decision"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 3,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/f39d149a-1ce7-4a7b-b9c1-3182f86cd2e6.jsonl",
+  "key": "toolu_01MULJkZFcQm1U3okf5EefeU",
+  "tool": "Bash",
+  "form": "ls /home/usain/gov-os-worktrees/W2-64/tests/acceptance/W2-54/ /home/usain/gov-os-worktrees/W2-64/tests/acceptance/W1-30/ | head -80",
+  "input": {
+   "command": "ls /home/usain/gov-os-worktrees/W2-64/tests/acceptance/W2-54/ /home/usain/gov-os-worktrees/W2-64/tests/acceptance/W1-30/ | head -80",
+   "description": "List W2-54 and W1-30 test folders"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 4,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/cfacb735-e5cd-4354-bd96-8c06625fc899.jsonl",
+  "key": "toolu_01UNhH7wmL1V6bT92GkL3xb7",
+  "tool": "Bash",
+  "form": "git log --oneline w2/integrate..HEAD | head -20; echo ---; git diff --name-only w2/integrate...HEAD; echo ---; ls tests/unit/rebuild/ tests/acceptance/W2-76/; cat .gov-runtime/scratch/lead/log/alone.o",
+  "input": {
+   "command": "git log --oneline w2/integrate..HEAD | head -20; echo ---; git diff --name-only w2/integrate...HEAD; echo ---; ls tests/unit/rebuild/ tests/acceptance/W2-76/; cat .gov-runtime/scratch/lead/log/alone.out | tail -40",
+   "description": "Show ticket commits and changed files"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 5,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/cfacb735-e5cd-4354-bd96-8c06625fc899.jsonl",
+  "key": "toolu_01VrqsNBefhpNTok5GdYbrAJ",
+  "tool": "Bash",
+  "form": "grep -n \"def test_\\|def _\\|lexical_s\\|rebuild(\" tests/acceptance/W2-76/test_w2_76_watchdog.py | head -60; wc -l tests/acceptance/W2-76/test_w2_76_watchdog.py tests/conftest.py",
+  "input": {
+   "command": "grep -n \"def test_\\|def _\\|lexical_s\\|rebuild(\" tests/acceptance/W2-76/test_w2_76_watchdog.py | head -60; wc -l tests/acceptance/W2-76/test_w2_76_watchdog.py tests/conftest.py",
+   "description": "Outline the watchdog acceptance test"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 6,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76/.gov-runtime/scratch/lead",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/cfacb735-e5cd-4354-bd96-8c06625fc899.jsonl",
+  "key": "toolu_0192WvTjvDkvZfUBTV9cWKYY",
+  "tool": "Bash",
+  "form": "cd /home/usain/gov-os-worktrees/W2-76 && cat .gov-runtime/scratch/lead/entries.py; grep -nE \"W1-07|W1-27|W1-41|W2-69\" tests/acceptance/serial-only.txt",
+  "input": {
+   "command": "cd /home/usain/gov-os-worktrees/W2-76 && cat .gov-runtime/scratch/lead/entries.py; grep -nE \"W1-07|W1-27|W1-41|W2-69\" tests/acceptance/serial-only.txt",
+   "description": "Show entries helper and serial-only entries of the suites"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76/.gov-runtime/scratch/lead",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 7,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/7665d1fb-3135-457d-b558-522b16b78fdf.jsonl",
+  "key": "toolu_01XRaCWabtMAJuH7cVtaLiJL",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-76/src timeout 590 python3 -m pytest tests/acceptance/W2-76 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rA 2>&1 | grep -E \"^(PASSED|FAILED|ER",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-76/src timeout 590 python3 -m pytest tests/acceptance/W2-76 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rA 2>&1 | grep -E \"^(PASSED|FAILED|ERROR|SKIPPED|XFAIL)|passed|failed|^E  \" | head -60",
+   "description": "Run 2: W2-76 acceptance tests, results only",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-b41lu80z",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 8,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/7665d1fb-3135-457d-b558-522b16b78fdf.jsonl",
+  "key": "toolu_014Fkhxay3C8odM2dHheMTvd",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-76/src python3 -m pytest tests/acceptance/W2-76 -q -p no:cacheprovider -o tmp_path_retention_policy=failed",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-76/src python3 -m pytest tests/acceptance/W2-76 -q -p no:cacheprovider -o tmp_path_retention_policy=failed",
+   "description": "Run 2: W2-76 acceptance tests (prescribed form)",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-b41lu80z",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 9,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/7665d1fb-3135-457d-b558-522b16b78fdf.jsonl",
+  "key": "toolu_01LyUoEmXCbWn4om8mHPZ47K",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-76/src python3 -m pytest tests/acceptance/W1-27 tests/acceptance/W1-41 -n 4 -q -p no:cacheprovider -o tmp_path_retention_policy=failed",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-76/src python3 -m pytest tests/acceptance/W1-27 tests/acceptance/W1-41 -n 4 -q -p no:cacheprovider -o tmp_path_retention_policy=failed",
+   "description": "Run 3: W1-27 and W1-41 suites with xdist -n 4",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-b41lu80z",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 10,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-90",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1.jsonl",
+  "key": "toolu_01VE5c7HgYXKd4GYeim5Hwp5",
+  "tool": "Bash",
+  "form": "git status --short; ls -la tests/acceptance/.claude 2>&1 | head; grep -n \"acceptance folder\" -B2 -A8 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tripwire.py | he",
+  "input": {
+   "command": "git status --short; ls -la tests/acceptance/.claude 2>&1 | head; grep -n \"acceptance folder\" -B2 -A8 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tripwire.py | head -40",
+   "description": "Investigate the .claude acceptance-folder change"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-90",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 11,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-90",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1.jsonl",
+  "key": "toolu_01HbFdBb5LVmsgCyUPe77BqJ",
+  "tool": "Bash",
+  "form": "python3 /tmp/claude-1000/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1/scratchpad/look_dotclaude.py /home/usain/gov-os-worktrees/W2-90/tests/acceptance/.claude /home/usain/go",
+  "input": {
+   "command": "python3 /tmp/claude-1000/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1/scratchpad/look_dotclaude.py /home/usain/gov-os-worktrees/W2-90/tests/acceptance/.claude /home/usain/gov-os-worktrees/W2-90/.gov-runtime/scratch/lead/tripwire-before-1.json; date -u",
+   "description": "List the tests/acceptance/.claude folder"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-90",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 12,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/7665d1fb-3135-457d-b558-522b16b78fdf.jsonl",
+  "key": "toolu_01LtSEs6yTkHgpje8bHwLxvs",
+  "tool": "Bash",
+  "form": "python3 /tmp/gov-launch-engineer-b41lu80z/claude-1000/-home-usain-gov-os-worktrees-W2-76/7665d1fb-3135-457d-b558-522b16b78fdf/scratchpad/run3b.py tests/acceptance/W1-41",
+  "input": {
+   "command": "python3 /tmp/gov-launch-engineer-b41lu80z/claude-1000/-home-usain-gov-os-worktrees-W2-76/7665d1fb-3135-457d-b558-522b16b78fdf/scratchpad/run3b.py tests/acceptance/W1-41",
+   "description": "Rerun W1-41 sample with one-line failure messages",
+   "timeout": 3600000,
+   "run_in_background": true
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-b41lu80z",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 13,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-76",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-76/cfacb735-e5cd-4354-bd96-8c06625fc899.jsonl",
+  "key": "toolu_01BSpRi1443EsiFBMykFg3hc",
+  "tool": "Bash",
+  "form": "find tests/acceptance/.claude -maxdepth 3 -printf '%M %s %TT %p\\n'; git check-ignore -v tests/acceptance/.claude",
+  "input": {
+   "command": "find tests/acceptance/.claude -maxdepth 3 -printf '%M %s %TT %p\\n'; git check-ignore -v tests/acceptance/.claude",
+   "description": "Inspect the new .claude folder under acceptance"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-76",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 14,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/f39d149a-1ce7-4a7b-b9c1-3182f86cd2e6.jsonl",
+  "key": "toolu_01NRucEnxv1Nbjvf1FkNcSLe",
+  "tool": "Bash",
+  "form": "git diff 24d70ca7..HEAD -- tests/acceptance/W1-30/test_w1_30_close.py | head -80",
+  "input": {
+   "command": "git diff 24d70ca7..HEAD -- tests/acceptance/W1-30/test_w1_30_close.py | head -80",
+   "description": "Show the trailer test's diff"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 15,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/f39d149a-1ce7-4a7b-b9c1-3182f86cd2e6.jsonl",
+  "key": "toolu_01HAt5vYEfhWBWsenrAdXBem",
+  "tool": "Bash",
+  "form": "sh /home/usain/gov-os-worktrees/W2-64/.gov-runtime/scratch/lead/show_diff.sh 24d70ca7 HEAD tests/acceptance/W1-30/test_w1_30_close.py | grep -n -B2 -A2 'tkaa\\|PROJ-a\\b\\|PROJ-ab' | head -60",
+  "input": {
+   "command": "sh /home/usain/gov-os-worktrees/W2-64/.gov-runtime/scratch/lead/show_diff.sh 24d70ca7 HEAD tests/acceptance/W1-30/test_w1_30_close.py | grep -n -B2 -A2 'tkaa\\|PROJ-a\\b\\|PROJ-ab' | head -60",
+   "description": "Show the trailer test's diff via a script"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 16,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/f39d149a-1ce7-4a7b-b9c1-3182f86cd2e6.jsonl",
+  "key": "toolu_011M9w8nuh9s8reh9RSxDzmg",
+  "tool": "Bash",
+  "form": "cat .gov-runtime/scratch/lead/verify_parallel.sh; echo ----; cat .gov-runtime/scratch/lead/verify_serial.sh; echo ----; grep -c . tests/acceptance/serial-only.txt",
+  "input": {
+   "command": "cat .gov-runtime/scratch/lead/verify_parallel.sh; echo ----; cat .gov-runtime/scratch/lead/verify_serial.sh; echo ----; grep -c . tests/acceptance/serial-only.txt",
+   "description": "Read run 1's verification scripts"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 17,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/2a08e596-2743-4845-8c33-b356d7cf5ae7.jsonl",
+  "key": "toolu_01HBwUpFDJS8YxBhYM2jXi1t",
+  "tool": "Bash",
+  "form": "ls /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/ 2>&1 | grep RUNNING; PYTHONPATH=/home/usain/gov-os-worktrees/W2-64/src python3 -m pytest tests/acceptance/W2-64 -q -p n",
+  "input": {
+   "command": "ls /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/ 2>&1 | grep RUNNING; PYTHONPATH=/home/usain/gov-os-worktrees/W2-64/src python3 -m pytest tests/acceptance/W2-64 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rs 2>&1 | tail -15",
+   "description": "Run W2-64 acceptance tests",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-67ww70mn",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 18,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-64",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-64/2a08e596-2743-4845-8c33-b356d7cf5ae7.jsonl",
+  "key": "toolu_01MMt7jUvnWVJhTWEfn3gbRM",
+  "tool": "Bash",
+  "form": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/usain/gov-os-worktrees/W2-64/src python3 -B -m pytest tests/acceptance/W2-64 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rs",
+  "input": {
+   "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/usain/gov-os-worktrees/W2-64/src python3 -B -m pytest tests/acceptance/W2-64 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rs",
+   "description": "Run W2-64 acceptance tests without bytecode writes",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-64",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-67ww70mn",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 19,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-90/.gov-runtime/scratch/lead/log",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1.jsonl",
+  "key": "toolu_0168MZMfXaQ61GdpzrrFWKYg",
+  "tool": "Bash",
+  "form": "cd /home/usain/gov-os-worktrees/W2-90 && python3 /tmp/claude-1000/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1/scratchpad/mapcheck.py .gov-runtime/scratch/lead/briefs/W2-90-",
+  "input": {
+   "command": "cd /home/usain/gov-os-worktrees/W2-90 && python3 /tmp/claude-1000/-home-usain-gov-os-worktrees-W2-90/87c38a18-9547-490d-b492-0c27eb88aff1/scratchpad/mapcheck.py .gov-runtime/scratch/lead/briefs/W2-90-cases.txt tests/acceptance/W2-90/README.md .gov-runtime/scratch/lead/log/head-run1.xml .gov-runtime/scratch/lead/log/rerun-head-r1.xml",
+   "description": "Check every listed id maps to a run case on head"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-90/.gov-runtime/scratch/lead/log",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 20,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e/subagents/agent-a55a3fb38ba285535.jsonl",
+  "key": "toolu_018FwrmGKfcQJyh6wAWc9tie",
+  "tool": "Bash",
+  "form": "python3 -c \" import json;d=json.load(open('.claude/settings.json'));print(d['hooks']['PreToolUse'][0]['hooks'][0]['command'])\"; echo; ls tests/acceptance/ | grep -E \"W1-3[89]|W2-59\"; grep -rln \"copier",
+  "input": {
+   "command": "python3 -c \"\nimport json;d=json.load(open('.claude/settings.json'));print(d['hooks']['PreToolUse'][0]['hooks'][0]['command'])\"; echo; ls tests/acceptance/ | grep -E \"W1-3[89]|W2-59\"; grep -rln \"copier\\|_copier\" template/copier.yml copier.yml 2>/dev/null; ls template | head -20",
+   "description": "Read this repo's pinned hook line form"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "agent": "a55a3fb38ba285535",
+   "sidechain": true
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 21,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-05",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-05/8f696f48-3724-45bd-8ef2-dcc024b3ff5f.jsonl",
+  "key": "toolu_01CNvnzQeLRMpq15tKWarKvr",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -c \"import gov; print(gov.__file__)\"; ls tests/acceptance/W2-05/ | wc -l; PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/h",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -c \"import gov; print(gov.__file__)\"; ls tests/acceptance/W2-05/ | wc -l; PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src timeout 580 python3 -m pytest tests/acceptance/W2-05 -v --tb=no -rN -p no:cacheprovider -q 2>&1 | grep -E 'PASSED|FAILED|ERROR|SKIPPED|passed|failed' | sed -E 's/^tests\\/acceptance\\/W2-05\\///' | awk '{print $NF, $1}' | sort | uniq -c | sort -rn | head -5",
+   "description": "Baseline W2-05 acceptance run, summary",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-05",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-engineer-llczhfhv",
+  "launch_role": "engineer"
+ },
+ {
+  "i": 22,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-95",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-95/4fc9a533-800b-4ee7-8a14-6f53e928e9ff.jsonl",
+  "key": "toolu_01Tqn6dyq6S54fDXbiNxnYBm",
+  "tool": "Bash",
+  "form": "cd /home/usain/gov-os-worktrees/W2-95-tests && PYTHONPATH=/home/usain/gov-os-worktrees/W2-95-tests/src python3 -c \"import gov; print(gov.__file__)\" && TMPDIR=/tmp/gov-os-lead-W2-95 PYTHONPATH=/home/us",
+  "input": {
+   "command": "cd /home/usain/gov-os-worktrees/W2-95-tests && PYTHONPATH=/home/usain/gov-os-worktrees/W2-95-tests/src python3 -c \"import gov; print(gov.__file__)\" && TMPDIR=/tmp/gov-os-lead-W2-95 PYTHONPATH=/home/usain/gov-os-worktrees/W2-95-tests/src timeout 500 python3 -m pytest tests/acceptance/W2-95 -q -p no:cacheprovider -o tmp_path_retention_policy=failed -rfs 2>&1 | grep -E \"^(FAILED|SKIPPED|ERROR)|passed|failed\" | cut -c1-230",
+   "description": "Run the red check on base code",
+   "timeout": 540000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-95",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 23,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e.jsonl",
+  "key": "toolu_01J4G4JtvqY4UBMCSG4QEQAe",
+  "tool": "Bash",
+  "form": "python3 - <<'EOF' p='drafts/act-guard-fix-2/pretooluse.py'; s=open(p).read() old='INLINE_CODE = re.compile(r\"\\\\b(python3?|perl|node|ruby)\\\\s+(-\\\\w*\\\\s+)*-[cei]\\\\b\")' assert old in s s=s.replace(old, o",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && python3 - <<'EOF'\np='drafts/act-guard-fix-2/pretooluse.py'; s=open(p).read()\nold='INLINE_CODE = re.compile(r\"\\\\b(python3?|perl|node|ruby)\\\\s+(-\\\\w*\\\\s+)*-[cei]\\\\b\")'\nassert old in s\ns=s.replace(old, old+'''\n\n\ndef inline_writes_acceptance(command):\n    \"\"\"Rule 1 for inline interpreter code (DEC-958, ACT-GUARD-FIX-2): each simple command of ``command`` is judged\n    alone (split at ; && || | and newlines, quotes kept), and one is refused only when it holds inline code and names\n    the acceptance tests itself. A command that cannot be split (unbalanced quotes) is judged whole, as before.\"\"\"\n    import shlex\n    try:\n        lex = shlex.shlex(command, posix=True, punctuation_chars=\";&|\\\\n\")\n        lex.whitespace_split = True\n        lex.whitespace = \" \\\\t\\\\r\"\n        lex.commenters = \"\"\n        parts, cur = [], []\n        for tok in lex:\n            if tok and set(tok) <= set(\";&|\\\\n\"):\n                parts.append(\" \".join(cur)); cur = []\n            else:\n                cur.append(tok)\n        parts.append(\" \".join(cur))\n    except ValueError:\n        parts = [command]\n    return any(INLINE_CODE.search(part) and ACCEPTANCE in part for part in parts)''',1)\nold='            unreadable = (found is not None and _UNRESOLVABLE in found) or INLINE_CODE.search(command)\\n            if unreadable and ACCEPTANCE in command:'\nassert old in s\ns=s.replace(old,'            unresolved = found is not None and _UNRESOLVABLE in found and ACCEPTANCE in command\\n            if unresolved or inline_writes_acceptance(command):',1)\nopen(p,'w').write(s)\np='tools/guard4_check.py'; s=open(p).read()\nold='''    (\"dec958 engineer tee into acceptance\", \"engineer\", \"Bash\",'''\nassert old in s\ns=s.replace(old,'''    (\"fix2 lead import check then lists acceptance\", \"orchestrator@DAEO-0z8c\", \"Bash\",\n     {\"command\": \"PYTHONPATH=src python3 -c \\\\\"import gov; print(gov.__file__)\\\\\"; ls tests/acceptance/W2-05/\"}, \"allow\"),\n    (\"fix2 lead import check then greps acceptance\", \"orchestrator@DAEO-57hm\", \"Bash\",\n     {\"command\": \"python3 -c 'import gov' && grep -rn x tests/acceptance/W2-95/ | head\"}, \"allow\"),\n    (\"fix2 engineer inline python writes acceptance after a cd\", \"engineer\", \"Bash\",\n     {\"command\": \"cd /tmp && python3 -c 'open(\\\\\"tests/acceptance/W2-64/t.py\\\\\", \\\\\"w\\\\\")'\"}, \"deny\"),\n    (\"fix2 engineer perl -i on acceptance\", \"engineer\", \"Bash\",\n     {\"command\": \"perl -i -pe s/a/b/ tests/acceptance/W2-64/t.py\"}, \"deny\"),\n    (\"fix2 unbalanced quotes naming acceptance\", \"engineer\", \"Bash\",\n     {\"command\": \"python3 -c 'open(\\\\\"tests/acceptance/x\\\\\" ; ls\"}, \"deny\"),\n'''+old,1)\nopen(p,'w').write(s)\nEOF\necho \"== live\"; python3 tools/guard4_check.py | grep -E \"fix2|^PASS|^FAIL\"; echo \"== candidate\"; python3 tools/guard4_check.py drafts/act-guard-fix-2/pretooluse.py | grep -E \"FAIL|fix2|^PASS\"",
+   "description": "Build the candidate fix; run planted cases"
+  },
+  "meta": {
+   "cwd": null,
+   "agent": null,
+   "sidechain": null
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 24,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-84",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-84/b9e686e1-8be3-4997-963e-1b01a8db9cb4.jsonl",
+  "key": "toolu_013U7YX6mnojmQhBJdwrXgQd",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src python3 -c \"import gov; print(gov.__file__)\"; TMPDIR=/tmp/gov-os-lead-W2-84 PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src timeout 580 python3 -m p",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src python3 -c \"import gov; print(gov.__file__)\"; TMPDIR=/tmp/gov-os-lead-W2-84 PYTHONPATH=/home/usain/gov-os-worktrees/W2-84/src timeout 580 python3 -m pytest tests/acceptance/W2-84 tests/unit/guard/test_w2_84_trees.py -q -p no:cacheprovider --no-header -o tmp_path_retention_policy=failed -n 4 --junitxml=.gov-runtime/scratch/lead/log/own-run1c.xml 2>&1 | tail -5",
+   "description": "Run W2-84's acceptance suite and unit tests",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-84",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 25,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-96",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-96/1283a9f1-7f94-4ce7-a01d-54a3f0a50176.jsonl",
+  "key": "toolu_01JAZBam5mYzjEvyWBQTKMny",
+  "tool": "Bash",
+  "form": "printf 'w2/W2-96-tests 73e50896445c (independent-test-designer, 54 cases, tests/acceptance/W2-96/)\\n' > /home/usain/gov-os-worktrees/W2-96/.gov-runtime/scratch/lead/TESTS-READY; cat .gov-runtime/scrat",
+  "input": {
+   "command": "printf 'w2/W2-96-tests 73e50896445c (independent-test-designer, 54 cases, tests/acceptance/W2-96/)\\n' > /home/usain/gov-os-worktrees/W2-96/.gov-runtime/scratch/lead/TESTS-READY; cat .gov-runtime/scratch/lead/TESTS-READY; python3 -c \"import os; print(os.getloadavg())\"",
+   "description": "Write TESTS-READY naming the tests commit"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-96",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 26,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-96",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-96/1283a9f1-7f94-4ce7-a01d-54a3f0a50176.jsonl",
+  "key": "toolu_01EuUvq2sqM3K1aPiFRumc8X",
+  "tool": "Bash",
+  "form": "cd /home/usain/gov-os-worktrees/W2-96-tests && PYTHONPATH=/home/usain/gov-os-worktrees/W2-96-tests/src python3 -c \"import gov; print(gov.__file__)\"; TMPDIR=/tmp/gov-os-lead-W2-96 PYTHONPATH=/home/usai",
+  "input": {
+   "command": "cd /home/usain/gov-os-worktrees/W2-96-tests && PYTHONPATH=/home/usain/gov-os-worktrees/W2-96-tests/src python3 -c \"import gov; print(gov.__file__)\"; TMPDIR=/tmp/gov-os-lead-W2-96 PYTHONPATH=/home/usain/gov-os-worktrees/W2-96-tests/src timeout 900 python3 -m pytest tests/acceptance/W2-96 -q -p no:cacheprovider -o tmp_path_retention_policy=failed --junitxml=/home/usain/gov-os-worktrees/W2-96/.gov-runtime/scratch/lead/log/red.xml 2>&1 | grep -E \"^E +AssertionError|passed|failed\" | sed 's/qzv96leak[^ ]*//g' | cut -c1-160 | sort | uniq -c | sort -rn | head -20",
+   "description": "Run the red check on the base code",
+   "timeout": 960000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-96",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 27,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-105",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-105/05b07bbd-e555-40ee-b9df-6804e1e2c161.jsonl",
+  "key": "toolu_012CQzwnJGNZsnJUFiHueLcM",
+  "tool": "Bash",
+  "form": "date; python3 -c \"import os; print(os.getloadavg())\"; ps -eo pid,etime,args | grep -E \"pytest tests/acceptance/W2-105|gov-launch-product-spec\" | grep -v grep | cut -c1-150",
+  "input": {
+   "command": "date; python3 -c \"import os; print(os.getloadavg())\"; ps -eo pid,etime,args | grep -E \"pytest tests/acceptance/W2-105|gov-launch-product-spec\" | grep -v grep | cut -c1-150",
+   "description": "Check ps-2 progress and load"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-105",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 28,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-105",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-105/05b07bbd-e555-40ee-b9df-6804e1e2c161.jsonl",
+  "key": "toolu_01EKLYNNXsvJdfaUMspEvfdE",
+  "tool": "Bash",
+  "form": "grep -n \"W1-39\\|W1-38\\|W2-105\" tests/acceptance/serial-only.txt; wc -l tests/acceptance/serial-only.txt; python3 -c \" import json d=json.load(open('.gov-runtime/scratch/lead/log/select-preview.txt')) ",
+  "input": {
+   "command": "grep -n \"W1-39\\|W1-38\\|W2-105\" tests/acceptance/serial-only.txt; wc -l tests/acceptance/serial-only.txt; python3 -c \"\nimport json\nd=json.load(open('.gov-runtime/scratch/lead/log/select-preview.txt'))\nprint(d['per_test_timeout']); print(len(d['ignore']), len(d['deselect'])); print(d['deselect'][:5])\n\"; grep -v '^#' tests/acceptance/serial-only.txt | grep -v '^$' | head -40",
+   "description": "Check serial-only list and selection details"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-105",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 29,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-95",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-95/4fc9a533-800b-4ee7-8a14-6f53e928e9ff.jsonl",
+  "key": "toolu_01UyCAC2d4acUBry1N7qjgy4",
+  "tool": "Bash",
+  "form": "git diff ba0f1bd51a0a 1f2e219940fa -- tests/acceptance/W2-95/test_w2_95_path_map_faults.py tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py; python3 /home/usain/Dynamic-Agentic-Engineering-O",
+  "input": {
+   "command": "git diff ba0f1bd51a0a 1f2e219940fa -- tests/acceptance/W2-95/test_w2_95_path_map_faults.py tests/acceptance/W2-95/test_w2_95_adopted_and_gov_check.py; python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tripwire.py compare /home/usain/gov-os-worktrees/W2-95/.gov-runtime/scratch/lead/tripwire-before-3.json > /home/usain/gov-os-worktrees/W2-95/.gov-runtime/scratch/lead/log/tripwire-3.json; python3 -c \"\nimport json\nd=json.load(open('/home/usain/gov-os-worktrees/W2-95/.gov-runtime/scratch/lead/log/tripwire-3.json'))\nfor c in d['changes']:\n    if 'W2-95' in c['tree']: print(c)\n\"",
+   "description": "Review td-2 test diff and tripwire"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-95",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 30,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-05",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-05/e1af8e2a-514a-4517-96f6-5ad3501540e0.jsonl",
+  "key": "toolu_01Rc9wYGzVqhVJpiVfWh5fKJ",
+  "tool": "Bash",
+  "form": "wc -l tests/acceptance/serial-only.txt; grep -v '^#' tests/acceptance/serial-only.txt | grep -v '^$' | head -30; python3 -c \" import json;d=json.load(open('/tmp/gov-os-lead-W2-05/select-preview.json')",
+  "input": {
+   "command": "wc -l tests/acceptance/serial-only.txt; grep -v '^#' tests/acceptance/serial-only.txt | grep -v '^$' | head -30; python3 -c \"\nimport json;d=json.load(open('/tmp/gov-os-lead-W2-05/select-preview.json'))\nprint(d.get('per_test_timeout')); print(len(d['ignore']), len(d['deselect'])); print(d['deselect'][:5])\"",
+   "description": "Read the serial-only list and selection options"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-05",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 31,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-05",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-05/a4ffbb78-c8c5-4435-a388-dddb0d731e07.jsonl",
+  "key": "toolu_01DBVRrW7hhmgXPSsWiXf9bp",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -c \" import sys; sys.path.insert(0,'tests/acceptance/W2-05') import w2_05_support as s print('GIT', s.GIT); print('lefthook', s.real_tool('lef",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -c \"\nimport sys; sys.path.insert(0,'tests/acceptance/W2-05')\nimport w2_05_support as s\nprint('GIT', s.GIT); print('lefthook', s.real_tool('lefthook')); print('gitleaks', s.real_tool('gitleaks')); print('lacking', s.LACKING)\n\"; git --version; ls -la /usr/bin/git",
+   "description": "Check the tools the hooked-commit probe needs"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-05",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-oe5v2yy0",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 32,
+  "rule": "the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.key, config/secrets*, a file under a .secrets folder, ~/.ssh/, the CLI's key file), which is refused to every role (DEC-820 (a)) (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-05",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-05/a4ffbb78-c8c5-4435-a388-dddb0d731e07.jsonl",
+  "key": "toolu_01RmfQRBfS2B3jNgBLAm1QzA",
+  "tool": "Bash",
+  "form": "mkdir -p \"$TMPDIR/probes/fa\" && cat > \"$TMPDIR/probes/fa/fa_probe.py\" <<'PYEOF' \"\"\"F-A / P-1 / staged-secrets probe at the probed head (independent-auditor, DAEO-0z8c, round 3). Everything is built fr",
+  "input": {
+   "command": "mkdir -p \"$TMPDIR/probes/fa\" && cat > \"$TMPDIR/probes/fa/fa_probe.py\" <<'PYEOF'\n\"\"\"F-A / P-1 / staged-secrets probe at the probed head (independent-auditor, DAEO-0z8c, round 3).\n\nEverything is built from scratch under TMPDIR: a box (bin with git, gitleaks, lefthook, python3 and a gov launcher\nrunning this worktree's src first), a project with this repository's lefthook.yml and template .gitleaks.toml copied\nas single files, a declared G1 check of the project's own, lefthook installed only there.\"\"\"\nimport json, os, shutil, subprocess, sys, time\nfrom pathlib import Path\n\nW = Path(\"/home/usain/gov-os-worktrees/W2-05\")\nSRC = W / \"src\"\nBASE = Path(os.environ[\"TMPDIR\"]) / \"probes\" / \"fa\" / \"run\"\nGIT = \"/usr/bin/git\"\nTOOLS = {\"git\": GIT, \"gitleaks\": \"/home/usain/.local/bin/gitleaks\", \"lefthook\": \"/home/usain/.local/bin/lefthook\"}\nSECRET = \"sk_\" + \"7Qd2\" + \"Xk9Lm4Wp8Zr3Tb6V\"   # a synthetic token by the template's rules; never printed\n\nCHECK = r'''\nimport json, os, subprocess, sys, tempfile\nMARKS, BASE, GIT = sys.argv[1], sys.argv[2], sys.argv[3]\nroot = os.getcwd()\nrec = {\"cwd\": root, \"git_env\": {k: v for k, v in os.environ.items() if k.startswith(\"GIT_\")}, \"steps\": []}\ndef run(args, cwd):\n    d = subprocess.run([GIT, *args], cwd=cwd, capture_output=True, text=True, stdin=subprocess.DEVNULL)\n    rec[\"steps\"].append({\"args\": args, \"exit\": d.returncode, \"out\": d.stdout[-400:], \"err\": d.stderr[-400:]})\n    return d\nrec[\"root_staged\"] = run([\"diff\", \"--cached\", \"--name-only\"], root).stdout.split()\nown = tempfile.mkdtemp(prefix=\"own-\", dir=BASE)\nopen(os.path.join(own, \"own.txt\"), \"w\").write(\"own\\n\")\nrun([\"-C\", own, \"init\", \"-q\", \"-b\", \"own\"], root)\nrun([\"-C\", own, \"add\", \"-A\"], root)\nrun([\"-C\", own, \"-c\", \"user.name=c\", \"-c\", \"user.email=c@x.invalid\", \"commit\", \"-q\", \"-m\", \"own commit\"], root)\nrec[\"own\"] = own\ncl = tempfile.mkdtemp(prefix=\"clone-\", dir=BASE)\nrun([\"clone\", \"-q\", root, os.path.join(cl, \"c\")], root)\nc = os.path.join(cl, \"c\")\nopen(os.path.join(c, \"adopted.txt\"), \"w\").write(\"adopted\\n\")\nrun([\"-C\", c, \"add\", \"-A\"], root)\nrun([\"-C\", c, \"-c\", \"user.name=c\", \"-c\", \"user.email=c@x.invalid\", \"commit\", \"-q\", \"-m\", \"adopted\"], root)\nrec[\"clone\"] = c\nwith open(os.path.join(MARKS, \"check.json\"), \"w\") as h:\n    json.dump(rec, h)\nsys.exit(0)\n'''\n\ndef sh(args, cwd, env=None, check=True, timeout=300):\n    d = subprocess.run([str(a) for a in args], cwd=str(cwd), env=env, capture_output=True, text=True,\n                       stdin=subprocess.DEVNULL, timeout=timeout)\n    if check and d.returncode:\n        raise RuntimeError(f\"{args}: {d.returncode} {d.stderr[-500:]}\")\n    return d\n\ndef clean():\n    return {\"PATH\": \"/usr/bin:/bin\", \"HOME\": str(BASE / \"setup-home\"), \"LC_ALL\": \"C.UTF-8\",\n            \"GIT_CONFIG_NOSYSTEM\": \"1\", \"GIT_AUTHOR_NAME\": \"setup\", \"GIT_AUTHOR_EMAIL\": \"s@x.invalid\",\n            \"GIT_COMMITTER_NAME\": \"setup\", \"GIT_COMMITTER_EMAIL\": \"s@x.invalid\"}\n\ndef g(cwd, *args, env=None):\n    return sh([GIT, \"-C\", cwd, *args], cwd, env or clean()).stdout\n\nclass Box:\n    def __init__(self, base):\n        self.base = base\n        self.bin, self.home, self.tmp, self.marks, self.pyc = (base / n for n in (\"bin\", \"home\", \"tmp\", \"marks\", \"pyc\"))\n        for f in (self.bin, self.home, self.tmp, self.marks, self.pyc):\n            f.mkdir(parents=True, exist_ok=True)\n        for name, path in TOOLS.items():\n            (self.bin / name).symlink_to(path)\n        (self.bin / \"python3\").symlink_to(sys.executable)\n        (self.bin / \"gov\").write_text(f\"#!{sys.executable}\\nimport sys\\nsys.path.insert(0, {str(SRC)!r})\\n\"\n                                      \"from gov.cli.main import main as _m\\nsys.argv[0]='gov'\\nsys.exit(_m())\\n\")\n        (self.bin / \"gov\").chmod(0o755)\n        (self.home / \".gitconfig\").write_text(\"[user]\\n\\tname = The person\\n\\temail = person@x.invalid\\n\")\n    def env(self, **extra):\n        e = {\"PATH\": f\"{self.bin}:/usr/bin:/bin\", \"HOME\": str(self.home), \"TMPDIR\": str(self.tmp), \"LC_ALL\": \"C.UTF-8\",\n             \"PYTHONPATH\": str(SRC), \"PYTHONDONTWRITEBYTECODE\": \"1\", \"PYTHONPYCACHEPREFIX\": str(self.pyc)}\n        e.update(extra)\n        return e\n\ndef project(base, box):\n    root = base / \"repo\"\n    root.mkdir(parents=True)\n    g(root, \"init\", \"-q\", \"-b\", \"main\")\n    files = {\"README.md\": \"# p\\n\", \".gitignore\": \".gov-runtime/\\n__pycache__/\\n\",\n             \".gitleaks.toml\": (W / \"template/.gitleaks.toml\").read_text(),\n             \"lefthook.yml\": (W / \"lefthook.yml\").read_text(), \"notes.md\": \"the first line\\n\",\n             \"other.md\": \"other\\n\",\n             \"tools/probe_check.py\": CHECK,\n             \"template/governance/kernel/checks/probe-own.yaml\":\n                 f\"id: probe-own\\nfamily: graph integrity\\ntier: G1\\nseverity: hard-block\\n\"\n                 f\"command: {sys.executable} tools/probe_check.py {box.marks} {box.tmp} {GIT}\\n\",\n             \"template/governance/kernel/checks/probe-g2.yaml\":\n                 \"id: probe-g2\\nfamily: graph integrity\\ntier: G2\\nseverity: hard-block\\ncommand: 'true'\\n\"}\n    for rel, text in files.items():\n        p = root / rel\n        p.parent.mkdir(parents=True, exist_ok=True)\n        p.write_text(text)\n    g(root, \"add\", \"-A\")\n    g(root, \"commit\", \"-q\", \"-m\", \"initial\")\n    return root\n\ndef state(main, trees):\n    refs = dict(l.split(\" \", 1)[::-1] for l in g(main, \"for-each-ref\", \"--format=%(objectname) %(refname)\").splitlines())\n    idx = {str(t): g(t, \"ls-files\", \"--stage\") for t in trees}\n    reach = set(g(main, \"rev-list\", \"--all\", \"--reflog\").split())\n    heads = {str(t): g(t, \"rev-parse\", \"HEAD\").strip() for t in trees}\n    return refs, idx, reach, heads\n\ndef expected_tree(tree, mode, scratch):\n    gd = Path(g(tree, \"rev-parse\", \"--absolute-git-dir\").strip())\n    copy = scratch / f\"idx-{time.time_ns()}\"\n    if mode == \"plain\":\n        return g(tree, \"write-tree\").strip()\n    env = dict(clean(), GIT_INDEX_FILE=str(copy))\n    if mode == \"-a\":\n        shutil.copyfile(gd / \"index\", copy)\n        g(tree, \"add\", \"-u\", env=env)\n    else:  # \"-- notes.md\": HEAD plus that path only\n        g(tree, \"read-tree\", \"HEAD\", env=env)\n        g(tree, \"add\", \"notes.md\", env=env)\n    return g(tree, \"write-tree\", env=env).strip()\n\ndef hooked(label, linked, mode, secret=False, foreign_index=False):\n    base = BASE / label\n    box = Box(base / \"box\")\n    main = project(base, box)\n    tree = main\n    if linked:\n        g(main, \"worktree\", \"add\", \"-q\", str(base / \"wt\"), \"-b\", \"feature\")\n        tree = base / \"wt\"\n    trees = [main, tree] if linked else [main]\n    inst = sh([\"lefthook\", \"install\"], main, box.env(), check=False)\n    out = {\"label\": label, \"install\": inst.returncode}\n    (tree / \"notes.md\").write_text(\"the first line\\nthe hooked change\\n\" + (f\"key = {SECRET}\\n\" if secret else \"\"))\n    (tree / \"other.md\").write_text(\"other, changed but not staged\\n\")\n    if mode == \"plain\":\n        g(tree, \"add\", \"notes.md\")\n    extra_env = {}\n    if foreign_index:\n        idx = base / \"outside-index\"\n        env = dict(clean(), GIT_INDEX_FILE=str(idx))\n        g(tree, \"read-tree\", \"HEAD\", env=env)\n        g(tree, \"add\", \"notes.md\", env=env)\n        extra_env[\"GIT_INDEX_FILE\"] = str(idx)\n        want = g(tree, \"write-tree\", env=env).strip()\n    else:\n        want = expected_tree(tree, mode, base)\n    before = state(main, trees)\n    args = {\"plain\": [], \"-a\": [\"-a\"], \"--\": [\"--\", \"notes.md\"]}[mode]\n    t0 = time.time()\n    done = sh([GIT, \"commit\", \"-q\", \"-m\", \"the hooked change\", *args], tree, box.env(**extra_env), check=False,\n              timeout=240)\n    out[\"seconds\"] = round(time.time() - t0, 1)\n    out[\"exit\"] = done.returncode\n    out[\"said\"] = (done.stdout + done.stderr)[-700:].replace(SECRET, \"<SECRET>\")\n    after = state(main, trees)\n    old, new = before[3][str(tree)], after[3][str(tree)]\n    out[\"landed\"] = new != old\n    branch = \"refs/heads/\" + g(tree, \"symbolic-ref\", \"--short\", \"HEAD\").strip()\n    if out[\"landed\"]:\n        out[\"parent_ok\"] = g(tree, \"rev-parse\", f\"{new}^\").strip() == old\n        out[\"tree_as_staged\"] = g(tree, \"rev-parse\", f\"{new}^{{tree}}\").strip() == want\n        out[\"diff_vs_staged\"] = g(tree, \"diff\", \"--name-status\", want, new).strip()\n    moved = {k: v for k, v in after[0].items() if before[0].get(k) != v}\n    out[\"refs_moved\"] = sorted(moved)\n    out[\"only_branch_moved\"] = set(moved) <= {branch}\n    out[\"new_reachable\"] = len(after[2] - before[2])\n    out[\"index_vs_HEAD\"] = g(tree, \"diff-index\", \"--cached\", \"--name-status\", \"HEAD\").strip()\n    miss = []\n    for line in g(tree, \"ls-files\", \"--stage\").splitlines():\n        sha = line.split()[1]\n        if sh([GIT, \"-C\", tree, \"cat-file\", \"-e\", sha], tree, clean(), check=False).returncode:\n            miss.append(line)\n    out[\"index_missing_objects\"] = miss\n    if linked:\n        out[\"main_index_unchanged\"] = after[1][str(main)] == before[1][str(main)]\n    rec_path = box.marks / \"check.json\"\n    if rec_path.exists():\n        rec = json.loads(rec_path.read_text())\n        out[\"check_git_env\"] = sorted(rec[\"git_env\"])\n        out[\"check_root_staged\"] = rec[\"root_staged\"]\n        out[\"check_steps_ok\"] = all(s[\"exit\"] == 0 for s in rec[\"steps\"])\n        out[\"check_failed_steps\"] = [(s[\"args\"][:4], s[\"exit\"], s[\"err\"][-200:]) for s in rec[\"steps\"] if s[\"exit\"]]\n        out[\"own_log\"] = g(rec[\"own\"], \"log\", \"--format=%s\").split(\"\\n\")[:3]\n        out[\"own_gitdir_ok\"] = g(rec[\"own\"], \"rev-parse\", \"--absolute-git-dir\").strip() == str(Path(rec[\"own\"]).resolve() / \".git\")\n        out[\"clone_log\"] = g(rec[\"clone\"], \"log\", \"--format=%s\", \"-2\").split(\"\\n\")[:2]\n    else:\n        out[\"check_ran\"] = False\n    return out\n\nif __name__ == \"__main__\":\n    if BASE.exists():\n        shutil.rmtree(BASE)\n    BASE.mkdir(parents=True)\n    cases = [a.split(\":\") for a in sys.argv[1:]]\n    for label, linked, mode, secret, foreign in cases:\n        r = hooked(label, linked == \"1\", mode, secret == \"1\", foreign == \"1\")\n        print(json.dumps(r, indent=None))\nPYEOF\necho written",
+   "description": "Write the F-A and staged-secrets probe script"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-05",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-oe5v2yy0",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 33,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-96",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-96/520f00a7-4f3f-41d6-a407-88ea4250a422.jsonl",
+  "key": "toolu_01UmpTSAK2ZPp7MAQzJ5Bxa1",
+  "tool": "Bash",
+  "form": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-96/src python3 -B -c \" from pathlib import Path from gov.accept.runner import parse_map m = parse_map(Path('/home/usain/gov-os-worktrees/W2-96/tests/acceptan",
+  "input": {
+   "command": "PYTHONPATH=/home/usain/gov-os-worktrees/W2-96/src python3 -B -c \"\nfrom pathlib import Path\nfrom gov.accept.runner import parse_map\nm = parse_map(Path('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W1-30/README.md').read_text())\nfor k in sorted(m): print(k, len(m[k]), [i for i in m[k] if 'close_refuses_when' in i or 'fourth_non' in i])\n\"; grep -n \"^#\" /home/usain/gov-os-worktrees/W2-96/tests/acceptance/W1-30/README.md | sed -n '1,60p' | cut -c1-110",
+   "description": "Show W1-30's mapped lines and its headings"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-96",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-os-lead-W2-96/gov-launch-independent-auditor-1j697t78",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 34,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-05",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-05/d26b718c-3d60-43bc-9846-0594d19fbfc5.jsonl",
+  "key": "toolu_015jpa2zsjZoheGpLhHsP94r",
+  "tool": "Bash",
+  "form": "B=/tmp/gov-launch-independent-auditor-uxaznz2t/claude-1000/probe/p8; mkdir -p $B/r && E=\"env -i PATH=/usr/bin:/bin HOME=$B GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_AUTHOR_NAME=p GIT_AUTHO",
+  "input": {
+   "command": "B=/tmp/gov-launch-independent-auditor-uxaznz2t/claude-1000/probe/p8; mkdir -p $B/r && E=\"env -i PATH=/usr/bin:/bin HOME=$B GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_AUTHOR_NAME=p GIT_AUTHOR_EMAIL=p@x GIT_COMMITTER_NAME=p GIT_COMMITTER_EMAIL=p@x\" && $E git -C $B/r init -q -b main && for i in 1 2 3 4; do echo $i > $B/r/f; $E git -C $B/r add f; $E git -C $B/r commit -q -m c$i; done && $E git -C $B/r bisect start HEAD HEAD~3 >/dev/null && $E GIT_NO_LAZY_FETCH=1 git -C $B/r bisect run sh -c \"env | grep -E '^GIT_' | sort > $B/step-env.txt; pwd >> $B/step-env.txt; exit 0\" >/dev/null 2>&1; cat $B/step-env.txt; $E git -C $B/r bisect reset >/dev/null 2>&1; echo done",
+   "description": "Probe 8: which GIT_ variables git bisect run gives its step"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-05",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-uxaznz2t",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 35,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-60a",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-60a/3c32abb2-c43a-41e3-96bd-43ac8f77e57b.jsonl",
+  "key": "toolu_01V6DojSdDVu3h1Lx7rPA7qF",
+  "tool": "Bash",
+  "form": "T=/tmp/gov-launch-independent-auditor-nke3k06n/claude-1000/r3; HOME=$T/fakehome CLAUDE_CONFIG_DIR=$T/fakehome/.claude timeout 60 /home/usain/.local/bin/claude --help > $T/help.txt 2> $T/help.err; echo",
+  "input": {
+   "command": "T=/tmp/gov-launch-independent-auditor-nke3k06n/claude-1000/r3; HOME=$T/fakehome CLAUDE_CONFIG_DIR=$T/fakehome/.claude timeout 60 /home/usain/.local/bin/claude --help > $T/help.txt 2> $T/help.err; echo \"exit=$?\"; wc -l $T/help.txt $T/help.err; grep -n -i -E \"project-config|managed-settings|setting|config-root|add-dir|worktree|plugin|agents\" $T/help.txt | head -40",
+   "description": "Read the CLI's help with a throwaway home, literal paths"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-60a",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-nke3k06n",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 36,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-67",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-67/29477cee-8ee8-442a-9ee4-e3872ad1fcad.jsonl",
+  "key": "toolu_019967ZMoQhd29bHybRfZ2qv",
+  "tool": "Bash",
+  "form": "D=/tmp/gov-launch-independent-auditor-714v6mfh/claude-1000/pf15probe && git diff --name-only bdc1bb3e1d43 0568d91baf56 | sort > $D/m_vs_p1.txt && git diff --name-only f21ede6ef198 c07a1115577f | sort ",
+  "input": {
+   "command": "D=/tmp/gov-launch-independent-auditor-714v6mfh/claude-1000/pf15probe && git diff --name-only bdc1bb3e1d43 0568d91baf56 | sort > $D/m_vs_p1.txt && git diff --name-only f21ede6ef198 c07a1115577f | sort > $D/theirs.txt && git diff --name-only c07a1115577f 0568d91baf56 | sort > $D/m_vs_p2.txt && git diff --name-only f21ede6ef198 bdc1bb3e1d43 | sort > $D/ours.txt && wc -l $D/m_vs_p1.txt $D/theirs.txt $D/m_vs_p2.txt $D/ours.txt && echo \"--- merge-vs-ours vs theirs-changes:\" && diff $D/m_vs_p1.txt $D/theirs.txt; echo \"--- merge-vs-theirs vs ours-changes:\" && diff $D/m_vs_p2.txt $D/ours.txt; echo \"--- files both sides changed:\" && comm -12 $D/theirs.txt $D/ours.txt",
+   "description": "Compare the files each side changed with the merge's diffs"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-67",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-714v6mfh",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 37,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-67",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-67/75a5fb44-6607-4386-ab23-4b87f0fa174b.jsonl",
+  "key": "toolu_012LaSAuAGYcdzaHJNeUXvK3",
+  "tool": "Bash",
+  "form": "cd /home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-10 && cat before-PF15.marker after-PF15.marker; echo ---; for f in before-file.xml after-file.xml; do echo \"$f: $(grep -o '<testsuite [^>]",
+  "input": {
+   "command": "cd /home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-10 && cat before-PF15.marker after-PF15.marker; echo ---; for f in before-file.xml after-file.xml; do echo \"$f: $(grep -o '<testsuite [^>]*' $f | grep -o ' \\(name\\|errors\\|failures\\|skipped\\|tests\\|time\\)=\"[^\"]*\"' | tr -d '\\n')\"; done; echo ---; grep -c \"def test_\" /home/usain/gov-os-worktrees/W2-67/tests/acceptance/W1-30/test_w1_30_close.py",
+   "description": "Read td-10's markers and whole-file test counts"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-67",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-kdmp14mj",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 38,
+  "rule": "a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own scratch, or /tmp (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-16",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-16/342c46c7-1ce2-4949-a888-d31502230927.jsonl",
+  "key": "toolu_015r6U7oudmKfeyuZS69eiCT",
+  "tool": "Bash",
+  "form": "cat > \"$TMPDIR/r3probe/scripts/p_pty.py\" <<'EOF' \"\"\"The real command on a pseudo-terminal from this session, clean environment (no GOV_*), the code typed back if shown.\"\"\" import sys, os, select, time",
+  "input": {
+   "command": "cat > \"$TMPDIR/r3probe/scripts/p_pty.py\" <<'EOF'\n\"\"\"The real command on a pseudo-terminal from this session, clean environment (no GOV_*), the code typed back if shown.\"\"\"\nimport sys, os, select, time\nsys.path.insert(0, os.path.dirname(__file__))\nfrom common import *\n\nrepo = stand_in(\"a\")\nfor label, extra in ((\"clean env, pty\", {}), (\"GOV_ROLE='' on a pty\", {\"GOV_ROLE\": \"\"}), (\"GOV_TICKET='' on a pty\", {\"GOV_TICKET\": \"\"})):\n    env = clean_env(extra)\n    before = support.snapshot(repo)\n    master, slave = os.openpty()\n    p = subprocess.Popen([sys.executable, \"-m\", \"gov.cli.main\", \"release\", \"1.4.0\"], cwd=repo, env=env,\n                         stdin=slave, stdout=slave, stderr=slave, close_fds=True, start_new_session=True)\n    os.close(slave)\n    shown, typed, deadline = b\"\", None, time.monotonic() + 120\n    while True:\n        r = select.select([master], [], [], 0.05)[0]\n        data = b\"\"\n        if r:\n            try: data = os.read(master, 65536)\n            except OSError: data = b\"\"\n            shown += data\n        m = support.RELEASE_CODE.search(shown.decode(\"utf-8\", \"replace\"))\n        if m and typed is None:\n            typed = m.group(0) + \"\\n\"; os.write(master, typed.encode())\n        if p.poll() is not None and not data: break\n        if time.monotonic() > deadline: p.kill(); break\n    os.close(master)\n    print(f\"[{label}] exit={p.returncode} typed={typed!r} shown={shown.decode()[:220]!r}\")\n    print(\"   changed:\", support.snapshot_difference(before, support.snapshot(repo)))\nEOF\ncd \"$TMPDIR/r3probe\" && PYTHONPATH=/home/usain/gov-os-worktrees/W2-16/src python3 scripts/p_pty.py",
+   "description": "Probe the real command on a pseudo-terminal, clean environment"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-16",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-kzmmiac5",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 39,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-16",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-16/342c46c7-1ce2-4949-a888-d31502230927.jsonl",
+  "key": "toolu_016M3R58fbK8FcS9o6h4rmnD",
+  "tool": "Bash",
+  "form": "cd \"$TMPDIR/r3probe\" && rm -f chain-*.json; setsid -f python3 scripts/p_chain.py \"$TMPDIR/r3probe/chain-setsid.json\"; python3 scripts/p_chain.py \"$TMPDIR/r3probe/chain-double.json\" double-fork; nohup ",
+  "input": {
+   "command": "cd \"$TMPDIR/r3probe\" && rm -f chain-*.json; setsid -f python3 scripts/p_chain.py \"$TMPDIR/r3probe/chain-setsid.json\"; python3 scripts/p_chain.py \"$TMPDIR/r3probe/chain-double.json\" double-fork; nohup python3 scripts/p_chain.py \"$TMPDIR/r3probe/chain-nohup.json\" 2>/dev/null 1>/dev/null </dev/null & sleep_until=$(( $(date +%s) + 5 )); while [ \"$(date +%s)\" -lt \"$sleep_until\" ] && [ \"$(ls chain-*.json 2>/dev/null | wc -l)\" -lt 3 ]; do python3 -c \"import time; time.sleep(0.3)\"; done; for f in chain-*.json; do echo \"== $f\"; python3 -c \"import json,sys; d=json.load(open(sys.argv[1])); [print('  ',x) for x in d['chain']]; print('   refusal:', d['refusal'] and d['refusal'][0])\" \"$f\"; done",
+   "description": "Read the process chain after re-parenting by setsid, double fork, nohup"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-16",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-kzmmiac5",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 40,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e.jsonl",
+  "key": "toolu_01JPAVpuqEF3wPjYoTD8Yikn",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator; tail_part=$(sed -n \"$(grep -n '^## How this resume runs' briefs/W2-96-part-resume-dec970.md | cut -d: -f1),\\$p\" briefs/",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator; tail_part=$(sed -n \"$(grep -n '^## How this resume runs' briefs/W2-96-part-resume-dec970.md | cut -d: -f1),\\$p\" briefs/W2-96-part-resume-dec970.md); cat > briefs/W2-96-part-resume-dec976.md <<EOF\nYou are the ticket lead for ticket \\`DAEO-ouet\\` (\\`W2-96\\`, \"the opaque acceptance runner, gov accept\"), profile FULL, working only in the worktree \\`/home/usain/gov-os-worktrees/W2-96\\` on branch \\`w2/W2-96\\`.\n\n**This is a resume of run 2, under DEC-976 (P-W2-96-GATE (a)): read your lead checkpoint, \\`.gov-runtime/scratch/lead/CHECKPOINT.md\\` (\"Run 2 END\"), first**, and your last return (\\`/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/W2-96-A5-resume-dec970.json\\`). \\`git rev-parse --short=12 HEAD\\` must show \\`162f8f4e\\`'s full id prefix (\\`git log -1\\` is your run-2 checkpoint commit), and \\`git status --short\\` must show nothing. Anything else: stop and return PACKAGES naming it.\n\n## What DEC-976 decided, and what is left\n- **P-W2-96-GATE (a):** you resume now that the queue lets you start; no exemption from the load gate. **P-W2-96-R9-PREMISE (a)** (your P3, \\`c348af6b\\`) stands.\n- **Left, in this order:**\n  1. your own red check of review 3's cases (td-4's \\`588e43ae\\` on run 2's code: the whole folder and the new file alone);\n  2. the engineer's one \\`gov accept DAEO-ouet\\` run on all 106 cases (resume eng-6, session \\`7db40b77-6636-42a9-a111-3ffe1a6fb25f\\`, with \\`briefs/eng-6-resume.md\\`, or a fresh engineer from the same brief), reading results only;\n  3. review 4, the second and last review of this round (DEC-916): a fresh reviewer (brief A3, \\`JUDGEMENT.md\\`, effort max) on review 3's finding V1 and its fix (R14, R15: \\`b3dd46f8\\`, \\`a1d14a3f\\`), and eng-6's \\`..\\` escape fix; add to its probe list processes started outside the child's process group (your V1 lesson);\n  4. the rebuild on the final head, \\`select_tests.py\\`, the scoped run once, the probe record.\n- **P3, still left:** if the empty \\`tests/acceptance/.claude/.cc-writes/\\` folder is still there, your test designer removes it (it is in the acceptance folder).\n- **KPI 6** (the brief change naming \\`gov accept\\`) stays the orchestrator's at merge; your README map forms are recorded (\\`design-r2.md\\`).\n- **If the load gate holds a step for more than 90 minutes again:** write your checkpoint and return PACKAGES; do not wait longer.\n\n$tail_part\nEOF\npython3 tools/build_lead_brief.py briefs/W2-96-part-resume-dec976.md briefs/W2-96-A5-resume-dec976.md ID=DAEO-ouet W2=W2-96 PROFILE=FULL \"PATHS=$(python3 -c \"\nimport yaml;t=open('/home/usain/Dynamic-Agentic-Engineering-OS/.tickets/DAEO-ouet.md').read();fm=yaml.safe_load(t.split('---')[1]);print(', '.join(fm['allowed_paths'])+', and the test designer\\'s own suite '+str((fm.get('acceptance_tests') or {}).get('path','')))\")\" ROWS=none \"SOURCES=DEC-959, DEC-968, DEC-970, DEC-976, DEC-916\" \"IMPL=DEC-959, DEC-970, DEC-976\" \"EST=the rest of run 2, about 3 hours\"; grep -c \"@@\" briefs/W2-96-A5-resume-dec976.md",
+   "description": "Write and build W2-96's resume brief"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 41,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-107",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-107/5c8892c4-424d-4abf-bfeb-ec237b997026.jsonl",
+  "key": "toolu_01U2LvCcAr9g4iK7u9AKKbuQ",
+  "tool": "Bash",
+  "form": "K=/tmp/gov-launch-independent-auditor-cfx_uvgp/claude-1000/kiar; mkdir -p $K/cache $K/out && python3 $K/setup_probe.py $K p1 3",
+  "input": {
+   "command": "K=/tmp/gov-launch-independent-auditor-cfx_uvgp/claude-1000/kiar; mkdir -p $K/cache $K/out && python3 $K/setup_probe.py $K p1 3",
+   "description": "Make the probe project in the temp folder"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-107",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-cfx_uvgp",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 42,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e.jsonl",
+  "key": "toolu_01L2fxFQELqwiDs86iydsoj2",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS; cat >> docs/DECISION_REGISTER.md <<'EOF' ### DEC-978 \u2014 W2-107's close refused by W1-27's no-embeddings case (the secrets cache in the given home): P-W2-1",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS; cat >> docs/DECISION_REGISTER.md <<'EOF'\n\n### DEC-978 \u2014 W2-107's close refused by W1-27's no-embeddings case (the secrets cache in the given home): P-W2-107-2 (a) applied to it (delegated)\n- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, \"revises older tests under an existing decision\" (the escalation rubric); reversible; nothing in the Charter, the master rules or the Contract's scope; the guard not weakened; for the owner to overturn) \u00b7 **Under:** DEC-970 (P-W2-107-2 (a)), DEC-967, DEC-966 item 4, DEC-968, DEC-975 \u00b7 **Basis:** the close `log/close-build/W2-107-20261031-*` (refused 20:19)\n- **Decision:**\n  1. **The cause:** `tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` asserts that the rebuild's no-embeddings mode writes nothing in the home it is given; since W2-107 a rebuild creates the machine-wide secrets cache there (`.cache`, `.cache/gov-os`, `.cache/gov-os/secrets-scan.sqlite`), the place the owner's approved design gives it (DEC-967). Red with W2-107 3 of 3, green without it 3 of 3. The same clash DEC-970's P-W2-107-2 (a) settled for W1-16's home case.\n  2. **The same remedy:** a fresh independent test designer revises that one case to leave out exactly `.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and the two folders `.cache` and `.cache/gov-os` only where they hold nothing else, under the home the case gives; anything else written there still fails the case; lowering nothing else; `Rewrite-Reason: DEC-967`. Then W1-27's file and W1-16's home file alone, the merge, and W2-107's close again, alone (DEC-975).\n  3. **The lesson for the close of a change to where the product writes:** W2-107's own scoped runs did not select W1-27's case; the close did. Recorded in the daily document.\n- **Where it goes (DEC-851):** this register; W2-107's ticket body (the file named for the designer); the daily document.\n\n| Version | Date | Change |\n|---|---|---|\n| 0.361 | 2026-10-31 | Delegated (orchestrator): DEC-978 (W1-27's no-embeddings case revised to leave out exactly the secrets cache, as P-W2-107-2 (a) did for W1-16). Next free id: DEC-979. |\nEOF\ncat >> .tickets/DAEO-kiar.md <<'EOF'\n\n**W1-27 (DEC-978):** a fresh independent test designer revises `tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` to leave out exactly the secrets cache (`.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and `.cache`, `.cache/gov-os` only where they hold nothing else) under the home it gives, and W1-27's README line for it; nothing else (`Rewrite-Reason: DEC-967`).\nEOF\ngit add docs/DECISION_REGISTER.md .tickets/DAEO-kiar.md && git commit -q -m \"DEC-978 (delegated): W2-107's close refused by W1-27's no-embeddings case (the secrets cache in the given home); P-W2-107-2 (a) applied to it; the file named in W2-107's ticket\" --trailer \"Task: DAEO-kiar\" --trailer \"Implements: DEC-978, DEC-970, DEC-967\" --trailer \"Role: orchestrator\" --trailer \"Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" && git log --oneline -1 | cut -c1-80\ncd /home/usain/gov-os-worktrees/W2-107 && printf '%s\\n' \"Merge w2/integrate into w2/W2-107: DEC-978 (W1-27's file named for the designer), before the W1-27 revision\" \"\" \"Task: DAEO-kiar\" \"Implements: DEC-978\" \"Role: orchestrator\" \"Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" > /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e/scratchpad/m107b.txt && git merge --no-ff -q -F /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e/scratchpad/m107b.txt w2/integrate && H=$(git rev-parse --short=12 HEAD) && echo $H && git log --format=%h --abbrev=8 39f67c4c..HEAD | sed 's/^/W2-107 /' >> /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/interim-seen.txt && git worktree add -q -b w2/W2-107-tests /home/usain/gov-os-worktrees/W2-107-tests HEAD && git -C /home/usain/gov-os-worktrees/W2-107-tests rev-parse --short=12 HEAD; ls /home/usain/gov-os-worktrees/W2-107-tests/tests/acceptance/W1-27/ | grep -i \"r8\\|README\"",
+   "description": "Record DEC-978, update the ticket, prepare the tests worktree"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 43,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-81",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-81/47dd5343-86a7-437e-8ef4-0518bc474261.jsonl",
+  "key": "toolu_01JDxANX3Si4MCsbRHHnxQT6",
+  "tool": "Bash",
+  "form": "S=/tmp/gov-launch-independent-auditor-1n9i7xp4/claude-1000/-home-usain-gov-os-worktrees-W2-81/47dd5343-86a7-437e-8ef4-0518bc474261/scratchpad; T=/tmp/gov-launch-independent-auditor-1n9i7xp4/claude-100",
+  "input": {
+   "command": "S=/tmp/gov-launch-independent-auditor-1n9i7xp4/claude-1000/-home-usain-gov-os-worktrees-W2-81/47dd5343-86a7-437e-8ef4-0518bc474261/scratchpad; T=/tmp/gov-launch-independent-auditor-1n9i7xp4/claude-1000; PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src timeout 300 python3 -B tests/acceptance/W2-81/w2_81_run.py --folder \"$T/w281-r1b\" --mode build --seed 8128 --large-size 4096 --hidden \"$S/hidden-bad-question\" > \"$T/w281-r1b.out\" 2>&1; echo \"exit=$?\"; echo \"marker fragments: $(grep -c -e HIDDENQUESTION -e 'frame limit of' \"$T/w281-r1b.out\")\"; tail -3 \"$T/w281-r1b.out\"; echo ----; PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src timeout 300 python3 -B tests/acceptance/W2-81/w2_81_run.py --folder \"$T/w281-r1c\" --mode build --seed 8128 --large-size 4096 --hidden \"$S/hidden-bad-secret\" > \"$T/w281-r1c.out\" 2>&1; echo \"exit=$?\"; echo \"hidden path fragments: $(grep -c HIDDENPATH \"$T/w281-r1c.out\")\"; tail -2 \"$T/w281-r1c.out\"",
+   "description": "Run the runner with a malformed hidden question file, then a secret variant missing its placeholder",
+   "timeout": 620000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-81",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-1n9i7xp4",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 44,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-81",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-81/47dd5343-86a7-437e-8ef4-0518bc474261.jsonl",
+  "key": "toolu_019qCxVciYkGwEwsSguE3nLH",
+  "tool": "Bash",
+  "form": "PYTHONDONTWRITEBYTECODE=1 python3 -B -c \" import sys; sys.path.insert(0, 'tests/acceptance/W2-81'); sys.dont_write_bytecode = True import w2_81_score as s Q = type('Q', (), dict(id='q', part='visible'",
+  "input": {
+   "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -c \"\nimport sys; sys.path.insert(0, 'tests/acceptance/W2-81'); sys.dont_write_bytecode = True\nimport w2_81_score as s\nQ = type('Q', (), dict(id='q', part='visible', sources=[('gold.md', 3, 'x')], forbidden=['stale.md']))\nf = [('f%d.md' % i, 1, 1) for i in range(4)]\ng, st = ('gold.md', 1, 9), ('stale.md', 1, 1)\nfor rank, items in ((5, [g] + f[:3] + [st]), (6, [g] + f + [st])):\n    r = s.score_question(Q, items); print('forbidden at rank', items.index(st) + 1, '| hit_at_5', r['hit_at_5'], '| full', r['full_evidence'], '| forbidden_in_top_5', r['forbidden_in_top_5'])\nprint('unanswered:', s.score_question(Q, None)['hit_at_5'], '| one figure alone feeds the judge:', s.figures([{'repository': 'r', 'hit_at_5': 90.0, 'stacked_share': None}]))\n\"",
+   "description": "Check the scorer's forbidden-citation rank rule and one-figure handling"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-81",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-1n9i7xp4",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 45,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e.jsonl",
+  "key": "toolu_01LUrFscvzE83QsNrR2e8wnT",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS; python3 - <<'EOF' p=\".tickets/DAEO-4eux.md\"; s=open(p).read() a=\"- tests/acceptance/W1-28/README.md\\n\" assert a in s s=s.replace(a,a+\"- tests/acceptance/",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS; python3 - <<'EOF'\np=\".tickets/DAEO-4eux.md\"; s=open(p).read()\na=\"- tests/acceptance/W1-28/README.md\\n\"\nassert a in s\ns=s.replace(a,a+\"- tests/acceptance/W1-28/w1_28_copy_check.py\\n\",1)\ns=s.rstrip(\"\\n\")+\"\\n\\n**DEC-986 (P-W2-114-1 (a)):** the check's own module `w1_28_copy_check.py` (where `_analyse` reads the text; W1-50's suite shares it) is in this ticket's paths; the KPIs are unchanged; W1-28's and W1-50's files run alone after the revision.\\n\"\nopen(p,\"w\").write(s)\nEOF\ncat >> docs/DECISION_REGISTER.md <<'EOF'\n\n### DEC-986 \u2014 W2-114's P-W2-114-1 (a): the check's module joins its paths (delegated)\n- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, \"changes a ticket's scope within the approved spec\"; the revision of W1-28's check is the owner's named decision, DEC-982 (DEC-906); reversible; for the owner to overturn) \u00b7 **Under:** DEC-982, DEC-906, DEC-385 \u00b7 **Basis:** `log/W2-114-A5-run1-dec983.json` (PACKAGES)\n- **Decision:** `tests/acceptance/W1-28/w1_28_copy_check.py` (its `_analyse` reads skip, fail and assertion messages as code; W1-50's suite shares it) joins W2-114's paths; KPIs unchanged; one fresh test designer revises it with the planted cases and the README; W1-28's and W1-50's files run alone.\n- **Where it goes (DEC-851):** this register; W2-114's ticket; its resume brief.\n\n| Version | Date | Change |\n|---|---|---|\n| 0.369 | 2026-11-01 | Delegated (orchestrator): DEC-986 (W2-114's check module in its paths). Next free id: DEC-987. |\nEOF\ngit add .tickets/DAEO-4eux.md docs/DECISION_REGISTER.md && git commit -q -m \"DEC-986 (delegated): W2-114's P-W2-114-1 (a), W1-28's check module in its paths\" --trailer \"Task: DAEO-4eux\" --trailer \"Implements: DEC-986, DEC-982\" --trailer \"Role: orchestrator\" --trailer \"Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" && git log --oneline -1 | cut -c1-50\nW=/home/usain/gov-os-worktrees/W2-114; S=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e/scratchpad; old=$(git -C $W rev-parse --short=12 HEAD); printf '%s\\n' \"Merge w2/integrate into w2/W2-114: DEC-986 (the check's module in its paths), before run 2\" \"\" \"Task: DAEO-4eux\" \"Implements: DEC-986\" \"Role: orchestrator\" \"Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" > $S/m-114.txt && git -C $W merge --no-ff -q -F $S/m-114.txt w2/integrate && new=$(git -C $W rev-parse --short=12 HEAD) && echo \"W2-114 $old -> $new\" && git -C $W log --format=%h --abbrev=8 $old..HEAD | sed 's/^/W2-114 /' >> .gov-runtime/scratch/orchestrator/log/interim-seen.txt; echo W2-114-A5-run1-dec983.json >> .gov-runtime/scratch/orchestrator/log/returns-seen.txt",
+   "description": "Record DEC-986, widen W2-114's paths, update its worktree"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 46,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/2aa7ef10-236c-46fd-abba-4b2cd1883e1e.jsonl",
+  "key": "toolu_01NycSXFaTAdQe7Sd1UnNdvW",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS; n=\"tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository\"; out=$(PYTHONPATH=$PWD/src t",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS; n=\"tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository\"; out=$(PYTHONPATH=$PWD/src timeout 300 python3 -m pytest -q -p no:cacheprovider --no-header -rfE \"$n\" 2>&1); echo \"$out\" | tail -2 | cut -c1-200; python3 - \"$n\" <<EOF\nimport sys; sys.path.insert(0,\".gov-runtime/scratch/orchestrator/tools\"); import close_build as cb\nprint(\"types:\", cb.failure_types('''$(echo \"$out\" | sed \"s/'/ /g\")''', sys.argv[1]))\nEOF",
+   "description": "Check the failure-type parsing on a real failure"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 47,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-05",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-05/d83ac155-01e9-4a7b-afba-b9ab231fdb90.jsonl",
+  "key": "toolu_01F2ejKc3o4qnNBGkQ3SByBV",
+  "tool": "Bash",
+  "form": "cd $TMPDIR/p && H=$TMPDIR/p/lxhome && mkdir -p $H && printf '[trace2]\\n\\teventTarget = %s/t2.json\\n' \"$H\" > $H/.gitconfig && HOME=$H PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -c \" from",
+  "input": {
+   "command": "cd $TMPDIR/p && H=$TMPDIR/p/lxhome && mkdir -p $H && printf '[trace2]\\n\\teventTarget = %s/t2.json\\n' \"$H\" > $H/.gitconfig && HOME=$H PYTHONPATH=/home/usain/gov-os-worktrees/W2-05/src python3 -c \"\nfrom pathlib import Path; from gov.retrieval import lexical as L\nr=Path('$TMPDIR/p/lx/main'); print('tree ok:', L._tree(r, r.resolve()) is not None)\" && ls $H; grep -c '\"event\"' $H/t2.json 2>/dev/null",
+   "description": "Check whether a global trace2 setting acts on lexical's git calls"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-05",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-hdf0urx9",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 48,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-96",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-96/a898de62-b400-4ab6-852d-85663db78428.jsonl",
+  "key": "toolu_01QKQNDmbP65iP8mbKzmcSrS",
+  "tool": "Bash",
+  "form": "cd /tmp/gov-os-lead-W2-96/gov-launch-independent-auditor-bt89xb6c/claude-1000/rev5 && for s in term int int2 hup; do python3 probe5.py label=w1-sleep-$s outer=wait nested=sleep stop=$s at=sleeping cou",
+  "input": {
+   "command": "cd /tmp/gov-os-lead-W2-96/gov-launch-independent-auditor-bt89xb6c/claude-1000/rev5 && for s in term int int2 hup; do python3 probe5.py label=w1-sleep-$s outer=wait nested=sleep stop=$s at=sleeping count=3 > w1-sleep-$s.out 2>&1; done; python3 probe5.py label=w1-sleep-timeout outer=wait nested=sleep stop=timeout timeout_s=3.5 count=3 > w1-sleep-timeout.out 2>&1; cat w1-sleep-*.out | grep -v '^scenario'",
+   "description": "Stop the outer gov alone in five ways while the nested test sleeps",
+   "timeout": 600000
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-96",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-os-lead-W2-96/gov-launch-independent-auditor-bt89xb6c",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 49,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-96",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-96/cef1ac98-daa4-4f57-b407-8be31bccb127.jsonl",
+  "key": "toolu_01Ka56cxkE2Ld6M8Q2yExvTY",
+  "tool": "Bash",
+  "form": "python3 -c \" import re t=open('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-96/w2_96_support.py').read() for name in ('pid_running','pid_gone','kill_quietly'): m=re.search(r'\\ndef '+name+r'\\",
+  "input": {
+   "command": "python3 -c \"\nimport re\nt=open('/home/usain/gov-os-worktrees/W2-96/tests/acceptance/W2-96/w2_96_support.py').read()\nfor name in ('pid_running','pid_gone','kill_quietly'):\n    m=re.search(r'\\ndef '+name+r'\\(.*?(?=\\n(?:def |[A-Z_]+ = |# ---))', t, re.S)\n    print(m.group(0) if m else 'missing '+name)\n\"",
+   "description": "Print the support helpers that judge a process alive or gone"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-96",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-os-lead-W2-96/gov-launch-independent-auditor-t9q011f1",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 50,
+  "rule": "implementer never writes acceptance tests",
+  "verdict": "false positive (known pattern, handover rule)",
+  "cwd": null,
+  "transcript": null,
+  "key": null,
+  "tool": null,
+  "form": "bash heredoc writing a lead brief whose text names the acceptance folder"
+ },
+ {
+  "i": 51,
+  "rule": "implementer never writes acceptance tests",
+  "verdict": "false positive (known pattern)",
+  "cwd": null,
+  "transcript": null,
+  "key": null,
+  "tool": null,
+  "form": "inline script whose text names the acceptance folder"
+ },
+ {
+  "i": 52,
+  "rule": "implementer never writes acceptance tests",
+  "verdict": "false positive (known pattern)",
+  "cwd": null,
+  "transcript": null,
+  "key": null,
+  "tool": null,
+  "form": "inline python whose text names the acceptance folder (reading a ticket and a return)"
+ },
+ {
+  "i": 53,
+  "rule": "implementer never writes acceptance tests",
+  "verdict": "false positive (known pattern)",
+  "cwd": null,
+  "transcript": null,
+  "key": null,
+  "tool": null,
+  "form": "python heredoc writing a unit-test string that names an acceptance folder path"
+ },
+ {
+  "i": 54,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/nightly",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2.jsonl",
+  "key": "toolu_019DVGLWz24AgHQnwyoTNMTE",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && { cat <<'EOF' # W2-11 (DAEO-k7hz) \u2014 one test-design batch: failure-1 leaves W2-11 (2026-11-01, DEC-995, DEC-996) **Re",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && { cat <<'EOF'\n# W2-11 (DAEO-k7hz) \u2014 one test-design batch: failure-1 leaves W2-11 (2026-11-01, DEC-995, DEC-996)\n\n**Read this first; it overrides the round's steps below where they differ.** Your verification at `c895bb6283a6` is\naccepted. The owner decided P-W2-11-9 (c) (DEC-995, DEC-996): W2-11's failure line \"the skill validator refuses a\nbrief without the twelve-field rule\" and row W2-L097 leave W2-11 for a child engineer ticket, W2-120, after W2-11; the\nCTO removes the line from W2-11's ticket file in the main tree. **Your only work now:** one fresh test-design batch\n(independent-test-designer, a tests worktree as before, effort high) that removes that one case\n(`tests/acceptance/W2-11/test_w2_11_validator.py::test_the_validator_accepts_the_brief_and_refuses_it_without_the_twelve_fields`)\nfrom W2-11's suite and updates the README map to say it moved to W2-120 (`Rewrite-Reason: DEC-995, DEC-996`), lowering\nnothing else; W2-120's own designer will write it afresh. Merge the tests branch while no worker runs here, then run\nW2-11's own acceptance tests once (`gov accept DAEO-k7hz` or the plain run of `tests/acceptance/W2-11/` in the close's\nform): nothing else (a test revision's scoped check, as P-W2-64-1 (a)). Known reds you saw are not yours: the four\nW1-33 cases and the two W1-05 install cases were red in the 31 Oct nightly (W2-90b's). Return DONE with the exact head.\nOne merge per ticket: the CTO lands it through the merge queue (DEC-988, DEC-989).\n\n---\n\nEOF\ncat briefs/W2-11-A5-resume-dec991.md; } > briefs/W2-11-A5-move-dec996.md && echo \"W2-11 DAEO-k7hz W2-11-A5-move-dec996.md W2-11-A5-move-dec996.json\" > log/chain-2026-11-01-dec996.txt",
+   "description": "Build W2-11's test-move brief and chain spec"
+  },
+  "meta": {
+   "cwd": null,
+   "agent": null,
+   "sidechain": null
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 55,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2/subagents/agent-a19267f1aa0ef32f6.jsonl",
+  "key": "toolu_01EBeYkuUQ75uwLd5dRnQrHN",
+  "tool": "Bash",
+  "form": "python3 - <<'EOF' import yaml,glob,re,fnmatch T={} for p in glob.glob('.tickets/*.md'): s=open(p).read() try: d=yaml.safe_load(s.split('\\n---',1)[0].lstrip('-\\n')) except: continue if d.get('wbs_id'):",
+  "input": {
+   "command": "python3 - <<'EOF'\nimport yaml,glob,re,fnmatch\nT={}\nfor p in glob.glob('.tickets/*.md'):\n    s=open(p).read()\n    try: d=yaml.safe_load(s.split('\\n---',1)[0].lstrip('-\\n'))\n    except: continue\n    if d.get('wbs_id'): T[d['wbs_id']]=d\ncand=['W2-105','W2-90b','W2-91','W2-33','W2-60a','W2-04','W2-61h','W2-94','W2-104','W2-115','W2-109','W2-82','W2-56','W2-09','W2-12','W2-17','W2-18','W2-19','W2-23','W2-31','W2-34','W2-83b','W2-60b']\nrun=['W2-92','W2-13','W2-81','W2-11']\ndef rx(p): return re.compile('^'+re.escape(p).replace(r'\\*\\*','.*').replace(r'\\*','[^/]*')+'$')\ndef ov(a,b):\n    out=[]\n    for x in a:\n        for y in b:\n            # overlap if either pattern could match the other's literal prefix\n            px=x.split('*')[0]; py=y.split('*')[0]\n            if px.startswith(py) or py.startswith(px):\n                if rx(x).match(y.replace('**','a/b').replace('*','a')) or rx(y).match(x.replace('**','a/b').replace('*','a')) or x==y: out.append(f\"{x}~{y}\")\n    return out\nfor c in cand:\n    d=T.get(c); \n    if not d: print(c,'missing'); continue\n    P=d.get('allowed_paths') or []\n    hits=[]\n    for o in run+cand:\n        if o==c or o not in T: continue\n        h=ov(P,T[o].get('allowed_paths') or [])\n        h=[x for x in h if not x.startswith('tests/acceptance/'+c)]\n        if h: hits.append(f\"{o}:{h[:2]}\")\n    print(f\"{c} [{d.get('role')},{d.get('profile')}] {d.get('title','')[:70]}\\n   paths={P[:6]}{'...' if len(P)>6 else ''}\\n   overlaps={hits}\")\nEOF",
+   "description": "Compute path overlaps among candidates and running tickets"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "agent": "a19267f1aa0ef32f6",
+   "sidechain": true
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 56,
+  "rule": "a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-81",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-81/f00a8125-adc8-4e2a-ab48-a3997cc10436.jsonl",
+  "key": "toolu_01TgrNXyJBwQXb2ya3N2jCFy",
+  "tool": "Bash",
+  "form": "P=/tmp/gov-launch-independent-auditor-290op8kb/claude-1000/w2-81-probe && ls $P/records | head; mkdir -p $P/ctl/root && sed \"s#^ROOT = .*#ROOT = \\\"$P/ctl/root\\\"#; s#^OUT = .*#OUT = \\\"$P/ctl/records\\\"#",
+  "input": {
+   "command": "P=/tmp/gov-launch-independent-auditor-290op8kb/claude-1000/w2-81-probe && ls $P/records | head; mkdir -p $P/ctl/root && sed \"s#^ROOT = .*#ROOT = \\\"$P/ctl/root\\\"#; s#^OUT = .*#OUT = \\\"$P/ctl/records\\\"#\" $P/w281_recorder.py > $P/ctl/w281_ctl.py && cd $P/ctl && python3 -c \"import w281_ctl, os, sqlite3, shutil; from pathlib import Path; r=Path('$P/ctl/root'); (r/'a'/'b').mkdir(parents=True); (r/'a'/'f.txt').write_text('x'); os.makedirs(r/'m'/'n'); sqlite3.connect(str(r/'s.db')).close(); shutil.copytree(r/'a', r/'c'); (r/'t').touch()\" && cat $P/ctl/records/rec-*.txt | cut -c1-120",
+   "description": "Validate the recorder plugin on a control folder in the temp area"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-81",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-290op8kb",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 57,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/gov-os-worktrees/W2-81",
+  "transcript": "/home/usain/.claude/projects/-home-usain-gov-os-worktrees-W2-81/f00a8125-adc8-4e2a-ab48-a3997cc10436.jsonl",
+  "key": "toolu_019pCEiYrjauwaGFPSzj97LY",
+  "tool": "Bash",
+  "form": "W2_81_PROBE_SEED=4242 W2_81_PROBE_OUT=/tmp/gov-launch-independent-auditor-290op8kb/claude-1000/w2-81-probe/records6 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src:/tmp/gov",
+  "input": {
+   "command": "W2_81_PROBE_SEED=4242 W2_81_PROBE_OUT=/tmp/gov-launch-independent-auditor-290op8kb/claude-1000/w2-81-probe/records6 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src:/tmp/gov-launch-independent-auditor-290op8kb/claude-1000/w2-81-probe:/home/usain/gov-os-worktrees/W2-81/tests/acceptance/W2-81 python3 -c \"import w281_recorder, w2_81_run as r; print(r.random_source.randbelow(2**31))\"",
+   "description": "Confirm the plugin fixes the runner's fresh seed"
+  },
+  "meta": {
+   "cwd": "/home/usain/gov-os-worktrees/W2-81",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": "/tmp/gov-launch-independent-auditor-290op8kb",
+  "launch_role": "independent-auditor"
+ },
+ {
+  "i": 58,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2.jsonl",
+  "key": "toolu_01LgRbWFgb1Hq3hwwFob2Po1",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS && python3 - <<'EOF' import yaml,re p='.tickets/DAEO-h2k3.md'; s=open(p).read() d=yaml.safe_load(s.split('\\n---',1)[0].lstrip('-\\n')); print(d['allowed_pa",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS && python3 - <<'EOF'\nimport yaml,re\np='.tickets/DAEO-h2k3.md'; s=open(p).read()\nd=yaml.safe_load(s.split('\\n---',1)[0].lstrip('-\\n')); print(d['allowed_paths'])\nEOF\npython3 -c \"\nimport json,re;r=json.load(open('.gov-runtime/scratch/orchestrator/log/W2-61h-A5-resume-claim.json'))['result']\nfor m in re.finditer(r'tests/acceptance/W2-61/[\\w./-]+',r): print(m.group(0))\" | sort -u | head",
+   "description": "Read W2-61h's paths and the W2-61 test files named"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator",
+   "agent": null,
+   "sidechain": false
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 59,
+  "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2/subagents/agent-a33fda5ec6bd2521b.jsonl",
+  "key": "toolu_01TEBCEg3ErktUn9zcxcQnJL",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/dispatch && python3 - <<'EOF' p='dispatcher_next.py'; s=open(p).read() old_start=s.index(' rest = a[start:]\\n targets = ",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/dispatch && python3 - <<'EOF'\np='dispatcher_next.py'; s=open(p).read()\nold_start=s.index('    rest = a[start:]\\n    targets = [x for x in rest')\nold_end=s.index('    return len(targets) == 1 and not folders')\ns=s[:old_start]+'''    rest = a[start:]\n    args = [x for i, x in enumerate(rest)  # an argument right after a bare `--option` is that option's value\n            if not x.startswith(\"-\") and not (i and rest[i - 1].startswith(\"--\") and \"=\" not in rest[i - 1])]\n    targets = [x for x in args if x.endswith(\".py\") or \".py::\" in x]\n    folders = [x for x in args if x not in targets]\n'''+s[old_end:]\nopen(p,'w').write(s)\nt=open('test_dispatcher_next.py').read()\nold='''        {\"cmd\": \"/home/u/.venv/bin/pytest tests/unit\", \"cwd\": \"/w\", \"pid\": 701, \"age_s\": 400},'''\nassert t.count(old)==1\nt=t.replace(old,'''        {\"cmd\": \"/usr/bin/python3 /home/usain/.local/bin/pytest tests/unit\", \"cwd\": \"/w\", \"pid\": 701, \"age_s\": 400},''')\nt+='''\n\ndef test_review2_a_single_file_with_an_option_path_is_not_heavy_a_folder_is(wp):\n    (wp.tmp / \"meminfo\").write_text(f\"MemAvailable: {60 * GB} kB\\\\n\")\n    leads(wp, 1, extra=[\n        {\"cmd\": \"/usr/bin/python3 -m pytest tests/unit/test_one.py --junitxml /tmp/x.xml -q\", \"cwd\": \"/w\", \"pid\": 710,\n         \"age_s\": 900},\n        {\"cmd\": \"/usr/bin/python3 /home/usain/.local/bin/pytest tests/unit/test_two.py::test_x\", \"cwd\": \"/w\", \"pid\": 711,\n         \"age_s\": 900},\n        {\"cmd\": \"/usr/bin/python3 -m pytest tests/acceptance/W2-01 --junitxml /tmp/y.xml\", \"cwd\": \"/w\", \"pid\": 712,\n         \"age_s\": 900}])\n    tick(wp)\n    found = \" \".join(status(wp)[\"outside_slot\"])\n    assert \"pid 710\" not in found and \"pid 711\" not in found and \"pid 712\" in found\n\n\ndef test_review2_a_reranker_outside_every_lead_tree_gets_headroom(wp):\n    tick(wp)\n    pk = json.loads((wp.d / \"peaks.json\").read_text())\n    pk.setdefault(\"kinds\", {})[\"reranker\"] = {\"cpu_p95\": 1, \"cpu_max\": 1, \"rss_kb_p95\": 3 * GB, \"rss_kb_max\": 3 * GB,\n                                              \"samples\": 60}\n    (wp.d / \"peaks.json\").write_text(json.dumps(pk))\n    (wp.d / \"started.txt\").write_text(\"\")\n    (wp.tmp / \"meminfo\").write_text(f\"MemAvailable: {30 * GB} kB\\\\n\")\n    queue_rr = [{\"cmd\": \"/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1\", \"cwd\": \"/\", \"pid\": 800, \"ppid\": 1},\n                {\"cmd\": \"/home/u/.local/share/gov-os/reranker-venv/bin/python -I serve.py\", \"cwd\": \"/\", \"pid\": 801,\n                 \"ppid\": 800, \"rss_kb\": 1 * GB}]\n    leads(wp, 1, extra=queue_rr)\n    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 300)\n    with_queue = status(wp)[\"admit_reason\"]\n    # the planted embedding p95 600,000 kB (no resident) + the reranker's 3 GB p95 minus its 1 GB resident\n    assert f\"services' headroom {(600_000 + 2 * GB) // 1024} MB\" in with_queue\n    leads(wp, 1)  # no queue, no close, no reranker outside the leads: no reranker headroom\n    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 600)\n    assert f\"services' headroom {600_000 // 1024} MB\" in status(wp)[\"admit_reason\"]\n\n\ndef test_review2_a_reranker_inside_a_lead_tree_is_not_counted_again(wp):\n    tick(wp)\n    pk = json.loads((wp.d / \"peaks.json\").read_text())\n    pk.setdefault(\"kinds\", {})[\"reranker\"] = {\"cpu_p95\": 1, \"cpu_max\": 1, \"rss_kb_p95\": 3 * GB, \"rss_kb_max\": 3 * GB,\n                                              \"samples\": 60}\n    (wp.d / \"peaks.json\").write_text(json.dumps(pk))\n    (wp.d / \"started.txt\").write_text(\"\")\n    (wp.tmp / \"meminfo\").write_text(f\"MemAvailable: {30 * GB} kB\\\\n\")\n    leads(wp, 1, extra=[{\"cmd\": \"/home/u/.local/share/gov-os/reranker-venv/bin/python -I serve.py\", \"cwd\": \"/\",\n                         \"pid\": 820, \"ppid\": 100, \"rss_kb\": 1 * GB}])  # pid 100: the lead L0\n    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 300)\n    s = status(wp)\n    assert s[\"rerankers_outside_kb\"] == 0 and f\"services' headroom {600_000 // 1024} MB\" in s[\"admit_reason\"]\n'''\nopen('test_dispatcher_next.py','w').write(t)\nEOF\npython3 -c \"import ast;ast.parse(open('dispatcher_next.py').read())\"; cd .. && env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS python3 -m pytest -q -p no:cacheprovider dispatch/test_dispatcher_next.py 2>&1 | tail -6; env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS python3 -m pytest -q -p no:cacheprovider dispatch/test_dispatcher.py 2>&1 | tail -1",
+   "description": "Refine the single-file rule, add tests, run both suites"
+  },
+  "meta": {
+   "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "agent": "a33fda5ec6bd2521b",
+   "sidechain": true
+  },
+  "tmpdir": null,
+  "launch_role": null
+ },
+ {
+  "i": 60,
+  "rule": "the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, and this session is refused a part of the project (DEC-820 (c), (d)): name the folder the listing starts at (DEC-953 item 2)",
+  "verdict": "false-positive",
+  "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/dispatch",
+  "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2/subagents/agent-ad1797002d9340c1e.jsonl",
+  "key": "toolu_01RJhmApd4qhorv5YmCwbFba",
+  "tool": "Bash",
+  "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS; for n in 864 7795 8769 8781 9137 9229 10809; do sed -n \"${n},$((n+6))p\" docs/DECISION_REGISTER.md | cut -c1-700; echo ====; done; sed -n 2590,2602p docs/",
+  "input": {
+   "command": "cd /home/usain/Dynamic-Agentic-Engineering-OS; for n in 864 7795 8769 8781 9137 9229 10809; do sed -n \"${n},$((n+6))p\" docs/DECISION_REGISTER.md | cut -c1-700; echo ====; done; sed -n 2590,2602p docs/DECISION_REGISTER.md | cut -c1-500",
+   "description": "Read key DEC entries"
+  },
+  "meta": {
+   "cwd": null,
+   "agent": "ad1797002d9340c1e",
+   "sidechain": null
+  },
+  "agent_type": "research",
+  "tmpdir": null,
+  "launch_role": null
+ }
+]

@@ -43,6 +43,22 @@ t0=$(date +%s); GOV_HEAVY_SLOTS=1 timeout 25 bash "$S" true; rc=$?; t=$(( $(date
 [ "$rc" -eq 0 ] && [ "$t" -le 5 ] || fail "H6: the slot stayed held by a leftover process (rc $rc, $t s)"
 pkill -f "^sleep 30$" 2>/dev/null
 
+# H7 (DEC-1011): with one slot busy, a waiting landing or close (GOV_HEAVY_PRIORITY=1) takes the freed slot before a
+# lead's step that started waiting earlier
+ord="$work/order"; : > "$ord"
+GOV_HEAVY_SLOTS=1 bash "$S" sleep 6 & h=$!
+sleep 1; GOV_HEAVY_SLOTS=1 bash "$S" bash -c "echo L >> $ord" & l=$!
+sleep 1; GOV_HEAVY_SLOTS=1 GOV_HEAVY_PRIORITY=1 bash "$S" bash -c "echo P >> $ord; sleep 1" & p=$!
+wait $h $l $p
+[ "$(head -1 "$ord")" = "P" ] || fail "H7: the lead's step took the slot before the waiting landing ($(tr '\n' ' ' < "$ord"))"
+ls "$work"/gov-os-heavy-prio-* >/dev/null 2>&1 && fail "H7: a priority registration was left behind"
+
+# H8: while a priority run RUNS (not waits), a lead's step still takes another free slot at once
+GOV_HEAVY_SLOTS=2 GOV_HEAVY_PRIORITY=1 bash "$S" sleep 6 & p=$!
+sleep 1; t0=$(date +%s); GOV_HEAVY_SLOTS=2 timeout 20 bash "$S" true; t=$(( $(date +%s) - t0 ))
+[ "$t" -le 3 ] || fail "H8: a lead waited $t s for a free slot while a priority run ran"
+wait $p
+
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: heavy_slot.sh H1-H6"
+[ "$fails" -eq 0 ] && echo "PASS: heavy_slot.sh H1-H8"
 exit "$fails"

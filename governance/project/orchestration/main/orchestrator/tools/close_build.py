@@ -38,6 +38,15 @@ ORCH = ROOT / ".gov-runtime/scratch/orchestrator"
 RUNS = Path("/home/usain/gov-os-runs/W2-00/close")
 VERIFY_LOCK = "/tmp/gov-os-verify.lock"
 REBUILD_LOCK = "/tmp/gov-os-rebuild.lock"
+REBUILD_SLOT = ORCH / "tools/rebuild_slot.sh"  # DEC-1001 (d): a heavy-job slot, a lock of the tree's own
+
+
+def rebuild_cmd(tree):
+    """The rebuild of one tree: in a heavy-job slot with its own lock (DEC-1001 (d)); the old shared lock only if the
+    wrapper is missing."""
+    if REBUILD_SLOT.is_file():
+        return ["env", f"GOV_REBUILD_PYTHON={sys.executable}", "bash", str(REBUILD_SLOT), str(tree)]
+    return ["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"]
 WANTS_LOCK = "/tmp/gov-os-close-wants-lock"
 NODE = "/home/usain/.nvm/versions/node/v22.23.3/bin"
 
@@ -156,6 +165,20 @@ def sh(cmd, **kw):
     return subprocess.run(cmd, capture_output=True, text=True, **kw)
 
 
+def git_retry(args, root=None, tries=3, wait=None):
+    """A git command in the main tree, tried again (up to `tries` in all, `wait` s apart) while another process holds
+    the index lock: land.py and close_build.py may commit records at the same moment (DEC-1014 item 1). Returns the
+    last result; never raises on a held lock."""
+    wait = float(os.environ.get("GIT_RETRY_WAIT", "2")) if wait is None else wait
+    r = None
+    for n in range(tries):
+        r = sh(["git", "-C", str(root or ROOT), *args])
+        if r.returncode == 0 or "index.lock" not in (r.stderr + r.stdout) or n == tries - 1:
+            return r
+        time.sleep(wait)
+    return r
+
+
 def git(*args, cwd=ROOT):
     return sh(["git", "-C", str(cwd), *args]).stdout.strip()
 
@@ -207,6 +230,7 @@ def totals(xml_path):
 
 
 def main():
+    os.environ["GOV_HEAVY_PRIORITY"] = "1"  # DEC-1011: a close takes the next free heavy-job slot before any lead's step
     ap = argparse.ArgumentParser()
     ap.add_argument("w2", nargs="+")
     ap.add_argument("--full", action="store_true")
@@ -283,7 +307,7 @@ def main():
     if rdir:
         run["rebuild_s"] = prev.get("rebuild_s", 0)
     else:
-        rb = sh(["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"], cwd=clone, env=env)
+        rb = sh(rebuild_cmd(clone), cwd=clone, env=env)
         (log / "rebuild.txt").write_text(rb.stdout[-4000:] + rb.stderr[-4000:])
         if rb.returncode:
             stop(4, "clone rebuild failed")
@@ -402,7 +426,7 @@ def main():
         run["trace_base"] = f"the known state {b[:12]} ({why_b}; DEC-989)"
         note(f"trace: against the known state {b[:12]} ({why_b})")
         wenv = dict(env, PYTHONPATH=str(wo / "src"))
-        rb2 = sh(["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"], cwd=wo, env=wenv)
+        rb2 = sh(rebuild_cmd(wo), cwd=wo, env=wenv)
         wpenv = dict(penv, PYTHONPATH=f"{wo}/src:{wo}/src/gov/close/pytest_plugin", GOV_CLOSE_SERIAL_ONLY_OF=str(wo))
         if rb2.returncode:
             stop(3, f"{len(reds)} test(s) red alone; the clone without the change did not rebuild (refused)")
@@ -466,8 +490,15 @@ def main():
     for i in items:
         if i["profile"] == "FULL":
             probes = sorted(glob.glob(str(ROOT / "docs/probes" / i["ticket"] / "*.md")))
-            passing = [p for p in probes
-                       if re.search(r"^(judgement|verdict|result|status):\s*(PASS|pass)", open(p).read(), re.M)]
+            sys.path.insert(0, str(ORCH / "tools"))
+            from verdict import ready  # DEC-1010: READY computed from a structured verdict where the record has one
+
+            def passes(p):
+                text = open(p).read()
+                ok, _ = ready(text)
+                return ok if ok is not None else bool(re.search(r"^(judgement|verdict|result|status):\s*(PASS|pass)",
+                                                                   text, re.M))
+            passing = [p for p in probes if passes(p)]
             i["review"] = [os.path.relpath(p, ROOT) for p in passing]
             if not passing:
                 stop(4, f"{i['w2']}: FULL ticket without a passing independent review record")
@@ -517,8 +548,8 @@ def main():
         tk = sh(["tk", "close", i["ticket"]], cwd=ROOT)
         note(f"tk close {i['ticket']}: " + (tk.stdout + tk.stderr).strip()[:200])
         paths = [os.path.relpath(out, ROOT), f".tickets/{i['ticket']}.md"]
-        sh(["git", "-C", str(ROOT), "add", "--", *paths])
-        cm = sh(["git", "-C", str(ROOT), "commit", "-q", "-m",
+        git_retry(["add", "--", *paths])
+        cm = git_retry(["commit", "-q", "-m",
                  f"{i['w2']} ({i['ticket']}): closed on the 10 practices (DEC-953)",
                  "--trailer", f"Task: {i['ticket']}", "--trailer", "Implements: DEC-953", "--trailer",
                  "Role: orchestrator", "--trailer", "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",

@@ -1,0 +1,7 @@
+log: W2-61h-A5-revise.json
+W2: W2-61h
+status: PACKAGES. The revision is committed, but the scoped run did not happen: the store is stale, and its rebuild waited 88 minutes for a heavy-job slot and never got one. I stopped the wait under DEC-943's 90-minute rule.
+
+task: W2-61h (DAEO-h2k3) resume on P-W2-61h-1 (a) (DEC-1009): a fresh independent test designer revises the four W2-61 cases that assume 20 visible questions, then one scoped run and DONE at the exact head.
+status: PACKAGES. The revision is committed, but the scoped run did not happen: the store is stale, and its rebuild waited 88 minutes for a heavy-job slot and never got one. I stopped the wait under DEC-943's 90-minute rule.
+work_completed: One fresh independent test designer ran sandboxed (itd-3, effort high, session c5876354) and committed `6cc469cd66cf`. Its changes, which I checked agai

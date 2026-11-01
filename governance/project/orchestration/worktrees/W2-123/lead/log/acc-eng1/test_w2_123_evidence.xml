@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.046" timestamp="2026-11-01T23:24:00.504643+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-123.test_w2_123_evidence" name="test_the_evidence_file_holds_the_sixteen_measured_cases_and_the_chosen_setting" time="0.001"><failure message="AssertionError: there is no docs/changes/W2-123-evidence.md&#10;assert False&#10; +  where False = is_file()&#10; +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-123/docs/changes/W2-123-evidence.md').is_file">E   AssertionError: there is no docs/changes/W2-123-evidence.md
+    assert False
+     +  where False = is_file()
+     +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-123/docs/changes/W2-123-evidence.md').is_file</failure></testcase></testsuite></testsuites>

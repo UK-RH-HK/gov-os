@@ -1,0 +1,7 @@
+log: W2-104-A5-run1-ten.json
+W2: W2-104
+status: DONE. All 7 KPI lines pass through `gov accept` (43 of 43). Two reds come from this ticket, because `skilleval` is not yet in `src/gov/check/commands.py`, which is outside the ticket's paths (P-W2-104-CMDLIST, for the CTO). The other reds were there before this ticket or come from machine load.
+
+task: As ticket lead for DAEO-drhj (W2-104), get `gov skilleval` (the skill evaluation harness and the licence check before an import is adopted) tested independently, built, verified in scope and returned
+status: DONE. All 7 KPI lines pass through `gov accept` (43 of 43). Two reds come from this ticket, because `skilleval` is not yet in `src/gov/check/commands.py`, which is outside the ticket's paths (P-W2-104-CMDLIST, for the CTO). The other reds were there before this ticket or come from machine load.
+work_completed: Merged `w2/integrate` into the branch, because the branch started before t

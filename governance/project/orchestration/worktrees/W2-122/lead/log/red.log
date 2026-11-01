@@ -1,0 +1,818 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-01 22:49:21)
+FFF.FFFFFFFFFFFFFFFFFFFFF.                                               [100%]
+=================================== FAILURES ===================================
+_____________ test_a_full_rebuild_writes_the_record_of_its_stores ______________
+
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_full_rebuild_writes_the0/box/base')
+
+    def test_a_full_rebuild_writes_the_record_of_its_stores(base):
+>       record = support.read_record(base)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_answer_and_record.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_full_rebuild_writes_the0/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_full_rebuild_writes_the0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+______ test_the_same_code_and_embedder_write_the_same_record_in_two_trees ______
+
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_same_code_and_embedde0/box/base')
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_same_code_and_embedde0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+
+    def test_the_same_code_and_embedder_write_the_same_record_in_two_trees(base, tree, env):
+        support.built(tree, env)
+    
+>       mine, theirs = support.read_record(tree), support.read_record(base)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_answer_and_record.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_same_code_and_embedde0/box/tree')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_same_code_and_embedde0/box/tree
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+______________________ test_a_seeded_answer_has_its_form _______________________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+
+    def test_a_seeded_answer_has_its_form(tree, base, env):
+>       run = support.built(tree, env, "--seed", str(base))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_answer_and_record.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_it...mp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/base\n', seconds=0.1696904581040144)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_answer_has_its_f0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+_____________ test_seed_without_a_folder_reads_the_configured_base _____________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seed_without_a_folder_rea0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seed_without_a_folder_rea0/box/locks/rebuild.lock'))
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seed_without_a_folder_rea0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e92930>
+
+    def test_seed_without_a_folder_reads_the_configured_base(box, base, env, embedder):
+        tree = support.make_tree(box, base, integration_store=base)
+    
+>       run = support.built(tree, env, "--seed")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_configured_base.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seed_without_a_folder_rea0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed',)
+run = Run(args=('rebuild', '--json', '--seed'), returncode=2, stdout='', stderr='usage: gov [-h] <command> ...\ngov: error: unrecognized arguments: --seed\n', seconds=0.22905248194001615)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+__________ test_a_project_with_no_configured_base_rebuilds_cold_named __________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_project_with_no_configu0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_project_with_no_configu0/box/locks/rebuild.lock'))
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_project_with_no_configu0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e6a5a0>
+
+    def test_a_project_with_no_configured_base_rebuilds_cold_named(box, base, env, embedder):
+        """No ``integration_store`` key. A base is planted where this machine's integration store lives, under the
+        ``HOME`` the rebuild is given: a path of this machine written into the code would find it."""
+        machine_place = box.home / "gov-os-worktrees" / "W2-00-store"
+        machine_place.parent.mkdir(parents=True)
+        machine_place.symlink_to(base, target_is_directory=True)
+        tree = support.make_tree(box, base)
+    
+>       run = support.built(tree, env, "--seed")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_configured_base.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_project_with_no_configu0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed',)
+run = Run(args=('rebuild', '--json', '--seed'), returncode=2, stdout='', stderr='usage: gov [-h] <command> ...\ngov: error: unrecognized arguments: --seed\n', seconds=0.1836974360048771)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+________ test_a_configured_path_that_holds_no_base_rebuilds_cold_named _________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_path_that_ho0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_path_that_ho0/box/locks/rebuild.lock'))
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_path_that_ho0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927ce6cc0>
+
+    def test_a_configured_path_that_holds_no_base_rebuilds_cold_named(box, base, env, embedder):
+        missing = box.base / "no-base-here"
+        tree = support.make_tree(box, base, integration_store=missing)
+    
+>       run = support.built(tree, env, "--seed")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_configured_base.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_path_that_ho0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed',)
+run = Run(args=('rebuild', '--json', '--seed'), returncode=2, stdout='', stderr='usage: gov [-h] <command> ...\ngov: error: unrecognized arguments: --seed\n', seconds=0.19637627294287086)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+_ test_a_configured_base_that_does_not_match_is_refused_and_the_rebuild_runs_cold _
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_base_that_do0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_base_that_do0/box/locks/rebuild.lock'))
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_base_that_do0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e699a0>
+
+    def test_a_configured_base_that_does_not_match_is_refused_and_the_rebuild_runs_cold(box, base, env, embedder):
+>       support.change_record(base, lambda record: record.update(schema=f"other-{record.get('schema')}"))
+
+tests/acceptance/W2-122/test_w2_122_configured_base.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/w2_122_support.py:451: in change_record
+    record = read_record(project)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_base_that_do0/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_configured_base_that_do0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+_________________ test_the_evidence_file_names_the_measurement _________________
+
+    def test_the_evidence_file_names_the_measurement():
+        path = support.REPO_ROOT / support.EVIDENCE_REL
+>       assert path.is_file(), f"no evidence file at {support.EVIDENCE_REL}"
+E       AssertionError: no evidence file at docs/changes/W2-122-evidence.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-122-tests/docs/changes/W2-122-evidence.md').is_file
+
+tests/acceptance/W2-122/test_w2_122_evidence.py:17: AssertionError
+_ test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[code] _
+
+case = 'code'
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2c290>
+
+    @pytest.mark.parametrize("case", sorted(CHANGES))
+    def test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold(case, tree, base, env, embedder):
+        change, named = CHANGES[case]
+>       support.change_record(base, change)
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/w2_122_support.py:451: in change_record
+    record = read_record(project)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe0/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+_ test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[embedder-model] _
+
+case = 'embedder-model'
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe1/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe1/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2c830>
+
+    @pytest.mark.parametrize("case", sorted(CHANGES))
+    def test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold(case, tree, base, env, embedder):
+        change, named = CHANGES[case]
+>       support.change_record(base, change)
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/w2_122_support.py:451: in change_record
+    record = read_record(project)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe1/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe1/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+_ test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[embedder-revision] _
+
+case = 'embedder-revision'
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe2/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe2/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927ce64b0>
+
+    @pytest.mark.parametrize("case", sorted(CHANGES))
+    def test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold(case, tree, base, env, embedder):
+        change, named = CHANGES[case]
+>       support.change_record(base, change)
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/w2_122_support.py:451: in change_record
+    record = read_record(project)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe2/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe2/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+_ test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[schema] _
+
+case = 'schema'
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe3/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe3/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e6be30>
+
+    @pytest.mark.parametrize("case", sorted(CHANGES))
+    def test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold(case, tree, base, env, embedder):
+        change, named = CHANGES[case]
+>       support.change_record(base, change)
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/w2_122_support.py:451: in change_record
+    record = read_record(project)
+             ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe3/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_diffe3/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+_______ test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold ________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_with_no_record_is_0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_with_no_record_is_0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e6b5c0>
+
+    def test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold(tree, base, env, embedder):
+>       support.read_record(base)   # the premise: the base's full rebuild wrote one
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_with_no_record_is_0/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_with_no_record_is_0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+_ test_a_base_whose_record_cannot_be_read_is_refused_and_the_rebuild_runs_cold _
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_canno0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_canno0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2d310>
+
+    def test_a_base_whose_record_cannot_be_read_is_refused_and_the_rebuild_runs_cold(tree, base, env, embedder):
+>       support.read_record(base)
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_canno0/box/base')
+
+    def read_record(project):
+        path = Path(project) / RECORD_REL
+>       assert path.is_file(), f"the full rebuild wrote no record at {RECORD_REL} in {project}"
+               ^^^^^^^^^^^^^^
+E       AssertionError: the full rebuild wrote no record at .gov-runtime/rebuild/stores.json in /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_whose_record_canno0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:440: AssertionError
+__ test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed ___
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box/locks/rebuild.lock'))
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2eb70>
+
+    def test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed(box, embedder):
+        """The base is built against an endpoint that reports another revision of the model and gives other vectors;
+        the tree's endpoint reports the pin. A seed that used the base would leave the kept files' vectors from the
+        other embedder: the store would differ from the cold one in those vectors."""
+        other = support.OllamaStandIn(revision=support.OTHER_REVISION, salt="the other embedder ")
+        try:
+            base = support.make_base(box)
+            support.built(base, support.environment(box, other.host))
+        finally:
+            other.close()
+        tree = support.make_tree(box, base)
+        env = support.environment(box, embedder.host)
+    
+>       run = _refused_then_cold(tree, base, env, embedder, "embedder")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2eb70>
+named = 'embedder'
+
+    def _refused_then_cold(tree, base, env, embedder, named):
+        """Seed ``tree`` from ``base``: refused naming ``named``, the rebuild succeeds and runs cold, and its store is a
+        cold rebuild's entry for entry."""
+        embedder.forget()
+        run = support.rebuild(tree, env, "--seed", str(base))
+>       assert run.ok, f"a refused seed failed the rebuild (it must run cold and succeed)\n{run.describe()}"
+E       AssertionError: a refused seed failed the rebuild (it must run cold and succeed)
+E         rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box/base
+E         exit code: 2 after 0.2 s
+E         stdout:
+E         
+E         stderr:
+E         usage: gov [-h] <command> ...
+E         gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box/base
+E         
+E       assert False
+E        +  where False = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_anothe...p/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_base_built_by_another_e0/box/base\n', seconds=0.17152531282044947).ok
+
+tests/acceptance/W2-122/test_w2_122_fail_closed.py:64: AssertionError
+__________ test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry ___________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2cec0>
+
+    def test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry(tree, base, env, embedder):
+>       seeded_run = _seeded(tree, env, embedder, base)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:23: in _seeded
+    run = support.built(tree, env, "--seed", str(folder))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_th...p/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/base\n', seconds=0.19487832789309323)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_is_the_c0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+_____________________ test_the_seed_names_the_base_it_read _____________________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2fb60>
+
+    def test_the_seed_names_the_base_it_read(tree, base, env, embedder):
+>       run = _seeded(tree, env, embedder, base)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:23: in _seeded
+    run = support.built(tree, env, "--seed", str(folder))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_bas...tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/base\n', seconds=0.215442662127316)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_the_seed_names_the_base_i0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+______ test_a_seeded_rebuild_embeds_only_the_files_whose_content_changed _______
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2d760>
+
+    def test_a_seeded_rebuild_embeds_only_the_files_whose_content_changed(tree, base, env, embedder):
+>       _seeded(tree, env, embedder, base)
+
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:23: in _seeded
+    run = support.built(tree, env, "--seed", str(folder))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embed...p/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/base\n', seconds=0.21370032895356417)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_embeds_o0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+____ test_a_file_removed_since_the_base_leaves_no_entry_in_the_seeded_store ____
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1926b2c1a0>
+
+    def test_a_file_removed_since_the_base_leaves_no_entry_in_the_seeded_store(tree, base, env, embedder):
+>       _seeded(tree, env, embedder, base)
+
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:23: in _seeded
+    run = support.built(tree, env, "--seed", str(folder))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_t...mp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/base\n', seconds=0.2162186608184129)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_file_removed_since_the_0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+_____________________ test_a_link_to_the_base_is_followed ______________________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e6b4d0>
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/locks/rebuild.lock'))
+
+    def test_a_link_to_the_base_is_followed(tree, base, env, embedder, box):
+        link = box.base / "link-to-base"
+        link.symlink_to(base, target_is_directory=True)
+    
+>       seeded_run = _seeded(tree, env, embedder, link)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:23: in _seeded
+    run = support.built(tree, env, "--seed", str(folder))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/link-to-base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_...-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/link-to-base\n', seconds=0.19505554297938943)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/link-to-base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_link_to_the_base_is_fol0/box/link-to-base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+____________________ test_seeding_leaves_the_base_unchanged ____________________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/base')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+embedder = <w2_122_support.OllamaStandIn object at 0x7a1927e6b1a0>
+
+    def test_seeding_leaves_the_base_unchanged(tree, base, env, embedder):
+        before = support.store_tables(base)
+        record_before = (base / support.RECORD_REL).read_bytes() if (base / support.RECORD_REL).is_file() else None
+    
+>       _seeded(tree, env, embedder, base)
+
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py:23: in _seeded
+    run = support.built(tree, env, "--seed", str(folder))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/tree')
+env = {'GIT_AUTHOR_EMAIL': 'w2-122@example.invalid', 'GIT_AUTHOR_NAME': 'W2-122 acceptance', 'GIT_COMMITTER_EMAIL': 'w2-122@example.invalid', 'GIT_COMMITTER_NAME': 'W2-122 acceptance', ...}
+extra = ('--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/base')
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_bas...p/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/base\n', seconds=0.21864547906443477)
+
+    def built(project, env, *extra):
+        """A rebuild that must succeed: its run."""
+        run = rebuild(project, env, *extra)
+>       assert run.ok, f"the rebuild did not succeed\n{run.describe()}"
+               ^^^^^^
+E       AssertionError: the rebuild did not succeed
+E       rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/base
+E       exit code: 2 after 0.2 s
+E       stdout:
+E       
+E       stderr:
+E       usage: gov [-h] <command> ...
+E       gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_seeding_leaves_the_base_u0/box/base
+
+tests/acceptance/W2-122/w2_122_support.py:419: AssertionError
+______________ test_a_rebuild_with_the_endpoint_down_fails_named _______________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_rebuild_with_the_endpoi0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_rebuild_with_the_endpoi0/box/locks/rebuild.lock'))
+
+    def test_a_rebuild_with_the_endpoint_down_fails_named(box):
+        project = support.make_base(box)
+        env = support.environment(box, support.closed_loopback_host())
+    
+        run = support.rebuild(project, env)
+    
+>       _failed_naming_the_semantic_store(run)
+
+tests/acceptance/W2-122/test_w2_122_semantic_required.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('rebuild', '--json'), returncode=0, stdout='{"ok": true, "command": "rebuild", "result": {"digest": "2a39b6e... stderr='Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.\n', seconds=3.0851472730282694)
+
+    def _failed_naming_the_semantic_store(run):
+        error = run.error
+>       assert run.returncode not in (0, None), \
+            f"a rebuild whose semantic store was not recreated exited {run.returncode}\n{run.describe()}"
+E       AssertionError: a rebuild whose semantic store was not recreated exited 0
+E         rebuild --json
+E         exit code: 0 after 3.1 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "2a39b6ee5d2096c5fa37b599f6f8bda164a61e839b477438dfb8f55ba9a8a59d", "store": {"digest": "2a39b6ee5d2096c5fa37b599f6f8bda164a61e839b477438dfb8f55ba9a8a59d", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "secrets_counts": {"content": {"scanned": 8, "remembered": 0}, "path": {"scanned": 4, "remembered": 0}}, "timing": {"record_s": 0.2, "lexical_s": 0.7, "secrets_s": 2.2, "semantic_s": 0.3, "codeintel_s": 1.5, "compaction_s": 0.0, "total_s": 2.8}, "lock": {"path": "/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_rebuild_with_the_endpoi0/box/locks/rebuild.lock", "source": "rebuild.yaml", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-01T22:51:02.247490+00:00", "released_at": "2026-11-01T22:51:05.061361+00:00"}, "slow": false, "slow_after_s": 600, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E         
+E         stderr:
+E         Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.
+E         
+E       assert 0 not in (0, None)
+E        +  where 0 = Run(args=('rebuild', '--json'), returncode=0, stdout='{"ok": true, "command": "rebuild", "result": {"digest": "2a39b6e... stderr='Ollama is unavailable: semantic retrieval is skipped and results are FTS-only.\n', seconds=3.0851472730282694).returncode
+
+tests/acceptance/W2-122/test_w2_122_semantic_required.py:20: AssertionError
+___________ test_a_rebuild_whose_endpoint_fails_part_way_fails_named ___________
+
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_rebuild_whose_endpoint_0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_rebuild_whose_endpoint_0/box/locks/rebuild.lock'))
+
+    def test_a_rebuild_whose_endpoint_fails_part_way_fails_named(box):
+        project = support.make_base(box)
+        for number in range(MANY):
+            support.write(project / f"docs/many/n{number:03d}.md", support.note(f"entry{number:03d}word"))
+        support.git(project, "add", "-A")
+        support.git(project, "commit", "-q", "-m", "many notes")
+        failing = support.OllamaStandIn(fail_after=1)
+        try:
+            run = support.rebuild(project, support.environment(box, failing.host))
+            requests, answered = failing.embed_requests, len(failing.embedded)
+        finally:
+            failing.close()
+    
+        assert requests >= 2 and answered > 0, \
+            f"the premise fails: the rebuild sent {requests} embed request(s), {answered} text(s) answered; the " \
+            f"failure did not come part way"
+>       _failed_naming_the_semantic_store(run)
+
+tests/acceptance/W2-122/test_w2_122_semantic_required.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('rebuild', '--json'), returncode=0, stdout='{"ok": true, "command": "rebuild", "result": {"digest": "1b17390...: ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}\n', stderr='', seconds=10.542709550820291)
+
+    def _failed_naming_the_semantic_store(run):
+        error = run.error
+>       assert run.returncode not in (0, None), \
+            f"a rebuild whose semantic store was not recreated exited {run.returncode}\n{run.describe()}"
+E       AssertionError: a rebuild whose semantic store was not recreated exited 0
+E         rebuild --json
+E         exit code: 0 after 10.5 s
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "1b173901667cfaeb031e460b787ded328d0f04f243f87382bc9a122dfab126b0", "store": {"digest": "1b173901667cfaeb031e460b787ded328d0f04f243f87382bc9a122dfab126b0", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "Ollama did not embed with qwen3-embedding:0.6b"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}}, "compaction": {".gov-runtime/store.db": "compacted"}, "secrets_counts": {"content": {"scanned": 88, "remembered": 0}, "path": {"scanned": 44, "remembered": 0}}, "timing": {"record_s": 0.2, "lexical_s": 3.2, "secrets_s": 9.5, "semantic_s": 0.4, "codeintel_s": 6.4, "compaction_s": 0.0, "total_s": 10.3}, "lock": {"path": "/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_rebuild_whose_endpoint_0/box/locks/rebuild.lock", "source": "rebuild.yaml", "wait_s": 0.0, "holder": null, "held_by_caller": false, "taken_at": "2026-11-01T22:51:06.263683+00:00", "released_at": "2026-11-01T22:51:16.520686+00:00"}, "slow": false, "slow_after_s": 600, "record": ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert 0 not in (0, None)
+E        +  where 0 = Run(args=('rebuild', '--json'), returncode=0, stdout='{"ok": true, "command": "rebuild", "result": {"digest": "1b17390...: ".gov-runtime/rebuild/record.json", "watchdog_faults": []}, "session": ""}\n', stderr='', seconds=10.542709550820291).returncode
+
+tests/acceptance/W2-122/test_w2_122_semantic_required.py:20: AssertionError
+___________ test_a_seeded_rebuild_with_the_endpoint_down_fails_named ___________
+
+tree = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/tree')
+base = PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/base')
+box = Box(base=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box'), home=Posix...k=PosixPath('/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/locks/rebuild.lock'))
+
+    def test_a_seeded_rebuild_with_the_endpoint_down_fails_named(tree, base, box):
+        env = support.environment(box, support.closed_loopback_host())
+    
+        run = support.rebuild(tree, env, "--seed", str(base))
+    
+>       _failed_naming_the_semantic_store(run)
+
+tests/acceptance/W2-122/test_w2_122_semantic_required.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_...mp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/base\n', seconds=0.2144869938492775)
+
+    def _failed_naming_the_semantic_store(run):
+        error = run.error
+        assert run.returncode not in (0, None), \
+            f"a rebuild whose semantic store was not recreated exited {run.returncode}\n{run.describe()}"
+>       assert run.envelope().get("ok") is False, f"a rebuild without its semantic store answered ok\n{run.describe()}"
+E       AssertionError: a rebuild without its semantic store answered ok
+E         rebuild --json --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/base
+E         exit code: 2 after 0.2 s
+E         stdout:
+E         
+E         stderr:
+E         usage: gov [-h] <command> ...
+E         gov: error: unrecognized arguments: --seed /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/base
+E         
+E       assert None is False
+E        +  where None = <built-in method get of dict object at 0x7a192536ba40>('ok')
+E        +    where <built-in method get of dict object at 0x7a192536ba40> = {}.get
+E        +      where {} = envelope()
+E        +        where envelope = Run(args=('rebuild', '--json', '--seed', '/tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_...mp/gov-os-lead-W2-122/pytest-of-usain/pytest-4/test_a_seeded_rebuild_with_the0/box/base\n', seconds=0.2144869938492775).envelope
+
+tests/acceptance/W2-122/test_w2_122_semantic_required.py:22: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-122/test_w2_122_answer_and_record.py::test_without_seed_a_rebuild_does_not_seed
+PASSED tests/acceptance/W2-122/test_w2_122_semantic_required.py::test_without_embeddings_the_semantic_store_is_skipped_and_the_answer_is_ok
+FAILED tests/acceptance/W2-122/test_w2_122_answer_and_record.py::test_a_full_rebuild_writes_the_record_of_its_stores
+FAILED tests/acceptance/W2-122/test_w2_122_answer_and_record.py::test_the_same_code_and_embedder_write_the_same_record_in_two_trees
+FAILED tests/acceptance/W2-122/test_w2_122_answer_and_record.py::test_a_seeded_answer_has_its_form
+FAILED tests/acceptance/W2-122/test_w2_122_configured_base.py::test_seed_without_a_folder_reads_the_configured_base
+FAILED tests/acceptance/W2-122/test_w2_122_configured_base.py::test_a_project_with_no_configured_base_rebuilds_cold_named
+FAILED tests/acceptance/W2-122/test_w2_122_configured_base.py::test_a_configured_path_that_holds_no_base_rebuilds_cold_named
+FAILED tests/acceptance/W2-122/test_w2_122_configured_base.py::test_a_configured_base_that_does_not_match_is_refused_and_the_rebuild_runs_cold
+FAILED tests/acceptance/W2-122/test_w2_122_evidence.py::test_the_evidence_file_names_the_measurement
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[code]
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[embedder-model]
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[embedder-revision]
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold[schema]
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_whose_record_cannot_be_read_is_refused_and_the_rebuild_runs_cold
+FAILED tests/acceptance/W2-122/test_w2_122_fail_closed.py::test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed
+FAILED tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py::test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry
+FAILED tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py::test_the_seed_names_the_base_it_read
+FAILED tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py::test_a_seeded_rebuild_embeds_only_the_files_whose_content_changed
+FAILED tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py::test_a_file_removed_since_the_base_leaves_no_entry_in_the_seeded_store
+FAILED tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py::test_a_link_to_the_base_is_followed
+FAILED tests/acceptance/W2-122/test_w2_122_seeded_equals_cold.py::test_seeding_leaves_the_base_unchanged
+FAILED tests/acceptance/W2-122/test_w2_122_semantic_required.py::test_a_rebuild_with_the_endpoint_down_fails_named
+FAILED tests/acceptance/W2-122/test_w2_122_semantic_required.py::test_a_rebuild_whose_endpoint_fails_part_way_fails_named
+FAILED tests/acceptance/W2-122/test_w2_122_semantic_required.py::test_a_seeded_rebuild_with_the_endpoint_down_fails_named
+24 failed, 2 passed in 86.89s (0:01:26)

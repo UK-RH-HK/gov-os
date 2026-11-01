@@ -1,0 +1,16 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+E   AssertionError: ensure_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:658: AssertionError: ensure_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+E   AssertionError: ensure_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:658: AssertionError: ensure_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+E   AssertionError: ensure_query_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:658: AssertionError: ensure_query_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+E   AssertionError: ensure_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': False, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:658: AssertionError: ensure_available's result lacks ['settings'] (the interface names ['available', 'started', 'facet', 'state', 'warning', 'settings']): {'available': True, 'started': False, 'facet': 'semantic', 'state': 'AVAILABLE', 'warning': None}
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-123/test_w2_123_start.py::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner
+FAILED tests/acceptance/W2-123/test_w2_123_start.py::test_shared_start_without_configuration_uses_the_default_resolved_from_the_callers_cpus
+FAILED tests/acceptance/W2-123/test_w2_123_start.py::test_query_start_uses_its_own_entry_and_keeps_the_gpu_hidden
+FAILED tests/acceptance/W2-123/test_w2_123_start.py::test_a_server_already_answering_is_used_and_the_settings_a_start_would_use_are_stated
+4 failed in 1.12s

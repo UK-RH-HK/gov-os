@@ -1,0 +1,46 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+E   AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+    Traceback (most recent call last):
+      File "<string>", line 6, in <module>
+    AttributeError: module 'gov.retrieval.ollama' has no attribute 'safe_restart'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/w2_123_support.py:554: AssertionError: the child that calls gov.retrieval.ollama.safe_restart ended with exit code 1:
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_a_server_that_answers_is_never_restarted[healthy]
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_a_server_that_answers_is_never_restarted[slow]
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_a_hung_server_of_the_gov_os_is_stopped_with_its_runner_and_started_again_under_its_cap
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_a_port_held_by_another_program_is_never_stopped
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_a_down_server_is_started_under_its_cap_and_recorded
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_cpu_only
+FAILED tests/acceptance/W2-123/test_w2_123_restart.py::test_an_unreadable_value_stops_and_starts_nothing
+7 failed in 4.34s

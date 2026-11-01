@@ -1,0 +1,15 @@
+# W2-33 (DAEO-lrre) — run 1, as briefed below, with the owner's decisions of 2026-11-01 (read this first; it overrides the brief below where they differ)
+
+`git rev-parse --short=12 HEAD` must show `@@HEAD@@` (the CTO created this worktree after W2-11 landed: its role-file sentences and `.claude/agents/orchestrator.md` are on `w2/integrate`, and you now hold `template/governance/kernel/roles/**` alone).
+
+**The ticket file as the CTO left it at claim (`.tickets/DAEO-lrre.md`) is the spec; it changed since the brief below was built:**
+- **DEC-995, DEC-996 (a role is what it may read and write; a skill never widens it):** each role file's machine-readable defaults now state its reads (`- **Reads:**`), its writes (`- **Writes:**`, as path classes the project's path map resolves, never this repository's paths) and the closed list of skills it may load (`- **Skills:**`); each role file states that a role is its reads and writes and that no skill changes them; domain work sharing the engineer's reads and writes (backend, frontend, API, data, security, DevOps, UI/UX) is a skill in the engineer's list, never a role file; no role lists a skill whose output class its writes do not hold (spec-writing is product-spec's, test-design the test designer's; the CTO's on-demand skills only those its writes hold). The failure line adds: a role without its reads, writes or skills list; a role file listing a skill whose output its writes do not hold; a domain specialist given a role file of its own.
+- **DEC-994:** the CTO's role file states the approval classes (a call that may need the owner's approval: the host's ask rules and safety checks) and the quiet hours and morning-package time as role defaults read from the project's configuration.
+- **P-W2-11-3 (DEC-992):** DEC-808's schema fields (the two judgement lines) are yours, in the handoff schema.
+- **Your paths gained** `.rulesync/subagents/**`, `template/.rulesync/subagents/**` (each new role needs its rulesync source, or the portability check fails with SOURCE_MISSING) and `governance/project/roster.yaml` (the new roles' entries). W2-113's role-file sentences moved to you (DEC-996 split): the orchestrator role file's adoption sentence is yours.
+- **The generated copies under `.claude/agents/**` are the CTO's step** (no worker may write `.claude/`; the CTO generates them with rulesync and commits them here with the owner's daytime approval, DEC-991, DEC-992). When everything else is done and verified, if no commit in `@@HEAD@@..HEAD` touches `.claude/agents/`, write your checkpoint and return PACKAGES naming the copies as the only thing left. Never write them another way.
+- **One role (DEC-995):** if a handoff record must be refused by `gov check` (a code change in `src/gov/check/schema.py`), that is a child engineer ticket (W2-33-c, approved in DEC-996's list): name it in your return, never write it.
+- **One merge per ticket (DEC-988, DEC-989):** return DONE with the exact head you verified; the CTO lands it through the merge queue.
+
+---
+

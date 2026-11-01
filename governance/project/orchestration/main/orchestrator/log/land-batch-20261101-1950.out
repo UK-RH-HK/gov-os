@@ -1,0 +1,6 @@
+W2-11 (DAEO-k7hz, STANDARD) at c9f99b28b88b: pre-check passed
+W2-105 (DAEO-zpdj, STANDARD) at fa653609cc93: pre-check passed
+baseline 1f0bb5b3c516 (the nightly of 2026-10-31 (red))
+the baseline's own record: /tmp/gov-os-nightly-junit/20261031-0200, /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/nightly/20261031-0200/run.txt
+2026-11-01 19:37:24 merged W2-11, W2-105 onto cbf9a8a675e1: 4a302ff13779
+exit 143

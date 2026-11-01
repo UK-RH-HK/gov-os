@@ -1,0 +1,2 @@
+2026-11-01 16:10:41 gate OPEN leads=7 load=18.8/28.8 nproc=20 have=21050588kB need=20956092kB; launching W2-104
+disk gate open: 854 GiB free, 64505298 inodes free

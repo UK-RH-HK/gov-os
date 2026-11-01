@@ -1,0 +1,8 @@
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 12455.66it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 14042.32it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights:  59%|█████▉    | 184/310 [00:00<00:00, 1838.39it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 2854.22it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights:  56%|█████▋    | 175/310 [00:00<00:00, 1734.64it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 2450.18it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.

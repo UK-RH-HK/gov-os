@@ -1,0 +1,76 @@
+--- dispatcher_next.reviewed.py	2026-11-01 20:19:05.723039534 +0000
++++ dispatcher_next.py	2026-11-01 20:19:45.353313297 +0000
+@@ -216,6 +216,9 @@
+             pending.add(e[2])
+     t["pending_launches"] = sorted(pending - set(t["leads"]))
+     t["services_kb"] = services_resident(facts)
++    t["rerankers_outside_kb"] = rerankers_outside_leads(facts)
++    t["outside_reranker_possible"] = bool(t["rerankers_outside_kb"]) or t["land_running"] or t["close_running"] \
++        or t["queue_busy"]
+     try:
+         pk = peaks(c, bool(E("DISPATCH_DRY_FLAG"))) if c else None
+     except Exception as exc:
+@@ -293,6 +296,22 @@
+ # run; the CTO's session, inside the base), so counting it again would double count (measured 2026-11-01).
+ 
+ 
++def under_lead(facts, f):
++    by_pid = {x["pid"]: x for x in facts}
++    seen, cur = set(), f
++    while cur and cur["pid"] not in seen:
++        seen.add(cur["pid"])
++        if lead_w2(cur["argv"], cur["cwd"]) or (any(MARKER in a for a in cur["argv"])):
++            return True
++        cur = by_pid.get(cur["ppid"])
++    return False
++
++
++def rerankers_outside_leads(facts):
++    """The memory of rerankers whose process is not inside a lead's tree (a queue or close run's, the CTO's)."""
++    return sum(f["rss_kb"] for f in facts if f["argv"] and "reranker-venv" in f["argv"][0] and not under_lead(facts, f))
++
++
+ def services_resident(facts):
+     out = {}
+     for kind, names in SERVICES.items():
+@@ -352,15 +371,23 @@
+ 
+ 
+ def is_pytest(a):
+-    return bool(a) and (os.path.basename(a[0]) in ("pytest", "py.test") or
++    """pytest by its script (also through its shebang: an interpreter then .../pytest) or `python -m pytest`."""
++    return bool(a) and (any(os.path.basename(x) in ("pytest", "py.test") for x in a[:4]) or
+                         any(a[i] == "-m" and i + 1 < len(a) and a[i + 1] == "pytest" for i in range(min(4, len(a)))))
+ 
+ 
+ def single_file_pytest(a):
+-    """One target that is a file or a test in a file: not a heavy step (the brief's rule)."""
+-    start = next((i + 2 for i in range(len(a) - 1) if a[i] == "-m" and a[i + 1] == "pytest"), 1)
+-    targets = [x for x in a[start:] if not x.startswith("-") and (x.endswith(".py") or ".py::" in x or "/" in x)]
+-    return len(targets) == 1 and (targets[0].endswith(".py") or ".py::" in targets[0])
++    """One target that is a file or a test in a file: not a heavy step (the brief's rule). Only `.py` and `.py::`
++    arguments count as targets (an option's value such as `--junitxml /tmp/x.xml` is not one); a folder target, or
++    none (pytest then collects the whole tree), is heavy."""
++    start = next((i + 2 for i in range(len(a) - 1) if a[i] == "-m" and a[i + 1] == "pytest"),
++                 next((i + 1 for i, x in enumerate(a[:4]) if os.path.basename(x) in ("pytest", "py.test")), 1))
++    rest = a[start:]
++    args = [x for i, x in enumerate(rest)  # an argument right after a bare `--option` is that option's value
++            if not x.startswith("-") and not (i and rest[i - 1].startswith("--") and "=" not in rest[i - 1])]
++    targets = [x for x in args if x.endswith(".py") or ".py::" in x]
++    folders = [x for x in args if x not in targets]
++    return len(targets) == 1 and not folders
+ 
+ 
+ def heavy_outside_slots(facts, limit_s):
+@@ -498,6 +525,11 @@
+     # F2: the shared services' headroom (each at most its p95 above what it holds now), counted once
+     headroom = sum(max(0, (pk.get("kinds", {}).get(k, {}).get("rss_kb_p95") or 0) - t.get("services_kb", {}).get(k, 0))
+                    for k in SERVICES)
++    # a reranker outside every lead tree (a queue or close run's, which no lead's peak covers): its kind's p95 above
++    # what such rerankers hold now, while a queue or close run, or such a reranker, exists (review of 2026-11-01)
++    if t.get("outside_reranker_possible"):
++        headroom += max(0, (pk.get("kinds", {}).get("reranker", {}).get("rss_kb_p95") or 0)
++                        - t.get("rerankers_outside_kb", 0))
+     pending = len(t.get("pending_launches", []))
+     if rule == "slots":
+         if not (lo and lo["samples"] >= c["min_outside_samples"] and pk.get("slot_run_kb")):  # F4: too little history

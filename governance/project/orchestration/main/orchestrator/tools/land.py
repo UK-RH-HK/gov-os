@@ -18,22 +18,40 @@ landed but its close step failed (fix at once).
 import argparse
 import glob
 import json
+import os
 import re
 import subprocess
 import sys
 import time
 from pathlib import Path
 
-ROOT = Path("/home/usain/Dynamic-Agentic-Engineering-OS")
+ROOT = Path(os.environ.get("LAND_ROOT", "/home/usain/Dynamic-Agentic-Engineering-OS"))  # LAND_ROOT: tests only
 ORCH = ROOT / ".gov-runtime/scratch/orchestrator"
 MQ = ROOT / "governance/project/orchestration/tools/merge_queue.py"
 QUEUE = ORCH / "merge-queue"
 STATUS = ORCH / "log/nightly/status.txt"
+NIGHTLY = ORCH / "log/nightly"
+JUNIT = Path("/tmp/gov-os-nightly-junit")  # the nightly's JUnit folders (nightly.sh)
+WARM = Path.home() / "gov-os-runs/W2-00/merge-queue/warm"  # the queue's warm clones (DEC-1001 (b))
 ACT1_FIRST_NIGHT = "2026-10-31"  # ACT 1 was committed on 2026-10-30 evening; the first nightly after it is 10-31's
 
 
 def sh(cmd, **kw):
     return subprocess.run(cmd, capture_output=True, text=True, **kw)
+
+
+def git_retry(args, root=None, tries=3, wait=None):
+    """A git command in the main tree, tried again (up to `tries` in all, `wait` s apart) while another process holds
+    the index lock: land.py and close_build.py may commit records at the same moment (DEC-1014 item 1). Returns the
+    last result; never raises on a held lock."""
+    wait = float(os.environ.get("GIT_RETRY_WAIT", "2")) if wait is None else wait
+    r = None
+    for n in range(tries):
+        r = sh(["git", "-C", str(root or ROOT), *args])
+        if r.returncode == 0 or "index.lock" not in (r.stderr + r.stdout) or n == tries - 1:
+            return r
+        time.sleep(wait)
+    return r
 
 
 def git(*args):
@@ -54,6 +72,21 @@ def baseline(status=STATUS):
     return pick[2], f"the nightly of {pick[0]} ({pick[1]})"
 
 
+def base_record(head12):
+    """DEC-1001 (c): the baseline nightly's own record, (its JUnit folder, its run file), for the nightly whose run file
+    names this head; (None, None) when either is missing (the queue then traces the baseline as before)."""
+    for run in sorted(NIGHTLY.glob("*/run.txt"), reverse=True):
+        try:
+            if re.search(r"^head " + re.escape(head12) + r"\b", run.read_text(encoding="utf-8"), re.M):
+                junit = JUNIT / run.parent.name
+                if any(junit.glob("*.xml")):
+                    return junit, run
+                return None, None
+        except OSError:
+            continue
+    return None, None
+
+
 def ticket_of(w2):
     for path in glob.glob(str(ROOT / ".tickets/*.md")):
         text = open(path, encoding="utf-8").read()
@@ -69,8 +102,14 @@ def precheck(w2, tid, profile, commit):
     if profile == "FULL":
         files = [f for f in git("ls-tree", "-r", "--name-only", commit, f"docs/probes/{tid}/").splitlines()
                  if f.endswith(".md")]
-        passing = [f for f in files if re.search(r"^(judgement|verdict|result|status):\s*(PASS|pass)",
-                                                 git("show", f"{commit}:{f}"), re.M)]
+        from verdict import ready  # DEC-1010: READY computed from a structured verdict where the record has one
+
+        def passes(f):
+            text = git("show", f"{commit}:{f}")
+            ok, _ = ready(text)
+            return ok if ok is not None else bool(re.search(r"^(judgement|verdict|result|status):\s*(PASS|pass)",
+                                                               text, re.M))
+        passing = [f for f in files if passes(f)]
         review = ", ".join(passing)
         if not passing:
             bad.append(f"{w2}: FULL ticket without a passing independent review record at {commit[:12]}")
@@ -152,7 +191,13 @@ def main():
             if r.returncode:
                 sys.exit(f"{i['w2']}: merge_queue {cmd[0]} failed: {r.stderr.strip()[:300]}")
     started = time.strftime("%F %T")
-    run = subprocess.run([sys.executable, str(MQ), "run", "--repo", str(ROOT), "--queue", str(QUEUE), "--base", base])
+    junit, nightly_run = base_record(base[:12])
+    extra = ["--warm", str(WARM)]
+    if junit and nightly_run:
+        extra += ["--base-results", str(junit), "--base-run", str(nightly_run)]
+        print(f"the baseline's own record: {junit}, {nightly_run}", flush=True)
+    run = subprocess.run([sys.executable, str(MQ), "run", "--repo", str(ROOT), "--queue", str(QUEUE), "--base", base,
+                          *extra])
     print(f"queue run exit {run.returncode}", flush=True)
     failed_close = False
     for i in items:
@@ -171,8 +216,8 @@ def main():
         out.write_text(close_record(i["w2"], i["tid"], i["profile"], landed, rec, i["review"], base_why))
         tk = sh(["tk", "close", i["tid"]], cwd=ROOT)
         paths = [str(out.relative_to(ROOT)), f".tickets/{i['tid']}.md"]
-        sh(["git", "-C", str(ROOT), "add", "--", *paths])
-        cm = sh(["git", "-C", str(ROOT), "commit", "-q", "-m",
+        git_retry(["add", "--", *paths])
+        cm = git_retry(["commit", "-q", "-m",
                  f"{i['w2']} ({i['tid']}): merged and closed in one step by the merge queue (DEC-989)",
                  "--trailer", f"Task: {i['tid']}", "--trailer", "Implements: DEC-953, DEC-989", "--trailer",
                  "Role: orchestrator", "--trailer", "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",

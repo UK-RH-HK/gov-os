@@ -1,0 +1,284 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-01 18:30:31)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+............................................FF.......................... [  2%]
+........................................................................ [  3%]
+........................................................................ [  4%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [  9%]
+........................................................................ [ 10%]
+..................................F..................................... [ 11%]
+........................................................................ [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 16%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 19%]
+........................................................................ [ 20%]
+....................................F................................... [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 31%]
+........................................................................ [ 32%]
+........................................................................ [ 33%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 36%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 39%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 43%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+...............................F.FF..F.................................. [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+.............................s.......................................... [ 90%]
+........................................................................ [ 91%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+.........................................                                [100%]
+=================================== FAILURES ===================================
+___ test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] ___
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw0/w2-90-w1-05-live0/repo')
+kernel_decide = <function kernel_decide.<locals>._decide at 0x721704233880>
+command = 'pip install requests'
+
+    @pytest.mark.parametrize("command", NOT_MOVED_TO_THE_KERNEL)
+    def test_an_install_by_the_orchestrator_asks_the_owner(kernel_live, kernel_decide, command):
+        """The interim deny rules on installs (W1-01) would stop the prompt from ever appearing."""
+        live, decide = kernel_live, kernel_decide
+        for mode in ("default", "auto", "acceptEdits"):
+            result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, permission_mode=mode)
+>           assert result.decision == "ask", (
+                f"Bash `{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"
+            )
+E           AssertionError: Bash `pip install requests` by the orchestrator in default mode did not ask: decision=deny (permissions.deny rule Bash(pip install*))
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:263: AssertionError
+__ test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] __
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_live = PosixPath('/tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw0/w2-90-w1-05-live0/repo')
+kernel_decide = <function kernel_decide.<locals>._decide at 0x7217041ef380>
+command = 'npm install -g ccusage'
+
+    @pytest.mark.parametrize("command", NOT_MOVED_TO_THE_KERNEL)
+    def test_an_install_by_the_orchestrator_asks_the_owner(kernel_live, kernel_decide, command):
+        """The interim deny rules on installs (W1-01) would stop the prompt from ever appearing."""
+        live, decide = kernel_live, kernel_decide
+        for mode in ("default", "auto", "acceptEdits"):
+            result = decide(live, "Bash", support.bash_input(command), ORCHESTRATOR, permission_mode=mode)
+>           assert result.decision == "ask", (
+                f"Bash `{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"
+            )
+E           AssertionError: Bash `npm install -g ccusage` by the orchestrator in default mode did not ask: decision=deny (permissions.deny rule Bash(npm install*))
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:263: AssertionError
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_guard = <function kernel_guard.<locals>._guard at 0x7ed1ed58d620>
+kernel_folder = PosixPath('/tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw3/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(kernel_guard, kernel_folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule.
+    
+        W2-90b (Rewrite-Reason: DEC-953 item 2, DEC-999 item 1): asked of the kernel's wiring, no longer of this
+        repository's settings (whose hook program W1-46's fixture project does not hold since ACT 1), with its verdict
+        unchanged. Until W2-105 removes the template's ``Bash(npm install*)`` deny rule it is red at its own assertion;
+        W2-90c holds it (tests/acceptance/W2-90b/README.md)."""
+        guard, folder = kernel_guard, kernel_folder
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=0, stdout='permissions.deny rule Bash(npm install*)', stderr='')
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=0 stdout='permissions.deny rule Bash(npm install*)' stderr=''
+
+tests/acceptance/W1-47/w1_47_support.py:488: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+kernel_guard = <function kernel_guard.<locals>._guard at 0x7ac038dd76a0>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(kernel_guard, role):
+        guard = kernel_guard
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=0 stdout='permissions.deny rule Bash(pip install*)' stderr=''
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:143: AssertionError
+______ test_a_folder_already_there_is_neither_marked_nor_added[content0] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+started = <function started.<locals>._started at 0x7ac03890d6c0>, content = ()
+
+    @pytest.mark.parametrize("content", ((), ("work.txt",)))
+    def test_a_folder_already_there_is_neither_marked_nor_added(started, content):
+        """DEC-751 1: the launcher marks only a folder it has just made."""
+        (started.root / "W2-90").mkdir(parents=True)
+        for name in content:
+            (started.root / "W2-90" / name).write_text("x", encoding="utf-8")
+        allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+>       assert len(allow) == 1 and "W2-90" not in allow[0]
+E       AssertionError: assert (1 == 1 and 'W2-90' not in '//tmp/gov-o...eer-7l6jwhai'
+E        +  where 1 = len(['//tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_folder_already_there_is0/temp/gov-launch-engineer-7l6jwhai'])
+E         
+E         'W2-90' is contained here:
+E           //tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_folder_already_there_is0/temp/gov-launch-engineer-7l6jwhai
+E         ?                   +++++)
+
+tests/unit/launch/test_runs.py:79: AssertionError
+______ test_a_folder_already_there_is_neither_marked_nor_added[content1] _______
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+started = <function started.<locals>._started at 0x7ac03890cc20>
+content = ('work.txt',)
+
+    @pytest.mark.parametrize("content", ((), ("work.txt",)))
+    def test_a_folder_already_there_is_neither_marked_nor_added(started, content):
+        """DEC-751 1: the launcher marks only a folder it has just made."""
+        (started.root / "W2-90").mkdir(parents=True)
+        for name in content:
+            (started.root / "W2-90" / name).write_text("x", encoding="utf-8")
+        allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+>       assert len(allow) == 1 and "W2-90" not in allow[0]
+E       AssertionError: assert (1 == 1 and 'W2-90' not in '//tmp/gov-o...eer-l3_2h6e1'
+E        +  where 1 = len(['//tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_folder_already_there_is1/temp/gov-launch-engineer-l3_2h6e1'])
+E         
+E         'W2-90' is contained here:
+E           //tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_folder_already_there_is1/temp/gov-launch-engineer-l3_2h6e1
+E         ?                   +++++)
+
+tests/unit/launch/test_runs.py:79: AssertionError
+____________ test_a_name_two_tickets_give_is_neither_made_nor_added ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+started = <function started.<locals>._started at 0x7ac03890c7c0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_name_two_tickets_give_i0')
+
+    def test_a_name_two_tickets_give_is_neither_made_nor_added(started, tmp_path):
+        (tmp_path / "project" / ".tickets" / "TST-a002.md").write_text(
+            TICKET.replace("TST-a001", "TST-a002").replace("in_progress", "closed"), encoding="utf-8")
+        allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+>       assert len(allow) == 1 and "W2-90" not in allow[0]
+E       AssertionError: assert (1 == 1 and 'W2-90' not in '//tmp/gov-o...eer-m41vhuc7'
+E        +  where 1 = len(['//tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_name_two_tickets_give_i0/temp/gov-launch-engineer-m41vhuc7'])
+E         
+E         'W2-90' is contained here:
+E           //tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_a_name_two_tickets_give_i0/temp/gov-launch-engineer-m41vhuc7
+E         ?                   +++++)
+
+tests/unit/launch/test_runs.py:87: AssertionError
+_______________ test_an_own_folder_that_is_a_link_is_not_opened ________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+started = <function started.<locals>._started at 0x7ac03890f6a0>
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_an_own_folder_that_is_a_l0')
+
+    def test_an_own_folder_that_is_a_link_is_not_opened(started, tmp_path):
+        (tmp_path / "elsewhere").mkdir()
+        started.root.mkdir()
+        (started.root / "W2-90").symlink_to(tmp_path / "elsewhere", target_is_directory=True)
+        allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+>       assert len(allow) == 1 and "W2-90" not in allow[0]
+E       AssertionError: assert (1 == 1 and 'W2-90' not in '//tmp/gov-o...eer-6ezlf46l'
+E        +  where 1 = len(['//tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_an_own_folder_that_is_a_l0/temp/gov-launch-engineer-6ezlf46l'])
+E         
+E         'W2-90' is contained here:
+E           //tmp/gov-os-lead-W2-90b/pytest-of-usain/pytest-1/popen-gw4/test_an_own_folder_that_is_a_l0/temp/gov-launch-engineer-6ezlf46l
+E         ?                   +++++)
+
+tests/unit/launch/test_runs.py:125: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+8 failed, 7016 passed, 1 skipped in 2945.97s (0:49:05)

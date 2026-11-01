@@ -1,0 +1,6 @@
+W2-91: merge the test designer's README map fix (w2/W2-91-tests, f57fa0cdf694; gov accept's ACCEPT_NO_MAP)
+
+Task: DAEO-a3u2
+Implements: DEC-957,DEC-954,DEC-388,DEC-694
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

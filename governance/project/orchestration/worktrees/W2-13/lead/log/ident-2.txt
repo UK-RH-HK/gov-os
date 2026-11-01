@@ -1,0 +1,20 @@
+.........................F                                               [100%]
+=================================== FAILURES ===================================
+_ test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question _
+
+box = <w2_13_support.Box object at 0x7819322c9790>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-5/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x7819322e9a00>
+
+    def test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question(box, built, ollama):
+        bundle = support.check_bundle(box.retrieve(built, support.PLAIN_QUESTION, host=ollama.host).result(), root=built)
+        lexical = [item["path"] for item in bundle[support.K_EVIDENCE] if support.ROUTE_LEXICAL in item["routes"]]
+>       assert support.BEST in lexical, \
+            f"gov retrieve does not cite {support.BEST} by the lexical route; cited by it: {lexical}; " \
+            f"all cited: {support.cited_paths(bundle)}"
+E       AssertionError: gov retrieve does not cite rank/z-best.md by the lexical route; cited by it: []; all cited: ['records/dec-0042.md', 'rank/z-best.md', 'rank/m-second.md', 'rank/a-third.md', 'fields/e-id.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', 'exact/two.py', 'fields/d-title.md', 'spans/tool.py']
+E       assert 'rank/z-best.md' in []
+E        +  where 'rank/z-best.md' = support.BEST
+
+tests/acceptance/W2-13/test_w2_13_fusion.py:65: AssertionError
+1 failed, 25 passed in 12.60s

@@ -1,0 +1,19 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-81/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line added",
+   "line": " M tests/acceptance/W2-81/w2_81_git.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "acceptance folder",
+   "folder": "W2-81"
+  }
+ ]
+}

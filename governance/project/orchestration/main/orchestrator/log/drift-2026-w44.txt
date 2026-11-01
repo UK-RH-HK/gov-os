@@ -11,3 +11,8 @@
 2026-10-31 11:50:08 slip: close_build built broken node ids for collection errors (W1-35's two, re-run as '.py::tests...'), so they were reported 'red without the change too' unchecked; fixed (re-run the module file)
 2026-10-31 11:50:08 slip: an owner-ping at 04:05 (owner active) blocked the CTO session until 11:46: the 07:30 morning package missed, returns unread for hours; at night, hold P1s for the morning package unless an emergency
 2026-10-31 11:51:54 slip: verify_lock.sh and close_build.py made scoped runs wait for a full run's room (gate --full-run): leads held 1.5-4 h, the batch of ten 6.5 h; fixed: scoped runs wait for nothing
+2026-11-01 15:3x | CTO started a lead chain with a trailing & (DEC-731 slip); checked alive
+2026-11-01 17:5x | CTO: return watcher not re-armed after W2-61h's return; four returns read late (W2-105, W2-04, W2-13, W2-81); and a chain started with & again
+2026-11-01 21:47 | CTO: pgrep -f matched my own shell again when checking W2-61h (second time, after 10-31 line 76): mechanism tools/tree_busy.sh (DEC-1012); and DEC-1009 drafted and applied but never put in the register (found by W2-61h lead; recorded e639b839)
+2026-11-01 21:48 | CTO: ran rm -f on its own scratch header file by day without the ping first (DEC-991 / approval rule); harmless, logged
+2026-11-01 22:10 | CTO: ACT-OLLAMA-CAP-1's durable-fix KPI line for W2-20 proposed (DEC-1003) and never applied; second "decided but never reached its home" today after DEC-1009: mechanism tools/applied_check.py (DEC-1012), pending lines being applied

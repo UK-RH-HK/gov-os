@@ -1,0 +1,6 @@
+W2-104: merge the independent test designer's acceptance tests (w2/W2-104-tests at 09d9f89bd183: the README map in gov accept's form; DEC-963)
+
+Task: DAEO-drhj
+Implements: DEC-959,DEC-820
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

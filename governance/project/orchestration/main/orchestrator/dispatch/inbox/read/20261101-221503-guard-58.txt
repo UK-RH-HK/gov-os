@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 59
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01LgRbWFgb1Hq3hwwFob2Po1", "time": "2026-11-01T20:06:45.248Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator", "tool": "Bash", "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS && python3 - <<'EOF' import yaml,re p='.tickets/DAEO-h2k3.md'; s=open(p).read() d=yaml.safe_load(s.split('\\n---',1)[0].lstrip('-\\n')); print(d['allowed_pa", "rule": "a command that may write the acceptance tests, which only the in

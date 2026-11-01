@@ -1,0 +1,4 @@
+{"label": "base-1", "gov": "/home/usain/gov-os-runs/W2-13/base/src/gov/__init__.py", "n": 52, "p95": 1.334, "median": 0.483, "slowest": [1.334, 2.252, 3.051], "load": ["29.55", "36.18", "32.95"]}
+{"label": "head-1", "gov": "/home/usain/gov-os-worktrees/W2-13/src/gov/__init__.py", "n": 52, "p95": 0.407, "median": 0.262, "slowest": [0.407, 0.408, 0.568], "load": ["24.53", "34.47", "32.46"]}
+{"label": "base-2", "gov": "/home/usain/gov-os-runs/W2-13/base/src/gov/__init__.py", "n": 52, "p95": 0.479, "median": 0.298, "slowest": [0.479, 0.509, 0.573], "load": ["24.19", "33.53", "32.20"]}
+{"label": "head-2", "gov": "/home/usain/gov-os-worktrees/W2-13/src/gov/__init__.py", "n": 52, "p95": 0.423, "median": 0.273, "slowest": [0.423, 0.433, 0.5], "load": ["22.63", "32.32", "31.83"]}

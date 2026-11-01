@@ -113,6 +113,7 @@ tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w1_27_schema.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w1_27_schema_compat_r2.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w2_67_codegraph_folders.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w2_67_copies.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w2_67_sweep_namespaces.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W1-27/test_w2_67_temp_folders.py
@@ -209,7 +210,13 @@ tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-02/test_w2_02_verdict_conditions.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-02/test_w2_02_wbs_grammar.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-03
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-05
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-07
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-106
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-107
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-108
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-16
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-49
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-50
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-51
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-53
@@ -221,6 +228,7 @@ tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-54/test_w2_54_shared_gpu.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-54/test_w2_54_time_limit.py
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-55
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-57
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-58
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-59
@@ -233,9 +241,15 @@ tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-69
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-71
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-72
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-76
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-77
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-84
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-86
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-87
 --ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-90
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-95
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-96
+--ignore=/home/usain/gov-os-worktrees/W2-105/tests/acceptance/W2-97
 --deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced
 --deselect=acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced
 --deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests

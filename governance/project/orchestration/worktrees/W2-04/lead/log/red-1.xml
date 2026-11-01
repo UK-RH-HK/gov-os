@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="35" skipped="2" tests="56" time="27.225" timestamp="2026-11-01T17:05:14.795214+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-04.test_w2_04_batches" name="test_with_room_for_all_every_matching_item_is_stacked_in_rank_order" time="5.110"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;
+
+    def test_with_room_for_all_every_matching_item_is_stacked_in_rank_order(retrieval_api, ledger):
+        packet = _full(retrieval_api, ledger)
+&gt;       s.assert_holds_its_ceiling(packet, ledger.text(f".tickets/{s.LEDGER_TICKET}.md"))
+
+tests/acceptance/W2-04/test_w2_04_batches.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...': 6000, 'used': 1418}, 'dropped': [], 'hash': '538bc7cec686ee9ea77166eef5e5912b9400096e604fbb49aba0dec41c4963b6', ...}
+ticket_text = "---\nid: TK-W204-LEDGER\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: Beacon ledger\nrole: e...A page of the ledger is lost.\nsources:\n- CHARTER-W204\n---\n\n# TK-W204-LEDGER Beacon ledger\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_batches" name="test_when_room_is_left_after_one_batch_the_next_batch_is_taken" time="0.378"><failure message="AssertionError: 1 retrieval call(s), the largest returning 20 items, and 18 pages stacked: the stack holds no more than one batch although room is left&#10;assert (1 &gt;= 2)&#10; +  where 1 = len([{'batch_size': None, 'continued': False, 'in': [['TK-W204-LEDGER', '.tickets/TK-W204-LEDGER.md'], ['TK-W204-LEDGER', ...1ba7a50988eac887636ead', 'docs/ledger/page-02.md'], ['c7fdb06840f7f56b183b5a08', 'docs/ledger/page-03.md'], ...], ...}])">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;
+
+    def test_when_room_is_left_after_one_batch_the_next_batch_is_taken(retrieval_api, ledger):
+        packet = _full(retrieval_api, ledger, mode="log")
+        calls = retrieval_api.calls()
+        assert calls, "the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called"
+        one_batch = max(len(call["out"]) for call in calls)
+        stacked = s.ledger_paths(packet[s.K_SUPPLEMENTARY])
+&gt;       assert len(calls) &gt;= 2 and len(stacked) &gt; one_batch, (
+            f"{len(calls)} retrieval call(s), the largest returning {one_batch} items, and {len(stacked)} pages stacked: "
+            f"the stack holds no more than one batch although room is left")
+E       AssertionError: 1 retrieval call(s), the largest returning 20 items, and 18 pages stacked: the stack holds no more than one batch although room is left
+E       assert (1 &gt;= 2)
+E        +  where 1 = len([{'batch_size': None, 'continued': False, 'in': [['TK-W204-LEDGER', '.tickets/TK-W204-LEDGER.md'], ['TK-W204-LEDGER', ...1ba7a50988eac887636ead', 'docs/ledger/page-02.md'], ['c7fdb06840f7f56b183b5a08', 'docs/ledger/page-03.md'], ...], ...}])
+
+tests/acceptance/W2-04/test_w2_04_batches.py:53: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_batches" name="test_with_less_room_the_stack_stops_at_the_first_item_that_does_not_fit" time="0.925"><failure message="AssertionError: with a budget of 443 the stack should be the 5 items ranked above docs/ledger/page-03.md (244 tokens, which does not fit) and nothing ranked below it; got [('f1f44e2c361c56bc58f1767f', 'docs/ledger/page-01.md'), ('6b1ba7a50988eac887636ead', 'docs/ledger/page-02.md'), ('736777209460466ba100186c', 'docs/ledger/page-04.md'), ('8811ae384ee0a2868e6eeffc', 'docs/ledger/page-05.md'), ('2faf69eed1d7c8d8610624f2', 'docs/ledger/page-06.md'), ('ba568feb8c3609aa2203b86d', 'docs/ledger/page-08.md'), ('069c66e63249dd338e07315a', 'docs/ledger/page-09.md'), ('f4e199a123e3965be774c0af', 'docs/ledger/page-10.md'), ('1db82a3e8292d317f2377154', 'docs/ledger/page-12.md'), ('742005175ea5446a59ca9112', 'docs/ledger/page-13.md'), ('2671230e52573ffc1e0d2a51', 'docs/ledger/page-14.md'), ('f66e6d8c9e4deac46b90cce1', 'docs/ledger/page-16.md'), ('99948f6b51f5cd91056380ad', 'docs/ledger/page-17.md')] at its end&#10;assert [('TK-W204-LE...-04.md'), ...] == [('TK-W204-LE.../page-02.md')]&#10;  &#10;  Left contains 11 more items, first extra item: ('736777209460466ba100186c', 'docs/ledger/page-04.md')&#10;  Use -v to get more diff">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;
+
+    def test_with_less_room_the_stack_stops_at_the_first_item_that_does_not_fit(retrieval_api, ledger):
+        full = _full(retrieval_api, ledger)
+        ranked, k, budget = _tight_budget(full)
+    
+        packet = retrieval_api.gov(ledger.root, s.LEDGER_TICKET, "--budget", budget).packet
+    
+        got = [(item["id"], item["path"]) for item in packet[s.K_SUPPLEMENTARY]]
+        expected = [(rid, path) for rid, path, _ in ranked[:k]]
+&gt;       assert got == expected, (
+            f"with a budget of {budget} the stack should be the {k} items ranked above {ranked[k][1]} "
+            f"({ranked[k][2]} tokens, which does not fit) and nothing ranked below it; got {got[max(0, k - 2):]} "
+            f"at its end")
+E       AssertionError: with a budget of 443 the stack should be the 5 items ranked above docs/ledger/page-03.md (244 tokens, which does not fit) and nothing ranked below it; got [('f1f44e2c361c56bc58f1767f', 'docs/ledger/page-01.md'), ('6b1ba7a50988eac887636ead', 'docs/ledger/page-02.md'), ('736777209460466ba100186c', 'docs/ledger/page-04.md'), ('8811ae384ee0a2868e6eeffc', 'docs/ledger/page-05.md'), ('2faf69eed1d7c8d8610624f2', 'docs/ledger/page-06.md'), ('ba568feb8c3609aa2203b86d', 'docs/ledger/page-08.md'), ('069c66e63249dd338e07315a', 'docs/ledger/page-09.md'), ('f4e199a123e3965be774c0af', 'docs/ledger/page-10.md'), ('1db82a3e8292d317f2377154', 'docs/ledger/page-12.md'), ('742005175ea5446a59ca9112', 'docs/ledger/page-13.md'), ('2671230e52573ffc1e0d2a51', 'docs/ledger/page-14.md'), ('f66e6d8c9e4deac46b90cce1', 'docs/ledger/page-16.md'), ('99948f6b51f5cd91056380ad', 'docs/ledger/page-17.md')] at its end
+E       assert [('TK-W204-LE...-04.md'), ...] == [('TK-W204-LE.../page-02.md')]
+E         
+E         Left contains 11 more items, first extra item: ('736777209460466ba100186c', 'docs/ledger/page-04.md')
+E         Use -v to get more diff
+
+tests/acceptance/W2-04/test_w2_04_batches.py:83: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_batches" name="test_further_batch_begins_with_the_first_item_that_did_not_fit_in_rank_order" time="0.532"><failure message="AssertionError: `further_batch` is None: it names nothing left&#10;assert (False)&#10; +  where False = isinstance(None, list)">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;
+
+    def test_further_batch_begins_with_the_first_item_that_did_not_fit_in_rank_order(retrieval_api, ledger):
+        full = _full(retrieval_api, ledger)
+        ranked, k, budget = _tight_budget(full)
+    
+        packet = retrieval_api.gov(ledger.root, s.LEDGER_TICKET, "--budget", budget).packet
+    
+        further = packet.get(s.K_FURTHER)
+&gt;       assert isinstance(further, list) and further, f"`{s.K_FURTHER}` is {further!r}: it names nothing left"
+E       AssertionError: `further_batch` is None: it names nothing left
+E       assert (False)
+E        +  where False = isinstance(None, list)
+
+tests/acceptance/W2-04/test_w2_04_batches.py:97: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_batches" name="test_further_batch_is_at_most_one_batch_long" time="0.364"><failure message="AssertionError: `further_batch` holds None items; one batch is at most 20&#10;assert (False)&#10; +  where False = isinstance(None, list)">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;
+
+    def test_further_batch_is_at_most_one_batch_long(retrieval_api, ledger):
+        full = _full(retrieval_api, ledger)
+        _, _, budget = _tight_budget(full)
+        retrieval_api.reset_log()
+    
+        packet = retrieval_api.gov(ledger.root, s.LEDGER_TICKET, "--budget", budget,
+                                   env=retrieval_api.env(mode="log")).packet
+    
+        calls = retrieval_api.calls()
+        assert calls, "the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called"
+        one_batch = max(len(call["out"]) for call in calls)
+        further = packet.get(s.K_FURTHER)
+&gt;       assert isinstance(further, list) and 0 &lt; len(further) &lt;= one_batch, \
+            f"`{s.K_FURTHER}` holds {further if not isinstance(further, list) else len(further)} items; one batch is " \
+            f"at most {one_batch}"
+E       AssertionError: `further_batch` holds None items; one batch is at most 20
+E       assert (False)
+E        +  where False = isinstance(None, list)
+
+tests/acceptance/W2-04/test_w2_04_batches.py:120: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_batches" name="test_a_lookup_failure_is_named_in_dropped_by_its_kind" time="0.629" /><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_the_packet_carries_the_tickets_own_text_whole_and_verbatim" time="0.328"><failure message="AssertionError: `ticket_text` is not the ticket's file text, front matter and body: None&#10;assert None == &quot;---\nid: TK-W204-PLAIN\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The plain ticket\nrole:...laceholder fails.\nsources:\n- CHARTER-W204\n- CAP-15\n---\n\n# TK-W204-PLAIN The plain ticket\n\nThe ticket's body.\n&quot;&#10; +  where None = &lt;built-in method get of dict object at 0x7a3c82d05100&gt;('ticket_text')&#10; +    where &lt;built-in method get of dict object at 0x7a3c82d05100&gt; = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...it': 6000, 'used': 90}, 'dropped': [], 'hash': '6bc5ec2e09e873d8842512922208fb154b408fa5db2218ec5dd65ffe702c1ee8', ...}.get&#10; +    and   'ticket_text' = s.K_TICKET_TEXT&#10; +  and   &quot;---\nid: TK-W204-PLAIN\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The plain ticket\nrole:...laceholder fails.\nsources:\n- CHARTER-W204\n- CAP-15\n---\n\n# TK-W204-PLAIN The plain ticket\n\nThe ticket's body.\n&quot; = text('.tickets/TK-W204-PLAIN.md')&#10; +    where text = &lt;w2_04_support.Project object at 0x7a3c82e2fb90&gt;.text">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+plain = &lt;w2_04_support.Project object at 0x7a3c82e2fb90&gt;
+
+    def test_the_packet_carries_the_tickets_own_text_whole_and_verbatim(api, plain):
+        packet = api.gov(plain.root, PLAIN_TICKET).packet
+&gt;       assert packet.get(s.K_TICKET_TEXT) == plain.text(f".tickets/{PLAIN_TICKET}.md"), \
+            f"`{s.K_TICKET_TEXT}` is not the ticket's file text, front matter and body: {packet.get(s.K_TICKET_TEXT)!r}"
+E       AssertionError: `ticket_text` is not the ticket's file text, front matter and body: None
+E       assert None == "---\nid: TK-W204-PLAIN\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The plain ticket\nrole:...laceholder fails.\nsources:\n- CHARTER-W204\n- CAP-15\n---\n\n# TK-W204-PLAIN The plain ticket\n\nThe ticket's body.\n"
+E        +  where None = &lt;built-in method get of dict object at 0x7a3c82d05100&gt;('ticket_text')
+E        +    where &lt;built-in method get of dict object at 0x7a3c82d05100&gt; = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...it': 6000, 'used': 90}, 'dropped': [], 'hash': '6bc5ec2e09e873d8842512922208fb154b408fa5db2218ec5dd65ffe702c1ee8', ...}.get
+E        +    and   'ticket_text' = s.K_TICKET_TEXT
+E        +  and   "---\nid: TK-W204-PLAIN\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The plain ticket\nrole:...laceholder fails.\nsources:\n- CHARTER-W204\n- CAP-15\n---\n\n# TK-W204-PLAIN The plain ticket\n\nThe ticket's body.\n" = text('.tickets/TK-W204-PLAIN.md')
+E        +    where text = &lt;w2_04_support.Project object at 0x7a3c82e2fb90&gt;.text
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:42: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_tokens_count_the_tickets_text_and_every_mandatory_input" time="0.162"><failure message="AssertionError: tokens is 90; the ticket's text and its mandatory inputs are 172 to 173 (the ticket's text alone is 83)&#10;assert 172 &lt;= 90">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+plain = &lt;w2_04_support.Project object at 0x7a3c82e2fb90&gt;
+
+    def test_tokens_count_the_tickets_text_and_every_mandatory_input(api, plain):
+        """With nothing supplementary, ``tokens`` is the ticket's text and its two mandatory files, each counted as the
+        packet counts (each text alone, or their sum: both roundings are taken)."""
+        packet = api.gov(plain.root, PLAIN_TICKET).packet
+        texts = [plain.text(f".tickets/{PLAIN_TICKET}.md"), plain.text(CHARTER_REL), plain.text(CAP_REL)]
+        assert packet[s.K_SUPPLEMENTARY] == [], f"the fixture is wrong: no index, yet supplementary items: {packet}"
+        low, high = s.tokens("".join(texts)), sum(s.tokens(text) for text in texts)
+&gt;       assert low &lt;= packet[s.K_TOKENS] &lt;= high, (
+            f"tokens is {packet[s.K_TOKENS]}; the ticket's text and its mandatory inputs are {low} to {high} "
+            f"(the ticket's text alone is {s.tokens(texts[0])})")
+E       AssertionError: tokens is 90; the ticket's text and its mandatory inputs are 172 to 173 (the ticket's text alone is 83)
+E       assert 172 &lt;= 90
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:53: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_a_large_ticket_whose_total_fits_is_served_whole" time="0.155"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+plain = &lt;w2_04_support.Project object at 0x7a3c82e2fb90&gt;
+
+    def test_a_large_ticket_whose_total_fits_is_served_whole(api, plain):
+        text = plain.text(f".tickets/{LARGE_TICKET}.md")
+        assert 3500 &lt; s.tokens(text) &lt; s.DEFAULT_CEILING - 500, f"the fixture is wrong: {s.tokens(text)} tokens"
+        packet = api.gov(plain.root, LARGE_TICKET).packet
+&gt;       s.assert_holds_its_ceiling(packet, text)
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...it': 6000, 'used': 50}, 'dropped': [], 'hash': '1e18125d3a4979c88c8be9ae845af6947208c6b6767c7108a55f859252e60424', ...}
+ticket_text = '---\nid: TK-W204-LARGE\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The large ticket\nrole:...ket before the tide turns.\nParagraph 189: the harbour master reads every line of this ticket before the tide turns.\n'
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole[default ceiling]" time="0.185"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;, share = None
+
+    @pytest.mark.parametrize("share", (None, 0.5, 0.0), ids=("default ceiling", "half the supplementary room",
+                                                             "no supplementary room"))
+    def test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole(retrieval_api, ledger, share):
+        """The ledger ticket at the default ceiling (everything fits), then with ``--budget`` leaving room for half of
+        its supplementary items, then for none: each packet holds its ceiling, its mandatory input and the ticket's whole
+        text; only the supplementary block shrinks."""
+        text = ledger.text(f".tickets/{s.LEDGER_TICKET}.md")
+        full = retrieval_api.gov(ledger.root, s.LEDGER_TICKET).packet
+&gt;       s.assert_holds_its_ceiling(full, text)
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...': 6000, 'used': 1418}, 'dropped': [], 'hash': '538bc7cec686ee9ea77166eef5e5912b9400096e604fbb49aba0dec41c4963b6', ...}
+ticket_text = "---\nid: TK-W204-LEDGER\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: Beacon ledger\nrole: e...A page of the ledger is lost.\nsources:\n- CHARTER-W204\n---\n\n# TK-W204-LEDGER Beacon ledger\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole[half the supplementary room]" time="0.186"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;, share = 0.5
+
+    @pytest.mark.parametrize("share", (None, 0.5, 0.0), ids=("default ceiling", "half the supplementary room",
+                                                             "no supplementary room"))
+    def test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole(retrieval_api, ledger, share):
+        """The ledger ticket at the default ceiling (everything fits), then with ``--budget`` leaving room for half of
+        its supplementary items, then for none: each packet holds its ceiling, its mandatory input and the ticket's whole
+        text; only the supplementary block shrinks."""
+        text = ledger.text(f".tickets/{s.LEDGER_TICKET}.md")
+        full = retrieval_api.gov(ledger.root, s.LEDGER_TICKET).packet
+&gt;       s.assert_holds_its_ceiling(full, text)
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...': 6000, 'used': 1418}, 'dropped': [], 'hash': '538bc7cec686ee9ea77166eef5e5912b9400096e604fbb49aba0dec41c4963b6', ...}
+ticket_text = "---\nid: TK-W204-LEDGER\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: Beacon ledger\nrole: e...A page of the ledger is lost.\nsources:\n- CHARTER-W204\n---\n\n# TK-W204-LEDGER Beacon ledger\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole[no supplementary room]" time="0.206"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ledger = &lt;w2_04_support.Project object at 0x7a3c82db0140&gt;, share = 0.0
+
+    @pytest.mark.parametrize("share", (None, 0.5, 0.0), ids=("default ceiling", "half the supplementary room",
+                                                             "no supplementary room"))
+    def test_under_pressure_supplementary_goes_first_and_the_ticket_text_stays_whole(retrieval_api, ledger, share):
+        """The ledger ticket at the default ceiling (everything fits), then with ``--budget`` leaving room for half of
+        its supplementary items, then for none: each packet holds its ceiling, its mandatory input and the ticket's whole
+        text; only the supplementary block shrinks."""
+        text = ledger.text(f".tickets/{s.LEDGER_TICKET}.md")
+        full = retrieval_api.gov(ledger.root, s.LEDGER_TICKET).packet
+&gt;       s.assert_holds_its_ceiling(full, text)
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...': 6000, 'used': 1418}, 'dropped': [], 'hash': '538bc7cec686ee9ea77166eef5e5912b9400096e604fbb49aba0dec41c4963b6', ...}
+ticket_text = "---\nid: TK-W204-LEDGER\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: Beacon ledger\nrole: e...A page of the ledger is lost.\nsources:\n- CHARTER-W204\n---\n\n# TK-W204-LEDGER Beacon ledger\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_ceiling" name="test_the_function_holds_the_ceiling_as_the_command_does" time="0.127"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+plain = &lt;w2_04_support.Project object at 0x7a3c82e2fb90&gt;
+
+    def test_the_function_holds_the_ceiling_as_the_command_does(api, plain):
+        """``gov.context.context`` in a process of its own gives the packet the command gives."""
+        (out,) = api.context_calls(plain.root, PLAIN_TICKET)
+        assert "value" in out, f"gov.context.context refused: {out}"
+&gt;       s.assert_holds_its_ceiling(out["value"], plain.text(f".tickets/{PLAIN_TICKET}.md"))
+
+tests/acceptance/W2-04/test_w2_04_ceiling.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...it': 6000, 'used': 90}, 'dropped': [], 'hash': '6bc5ec2e09e873d8842512922208fb154b408fa5db2218ec5dd65ffe702c1ee8', ...}
+ticket_text = "---\nid: TK-W204-PLAIN\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The plain ticket\nrole:...laceholder fails.\nsources:\n- CHARTER-W204\n- CAP-15\n---\n\n# TK-W204-PLAIN The plain ticket\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_code_under_test" name="test_the_processes_the_suite_starts_run_this_trees_code" time="0.118" /><testcase classname="tests.acceptance.W2-04.test_w2_04_context_check" name="test_an_unheld_file_alone_is_named_and_the_message_is_accurate" time="0.240"><failure message="AssertionError: no ticket's computation ran, yet the check says every one failed&#10;  python3 -m gov.context.context_check&#10;  exit 1&#10;  stdout: ERROR: README: .tickets/README.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured&#10;  unmeasured: every ticket's context computation failed&#10;  &#10;  stderr: &#10;assert 'every ticke...ation failed' not in 'ERROR: READ...ion failed\n'&#10;  &#10;  &quot;every ticket's con... computation failed&quot; is contained here:&#10;    measured: every ticket's context computation failed">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/test_an_unheld_file_alone_is_n0')
+
+    def test_an_unheld_file_alone_is_named_and_the_message_is_accurate(api, tmp_path):
+        project = _project(api, tmp_path / "repo", {".tickets/README.md": "# Tickets\n\nThe project's tickets.\n"})
+        answer = api.context_check(project.root)
+        assert answer.returncode != 0, f"a ticket folder holding only an unheld file is green\n{answer.describe()}"
+        assert "README.md" in answer.stdout, f"the unheld file is not named\n{answer.describe()}"
+&gt;       assert FAILED_ALL not in answer.stdout, \
+            f"no ticket's computation ran, yet the check says every one failed\n{answer.describe()}"
+E       AssertionError: no ticket's computation ran, yet the check says every one failed
+E         python3 -m gov.context.context_check
+E         exit 1
+E         stdout: ERROR: README: .tickets/README.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
+E         unmeasured: every ticket's context computation failed
+E         
+E         stderr: 
+E       assert 'every ticke...ation failed' not in 'ERROR: READ...ion failed\n'
+E         
+E         "every ticket's con... computation failed" is contained here:
+E           measured: every ticket's context computation failed
+
+tests/acceptance/W2-04/test_w2_04_context_check.py:35: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_context_check" name="test_an_unheld_file_beside_a_ticket_keeps_the_check_red" time="0.331" /><testcase classname="tests.acceptance.W2-04.test_w2_04_context_check" name="test_a_ticket_file_with_another_ending_is_named_never_unseen[TK-W204-ODD.MD]" time="0.340"><failure message="AssertionError: the ticket file TK-W204-ODD.MD is seen by nothing: the check does not name it&#10;  python3 -m gov.context.context_check&#10;  exit 0&#10;  stdout: context-reproducibility: green&#10;  &#10;  stderr: &#10;assert ('TK-W204-ODD.MD' in 'context-reproducibility: green\n' or 'TK-W204-ODD' in 'context-reproducibility: green\n')&#10; +  where 'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c83f6b320&gt;.stdout&#10; +  and   'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c83f6b320&gt;.stdout">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/test_a_ticket_file_with_anothe0')
+name = 'TK-W204-ODD.MD'
+
+    @pytest.mark.parametrize("name", ("TK-W204-ODD.MD", "TK-W204-ODD.markdown"))
+    def test_a_ticket_file_with_another_ending_is_named_never_unseen(api, tmp_path, name):
+        project = _project(api, tmp_path / "repo", {
+            f".tickets/{OK_TICKET}.md": s.ticket(OK_TICKET, "A ticket that is measured", [s.CHARTER_ID]),
+            f".tickets/{name}": s.ticket("TK-W204-ODD", "A ticket with another ending", [s.CHARTER_ID])})
+        answer = api.context_check(project.root)
+&gt;       assert name in answer.stdout or "TK-W204-ODD" in answer.stdout, \
+            f"the ticket file {name} is seen by nothing: the check does not name it\n{answer.describe()}"
+E       AssertionError: the ticket file TK-W204-ODD.MD is seen by nothing: the check does not name it
+E         python3 -m gov.context.context_check
+E         exit 0
+E         stdout: context-reproducibility: green
+E         
+E         stderr: 
+E       assert ('TK-W204-ODD.MD' in 'context-reproducibility: green\n' or 'TK-W204-ODD' in 'context-reproducibility: green\n')
+E        +  where 'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c83f6b320&gt;.stdout
+E        +  and   'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c83f6b320&gt;.stdout
+
+tests/acceptance/W2-04/test_w2_04_context_check.py:54: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_context_check" name="test_a_ticket_file_with_another_ending_is_named_never_unseen[TK-W204-ODD.markdown]" time="0.327"><failure message="AssertionError: the ticket file TK-W204-ODD.markdown is seen by nothing: the check does not name it&#10;  python3 -m gov.context.context_check&#10;  exit 0&#10;  stdout: context-reproducibility: green&#10;  &#10;  stderr: &#10;assert ('TK-W204-ODD.markdown' in 'context-reproducibility: green\n' or 'TK-W204-ODD' in 'context-reproducibility: green\n')&#10; +  where 'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c82e01b50&gt;.stdout&#10; +  and   'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c82e01b50&gt;.stdout">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/test_a_ticket_file_with_anothe1')
+name = 'TK-W204-ODD.markdown'
+
+    @pytest.mark.parametrize("name", ("TK-W204-ODD.MD", "TK-W204-ODD.markdown"))
+    def test_a_ticket_file_with_another_ending_is_named_never_unseen(api, tmp_path, name):
+        project = _project(api, tmp_path / "repo", {
+            f".tickets/{OK_TICKET}.md": s.ticket(OK_TICKET, "A ticket that is measured", [s.CHARTER_ID]),
+            f".tickets/{name}": s.ticket("TK-W204-ODD", "A ticket with another ending", [s.CHARTER_ID])})
+        answer = api.context_check(project.root)
+&gt;       assert name in answer.stdout or "TK-W204-ODD" in answer.stdout, \
+            f"the ticket file {name} is seen by nothing: the check does not name it\n{answer.describe()}"
+E       AssertionError: the ticket file TK-W204-ODD.markdown is seen by nothing: the check does not name it
+E         python3 -m gov.context.context_check
+E         exit 0
+E         stdout: context-reproducibility: green
+E         
+E         stderr: 
+E       assert ('TK-W204-ODD.markdown' in 'context-reproducibility: green\n' or 'TK-W204-ODD' in 'context-reproducibility: green\n')
+E        +  where 'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c82e01b50&gt;.stdout
+E        +  and   'context-reproducibility: green\n' = &lt;w2_04_support.Answer object at 0x7a3c82e01b50&gt;.stdout
+
+tests/acceptance/W2-04/test_w2_04_context_check.py:54: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_context_check" name="test_two_ticket_files_with_one_id_are_named_as_a_duplicate_and_not_green" time="0.382"><failure message="AssertionError: two ticket files with one id, and the check is green&#10;  python3 -m gov.context.context_check&#10;  exit 0&#10;  stdout: context-reproducibility: green&#10;  &#10;  stderr: &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_04_support.Answer object at 0x7a3c82e2fb30&gt;.returncode">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/test_two_ticket_files_with_one0')
+
+    def test_two_ticket_files_with_one_id_are_named_as_a_duplicate_and_not_green(api, tmp_path):
+        duplicate = "TK-W204-DUP"
+        project = _project(api, tmp_path / "repo", {
+            f".tickets/{duplicate}.md": s.ticket(duplicate, "The first copy", [s.CHARTER_ID]),
+            f".tickets/{duplicate}-copy.md": s.ticket(duplicate, "The copied file", [s.CHARTER_ID]),
+            f".tickets/{OK_TICKET}.md": s.ticket(OK_TICKET, "A ticket that is measured", [s.CHARTER_ID])})
+        answer = api.context_check(project.root)
+&gt;       assert answer.returncode != 0, f"two ticket files with one id, and the check is green\n{answer.describe()}"
+E       AssertionError: two ticket files with one id, and the check is green
+E         python3 -m gov.context.context_check
+E         exit 0
+E         stdout: context-reproducibility: green
+E         
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_04_support.Answer object at 0x7a3c82e2fb30&gt;.returncode
+
+tests/acceptance/W2-04/test_w2_04_context_check.py:65: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_decision_hash" name="test_a_decision_is_named_by_its_entrys_own_hash_not_the_registers" time="0.371"><failure message="AssertionError: DEC-102 is named by the whole register's hash, not its own&#10;assert 'e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c' != 'e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c'">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+harbour = &lt;w2_04_support.Project object at 0x7a3c82e70e90&gt;
+
+    def test_a_decision_is_named_by_its_entrys_own_hash_not_the_registers(api, harbour):
+        entry = _entry_hash(api, harbour, CITED)
+        item = s.item_of(api.gov(harbour.root, TICKET).packet, CITED)
+        register_sha = s.sha256_file(harbour.root / s.REGISTER_REL)
+&gt;       assert item["sha256"] != register_sha, f"{CITED} is named by the whole register's hash, not its own"
+E       AssertionError: DEC-102 is named by the whole register's hash, not its own
+E       assert 'e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c' != 'e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c'
+
+tests/acceptance/W2-04/test_w2_04_decision_hash.py:63: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_decision_hash" name="test_a_decisions_token_cost_is_its_span_so_one_short_decision_of_a_large_register_fits" time="0.210"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+harbour = &lt;w2_04_support.Project object at 0x7a3c82e70e90&gt;
+
+    def test_a_decisions_token_cost_is_its_span_so_one_short_decision_of_a_large_register_fits(api, harbour):
+        span = _entry_hash(api, harbour, CITED)["span"]
+        texts = [harbour.text(f".tickets/{TICKET}.md"), span, harbour.text(CAP_REL)]
+        assert s.tokens(harbour.text(s.REGISTER_REL)) &gt; 10 * s.DEFAULT_CEILING, "the fixture is wrong: a small register"
+        answer = api.gov(harbour.root, TICKET)
+        assert answer.envelope["ok"] is True, f"one short decision of a large register does not fit\n{answer.describe()}"
+        packet = answer.packet
+&gt;       s.assert_holds_its_ceiling(packet, texts[0])
+
+tests/acceptance/W2-04/test_w2_04_decision_hash.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'decision', 'constraint': 'e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e33...: 6000, 'used': 77818}, 'dropped': [], 'hash': 'dd377e9f72fa31c4b1a38ecf7eec3efb97821e2398adf68018b01c680ac1b998', ...}
+ticket_text = "---\nid: TK-W204-DEC\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The gauge ticket\nrole: e...- The placeholder fails.\nsources:\n- DEC-102\n- CAP-15\n---\n\n# TK-W204-DEC The gauge ticket\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_decision_hash" name="test_editing_another_entry_leaves_the_decisions_hash_unchanged" time="0.652"><failure message="AssertionError: editing DEC-104 changed DEC-102's sha256 (e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c -&gt; a4160a34d511fd4667a599de2fc7b1f9f2045544fbee746c05b5244daf1909c2)&#10;assert 'a4160a34d511...5244daf1909c2' == 'e506d5bb2166...6ced4514e332c'&#10;  &#10;  - e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c&#10;  + a4160a34d511fd4667a599de2fc7b1f9f2045544fbee746c05b5244daf1909c2">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+own = &lt;w2_04_support.Project object at 0x7a3c82e70f50&gt;
+
+    def test_editing_another_entry_leaves_the_decisions_hash_unchanged(api, own):
+        before = s.item_of(api.gov(own.root, TICKET).packet, CITED)["sha256"]
+        own.write(s.REGISTER_REL, _register(other_body="The beacon is lit at dusk and put out at dawn."))
+        own.commit("another entry changes")
+        api.load(own.root)
+    
+        after = s.item_of(api.gov(own.root, TICKET).packet, CITED)["sha256"]
+    
+&gt;       assert after == before, f"editing {OTHER} changed {CITED}'s sha256 ({before} -&gt; {after})"
+E       AssertionError: editing DEC-104 changed DEC-102's sha256 (e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c -&gt; a4160a34d511fd4667a599de2fc7b1f9f2045544fbee746c05b5244daf1909c2)
+E       assert 'a4160a34d511...5244daf1909c2' == 'e506d5bb2166...6ced4514e332c'
+E         
+E         - e506d5bb21662a8e62d1f926d8c8484b0c560b59db049f2903a6ced4514e332c
+E         + a4160a34d511fd4667a599de2fc7b1f9f2045544fbee746c05b5244daf1909c2
+
+tests/acceptance/W2-04/test_w2_04_decision_hash.py:90: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_decision_hash" name="test_editing_the_decisions_own_text_changes_its_hash_to_its_new_entry_hash" time="0.679"><failure message="AssertionError: DEC-102's new sha256 is not its entry's new content_hash&#10;assert '088129237caf...5f783148e7bdd' == '87874cd0acf3...76d7bd15faf9f'&#10;  &#10;  - 87874cd0acf3fc22fc27f73f9516192398df2efb2ff3566ad3976d7bd15faf9f&#10;  + 088129237caf2bc286106ab66683f5a3e216248e53d2a07ebba5f783148e7bdd">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+own = &lt;w2_04_support.Project object at 0x7a3c82e722a0&gt;
+
+    def test_editing_the_decisions_own_text_changes_its_hash_to_its_new_entry_hash(api, own):
+        before = s.item_of(api.gov(own.root, TICKET).packet, CITED)["sha256"]
+        own.write(s.REGISTER_REL, _register(cited_body="The tide gauge is read at dawn and at dusk."))
+        own.commit("the cited entry changes")
+        api.load(own.root)
+    
+        after = s.item_of(api.gov(own.root, TICKET).packet, CITED)["sha256"]
+    
+        assert after != before, f"editing {CITED}'s own text left its sha256 unchanged"
+&gt;       assert after == _entry_hash(api, own, CITED)["content_hash"], \
+            f"{CITED}'s new sha256 is not its entry's new content_hash"
+E       AssertionError: DEC-102's new sha256 is not its entry's new content_hash
+E       assert '088129237caf...5f783148e7bdd' == '87874cd0acf3...76d7bd15faf9f'
+E         
+E         - 87874cd0acf3fc22fc27f73f9516192398df2efb2ff3566ad3976d7bd15faf9f
+E         + 088129237caf2bc286106ab66683f5a3e216248e53d2a07ebba5f783148e7bdd
+
+tests/acceptance/W2-04/test_w2_04_decision_hash.py:103: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_decision_hash" name="test_a_mandatory_input_that_is_a_file_of_its_own_keeps_its_files_sha256" time="0.168" /><testcase classname="tests.acceptance.W2-04.test_w2_04_one_read_and_notes" name="test_a_context_reads_the_ticket_file_once" time="0.316"><failure message="AssertionError: the context read the ticket file 3 times (['open', 'open', 'open']); one read gives its sources, dependencies, KPI lines, title and text&#10;assert 3 &lt;= 1&#10; +  where 3 = len(['open', 'open', 'open'])">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+once = &lt;w2_04_support.Project object at 0x7a3c82e732c0&gt;
+
+    def test_a_context_reads_the_ticket_file_once(api, once):
+        answer = api.gov(once.root, TICKET, env=api.env(watch=(once.root, f".tickets/{TICKET}.md")))
+        packet = answer.packet
+        reads = answer.reads()
+&gt;       assert len(reads) &lt;= 1, f"the context read the ticket file {len(reads)} times ({reads}); one read gives its " \
+                                f"sources, dependencies, KPI lines, title and text"
+E       AssertionError: the context read the ticket file 3 times (['open', 'open', 'open']); one read gives its sources, dependencies, KPI lines, title and text
+E       assert 3 &lt;= 1
+E        +  where 3 = len(['open', 'open', 'open'])
+
+tests/acceptance/W2-04/test_w2_04_one_read_and_notes.py:44: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_one_read_and_notes" name="test_notes_that_fail_their_validator_are_reported_as_failing_never_as_valid" time="0.341"><failure message="AssertionError: the packet does not name the notes' failure code (HASH_MISMATCH)&#10;assert 'HASH_MISMATCH' in '{&quot;ticket&quot;: &quot;TK-W204-ONCE&quot;, &quot;authority&quot;: [{&quot;id&quot;: &quot;CHARTER-W204&quot;, &quot;sha256&quot;: &quot;cabdecad8cba5876c3ef95ea83a8d4291c2751d370...f5c135f13e5c1454deb4888d62ae4108781ec492c3dc20964b9d52f65e1878e&quot;, &quot;tokens&quot;: 50, &quot;budget&quot;: {&quot;limit&quot;: 6000, &quot;used&quot;: 50}}'">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+once = &lt;w2_04_support.Project object at 0x7a3c82e70470&gt;
+
+    def test_notes_that_fail_their_validator_are_reported_as_failing_never_as_valid(api, once):
+        _notes(once, broken=True)
+        (check,) = api.batch([("gov.retrieval.synthesis", "validate_notes", once.root, (), {})])
+        assert check.get("value", {}).get("valid") is False and \
+            "HASH_MISMATCH" in json.dumps(check["value"]), f"the fixture is wrong: the notes pass: {check}"
+    
+        packet = api.gov(once.root, TICKET).packet
+    
+        said = json.dumps(packet)
+&gt;       assert "HASH_MISMATCH" in said, "the packet does not name the notes' failure code (HASH_MISMATCH)"
+E       AssertionError: the packet does not name the notes' failure code (HASH_MISMATCH)
+E       assert 'HASH_MISMATCH' in '{"ticket": "TK-W204-ONCE", "authority": [{"id": "CHARTER-W204", "sha256": "cabdecad8cba5876c3ef95ea83a8d4291c2751d370...f5c135f13e5c1454deb4888d62ae4108781ec492c3dc20964b9d52f65e1878e", "tokens": 50, "budget": {"limit": 6000, "used": 50}}'
+
+tests/acceptance/W2-04/test_w2_04_one_read_and_notes.py:81: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_one_read_and_notes" name="test_a_project_with_no_notes_is_unchanged" time="0.319" /><testcase classname="tests.acceptance.W2-04.test_w2_04_query" name="test_the_packet_carries_the_query_built_from_the_kpi_lines_and_the_title" time="1.262"><failure message="AssertionError: the packet does not carry the query it used under `supplementary_query`: ['authority', 'budget', 'dropped', 'hash', 'mandatory', 'supplementary', 'ticket', 'tokens']&#10;assert 'supplementary_query' in {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...t': 6000, 'used': 166}, 'dropped': [], 'hash': '27e862d00d0065e6c8a3f9078aaf95387bca4723a2848342650615facec8c386', ...}&#10; +  where 'supplementary_query' = s.K_QUERY">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+quay = &lt;w2_04_support.Project object at 0x7a3c82e71430&gt;
+
+    def test_the_packet_carries_the_query_built_from_the_kpi_lines_and_the_title(retrieval_api, quay):
+        packet = retrieval_api.gov(quay.root, TICKET).packet
+&gt;       assert s.K_QUERY in packet, f"the packet does not carry the query it used under `{s.K_QUERY}`: {sorted(packet)}"
+E       AssertionError: the packet does not carry the query it used under `supplementary_query`: ['authority', 'budget', 'dropped', 'hash', 'mandatory', 'supplementary', 'ticket', 'tokens']
+E       assert 'supplementary_query' in {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...t': 6000, 'used': 166}, 'dropped': [], 'hash': '27e862d00d0065e6c8a3f9078aaf95387bca4723a2848342650615facec8c386', ...}
+E        +  where 'supplementary_query' = s.K_QUERY
+
+tests/acceptance/W2-04/test_w2_04_query.py:49: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_query" name="test_a_document_matching_only_the_kpi_lines_reaches_the_supplementary_block" time="0.200"><failure message="AssertionError: the note that matches the KPI lines alone is not supplementary: ['.tickets/TK-W204-QUERY.md', '.tickets/TK-W204-QUERY.md', 'docs/notes/lamps.md']&#10;assert 'docs/notes/datum.md' in ['.tickets/TK-W204-QUERY.md', '.tickets/TK-W204-QUERY.md', 'docs/notes/lamps.md']">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+quay = &lt;w2_04_support.Project object at 0x7a3c82e71430&gt;
+
+    def test_a_document_matching_only_the_kpi_lines_reaches_the_supplementary_block(retrieval_api, quay):
+        packet = retrieval_api.gov(quay.root, TICKET).packet
+        paths = [item["path"] for item in packet[s.K_SUPPLEMENTARY]]
+&gt;       assert DATUM_NOTE in paths, f"the note that matches the KPI lines alone is not supplementary: {paths}"
+E       AssertionError: the note that matches the KPI lines alone is not supplementary: ['.tickets/TK-W204-QUERY.md', '.tickets/TK-W204-QUERY.md', 'docs/notes/lamps.md']
+E       assert 'docs/notes/datum.md' in ['.tickets/TK-W204-QUERY.md', '.tickets/TK-W204-QUERY.md', 'docs/notes/lamps.md']
+
+tests/acceptance/W2-04/test_w2_04_query.py:60: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_mandatory_inputs_over_the_default_ceiling_refuse_by_name" time="0.336"><failure message="AssertionError: the mandatory inputs are over the ceiling of 6000 and gov context reported ok: true with tokens 35758&#10;gov context TK-W204-BIG&#10;exit 0&#10;stdout: {&quot;ok&quot;: true, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;TK-W204-BIG&quot;, &quot;authority&quot;: [{&quot;id&quot;: &quot;CHARTER-W204-BIG&quot;, &quot;sha256&quot;: &quot;7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591&quot;, &quot;authority&quot;: &quot;charter&quot;, &quot;lifecycle&quot;: &quot;ACTIVE&quot;, &quot;constraint&quot;: &quot;7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591&quot;, &quot;reason&quot;: &quot;declared in sources&quot;}], &quot;mandatory&quot;: [{&quot;id&quot;: &quot;CHARTER-W204-BIG&quot;, &quot;sha256&quot;: &quot;7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591&quot;, &quot;authority&quot;: &quot;charter&quot;, &quot;lifecycle&quot;: &quot;ACTIVE&quot;, &quot;constraint&quot;: &quot;7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591&quot;, &quot;reason&quot;: &quot;declared in sources&quot;}], &quot;supplementary&quot;: [], &quot;dropped&quot;: [], &quot;hash&quot;: &quot;1242abc03e4c00f8f5cf70f5e69be1d93066d256f9a572b6641606a63fba631f&quot;, &quot;tokens&quot;: 35758, &quot;budget&quot;: {&quot;limit&quot;: 6000, &quot;used&quot;: 35758}}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+over = &lt;w2_04_support.Project object at 0x7a3c82d861e0&gt;
+
+    def test_mandatory_inputs_over_the_default_ceiling_refuse_by_name(api, over):
+        answer = api.gov(over.root, BIG_TICKET)
+&gt;       details = s.assert_refused_over_ceiling(answer, BIG_TICKET, s.DEFAULT_CEILING)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = &lt;w2_04_support.Answer object at 0x7a3c82dd1190&gt;
+ticket_id = 'TK-W204-BIG', limit = 6000
+
+    def assert_refused_over_ceiling(answer, ticket_id, limit):
+        """S2: ``ok: false``, ``CONTEXT_OVER_CEILING``, a non-zero exit, a message that names the ticket, the ceiling and
+        the mandatory size, and the details."""
+        envelope = answer.envelope
+&gt;       assert envelope["ok"] is False, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"the mandatory inputs are over the ceiling of {limit} and gov context reported ok: true with "
+            f"tokens {(envelope.get('result') or {}).get(K_TOKENS)}\n{answer.describe()[:1500]}")
+E       AssertionError: the mandatory inputs are over the ceiling of 6000 and gov context reported ok: true with tokens 35758
+E       gov context TK-W204-BIG
+E       exit 0
+E       stdout: {"ok": true, "command": "context", "result": {"ticket": "TK-W204-BIG", "authority": [{"id": "CHARTER-W204-BIG", "sha256": "7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591", "authority": "charter", "lifecycle": "ACTIVE", "constraint": "7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591", "reason": "declared in sources"}], "mandatory": [{"id": "CHARTER-W204-BIG", "sha256": "7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591", "authority": "charter", "lifecycle": "ACTIVE", "constraint": "7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d9b061cc4591", "reason": "declared in sources"}], "supplementary": [], "dropped": [], "hash": "1242abc03e4c00f8f5cf70f5e69be1d93066d256f9a572b6641606a63fba631f", "tokens": 35758, "budget": {"limit": 6000, "used": 35758}}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-04/w2_04_support.py:541: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_mandatory_inputs_over_a_given_budget_refuse_by_name" time="0.151"><failure message="AssertionError: the mandatory inputs are over the ceiling of 40 and gov context reported ok: true with tokens 50&#10;gov context TK-W204-SMALL --budget 40&#10;exit 0&#10;stdout: {&quot;ok&quot;: true, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {&quot;ticket&quot;: &quot;TK-W204-SMALL&quot;, &quot;authority&quot;: [{&quot;id&quot;: &quot;CHARTER-W204&quot;, &quot;sha256&quot;: &quot;cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8&quot;, &quot;authority&quot;: &quot;charter&quot;, &quot;lifecycle&quot;: &quot;ACTIVE&quot;, &quot;constraint&quot;: &quot;cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8&quot;, &quot;reason&quot;: &quot;declared in sources&quot;}], &quot;mandatory&quot;: [{&quot;id&quot;: &quot;CHARTER-W204&quot;, &quot;sha256&quot;: &quot;cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8&quot;, &quot;authority&quot;: &quot;charter&quot;, &quot;lifecycle&quot;: &quot;ACTIVE&quot;, &quot;constraint&quot;: &quot;cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8&quot;, &quot;reason&quot;: &quot;declared in sources&quot;}], &quot;supplementary&quot;: [], &quot;dropped&quot;: [], &quot;hash&quot;: &quot;f1d0e455f360b9ddb9380b52e5e32d935b4b3803fbd9bb52eb7ecab463602881&quot;, &quot;tokens&quot;: 50, &quot;budget&quot;: {&quot;limit&quot;: 40, &quot;used&quot;: 50}}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+over = &lt;w2_04_support.Project object at 0x7a3c82d861e0&gt;
+
+    def test_mandatory_inputs_over_a_given_budget_refuse_by_name(api, over):
+        answer = api.gov(over.root, SMALL_TICKET, "--budget", 40)
+&gt;       s.assert_refused_over_ceiling(answer, SMALL_TICKET, 40)
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = &lt;w2_04_support.Answer object at 0x7a3c82db3e00&gt;
+ticket_id = 'TK-W204-SMALL', limit = 40
+
+    def assert_refused_over_ceiling(answer, ticket_id, limit):
+        """S2: ``ok: false``, ``CONTEXT_OVER_CEILING``, a non-zero exit, a message that names the ticket, the ceiling and
+        the mandatory size, and the details."""
+        envelope = answer.envelope
+&gt;       assert envelope["ok"] is False, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"the mandatory inputs are over the ceiling of {limit} and gov context reported ok: true with "
+            f"tokens {(envelope.get('result') or {}).get(K_TOKENS)}\n{answer.describe()[:1500]}")
+E       AssertionError: the mandatory inputs are over the ceiling of 40 and gov context reported ok: true with tokens 50
+E       gov context TK-W204-SMALL --budget 40
+E       exit 0
+E       stdout: {"ok": true, "command": "context", "result": {"ticket": "TK-W204-SMALL", "authority": [{"id": "CHARTER-W204", "sha256": "cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8", "authority": "charter", "lifecycle": "ACTIVE", "constraint": "cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8", "reason": "declared in sources"}], "mandatory": [{"id": "CHARTER-W204", "sha256": "cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8", "authority": "charter", "lifecycle": "ACTIVE", "constraint": "cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a8", "reason": "declared in sources"}], "supplementary": [], "dropped": [], "hash": "f1d0e455f360b9ddb9380b52e5e32d935b4b3803fbd9bb52eb7ecab463602881", "tokens": 50, "budget": {"limit": 40, "used": 50}}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-04/w2_04_support.py:541: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_the_function_refuses_with_the_named_error" time="0.123"><failure message="AssertionError: gov.context.context returned a packet over its ceiling: tokens 35758&#10;assert 'error' in {'value': {'authority': [{'authority': 'charter', 'constraint': '7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d... 6000, 'used': 35758}, 'dropped': [], 'hash': '1242abc03e4c00f8f5cf70f5e69be1d93066d256f9a572b6641606a63fba631f', ...}}">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+over = &lt;w2_04_support.Project object at 0x7a3c82d861e0&gt;
+
+    def test_the_function_refuses_with_the_named_error(api, over):
+        (out,) = api.context_calls(over.root, BIG_TICKET)
+&gt;       assert "error" in out, f"gov.context.context returned a packet over its ceiling: tokens " \
+                               f"{(out.get('value') or {}).get(s.K_TOKENS)}"
+E       AssertionError: gov.context.context returned a packet over its ceiling: tokens 35758
+E       assert 'error' in {'value': {'authority': [{'authority': 'charter', 'constraint': '7e7806b0ec962e2973ce78378e6495856dcd13e75d39b94c7b12d... 6000, 'used': 35758}, 'dropped': [], 'hash': '1242abc03e4c00f8f5cf70f5e69be1d93066d256f9a572b6641606a63fba631f', ...}}
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:53: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_at_the_line_it_fits_and_one_token_over_it_refuses" time="0.308"><failure message="AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+over = &lt;w2_04_support.Project object at 0x7a3c82d861e0&gt;
+
+    def test_at_the_line_it_fits_and_one_token_over_it_refuses(api, over):
+        """The packet's own count of the ticket and its mandatory input (nothing supplementary without an index) is the
+        line: a ceiling one token above it or at it fits; one token below it refuses (never ok: true over the budget)."""
+        line = api.gov(over.root, SMALL_TICKET).packet[s.K_TOKENS]
+        text = over.text(f".tickets/{SMALL_TICKET}.md")
+    
+        for budget in (line + 1, line):
+            packet = api.gov(over.root, SMALL_TICKET, "--budget", budget).packet
+&gt;           s.assert_holds_its_ceiling(packet, text)
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+packet = {'authority': [{'authority': 'charter', 'constraint': 'cabdecad8cba5876c3ef95ea83a8d4291c2751d37064ca6cd7532afbc43d51a...imit': 51, 'used': 50}, 'dropped': [], 'hash': '0b0768eee966d6b9c9aa176890fc042394040d38c3449ca6bb9f1fdcf4f5f98b', ...}
+ticket_text = "---\nid: TK-W204-SMALL\ntype: ticket\nstatus: in_progress\nstate_class: AUTHORITATIVE\ntitle: The small ticket\nrole:...n  - The placeholder fails.\nsources:\n- CHARTER-W204\n---\n\n# TK-W204-SMALL The small ticket\n\nThe ticket's body.\n"
+
+    def assert_holds_its_ceiling(packet, ticket_text):
+        """Every packet returned with ``ok: true`` (S1): the ticket's own text whole and verbatim, ``tokens`` equal to
+        ``budget.used``, at most ``budget.limit``, and counting at least the ticket's text and the supplementary items."""
+&gt;       assert packet.get(K_TICKET_TEXT) == ticket_text, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the packet does not carry the ticket's own text whole and verbatim under `{K_TICKET_TEXT}`: "
+            f"{'absent' if K_TICKET_TEXT not in packet else repr(str(packet[K_TICKET_TEXT])[:200])}")
+E       AssertionError: the packet does not carry the ticket's own text whole and verbatim under `ticket_text`: absent
+
+tests/acceptance/W2-04/w2_04_support.py:525: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_brief_over_the_ceiling_refuses_and_writes_no_packet_file[brief]" time="0.156"><failure message="AssertionError: the mandatory inputs are over the ceiling of 6000 and gov context reported ok: true with tokens None&#10;gov context TK-W204-BIG --brief&#10;exit 0&#10;stdout: {&quot;ok&quot;: true, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {&quot;path&quot;: &quot;/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/w2-04-over0/repo/.gov-runtime/scratch/context/TK-W204-BIG.json&quot;, &quot;summary&quot;: &quot;Context for TK-W204-BIG:\n  CHARTER-W204-BIG (charter, ACTIVE)&quot;}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+over = &lt;w2_04_support.Project object at 0x7a3c82d861e0&gt;, dry_run = False
+
+    @pytest.mark.parametrize("dry_run", (False, True), ids=("brief", "brief dry run"))
+    def test_brief_over_the_ceiling_refuses_and_writes_no_packet_file(api, over, dry_run):
+        scratch = over.root / s.SCRATCH_REL
+    
+        def files():
+            return {p for p in over.root.rglob("*") if p.is_file() and ".git" not in p.relative_to(over.root).parts}
+    
+        before = files()
+        answer = api.gov(over.root, BIG_TICKET, "--brief", *(["--dry-run"] if dry_run else []))
+        written = sorted(str(p.relative_to(over.root)) for p in files() - before
+                         if scratch in p.parents or BIG_TICKET in p.name)
+&gt;       s.assert_refused_over_ceiling(answer, BIG_TICKET, s.DEFAULT_CEILING)
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = &lt;w2_04_support.Answer object at 0x7a3c82d85250&gt;
+ticket_id = 'TK-W204-BIG', limit = 6000
+
+    def assert_refused_over_ceiling(answer, ticket_id, limit):
+        """S2: ``ok: false``, ``CONTEXT_OVER_CEILING``, a non-zero exit, a message that names the ticket, the ceiling and
+        the mandatory size, and the details."""
+        envelope = answer.envelope
+&gt;       assert envelope["ok"] is False, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"the mandatory inputs are over the ceiling of {limit} and gov context reported ok: true with "
+            f"tokens {(envelope.get('result') or {}).get(K_TOKENS)}\n{answer.describe()[:1500]}")
+E       AssertionError: the mandatory inputs are over the ceiling of 6000 and gov context reported ok: true with tokens None
+E       gov context TK-W204-BIG --brief
+E       exit 0
+E       stdout: {"ok": true, "command": "context", "result": {"path": "/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/w2-04-over0/repo/.gov-runtime/scratch/context/TK-W204-BIG.json", "summary": "Context for TK-W204-BIG:\n  CHARTER-W204-BIG (charter, ACTIVE)"}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-04/w2_04_support.py:541: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_brief_over_the_ceiling_refuses_and_writes_no_packet_file[brief dry run]" time="0.174"><failure message="AssertionError: the mandatory inputs are over the ceiling of 6000 and gov context reported ok: true with tokens None&#10;gov context TK-W204-BIG --brief --dry-run&#10;exit 0&#10;stdout: {&quot;ok&quot;: true, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {&quot;path&quot;: &quot;&quot;, &quot;summary&quot;: &quot;Context for TK-W204-BIG:\n  CHARTER-W204-BIG (charter, ACTIVE)&quot;}, &quot;session&quot;: &quot;&quot;}&#10;&#10;stderr:">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+over = &lt;w2_04_support.Project object at 0x7a3c82d861e0&gt;, dry_run = True
+
+    @pytest.mark.parametrize("dry_run", (False, True), ids=("brief", "brief dry run"))
+    def test_brief_over_the_ceiling_refuses_and_writes_no_packet_file(api, over, dry_run):
+        scratch = over.root / s.SCRATCH_REL
+    
+        def files():
+            return {p for p in over.root.rglob("*") if p.is_file() and ".git" not in p.relative_to(over.root).parts}
+    
+        before = files()
+        answer = api.gov(over.root, BIG_TICKET, "--brief", *(["--dry-run"] if dry_run else []))
+        written = sorted(str(p.relative_to(over.root)) for p in files() - before
+                         if scratch in p.parents or BIG_TICKET in p.name)
+&gt;       s.assert_refused_over_ceiling(answer, BIG_TICKET, s.DEFAULT_CEILING)
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = &lt;w2_04_support.Answer object at 0x7a3c82d845c0&gt;
+ticket_id = 'TK-W204-BIG', limit = 6000
+
+    def assert_refused_over_ceiling(answer, ticket_id, limit):
+        """S2: ``ok: false``, ``CONTEXT_OVER_CEILING``, a non-zero exit, a message that names the ticket, the ceiling and
+        the mandatory size, and the details."""
+        envelope = answer.envelope
+&gt;       assert envelope["ok"] is False, (
+               ^^^^^^^^^^^^^^^^^^^^^^^
+            f"the mandatory inputs are over the ceiling of {limit} and gov context reported ok: true with "
+            f"tokens {(envelope.get('result') or {}).get(K_TOKENS)}\n{answer.describe()[:1500]}")
+E       AssertionError: the mandatory inputs are over the ceiling of 6000 and gov context reported ok: true with tokens None
+E       gov context TK-W204-BIG --brief --dry-run
+E       exit 0
+E       stdout: {"ok": true, "command": "context", "result": {"path": "", "summary": "Context for TK-W204-BIG:\n  CHARTER-W204-BIG (charter, ACTIVE)"}, "session": ""}
+E       
+E       stderr:
+
+tests/acceptance/W2-04/w2_04_support.py:541: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_daeo_03pw_shape_fits_or_refuses" time="1.781"><failure message="AssertionError: DAEO-03pw's shape: ok: true with tokens 1631999 over the ceiling of 6000 (each decision counted as the whole register?)&#10;assert 1631999 &lt;= 6000">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+audit = &lt;w2_04_support.Project object at 0x7a3c82d84650&gt;
+
+    def test_daeo_03pw_shape_fits_or_refuses(retrieval_api, audit):
+        register_bytes = (audit.root / s.REGISTER_REL).stat().st_size
+        assert register_bytes &gt;= min(OWN_REGISTER.stat().st_size if OWN_REGISTER.is_file() else 0, 1_500_000), \
+            f"the fixture is wrong: the planted register is {register_bytes} bytes"
+        answer = retrieval_api.gov(audit.root, AUDIT_TICKET)
+        envelope = answer.envelope
+        if envelope["ok"] is False:
+            s.assert_refused_over_ceiling(answer, AUDIT_TICKET, s.DEFAULT_CEILING)
+            return
+        packet = answer.packet
+&gt;       assert packet[s.K_TOKENS] &lt;= packet[s.K_BUDGET]["limit"] == s.DEFAULT_CEILING, (
+            f"DAEO-03pw's shape: ok: true with tokens {packet[s.K_TOKENS]} over the ceiling of "
+            f"{packet[s.K_BUDGET]['limit']} (each decision counted as the whole register?)")
+E       AssertionError: DAEO-03pw's shape: ok: true with tokens 1631999 over the ceiling of 6000 (each decision counted as the whole register?)
+E       assert 1631999 &lt;= 6000
+
+tests/acceptance/W2-04/test_w2_04_refusal.py:141: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_refusal" name="test_this_repositorys_daeo_03pw_fits_or_refuses" time="0.000"><skipped type="pytest.skip" message="this tree has no store (.gov-runtime/store.db) or no DAEO-03pw; the lead's rebuild makes one">/home/usain/gov-os-worktrees/W2-04-tests/tests/acceptance/W2-04/test_w2_04_refusal.py:155: this tree has no store (.gov-runtime/store.db) or no DAEO-03pw; the lead's rebuild makes one</skipped></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_two_builds_in_one_process_give_one_hash" time="1.852" /><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_two_builds_in_two_processes_give_one_hash" time="0.366" /><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_two_stores_rebuilt_from_one_commit_give_one_hash" time="1.456" /><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_tied_items_are_ordered_by_path_then_id" time="0.178" /><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them" time="0.372"><failure message="AssertionError: tied items follow the retrieval's order: [('docs/ties/tie-d.md', 'f513d3bd0cb380ff896da6dd'), ('docs/ties/tie-c.md', '048e3838c5b19203b4cca112'), ('docs/ties/tie-b.md', '9834782dee95ddb4e93d9e68'), ('docs/ties/tie-a.md', '841a0c0aa6676c6a9427b172')]&#10;assert [('docs/ties/...c6a9427b172')] == [('docs/ties/...0ff896da6dd')]&#10;  &#10;  At index 0 diff: ('docs/ties/tie-d.md', 'f513d3bd0cb380ff896da6dd') != ('docs/ties/tie-a.md', '841a0c0aa6676c6a9427b172')&#10;  Use -v to get more diff">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ties = &lt;w2_04_support.Project object at 0x7a3c82d84c50&gt;
+
+    def test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them(retrieval_api, ties):
+        expected = _packet(retrieval_api, ties, mode="log")
+        reordered = _packet(retrieval_api, ties, mode="ties-reversed")
+        calls = retrieval_api.calls()
+        assert any(call["in"] != call["out"] for call in calls), \
+            f"the fixture is wrong: the stand-in saw no tied items to reorder: {calls}"
+&gt;       assert _tied(reordered) == sorted(_tied(reordered)), f"tied items follow the retrieval's order: {_tied(reordered)}"
+E       AssertionError: tied items follow the retrieval's order: [('docs/ties/tie-d.md', 'f513d3bd0cb380ff896da6dd'), ('docs/ties/tie-c.md', '048e3838c5b19203b4cca112'), ('docs/ties/tie-b.md', '9834782dee95ddb4e93d9e68'), ('docs/ties/tie-a.md', '841a0c0aa6676c6a9427b172')]
+E       assert [('docs/ties/...c6a9427b172')] == [('docs/ties/...0ff896da6dd')]
+E         
+E         At index 0 diff: ('docs/ties/tie-d.md', 'f513d3bd0cb380ff896da6dd') != ('docs/ties/tie-a.md', '841a0c0aa6676c6a9427b172')
+E         Use -v to get more diff
+
+tests/acceptance/W2-04/test_w2_04_reproducible.py:98: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers" time="0.351"><failure message="AssertionError: the packet changes when the semantic index answers: ['.tickets/TK-W204-TIES.md', '.tickets/TK-W204-TIES.md', 'docs/semantic/gulls.md', 'docs/notes/note-0.md', 'docs/notes/note-1.md', 'docs/notes/note-2.md', 'docs/notes/note-3.md', 'docs/notes/note-4.md', 'docs/notes/note-5.md', 'docs/ties/tie-a.md', 'docs/ties/tie-b.md', 'docs/ties/tie-c.md', 'docs/ties/tie-d.md'] vs ['.tickets/TK-W204-TIES.md', '.tickets/TK-W204-TIES.md', 'docs/notes/note-0.md', 'docs/notes/note-1.md', 'docs/notes/note-2.md', 'docs/notes/note-3.md', 'docs/notes/note-4.md', 'docs/notes/note-5.md', 'docs/ties/tie-a.md', 'docs/ties/tie-b.md', 'docs/ties/tie-c.md', 'docs/ties/tie-d.md']&#10;assert '3e45487b3796...b5eaa6a7cd3bc' == '562cf8ab2306...ea00163e365b9'&#10;  &#10;  - 562cf8ab230696d02370b3e494f7f1953e85798f6d92c190e26ea00163e365b9&#10;  + 3e45487b3796f882a51c3d3f1621ca4e599d31baf64ae396651b5eaa6a7cd3bc">retrieval_api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+ties = &lt;w2_04_support.Project object at 0x7a3c82d84c50&gt;
+
+    def test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers(retrieval_api, ties):
+        """No vector is built, so the semantic route is unavailable; the ``semantic-live`` stand-in makes it answer (one
+        hit, the gulls note, which no lexical query finds). The packet and its hash do not change."""
+        unavailable = _packet(retrieval_api, ties, mode="log")
+        answering = _packet(retrieval_api, ties, mode="semantic-live", W204_SEMANTIC_PATH=SEMANTIC_ONLY)
+        assert retrieval_api.calls(), "the fixture is wrong: the retrieval was not reached"
+&gt;       assert answering[s.K_HASH] == unavailable[s.K_HASH], (
+            "the packet changes when the semantic index answers: "
+            f"{[item['path'] for item in answering[s.K_SUPPLEMENTARY]]} vs "
+            f"{[item['path'] for item in unavailable[s.K_SUPPLEMENTARY]]}")
+E       AssertionError: the packet changes when the semantic index answers: ['.tickets/TK-W204-TIES.md', '.tickets/TK-W204-TIES.md', 'docs/semantic/gulls.md', 'docs/notes/note-0.md', 'docs/notes/note-1.md', 'docs/notes/note-2.md', 'docs/notes/note-3.md', 'docs/notes/note-4.md', 'docs/notes/note-5.md', 'docs/ties/tie-a.md', 'docs/ties/tie-b.md', 'docs/ties/tie-c.md', 'docs/ties/tie-d.md'] vs ['.tickets/TK-W204-TIES.md', '.tickets/TK-W204-TIES.md', 'docs/notes/note-0.md', 'docs/notes/note-1.md', 'docs/notes/note-2.md', 'docs/notes/note-3.md', 'docs/notes/note-4.md', 'docs/notes/note-5.md', 'docs/ties/tie-a.md', 'docs/ties/tie-b.md', 'docs/ties/tie-c.md', 'docs/ties/tie-d.md']
+E       assert '3e45487b3796...b5eaa6a7cd3bc' == '562cf8ab2306...ea00163e365b9'
+E         
+E         - 562cf8ab230696d02370b3e494f7f1953e85798f6d92c190e26ea00163e365b9
+E         + 3e45487b3796f882a51c3d3f1621ca4e599d31baf64ae396651b5eaa6a7cd3bc
+
+tests/acceptance/W2-04/test_w2_04_reproducible.py:108: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_with_a_live_local_embedder_the_packet_is_the_same" time="0.001"><skipped type="pytest.skip" message="W204_LIVE_HOME names no HOME with the pinned embedder (README, local_only)">/home/usain/gov-os-worktrees/W2-04-tests/tests/acceptance/W2-04/test_w2_04_reproducible.py:121: W204_LIVE_HOME names no HOME with the pinned embedder (README, local_only)</skipped></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_reproducible" name="test_the_check_is_never_green_on_a_stale_store_and_red_on_a_fresh_one" time="0.659"><failure message="AssertionError: green on a stale store, red on the fresh one&#10;  stale:&#10;  python3 -m gov.context.context_check&#10;  exit 0&#10;  stdout: context-reproducibility: green&#10;  &#10;  stderr: &#10;  fresh:&#10;  python3 -m gov.context.context_check&#10;  exit 1&#10;  stdout: ERROR: TK-W204-CHECK: mandatory input 'ADR-W204-GAUGE' is RETIRED: it no longer stands and cannot satisfy a current requirement&#10;  unmeasured: every ticket's context computation failed&#10;  &#10;  stderr: &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_04_support.Answer object at 0x7a3c830398e0&gt;.returncode">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-0/test_the_check_is_never_green_0')
+
+    def test_the_check_is_never_green_on_a_stale_store_and_red_on_a_fresh_one(api, tmp_path):
+        """The store is built at a commit where the ticket's source stands; the next commit retires it. On the stale
+        store the check is red or reports the store as stale (unmeasured, by name, non-zero); after the reload it is red.
+        Today: green on the stale store."""
+        files = {SOURCE_REL: s.record(SOURCE_ID, "decision", "ACTIVE", "The gauge is read at dawn."),
+                 f".tickets/{CHECK_TICKET}.md": s.ticket(CHECK_TICKET, "The gauge check", [SOURCE_ID])}
+        project = s.build_project(tmp_path / "repo", files)
+        api.build(project.root, index=False)
+        assert api.context_check(project.root).returncode == 0, "the fixture is wrong: the check is red at the start"
+    
+        project.write(SOURCE_REL, s.record(SOURCE_ID, "decision", "RETIRED", "The gauge is read at dawn."))
+        project.commit("the source is retired")
+        stale = api.context_check(project.root)
+        api.load(project.root)
+        fresh = api.context_check(project.root)
+    
+        assert fresh.returncode != 0, f"the fixture is wrong: the fresh store is green\n{fresh.describe()}"
+&gt;       assert stale.returncode != 0, (f"green on a stale store, red on the fresh one\nstale:\n{stale.describe()}\n"
+                                       f"fresh:\n{fresh.describe()}")
+E       AssertionError: green on a stale store, red on the fresh one
+E         stale:
+E         python3 -m gov.context.context_check
+E         exit 0
+E         stdout: context-reproducibility: green
+E         
+E         stderr: 
+E         fresh:
+E         python3 -m gov.context.context_check
+E         exit 1
+E         stdout: ERROR: TK-W204-CHECK: mandatory input 'ADR-W204-GAUGE' is RETIRED: it no longer stands and cannot satisfy a current requirement
+E         unmeasured: every ticket's context computation failed
+E         
+E         stderr: 
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_04_support.Answer object at 0x7a3c830398e0&gt;.returncode
+
+tests/acceptance/W2-04/test_w2_04_reproducible.py:162: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_mandatory_file_that_cannot_be_read_blocks_or_is_marked_not_read[deleted]" time="0.260" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_mandatory_file_that_cannot_be_read_blocks_or_is_marked_not_read[no permission to read]" time="0.242" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_register_entry_whose_span_cannot_be_read_blocks_or_is_marked_not_read[deleted]" time="0.308" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_register_entry_whose_span_cannot_be_read_blocks_or_is_marked_not_read[emptied]" time="0.365"><failure message="AssertionError: DEC-102 is shown as read with the hash of empty content: {'id': 'DEC-102', 'sha256': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'authority': 'decision', 'lifecycle': 'ACCEPTED', 'constraint': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'reason': 'declared in sources'}&#10;assert 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'&#10; +  where 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' = s.EMPTY_SHA">api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+harbour = &lt;w2_04_support.Project object at 0x7a3c82d84560&gt;
+change = &lt;function _emptied at 0x7a3c82e1f420&gt;
+
+    @pytest.mark.parametrize("change", [_deleted, _emptied, _no_permission],
+                             ids=["deleted", "emptied", "no permission to read"])
+    def test_a_register_entry_whose_span_cannot_be_read_blocks_or_is_marked_not_read(api, harbour, change):
+        """The store holds the entry (loaded from the commit); the register in the working tree is gone, empty or
+        unreadable. A context that reads the span from the store shows the entry's own hash; one that reads it from
+        the working tree blocks or marks it not read. Red today for "emptied": shown read with the empty hash."""
+        own_hash = api.records(harbour.root)[CITED]["content_hash"]
+        restore = change(harbour.root / s.REGISTER_REL)
+        try:
+&gt;           _never_shown_read_unread(api, harbour, CITED, s.REGISTER_REL, own_hash)
+
+tests/acceptance/W2-04/test_w2_04_unreadable.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = &lt;w2_04_support.Api object at 0x7a3c82e2fb60&gt;
+project = &lt;w2_04_support.Project object at 0x7a3c82d84560&gt;
+record_id = 'DEC-102', rel = 'docs/DECISION_REGISTER.md'
+own_hash = '337d1d808fa32db3f74da114ecbef65e023012dc7b702e808847b268be928599'
+
+    def _never_shown_read_unread(api, project, record_id, rel, own_hash=None):
+        """The context of ``TICKET`` blocks naming ``record_id`` and ``rel``, or lists ``record_id`` as not read, or (a
+        register entry the store still holds) shows it read with its own ``content_hash``; never the empty hash, never 0
+        tokens."""
+        answer = api.gov(project.root, TICKET)
+        envelope = answer.envelope
+        if envelope["ok"] is False:
+            error = envelope.get("error") or {}
+            assert error.get("code") == s.BLOCKED, f"expected {s.BLOCKED}, got {error.get('code')!r}\n{answer.describe()}"
+            assert answer.returncode != 0
+            said = json.dumps(error)
+            assert record_id in said and rel in said, f"the refusal does not name {record_id} and {rel}: {error}"
+            return
+        packet = answer.packet
+        if s.marked_not_read(packet, record_id):
+            shown = [item for item in packet[s.K_MANDATORY] if item.get("id") == record_id and item.get("read") is not False]
+            assert not shown, f"{record_id} is marked not read and also shown as read: {shown}"
+            return
+        item = s.item_of(packet, record_id)
+&gt;       assert item["sha256"] != s.EMPTY_SHA, f"{record_id} is shown as read with the hash of empty content: {item}"
+E       AssertionError: DEC-102 is shown as read with the hash of empty content: {'id': 'DEC-102', 'sha256': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'authority': 'decision', 'lifecycle': 'ACCEPTED', 'constraint': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'reason': 'declared in sources'}
+E       assert 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' != 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+E        +  where 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' = s.EMPTY_SHA
+
+tests/acceptance/W2-04/test_w2_04_unreadable.py:78: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_register_entry_whose_span_cannot_be_read_blocks_or_is_marked_not_read[no permission to read]" time="0.283" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_source_that_no_longer_stands_blocks_naming_its_status[register entry-SUPERSEDED]" time="0.293" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_source_that_no_longer_stands_blocks_naming_its_status[register entry-RETIRED]" time="0.289" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_source_that_no_longer_stands_blocks_naming_its_status[register entry-REJECTED]" time="0.283" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_source_that_no_longer_stands_blocks_naming_its_status[decision file-SUPERSEDED]" time="0.281" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_source_that_no_longer_stands_blocks_naming_its_status[decision file-RETIRED]" time="0.290" /><testcase classname="tests.acceptance.W2-04.test_w2_04_unreadable" name="test_a_source_that_no_longer_stands_blocks_naming_its_status[decision file-REJECTED]" time="0.280" /></testsuite></testsuites>

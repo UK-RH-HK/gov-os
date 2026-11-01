@@ -1,0 +1,9 @@
+log: W2-90b-A5-run1-ten.json
+W2: W2-90b
+status: PACKAGES. The work is done, committed and verified. One package, P-W2-90b-1, is open, and it covers only part of KPI S4: the stand-in homes of two live-session harnesses (W1-46's live sessions and W1-50's launcher case). Nothing else waits on it.
+
+task: Ticket lead for DAEO-nqa2 (W2-90b, LITE, test revision): move the cases still tied to this repository's live wiring onto the kernel's wiring, without lowering anything, and verify the result.
+status: PACKAGES. The work is done, committed and verified. One package, P-W2-90b-1, is open, and it covers only part of KPI S4: the stand-in homes of two live-session harnesses (W1-46's live sessions and W1-50's launcher case). Nothing else waits on it.
+work_completed:
+- **Preflight passed.** Identity, branch, head `f46b96537d74` and clean tree all as expected; W2-106 is closed.
+- **First launch re

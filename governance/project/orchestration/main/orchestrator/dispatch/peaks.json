@@ -1,0 +1,160 @@
+{
+ "computed": "2026-11-01 23:22:04",
+ "days": 7,
+ "kinds": {
+  "other": {
+   "cpu_p95": 12.56,
+   "cpu_max": 7206.96,
+   "rss_kb_p95": 3880464,
+   "rss_kb_max": 5552236,
+   "samples": 1861
+  },
+  "embedding": {
+   "cpu_p95": 8.14,
+   "cpu_max": 16.2,
+   "rss_kb_p95": 2990508,
+   "rss_kb_max": 5520432,
+   "samples": 1861
+  },
+  "rebuild": {
+   "cpu_p95": 13.57,
+   "cpu_max": 126.32,
+   "rss_kb_p95": 560212,
+   "rss_kb_max": 637492,
+   "samples": 1324
+  },
+  "test_run": {
+   "cpu_p95": 17.16,
+   "cpu_max": 55.11,
+   "rss_kb_p95": 4227888,
+   "rss_kb_max": 6778004,
+   "samples": 1461
+  },
+  "claude": {
+   "cpu_p95": 9.57,
+   "cpu_max": 444.15,
+   "rss_kb_p95": 2948572,
+   "rss_kb_max": 4055288,
+   "samples": 1438
+  },
+  "reranker": {
+   "cpu_p95": 2.07,
+   "cpu_max": 12.23,
+   "rss_kb_p95": 7023360,
+   "rss_kb_max": 10237512,
+   "samples": 1156
+  },
+  "gitleaks": {
+   "cpu_p95": 0.36,
+   "cpu_max": 4.08,
+   "rss_kb_p95": 2176284,
+   "rss_kb_max": 3528312,
+   "samples": 841
+  },
+  "git": {
+   "cpu_p95": 0.01,
+   "cpu_max": 0.03,
+   "rss_kb_p95": 124468,
+   "rss_kb_max": 164968,
+   "samples": 82
+  },
+  "codegraph": {
+   "cpu_p95": 0.27,
+   "cpu_max": 1.21,
+   "rss_kb_p95": 169136,
+   "rss_kb_max": 844648,
+   "samples": 661
+  },
+  "rebuild_with_embedding": {
+   "cpu_p95": 16.01,
+   "cpu_max": 126.32,
+   "rss_kb_p95": 3534332,
+   "rss_kb_max": 5663368,
+   "samples": 1324
+  }
+ },
+ "lead": {
+  "rss_kb_p95": 4188232,
+  "rss_kb_max": 9810916,
+  "samples": 17708
+ },
+ "lead_own_max_kb": {
+  "DAEO-e8f0": 7404492,
+  "DAEO-iw1f": 7480828,
+  "DAEO-ym8a": 9304584,
+  "DAEO-cv58": 8856664,
+  "DAEO-0z8c": 6946292,
+  "DAEO-b6hm": 7329688,
+  "DAEO-cy5o": 4612928,
+  "DAEO-m1u3": 7407956,
+  "DAEO-2ds6": 2410144,
+  "DAEO-egsy": 7928712,
+  "DAEO-9nys": 5484900,
+  "DAEO-0uhh": 7296300,
+  "DAEO-v4is": 8063632,
+  "DAEO-tgk2": 7483684,
+  "DAEO-s9qc": 9810916,
+  "DAEO-gdzh": 4566676,
+  "DAEO-8lmb": 2530688,
+  "DAEO-kiar": 7555084,
+  "DAEO-0mtg": 6514616,
+  "DAEO-zpdj": 4910660,
+  "DAEO-ouet": 5549268,
+  "DAEO-57hm": 6067188,
+  "DAEO-siiz": 2138660,
+  "DAEO-ha8z": 7363732,
+  "DAEO-49o5": 5655068,
+  "DAEO-zoex": 2242924,
+  "DAEO-3r1j": 6413700,
+  "DAEO-jsg1": 4054080,
+  "DAEO-wq2b": 7553184,
+  "DAEO-l78m": 5165320,
+  "DAEO-k7hz": 5971732,
+  "DAEO-4eux": 3432036,
+  "DAEO-arrl": 7859056,
+  "DAEO-n0wb": 5147624,
+  "DAEO-zqvn": 5729456,
+  "DAEO-nqa2": 6338316,
+  "DAEO-a3u2": 4893032,
+  "DAEO-u4oz": 4143928,
+  "DAEO-h2k3": 5249052,
+  "DAEO-drhj": 4261900,
+  "DAEO-blwa": 1599380,
+  "DAEO-qzrq": 3602684
+ },
+ "lead_outside": {
+  "rss_kb_p95": 2521636,
+  "rss_kb_max": 5042316,
+  "samples": 259
+ },
+ "lead_own_outside_max_kb": {
+  "DAEO-3r1j": 2188012,
+  "DAEO-0z8c": 2172840,
+  "DAEO-zoex": 297812,
+  "DAEO-jsg1": 775608,
+  "DAEO-ouet": 2564380,
+  "DAEO-wq2b": 293972,
+  "DAEO-l78m": 1140652,
+  "DAEO-arrl": 263644,
+  "DAEO-n0wb": 2296324,
+  "DAEO-zqvn": 5042316,
+  "DAEO-k7hz": 665764,
+  "DAEO-zpdj": 599560,
+  "DAEO-nqa2": 657684,
+  "DAEO-a3u2": 1793484,
+  "DAEO-u4oz": 347032,
+  "DAEO-h2k3": 310468,
+  "DAEO-drhj": 310636
+ },
+ "lead_inside": {
+  "rss_kb_p95": 3988152,
+  "rss_kb_max": 7859056,
+  "samples": 6015
+ },
+ "test_run_per_slot": {
+  "rss_kb_p95": 733774.6666666666,
+  "rss_kb_max": 1277816.0,
+  "samples": 1461
+ },
+ "slot_run_kb": 1466516
+}

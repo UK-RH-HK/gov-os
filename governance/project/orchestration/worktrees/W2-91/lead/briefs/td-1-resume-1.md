@@ -1,0 +1,15 @@
+Your lead again, resuming you in the same tests worktree (`/home/usain/gov-os-worktrees/W2-91-tests`, branch `w2/W2-91-tests`, recreated at your own commit `657a264dcd53`; it holds no implementation). Your tests are merged into the ticket's branch.
+
+**What happened:** the engineer ran the acceptance tests through `gov accept DAEO-a3u2` and it refused before running any test: `ACCEPT_NO_MAP` (the README of `tests/acceptance/W2-91/` maps no KPI line). `gov accept` reads the map from the README's tables (`src/gov/accept/runner.py`, `parse_map`, a public reader you may read): a table is read only when its header row has a column whose title begins with `KPI` and a column whose title begins with `Test` or `File`; each row's KPI cell names its lines at its start (`Success 2 / failure 1: …` is read as success-2 and failure-1), and the test cell's items are the back-quoted names in it. Your table's second column is titled `Cases`, so the whole table is ignored.
+
+**What to do, and only this:**
+1. Step 0 again: the sandbox check, and `printenv GOV_ROLE GOV_TICKET` and `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-91-tests` and `w2/W2-91-tests`).
+2. Change the README's map so `gov accept` reads it (for example the column title `Cases` to `Tests`). Check that every back-quoted item in the test cells is a test name `gov accept` can find, or that a non-test item in a cell does no harm, by reading `parse_map` and its callers; change no test and lower no expectation.
+3. Check it: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-91-tests/src python3 -m gov.cli.main accept DAEO-a3u2` in your worktree. It runs at the base, so it must now report per KPI line (red where the README says red), not `ACCEPT_NO_MAP`. Quote its summary lines (pass or fail per KPI line and the counts).
+4. Commit only the README, with the trailers in the final block; this is a rewrite after the implementer's commit (DEC-491):
+
+       git commit -m "W2-91: the acceptance README's KPI map in the form gov accept reads (ACCEPT_NO_MAP)" --trailer "Task: DAEO-a3u2" --trailer "Role: independent-test-designer" --trailer "Implements: DEC-957,DEC-954,DEC-388,DEC-694" --trailer "Rewrite-Reason: gov accept refused the README map (ACCEPT_NO_MAP); its table's test column title only; no test or expectation changed" --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+
+All the rules of your first brief still hold (Policy 2 (c): never read the ticket's implementation; `gov retrieve` only from `/home/usain/gov-os-worktrees/W2-00-store`; the guard's command forms; scratch in your session scratchpad or the sandbox's own temp folder; refused twice for the same call, stop and say so).
+
+Your last message: **the twelve fields first, each as a labelled line** (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action), then the sandbox check, your commit's 12-digit hash, the `gov accept` summary, and the guard refusals you met. Refused twice for the same call: stop and say so.

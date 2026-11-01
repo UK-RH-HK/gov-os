@@ -1,0 +1,24 @@
+corpus (61 rows, all logged false positives):
+   ('rule1', 'allow') 34
+   ('rule1', 'deny') 14
+   ('rule2-listing', 'allow') 1
+   ('rule3', 'allow') 1
+   ('rule5', 'allow') 10
+   ('rule5', 'deny') 1
+  still refused: 15/61 = 24.6%
+planted: 154/169 as expected; deny-cases 116, missed (allowed) 6
+   FAIL fix3 python heredoc os.remove of a joined path want deny got allow | 
+   FAIL fix3 cd into acceptance then python heredoc want deny got allow | 
+   FAIL fix3 cd into acceptance then python -c want deny got allow | 
+   FAIL fix3 python -c path built from pieces want deny got allow | 
+   FAIL fix3 python -c reads a test want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python heredoc reads a test want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python heredoc edits a ticket whose text names a test want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python -c imports from the tests' folder want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 nested quotes in a substitution naming the tests want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python heredoc writes a unit test string naming a test want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 heredoc python file written then run want deny got allow | 
+   FAIL fix3 heredoc python written then run, definite write want deny got allow | 
+   FAIL fix3 python heredoc getattr read (differential #1586) want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python -c reads a support module of the tests want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python -c parse_map of a test's text want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)

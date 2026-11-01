@@ -1,0 +1,11 @@
+W2-11 (DAEO-k7hz): merge the test designer's removal of the validator case (DEC-995, DEC-996)
+
+The tests worktree's branch w2/W2-11-tests: the failure line "the skill validator refuses a brief without the
+twelve-field rule" (row W2-L097) leaves W2-11 for W2-120; its one case is removed and the README map says where it
+went, and names the DEC-866 line failure-1 as the ticket numbers it after the removal. Nothing else lowered. Merged
+while no worker runs here (DEC-963).
+
+Task: DAEO-k7hz
+Implements: DEC-992, DEC-963, DEC-959
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

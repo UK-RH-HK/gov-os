@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 63
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01Q2RUv2FA1Voyxshp4JrmbP", "time": "2026-11-01T22:44:41.543Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2/subagents/agent-ad3a2922bea572151.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "S=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2/scratchpad/guard-fix; python3 - <<'EOF' p=\"/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-O", "rule": "a command that may write the acceptance tests, which only the ind

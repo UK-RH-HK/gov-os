@@ -1,0 +1,218 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-01 18:51:24)
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  7%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 14%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 22%]
+........................................................................ [ 24%]
+........................................................................ [ 26%]
+........................................................................ [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 31%]
+........................................................................ [ 33%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+................F....................................................... [ 79%]
+...........s............................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 84%]
+........................................................................ [ 86%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 91%]
+.............................................................F.......... [ 93%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+.....F...F....F......................................................... [ 98%]
+....................................................                     [100%]
+=================================== FAILURES ===================================
+_____________ test_no_command_writes_outside_its_act_paths[check] ______________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+request = <FixtureRequest for <Function test_no_command_writes_outside_its_act_paths[check]>>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/san...ixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+args = ('check',)
+
+    @pytest.mark.parametrize("args", support.EVERY_INVOCATION + (("--help",),), ids=support.label)
+    def test_no_command_writes_outside_its_act_paths(request, sandbox, interface, args):
+        """Failure 1. No command built at W1-07 declares an act path, and a command not yet built does nothing."""
+        # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+        # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+        # case time out.
+        if args[0] in support.TREE_SENSITIVE_COMMANDS:
+            gov = request.getfixturevalue("small_gov")
+            project = request.getfixturevalue("small_project")
+        else:
+            gov = request.getfixturevalue("gov")
+            project = request.getfixturevalue("project")
+        before = _state(project, sandbox)
+>       run = gov(*args) if args == ("--help",) else gov(*args, "--json")
+                                                     ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-07/test_w1_07_read_act.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-07/conftest.py:70: in _gov
+    return support.run_gov(project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:437: in run_gov
+    return run_gov_with_code(code_root, project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code_root = PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/repo')
+project = PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/san...ixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/sandbox/elsewhere'))
+cwd = None, args = ('check', '--json')
+launcher = PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw2/test_no_command_writes_outside0/sandbox/bin/gov')
+
+    def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+        """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``."""
+        launcher = write_launcher(code_root, sandbox)
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(sandbox.home),
+            "TMPDIR": str(sandbox.tmpdir),
+            "LC_ALL": "C.UTF-8",
+            "PYTHONPATH": str(Path(code_root) / "src"),
+            "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+            **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
+        }
+        started = time.perf_counter()
+        try:
+            done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                                  capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired as exc:
+            # Row W2-L409: what the command printed before the wait ended is kept, so its cause shows.
+>           raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s; "
+                                 f"what it printed before then:\n{output_excerpt(exc.stdout, exc.stderr)}") from None
+E           AssertionError: gov check --json did not end within 180 s; what it printed before then:
+E           stdout (trimmed):
+E           (nothing)
+E           stderr (trimmed):
+E           (nothing)
+
+tests/acceptance/W1-07/w1_07_support.py:458: AssertionError
+________________ test_a_per_question_table_of_the_visible_half _________________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+text = '# W2-61 baseline: the standing 20-question memory measure, visible half\n\n- **Ticket:** DAEO-iw1f (W2-61), profile S...r records.\n5. **The hidden half:** the orchestrator only, with `--part hidden`, writing scores only into section 7.\n'
+
+    def test_a_per_question_table_of_the_visible_half(text):
+        assert text is not None, MISSING
+        rows = [line for line in text.splitlines() if line.lstrip().startswith("|")]
+        headers = [line for line in rows if s.HIT_LABEL.search(line) and s.FULL_LABEL.search(line)
+                   and "bundle" in line.lower() and "repeat" in line.lower() and "rebuild" in line.lower()]
+        assert headers, ("no table header gives hit@5, in the bundle, full evidence, the repeat run and the run after "
+                         "the rebuild")
+        missing = [qid for qid in _visible_ids() if not any(re.search(rf"\b{re.escape(qid)}\b", row) for row in rows)]
+>       assert not missing, f"the table has no row for: {missing}"
+E       AssertionError: the table has no row for: ['q21', 'q22', 'q23', 'q24']
+E       assert not ['q21', 'q22', 'q23', 'q24']
+
+tests/acceptance/W2-61/test_w2_61_baseline.py:104: AssertionError
+_____ test_the_visible_half_holds_lens_b_s_twenty_questions_one_file_each ______
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_the_visible_half_holds_lens_b_s_twenty_questions_one_file_each():
+        files = _files()
+>       assert len(files) == 20, f"the visible half holds {len(files)} question files, not lens B's 20"
+E       AssertionError: the visible half holds 24 question files, not lens B's 20
+E       assert 24 == 20
+E        +  where 24 = len([PosixPath('/home/usain/gov-os-worktrees/W2-61h/fixtures/evaluation/memory-retrieval/visible/q01.yaml'), PosixPath('/h...05.yaml'), PosixPath('/home/usain/gov-os-worktrees/W2-61h/fixtures/evaluation/memory-retrieval/visible/q06.yaml'), ...])
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:70: AssertionError
+___________ test_each_question_is_table_2_s_command_with_its_options ___________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_each_question_is_table_2_s_command_with_its_options():
+        table = s.lens_b_commands()
+        assert len(table) == 20, f"Table 2 of lens B's report parsed to {len(table)} commands, not 20"
+        assert table["Q01"]["question"] == "DEC-782"
+        assert table["Q12"]["question"] == "CONTINUATION_INVALID"
+        assert table["Q09"]["question"] == "How large may the context packet be?"
+        expected = sorted((e["question"], e["ticket"], tuple(e["ids"]), e["radius"]) for e in table.values())
+        got = []
+        for path in _files():
+            data = _load(path)
+            ids = data.get("ids") or []
+            assert isinstance(ids, list), f"{path.name}: ids is not a list"
+            got.append((data.get("question"), data.get("ticket"), tuple(str(i) for i in ids),
+                        int(data.get("radius") or 0)))
+        missing = sorted(set(expected) - set(got))
+        extra = sorted(set(got) - set(expected))
+>       assert sorted(got) == expected, (
+            f"the visible questions are not Table 2's commands; missing: {missing}; not in Table 2: {extra}")
+E       AssertionError: the visible questions are not Table 2's commands; missing: []; not in Table 2: [('By default, how long may a store rebuild run before it counts as slow, and how often is its record rewritten after that?', None, (), 0), ("What compaction threshold is set for a session's context window?", None, (), 0), ("Which constant in the close's test selection holds the test map's path, and what is its exact value?", None, (), 0), ('Which functions call set_fault?', None, (), 0)]
+E       assert [('By default..., (), 0), ...] == [('CONTINUATI..., (), 0), ...]
+E         
+E         At index 0 diff: ('By default, how long may a store rebuild run before it counts as slow, and how often is its record rewritten after that?', None, (), 0) != ('CONTINUATION_INVALID', None, (), 0)
+E         Left contains 4 more items, first extra item: ('Which tickets must be done before the Track A gate run?', 'DAEO-0mab', (), 0)
+E         Use -v to get more diff
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:105: AssertionError
+________ test_the_measure_takes_the_real_visible_half_by_its_set_s_name ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-61h/pytest-of-usain/pytest-0/popen-gw3/test_the_measure_takes_the_rea0')
+
+    def test_the_measure_takes_the_real_visible_half_by_its_set_s_name(tmp_path):
+        """End to end on this worktree: ``memory-retrieval`` declared by this worktree's path map, its 20 visible files
+        read in the measure's own form, every source resolved in this worktree; the answers are the planted gov's
+        (empty bundles), so the figures are 0 of 20 and the run ends with 0. Only ``--part visible``: the real hidden
+        folder is never named to the measure."""
+        files = _files()
+        world = s.make_world(tmp_path)
+        for path in files:
+            world.answer(_load(path).get("question"), [[]])
+        run = world.measure(s.REAL_SET, "--root", s.REPO_ROOT, "--part", "visible", "--json", root=False,
+                            cwd=world.base, role="orchestrator")
+        document = run.json()
+        assert document.get("set") == s.REAL_SET and document.get("part") == "visible"
+        ids = [str(_load(path).get("id") or path.stem) for path in files]
+        assert [q.get("id") for q in s.questions(document)] == ids, "the measure did not take the 20 files in order"
+        total = document.get("total") or {}
+>       assert total.get("questions") == 20, f"total: {total}"
+E       AssertionError: total: {'questions': 24, 'hit_at_5': {'count': 0, 'of': 24, 'percent': 0.0, 'floor': 85}, 'full_evidence': {'count': 0, 'of': 24, 'percent': 0.0, 'target': 99}}
+E       assert 24 == 20
+E        +  where 24 = <built-in method get of dict object at 0x716baad6ad40>('questions')
+E        +    where <built-in method get of dict object at 0x716baad6ad40> = {'full_evidence': {'count': 0, 'of': 24, 'percent': 0.0, 'target': 99}, 'hit_at_5': {'count': 0, 'floor': 85, 'of': 24, 'percent': 0.0}, 'questions': 24}.get
+
+tests/acceptance/W2-61/test_w2_61_visible_half.py:158: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+5 failed, 4078 passed, 1 skipped in 2027.70s (0:33:47)

@@ -1,0 +1,6 @@
+W2-91: merge the independent test designer's acceptance tests (w2/W2-91-tests, 657a264dcd53)
+
+Task: DAEO-a3u2
+Implements: DEC-957,DEC-954,DEC-388,DEC-694
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

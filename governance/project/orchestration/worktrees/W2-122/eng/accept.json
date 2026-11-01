@@ -1,0 +1,1 @@
+{"ok": false, "command": "accept", "result": {}, "session": "", "error": {"code": "ACCEPT_MAP_UNREADABLE", "message": "ticket DAEO-blwa: the README of tests/acceptance/W2-122/ has a map row naming no KPI line it can read", "details": {"ticket": "DAEO-blwa", "path": "tests/acceptance/W2-122/"}}}

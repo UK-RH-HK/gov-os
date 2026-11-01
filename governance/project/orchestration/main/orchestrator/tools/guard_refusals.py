@@ -27,7 +27,11 @@ def load():
 
 
 def save(rows):
-    LOG.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+    # Atomic: a temp file in the same folder, then a rename, so a reader never sees a truncated log (dispatcher review
+    # round 2, F1).
+    tmp = LOG.with_name(LOG.name + ".tmp")
+    tmp.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows))
+    tmp.replace(LOG)
 
 
 def form(inp):
@@ -129,22 +133,22 @@ def main():
     if a.classify:
         key, verdict, cost, note = a.classify
         for r in rows:
-            if r["key"].endswith(key):
+            if r.get("key", "").endswith(key):
                 r.update(verdict=verdict, cost=cost, note=note)
         save(rows)
     else:
-        seen = {r["key"] for r in rows}
+        seen = {r.get("key") for r in rows}  # hand-written rows carry no key
         new = [r for r in harvest(a.since) if r["key"] not in seen]
         new.sort(key=lambda r: r["time"])
         rows += new
         save(rows)
         if not a.quiet:
             for r in new:
-                if r["verdict"]:  # a known pattern, marked automatically: counted, not woken for
+                if r.get("verdict"):  # a known pattern, marked automatically: counted, not woken for
                     continue
                 print(f"NEW {r['key'][-10:]} {r['time'][:19]} {r['cwd']} {r['tool']}: {r['form'][:120]} -> {r['rule'][:120]}")
-    fp = sum(1 for r in rows if r["verdict"] == "false-positive")
-    un = sum(1 for r in rows if not r["verdict"])
+    fp = sum(1 for r in rows if (r.get("verdict") or r.get("judgement")) == "false-positive")
+    un = sum(1 for r in rows if not (r.get("verdict") or r.get("judgement")))
     print(f"guard refusals since ACT 1: {len(rows)} total, {fp} false positives, {un} unclassified")
 
 

@@ -1,0 +1,4 @@
+tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py
+tests/acceptance/W2-54/test_w2_54_query_vector.py::test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before
+tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here

@@ -1,0 +1,6 @@
+log: W2-91-A5-run1-ten.json
+W2: W2-91
+status: PACKAGES. The implementation, the acceptance tests and the evidence record are done and green under `gov accept` (8 of 8 KPI lines). My scoped verification did not run: its rebuild waited for a heavy-job slot from 19:45 to 21:15, which is the 90-minute hold limit. Two decision packages from the test
+
+task: W2-91 (DAEO-a3u2), ticket lead, run 1: embed the root files, the governance overlay and `schemas/`, keep the stay-out sets out, and re-run W2-61's measure. Work in the parallel order (independent test designer and engineer), then verify and return.
+status: PACKAGES. The implementation, the acceptance tests and the evidence record are done and green under `gov accept` (8 of 8 KPI lines). My scoped verification did not run: its rebuild waited for a heavy-job slot from 19:45 to 21:15, which is the 90-minute hold limit. Two decision packages from the test designer are also open (TD-1, TD-2).

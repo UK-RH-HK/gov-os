@@ -1,0 +1,120 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-04/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-04-tests",
+   "change": "acceptance folder",
+   "folder": "W2-04"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-104/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-104/test_w2_104_command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-104/test_w2_104_not_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-104/test_w2_104_run.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-104/w2_104_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-104-tests",
+   "change": "acceptance folder",
+   "folder": "W2-104"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13",
+   "change": "head",
+   "before": "962fc43467f7",
+   "after": "febe5f6403d5"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-91",
+   "change": "head",
+   "before": "b652fc96d2b5",
+   "after": "a53650525fd8"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-91",
+   "change": "acceptance folder",
+   "folder": "W2-91"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-91-tests",
+   "change": "tree disappeared"
+  }
+ ]
+}

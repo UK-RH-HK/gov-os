@@ -1,7 +1,7 @@
 {
   "retriever": {
     "executable": "/home/usain/gov-os-worktrees/W2-13/.gov-runtime/scratch/lead/bin/gov-base",
-    "version": "gov 0.1.0 (commit c38a5b49bc86e4c30f012acb01f7db50b8e41665)",
+    "version": "gov 0.1.0 (commit c38a5b49bc86)",
     "gov_file": "/home/usain/gov-os-runs/W2-13/base/src/gov/__init__.py"
   },
   "root": "/home/usain/gov-os-runs/W2-13/base",

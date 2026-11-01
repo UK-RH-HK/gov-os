@@ -1,0 +1,58 @@
+corpus (61 rows, all logged false positives):
+   ('rule1', 'allow') 30
+   ('rule1', 'deny') 18
+   ('rule2-listing', 'deny') 1
+   ('rule3', 'deny') 1
+   ('rule5', 'deny') 11
+  still refused: 31/61 = 50.8%
+planted: 117/167 as expected; deny-cases 115, missed (allowed) 39
+   FAIL fix3 python heredoc open w want deny got allow | 
+   FAIL fix3 python heredoc write_text want deny got allow | 
+   FAIL fix3 python heredoc shutil.copy want deny got allow | 
+   FAIL fix3 python heredoc variable then append want deny got allow | 
+   FAIL fix3 python heredoc os.remove of a joined path want deny got allow | 
+   FAIL fix3 python heredoc rebinding by a loop want deny got allow | 
+   FAIL fix3 python heredoc write inside a function want deny got allow | 
+   FAIL fix3 python heredoc global rebinding want deny got allow | 
+   FAIL fix3 python piped into python want deny got allow | 
+   FAIL fix3 cd into acceptance then python heredoc want deny got allow | 
+   FAIL fix3 cd into acceptance then python -c want deny got allow | 
+   FAIL fix3 perl heredoc naming acceptance want deny got allow | 
+   FAIL fix3 unquoted python heredoc with a shell variable want deny got allow | 
+   FAIL fix3 python -c path built from pieces want deny got allow | 
+   FAIL fix3 python -c with a shell variable target want deny got allow | 
+   FAIL fix3 python heredoc target in argv want deny got allow | 
+   FAIL fix3 loop over folders, one in acceptance want deny got allow | 
+   FAIL fix3 substitution in double quotes want deny got allow | 
+   FAIL fix3 backtick substitution want deny got allow | 
+   FAIL fix3 sh -c string want deny got allow | 
+   FAIL fix3 bash -lc string want deny got allow | 
+   FAIL fix3 eval words want deny got allow | 
+   FAIL fix3 git checkout -- a test want deny got allow | 
+   FAIL fix3 git restore a test want deny got allow | 
+   FAIL fix3 git rm a test want deny got allow | 
+   FAIL fix3 dd of= a test want deny got allow | 
+   FAIL fix3 truncate a test want deny got allow | 
+   FAIL fix3 sort -o a test want deny got allow | 
+   FAIL fix3 rsync into acceptance want deny got allow | 
+   FAIL fix3 python -c reads a test want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 brief heredoc whose text names the tests want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python -c imports from the tests' folder want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 nested quotes in a substitution naming the tests want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 fixed-line read loop on the register (research, hidden set) want allow got deny | the call reads files whose names another command gives at run time, from a listing whose start the guard cannot place, a
+   FAIL fix3 heredoc python file written then run want deny got allow | 
+   FAIL fix3 timeout prefix then touch want deny got allow | 
+   FAIL fix3 then rm in an if want deny got allow | 
+   FAIL fix3 env -i prefix then cp want deny got allow | 
+   FAIL fix3 while read loop rm (target unresolvable, names the tests) want deny got allow | 
+   FAIL fix3 patch from stdin in a command naming the tests want deny got allow | 
+   FAIL fix3 python -c loop word naming a test in the code want deny got allow | 
+   FAIL fix3 heredoc python written then run, definite write want deny got allow | 
+   FAIL fix3 python -c reads a support module of the tests want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 python -c parse_map of a test's text want allow got deny | a command that may write the acceptance tests, which only the independent test designer writes (DEC-953 item 2)
+   FAIL fix3 auditor variable in /tmp want allow got deny | a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-9
+   FAIL fix3 auditor loop writes in /tmp want allow got deny | a reviewer or auditor runs only commands whose writes can be read, and writes only its own review or audit record (DEC-9
+   FAIL fix3 auditor probe heredoc into /tmp want allow got deny | a reviewer or auditor writes only its own review or audit record (docs/probes/, docs/audit/, docs/assessment/), its own 
+   FAIL fix3 auditor probe text naming secret files (rule 3) want allow got deny | the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.key, config/secrets*, a file under a .secrets folder, ~/
+   FAIL fix3 auditor loop, one folder in code want deny got allow | 
+   FAIL fix3 auditor sh -c writes code want deny got allow | 

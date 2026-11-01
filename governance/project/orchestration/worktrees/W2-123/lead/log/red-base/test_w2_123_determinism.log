@@ -1,0 +1,22 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_determinism.py:20: AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_determinism.py:20: AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_determinism.py:20: AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_determinism.py:20: AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_determinism.py:20: AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+E   AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_determinism.py:20: AttributeError: module 'gov.retrieval.ollama' has no attribute 'check_determinism'
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-123/test_w2_123_determinism.py::test_equal_vectors_are_accepted_with_that_many_requests_in_flight[1]
+FAILED tests/acceptance/W2-123/test_w2_123_determinism.py::test_equal_vectors_are_accepted_with_that_many_requests_in_flight[4]
+FAILED tests/acceptance/W2-123/test_w2_123_determinism.py::test_a_difference_below_the_stored_precision_is_not_a_difference
+FAILED tests/acceptance/W2-123/test_w2_123_determinism.py::test_vectors_changed_by_parallel_requests_refuse_the_setting
+FAILED tests/acceptance/W2-123/test_w2_123_determinism.py::test_one_differing_vector_is_named_and_refuses
+FAILED tests/acceptance/W2-123/test_w2_123_determinism.py::test_a_missing_vector_refuses
+6 failed in 0.68s

@@ -1,0 +1,11 @@
+2026-11-01 15:16:56 merged W2-11 onto f46b96537d74: 74d3621fe226
+2026-11-01 17:01:12 flaky candidate (passes alone, decides nothing): tests/acceptance/W1-35/test_w1_35.py
+2026-11-01 17:01:41 flaky candidate (passes alone, decides nothing): tests/acceptance/W1-35/test_w1_35_orchestration.py
+2026-11-01 18:41:19 red alone, traced against the baseline 1f0bb5b3c516 ({'rounds': 3, 'red_with': 3, 'red_without': 3, 'without_exit': None}): unowned: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-11-01 18:41:25 red alone, traced against the baseline 1f0bb5b3c516 ({'rounds': 3, 'red_with': 3, 'red_without': 3, 'without_exit': None}): unowned: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-11-01 18:41:39 red alone, traced against the baseline 1f0bb5b3c516 ({'rounds': 3, 'red_with': 3, 'red_without': 3, 'without_exit': None}): unowned: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-11-01 18:41:50 red alone, traced against the baseline 1f0bb5b3c516 ({'rounds': 3, 'red_with': 3, 'red_without': 3, 'without_exit': None}): unowned: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-11-01 18:42:00 red alone, traced against the baseline 1f0bb5b3c516 ({'rounds': 3, 'red_with': 3, 'red_without': 3, 'without_exit': None}): unowned: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-11-01 18:42:09 red alone, traced against the baseline 1f0bb5b3c516 ({'rounds': 3, 'red_with': 3, 'red_without': 3, 'without_exit': None}): unowned: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-11-01 19:12:51 refs/heads/w2/integrate moved while under test; merged again onto the new head (1)
+2026-11-01 19:13:08 merged W2-11 onto 8723754f3fec: ea54f1452d81

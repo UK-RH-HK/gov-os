@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="342.125" timestamp="2026-11-01T21:54:48.780118+00:00" hostname="Usain"><testcase classname="tests.acceptance.W1-19.test_w1_19_real_models" name="test_a_warm_query_answers_within_half_a_second_at_p95" time="342.076"><failure message="AssertionError: warm p95 is 4.166 s over 52 queries (limit 0.5 s; the three slowest: [4.166, 4.198, 5.484])&#10;assert 4.1656554020009935 &lt;= 0.5&#10; +  where 4.1656554020009935 = &lt;function p95 at 0x7ca6803bc9a0&gt;([0.575716651044786, 0.7819063649512827, 5.48410160606727, 2.46379738394171, 0.8130172160454094, 0.5349549881648272, ...])&#10; +    where &lt;function p95 at 0x7ca6803bc9a0&gt; = support.p95&#10; +  and   0.5 = support.WARM_P95_LIMIT_S">measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...59603, 0.4137143928091973, 0.5787278460338712, 0.40774544700980186, 0.589239259948954, 0.43440249492414296, ...], ...}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        # The timed pass's times: no memory sampler ran in that process (W2-M332).
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) &gt;= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+&gt;       assert support.p95(seconds) &lt;= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 4.166 s over 52 queries (limit 0.5 s; the three slowest: [4.166, 4.198, 5.484])
+E       assert 4.1656554020009935 &lt;= 0.5
+E        +  where 4.1656554020009935 = &lt;function p95 at 0x7ca6803bc9a0&gt;([0.575716651044786, 0.7819063649512827, 5.48410160606727, 2.46379738394171, 0.8130172160454094, 0.5349549881648272, ...])
+E        +    where &lt;function p95 at 0x7ca6803bc9a0&gt; = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:204: AssertionError</failure></testcase></testsuite></testsuites>

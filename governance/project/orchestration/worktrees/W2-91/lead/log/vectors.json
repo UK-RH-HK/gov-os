@@ -1,0 +1,436 @@
+{
+ "namespaces_by_head_map": {
+  "root-files": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "agent-settings": {
+   "embedding_policy": "not embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "ci": {
+   "embedding_policy": "not embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "tickets": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "docs": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "project-overlay": {
+   "embedding_policy": "embedded",
+   "sensitivity": "restricted",
+   "export_policy": "denied"
+  },
+  "kernel-template": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed; copied into adopting products"
+  },
+  "kernel-vendored": {
+   "embedding_policy": "not embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed; copied into adopting products"
+  },
+  "kernel-adapter-copies": {
+   "embedding_policy": "not embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed; copied into adopting products"
+  },
+  "gov-source": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "tests": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "fixtures": {
+   "embedding_policy": "not embedded",
+   "sensitivity": "internal",
+   "export_policy": "denied"
+  },
+  "carried-code": {
+   "embedding_policy": "not embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  },
+  "carried-schemas": {
+   "embedding_policy": "embedded",
+   "sensitivity": "internal",
+   "export_policy": "allowed"
+  }
+ },
+ "base": {
+  "per_namespace": {
+   "agent-settings": {
+    "files": 87,
+    "chunks": 1071,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "ci": {
+    "files": 1,
+    "chunks": 5,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "root-files": {
+    "files": 8,
+    "chunks": 26,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "tickets": {
+    "files": 181,
+    "chunks": 928,
+    "chunks_with_vectors": 928,
+    "files_with_vectors": 180
+   },
+   "docs": {
+    "files": 868,
+    "chunks": 14235,
+    "chunks_with_vectors": 14235,
+    "files_with_vectors": 866
+   },
+   "fixtures": {
+    "files": 78,
+    "chunks": 0,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "project-overlay": {
+    "files": 165,
+    "chunks": 2902,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "carried-schemas": {
+    "files": 5,
+    "chunks": 31,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "gov-source": {
+    "files": 138,
+    "chunks": 2795,
+    "chunks_with_vectors": 2795,
+    "files_with_vectors": 132
+   },
+   "kernel-template": {
+    "files": 93,
+    "chunks": 410,
+    "chunks_with_vectors": 410,
+    "files_with_vectors": 93
+   },
+   "kernel-adapter-copies": {
+    "files": 44,
+    "chunks": 529,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "kernel-vendored": {
+    "files": 30,
+    "chunks": 323,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "tests": {
+    "files": 1202,
+    "chunks": 35531,
+    "chunks_with_vectors": 35531,
+    "files_with_vectors": 1162
+   }
+  },
+  "total": {
+   "paths_with_chunks": 2773,
+   "chunks": 58786,
+   "chunks_with_vectors": 53899
+  }
+ },
+ "head": {
+  "per_namespace": {
+   "agent-settings": {
+    "files": 87,
+    "chunks": 1071,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "ci": {
+    "files": 1,
+    "chunks": 5,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "root-files": {
+    "files": 8,
+    "chunks": 26,
+    "chunks_with_vectors": 26,
+    "files_with_vectors": 8
+   },
+   "tickets": {
+    "files": 182,
+    "chunks": 931,
+    "chunks_with_vectors": 931,
+    "files_with_vectors": 181
+   },
+   "docs": {
+    "files": 868,
+    "chunks": 14245,
+    "chunks_with_vectors": 14245,
+    "files_with_vectors": 866
+   },
+   "fixtures": {
+    "files": 78,
+    "chunks": 0,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "project-overlay": {
+    "files": 166,
+    "chunks": 2941,
+    "chunks_with_vectors": 2941,
+    "files_with_vectors": 166
+   },
+   "carried-schemas": {
+    "files": 5,
+    "chunks": 31,
+    "chunks_with_vectors": 31,
+    "files_with_vectors": 5
+   },
+   "gov-source": {
+    "files": 138,
+    "chunks": 2795,
+    "chunks_with_vectors": 2795,
+    "files_with_vectors": 132
+   },
+   "kernel-template": {
+    "files": 93,
+    "chunks": 410,
+    "chunks_with_vectors": 410,
+    "files_with_vectors": 93
+   },
+   "kernel-adapter-copies": {
+    "files": 44,
+    "chunks": 529,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "kernel-vendored": {
+    "files": 30,
+    "chunks": 323,
+    "chunks_with_vectors": 0,
+    "files_with_vectors": 0
+   },
+   "tests": {
+    "files": 1207,
+    "chunks": 35741,
+    "chunks_with_vectors": 35741,
+    "files_with_vectors": 1167
+   }
+  },
+  "total": {
+   "paths_with_chunks": 2780,
+   "chunks": 59048,
+   "chunks_with_vectors": 57120
+  }
+ },
+ "gained_vectors": [
+  ".gitignore",
+  ".gitleaks.toml",
+  ".tickets/DAEO-fu3n.md",
+  "AGENTS.md",
+  "CLAUDE.md",
+  "README.md",
+  "copier.yml",
+  "governance/adoption/A0-safety-baseline.md",
+  "governance/adoption/A1-inventory.md",
+  "governance/adoption/A2-classification.md",
+  "governance/adoption/A3-target-path-map.md",
+  "governance/adoption/A4-batched-plan.md",
+  "governance/adoption/A5-independent-review-of-the-path-map.md",
+  "governance/adoption/A6-controlled-migration.md",
+  "governance/adoption/A8-legacy-import-and-retirement.md",
+  "governance/project/bootstrap.md",
+  "governance/project/briefs/AUDITOR-common.md",
+  "governance/project/briefs/JUDGEMENT.md",
+  "governance/project/briefs/LEAD-w2-common.md",
+  "governance/project/external-references.yaml",
+  "governance/project/held-out.yaml",
+  "governance/project/orchestration/ARCHIVE-SUPERSEDED.md",
+  "governance/project/orchestration/DECISIONS-IN-FORCE.md",
+  "governance/project/orchestration/LIFTED-BY-DEC953.md",
+  "governance/project/orchestration/README.md",
+  "governance/project/orchestration/brief-gaps.md",
+  "governance/project/orchestration/closes/W2-03-DAEO-ym8a.md",
+  "governance/project/orchestration/closes/W2-106-DAEO-0mtg.md",
+  "governance/project/orchestration/closes/W2-107-DAEO-kiar.md",
+  "governance/project/orchestration/closes/W2-108-DAEO-zoex.md",
+  "governance/project/orchestration/closes/W2-114-DAEO-4eux.md",
+  "governance/project/orchestration/closes/W2-16-DAEO-49o5.md",
+  "governance/project/orchestration/closes/W2-26-DAEO-2ds6.md",
+  "governance/project/orchestration/closes/W2-49-DAEO-ha8z.md",
+  "governance/project/orchestration/closes/W2-51-DAEO-egsy.md",
+  "governance/project/orchestration/closes/W2-57-DAEO-cy5o.md",
+  "governance/project/orchestration/closes/W2-61-DAEO-iw1f.md",
+  "governance/project/orchestration/closes/W2-64-DAEO-0uhh.md",
+  "governance/project/orchestration/closes/W2-67-DAEO-9nys.md",
+  "governance/project/orchestration/closes/W2-71-DAEO-e8f0.md",
+  "governance/project/orchestration/closes/W2-76-DAEO-tgk2.md",
+  "governance/project/orchestration/closes/W2-77-DAEO-b6hm.md",
+  "governance/project/orchestration/closes/W2-84-DAEO-m1u3.md",
+  "governance/project/orchestration/closes/W2-85-DAEO-gdzh.md",
+  "governance/project/orchestration/closes/W2-86-DAEO-jsg1.md",
+  "governance/project/orchestration/closes/W2-87-DAEO-s9qc.md",
+  "governance/project/orchestration/closes/W2-90-DAEO-8lmb.md",
+  "governance/project/orchestration/closes/W2-95-DAEO-57hm.md",
+  "governance/project/orchestration/closes/W2-97-DAEO-wq2b.md",
+  "governance/project/orchestration/main/orchestrator/CHECKPOINT.md",
+  "governance/project/orchestration/nightly/README.md",
+  "governance/project/orchestration/nightly/disk_gate.sh",
+  "governance/project/orchestration/nightly/nightly.sh",
+  "governance/project/orchestration/nightly/nightly_alone.py",
+  "governance/project/orchestration/nightly/nightly_check.sh",
+  "governance/project/orchestration/nightly/nightly_cron.sh",
+  "governance/project/orchestration/nightly/nightly_estimate.py",
+  "governance/project/orchestration/nightly/ping_gate.sh",
+  "governance/project/orchestration/nightly/rotate.sh",
+  "governance/project/orchestration/nightly/runs_sweep.sh",
+  "governance/project/orchestration/nightly/test_nightly.sh",
+  "governance/project/orchestration/packages/ACT-1-GUARD.hooks.patch",
+  "governance/project/orchestration/packages/ACT-1-GUARD.md",
+  "governance/project/orchestration/packages/ACT-DEADMAN-1.md",
+  "governance/project/orchestration/packages/ACT-GUARD-FIX-1.md",
+  "governance/project/orchestration/packages/ACT-GUARD-FIX-1.patch",
+  "governance/project/orchestration/packages/ACT-GUARD-FIX-2.md",
+  "governance/project/orchestration/packages/ACT-GUARD-FIX-2.patch",
+  "governance/project/orchestration/packages/ACT-NIGHTLY-0400.md",
+  "governance/project/orchestration/packages/ACT-NIGHTLY-1.md",
+  "governance/project/orchestration/packages/ACT-P-TRACE-IMPL-1.md",
+  "governance/project/orchestration/packages/ACT-PUSH-INPUT-1.md",
+  "governance/project/orchestration/packages/ACT-QUIET-DENY-1.md",
+  "governance/project/orchestration/packages/ACT-REPIN-1.md",
+  "governance/project/orchestration/packages/ACT-REPIN-2.md",
+  "governance/project/orchestration/packages/ACT-RUNS-SWEEP-1.md",
+  "governance/project/orchestration/packages/ACT-SENTINEL-1.md",
+  "governance/project/orchestration/packages/ACT-W2-57-LS-1.md",
+  "governance/project/orchestration/packages/AUDIT-GOV-FEATURES-1.md",
+  "governance/project/orchestration/packages/CAPACITY-1.md",
+  "governance/project/orchestration/packages/CLEANUP-PROPOSAL-2026-10-23.md",
+  "governance/project/orchestration/packages/COMPANY-MAP-2026-10-29.md",
+  "governance/project/orchestration/packages/HOLDS-REVIEW-1.md",
+  "governance/project/orchestration/packages/MEMORY-SPEC-MAP.md",
+  "governance/project/orchestration/packages/P-CLOSE-ATTR-1.md",
+  "governance/project/orchestration/packages/P-GATE-WAIT-1.md",
+  "governance/project/orchestration/packages/P-PARALLEL-1.md",
+  "governance/project/orchestration/packages/P-PING-1.md",
+  "governance/project/orchestration/packages/P-REC-1.md",
+  "governance/project/orchestration/packages/P-REC-2.md",
+  "governance/project/orchestration/packages/P-REPIN-2.md",
+  "governance/project/orchestration/packages/P-REPIN-R1.md",
+  "governance/project/orchestration/packages/P-RERANKER-1.md",
+  "governance/project/orchestration/packages/P-SCOPE-RECORDS-1.md",
+  "governance/project/orchestration/packages/P-SKIP-GUARD-1.md",
+  "governance/project/orchestration/packages/P-SPEED-1.md",
+  "governance/project/orchestration/packages/P-TOOLS-REVIEW-1.md",
+  "governance/project/orchestration/packages/P-TRACE-IMPL-1.md",
+  "governance/project/orchestration/packages/P-W1-01-H.md",
+  "governance/project/orchestration/packages/P-W2-02-C3.md",
+  "governance/project/orchestration/packages/P-W2-07-A-B.md",
+  "governance/project/orchestration/packages/P-W2-07-DR.md",
+  "governance/project/orchestration/packages/P-W2-07-DR2.md",
+  "governance/project/orchestration/packages/P-W2-11-9.md",
+  "governance/project/orchestration/packages/P-W2-110-4.md",
+  "governance/project/orchestration/packages/P-W2-20-SCOPE.md",
+  "governance/project/orchestration/packages/P-W2-48-5.md",
+  "governance/project/orchestration/packages/P-W2-48-8.md",
+  "governance/project/orchestration/packages/P-W2-48.md",
+  "governance/project/orchestration/packages/P-W2-49.md",
+  "governance/project/orchestration/packages/P-W2-50.md",
+  "governance/project/orchestration/packages/P-W2-51.md",
+  "governance/project/orchestration/packages/P-W2-52.md",
+  "governance/project/orchestration/packages/P-W2-53.md",
+  "governance/project/orchestration/packages/P-W2-54-LOAD-1.md",
+  "governance/project/orchestration/packages/P-W2-54.md",
+  "governance/project/orchestration/packages/P-W2-55.md",
+  "governance/project/orchestration/packages/P-W2-58-1.md",
+  "governance/project/orchestration/packages/P-W2-58-3.md",
+  "governance/project/orchestration/packages/P-W2-58-4.md",
+  "governance/project/orchestration/packages/P-W2-58-C1.md",
+  "governance/project/orchestration/packages/P-W2-59-8.md",
+  "governance/project/orchestration/packages/P-W2-60a-ROUND3.md",
+  "governance/project/orchestration/packages/P-W2-62-G1.md",
+  "governance/project/orchestration/packages/P-W2-62-H.md",
+  "governance/project/orchestration/packages/P-W2-63-C1.md",
+  "governance/project/orchestration/packages/P-W2-64-1.md",
+  "governance/project/orchestration/packages/P-W2-65-M1.md",
+  "governance/project/orchestration/packages/P-W2-66-M1-R2.md",
+  "governance/project/orchestration/packages/P-W2-67-R23.md",
+  "governance/project/orchestration/packages/P-W2-69-R2-1.md",
+  "governance/project/orchestration/packages/P-W2-78-PARK.md",
+  "governance/project/orchestration/packages/P-W2-90-1.md",
+  "governance/project/orchestration/packages/P-W2-96-R4.md",
+  "governance/project/orchestration/packages/P-W2-H063-1.md",
+  "governance/project/orchestration/packages/P-W2-H064.md",
+  "governance/project/orchestration/packages/P-W2-L423-A.md",
+  "governance/project/orchestration/packages/P-W2-L423-Q.md",
+  "governance/project/orchestration/packages/P-W2-L437-A.md",
+  "governance/project/orchestration/packages/P-W2-L437-B.md",
+  "governance/project/orchestration/packages/P1-DEC995-APPLY.md",
+  "governance/project/orchestration/packages/P1-MORNING-2026-10-29.md",
+  "governance/project/orchestration/packages/P1-MORNING-2026-10-30.md",
+  "governance/project/orchestration/packages/P1-MORNING-2026-10-31.md",
+  "governance/project/orchestration/packages/P1-MORNING-2026-11-01.md",
+  "governance/project/orchestration/packages/P1-NEW-TICKETS-2026-10-31.md",
+  "governance/project/orchestration/packages/P1-ORCH-APPROVALS-1.md",
+  "governance/project/orchestration/packages/PLAN-GROWTH-1.md",
+  "governance/project/orchestration/packages/PLAN-W2-DEC953.md",
+  "governance/project/orchestration/packages/REPLAN-W2.md",
+  "governance/project/orchestration/packages/REVIEW-BUNDLE-2026-10-22.md",
+  "governance/project/orchestration/packages/ROLES-RESEARCH-1.md",
+  "governance/project/orchestration/packages/ROLES-SPEC-1.md",
+  "governance/project/orchestration/packages/SMART-WORK-1.md",
+  "governance/project/orchestration/packages/SMART-WORK-2.md",
+  "governance/project/orchestration/packages/SWEEP-2026-10-20.md",
+  "governance/project/orchestration/packages/TOOL-TRIALS-2026-10-22.md",
+  "governance/project/orchestration/sessions/2026-10-19-orchestrator-DAEO-sdxk.md",
+  "governance/project/orchestration/sessions/2026-10-30-orchestrator-DAEO-sdxk.md",
+  "governance/project/orchestration/sync_context.py",
+  "governance/project/orchestration/tools/README.md",
+  "governance/project/orchestration/tools/deadman.py",
+  "governance/project/orchestration/tools/merge_queue.py",
+  "governance/project/orchestration/tools/permission_request.py",
+  "governance/project/orchestration/tools/sentinel-brief.md",
+  "governance/project/orchestration/tools/win_toast.ps1",
+  "governance/project/path-map.yaml",
+  "governance/project/prompts/w1-orchestrator.md",
+  "governance/project/prompts/w2-orchestrator.md",
+  "governance/project/research-allowlist.yaml",
+  "governance/project/roster.yaml",
+  "governance/project/test-map.yaml",
+  "governance/project/tool-registry.yaml",
+  "lefthook.yml",
+  "pyproject.toml",
+  "schemas/records/checkpoint.schema.json",
+  "schemas/records/decision.schema.json",
+  "schemas/records/lesson.schema.json",
+  "schemas/records/record.schema.json",
+  "schemas/records/research.schema.json",
+  "tests/acceptance/W2-91/README.md",
+  "tests/acceptance/W2-91/test_w2_91_full_embeddings.py",
+  "tests/acceptance/W2-91/w2_91_support.py",
+  "tests/unit/orchestration/test_merge_queue_speed.py",
+  "tests/unit/retrieval/test_w2_91_full_embeddings.py"
+ ],
+ "lost_vectors": []
+}

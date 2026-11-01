@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+[ "${GOV_CHAIN_OVERRIDE:-}" = 1 ] || { echo "lead_chain.sh is retired (DEC-1012): the dispatcher does this" >&2; exit 2; }
 # Starts queued ticket leads in order with no fixed ceiling (owner, DEC-942): each start waits until the measured
 # gate is open (tools/gate_check.py), no ticket is ready to close and waiting for its close to start (CLOSE-PENDING,
 # item 4), and it is not between 00:30 and 05:30 (item 5). Each lead is started detached (setsid -f), so stopping

@@ -1,0 +1,6 @@
+W2-104: merge w2/integrate into the ticket branch before the first worker (the claim 5c1a6ef0, so gov launch sees the ticket in_progress; DEC-959 item 10)
+
+Task: DAEO-drhj
+Implements: DEC-959,DEC-820
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

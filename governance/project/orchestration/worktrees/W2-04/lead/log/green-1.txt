@@ -1,0 +1,71 @@
+.F..F...............................s....FFs............                 [100%]
+=================================== FAILURES ===================================
+________ test_when_room_is_left_after_one_batch_the_next_batch_is_taken ________
+
+retrieval_api = <w2_04_support.Api object at 0x7c9edef09790>
+ledger = <w2_04_support.Project object at 0x7c9ee00647a0>
+
+    def test_when_room_is_left_after_one_batch_the_next_batch_is_taken(retrieval_api, ledger):
+        packet = _full(retrieval_api, ledger, mode="log")
+        calls = retrieval_api.calls()
+>       assert calls, "the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called"
+E       AssertionError: the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called
+E       assert []
+
+tests/acceptance/W2-04/test_w2_04_batches.py:50: AssertionError
+_________________ test_further_batch_is_at_most_one_batch_long _________________
+
+retrieval_api = <w2_04_support.Api object at 0x7c9edef09790>
+ledger = <w2_04_support.Project object at 0x7c9ee00647a0>
+
+    def test_further_batch_is_at_most_one_batch_long(retrieval_api, ledger):
+        full = _full(retrieval_api, ledger)
+        _, _, budget = _tight_budget(full)
+        retrieval_api.reset_log()
+    
+        packet = retrieval_api.gov(ledger.root, s.LEDGER_TICKET, "--budget", budget,
+                                   env=retrieval_api.env(mode="log")).packet
+    
+        calls = retrieval_api.calls()
+>       assert calls, "the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called"
+E       AssertionError: the retrieval's public entry (gov.retrieval.retrieve.retrieve) was never called
+E       assert []
+
+tests/acceptance/W2-04/test_w2_04_batches.py:117: AssertionError
+____ test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them ____
+
+retrieval_api = <w2_04_support.Api object at 0x7c9edef09790>
+ties = <w2_04_support.Project object at 0x7c9edf056120>
+
+    def test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them(retrieval_api, ties):
+        expected = _packet(retrieval_api, ties, mode="log")
+        reordered = _packet(retrieval_api, ties, mode="ties-reversed")
+        calls = retrieval_api.calls()
+>       assert any(call["in"] != call["out"] for call in calls), \
+            f"the fixture is wrong: the stand-in saw no tied items to reorder: {calls}"
+E       AssertionError: the fixture is wrong: the stand-in saw no tied items to reorder: []
+E       assert False
+E        +  where False = any(<generator object test_tied_items_keep_one_order_whatever_order_the_retrieval_gives_them.<locals>.<genexpr> at 0x7c9eded745f0>)
+
+tests/acceptance/W2-04/test_w2_04_reproducible.py:96: AssertionError
+____ test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers _____
+
+retrieval_api = <w2_04_support.Api object at 0x7c9edef09790>
+ties = <w2_04_support.Project object at 0x7c9edf056120>
+
+    def test_the_packet_is_the_same_whether_or_not_the_semantic_route_answers(retrieval_api, ties):
+        """No vector is built, so the semantic route is unavailable; the ``semantic-live`` stand-in makes it answer (one
+        hit, the gulls note, which no lexical query finds). The packet and its hash do not change."""
+        unavailable = _packet(retrieval_api, ties, mode="log")
+        answering = _packet(retrieval_api, ties, mode="semantic-live", W204_SEMANTIC_PATH=SEMANTIC_ONLY)
+>       assert retrieval_api.calls(), "the fixture is wrong: the retrieval was not reached"
+E       AssertionError: the fixture is wrong: the retrieval was not reached
+E       assert []
+E        +  where [] = calls()
+E        +    where calls = <w2_04_support.Api object at 0x7c9edef09790>.calls
+
+tests/acceptance/W2-04/test_w2_04_reproducible.py:107: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-04/test_w2_04_refusal.py:155: this tree has no store (.gov-runtime/store.db) or no DAEO-03pw; the lead's rebuild makes one
+SKIPPED [1] tests/acceptance/W2-04/test_w2_04_reproducible.py:121: W204_LIVE_HOME names no HOME with the pinned embedder (README, local_only)
+4 failed, 50 passed, 2 skipped in 23.28s

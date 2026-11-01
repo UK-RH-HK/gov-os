@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 55
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_019DVGLWz24AgHQnwyoTNMTE", "time": "2026-11-01T15:10:19.338Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/20804c5c-af51-4450-934e-42f650effce2.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/nightly", "tool": "Bash", "form": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator && { cat <<'EOF' # W2-11 (DAEO-k7hz) — one test-design batch: failure-1 leaves W2-11 (2026-11-01, DEC-995, DEC-996) **Re", "rule": "a command that may write the acceptance tests, which o

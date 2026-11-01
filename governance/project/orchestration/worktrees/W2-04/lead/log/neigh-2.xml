@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="22" skipped="0" tests="226" time="393.874" timestamp="2026-11-01T17:34:21.734719+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_the_schema_file_is_w2_02_s_byte_for_byte" time="0.003" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD]" time="0.286" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_no_schema_file_of_w2_02_s_other_types_comes_with_it[4ce16df2]" time="0.217" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[docs/audit/report.md]" time="1.271" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[docs/audit/wave-9/wave-9-exit-audit.md]" time="0.429" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_of_type_audit_report_owes_no_shared_frontmatter[docs/reports/report.md]" time="0.416" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_of_type_audit_report_owes_no_shared_frontmatter[docs/audit/stated.md]" time="0.412" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[commit-not-a-commit]" time="0.404" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[milestone-]" time="0.566" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[pack_sha256-]" time="0.471" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_w2_02_s_other_types_are_judged_as_an_unknown_type[close-HEAD]" time="0.238" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_w2_02_s_other_types_are_judged_as_an_unknown_type[close-4ce16df2]" time="0.227" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict-HEAD]" time="0.256" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict-4ce16df2]" time="0.194" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/notes/report.md]" time="0.261" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/audit-archive/report.md]" time="0.235" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/reports/audit/report.md]" time="0.218" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_lacking_a_required_field_fails_naming_it[folder-milestone]" time="0.391" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_lacking_a_required_field_fails_naming_it[folder-commit]" time="0.396" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_lacking_a_required_field_fails_naming_it[folder-pack_sha256]" time="0.437" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_lacking_a_required_field_fails_naming_it[stated-milestone]" time="0.393" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_lacking_a_required_field_fails_naming_it[stated-commit]" time="0.468" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_an_audit_report_lacking_a_required_field_fails_naming_it[stated-pack_sha256]" time="0.427" /><testcase classname="tests.acceptance.W2-54.test_w2_54_audit_report" name="test_core_schema_is_green_on_this_repository_with_w1_43_untouched" time="4.307" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner" time="2.093"><failure message="AssertionError: `gov context --json --root TK-W254-TIDES` sent the CPU embedder nothing to embed&#10;assert 2 &gt; 2&#10; +  where 2 = len([{'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}, {'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}])&#10; +    where [{'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}, {'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}] = embed_requests()&#10; +      where embed_requests = &lt;w2_54_support.EmbedderStandIn object at 0x770573ca59a0&gt;.embed_requests">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+shared = &lt;w2_54_support.EmbedderStandIn object at 0x770573ca5160&gt;
+cpu = &lt;w2_54_support.EmbedderStandIn object at 0x770573ca59a0&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/test_every_read_sends_its_ques0')
+
+    @STAND_IN
+    def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner(
+            box, shared, cpu, tmp_path):
+        """*Red.* With the shared runner at OLLAMA_HOST and the CPU embedder at its address: two ``gov retrieve``, two
+        ``gov context``, a semantic search and a retrieval through the public entry each send the CPU embedder at least
+        one text to embed (the question) and send the shared runner none; the search's answer is the CPU embedder's
+        vector (the kiln, where the shared runner's would be the forge). No request to the shared runner names a runner
+        option, and its model stays on the GPU. Today every question goes to OLLAMA_HOST, with ``num_gpu: 0``.
+    
+        Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-2 (a): the search and the retrieval
+        (steps 5 and 6) ask texts no earlier step asked (they asked QUESTION and OTHER again, whose vectors the cache
+        rightly serves with no request), so each step has a text the CPU embedder has not embedded yet."""
+        project = S.semantic_project(box, tmp_path / "p", shared, S.ticket_files(), cpu=cpu)
+        assert shared.embed_requests() and not cpu.embedded(), \
+            f"the premise: the index was built through the shared runner only (CPU embedder sent {cpu.embedded()[:2]})"
+        env = S.embed_env(box, shared, cpu)
+        steps = [("gov", "retrieve", "--json", "--root", project, QUESTION),
+                 ("gov", "retrieve", "--json", "--root", project, OTHER),
+                 ("gov", "context", "--json", "--root", project, "TK-W254-TIDES"),
+                 ("gov", "context", "--json", "--root", project, "TK-W254-BAKERY"),
+                 ("search", AGAIN_KILN), ("retrieve", AGAIN_OTHER)]
+        answer = None
+        for step in steps:
+            to_shared, to_cpu = len(shared.embed_requests()), len(cpu.embed_requests())
+            if step[0] == "gov":
+                done = S.gov(box, *step[1:], env=env)
+                assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
+            else:
+                answers, done = S.drive_run(box, project, env, step)
+                assert not S.clean(done), done.describe()
+                answer = answers[0] if step[0] == "search" else answer
+            what = " ".join(str(part) for part in step if part != project)
+            sent = [text[-60:] for request in shared.embed_requests()[to_shared:] for text in request["texts"]]
+            assert not sent, f"`{what}` sent the shared runner texts to embed: {sent}"
+&gt;           assert len(cpu.embed_requests()) &gt; to_cpu, f"`{what}` sent the CPU embedder nothing to embed"
+E           AssertionError: `gov context --json --root TK-W254-TIDES` sent the CPU embedder nothing to embed
+E           assert 2 &gt; 2
+E            +  where 2 = len([{'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}, {'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}])
+E            +    where [{'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}, {'mode': 'healthy', 'model': 'qwen3-embedding:0.6b', 'options': None, 'route': '/api/embed', ...}] = embed_requests()
+E            +      where embed_requests = &lt;w2_54_support.EmbedderStandIn object at 0x770573ca59a0&gt;.embed_requests
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:130: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shared_runner_and_none_to_the_cpu_one" time="3.697" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[gpu]" time="1.037" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[partial]" time="0.993" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[nothing]" time="1.074" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[other-model]" time="1.087" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_a_vector_cached_under_round_3_s_key_is_never_served" time="1.625" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN]" time="2.025" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[PATH]" time="1.977" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[HOME]" time="1.979" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer" time="1.812" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback" time="40.914" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers" time="0.877" /><testcase classname="tests.acceptance.W2-54.test_w2_54_cpu_embedder" name="test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_the_stand_in_reaches_the_retrieval_s_public_entry_with_tied_and_same_id_items" time="1.906"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+
+    def test_the_stand_in_reaches_the_retrieval_s_public_entry_with_tied_and_same_id_items(box, indexed):
+        """The harness: computing the context calls ``gov.retrieval.retrieve.retrieve``, and its items include
+        several with the same id (one record in many sections) beside items of other ids. Passes today."""
+&gt;       S.packet(box, indexed, S.TK_BIG, "identity")
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b36390&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_two_computations_with_the_retrieval_s_own_order_give_one_packet" time="0.107"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+
+    def test_two_computations_with_the_retrieval_s_own_order_give_one_packet(box, indexed):
+        """Two computations of one ticket in one store, the retrieval unchanged: one packet, one hash."""
+&gt;       first = S.packet(box, indexed, S.TK_BIG, "identity")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b71f70&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash[reverse]" time="0.115"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+order = 'reverse'
+
+    @pytest.mark.parametrize("order", ORDERS)
+    def test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash(box, indexed, order):
+        """*Red.* The ticket's mandatory input is past the default ceiling, so every supplementary item is dropped.
+        The retrieval returning the same items in another order (``order``) gives the same packet, ``dropped``
+        included, and the same hash."""
+&gt;       expected = S.packet(box, indexed, S.TK_BIG, "identity")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b734a0&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash[rotate]" time="0.129"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+order = 'rotate'
+
+    @pytest.mark.parametrize("order", ORDERS)
+    def test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash(box, indexed, order):
+        """*Red.* The ticket's mandatory input is past the default ceiling, so every supplementary item is dropped.
+        The retrieval returning the same items in another order (``order``) gives the same packet, ``dropped``
+        included, and the same hash."""
+&gt;       expected = S.packet(box, indexed, S.TK_BIG, "identity")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b73770&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash[shuffle]" time="0.129"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+order = 'shuffle'
+
+    @pytest.mark.parametrize("order", ORDERS)
+    def test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash(box, indexed, order):
+        """*Red.* The ticket's mandatory input is past the default ceiling, so every supplementary item is dropped.
+        The retrieval returning the same items in another order (``order``) gives the same packet, ``dropped``
+        included, and the same hash."""
+&gt;       expected = S.packet(box, indexed, S.TK_BIG, "identity")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b72000&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_a_budget_below_the_mandatory_inputs_gives_the_same_packet_under_any_order" time="0.280"><failure message="AssertionError: with a budget of 1590 the fixture should drop every supplementary item: {&quot;authority&quot;: [{&quot;authority&quot;: &quot;charter&quot;, &quot;constraint&quot;: &quot;0e6b0ba45cd192cd96ac465f8e35690ee1912f4937873f7feb9844d632589acf&quot;, &quot;id&quot;: &quot;CHARTER-W254&quot;, &quot;lifecycle&quot;: &quot;ACTIVE&quot;, &quot;reason&quot;: &quot;declared in sources&quot;, &quot;sha256&quot;: &quot;0e6b0ba45cd192cd96ac465f8e35690ee1912f4937873f7feb9844d632589acf&quot;, &quot;tokens&quot;: 61}], &quot;budget&quot;: {&quot;limit&quot;: 1590, &quot;used&quot;: 1590}, &quot;dropped&quot;: [{&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;reason&quot;: &quot;budget exceeded&quot;}, {&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;reason&quot;: &quot;budget exceeded&quot;}, {&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;reason&quot;: &quot;budget exceeded&quot;}, {&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;reason&quot;: &quot;budget exceeded&quot;}], &quot;further_batch&quot;: [{&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;path&quot;: &quot;docs/adr/split.md&quot;}, {&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;path&quot;: &quot;docs/adr/split.md&quot;}, {&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;path&quot;: &quot;docs/adr/split.md&quot;}, {&quot;id&quot;: &quot;ADR-W254-SPLIT&quot;, &quot;path&quot;: &quot;docs/adr/split.&#10;assert ([{'id': 'TK-W...ns': 40}, ...] == []&#10;  &#10;  Left contains 16 more items, first extra item: {'id': 'TK-W254-BIG', 'path': '.tickets/TK-W254-BIG.md', 'text': '---\nid: TK-W254-BIG\ntype: ticket\nstatus: in_progr...n  failure:\n  - context packet dropped order stable hash budget\nsources:\n- CHARTER-W254-BIG\n---\n\n', 'tokens': 88}&#10;  Use -v to get more diff)">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+
+    def test_a_budget_below_the_mandatory_inputs_gives_the_same_packet_under_any_order(box, indexed):
+        """*Red.* ``gov context --budget``: with a ceiling below the mandatory inputs alone, every supplementary
+        item is dropped, and the reversed order of the retrieval's items gives the same packet and hash."""
+        alone = S.packet(box, indexed, S.TK_SMALL, "empty")
+        budget = max(1, int(alone["tokens"]) // 2)
+        expected = S.packet(box, indexed, S.TK_SMALL, "identity", "--budget", str(budget))
+&gt;       assert expected[S.K_SUPPLEMENTARY] == [] and expected[S.K_DROPPED], \
+            f"with a budget of {budget} the fixture should drop every supplementary item: {S.canonical(expected)[:800]}"
+E       AssertionError: with a budget of 1590 the fixture should drop every supplementary item: {"authority": [{"authority": "charter", "constraint": "0e6b0ba45cd192cd96ac465f8e35690ee1912f4937873f7feb9844d632589acf", "id": "CHARTER-W254", "lifecycle": "ACTIVE", "reason": "declared in sources", "sha256": "0e6b0ba45cd192cd96ac465f8e35690ee1912f4937873f7feb9844d632589acf", "tokens": 61}], "budget": {"limit": 1590, "used": 1590}, "dropped": [{"id": "ADR-W254-SPLIT", "reason": "budget exceeded"}, {"id": "ADR-W254-SPLIT", "reason": "budget exceeded"}, {"id": "ADR-W254-SPLIT", "reason": "budget exceeded"}, {"id": "ADR-W254-SPLIT", "reason": "budget exceeded"}], "further_batch": [{"id": "ADR-W254-SPLIT", "path": "docs/adr/split.md"}, {"id": "ADR-W254-SPLIT", "path": "docs/adr/split.md"}, {"id": "ADR-W254-SPLIT", "path": "docs/adr/split.md"}, {"id": "ADR-W254-SPLIT", "path": "docs/adr/split.
+E       assert ([{'id': 'TK-W...ns': 40}, ...] == []
+E         
+E         Left contains 16 more items, first extra item: {'id': 'TK-W254-BIG', 'path': '.tickets/TK-W254-BIG.md', 'text': '---\nid: TK-W254-BIG\ntype: ticket\nstatus: in_progr...n  failure:\n  - context packet dropped order stable hash budget\nsources:\n- CHARTER-W254-BIG\n---\n\n', 'tokens': 88}
+E         Use -v to get more diff)
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:75: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once[identity]" time="0.112"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+order = 'identity'
+
+    @pytest.mark.parametrize("order", ("identity", "reverse"))
+    def test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once(box, indexed, order):
+        """A context otherwise unchanged keeps its contents: each item the retrieval returned is one entry of
+        ``dropped`` (items with the same id stay apart, none is merged, none is added), and the entries are the same
+        under any order. Passes today (the entries are there, only their order changes)."""
+&gt;       expected = S.packet(box, indexed, S.TK_BIG, "identity")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b71e20&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once[reverse]" time="0.107"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+order = 'reverse'
+
+    @pytest.mark.parametrize("order", ("identity", "reverse"))
+    def test_nothing_is_dropped_or_added_every_item_stays_in_the_packet_once(box, indexed, order):
+        """A context otherwise unchanged keeps its contents: each item the retrieval returned is one entry of
+        ``dropped`` (items with the same id stay apart, none is merged, none is added), and the entries are the same
+        under any order. Passes today (the entries are there, only their order changes)."""
+&gt;       expected = S.packet(box, indexed, S.TK_BIG, "identity")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b73530&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing" time="0.155"><failure message="AssertionError: the retrieval's public entry was never called for TK-W254-SMALL: []&#10;assert []">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+
+    def test_a_ticket_whose_items_fit_keeps_every_item_and_drops_nothing(box, indexed):
+        """A ticket whose supplementary part fits the default ceiling keeps every item the retrieval returned and
+        drops none: the fix adds nothing to ``dropped`` and takes nothing from ``supplementary``. Passes today."""
+        packet = S.packet(box, indexed, S.TK_SMALL, "identity")
+&gt;       returned = collections.Counter(_evidence_ids(box, S.TK_SMALL))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;, ticket_id = 'TK-W254-SMALL'
+
+    def _evidence_ids(box, ticket_id):
+        """The ids of the items the stand-in returned for ``ticket_id``'s last retrieval call."""
+        calls = [call for call in box.calls() if call["ticket"] in (ticket_id, None)]
+&gt;       assert calls, f"the retrieval's public entry was never called for {ticket_id}: {box.calls()}"
+E       AssertionError: the retrieval's public entry was never called for TK-W254-SMALL: []
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:28: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_an_empty_retrieval_result_gives_one_packet" time="0.114"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+
+    def test_an_empty_retrieval_result_gives_one_packet(box, indexed):
+        """The retrieval returns no item: two computations give one packet and one hash, with nothing supplementary
+        and nothing of the retrieval's in ``dropped``. Passes today."""
+&gt;       first = S.packet(box, indexed, S.TK_BIG, "empty")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+ticket_id = 'TK-W254-BIG', mode = 'empty', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573b37fe0&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_a_store_whose_index_is_missing_gives_one_packet_under_any_order[TK-W254-SMALL]" time="0.416" /><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_a_store_whose_index_is_missing_gives_one_packet_under_any_order[TK-W254-BIG]" time="0.134"><failure message="AssertionError: gov context did not succeed&#10;/usr/bin/python3 -c import sys&#10;import gov.cli.main as _m&#10;sys.argv[0] = 'gov'&#10;sys.exit(_m.main())&#10; context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/unindexed TK-W254-BIG&#10;exit code: 1 (0.1 s)&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;context&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;CONTEXT_OVER_CEILING&quot;, &quot;message&quot;: &quot;ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens&quot;, &quot;details&quot;: {&quot;ticket&quot;: &quot;TK-W254-BIG&quot;, &quot;limit&quot;: 6000, &quot;mandatory_tokens&quot;: 35890}}}&#10;&#10;stderr:">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+unindexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/unindexed')
+ticket_id = 'TK-W254-BIG'
+
+    @pytest.mark.parametrize("ticket_id", (S.TK_SMALL, S.TK_BIG))
+    def test_a_store_whose_index_is_missing_gives_one_packet_under_any_order(box, unindexed, ticket_id):
+        """No lexical index: two computations, one with the retrieval's order reversed, give one packet and one
+        hash. Passes today."""
+&gt;       first = S.packet(box, unindexed, ticket_id, "identity")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+project = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/unindexed')
+ticket_id = 'TK-W254-BIG', mode = 'identity', extra = ()
+done = &lt;w2_54_support.Run object at 0x770573bc9340&gt;
+
+    def packet(box, project, ticket_id, mode, *extra):
+        """``gov context --json`` for ``ticket_id`` with the retrieval stand-in in ``mode``; the packet."""
+        done = gov(box, "context", "--json", "--root", project, *extra, ticket_id, env=box.env(mode))
+&gt;       assert done.returncode == 0, f"gov context did not succeed\n{done.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov context did not succeed
+E       /usr/bin/python3 -c import sys
+E       import gov.cli.main as _m
+E       sys.argv[0] = 'gov'
+E       sys.exit(_m.main())
+E        context --json --root /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/unindexed TK-W254-BIG
+E       exit code: 1 (0.1 s)
+E       stdout:
+E       {"ok": false, "command": "context", "result": {}, "session": "", "error": {"code": "CONTEXT_OVER_CEILING", "message": "ticket 'TK-W254-BIG': its own text and its mandatory inputs come to 35890 tokens, over the packet's ceiling of 6000 tokens", "details": {"ticket": "TK-W254-BIG", "limit": 6000, "mandatory_tokens": 35890}}}
+E       
+E       stderr:
+
+tests/acceptance/W2-54/w2_54_support.py:421: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_the_check_is_green_when_two_computations_see_two_orders" time="0.558"><failure message="AssertionError: the check's computations did not see two orders of the retrieval's items: []&#10;assert 0 &gt;= 2&#10; +  where 0 = len(set())">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+big_only = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/big-only')
+
+    def test_the_check_is_green_when_two_computations_see_two_orders(box, big_only):
+        """*Red.* The context-reproducibility check, run as its declaration says, computes the ticket's context
+        twice; the retrieval returns its items in one order the first time and reversed the second. One packet, one
+        hash: the check is green. Today it prints ``FAIL: TK-W254-BIG: &lt;hash&gt; != &lt;hash&gt;`` and exits 1."""
+        done = S.context_check(box, big_only, "alternate")
+        calls = [call for call in box.calls() if call["ticket"] in (S.TK_BIG, None)]
+&gt;       assert len({S.canonical(call["out"]) for call in calls}) &gt;= 2, \
+            f"the check's computations did not see two orders of the retrieval's items: {calls}"
+E       AssertionError: the check's computations did not see two orders of the retrieval's items: []
+E       assert 0 &gt;= 2
+E        +  where 0 = len(set())
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:134: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket" time="0.116"><failure message="AssertionError: the check's computations did not see two different sets of items: []&#10;assert 0 &gt;= 2&#10; +  where 0 = len(set())">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+big_only = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/big-only')
+
+    def test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket(box, big_only):
+        """Failure line 1. The second computation's retrieval returns one item fewer: the items and the hash
+        differ, the check is not green and names the ticket. Passes today."""
+        done = S.context_check(box, big_only, "drop-alternate")
+&gt;       assert len({len(call["out"]) for call in box.calls()}) &gt;= 2, \
+            f"the check's computations did not see two different sets of items: {box.calls()}"
+E       AssertionError: the check's computations did not see two different sets of items: []
+E       assert 0 &gt;= 2
+E        +  where 0 = len(set())
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:143: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_dropped_order" name="test_the_check_names_only_the_ticket_whose_context_differs" time="0.155"><failure message="AssertionError: a context that differs between two computations is green&#10;  sh -c python3 -m gov.context.context_check&#10;  exit code: 0 (0.2 s)&#10;  stdout:&#10;  REFUSED: TK-W254-BIG: 35890 tokens of its own text and mandatory inputs, over the ceiling of 6000&#10;  context-reproducibility: green (1 packet(s) built twice alike, 1 refused over the ceiling twice alike)&#10;  &#10;  stderr:&#10;  &#10;assert 0 != 0&#10; +  where 0 = &lt;w2_54_support.Run object at 0x770573b73110&gt;.returncode">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+indexed = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/w2-54-box0/indexed')
+
+    def test_the_check_names_only_the_ticket_whose_context_differs(box, indexed):
+        """Failure line 1, two tickets: only the second ticket's items differ between its two computations. The
+        check is not green and names that ticket, and not the one whose context is stable. Passes today."""
+        done = S.context_check(box, indexed, "drop-alternate", target=S.TK_BIG)
+&gt;       assert done.returncode != 0, f"a context that differs between two computations is green\n{done.describe()}"
+E       AssertionError: a context that differs between two computations is green
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 0 (0.2 s)
+E         stdout:
+E         REFUSED: TK-W254-BIG: 35890 tokens of its own text and mandatory inputs, over the ceiling of 6000
+E         context-reproducibility: green (1 packet(s) built twice alike, 1 refused over the ceiling twice alike)
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = &lt;w2_54_support.Run object at 0x770573b73110&gt;.returncode
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:153: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_the_suite_runs_this_worktree_s_code" time="0.000" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_gov_check_gives_context_reproducibility_green_here" time="216.292"><failure message="AssertionError: context-reproducibility is RED here: [{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;context-reproducibility: cannot read the store or the ticket folder: .gov-runtime/store.db: no store at /home/usain/gov-os-worktrees/W2-04; load it first&quot;}]&#10;assert 'RED' == 'GREEN'&#10;  &#10;  - GREEN&#10;  + RED">gov_check_here = (&lt;w2_54_support.Run object at 0x770573b70e60&gt;, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '97846dd57aadeb5431cc306971e75d2dbaf114c3', 'inputs_hash': '0fba36dc5e97f16b'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+&gt;       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "context-reproducibility: cannot read the store or the ticket folder: .gov-runtime/store.db: no store at /home/usain/gov-os-worktrees/W2-04; load it first"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_gov_check_gives_core_schema_green_here" time="0.000" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_the_w1_43_audit_report_is_untouched" time="0.003" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_in_a_close_the_fixture_reads_the_check_result_and_starts_no_gov_check" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_outside_a_close_the_fixture_runs_gov_check_in_this_worktree" time="0.000" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_a_check_result_that_is_missing_or_broken_is_never_read_as_green" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_a_red_or_missing_check_in_the_close_s_result_still_fails_the_cases" time="0.002" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_gov_retrieve_and_gov_context_write_at_most_one_derived_file_under_the_runtime_folder" time="1.184" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_in_a_project_without_an_index_a_read_creates_nothing" time="0.252" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_no_file_of_the_project_holds_a_question_in_clear_after_it_was_asked" time="0.832" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_two_long_texts_that_differ_only_in_their_last_character_get_their_own_answers" time="0.913" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_several_processes_reading_at_once_on_a_cold_cache_get_the_one_answer_and_lose_no_entry" time="7.990" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_the_change_record_states_the_cache_s_bound_and_the_setting_that_lowers_it" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_the_cache_never_grows_past_its_bound_and_reads_at_the_bound_give_the_same_answers" time="5.575" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_text_gets_one_answer_whatever_the_cache_s_state[cold]" time="1.468" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_text_gets_one_answer_whatever_the_cache_s_state[warm]" time="1.575" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_text_gets_one_answer_whatever_the_cache_s_state[deleted]" time="1.630" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_text_gets_one_answer_whatever_the_cache_s_state[full]" time="3.467" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_text_gets_one_answer_whatever_the_cache_s_state[unwritable-folder]" time="1.690" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_text_gets_one_answer_whatever_the_cache_s_state[unwritable-file]" time="1.659" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_cache" name="test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state" time="1.661"><failure message="AssertionError: the premise: the contexts left no cache to delete&#10;assert []&#10; +  where [] = &lt;function delete_cache at 0x7705740a2a20&gt;(PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/test_one_ticket_gets_one_packe0/p'))&#10; +    where &lt;function delete_cache at 0x7705740a2a20&gt; = S.delete_cache">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+embedder = &lt;w2_54_support.EmbedderStandIn object at 0x7705717f31d0&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/test_one_ticket_gets_one_packe0')
+
+    @STAND_IN
+    def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedder, tmp_path):
+        """*Red.* ``gov context --json`` for one ticket, in a process of its own, after other tickets' contexts and
+        other questions: cold, warm, the cache deleted, ``.gov-runtime/`` read-only, the cache's files read-only, and the
+        cache full (bound lowered, 200 other texts): one packet and one hash, the one the ticket gets as the first
+        context in a new store built alike. Every run ends with exit code 0 and no traceback. Today the hash depends on
+        what was embedded before the ticket's question was first asked."""
+        files = S.ticket_files()
+        fresh = S.EmbedderStandIn()
+        try:
+            twin = S.semantic_project(box, tmp_path / "reference", fresh, files)
+            reference = S.gov(box, "context", "--json", "--root", twin, TICKET, env=S.embed_env(box, fresh))
+            assert not S.clean(reference), reference.describe()
+            reference = reference.envelope()["result"]
+        finally:
+            fresh.close()
+        assert reference[S.K_SUPPLEMENTARY], "the premise: the ticket's context holds no retrieval item"
+        project = S.semantic_project(box, tmp_path / "p", embedder, files)
+        env = S.embed_env(box, embedder)
+        runtime = project / S.RUNTIME_REL
+    
+        def context(what, ticket=TICKET, env=env):
+            done = S.gov(box, "context", "--json", "--root", project, ticket, env=env)
+            assert not S.clean(done) and done.envelope().get("ok") is True, f"{what}\n{done.describe()}"
+            return done.envelope()["result"]
+    
+        def same(what, **kwargs):
+            packet = context(what, **kwargs)
+            assert packet[S.K_HASH] == reference[S.K_HASH] and S.canonical(packet) == S.canonical(reference), (
+                f"{what}: one ticket, two packets: {packet[S.K_HASH]} != {reference[S.K_HASH]} (the first in a new store)"
+                f"\nsupplementary ids: {[item.get('id') for item in packet[S.K_SUPPLEMENTARY]]} / "
+                f"{[item.get('id') for item in reference[S.K_SUPPLEMENTARY]]}")
+    
+        context("another ticket first", ticket="TK-W254-BAKERY")
+        same("cold, after another ticket")
+        context("another ticket", ticket="TK-W254-ORCHARD")
+        same("warm, after another ticket")
+&gt;       assert S.delete_cache(project), "the premise: the contexts left no cache to delete"
+E       AssertionError: the premise: the contexts left no cache to delete
+E       assert []
+E        +  where [] = &lt;function delete_cache at 0x7705740a2a20&gt;(PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/test_one_ticket_gets_one_packe0/p'))
+E        +    where &lt;function delete_cache at 0x7705740a2a20&gt; = S.delete_cache
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:360: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_one_question_asked_again_after_others_gives_the_same_answer_across_processes" time="1.449" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_one_question_asked_again_after_others_gives_the_same_answer_within_one_process" time="0.798" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_the_retrieval_s_public_entry_gives_one_bundle_for_one_question_whatever_was_asked_before" time="1.091" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet" time="1.723" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary" time="0.699"><failure message="AssertionError: the premise: the check's contexts never reached the embedder&#10;assert 8 &gt; 8&#10; +  where 8 = len(['---\nid: CHARTER-W254-Q\ntype: charter\nstatus: ACTIVE\nstate_class: AUTHORITATIVE\n---\n\n', '# CHARTER-W254-Q\n\nT... in the forge trough at noon.\n', '# Kiln\n\nThe potter fires the glazed bowls in the brick kiln on Thursdays.\n', ...])&#10; +    where ['---\nid: CHARTER-W254-Q\ntype: charter\nstatus: ACTIVE\nstate_class: AUTHORITATIVE\n---\n\n', '# CHARTER-W254-Q\n\nT... in the forge trough at noon.\n', '# Kiln\n\nThe potter fires the glazed bowls in the brick kiln on Thursdays.\n', ...] = embedded()&#10; +      where embedded = &lt;w2_54_support.EmbedderStandIn object at 0x7705717f2300&gt;.embedded">box = &lt;w2_54_support.Box object at 0x770573c7b380&gt;
+embedder = &lt;w2_54_support.EmbedderStandIn object at 0x7705717f2300&gt;
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-3/test_the_context_check_is_gree0')
+
+    @STAND_IN
+    def test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary(
+            box, embedder, tmp_path):
+        """*Red.* The context-reproducibility check, run as its declaration says, over a project with three tickets,
+        the stand-in behind every context: green. Today it prints ``FAIL: &lt;ticket&gt;: &lt;hash&gt; != &lt;hash&gt;``."""
+        project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
+        before = len(embedder.embedded())
+        done = S.run(["sh", "-c", S.yaml.safe_load(
+            (S.REPO_ROOT / S.CONTEXT_DECLARATION_REL).read_text(encoding="utf-8"))["command"]],
+            cwd=project, env=S.embed_env(box, embedder), timeout=S.CHECK_TIMEOUT_S)
+&gt;       assert len(embedder.embedded()) &gt; before, "the premise: the check's contexts never reached the embedder"
+E       AssertionError: the premise: the check's contexts never reached the embedder
+E       assert 8 &gt; 8
+E        +  where 8 = len(['---\nid: CHARTER-W254-Q\ntype: charter\nstatus: ACTIVE\nstate_class: AUTHORITATIVE\n---\n\n', '# CHARTER-W254-Q\n\nT... in the forge trough at noon.\n', '# Kiln\n\nThe potter fires the glazed bowls in the brick kiln on Thursdays.\n', ...])
+E        +    where ['---\nid: CHARTER-W254-Q\ntype: charter\nstatus: ACTIVE\nstate_class: AUTHORITATIVE\n---\n\n', '# CHARTER-W254-Q\n\nT... in the forge trough at noon.\n', '# Kiln\n\nThe potter fires the glazed bowls in the brick kiln on Thursdays.\n', ...] = embedded()
+E        +      where embedded = &lt;w2_54_support.EmbedderStandIn object at 0x7705717f2300&gt;.embedded
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:128: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_text_that_differs_in_any_character_gets_its_own_answer[case]" time="0.834" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_text_that_differs_in_any_character_gets_its_own_answer[spacing]" time="0.876" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_text_that_differs_in_any_character_gets_its_own_answer[trailing-newline]" time="0.849" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_text_that_differs_in_any_character_gets_its_own_answer[unicode-normal-form]" time="0.879" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_stored_vector_is_not_used_under_another_revision_and_is_used_again_when_the_revision_matches" time="1.165" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it" time="1.217" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_failed_embedding_gives_no_hit_and_leaves_nothing_a_later_search_uses[fail]" time="0.750" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_a_failed_embedding_gives_no_hit_and_leaves_nothing_a_later_search_uses[short]" time="0.779" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_two_projects_do_not_share_query_vectors" time="1.434" /><testcase classname="tests.acceptance.W2-54.test_w2_54_query_vector" name="test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before" time="5.915" /><testcase classname="tests.acceptance.W2-54.test_w2_54_sandboxed_worker" name="test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written" time="6.318"><failure message="Failed: the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)&#10;gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash&#10;exit code: 0&#10;stdout:&#10;The command failed due to a missing hook file. As instructed, I'm not retrying or working around it.&#10;&#10;DONE&#10;&#10;stderr:">the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The command failed due to a missing hook file. As instructed, I'm not retrying or working around it.
+
+DONE
+
+stderr:</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_only_the_timeout_line_is_added_to_the_declaration" time="0.002" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_declaration_s_other_keys_are_unchanged" time="0.002" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_declared_limit_is_above_the_runner_s_and_bounded" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_change_record_states_the_limit_and_its_measurement" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit" time="0.031"><failure message="AssertionError: the check is not green on this repository&#10;  sh -c python3 -m gov.context.context_check&#10;  exit code: 1 (0.0 s)&#10;  stdout:&#10;  context-reproducibility: cannot read the store or the ticket folder: .gov-runtime/store.db: no store at /home/usain/gov-os-worktrees/W2-04; load it first&#10;  &#10;  stderr:&#10;  &#10;assert 1 == 0&#10; +  where 1 = &lt;w2_54_support.Run object at 0x770571795400&gt;.returncode">code_under_test = '/home/usain/gov-os-worktrees/W2-04/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds &lt; limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+&gt;       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (0.0 s)
+E         stdout:
+E         context-reproducibility: cannot read the store or the ticket folder: .gov-runtime/store.db: no store at /home/usain/gov-os-worktrees/W2-04; load it first
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = &lt;w2_54_support.Run object at 0x770571795400&gt;.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_a_check_past_its_declared_limit_is_red" time="2.083" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_same_check_within_its_limit_is_green" time="0.087" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_no_hard_block_check_is_weakened" time="0.032" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_two_checks_of_this_ticket_stay_hard_block[template/governance/kernel/checks/context-reproducibility.yaml]" time="0.001" /><testcase classname="tests.acceptance.W2-54.test_w2_54_time_limit" name="test_the_two_checks_of_this_ticket_stay_hard_block[template/governance/kernel/checks/core-schema.yaml]" time="0.001" /><testcase classname="tests.acceptance.W1-24.test_w1_24_authority" name="test_the_authority_block_holds_only_the_higher_precedence_record" time="0.716" /><testcase classname="tests.acceptance.W1-24.test_w1_24_authority" name="test_the_lower_precedence_record_is_marked_superseded" time="0.065" /><testcase classname="tests.acceptance.W1-24.test_w1_24_authority" name="test_the_full_precedence_order" time="0.059" /><testcase classname="tests.acceptance.W1-24.test_w1_24_authority" name="test_all_five_store_representable_levels_in_precedence_order" time="0.066" /><testcase classname="tests.acceptance.W1-24.test_w1_24_blocked" name="test_a_missing_mandatory_input_refuses_with_blocked" time="0.048" /><testcase classname="tests.acceptance.W1-24.test_w1_24_blocked" name="test_a_superseded_record_cannot_satisfy_a_requirement" time="0.044" /><testcase classname="tests.acceptance.W1-24.test_w1_24_blocked" name="test_conflicting_inputs_at_the_same_level_raise_a_contradiction" time="0.049" /><testcase classname="tests.acceptance.W1-24.test_w1_24_blocked" name="test_the_blocked_error_names_the_superseded_record" time="0.047" /><testcase classname="tests.acceptance.W1-24.test_w1_24_blocked" name="test_a_record_superseded_by_several_records_cannot_satisfy" time="0.052" /><testcase classname="tests.acceptance.W1-24.test_w1_24_blocked" name="test_two_active_records_at_the_same_level_without_supersession_raise_contradiction" time="0.052" /><testcase classname="tests.acceptance.W1-24.test_w1_24_brief" name="test_brief_delivers_a_file_path_and_a_summary" time="0.078" /><testcase classname="tests.acceptance.W1-24.test_w1_24_brief" name="test_the_brief_file_is_under_gov_runtime_scratch" time="0.071" /><testcase classname="tests.acceptance.W1-24.test_w1_24_brief" name="test_the_brief_summary_is_at_most_2500_tokens" time="0.068" /><testcase classname="tests.acceptance.W1-24.test_w1_24_brief" name="test_a_hostile_ticket_id_cannot_escape_the_scratch_directory" time="0.196" /><testcase classname="tests.acceptance.W1-24.test_w1_24_brief" name="test_brief_writes_nothing_outside_the_brief_file" time="0.217" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_gov_context_prints_the_api_0002_envelope" time="0.111" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_the_envelope_result_is_the_packet" time="0.090" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_a_missing_input_gives_the_blocked_error" time="0.073" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_repeated_runs_print_the_same_bytes" time="0.199" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_brief_prints_the_path_and_summary" time="0.097" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_dry_run_with_brief_computes_without_writing" time="0.083" /><testcase classname="tests.acceptance.W1-24.test_w1_24_command" name="test_budget_option_sets_the_limit" time="0.096" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_the_context_reproducibility_check_is_registered" time="0.085" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_the_check_declaration_has_the_required_fields" time="0.000" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_the_same_ticket_and_commit_give_the_same_packet_hash" time="0.143" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_the_check_command_is_runnable" time="0.000" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_the_same_hash_across_separate_processes_and_directories" time="0.500" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_all_ticket_computations_fail_is_not_green" time="0.247" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_some_ticket_computations_fail_names_each_failure" time="0.266" /><testcase classname="tests.acceptance.W1-24.test_w1_24_family_check" name="test_no_tickets_reports_unmeasured_and_is_not_green" time="0.213" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_mandatory_inputs_are_resolved_from_the_tickets_declared_ids" time="0.069" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_mandatory_inputs_are_not_ranked_by_retrieval" time="0.073" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_each_mandatory_input_lists_its_authority_tier" time="0.074" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_each_mandatory_input_lists_its_lifecycle_state" time="0.088" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_each_mandatory_input_lists_its_version_or_hash_constraint" time="0.082" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_each_mandatory_input_lists_the_reason_it_is_required" time="0.072" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_the_resolution_is_deterministic" time="0.151" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_mandatory_ids_from_depends_on_are_resolved" time="0.086" /><testcase classname="tests.acceptance.W1-24.test_w1_24_mandatory" name="test_precedence_is_not_overridden_by_retrieval_rank" time="0.086" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_packet_holds_every_mandatory_input_by_id_and_sha256" time="0.084" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_authority_block_is_first_in_the_packet" time="0.073" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_packet_stays_under_the_default_ceiling" time="0.090" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_packet_carries_its_own_hash" time="0.078" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_hash_is_stable_across_two_runs" time="0.146" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_supplementary_block_is_separate_from_the_authority_block" time="0.078" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_the_token_count_is_consistent_with_the_four_character_rule" time="0.080" /><testcase classname="tests.acceptance.W1-24.test_w1_24_packet" name="test_a_custom_budget_overrides_the_default_ceiling" time="0.071" /><testcase classname="tests.acceptance.W1-24.test_w1_24_pressure" name="test_supplementary_is_dropped_before_mandatory_inputs" time="0.092" /><testcase classname="tests.acceptance.W1-24.test_w1_24_pressure" name="test_the_packet_records_what_was_dropped" time="0.072" /><testcase classname="tests.acceptance.W1-24.test_w1_24_pressure" name="test_mandatory_inputs_are_delivered_without_the_lexical_index" time="0.233" /><testcase classname="tests.acceptance.W1-24.test_w1_24_pressure" name="test_mandatory_inputs_are_delivered_without_the_semantic_store" time="0.249" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_no_longer_stands_does_not_satisfy_and_is_named_with_its_status[RETIRED]" time="0.283" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_no_longer_stands_does_not_satisfy_and_is_named_with_its_status[REJECTED]" time="0.301" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_superseded_source_is_refused_and_named_with_its_status_as_today" time="0.267" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_stands_satisfies[ACTIVE]" time="0.271" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_stands_satisfies[ACCEPTED]" time="0.281" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_stands_satisfies[PROPOSED]" time="0.319" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_stands_satisfies[DRAFT]" time="0.294" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_stands_satisfies[DEPRECATED]" time="0.275" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_source_that_stands_satisfies[SOMETHING_ELSE]" time="0.255" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_mandatory_record_whose_file_cannot_be_read_is_refused_and_the_file_is_named[deleted]" time="0.255" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_mandatory_record_whose_file_cannot_be_read_is_refused_and_the_file_is_named[a folder in its place]" time="0.244" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_mandatory_record_whose_file_cannot_be_read_is_refused_and_the_file_is_named[no permission to read]" time="0.238" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_mandatory_record_that_is_read_has_the_hash_of_its_file" time="0.264" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_lookup_that_fails_on_a_file_it_cannot_read_says_so_and_not_that_the_index_is_unavailable" time="3.401" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_a_lookup_that_fails_on_a_damaged_index_says_that_the_index_is_unavailable" time="0.946" /><testcase classname="tests.acceptance.W1-24.test_w1_24_standing_sources" name="test_the_two_failures_give_two_packets" time="0.979" /><testcase classname="tests.acceptance.W1-24.test_w1_24_supplementary" name="test_supplementary_context_is_non_empty_with_a_built_index" time="0.752" /><testcase classname="tests.acceptance.W1-24.test_w1_24_supplementary" name="test_supplementary_is_dropped_before_mandatory_and_the_drop_is_named" time="0.144" /><testcase classname="tests.acceptance.W1-24.test_w1_24_supplementary" name="test_the_packet_indicates_supplementary_is_unavailable_when_the_index_is_down" time="0.277" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_context_of_a_ticket_that_declares_a_listed_id_is_built" time="0.790" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_packet_reports_each_listed_id_as_external_with_where_it_lives" time="0.281" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_an_external_reference_is_not_among_the_items_read_as_records" time="0.256" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_an_external_reference_adds_nothing_to_the_packets_tokens" time="0.373"><failure message="AssertionError: the external reference counts as read content: 128 tokens, 125 without&#10;assert 128 == 125">api = &lt;w1_24_support.Api object at 0x7705716fc380&gt;
+quay = &lt;function quay.&lt;locals&gt;.build at 0x7705717a1d00&gt;
+
+    def test_an_external_reference_adds_nothing_to_the_packets_tokens(api, quay):
+        """The ticket's twin declares the same records and no external reference: both packets count the same."""
+        project = quay()
+        with_it, without = _packet(api, project, TK_EXTERNAL), _packet(api, project, TK_RECORDS)
+        assert EXT in _ids(_external(with_it))
+&gt;       assert with_it[C.K_TOKENS] == without[C.K_TOKENS], \
+            f"the external reference counts as read content: {with_it[C.K_TOKENS]} tokens, {without[C.K_TOKENS]} without"
+E       AssertionError: the external reference counts as read content: 128 tokens, 125 without
+E       assert 128 == 125
+
+tests/acceptance/W1-41/test_w1_41_external_references.py:160: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_function_reports_the_same_external_reference" time="0.345" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_brief_says_that_the_external_source_was_not_read" time="0.257" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_same_project_gives_the_same_hash_twice" time="0.362" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_change_of_the_listed_entry_changes_the_packets_hash[location-the owner's archive, moved: vault/S0a/G-12.md]" time="0.564" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_change_of_the_listed_entry_changes_the_packets_hash[reason-superseded outside this repository; kept for history]" time="0.513" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_whose_declared_ids_are_all_external_is_refused[one external id]" time="0.354" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_whose_declared_ids_are_all_external_is_refused[several]" time="0.324" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external" time="0.210" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies[a dependency ticket by depends_on]" time="0.554" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies[a dependency ticket by deps]" time="0.568" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies[a record that is no ticket by depends_on (package P-14)]" time="0.556" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies[no dependency]" time="0.485" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies[by depends_on]" time="0.590" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies[by deps]" time="0.586" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_an_id_that_is_neither_a_record_nor_listed_stays_blocked" time="0.227" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_an_unlisted_id_blocks_a_ticket_that_also_declares_a_listed_one" time="0.237" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_listed_id_that_is_a_record_is_the_stores_record" time="0.248" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_listed_id_that_is_a_superseded_record_still_blocks" time="0.285" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[not valid YAML]" time="0.293" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an empty file]" time="0.239" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[a list, not a mapping]" time="0.242" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[a mapping without `references`]" time="0.283" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[`references` is a mapping, not a list]" time="0.274" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an entry that is not a mapping]" time="0.270" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an entry without an id]" time="0.276" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an entry without where it lives]" time="0.275" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an entry without its reason]" time="0.277" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an empty location]" time="0.393" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[a reason that is not text]" time="0.316" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[an id listed twice]" time="0.346" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named[another entry is broken]" time="0.330" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_cannot_be_read_blocks_and_is_named[not text]" time="0.488" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_that_cannot_be_read_blocks_and_is_named[a link to a file]" time="0.398" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_the_function_names_the_defective_file_in_its_message" time="0.255" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too[not valid YAML]" time="0.261" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too[an entry without its reason]" time="0.246" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_project_without_the_file_gives_the_packet_it_gave_before" time="0.288"><failure message="AssertionError: the packet's keys changed: ['authority', 'budget', 'dropped', 'further_batch', 'hash', 'mandatory', 'supplementary', 'supplementary_query', 'ticket', 'ticket_text', 'tokens']&#10;assert ['authority',...ndatory', ...] == ['authority',...mentary', ...]&#10;  &#10;  At index 3 diff: 'further_batch' != 'hash'&#10;  Left contains 3 more items, first extra item: 'ticket'&#10;  Use -v to get more diff">api = &lt;w1_24_support.Api object at 0x7705716fc380&gt;
+quay = &lt;function quay.&lt;locals&gt;.build at 0x7705722c6fc0&gt;
+
+    def test_a_project_without_the_file_gives_the_packet_it_gave_before(api, quay):
+        """The eight keys of W1-24's packet and no other: the key of the external references is absent where the
+        ticket declares none. Green before and after."""
+        project = quay(references=None)
+        assert not (project / support.EXTERNAL_REFERENCES_REL).exists()
+        packet = _packet(api, project, TK_RECORDS)
+&gt;       assert sorted(packet) == sorted(support.PACKET_KEYS), f"the packet's keys changed: {sorted(packet)}"
+E       AssertionError: the packet's keys changed: ['authority', 'budget', 'dropped', 'further_batch', 'hash', 'mandatory', 'supplementary', 'supplementary_query', 'ticket', 'ticket_text', 'tokens']
+E       assert ['authority',...ndatory', ...] == ['authority',...mentary', ...]
+E         
+E         At index 3 diff: 'further_batch' != 'hash'
+E         Left contains 3 more items, first extra item: 'ticket'
+E         Use -v to get more diff
+
+tests/acceptance/W1-41/test_w1_41_external_references.py:409: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_missing_id_blocks_in_a_project_without_the_file" time="0.309" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_the_ticket_names_nothing_of_leaves_its_packet_as_it_was[lists nothing]" time="0.528" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_file_the_ticket_names_nothing_of_leaves_its_packet_as_it_was[lists other ids]" time="0.501" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_listed_id_of_the_decision_registers_form_is_refused[in the named register]" time="0.253" /><testcase classname="tests.acceptance.W1-41.test_w1_41_external_references" name="test_a_listed_id_of_the_decision_registers_form_is_refused[by its form alone]" time="0.270" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_retrieve_leaves_out_superseded_and_done_entries" time="2.489" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_retrieve_says_how_many_it_left_out" time="0.236" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_retrieve_with_nothing_to_leave_out_has_no_key" time="1.453" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_lens_b_q05_serves_the_decision_in_force_and_no_superseded_one" time="1.595" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_context_leaves_out_superseded_and_done_entries_from_the_supplementary_context" time="0.221" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_context_says_how_many_it_left_out" time="0.206" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_context_with_nothing_to_leave_out_has_no_key" time="0.199" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_a_superseded_mandatory_input_still_refuses" time="0.090" /><testcase classname="tests.acceptance.W2-55.test_w2_55_left_out" name="test_a_done_entry_declared_as_a_source_is_still_read" time="0.213" /></testsuite></testsuites>

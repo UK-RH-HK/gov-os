@@ -1,0 +1,36 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_a_warm_retrieval_with_the_real_models_answers_within_the_budget _____
+
+box = <w2_13_support.Box object at 0x7d3c1a3023c0>
+real_tiers = {'A': PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-3/w2-13-real-a-dev0/a-dev'), 'B': PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-3/w2-13-real-b-dev0/b-dev')}
+
+    @pytest.mark.needs("ollama", "reranker")
+    def test_a_warm_retrieval_with_the_real_models_answers_within_the_budget(box, real_tiers):
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        roots = {programme: (root, [query["query"] for query in queries if query.get("programme") == programme])
+                 for programme, root in real_tiers.items()}
+        env = box.real_env()
+>       _within_budget(_timed(box, roots, support.FUSION, "search", [None], {"refresh": False}, env=env))
+
+tests/acceptance/W2-13/test_w2_13_latency.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+seconds = [0.36943051498383284, 0.5465996188577265, 0.32343754614703357, 0.3286092709749937, 0.49791724304668605, 0.36637548403814435, ...]
+
+    def _within_budget(seconds):
+        assert len(seconds) >= 20, f"only {len(seconds)} questions were timed"
+        slowest = [round(value, 3) for value in sorted(seconds)[-3:]]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} questions (limit " \
+            f"{support.WARM_P95_LIMIT_S} s; the three slowest: {slowest})"
+E       AssertionError: warm p95 is 0.547 s over 52 questions (limit 0.5 s; the three slowest: [0.547, 0.652, 0.905])
+E       assert 0.5465996188577265 <= 0.5
+E        +  where 0.5465996188577265 = <function p95 at 0x7d3c1a2b79c0>([0.36943051498383284, 0.5465996188577265, 0.32343754614703357, 0.3286092709749937, 0.49791724304668605, 0.36637548403814435, ...])
+E        +    where <function p95 at 0x7d3c1a2b79c0> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W2-13/test_w2_13_latency.py:56: AssertionError
+1 failed, 1 deselected in 127.95s (0:02:07)

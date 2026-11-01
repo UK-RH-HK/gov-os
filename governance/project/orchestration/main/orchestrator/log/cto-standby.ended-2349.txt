@@ -1,0 +1,1 @@
+2026-11-01 22:43:58 CTO stand-by: handover written (RESUME HERE in CHECKPOINT.md); the owner reloads VS Code for the fresh session; the fresh session ends this stand-by when it registers in log/cto-session.txt.
