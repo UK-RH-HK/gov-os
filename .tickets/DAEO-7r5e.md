@@ -29,6 +29,7 @@ kpis:
   - 'gov check on this repository: 17 of 17 families, no RED, no unexplained YELLOW [W2-H020, W2-L106, W2-L335, W2-M142, W2-L017].'
   - DEC-709 is retired by a register entry (DEC-719 item 4).
   - 'Entry criterion (DEC-971 item 3, W2-05''s R3-1): before the hooks go back on, a declared check that reads what is staged sees the staged content under `git commit -a` and `git commit -- <path>` too (git''s own index handed to it under a separate name), with a test; until then the hooks are not reinstalled [DEC-971, DEC-803]'
+  - 'The guard''s false-positive rate on the logged refusals (planted cases plus `guard-refusals.jsonl`) is reported, and is under 10 % before the hooks go back on [DEC-1014 item 2, SMART-WORK-4 line 14]'
   failure:
   - Any hook refusal is reported to the owner and never worked round.
 profile: STANDARD
