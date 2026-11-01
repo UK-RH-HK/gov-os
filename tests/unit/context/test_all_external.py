@@ -15,7 +15,8 @@ LISTED = ("references:\n"
 CHARTER = {"id": "CH-1", "type": "charter", "status": "ACTIVE", "path": "charter.md"}
 
 
-EMPTY = {"query": "", "supplementary": [], "dropped": [], "further_batch": [], "left_out": None}
+EMPTY = {"query": "", "supplementary": [], "dropped": [], "further_batch": [], "supplementary_batches": [],
+         "left_out": None}
 
 
 def _project(tmp_path, monkeypatch, declared, records=(), sources=None):

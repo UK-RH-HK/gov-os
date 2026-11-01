@@ -113,28 +113,37 @@ def _text(root: Path, item: dict, files: dict) -> str:
 
 def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), skip_entries=()) -> dict:
     """The supplementary block for ``room`` tokens: ``{"query", "supplementary", "dropped", "further_batch",
-    "left_out"}``. ``Unavailable`` where the lexical index does not answer."""
+    "supplementary_batches", "left_out"}``, each batch the ranked items it read and its limit, in the order taken.
+    ``Unavailable`` where the lexical index does not answer."""
     from gov.context import _tokens
 
     asked = query(title, kpis)
     ranked, left_out = _ranked(Path(root), terms(asked), set(skip_paths), set(skip_entries))
     files: dict[str, tuple] = {}
-    supplementary, dropped, further = [], [], []
-    taken = 0
-    while taken < len(ranked) and room > 0:
-        batch = ranked[taken:taken + min(BATCH_SIZE, room)]  # never more chunks than the room has tokens
+    supplementary, dropped, batches = [], [], []
+    taken, left_from = 0, None
+    while room > 0:
+        limit = min(BATCH_SIZE, room)  # never more chunks than the room has tokens
+        batch = ranked[taken:taken + limit]
+        batches.append({"items": [{"id": item["id"], "path": item["path"]} for item in batch], "limit": limit})
         for place, item in enumerate(batch):
             text = _text(root, item, files)
             cost = _tokens(text)
             if cost > room:
-                further = ranked[taken + place:taken + place + BATCH_SIZE]
+                left_from = taken + place
                 dropped = [{"id": left["id"], "reason": "budget exceeded"} for left in batch[place:]]
                 room = -1
                 break
             supplementary.append({"id": item["id"], "path": item["path"], "text": text, "tokens": cost})
             room -= cost
         taken += len(batch)
+        if len(batch) < limit:  # the evidence ended: this batch holds fewer items than its limit
+            break
     if room == 0 and taken < len(ranked):
-        further = ranked[taken:taken + BATCH_SIZE]
+        left_from = taken
+    # what is left is at most one batch: as long as the largest batch taken (DEC-1005, S7a)
+    width = max((batch["limit"] for batch in batches), default=BATCH_SIZE)
+    further = ranked[left_from:left_from + width] if left_from is not None else []
     return {"query": asked, "supplementary": supplementary, "dropped": dropped,
-            "further_batch": [{"id": item["id"], "path": item["path"]} for item in further], "left_out": left_out}
+            "further_batch": [{"id": item["id"], "path": item["path"]} for item in further],
+            "supplementary_batches": batches, "left_out": left_out}

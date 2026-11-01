@@ -79,19 +79,38 @@ def _supersedes_edges(root: Path) -> set:
     return {(r[0], r[1]) for r in rows}
 
 
+def _front_matter(text: str) -> dict | None:
+    """A ticket text's frontmatter; None where it has none that can be read as a mapping."""
+    import yaml
+    lines = [line.rstrip() for line in text.split("\n")]
+    try:
+        front = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)])) if lines[0] == "---" else None
+    except (ValueError, yaml.YAMLError):
+        front = None
+    return front if isinstance(front, dict) else None
+
+
 def _read_ticket(root: Path, ticket: str) -> tuple[str, str, dict]:
     """The ticket file's path, its text and its frontmatter, from the one read of it the context makes (W2-L183)."""
-    import yaml
     rel = f"{TICKETS_REL}/{ticket}.md"
     try:
         text = (root / rel).read_bytes().decode("utf-8")
-        lines = [line.rstrip() for line in text.split("\n")]
-        front = yaml.safe_load("\n".join(lines[1:lines.index("---", 1)])) if lines[0] == "---" else None
-    except (OSError, UnicodeDecodeError, ValueError, yaml.YAMLError):
-        front = None
-    if not isinstance(front, dict):
+    except (OSError, UnicodeDecodeError):
+        text = None
+    front = _front_matter(text) if text is not None else None
+    if front is None:
         raise GovError("BLOCKED", f"ticket {ticket!r} not found", {"ticket": ticket})
     return rel, text, front
+
+
+def _dependency_part(text: str) -> str:
+    """What a dependency ticket counts for: its id, its status, its title and its KPI lines, never its whole file
+    (CAP-15.b, DEC-1005); its whole text where its frontmatter cannot be read, so it is never counted as less."""
+    front = _front_matter(text)
+    if front is None:
+        return text
+    head = [f"{key}: {front.get(key, '')}" for key in ("id", "status", "title")]
+    return "\n".join(head + [f"- {line}" for line in _kpi_lines(front)]) + "\n"
 
 
 def _ticket_mandatory_ids(front: dict) -> list:
@@ -190,7 +209,7 @@ def _try_supplementary(root: Path, title: str, kpis: list, room: int, skip_paths
     except Exception as exc:
         reason = str(exc) if isinstance(exc, supplementary.Unavailable) else _lookup_failure(root, exc)
         return {"query": supplementary.query(title, kpis), "supplementary": [], "further_batch": [],
-                "dropped": [{"id": "supplementary", "reason": reason}], "left_out": None}
+                "supplementary_batches": [], "dropped": [{"id": "supplementary", "reason": reason}], "left_out": None}
 
 
 def _synthesis(root: Path) -> dict | None:
@@ -289,8 +308,11 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     # Build mandatory items sorted by precedence
     mandatory_items = []
     mandatory_tokens = _tokens(ticket_text)  # the ticket's own text is never dropped (CAP-15.d)
+    dependencies = {str(item) for field in ("deps", "depends_on") for item in (front.get(field) or [])}
     for rec in resolved:
-        sha, content = _read_record(root, rec, ticket)
+        sha, content = _read_record(root, rec, ticket)  # a dependency keeps its file's sha256 (S3)
+        if rec["id"] in dependencies and rec["path"].startswith(f"{TICKETS_REL}/"):  # a ticket's type is its own
+            content = _dependency_part(content)  # counted by its frontmatter only (CAP-15.b, DEC-1005)
         mandatory_tokens += _tokens(content)
         mandatory_items.append(_make_item(rec, sha, "declared in sources", _tokens(content)))
     mandatory_items.sort(key=lambda item: PRECEDENCE_RANK.get(item["authority"], 999))
@@ -333,6 +355,7 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
         "supplementary": supplementary,
         "supplementary_query": block["query"],
         "further_batch": block["further_batch"],
+        "supplementary_batches": block["supplementary_batches"],
         "dropped": dropped,
         "tokens": total_tokens,
         "budget": {"limit": limit, "used": total_tokens},

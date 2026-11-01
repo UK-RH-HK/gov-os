@@ -188,5 +188,76 @@ def test_the_next_batch_is_taken_while_room_is_left(monkeypatch, tmp_path):
 def test_what_is_left_for_a_further_batch_is_at_most_one_batch(monkeypatch, tmp_path):
     block = _stacked(monkeypatch, tmp_path, [1] * 30, room=3)
     assert [item["id"] for item in block["supplementary"]] == ["R-0", "R-1", "R-2"]
-    assert len(block["further_batch"]) == supplementary.BATCH_SIZE
-    assert block["further_batch"][0]["id"] == "R-3"
+    assert block["supplementary_batches"] == [{"items": [{"id": f"R-{n}", "path": f"f{n}.md"} for n in range(3)],
+                                               "limit": 3}]
+    assert [item["id"] for item in block["further_batch"]] == ["R-3", "R-4", "R-5"]  # the largest limit's length
+    block = _stacked(monkeypatch, tmp_path, [1] * 30, room=12)
+    assert len(block["further_batch"]) == supplementary.BATCH_SIZE and block["further_batch"][0]["id"] == "R-12"
+
+
+def _sequence(block):
+    return [item for batch in block["supplementary_batches"] for item in batch["items"]]
+
+
+def test_each_batch_is_named_with_the_items_it_read_and_its_limit(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 25, room=100)
+    assert [(len(batch["items"]), batch["limit"]) for batch in block["supplementary_batches"]] \
+        == [(10, 10), (10, 10), (5, 10)]
+    assert _sequence(block) == [{"id": item["id"], "path": item["path"]} for item in block["supplementary"]]
+
+
+def test_evidence_that_ends_on_a_full_batch_shows_a_last_batch_with_fewer_items(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 10, room=100)
+    assert [(len(batch["items"]), batch["limit"]) for batch in block["supplementary_batches"]] == [(10, 10), (0, 10)]
+    assert block["further_batch"] == []
+
+
+def test_the_batches_hold_the_rank_order_through_the_item_left_out(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [3, 10, 1, 1], room=5)
+    sequence = _sequence(block)
+    assert sequence[:len(block["supplementary"])] == [{"id": "R-0", "path": "f0.md"}]
+    assert sequence[len(block["supplementary"])] == block["further_batch"][0]
+    assert all(len(batch["items"]) <= batch["limit"] <= 5 for batch in block["supplementary_batches"])
+
+
+def test_the_batches_are_in_the_packet_and_its_hash(project):
+    packet = ctx.context(project, "TK-1")
+    assert [item["path"] for item in _sequence(packet)] == ["notes/a-planted.md", "notes/b-planted.md"]
+    assert packet["supplementary_batches"][0]["limit"] == supplementary.BATCH_SIZE
+    assert ctx.context(project, "TK-1")["supplementary_batches"] == packet["supplementary_batches"]
+
+
+def test_a_failed_lookup_has_no_batch_and_is_named(project):
+    _commit(project, {"notes/new.md": "# New\n"})
+    packet = ctx.context(project, "TK-1")
+    assert packet["supplementary_batches"] == [] and packet["dropped"][0]["reason"] == "the lexical index is stale"
+
+
+DEPENDENCY = ("---\nid: TK-0\ntype: task\nstatus: closed\ntitle: the dependency\nkpis:\n  success:\n"
+              "  - its one line\n---\n# TK-0\n\n")
+
+
+def _with_dependency(project, body):
+    _commit(project, {".tickets/TK-0.md": DEPENDENCY + body,
+                      ".tickets/TK-1.md": TICKET.replace("sources: [DEC-101, CAP-1]",
+                                                         "sources: [DEC-101, CAP-1]\ndeps: [TK-0]")})
+    _build(project)
+    return ctx.context(project, "TK-1")
+
+
+def test_a_dependency_counts_by_its_front_matter_and_keeps_its_file_hash(project):
+    import hashlib
+    packet = _with_dependency(project, "A short body.\n")
+    item = next(item for item in packet["mandatory"] if item["id"] == "TK-0")
+    text = (project / ".tickets/TK-0.md").read_bytes()
+    assert item["sha256"] == hashlib.sha256(text).hexdigest()
+    assert item["tokens"] == _tokens("id: TK-0\nstatus: closed\ntitle: the dependency\n- its one line\n")
+    assert packet["ticket_text"] == (project / ".tickets/TK-1.md").read_text(encoding="utf-8")
+
+
+def test_a_dependency_body_never_moves_the_tokens_nor_passes_the_ceiling(project):
+    short = _with_dependency(project, "A short body.\n")
+    large = _with_dependency(project, "word " * 40000)  # 50,000 tokens of body
+    assert large["tokens"] == short["tokens"] <= large["budget"]["limit"]
+    dep = [next(item for item in packet["mandatory"] if item["id"] == "TK-0") for packet in (short, large)]
+    assert dep[0]["tokens"] == dep[1]["tokens"] and dep[0]["sha256"] != dep[1]["sha256"]
