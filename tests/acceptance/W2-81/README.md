@@ -40,7 +40,7 @@ Measured on 2026-10-31, on a machine shared with other leads:
 | batch 4 | 183 | 28 to 66 s | 16 s |
 | batch 5 | 218 | 39 s | 16 s |
 | batch 6 | 271 | 36 s | 10 s |
-| batch 7 | 276 | see the return | see the return |
+| batch 7 | 276 | 33 s | 9 s |
 
 Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
