@@ -31,6 +31,13 @@ repository is read-only to the worker as a whole (W1-46 success 8), which is the
 credentials (``--model haiku``, one Bash call, about one to two minutes); ``bwrap``, ``socat``, ``gitleaks`` and
 ``sqlite_vec``. No network: the embedder is the stand-in inside the sandbox. The case fails, as W1-46's live cases do,
 when a prerequisite is missing. Leave it out with ``-m "not local_only"``.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90b, DEC-970, DEC-999 item 1). Since ACT 1 this repository's settings register
+their pre-tool line on ``.claude/hooks/pretooluse.py``, which W1-46's fixture project (``make_project``) does not hold,
+so in that project every tool call was refused by the line and the worker's one Bash call never ran the probe (the
+nightly of 2026-10-31: exit 0, DONE, no complete results file). The launched project is W1-46's launch fixture project
+built on a project generated from the template (W2-90's ``w1_46_project``): the session runs the kernel's wiring, as
+W1-46's live sessions do since W2-90 (``tests/acceptance/W2-90b/README.md``).
 """
 
 from __future__ import annotations
@@ -47,6 +54,9 @@ import w2_54_support as S
 
 sys.path.insert(0, str(S.REPO_ROOT / "tests/acceptance/W1-46"))
 import w1_46_support as L  # noqa: E402
+
+sys.path.insert(0, str(S.REPO_ROOT / "tests/acceptance/W2-90"))
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
 
 pytestmark = pytest.mark.local_only
 
@@ -189,8 +199,12 @@ def test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_c
     finally:
         builder.close()
     runtime_before = S.runtime_digest(read_root)
-    # The launched project: W1-46's fixture project, with W1-46's held-out stand-in.
-    project = L.make_project(tmp_path / "repo")
+    # The launched project: W1-46's fixture project on a generated project (the kernel's wiring, W2-90b), with
+    # W1-46's held-out stand-in.
+    try:
+        project = kernel_wiring.w1_46_project(tmp_path)
+    except kernel_wiring.GenerationFailed as exc:
+        pytest.fail(str(exc), pytrace=False)
     sandbox = L.cli_support.make_sandbox(tmp_path / "sandbox")
     L.w47.configure_stand_in(project, L.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
     scratch = project / SCRATCH
