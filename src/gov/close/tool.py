@@ -15,6 +15,7 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.close import state as _state
 from gov.close.repo import git as _git
+from gov.util.gitenv import git_env
 
 TOOL_NAME = "tk"
 NOT_OPENED = "not opened"  # how the answer begins where the tool opened no repair ticket
@@ -50,7 +51,7 @@ def tk(root: Path, *args: str) -> str:
     try:
         done = subprocess.run(
             [str(tool), *args], capture_output=True, text=True, cwd=str(root),
-            env={**os.environ, "TICKETS_DIR": str(Path(root) / TICKETS_REL)})
+            env={**git_env(root), "TICKETS_DIR": str(Path(root) / TICKETS_REL)})
     except OSError as e:
         raise GovError("TICKET_TOOL_FAILED", f"tk {args[0]} cannot run: {e}",
                         {"command": args[0], "tool": str(tool)})
@@ -150,12 +151,12 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
 def _commit_alone(root: Path, rel: str, repair_id: str, ticket: str) -> None:
     """Commit the repair ticket and nothing else, as the orchestrator's record (AR-9, W2-L209): it stays tracked,
     no worker's later commit carries it in (DEC-390), and the tree of the next close is its commit."""
-    named = _git(root, "config", "user.email", ok=(0, 1), code=True) == 0
+    named = _git(root, "config", "user.email", ok=(0, 1), code=True, pinned=False) == 0
     identity = [] if named else ["-c", "user.name=gov", "-c", "user.email=gov@localhost"]
-    _git(root, "add", "--", rel)
+    _git(root, "add", "--", rel, pinned=False)
     _git(root, *identity, "commit", "-q", "-m", f"Repair ticket {repair_id} of the refused close of {ticket}",
          "--trailer", f"Task: {repair_id}", "--trailer", "Role: orchestrator", "--trailer", "Implements: AR-9",
-         "--", rel)
+         "--", rel, pinned=False)
 
 
 FINGERPRINT_KEY = "repair_of_findings"

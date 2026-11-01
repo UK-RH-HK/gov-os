@@ -31,6 +31,7 @@ import subprocess
 from pathlib import Path
 
 from gov.cli.errors import GovError
+from gov.util.gitenv import git_env
 
 STORE_REL = ".gov-runtime/store.db"
 EDGE_TYPES = ("EVIDENCE_FOR", "CONSTRAINS", "IMPLEMENTS", "TESTS", "GENERATES", "VALIDATES", "SUPERSEDES",
@@ -72,7 +73,8 @@ REBUILD, RECORDS = "rebuild", "records"
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> bytes:
     try:
-        return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True, check=True).stdout
+        return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True, check=True,
+                              env=git_env(root, pinned=True)).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         reason = " ".join(getattr(exc, "stderr", b"").decode("utf-8", "replace").split()) or str(exc)
         raise GovError("STORE_GIT_FAILED", f"git {args[0]} failed in {root}: {reason}", {"root": str(root)}) from None
