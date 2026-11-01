@@ -12584,3 +12584,20 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.386 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1004 (SMART-WORK-2 approved). Next free id: DEC-1005. |
+
+### DEC-1005 — W2-04's P-W2-04-2 (A) and P-W2-04-3 (b); W2-81's round 3 for review 4's F1 and F2 (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: P2s within the approved KPIs, reversible; older tests revised under an approved KPI, DEC-957's rubric; confidence medium-high) · **Under:** DEC-916, DEC-997, CAP-15, DEC-860, DEC-957
+- **Decision:** (1) P-W2-04-2 (A): W2-04's test designer revises W2-54's 17 cases and W1-41's 2 to W2-04's KPIs 2 and 4 (Rewrite-Reason, nothing lowered); the engineer adds `supplementary_batches`. (2) P-W2-04-3 (b): a dependency ticket counts by its front matter (CAP-15.b). W2-04's four needed tickets go to the owner as P1s (DEC-974). (3) W2-81: round 3 declared before it starts (one review): F1 (a test helper made a folder inside the repository) and F2 (a typo in a hidden forbidden citation dropped silently) fixed by its designer; F3 an entry criterion of the findings capability's ticket; the reviews converge, so no owner exception (DEC-096 not met).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.387 | 2026-11-01 | Orchestrator (delegated): DEC-1005. Next free id: DEC-1006. |
+
+
+### DEC-1006 — W2-92's P-W2-92-1 to 4 (a) (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: P2s within the approved KPIs; the lead's recommendations; confidence medium to high) · **Under:** DEC-957, DEC-833, DEC-860, DEC-802
+- **Decision:** P-1 (a): W2-92's `retrieve.py` scope widens to the record-graph read (a missing record store named for its route). P-2 (a): its test designer sets f1's expected set to the lexical evidence (Rewrite-Reason). P-3 (a): a plain word joins the code route only with a code cue in the question. P-4 (a): with P-3, one tool session reused per process, context reproducibility well under its 600 s limit; the limit is never raised.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.388 | 2026-11-01 | Orchestrator (delegated): DEC-1006. Next free id: DEC-1007. |
