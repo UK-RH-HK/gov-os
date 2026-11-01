@@ -1,6 +1,6 @@
 ---
 id: DAEO-blwa
-status: open
+status: in_progress
 deps: []
 links: [DAEO-f58b, DAEO-r30l]
 created: 2026-11-01T21:35:00Z
