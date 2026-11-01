@@ -12520,3 +12520,17 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.380 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-998 (Claude-only dead-man's switch; Remote Control and a test push at every CTO session start). Next free id: DEC-999. |
+
+### DEC-999 — Speed: W2-90b split from W2-105 and ACT 2; ten leads; batched landings; the queue's waits cut (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-979 (order), DEC-847 and DEC-942 (no fixed number of leads), DEC-988, DEC-989 · **Changes:** W2-90b's dependency on W2-105
+- **Decision:**
+  1. **W2-90b is split so it does not wait for ACT 2:** every case that does not depend on W2-105 or W2-110 is fixed now (W1-33's four, W2-54's one, and any other that only needs its fixtures to carry the new hook file); only the cases that truly need W2-105 or W2-110 wait for them, in W2-90c (`DAEO-fu3n`, filed). W2-105 and W2-90b go to the front.
+  2. **Start every ready ticket now, up to the machine's capacity, aiming for 10 leads running;** for every ready ticket not started, the CTO tells the owner why (dependency, file overlap, ordering rule).
+  3. **Close in batches:** every ticket ready to land goes into the queue together, not one or two at a time.
+  4. The CTO reports what makes the queue wait and the quickest safe way to cut it.
+- **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; W2-90b's and W2-90c's ticket files and WBS rows.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.381 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-999 (W2-90b split, W2-90c filed; ten leads; batched landings; the queue's waits). Next free id: DEC-1000. |
+
