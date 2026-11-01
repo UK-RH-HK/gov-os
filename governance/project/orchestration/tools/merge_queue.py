@@ -30,6 +30,7 @@ from pathlib import Path
 ORCH_TOOLS = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools")
 WORK = Path.home() / "gov-os-runs/W2-00/merge-queue"
 REBUILD_LOCK = "/tmp/gov-os-rebuild.lock"
+SLOT = ORCH_TOOLS / "verify_lock.sh"  # a heavy-job slot (DEC-979 D1, DEC-983): waits for one, exits with the run's code
 NODE = "/home/usain/.nvm/versions/node/v22.23.3/bin"
 MAP_REL = "governance/project/test-map.yaml"
 GOVERNANCE = [  # select_tests.py's governance paths, left out of the skip's comparison (DEC-953 item 4a)
@@ -387,7 +388,8 @@ class Queue:
             except subprocess.TimeoutExpired:
                 return 1, []
         common += ["-p", "gov_close_serial_only", "-rs"]
-        par = sh([sys.executable, "-m", "pytest", *args, "-n", "auto", *common, f"--junitxml={junit}"], cwd=where, env=env)
+        par = sh(["bash", str(SLOT), sys.executable, "-m", "pytest", *args, "-n", "auto", *common, f"--junitxml={junit}"],
+                 cwd=where, env=env)
         (self.log / f"run-{self.n}.txt").write_text(par.stdout[-20000:] + par.stderr[-5000:], encoding="utf-8")
         listing = sh([sys.executable, "-c", "import json, sys; from pathlib import Path; from gov.close.pytest_plugin."
                       "gov_close_serial_only import entries; from gov.close.serial import phase; r = Path(sys.argv[1]); "
@@ -400,7 +402,7 @@ class Queue:
         if not serial:
             return par.returncode, [junit]
         sjunit = junit.with_name(junit.stem + "-serial.xml")
-        ser = sh([sys.executable, "-m", "pytest", *serial, *common, f"--junitxml={sjunit}"], cwd=where,
+        ser = sh(["bash", str(SLOT), sys.executable, "-m", "pytest", *serial, *common, f"--junitxml={sjunit}"], cwd=where,
                  env=dict(env, GOV_CLOSE_SERIAL_ONLY_GIVEN="\n".join(serial)))
         if par.returncode not in (0, 1) or ser.returncode not in (0, 1, 5):
             return 2, [junit, sjunit]
@@ -417,8 +419,13 @@ class Queue:
             sel = json.loads(r.stdout) if r.returncode == 0 else None
         except ValueError:
             sel = None
-        if not isinstance(sel, dict) or sel.get("scope") == "refused" or not isinstance(sel.get("selected"), list):
+        if not isinstance(sel, dict):
             raise Stop(f"the selection for {e['ticket']} cannot be made (exit {r.returncode})")
+        if sel.get("scope") != "scoped":  # DEC-968, DEC-983: only a scoped selection runs here
+            raise Stop(f"the selection for {e['ticket']} answered scope {sel.get('scope')!r}, not 'scoped'"
+                       + ("; the full suite runs only in the nightly" if sel.get("scope") == "full" else ""))
+        if not isinstance(sel.get("selected"), list):
+            raise Stop(f"the selection for {e['ticket']} names no list of targets")
         return sel
 
     # -- the steps

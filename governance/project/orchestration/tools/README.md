@@ -59,7 +59,10 @@ commit that brings another ticket's commits, or a candidate that cannot be isola
    out the governance paths (`select_tests.py`'s: briefs, prompts, the orchestration record, `.gov-runtime/`, and the
    test map's `record_only` places). The record's `skipped` says why, naming that commit and the paths left out.
 3. **Otherwise one run:** the prepare command, each ticket's selection on its own merge, then the tests once on the
-   union of the selected targets (one ticket's `pytest_options` added). No full run (DEC-968).
+   union of the selected targets (one ticket's `pytest_options` added). **No full run:** the full suite runs only in
+   the nightly (DEC-968, DEC-983); a selection whose `scope` is not `scoped` (`full`, `refused`, anything else) is
+   never run, and the run stops (exit 4). **No test lock** (DEC-962 ended it): the default run's two test commands
+   each take one of the machine's heavy-job slots (DEC-979 D1, below); the queue's own `run.lock` keeps one writer.
 4. **Green:** the head is read again. If it moved, the same commits are merged onto the new head and tested again (3
    attempts, then exit 4). If not, the branch is fast-forwarded to the tested merge: `merge --ff-only` in the worktree
    that has it checked out, else the ref is moved only if it still holds the old head.
@@ -70,8 +73,9 @@ commit that brings another ticket's commits, or a candidate that cannot be isola
    built without it and each red re-run alone `--rounds` times; green in every round means it explains the red. A test
    a ticket added is blamed on it only if red, every round, with that ticket alone merged. **Only the culprits are
    ejected;** the rest are merged again and get a run of their own. **Fail closed:** see the ejection reasons above.
-7. **A step that cannot be done** (the clone, the prepare command, the selection, a run that did not complete, the
-   branch that cannot be moved): nothing advances, nothing is ejected for it, the entries stay approved.
+7. **A step that cannot be done** (the clone, the prepare command, the selection, or a selection that is not
+   `scoped`, a run that did not complete, the branch that cannot be moved): nothing advances, nothing is ejected for
+   it, the entries stay approved.
 
 ### The record the close cites
 
@@ -87,10 +91,15 @@ code. Fields: `head` (the new integration head, full id), `base` (the head befor
   targets (or one test id for an alone re-run) appended. Exit 0 green; 1 red, failures named in the JUnit file; any
   other exit, or a missing or unreadable JUnit file, is a run that did not complete. **Default:** the close's form,
   one parallel run (`-n auto`, the serial-only plugin, `-o tmp_path_retention_policy=failed`), then the selected
-  serial-only cases, with the checkout's own `src` on `PYTHONPATH`.
+  serial-only cases, with the checkout's own `src` on `PYTHONPATH`. Each of those two commands goes through a
+  heavy-job slot: `bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/verify_lock.sh
+  <the command>`, which waits for a slot, caps `-n auto` for it and exits with the command's own code (a missing
+  wrapper is a run that did not complete). The single-process alone re-runs and traces take no slot. A stand-in
+  replaces the whole run command, slot included, and is run as given.
 - `--select-cmd "<cmd>"`: run in the merged checkout with `<checkout> <ticket> <task> --merge <merge commit>`
-  appended; prints `select_tests.py`'s JSON. A non-zero exit, a `refused` scope or output that is not that JSON: the
-  selection cannot be made. **Default:** `select_tests.py` (DEC-953 item 4) with the checkout's `src` on `PYTHONPATH`.
+  appended; prints `select_tests.py`'s JSON. A non-zero exit or output that is not that JSON: the selection cannot be
+  made. A `scope` other than `scoped` (`full`: the full suite runs only in the nightly): it is not run. Either way
+  exit 4. **Default:** `select_tests.py` (DEC-953 item 4) with the checkout's `src` on `PYTHONPATH`.
 - `--prepare-cmd "<cmd>"`: run in the merged checkout before the selection. **Default:** the store rebuild,
   `flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json`.
 

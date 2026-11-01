@@ -225,7 +225,8 @@ SELECT = ("import json, pathlib, sys\n"
           "    f.write(json.dumps(sys.argv[1:]) + '\\n')\n"
           "if pathlib.Path(sys.argv[0]).with_suffix('.refuse').exists():\n"
           "    print(json.dumps({'scope': 'refused'})); sys.exit(2)\n"
-          "print(json.dumps({'scope': 'scoped', 'selected': [{'target': 'tests'}], 'pytest_options': [],\n"
+          "full = pathlib.Path(sys.argv[0]).with_suffix('.full').exists()\n"
+          "print(json.dumps({'scope': 'full' if full else 'scoped', 'selected': [{'target': 'tests'}], 'pytest_options': [],\n"
           "                  'core_changed': [], 'unplaced': []}))\n")
 PYTEST = f"{sys.executable} -m pytest -q -p no:cacheprovider"
 
@@ -474,14 +475,46 @@ def test_another_run_holding_the_lock_exits_4_at_once(w):
     assert r.returncode == 4 and "lock" in r.stderr and (w.q / "approved/A.json").is_file()
 
 
-@pytest.mark.parametrize("why", ["selection refused", "run did not complete", "red without a JUnit file"])
+@pytest.mark.parametrize("why", ["selection refused", "selection full", "run did not complete",
+                                 "red without a JUnit file"])
 def test_a_step_that_cannot_be_done_keeps_everything(w, why):
     enter(w, "A", ticket(w, "A", {"tests/test_a.py": "def test_a():\n    pass\n"}))
     if why == "selection refused":
         w.sel.with_suffix(".refuse").write_text("")
+    if why == "selection full":  # DEC-968, DEC-983: never run here, whatever it names
+        w.sel.with_suffix(".full").write_text("")
+    ran = w.tmp / "ran"
     cmd = {"selection refused": PYTEST, "run did not complete": f"{sys.executable} -c 'raise SystemExit(3)'",
+           "selection full": f"{sys.executable} -c 'import pathlib; pathlib.Path(r\"{ran}\").write_text(\"x\")'",
            "red without a JUnit file": "false"}[why]
     old = head(w)
     r = run(w, test_cmd=cmd)
     assert r.returncode == 4 and "stopped" in r.stderr and head(w) == old
     assert (w.q / "approved/A.json").is_file() and not (w.q / "ejected").exists()
+    if why == "selection full":
+        assert "nightly" in r.stderr and not ran.exists()
+
+
+def test_the_default_run_takes_a_heavy_slot_and_the_alone_reruns_do_not(tmp_path, monkeypatch):
+    """DEC-979 D1, DEC-983: the parallel run and the serial-only cases go through verify_lock.sh; an alone re-run
+    runs freely. A recording sh: no slot is taken and no suite runs."""
+    calls = []
+
+    def recorded(cmd, **kw):
+        calls.append(cmd)
+        out = json.dumps(["tests/test_s.py::test_serial"]) if cmd[1:2] == ["-c"] else ""
+        return subprocess.CompletedProcess(cmd, 0, out, "")
+
+    a = SimpleNamespace(repo=str(tmp_path), integration="w2/integrate", rounds=3, test_cmd=None)
+    q = mq.Queue(a, tmp_path)
+    q.log = q.work = tmp_path
+    monkeypatch.setattr(mq, "sh", recorded)
+    assert q.tests(tmp_path, "run", ["tests"])[0] == 0
+    assert q.tests(tmp_path, "alone", ["tests/test_s.py::test_serial"])[0] == 0
+    slot = ["bash", "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/verify_lock.sh",
+            sys.executable, "-m", "pytest"]
+    parallel, listing, serial, alone = calls
+    assert parallel[:5] == slot and parallel[parallel.index("-n") + 1] == "auto" and "tests" in parallel
+    assert listing[:2] == [sys.executable, "-c"]
+    assert serial[:5] == slot and "tests/test_s.py::test_serial" in serial and "-n" not in serial
+    assert alone[:3] == [sys.executable, "-m", "pytest"] and "bash" not in alone
