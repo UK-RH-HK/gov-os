@@ -2,7 +2,12 @@
 
 Two rebuilds from the same commit give the same digest. Needs only git.
 
-``--no-embeddings`` (DEC-530) builds everything but the semantic vectors; a full rebuild is the default.
+``--no-embeddings`` (DEC-530) builds everything but the semantic vectors; a full rebuild is the default. A full
+rebuild whose semantic store is not recreated (the endpoint unavailable, hung or failing part way) fails with
+``REBUILD_FAILED``: never an ok answer over a partial store (DEC-1015 item 4).
+
+``--seed [FOLDER]`` (W2-122) seeds the stores from a warm base before the stages, so only what differs from it is
+built again (``gov.rebuild.seed``); every full rebuild leaves the record that makes its tree such a base.
 
 Every rebuild takes the machine's rebuild lock, times each stage and is watched past its threshold (W2-76,
 ``gov.rebuild.watch``).
@@ -68,10 +73,16 @@ def _compact(root: Path, rels) -> dict:
 
 
 def add_arguments(parser) -> None:
+    from gov.rebuild.seed import CONFIGURED
+
     parser.add_argument(NO_EMBEDDINGS, action="store_true",
                         help="rebuild everything but the semantic vectors: the embedding endpoint is not asked "
                              "(for closes and checks that need only the record store and the lexical and code "
                              "indexes); without it the rebuild is full")
+    parser.add_argument("--seed", nargs="?", const=CONFIGURED, default=None, metavar="FOLDER",
+                        help="first copy the stores of the warm base at FOLDER (default: integration_store in "
+                             "governance/project/rebuild.yaml), where its record matches this build's code, embedder "
+                             "and schema; then rebuild only what differs from it")
 
 
 def run(root: Path, args, config: dict) -> dict:
@@ -97,12 +108,21 @@ def run(root: Path, args, config: dict) -> dict:
 
 def _build(root: Path, args, config: dict, watch) -> dict:
     from gov.cli.errors import GovError
+    from gov.rebuild import seed
     from gov.retrieval import lexical
     from gov.retrieval.lexical import refresh as lexical_refresh
     from gov.secrets import scan_counts
     from gov.store import load as store_load
 
     has_path_map = "path-map.yaml" in config
+    embeddings = not getattr(args, "no_embeddings", False)
+
+    # The tree is no warm base while it is rebuilt: its record is written again only once its stores are complete.
+    seed.forget(root)
+    seeded = None
+    if getattr(args, "seed", None) is not None:
+        with watch.stage("seed"):
+            seeded = seed.seed(root, args.seed, embeddings)
 
     with watch.stage("record"):
         try:
@@ -140,7 +160,8 @@ def _build(root: Path, args, config: dict, watch) -> dict:
             "reason": "no path map: nothing is classified as indexable",
         }
 
-    if getattr(args, "no_embeddings", False):
+    note = none_embedded(config)
+    if not embeddings:
         # Not asked for (DEC-530): the embedding endpoint is not asked and its program is not started.
         watch.skip("semantic")
         stores["semantic"] = {
@@ -154,16 +175,17 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                 from gov.retrieval.semantic import refresh as semantic_refresh
 
                 sem = semantic_refresh(root)
-                if sem.get("available"):
-                    stores["semantic"] = {"status": "recreated"}
-                else:
-                    stores["semantic"] = {
-                        "status": "not_recreated",
-                        "reason": sem.get("reason", "unknown"),
-                    }
+                reason = None if sem.get("available") else sem.get("reason") or "unknown"
             except Exception as exc:
-                stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
-    note = none_embedded(config)
+                reason = getattr(exc, "message", None) or str(exc)
+        if reason is not None:
+            # Asked for and not recreated: a failed rebuild, never an ok answer over a partial store (DEC-1015 item 4).
+            raise GovError(
+                "REBUILD_FAILED",
+                f"rebuild failed on the semantic store: {reason}",
+                {"store": "semantic", "reason": reason, **({"embedding": note} if note else {})},
+            )
+        stores["semantic"] = {"status": "recreated"}
     if note:
         stores["semantic"]["embedding"] = note
     from gov.retrieval.semantic import QUERY_VECTORS_REL
@@ -203,10 +225,23 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                                                     for path in tool_home.rglob("*") if path.is_file())
                                    if tool_home.is_dir() else ())
 
+    if embeddings:  # complete: the tree is a warm base for the embedder its semantic store records
+        import sqlite3
+        import sys
+
+        from gov.retrieval.semantic import manifest
+
+        try:
+            built_by = manifest(root)
+            if built_by is not None:
+                seed.remember(root, built_by["embedder"])
+        except (OSError, sqlite3.Error) as exc:  # the stores stand; the tree is only no warm base
+            print(f"rebuild: {seed.RECORD_REL} not written, so this tree is no warm base: {exc}", file=sys.stderr)
+
     return {
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
         "compaction": compaction,
         "secrets_counts": secrets_counts,
-    }
+    } | ({} if seeded is None else {"seed": seeded})
