@@ -153,6 +153,8 @@ def test_a_base_that_differs_is_refused_named_and_the_rebuild_runs_cold(base, tr
         record_path.write_text(json.dumps(record))
     result = run(tree, _args("--seed", str(base)), CONFIG)
     assert result["seed"]["status"] == "refused" and words in result["seed"]["reason"]
+    if field is None:
+        assert str(base) in result["seed"]["reason"]
     assert len(endpoint["sent"]) == CHUNKS  # every chunk embedded: nothing of the base was used
     assert not (tree / ".gov-runtime" / "rebuild" / "seed.tmp").exists()
 
@@ -178,10 +180,20 @@ def test_the_configured_base_is_read_and_a_project_without_one_rebuilds_cold(bas
     settings.write_text(f"integration_store: {tmp_path / 'nowhere'}\n")
     answer = run(tree, _args("--seed"), CONFIG)["seed"]
     assert answer["status"] == "none" and "no warm base" in answer["reason"]
+    assert str(tmp_path / "nowhere") in answer["reason"]  # the configured path, named
     settings.write_text(f"integration_store: {base}\n")
     assert run(tree, _args("--seed"), CONFIG)["seed"]["status"] == "seeded"
     settings.write_text(f"integration_store: {tree}\n")
-    assert run(tree, _args("--seed"), CONFIG)["seed"]["status"] == "none"  # itself: nothing to seed from
+    answer = run(tree, _args("--seed"), CONFIG)["seed"]
+    assert answer["status"] == "none" and str(tree) in answer["reason"]  # itself: nothing to seed from
+
+
+def test_a_folder_given_that_holds_no_base_is_named_as_given_and_as_resolved(tree, endpoint, tmp_path):
+    (tmp_path / "empty").mkdir()
+    (tmp_path / "link").symlink_to(tmp_path / "empty")
+    answer = run(tree, _args("--seed", str(tmp_path / "link")), CONFIG)["seed"]
+    assert answer["status"] == "none" and answer["base"] == str((tmp_path / "empty").resolve())
+    assert str(tmp_path / "link") in answer["reason"] and answer["base"] in answer["reason"]
 
 
 def test_a_seed_without_embeddings_keeps_no_vector_and_asks_no_endpoint(base, tree, endpoint, monkeypatch):

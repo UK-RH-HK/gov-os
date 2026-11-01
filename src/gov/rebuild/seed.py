@@ -176,13 +176,14 @@ def seed(root: Path, given: str, embeddings: bool) -> dict:
         if answer:
             return answer
     base = Path(given).resolve()  # the link followed once; only the resolved path is read from here on
+    named = given if Path(given) == base else f"{given} (resolved to {base})"
     if base == root.resolve():
-        return _answer(NONE, base, "the base is this tree itself")
+        return _answer(NONE, base, f"the base {named} is this tree itself")
     if not (base / STORE_REL).is_file():
-        return _answer(NONE, base, f"no warm base there: it holds no {STORE_REL}")
+        return _answer(NONE, base, f"no warm base at {named}: it holds no {STORE_REL}")
     record = _read(base / RECORD_REL)
     if record is None:
-        return _answer(REFUSED, base, f"the base has no readable record of its stores ({RECORD_REL})")
+        return _answer(REFUSED, base, f"the base {named} has no readable record of its stores ({RECORD_REL})")
     said = _differences(record, embeddings)
     if said:
         return _answer(REFUSED, base, "; ".join(said))
