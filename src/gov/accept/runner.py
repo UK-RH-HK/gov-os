@@ -160,7 +160,58 @@ def _kill(process: subprocess.Popen) -> None:
     process.wait()
 
 
-FOLDER = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+PR_SET_CHILD_SUBREAPER, PR_GET_CHILD_SUBREAPER = 36, 37
+REAP_SECONDS = 5.0  # the bound on stopping and reaping the run's processes, after which the clean-up goes on
+
+
+def _subreaper(on: int) -> int | None:
+    """Make ``gov`` the reaper of its descendants' orphans, or not (Linux); the setting it had, None where it cannot."""
+    if not sys.platform.startswith("linux"):
+        return None
+    try:
+        import ctypes
+        libc, was = ctypes.CDLL(None, use_errno=True), ctypes.c_int()
+        if libc.prctl(PR_GET_CHILD_SUBREAPER, ctypes.byref(was), 0, 0, 0) or libc.prctl(
+                PR_SET_CHILD_SUBREAPER, on, 0, 0, 0):
+            return None
+        return was.value
+    except Exception:
+        return None
+
+
+def _children(pid: int) -> set[int]:
+    """The process's children, from the kernel (each of its threads' own); empty where it cannot read them."""
+    found: set[int] = set()
+    try:
+        for task in os.listdir(f"/proc/{pid}/task"):
+            with open(f"/proc/{pid}/task/{task}/children") as file:
+                found.update(int(child) for child in file.read().split())
+    except (OSError, ValueError):
+        pass
+    return found
+
+
+def _reap(before: set[int]) -> None:
+    """Stop and reap every process the run started, whatever its session: ``gov``'s children that were not there
+    before the run. Only its own children are signalled, by a pid it alone can free, so no other process is ever
+    hit; as each one ends, its own children come to ``gov`` (the subreaper) and are stopped in turn. It repeats
+    until no such child is left, or the bound; it never raises.
+    """
+    deadline = time.monotonic() + REAP_SECONDS
+    while time.monotonic() < deadline:
+        mine = _children(os.getpid()) - before
+        if not mine:
+            return
+        for pid in mine:
+            try:
+                os.kill(pid, signal.SIGKILL)
+                os.waitpid(pid, os.WNOHANG)
+            except OSError:
+                pass
+        time.sleep(0.002)
+
+
+FOLDER =os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
 PASSES = 20  # removal passes before whatever error remains is passed over
 
 
@@ -260,7 +311,8 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
 
     SIGINT, SIGTERM and SIGHUP stop the run; one that arrives before the private folder is in the try's hands, or
     during the clean-up, is held back and acted on once the clean-up is done. A signal the caller set to be
-    ignored stays ignored.
+    ignored stays ignored. Before the folder is removed, every process the run started, in whatever session, is
+    stopped and reaped (on Linux, through the subreaper; elsewhere only the child's process group is stopped).
     """
     stops = [signum for signum in STOPS if signal.getsignal(signum) is not signal.SIG_IGN]
     held: list[int] = []
@@ -269,7 +321,7 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
         held.append(signum)
 
     previous = {signum: signal.signal(signum, hold) for signum in stops}
-    private = process = stopped = None
+    private = process = stopped = subreaper = None
     try:
         private = Path(tempfile.mkdtemp(prefix="gov-accept-"))
         for signum in stops:
@@ -283,6 +335,7 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
         command = [sys.executable, "-B", "-m", "pytest", str(folder), f"--rootdir={root}", "-p", "no:cacheprovider",
                    f"--junitxml={report}", "-o", "junit_family=xunit1", "-o", "junit_logging=no",
                    "-o", "junit_log_passing_tests=false", f"--log-file={os.devnull}"]
+        before, subreaper = _children(os.getpid()), _subreaper(1)  # an orphan of the run comes to gov, not to init
         process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL, start_new_session=True)
         try:
@@ -307,7 +360,12 @@ def _run(root: Path, folder: Path, timeout: float) -> tuple[str | None, list[Cas
             signal.signal(signum, hold)  # a signal during the clean-up is held back, never cuts it short
         try:
             if process is not None:
-                _kill(process)
+                _kill(process)  # the child's own status is taken here, before any reaping
+            if subreaper is not None:  # every process of the run, whatever its session, ends before the removal
+                try:
+                    _reap(before)
+                finally:
+                    _subreaper(subreaper)
             if private is not None:
                 _remove(str(private))
         finally:
