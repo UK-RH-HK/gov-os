@@ -11,6 +11,25 @@ Ported from ``cli/govbridge/lexical/fts.py`` (the FTS5 table, its tokenizer and 
 - ``search(..., refresh=False)``, ``freshness``, ``digest``, ``chunks`` and ``parent`` open the store read-only
   and never write (DEC-322). A missing, empty or stale index makes the facet unavailable (DEC-342).
 
+The ranked route (W2-13; DEC-725, Lens G's R8). Each chunk's FTS5 row has three columns, ranked by FTS5's own
+``bm25()`` with the weights ``WEIGHTS``: ``text``, the body; ``ident``, the ids its document is known by (the
+frontmatter's ``id``, the id that leads the document's first heading and the one that leads its section's heading);
+``title``, its path, its document's first heading and the first line of its parent (a section's heading, a
+function's ``def`` line). ``search`` gives two lists:
+
+- ``hits``, the exact route (CAP-11): every line that holds the exact string, case and all, with its file and line.
+  FTS5 finds the chunks that hold the question's tokens as a phrase, and the lines are then matched exactly, so a
+  string that starts or ends inside a token is matched only where it is a whole token: the choice of W2-M072 and
+  W2-M100 is whole tokens. The hits come in the BM25 order of their chunks, then by line.
+- ``ranked``, the chunks for the fusion, best first: the exact route's chunks first (the boost, so an exact
+  identifier ranks first), then at most ``TOP_K`` more chunks that match the question's words (W2-M292). A word is
+  matched as a whole token, case-folded and Porter-stemmed (the tokenizer's); an id in the question is matched as
+  its tokens in a row; the words of ``STOPWORDS`` are not asked. Each chunk carries its ``bm25`` (lower is better).
+
+A store whose ``lexical_fts`` lacks these columns (built before W2-13) is stale: ``search(refresh=False)`` reports it
+unavailable, and a refresh drops the old index and builds it again. ``search`` never raises: an unreadable store or
+a failed ``git`` is the facet unavailable with the reason ``unreadable`` (W2-M071).
+
 ``python3 -m gov.retrieval.lexical`` in a project root is the index-freshness check: exit 0 when the index is fresh.
 """
 
@@ -18,6 +37,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import sqlite3
 import subprocess
 import sys
@@ -37,6 +57,18 @@ TOKENIZE = "porter unicode61 tokenchars '_'"
 # What the filter's verdict on a file depends on besides the file: when one changes, every file is judged again.
 JUDGES = (f"{PROJECT_DIR}/path-map.yaml", CONFIG_REL)
 FIELD_SEP, ROW_SEP = "\x1f", "\x1e"
+COLUMNS = ("text", "ident", "title")
+WEIGHTS = (1.0, 10.0, 4.0)  # bm25's weight of each of COLUMNS: body, id, title
+TOP_K = 30  # the chunks the words add to the ranked list, as many as the semantic route returns
+MAX_TERMS = 32  # the question's words and ids asked of the index, at most
+# An id: capitals and digits, then one or more '-' parts, with a digit somewhere (DEC-900, W2-13, RETR-X-02, W2-M071).
+ID_SHAPE = re.compile(r"\b[A-Z][A-Z0-9]*(?:-[A-Za-z0-9]+)+\b")
+_HEADING = re.compile(r"#{1,6}\s")
+_FRONT_ID = re.compile(r"^id:[ \t]*['\"]?([^\s'\"]+)", re.MULTILINE)
+STOPWORDS = frozenset(
+    "a about all an and any are as at be been but by can could did do does doing for from had has have how i if in "
+    "into is it its me my no not of on or our so than that the their them then there these they this those to was we "
+    "were what when where which while who whom why will with would you your".split())
 
 SCHEMA = f"""
 CREATE TABLE IF NOT EXISTS lexical_file (path TEXT PRIMARY KEY, blob TEXT NOT NULL, indexed INTEGER NOT NULL);
@@ -46,8 +78,15 @@ CREATE TABLE IF NOT EXISTS lexical_chunk (id INTEGER PRIMARY KEY, chunk_id TEXT 
     start_line INTEGER NOT NULL, end_line INTEGER NOT NULL, parent_id TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS lexical_chunk_by_path ON lexical_chunk (path);
 CREATE INDEX IF NOT EXISTS lexical_parent_by_path ON lexical_parent (path);
-CREATE VIRTUAL TABLE IF NOT EXISTS lexical_fts USING fts5(text, tokenize = "{TOKENIZE}");
+CREATE VIRTUAL TABLE IF NOT EXISTS lexical_fts USING fts5({", ".join(COLUMNS)}, tokenize = "{TOKENIZE}");
 """
+_OLD = "DROP TABLE IF EXISTS lexical_fts; DROP TABLE IF EXISTS lexical_chunk; DROP TABLE IF EXISTS lexical_parent; " \
+       "DROP TABLE IF EXISTS lexical_file;"
+# The chunks that match, best first by bm25 with the column weights; ``{}`` adds the text, or a limit.
+_RANKED = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, f.rank{} FROM (SELECT rowid, rank, text " \
+          f"FROM lexical_fts WHERE lexical_fts MATCH ? AND rank MATCH 'bm25({', '.join(map(str, WEIGHTS))})' " \
+          "ORDER BY rank{}) f JOIN lexical_chunk c ON c.id = f.rowid ORDER BY f.rank, c.path, c.start_line"
+_RANKED_TEXT, _RANKED_TOP = _RANKED.format(", f.text", ""), _RANKED.format("", " LIMIT ?")
 _CHUNKS = "SELECT chunk_id, path, start_line, end_line, parent_id FROM lexical_chunk"
 _DIGESTED = (
     "SELECT path, blob, indexed FROM lexical_file ORDER BY path",
@@ -81,15 +120,52 @@ def _tracked(root: Path) -> dict[str, str]:
     return dict(zip(files, hashes, strict=True))
 
 
+def ids_in(text: str) -> list[str]:
+    """The id-shaped tokens of ``text``, each once, in order."""
+    return list(dict.fromkeys(name for name in ID_SHAPE.findall(text) if any(char.isdigit() for char in name)))
+
+
+def _lead_id(line: str) -> str | None:
+    """The id that leads the heading ``line``, or None."""
+    if not _HEADING.match(line):
+        return None
+    found = ids_in(line.lstrip("#").strip().split(" ", 1)[0])
+    return found[0] if found else None
+
+
+def _fields(rel: str, text: str, parent_rows: list) -> dict[str, tuple[str, str]]:
+    """``parent_id -> (ident, title)`` for each parent of the file ``rel``."""
+    lines = text.splitlines()
+    doc = next((line for line in lines if _HEADING.match(line)), "") if rel.endswith((".md", ".markdown")) else ""
+    front = _FRONT_ID.search(text[4:text.find("\n---", 4)]) if text.startswith("---\n") else None
+    own = [front and front.group(1), _lead_id(doc)]
+    fields = {}
+    for parent_id, _, kind, start, _ in parent_rows:
+        head = lines[start - 1] if kind in ("section", "function") and start <= len(lines) else ""
+        ident = [*own, _lead_id(head) if kind == "section" else None]
+        title = [rel, doc.lstrip("#").strip(), head.strip().lstrip("#").strip()]
+        fields[parent_id] = (" ".join(dict.fromkeys(filter(None, ident))), " ".join(filter(None, title)))
+    return fields
+
+
+def _current(connection: sqlite3.Connection) -> bool:
+    """Whether the store's ``lexical_fts`` has the columns of this code (W2-13)."""
+    return tuple(row[1] for row in connection.execute("PRAGMA table_info(lexical_fts)")) == COLUMNS
+
+
 def _open(root: Path) -> sqlite3.Connection | None:
     """The store at ``root``, read-only; None when there is no store or it holds no index."""
     path = Path(root) / STORE_REL
     if not path.is_file():
         return None
     connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
-    if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'lexical_file'").fetchone() is None:
+    try:
+        if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'lexical_file'").fetchone() is None:
+            connection.close()
+            return None
+    except sqlite3.Error:
         connection.close()
-        return None
+        raise
     return connection
 
 
@@ -116,6 +192,9 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
     (root / STORE_REL).parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(root / STORE_REL)
     try:
+        if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'lexical_fts'").fetchone() \
+                and not _current(connection):
+            connection.executescript(_OLD)  # an index of the code before W2-13: built again from nothing
         connection.executescript(SCHEMA)
         stored = {rel: (blob, indexed) for rel, blob, indexed in connection.execute("SELECT * FROM lexical_file")}
         judge_all = any(stored.get(rel, (None,))[0] != current.get(rel) for rel in JUDGES)
@@ -135,11 +214,13 @@ def _update(root: Path) -> tuple[sqlite3.Connection, list[str]]:
                     continue
                 text = (root / rel).read_bytes().decode("utf-8", "replace")  # only after the filter let it through
                 parent_rows, chunk_rows = chunk_file(rel, current[rel], text)
+                fields = _fields(rel, text, parent_rows)
                 connection.executemany("INSERT INTO lexical_parent VALUES (?, ?, ?, ?, ?)", parent_rows)
                 for *record, chunk in chunk_rows:
                     rowid = connection.execute("INSERT INTO lexical_chunk (chunk_id, path, start_line, end_line, "
                                                "parent_id) VALUES (?, ?, ?, ?, ?)", record).lastrowid
-                    connection.execute("INSERT INTO lexical_fts (rowid, text) VALUES (?, ?)", (rowid, chunk))
+                    connection.execute("INSERT INTO lexical_fts (rowid, text, ident, title) VALUES (?, ?, ?, ?)",
+                                       (rowid, chunk, *fields[record[4]]))
                 indexed.append(rel)
         return connection, indexed
     except BaseException:
@@ -233,6 +314,8 @@ def _freshness(root: Path) -> tuple[str, list[str]]:
     if connection is None:
         return "missing", []
     try:
+        if not _current(connection):
+            return "stale", []  # built by the code before W2-13: a refresh builds it again
         stored = dict(connection.execute("SELECT path, blob FROM lexical_file"))
         current = _tracked(Path(root))
         stale = sorted(rel for rel in stored.keys() | current.keys() if stored.get(rel) != current.get(rel))
@@ -252,39 +335,80 @@ def digest(root: Path) -> str:
         connection.close()
 
 
+def _phrase(text: str) -> str:
+    """``text`` as one FTS5 phrase: its tokens in a row, whatever characters it holds (a NUL ends an FTS5 query)."""
+    return '"' + text.replace('"', '""').replace("\x00", " ") + '"'
+
+
+def _words(query: str) -> str | None:
+    """The FTS5 question for the words of ``query``: each id as a phrase, each other word but ``STOPWORDS`` as a
+    term, any of them (OR); None when there is none."""
+    names = ids_in(query)
+    rest = ID_SHAPE.sub(" ", query)
+    words = [word for word in dict.fromkeys(word.lower() for word in re.findall(r"\w+", rest))
+             if word not in STOPWORDS]
+    terms = [_phrase(term) for term in [*names, *words][:MAX_TERMS]]
+    return " OR ".join(terms) or None
+
+
+def _unavailable(reason: str) -> dict:
+    return {"available": False, "facet": FACET, "state": "FACET_UNAVAILABLE", "reason": reason, "hits": [],
+            "ranked": []}
+
+
 def search(root: Path, query: str, refresh: bool = True) -> dict:
-    """Every line of the corpus that holds the exact string ``query``, with its path, line, chunk and parent.
+    """Every line of the corpus that holds the exact string ``query`` (``hits``, with its path, line, chunk and
+    parent), and the chunks ranked for the fusion (``ranked``): see the module's docstring.
 
     With ``refresh`` the index is brought up to date first. Without, nothing is written, and a missing, empty or
-    stale index is reported as ``FACET_UNAVAILABLE`` with its reason and no hit (DEC-342).
+    stale index is reported as ``FACET_UNAVAILABLE`` with its reason and no hit (DEC-342). It never raises: a store
+    or a ``git`` that cannot be read is the reason ``unreadable`` (W2-M071).
     """
-    if refresh:
-        connection, status = _update(Path(root))[0], "fresh"
-    else:
-        connection, status = _open(root), freshness(root)["status"]
+    connection = None
     try:
+        if refresh:
+            connection, status = _update(Path(root))[0], "fresh"
+        else:
+            connection, status = _open(root), freshness(root)["status"]
         if status == "fresh" and _empty(connection):
             status = "empty"
         if status != "fresh":
-            return {"available": False, "facet": FACET, "state": "FACET_UNAVAILABLE", "reason": status, "hits": []}
-        # FTS5 finds the chunks that hold the query's tokens as a phrase; the lines are then matched exactly.
-        sql = f"SELECT c.chunk_id, c.path, c.start_line, c.parent_id, f.text FROM lexical_chunk c " \
-              f"JOIN lexical_fts f ON f.rowid = c.id {{}} ORDER BY c.path, c.start_line"
-        if any(char.isalnum() or char == "_" for char in query):
-            rows = connection.execute(sql.format("WHERE lexical_fts MATCH ?"), ('"' + query.replace('"', '""') + '"',))
-        else:  # no token to match by: every chunk is read
-            rows = connection.execute(sql.format(""))
-        hits, seen = [], set()
-        for chunk_id, path, start_line, parent_id, text in rows:
-            for line, content in enumerate(text.splitlines(), start_line):
-                if query in content and (path, line) not in seen:
-                    seen.add((path, line))
-                    hits.append({"path": path, "line": line, "text": content, "chunk_id": chunk_id,
-                                 "parent_id": parent_id})
-        return {"available": True, "facet": FACET, "state": "AVAILABLE", "reason": None, "hits": hits}
+            return _unavailable(status)
+        return {"available": True, "facet": FACET, "state": "AVAILABLE", "reason": None,
+                **_ranked(connection, query)}
+    except (sqlite3.Error, OSError, GovError):
+        return _unavailable("unreadable")
     finally:
         if connection is not None:
             connection.close()
+
+
+def _ranked(connection: sqlite3.Connection, query: str) -> dict:
+    """``hits`` and ``ranked`` of ``query`` in the open, fresh index."""
+    keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "bm25")
+    if any(char.isalnum() or char == "_" for char in query):
+        # FTS5 finds the chunks that hold the query's tokens as a phrase; the lines are then matched exactly.
+        rows = connection.execute(_RANKED_TEXT, (_phrase(query),))
+    else:  # no token to match by: every chunk is read
+        rows = connection.execute("SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, NULL, f.text "
+                                  "FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
+                                  "ORDER BY c.path, c.start_line")
+    hits, seen, ranked = [], set(), {}
+    for *record, text in rows:
+        chunk_id, path, start_line, _, parent_id, _ = record
+        for line, content in enumerate(text.splitlines(), start_line):
+            if query in content and (path, line) not in seen:
+                seen.add((path, line))
+                hits.append({"path": path, "line": line, "text": content, "chunk_id": chunk_id,
+                             "parent_id": parent_id})
+                ranked.setdefault(chunk_id, {**dict(zip(keys, record)), "exact": True})
+    words, added = _words(query), 0
+    if words:
+        for record in connection.execute(_RANKED_TOP, (words, TOP_K + len(ranked))):
+            if added < TOP_K and record[0] not in ranked:
+                ranked[record[0]] = {**dict(zip(keys, record)), "exact": False}
+                added += 1
+    return {"hits": hits, "ranked": list(ranked.values())}
 
 
 def chunks(root: Path, path: str | None = None) -> list[dict]:
@@ -318,6 +442,9 @@ def main() -> int:
         state = freshness(Path.cwd())
     except GovError as error:
         print(f"index freshness cannot be decided: {error.message}")
+        return 1
+    except sqlite3.Error as error:
+        print(f"index freshness cannot be decided: the store cannot be read: {error}")
         return 1
     for rel in state["stale"]:
         print(f"stale in the lexical index: {rel}")
