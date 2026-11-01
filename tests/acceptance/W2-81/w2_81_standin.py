@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import copy
 import hashlib
-import shutil
 import sqlite3
 from pathlib import Path
 
@@ -115,8 +114,9 @@ def render(model, built, dest, beside):
     """Write the model: a copy of the built repository's working tree (no .git), with the outputs in it. With
     ``dest`` the built repository itself, the outputs are written in place, as a launched session's adoption would."""
     dest, beside = gitlib.outside_this_repository(dest), gitlib.outside_this_repository(beside)
-    if dest != Path(built.root).resolve():
-        shutil.copytree(built.root, dest, ignore=shutil.ignore_patterns(".git"))
+    if dest != Path(built.root).resolve():  # a shared clone: the build's history is there to compare with
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        gitlib.run_git(dest.parent, "clone", "-q", "--shared", str(built.root), str(dest))
     beside.mkdir(parents=True, exist_ok=True)
 
     def put(rel, content, base=dest):

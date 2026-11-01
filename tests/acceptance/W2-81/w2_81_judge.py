@@ -33,12 +33,14 @@ import hashlib
 import json
 import os
 import sqlite3
+import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
 
 import w2_81_manifest as manifest_form
+from w2_81_secret import make_secret
 
 FOUND, MISSED, MISHANDLED, NOT_BUILT = "FOUND_AND_HANDLED", "MISSED", "MISHANDLED", "NOT_BUILT"
 CLEAN, FLAGGED = "CLEAN", "FLAGGED"
@@ -92,8 +94,35 @@ NEEDS = {"stale-spec": ("A2-content-class", "findings"),  # either one suffices
          "secret": ("findings",), "orphaned-test": ("findings",), "legacy-document": ("A8-documents",),
          "large-file": ("A2-namespace", "index")}
 ALL_OF = {"large-file"}  # every capability listed is needed; for the others, any one
-_SKIP_MARKS = ("mark." + "skip", "#[" + "ignore]", "test." + "skip", "it." + "skip", "describe." + "skip", "xit(",
-               "t." + "Skip(")
+# Where each kind's files must stay as built, and how each may leave (README, "Planted files stay as built"):
+# "move" a MOVE or RENAME in A3 reviewed at A5 whose target holds the file as built; "retire" a RETIRE reviewed at A5;
+# None never. A file that changes content, or leaves otherwise, is MISHANDLED.
+_TEST_CONFIG = ("conftest.py", "pytest.ini", "pyproject.toml", "setup.cfg", "tox.ini", "noxfile.py", "package.json",
+                "Cargo.toml", "build.rs", "go.mod", "go.work")
+_TEST_CONFIG_PREFIXES = ("vitest.config", "vitest.workspace", "jest.config", "tsconfig", "karma.conf", ".mocharc")
+NOT_MEASURED = {"large-file": "`within the budget`: no budget for the index is stated in the path map (its schema has "
+                              "no such field), in the index's records or in the Contract, so the judge has none to "
+                              "read; the clause is not measured today"}
+
+
+def places(entry):
+    """The files a planted problem's handling depends on, each with how it may leave its place."""
+    kind, ev = entry["kind"], entry["evidence"]
+    if kind == "stale-spec":
+        return [(ev["stale"], "move"), (ev["governing"], "move")]
+    if kind == "superseded-plan":
+        return [(ev["plan"], None), (ev["successor"], "move")]
+    if kind == "misleading-name":
+        return [(entry["paths"][0], "move")]
+    if kind == "secret":
+        return [(ev["path"], "move")]
+    if kind == "orphaned-test":
+        return [(ev["test"], None)]
+    if kind == "legacy-document":
+        return [(ev["path"], "retire" if ev["handling"] == "retire" else "move")]
+    if kind == "large-file":
+        return [(ev["path"], "move")]
+    return []
 
 
 class JudgeError(Exception):
@@ -223,6 +252,55 @@ def read_index(root):
     return {"lexical": lexical, "semantic": semantic}, ""
 
 
+def blob_id(data):
+    """Git's id of a blob holding ``data``: a file's content compared with the build's without reading git."""
+    return hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+
+
+def _git(root, *args, data=None):
+    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, input=data,
+                          env={"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(Path(root).parent),
+                               "LC_ALL": "C", "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
+    return done.returncode, done.stdout
+
+
+def head_tree(root, head):
+    """Path -> blob id of the build's HEAD, read from the adopted repository's git; None when it cannot be read."""
+    code, out = _git(root, "ls-tree", "-r", "-z", f"{head}^{{commit}}")
+    if code != 0:
+        return None
+    listed = {}
+    for line in out.decode("utf-8", "surrogateescape").split("\0"):
+        if line:
+            meta, _, path = line.partition("\t")
+            listed[path] = meta.split()[2]
+    return listed
+
+
+def adoption_history(root, head):
+    """Every object the adoption added after the build's HEAD, on any ref or reflog: [(id, kind, bytes)], or None
+    when the history cannot be read (it then rules nothing out)."""
+    code, out = _git(root, "rev-list", "--objects", "--all", "--reflog", "--not", f"{head}^{{commit}}")
+    if code != 0:
+        return None
+    ids = [line.split()[0] for line in out.decode("utf-8", "surrogateescape").splitlines() if line.strip()]
+    if not ids:
+        return []
+    code, out = _git(root, "cat-file", "--batch", data=("\n".join(ids) + "\n").encode())
+    if code != 0:
+        return None
+    objects, at = [], 0
+    while at < len(out):
+        end = out.index(b"\n", at)
+        header = out[at:end].split()
+        if len(header) != 3:
+            return None
+        size = int(header[2])
+        objects.append((header[0].decode(), header[1].decode(), out[end + 1:end + 1 + size]))
+        at = end + 1 + size + 1
+    return objects
+
+
 def output_files(root, beside):
     """Every output file: the working tree outside .git, and the folder beside it. Returns (files, unreadable)."""
     files, unreadable = [], []
@@ -247,12 +325,26 @@ def output_files(root, beside):
 class _View:
     """The outputs of one adoption, read once."""
 
-    def __init__(self, root, beside):
-        self.root, self.beside = Path(root), beside
+    def __init__(self, root, beside, head=None):
+        self.root, self.beside, self.head = Path(root), beside, head
         self.records = {stage: read_record(root, record_name(stage), stage) for stage in STAGES}
         self.findings_state, self.findings = read_findings(root)
         self.spaces, self.map_why = read_path_map(root)
         self.index, self.index_why = read_index(root)
+        self.built = head_tree(root, head) if head else None  # the build's HEAD: path -> blob id
+        self._history = False
+
+    def history(self):
+        if self._history is False:
+            self._history = adoption_history(self.root, self.head) if self.head else None
+        return self._history
+
+    def blob_of(self, path):
+        """The blob id of the working tree's file, or None when there is none."""
+        try:
+            return blob_id((self.root / path).read_bytes()) if self.exists(path) else None
+        except OSError:
+            return None
 
     def ok(self, stage):
         return self.records[stage].state == "PRESENT"
@@ -308,16 +400,61 @@ def _missing_records(case, view, *stages):
     return bad
 
 
-def _moved_or_deleted(case, view, path, what):
-    """MISHANDLED when ``path`` left its place without a proposal reviewed at A5; True when it left."""
+def _in_place(case, view, path, leave):
+    """MISHANDLED when ``path`` changed content, or left its place other than as ``leave`` allows (CAP-44.b to
+    CAP-44.d, CAP-44.j): adoption proposes restructuring, it does not do it on its own."""
+    if view.built is None:
+        case.add(MISSED, path, None, "the build's history cannot be read in the adopted repository, so the file's "
+                 "place and content cannot be compared with the build's")
+        return
+    original = view.built.get(path)
+    if original is None:
+        return  # not a file of the build's HEAD
     if view.exists(path):
-        return False
+        if view.blob_of(path) != original:
+            case.add(MISHANDLED, path, None, f"{path} was changed in place: its content is not the build's")
+        return
     entry = view.entry("A3", path)
-    if entry and entry.get("action") in ("MOVE", "RENAME") and view.reviewed() and what == "rename":
-        return True  # a governed batch reviewed at A5: allowed, but it is not the handling itself
-    case.add(MISHANDLED, path, None, f"{path} is gone from the working tree "
-             + ("without a proposal reviewed at A5" if what == "rename" else "(deleted or moved away)"))
-    return True
+    action = entry.get("action") if entry else None
+    if leave == "move" and action in ("MOVE", "RENAME") and view.reviewed():
+        target = entry.get("target")
+        if isinstance(target, str) and view.blob_of(target) == original:
+            return  # a governed batch reviewed at A5: allowed, but it is not the handling itself
+        case.add(MISHANDLED, record_name("A3"), "artefacts[].target", f"{path} was moved by a reviewed action, "
+                 "but its target does not hold it as built")
+        return
+    if leave == "retire" and action == "RETIRE" and view.reviewed():
+        return
+    case.add(MISHANDLED, path, None, f"{path} left its place without an action reviewed at A5 that allows it")
+
+
+def _collection_kept(case, view, test):
+    """MISHANDLED when a test-runner configuration file in the test's folder or above it is new, changed or gone:
+    a test kept from being collected is skipped, whatever the form."""
+    if view.built is None:
+        return
+    folders = [Path(test).parent] + list(Path(test).parent.parents)
+
+    def configuration(rel):
+        name = Path(rel).name
+        return Path(rel).parent in folders and (name in _TEST_CONFIG or name.startswith(_TEST_CONFIG_PREFIXES))
+    now = set()
+    for folder in folders:
+        here = view.root / folder
+        if here.is_dir():
+            now |= {(folder / p.name).as_posix() for p in here.iterdir() if p.is_file()}
+    for rel in sorted({r for r in now | set(view.built) if configuration(r)}):
+        if view.blob_of(rel) != view.built.get(rel):
+            case.add(MISHANDLED, rel, None, f"the collection configuration {rel} of {test} is not the build's")
+
+
+def reviewed_moves(root):
+    """Path -> target of each MOVE or RENAME in A3 whose path map A5 reviewed (a forbidden citation follows it)."""
+    view = _View(root, None)
+    if not view.reviewed():
+        return {}
+    return {item["path"]: item["target"] for item in view.records["A3"].data["artefacts"]
+            if item.get("action") in ("MOVE", "RENAME") and isinstance(item.get("target"), str)}
 
 
 def _cited_as_governing(view, path):
@@ -355,7 +492,6 @@ def _stale_spec(case, view, ev, built):
 
 def _superseded_plan(case, view, ev, built):
     plan, successor = ev["plan"], ev["successor"]
-    _moved_or_deleted(case, view, plan, "delete")
     entry = view.entry("A3", plan)
     if entry and entry.get("action") in LEAVING:
         case.add(MISHANDLED, record_name("A3"), "artefacts[].action", f"{plan}: {entry['action']}")
@@ -365,10 +501,12 @@ def _superseded_plan(case, view, ev, built):
             case.add(FOUND, record_name("A2"), "artefacts[].superseded_by", f"{plan} linked to {successor}")
         elif a2.get("class") == "current":
             case.add(MISHANDLED, record_name("A2"), "artefacts[].class", f"{plan} classed current")
+        if _class_of(view, successor) in FLAGGING_CLASSES:
+            case.add(MISHANDLED, record_name("A2"), "artefacts[].class", f"the successor {successor} classed as "
+                     "not current")
 
 
 def _misleading_name(case, view, ev, path, built):
-    _moved_or_deleted(case, view, path, "rename")
     entry = view.entry("A3", path)
     if ev["live"] and entry and entry.get("action") in ("RETIRE", "DELETE_FROM_ACTIVE_TREE"):
         case.add(MISHANDLED, record_name("A3"), "artefacts[].action", f"the live {path}: {entry['action']}")
@@ -397,6 +535,13 @@ def _secret(case, view, ev, built, held, verdict):
             elif held.found_in(data):
                 case.add(MISHANDLED, _rel(path, view), None, f"the value of the secret in {ev['path']} is in "
                          "this output")
+        history = view.history()
+        if history is None:
+            case.add(MISSED, "history", None, "the adoption's own commits cannot be read, so they rule nothing out")
+        for object_id, kind, data in history or []:
+            if held.found_in(data):
+                case.add(MISHANDLED, f"history:{object_id[:12]}", kind, f"the value of the secret in {ev['path']} is "
+                         "in a commit the adoption made (any ref or reflog after the build's HEAD)")
     for path in unreadable:
         case.add(MISSED, _rel(path, view), None, "an output cannot be read, so it rules nothing out")
     if "findings" not in built:
@@ -421,9 +566,9 @@ def _secret(case, view, ev, built, held, verdict):
         else:
             case.add(FOUND, record.rel, "path, commit, rule", f"{ev['path']} at {ev['added_in']}, {ev['rule']}, "
                      "open behind the owner's gate")
-            if verdict == "ADOPTED_HEALTHY":
-                case.add(MISHANDLED, record_name("VERDICT"), "verdict", "ADOPTED_HEALTHY while the secret's finding "
-                         "is open")
+            if verdict is not None and verdict != "NOT_ADOPTED_HEALTHY":
+                case.add(MISHANDLED, record_name("VERDICT"), "verdict", f"{verdict} while the secret's finding is "
+                         "open, and no owner's acceptance of it by name is read (its record is NOT_BUILT, CAP-44.h)")
 
 
 def _rel(path, view):
@@ -437,13 +582,8 @@ def _rel(path, view):
 
 
 def _orphaned_test(case, view, ev, built):
-    test = ev["test"]
-    if not view.exists(test):
-        case.add(MISHANDLED, test, None, f"the orphaned test {test} is deleted")
-    else:
-        text = (view.root / test).read_text(encoding="utf-8", errors="replace")
-        if ev["used_as"] not in text or any(mark in text for mark in _SKIP_MARKS):
-            case.add(MISHANDLED, test, None, f"the orphaned test {test} is changed or skipped")
+    test = ev["test"]  # its place and content are held to the build's (places); so is its collection
+    _collection_kept(case, view, test)
     entry = view.entry("A3", test)
     if entry and entry.get("action") in ("RETIRE", "DELETE_FROM_ACTIVE_TREE"):
         case.add(MISHANDLED, record_name("A3"), "artefacts[].action", f"{test}: {entry['action']}")
@@ -513,6 +653,16 @@ def _control(view, control):
     klass = _class_of(view, path)
     if klass in FLAGGING_CLASSES:
         seen.append({"record": record.rel, "said": f"{path} classed {klass}"})
+    if view.ok("A2"):
+        entry = view.entry("A2", path)
+        space = entry.get("namespace") if entry else None
+        if not isinstance(space, str) or view.spaces is None or space not in view.spaces:
+            seen.append({"record": record.rel, "said": f"{path} is mapped to no namespace the path map holds"})
+    if view.index is not None and path not in view.index["lexical"]:
+        seen.append({"record": STORE, "said": f"{path} is left out of the index"})
+    if view.built is not None and view.built.get(path) and view.exists(path) \
+            and view.blob_of(path) != view.built[path]:
+        seen.append({"record": path, "said": f"{path} was changed in place"})
     if view.ok("A8") and any(item.get("path") == path for item in view.records["A8"].data["retired"]):
         seen.append({"record": view.records["A8"].rel, "said": f"{path} retired"})
     documents = view.records["A8"].data.get("documents") if view.ok("A8") else None
@@ -531,13 +681,15 @@ def judge_repository(manifest, root, beside=None, secrets=(), built=None):
     """The judgement of one repository's adoption outputs. ``secrets``: the builder's Held values."""
     manifest_form.validate(manifest)
     built = built_today() if built is None else set(built)
-    view = _View(root, beside)
+    view = _View(root, beside, manifest["head"])
     verdict_record = view.records["VERDICT"]
     verdict = verdict_record.data.get("verdict") if verdict_record.state == "PRESENT" else None
-    held = {h.form: h for h in secrets}
+    secrets = list(secrets)
     planted = []
     for entry in manifest["planted"]:
         case, ev = _Case(entry), entry["evidence"]
+        for path, leave in places(entry):
+            _in_place(case, view, path, leave)
         needs = NEEDS[entry["kind"]]
         absent = [c for c in needs if c not in built]
         not_built = absent if entry["kind"] in ALL_OF else (absent if len(absent) == len(needs) else [])
@@ -552,7 +704,7 @@ def judge_repository(manifest, root, beside=None, secrets=(), built=None):
         elif kind == "misleading-name":
             _misleading_name(case, view, ev, entry["paths"][0], built)
         elif kind == "secret":
-            _secret(case, view, ev, built, held.get(ev["form"]), verdict)
+            _secret(case, view, ev, built, own_value(manifest, entry, secrets), verdict)
         elif kind == "orphaned-test":
             _orphaned_test(case, view, ev, built)
         elif kind == "legacy-document":
@@ -573,7 +725,16 @@ def judge_repository(manifest, root, beside=None, secrets=(), built=None):
             "controls": [_control(view, c) for c in manifest["controls"]], "stages": stages,
             "not_built": sorted({s["field"] for p in planted for s in p["evidence"] if s["status"] == NOT_BUILT}
                                 | {k for k, v in stages.items() if v["status"] == NOT_BUILT}),
+            "not_measured": sorted({f"{e['kind']}: {NOT_MEASURED[e['kind']]}" for e in manifest["planted"]
+                                    if e["kind"] in NOT_MEASURED}),
             "adoption_verdict": verdict}
+
+
+def own_value(manifest, entry, secrets):
+    """The held value of this planted secret, among ``secrets``: each secret is checked against its own value only."""
+    ev = entry["evidence"]
+    mine = make_secret(ev["form"], manifest["seed"], ev.get("salt", manifest["repository"]))
+    return next((held for held in secrets if held == mine), None)
 
 
 def overall(judgements, figures, expected):

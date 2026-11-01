@@ -652,7 +652,26 @@ def _put(value, hashes, facts, where):
     return _PLACE.sub(one, value)
 
 
+class VariantError(AssertionError):
+    """A hidden variant that cannot be built. Its message names the variant by its number and id only: never its
+    texts, paths or values (they are the hidden half's)."""
+
+
+def _ident(variant):
+    ident = variant.get("id") if isinstance(variant, dict) else None
+    return str(ident) if isinstance(ident, (str, int)) and len(str(ident)) <= 40 else "?"
+
+
 def apply_variants(built, variants, seed, manifests_root):
+    """Each variant built by ``_apply_one``; any failure is a VariantError naming its number and id only."""
+    for number, variant in enumerate(variants, 1):
+        try:
+            _apply_one(built, number, variant, seed, manifests_root)
+        except Exception:  # noqa: BLE001 - whatever stops it, the message holds nothing of the variant's content
+            raise VariantError(f"hidden variant #{number} ({_ident(variant)}) cannot be built") from None
+
+
+def _apply_one(built, number, variant, seed, manifests_root):
     """Append each variant to its repository as commits of its own, plant it in the manifest, rewrite the manifest.
 
     A variant is ``{id, repository, kind, variant, paths, steps, evidence}``: ``steps`` are the commits, each
@@ -663,57 +682,56 @@ def apply_variants(built, variants, seed, manifests_root):
     from w2_81_git import outside_this_repository, run_git
     from w2_81_secret import assert_absent
 
-    for number, variant in enumerate(variants, 1):
-        where = f"#{number}"
-        if not isinstance(variant, dict) or set(VARIANT_KEYS) - set(variant):
-            raise AssertionError(f"variant {where}: it needs {', '.join(VARIANT_KEYS)}")
-        if variant["kind"] not in manifest_form.KINDS + manifest_form.LEGACY_KINDS:
-            raise AssertionError(f"variant {where}: kind {variant['kind']!r} is not a planted kind")
-        if variant["repository"] not in built:
-            raise AssertionError(f"variant {where}: no repository {variant['repository']!r}")
-        target = built[variant["repository"]]
-        data, facts = target.manifest, target.manifest.get("facts") or {}
-        draw = Draw(seed, f"{target.name}:hidden:{variant['id']}")
-        draw.clock = datetime.fromisoformat(run_git(target.root, "log", "-1", "--format=%cI").strip())
-        held = None
-        if variant["kind"] == "secret":
-            form = variant["evidence"].get("form")
-            if form not in FORMS:
-                raise AssertionError(f"variant {where}: a secret names its form, one of {', '.join(FORMS)}")
-            held = make_secret(form, seed, f"{target.name}:hidden:{variant['id']}")
-        hashes = []
-        for step in variant["steps"]:
-            for rel, content in (step.get("write") or {}).items():
-                content = _put(str(content), hashes, facts, where)
-                content = held.line(content) if held is not None else content
-                place = outside_this_repository(target.root / rel)
-                place.parent.mkdir(parents=True, exist_ok=True)
-                place.write_text(content, encoding="utf-8")
-            for rel in step.get("remove") or []:
-                (target.root / rel).unlink()
-            run_git(target.root, "add", "-A")
-            run_git(target.root, "commit", "-q", "-m", str(step.get("message") or f"Change {number}"),
-                    author=draw.author(), date=draw.tick())
-            hashes.append(run_git(target.root, "rev-parse", "HEAD").strip())
-        evidence = _put(variant["evidence"], hashes, facts, where)
-        if held is not None:
-            evidence = {**evidence, "rule": FORMS[evidence["form"]]["rule"],
-                        "salt": f"{target.name}:hidden:{variant['id']}"}
-            assert held.found_in(blob(target.root, evidence["added_in"], evidence["path"])), \
-                f"variant {where}: the secret is not in {evidence['path']} at its added_in"
-            for rel in tree(target.root):
-                assert_absent(held, blob(target.root, "HEAD", rel), f"variant {where}: {rel} at HEAD")
-            target.secrets.append(held)
-        data["planted"].append({
-            "id": f"{target.name}.{variant['kind']}.hidden-{variant['id']}", "kind": variant["kind"],
-            "variant": str(variant["variant"]), "shape": data["shape"], "hidden": True,
-            "paths": _put(variant["paths"], hashes, facts, where), "commits": [h[:12] for h in hashes],
-            "detectable_by": manifest_form.DETECTABLE_BY[variant["kind"]],
-            "correct_handling": manifest_form.CORRECT_HANDLING[variant["kind"]], "evidence": evidence})
-        commits = run_git(target.root, "rev-list", "--reverse", "HEAD").split()
-        data["clean"] = False
-        data["commits"], data["head"] = [c[:12] for c in commits], commits[-1][:12]
-        target.manifest_path = manifest_form.write(data, manifests_root, target.root)
+    where = f"#{number}"
+    if not isinstance(variant, dict) or set(VARIANT_KEYS) - set(variant):
+        raise AssertionError(f"variant {where}: it needs {', '.join(VARIANT_KEYS)}")
+    if variant["kind"] not in manifest_form.KINDS + manifest_form.LEGACY_KINDS:
+        raise AssertionError(f"variant {where}: kind {variant['kind']!r} is not a planted kind")
+    if variant["repository"] not in built:
+        raise AssertionError(f"variant {where}: no repository {variant['repository']!r}")
+    target = built[variant["repository"]]
+    data, facts = target.manifest, target.manifest.get("facts") or {}
+    draw = Draw(seed, f"{target.name}:hidden:{variant['id']}")
+    draw.clock = datetime.fromisoformat(run_git(target.root, "log", "-1", "--format=%cI").strip())
+    held = None
+    if variant["kind"] == "secret":
+        form = variant["evidence"].get("form")
+        if form not in FORMS:
+            raise AssertionError(f"variant {where}: a secret names its form, one of {', '.join(FORMS)}")
+        held = make_secret(form, seed, f"{target.name}:hidden:{variant['id']}")
+    hashes = []
+    for step in variant["steps"]:
+        for rel, content in (step.get("write") or {}).items():
+            content = _put(str(content), hashes, facts, where)
+            content = held.line(content) if held is not None else content
+            place = outside_this_repository(target.root / rel)
+            place.parent.mkdir(parents=True, exist_ok=True)
+            place.write_text(content, encoding="utf-8")
+        for rel in step.get("remove") or []:
+            (target.root / rel).unlink()
+        run_git(target.root, "add", "-A")
+        run_git(target.root, "commit", "-q", "-m", str(step.get("message") or f"Change {number}"),
+                author=draw.author(), date=draw.tick())
+        hashes.append(run_git(target.root, "rev-parse", "HEAD").strip())
+    evidence = _put(variant["evidence"], hashes, facts, where)
+    if held is not None:
+        evidence = {**evidence, "rule": FORMS[evidence["form"]]["rule"],
+                    "salt": f"{target.name}:hidden:{variant['id']}"}
+        if not held.found_in(blob(target.root, evidence["added_in"], evidence["path"])):
+            raise AssertionError(f"variant {where}: the secret is not at its added_in")
+        for rel in tree(target.root):
+            assert_absent(held, blob(target.root, "HEAD", rel), f"variant {where}: a file at HEAD")
+        target.secrets.append(held)
+    data["planted"].append({
+        "id": f"{target.name}.{variant['kind']}.hidden-{variant['id']}", "kind": variant["kind"],
+        "variant": str(variant["variant"]), "shape": data["shape"], "hidden": True,
+        "paths": _put(variant["paths"], hashes, facts, where), "commits": [h[:12] for h in hashes],
+        "detectable_by": manifest_form.DETECTABLE_BY[variant["kind"]],
+        "correct_handling": manifest_form.CORRECT_HANDLING[variant["kind"]], "evidence": evidence})
+    commits = run_git(target.root, "rev-list", "--reverse", "HEAD").split()
+    data["clean"] = False
+    data["commits"], data["head"] = [c[:12] for c in commits], commits[-1][:12]
+    target.manifest_path = manifest_form.write(data, manifests_root, target.root)
 
 
 def remove(run_folder):

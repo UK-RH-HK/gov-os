@@ -104,9 +104,18 @@ def _hidden(options):
         return None, [], {}
     variants = []
     if (folder / "variants.yaml").is_file():
-        data = yaml.safe_load((folder / "variants.yaml").read_text(encoding="utf-8")) or {}
-        variants = data.get("variants") or []
-    sets = {path.stem: questions.load_set(path) for path in sorted(folder.glob("*.yaml")) if path.stem != "variants"}
+        try:  # a hidden file that cannot be read is refused naming the file only: never its text
+            data = yaml.safe_load((folder / "variants.yaml").read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, yaml.YAMLError):
+            raise RunnerError("the hidden file variants.yaml cannot be read") from None
+        variants = data.get("variants") if isinstance(data, dict) else None
+        if not isinstance(variants, list) or not all(isinstance(v, dict) for v in variants):
+            raise RunnerError("the hidden file variants.yaml holds no list `variants` of mappings")
+    try:
+        sets = {path.stem: questions.load_set(path) for path in sorted(folder.glob("*.yaml"))
+                if path.stem != "variants"}
+    except questions.QuestionError as refused:
+        raise RunnerError(str(refused)) from None
     return folder, variants, sets
 
 
@@ -162,10 +171,17 @@ def _build(options, folder, log):
     folder.mkdir(parents=True, exist_ok=True)
     seed = options.seed if options.seed is not None else random_source.randbelow(2 ** 31)
     _, variants, _ = _hidden(options)
-    manifests = Path(options.manifests).expanduser() if options.manifests else folder
-    built = build.build_all(folder, seed, options.large_size, manifests_root=manifests, variants=variants)
+    manifests = gitlib.outside_this_repository(Path(options.manifests).expanduser()) if options.manifests else folder
+    if (manifests / "manifests").is_dir() and any((manifests / "manifests").glob("*.json")):
+        raise RunnerError(f"{manifests / 'manifests'} already holds manifests: a build needs a manifests folder "
+                          "of its own (another run's would be overwritten)")
+    try:
+        built = build.build_all(folder, seed, options.large_size, manifests_root=manifests, variants=variants)
+    except build.VariantError as refused:
+        raise RunnerError(str(refused)) from None
     record = {"form": "w2-81-run/1", "seed": seed, "large_size": options.large_size,
-              "manifests": str(manifests / "manifests"), "hidden_variants": len(variants)}
+              "manifests": str(manifests / "manifests"), "hidden_variants": len(variants),
+              "heads": {name: b.manifest["head"] for name, b in built.items()}}
     (folder / "run.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     log(f"build: seed {seed}, {len(built)} repositories, {len(variants)} hidden variants")
     return record
@@ -179,9 +195,24 @@ def _read_back(folder):
     out = {}
     for name in EXPECTED:
         path = Path(record["manifests"]) / f"{name}.json"
-        manifest = manifest_form.load(path)
+        try:
+            manifest = manifest_form.load(path)
+        except (OSError, ValueError, AssertionError):
+            raise RunnerError(f"the manifest of {name} cannot be read") from None
+        if manifest["seed"] != record["seed"] or manifest["head"] != (record.get("heads") or {}).get(name):
+            raise RunnerError(f"the manifest of {name} is not this run's: its seed or head is not the run's record "
+                              "(another build wrote its manifests folder)")
         out[name] = _Repository(name, folder / "repos" / name, manifest, path, held_secrets(manifest))
     return record, out
+
+
+def follow_moves(asked, moves):
+    """A planted file moved by a reviewed action is still itself: its forbidden citation and its gold source follow it
+    to its new place (the judge holds the move to the file's content as built)."""
+    for q in asked:
+        q.forbidden = q.forbidden + [moves[p] for p in q.forbidden if p in moves]
+        q.sources = [(moves.get(p, p), line, holds) for p, line, holds in q.sources]
+    return asked
 
 
 def run(options, built=None):
@@ -218,6 +249,7 @@ def run(options, built=None):
                                   "visible")
         if name in hidden_sets:
             asked += questions.resolve(hidden_sets[name], repo.manifest, repo.root, "hidden")
+        follow_moves(asked, judge.reviewed_moves(repo.root))
         answers = {q.id: _ask(options.gov, repo.root, q, env, log) for q in asked} if options.gov else {}
         scores.append(score.score_repository(name, asked, answers) if options.gov
                       else {"repository": name, "questions": len(asked), "hit_at_5": None, "stacked_share": None,
@@ -305,7 +337,7 @@ def parse(argv):
 def main(argv=None):
     try:
         report = run(parse(argv))
-    except (RunnerError, gitlib.InsideThisRepository) as refused:
+    except (RunnerError, gitlib.InsideThisRepository, questions.QuestionError) as refused:
         print(f"refused: {refused}", file=sys.stderr)
         return 2
     print(f"{report['verdict'] if 'verdict' in report else 'BUILT'} (seed {report['seed']})")

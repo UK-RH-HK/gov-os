@@ -230,6 +230,7 @@ def test_a_rename_proposed_and_reviewed_at_a5_is_not_mishandled(ground, tmp_path
     entry = next(e for e in built_repo.manifest["planted"] if e["variant"] == "live-under-old-name")
     model = standin.perfect(built_repo)
     model["removed"].append(entry["paths"][0])
+    model["raw"]["src/renamed.py"] = (built_repo.root / entry["paths"][0]).read_bytes()  # the batch moved it
     standin.a3_entry(model, entry["paths"][0]).update(action="RENAME", target="src/renamed.py", batch=1)
     judgement = _judge(built_repo, model, tmp_path)
     assert _status(judgement, entry["id"]) == judge.FOUND

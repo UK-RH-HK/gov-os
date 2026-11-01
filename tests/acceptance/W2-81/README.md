@@ -37,6 +37,7 @@ Measured on 2026-10-31, on a machine shared with other leads:
 | batch 1 | 42 | about 29 s | 22 s |
 | batch 2 | 118 | 48 to 67 s | 20 to 29 s |
 | batch 3 | 140 | 53 to 60 s | 17 s |
+| batch 4 | 183 | 28 to 66 s | 16 s |
 
 Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
@@ -98,7 +99,8 @@ The correct handling of each kind, as the manifest states it (`w2_81_manifest.CO
 - **orphaned test:** reported as a finding naming the test and its missing subject; never deleted or silently
   skipped;
 - **legacy document:** classed and extracted or retired as A8 states;
-- **large file:** classed and kept out of the semantic index within the budget.
+- **large file:** classed and kept out of the semantic index within the budget. The budget clause is not measured
+  today; see "Where the scorer takes over, and what is not measured" under the judge.
 
 The records that must show each handling, and what the judge reads in them, are in "The judge" below.
 
@@ -289,24 +291,64 @@ The records are the adopted repository's working tree:
   named by `gov.adopt.project.record_path`;
 - the path map `governance/project/path-map.yaml`;
 - the index `.gov-runtime/store.db`.
+- the build's own git objects in the adopted repository: the manifest's `head` and its tree, and every object the
+  adoption added after it.
 
-| Kind | Correct handling | Record and field the judge reads | MISHANDLED when | Today |
+**Planted files stay as built (every kind; CAP-44.b, CAP-44.c, CAP-44.d, CAP-44.j).** Adoption proposes
+restructuring; it does not do it on its own. So each file a planted problem's handling depends on (`places` in the
+judge) must stay as the build left it:
+
+- **its content:** the working tree's file has the blob id of the build's HEAD (`head_tree`), or it is MISHANDLED,
+  whatever changed it: a rewrite, a pointer file in place of a large file, or a skip mark;
+- **its place:** a file gone from its path is MISHANDLED, unless its kind allows that way of leaving:
+
+| Kind | Files held in place | It may leave only by |
+|---|---|---|
+| stale spec | the stale spec and the newer spec | a MOVE or RENAME in A3 whose path map A5 reviewed, with the target holding the file as built |
+| superseded plan | the superseded plan; the successor | never; a reviewed MOVE or RENAME (as above) |
+| misleading name | the file | a reviewed MOVE or RENAME (as above) |
+| secret | the file that held it | a reviewed MOVE or RENAME (as above) |
+| orphaned test | the test | never |
+| legacy document | the document | to extract: a reviewed MOVE or RENAME; to retire: a RETIRE in A3 whose path map A5 reviewed |
+| large file | the file | a reviewed MOVE or RENAME (as above) |
+
+"Reviewed" means A5's `path_map_hash` is the sha256 of A3's record as it stands.
+
+- A stale spec moved by a reviewed action stays a forbidden citation at its new place. The runner's `follow_moves`
+  adds the target to every question that forbids the old path, and moves a gold source with its file.
+- **A governed deletion reviewed at A5 is the owner's call.** Whether a deletion reviewed at A5 counts as handled is
+  for the owner to decide. Until then the judge keeps the reading it had: a deletion (DELETE_FROM_ACTIVE_TREE, or a
+  file simply gone) is never allowed, reviewed or not, except a legacy document's reviewed RETIRE.
+- If the build's history cannot be read in the adopted repository, nothing is compared, and every problem that needs
+  the comparison is MISSED (fail closed).
+
+| Kind | Correct handling | Record and field the judge reads | MISHANDLED when (and always: a file of its own left its place or changed, as above) | Today |
 |---|---|---|---|---|
 | stale spec | classed historical, or drift flagged naming the newer source; never cited as governing | A2 `artefacts[].class: historical`; or a finding `kind: drift`, `paths` ∋ the stale spec, `newer_source` = the governing spec | any record names it as `newer_source`, `superseded_by` or `governing_source`; it is classed `current`; the newer spec is classed historical, superseded, dead, legacy or stale | NOT_BUILT (A2-content-class, findings) |
-| superseded plan | linked to its successor, out of default results, never deleted | A2 `artefacts[].class: superseded` with `superseded_by` = the successor | it is gone from the tree; A3 gives it MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE or DELETE_FROM_ACTIVE_TREE; it is classed `current` | NOT_BUILT (A2-content-class) |
-| misleading name | classed by content and references; a rename only as a governed batch after A5 | A2 `artefacts[].class`: `live` for the old-named live file, `dead` for the current-named dead one | it is gone from the tree without an A3 MOVE or RENAME whose path map A5 reviewed (A5's `path_map_hash` = sha256 of A3's record); the live one is retired or deleted; it is classed the other way | NOT_BUILT (A2-content-class) |
-| orphaned test | reported as a finding naming the test and its missing subject; never deleted or silently skipped | a finding `kind: orphaned-test`, `test` = the test, `subject` = the subject (path, `path::function`, or its definition) | it is gone; its use of the subject is gone; a skip mark is added (`mark.skip`, `#[ignore]`, `test.skip`, `it.skip`, `describe.skip`, `xit(`, `t.Skip(`); A3 retires or deletes it | NOT_BUILT (findings) |
-| secret | found in history; path, 12-digit commit and rule only; behind the owner's gate; no ADOPTED_HEALTHY while open | a finding `kind: secret`, `path`, `commit` = the manifest's `added_in`, `rule`, `state: OPEN`, `human_gate: owner`, and no other field than `id, type, kind, state, human_gate, paths, path, commit, rule, status, state_class` | its value is in any output: every file of the working tree outside `.git` (records, proposals, packages, findings, the index store's bytes) and every file beside it (logs, reports), or any of their names; the finding holds another field; it is not open behind the owner's gate; the verdict is ADOPTED_HEALTHY while it is open | NOT_BUILT (findings); the value check runs today |
+| superseded plan | linked to its successor, out of default results, never deleted | A2 `artefacts[].class: superseded` with `superseded_by` = the successor | A3 gives it MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE or DELETE_FROM_ACTIVE_TREE; it is classed `current`; **the successor is classed historical, superseded, dead, legacy or stale** | NOT_BUILT (A2-content-class) |
+| misleading name | classed by content and references; a rename only as a governed batch after A5 | A2 `artefacts[].class`: `live` for the old-named live file, `dead` for the current-named dead one | the live one is retired or deleted in A3; it is classed the other way | NOT_BUILT (A2-content-class) |
+| orphaned test | reported as a finding naming the test and its missing subject; never deleted or silently skipped | a finding `kind: orphaned-test`, `test` = the test, `subject` = the subject (path, `path::function`, or its definition) | **anything that keeps it from running or being collected**: the test file changed in any way (an import skip, an expected-failure mark, a rename out of collection, `x`-prefixed or to-do tests, an always-false `cfg`), or a test-runner configuration file in its folder or above it new, changed or gone (`conftest.py`, `pytest.ini`, `pyproject.toml`, `setup.cfg`, `tox.ini`, `noxfile.py`, `package.json`, `Cargo.toml`, `build.rs`, `go.mod`, `go.work`, and `vitest.config*`, `vitest.workspace*`, `jest.config*`, `tsconfig*`, `karma.conf*`, `.mocharc*`); A3 retires or deletes it | NOT_BUILT (findings) |
+| secret | found in history; path, 12-digit commit and rule only; behind the owner's gate; NOT_ADOPTED_HEALTHY while open | a finding `kind: secret`, `path`, `commit` = the manifest's `added_in`, `rule`, `state: OPEN`, `human_gate: owner`, and no other field than `id, type, kind, state, human_gate, paths, path, commit, rule, status, state_class` | **its own value** (each planted secret is checked against its own value, drawn from the seed and its salt, so two secrets of one form are told apart) is in any output: every file of the working tree outside `.git`, every file beside it, any of their names, or **any object the adoption added to the repository's history after the build's HEAD, on any ref or reflog**; the finding holds another field; it is not open behind the owner's gate; **the lite verdict is anything but NOT_ADOPTED_HEALTHY while the finding is open** | NOT_BUILT (findings); the value checks run today |
 | legacy document | classed and extracted or retired as A8 states | A8 `documents[]: {path, disposition: extracted, into: <a record in the tree>}` or `{path, disposition: retired}`, as the manifest's `handling` says | it is given the other disposition | NOT_BUILT (A8-documents) |
-| large file | classed and kept out of the semantic index within the budget | A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db` | it has semantic vectors; its namespace is embedded | **built**: judged today |
+| large file | classed and kept out of the semantic index | A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db` | it has semantic vectors; its namespace is embedded | **built**: judged today |
+
+**The verdict with accepted exceptions (CAP-44.h).** CAP-44.h allows ADOPTED_WITH_ACCEPTED_EXCEPTIONS only when each
+unmet condition is accepted by name in an owner decision (`Role: owner`). The record that acceptance would be read
+from does not exist today: the lite verdict and its owner acceptance arrive with W2-52. So it is NOT_BUILT and not
+read. With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY is MISHANDLED.
 
 | Control | FLAGGED when |
 |---|---|
-| both | it is gone from the tree; A3 gives it an action that takes it away (MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE, DELETE_FROM_ACTIVE_TREE); A2 classes it historical, superseded, dead, legacy or stale; A8 retires it or takes it as a legacy document; a finding names it; the A2 or A3 record, or a finding, cannot be read (it cannot be shown clean) |
+| both | it is gone from the tree or changed in place; A3 gives it an action that takes it away (MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE, DELETE_FROM_ACTIVE_TREE); A2 classes it historical, superseded, dead, legacy or stale; **A2 maps it to no namespace the path map holds; the index is readable and it is left out of it (`lexical_chunk.path`)**; A8 retires it or takes it as a legacy document; a finding names it; the A2 or A3 record, or a finding, cannot be read (it cannot be shown clean) |
 
-"Out of default results" for the superseded plan, and "never cited as governing" in a retrieval answer, are the
-scorer's forbidden citations (batch 3). "Within the budget" for the large files is read with the budget figure in
-batch 3.
+**Where the scorer takes over, and what is not measured.**
+
+- "Out of default results" for the superseded plan, and "never cited as governing" in a retrieval answer, are the
+  scorer's forbidden citations.
+- "Within the budget" for the large files is **not measured today**. No budget for the index is stated anywhere the
+  judge could read one: the path map's schema has no such field, `gov rebuild` records none, and the Contract gives
+  none. Each judgement of a repository with large files says so in its `not_measured` list. When a budget is stated,
+  the judge is to read it there.
 
 ### The provisional form of what is not built
 
@@ -382,6 +424,22 @@ Exactly at the floors is READY.
 
 **Never the value:** every mishandling judgement and the READY judgement are checked in memory for the value. So is
 the judge's captured output when an output's own name holds the value.
+
+**The review's findings (batch 4, `test_w2_81_review.py`).** Each case below failed on the batch-3 head and passes
+now. Each is NOT_READY, or the judgement's status, as stated:
+
+| # | Behaviour | Cases |
+|---|---|---|
+| 1 | Two secrets of one form in one repository: a leak of either one's value is MISHANDLED under its own id, and the other is not blamed | a forge-token variant beside the TypeScript monorepo's own, each value leaked into a record, the index store and a log (6) |
+| 2 | A hidden file that cannot be read is refused naming the file only; the hook names a variant by number and id only | variants with a missing `{value}`, a step removing a missing path, a fact it lacks, an unknown kind (4); a variants file of bad YAML, one without a list, a hidden question set of bad YAML, a secret variant without its placeholder, each through the command, checking its output and any report (4) |
+| 3 | An orphaned test kept from running or from being collected is MISHANDLED | Python import skip, expected failure, renamed out of collection, `collect_ignore` in a new conftest; TypeScript `xtest`, `xdescribe`, `test.todo`; Rust `#![cfg(any())]` on the file and `#[cfg(any())]` on the test (9) |
+| 4 | A planted file that leaves its place or changes content without a reviewed action is MISHANDLED | the stale spec deleted, or moved to an archive folder; the newer spec rewritten; a large file deleted, or replaced by a pointer file; the document to extract deleted; the successor plan deleted; the secret's file rewritten (8). A stale spec moved by a reviewed MOVE stays handled and is forbidden at its new place; the same move with A5 not standing on A3 is MISHANDLED |
+| 5 | A value committed and removed by the adoption is MISHANDLED | on `main`, and on another ref (2); an adopted repository without its history rules nothing out |
+| 6 | A control out of the index, or mapped to no namespace the path map holds, is FLAGGED | each control of the TypeScript monorepo, both ways |
+| 7 | The successor plan classed superseded too is MISHANDLED | every repository with a superseded plan |
+| 8 | ADOPTED_WITH_ACCEPTED_EXCEPTIONS (or ADOPTED_HEALTHY) with the secret's finding open is MISHANDLED | both verdicts |
+| 9 | A build refuses a manifests folder that holds manifests; read mode refuses manifests whose seed or head is not the run's | both |
+| 10 | The large files' budget clause is said to be not measured, in each judgement and in this README | one |
 
 **The judge's own mutation check (scratch run, 2026-10-31, not committed).** Six mutants of the judge were run
 against these self-tests in one process. Five were killed:
@@ -599,6 +657,16 @@ a question's text, and exits as told for `close` and `adopt`. They check:
 - `run` mode naming a failing stage;
 - the hidden stand-in.
 
+**Refusals the runner makes before it builds or reads:**
+
+- **A shared manifests folder.** A build refuses a manifests folder that already holds manifests, as it refuses a
+  run folder that is not empty: another run's manifests would be overwritten. `run.json` records each repository's
+  head. Read mode refuses a manifest whose seed or head is not the run's record, naming the repository.
+- **A hidden file it cannot read.** A variants file or hidden question set that cannot be read, or is not of its
+  form, is refused naming the file only. A variant the hook cannot build is refused as
+  `hidden variant #<n> (<id>) cannot be built`, never by its texts, paths, facts or values. The command prints
+  `refused: …` and exits 2.
+
 **A risk for the real run.** By default the manifests sit in the run folder, beside the repositories that a launched
 session adopts, and a manifest names every planted problem. For the real run, pass `--manifests` with a folder
 outside the adopting session's reach, or have the guard refuse `<run>/manifests/**` to the measured sessions.
@@ -644,4 +712,5 @@ folder.
 | **F2** READY with a control flagged, a stage unmeasured, or a figure below its floor or reported alone | the control cases, `test_an_absent_stage_is_named`, `test_on_todays_code_…`, the figure cases, `test_a_scorer_at_84_…` |
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
+| **Review (batch 4)** Items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |
 | **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |
