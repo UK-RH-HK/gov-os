@@ -103,6 +103,18 @@ imports the same `src`, through the path file in the stand-in home. `gov launch`
 They stay red on the head after ACT 1, for the reason they were red before this revision. On `aafd45c1` they pass, as
 before.
 
+## The next round (W2-90b, DEC-999 item 1)
+
+W2-90b (`DAEO-nqa2`) revised this folder's helper and the cases that need neither W2-105 nor W2-110
+(`tests/acceptance/W2-90b/README.md`):
+
+- **`install_gov_for`** now also writes the editable install's `gov` script at `<home>/.local/bin/gov`. The template's
+  guard lines are pinned since W2-106, so without the script they ran the owner's pin, not this worktree's code.
+- **The four W2-59 cases above** now run the template's pinned line and pass.
+- **The three install cases above, and W1-33's orchestrator install case,** judge the kernel's wiring and are red only
+  on the template's install deny rules. They wait for W2-105, in W2-90c.
+- **The 14 ids ACT 1 dropped** are restored on the template's post-tool lines.
+
 ## Split functions (every id kept)
 
 Two functions held both ids that could move and ids that could not:
