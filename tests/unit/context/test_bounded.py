@@ -186,13 +186,34 @@ def test_the_next_batch_is_taken_while_room_is_left(monkeypatch, tmp_path):
 
 
 def test_what_is_left_for_a_further_batch_is_at_most_one_batch(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1, 1, 30] + [1] * 27, room=12)
+    assert [item["id"] for item in block["supplementary"]] == ["R-0", "R-1"]
+    assert [item["id"] for item in block["further_batch"]] == [f"R-{n}" for n in range(2, 10)]  # its batch's rest
+    assert len(block["further_batch"]) <= max(batch["limit"] for batch in block["supplementary_batches"])
+
+
+def test_what_is_left_names_only_items_a_batch_read(monkeypatch, tmp_path):
+    # the second batch is smaller than the first (two tokens of room left): what is left ends where it ends
+    block = _stacked(monkeypatch, tmp_path, [1] * 9 + [2, 5] + [1] * 19, room=13)
+    assert [(len(batch["items"]), batch["limit"]) for batch in block["supplementary_batches"]] == [(10, 10), (2, 2)]
+    assert len(block["supplementary"]) == 10
+    assert [item["id"] for item in block["further_batch"]] == ["R-10", "R-11"]
+    sequence = _sequence(block)
+    assert block["further_batch"] == sequence[sequence.index(block["further_batch"][0]):]
+
+
+def test_room_that_ends_on_a_batch_s_last_item_leaves_nothing_named(monkeypatch, tmp_path):
     block = _stacked(monkeypatch, tmp_path, [1] * 30, room=3)
     assert [item["id"] for item in block["supplementary"]] == ["R-0", "R-1", "R-2"]
     assert block["supplementary_batches"] == [{"items": [{"id": f"R-{n}", "path": f"f{n}.md"} for n in range(3)],
                                                "limit": 3}]
-    assert [item["id"] for item in block["further_batch"]] == ["R-3", "R-4", "R-5"]  # the largest limit's length
-    block = _stacked(monkeypatch, tmp_path, [1] * 30, room=12)
-    assert len(block["further_batch"]) == supplementary.BATCH_SIZE and block["further_batch"][0]["id"] == "R-12"
+    assert block["further_batch"] == [] and block["dropped"] == []  # no item failed to fit, none unread is named
+
+
+def test_no_room_takes_no_batch_and_names_nothing_unread(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 5, room=0)
+    assert block["supplementary_batches"] == [] and block["supplementary"] == []
+    assert block["further_batch"] == [] and block["dropped"] == []
 
 
 def _sequence(block):

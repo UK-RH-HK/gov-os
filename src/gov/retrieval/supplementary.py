@@ -5,7 +5,7 @@ the semantic index answers (AR-9, W2-M239): the query's words are searched one b
 over the words it holds of one over the number of chunks that hold the word (a rarer word weighs more), and equal
 ranks are ordered by path, then id, then the first line a word was found on. The ranked chunks are read a batch at a
 time and stacked in rank order into the room the packet leaves; the stack stops at the first chunk that does not fit,
-and the chunks from it on, one batch at most, are named as left for a further batch.
+and the chunks of its batch from it on are named as left for a further batch.
 """
 
 from __future__ import annotations
@@ -139,11 +139,9 @@ def stack(root: Path, title: str, kpis: list[str], room: int, *, skip_paths=(), 
         taken += len(batch)
         if len(batch) < limit:  # the evidence ended: this batch holds fewer items than its limit
             break
-    if room == 0 and taken < len(ranked):
-        left_from = taken
-    # what is left is at most one batch: as long as the largest batch taken (DEC-1005, S7a)
-    width = max((batch["limit"] for batch in batches), default=BATCH_SIZE)
-    further = ranked[left_from:left_from + width] if left_from is not None else []
+    # what is left is the last batch's items from the first that did not fit, so one batch at most and nothing that no
+    # batch read (DEC-1005, S7a); where the room ends on a batch's last item, or none is left, no item failed to fit
+    further = ranked[left_from:taken] if left_from is not None else []
     return {"query": asked, "supplementary": supplementary, "dropped": dropped,
             "further_batch": [{"id": item["id"], "path": item["path"]} for item in further],
             "supplementary_batches": batches, "left_out": left_out}
