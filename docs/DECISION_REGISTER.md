@@ -12718,3 +12718,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.400 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1018. Next free id: DEC-1019. |
+
+### DEC-1019 — W2-92's P-W2-92-5 (a): with no readable record graph, no evidence from a record file (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: a P2 inside W2-92's approved KPIs that only makes the citation guard fail closed; the lead's recommendation; confidence medium-high) · **Under:** DEC-1006, DEC-423, DEC-957, DEC-1010
+- **Decision:** P-W2-92-5 (a): DEC-1006's P-1 (a) stays (a missing or unreadable record graph fails only the record and closure routes), and when the record graph cannot be read, retrieval cites no evidence from a record file and says so in the closure facet, so a superseded or must-not-cite record is never cited as current (DEC-423). W1-21's `test_without_a_record_graph_no_superseded_record_is_cited_as_current` and W2-92's f3 must both pass; W1-21's test is not changed. Option (b) (revert P-1) is kept as the fallback if (a) cannot pass both. Classification: ordinary work yes; consequence: fails open (closed by this fix). One engineer batch in `retrieve.py`, then the rebuild, `gov check` and the scoped run; no re-measure (the change acts only with no record graph).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.401 | 2026-11-01 | Orchestrator (delegated): DEC-1019. Next free id: DEC-1020. |
