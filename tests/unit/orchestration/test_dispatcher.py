@@ -1376,3 +1376,87 @@ def test_slot_an_idle_holder_while_the_server_is_hung_is_likely_waiting_on_it(w,
     etick(w, server, NOW + 120)
     found = items_with(w, "Slot:")
     assert len(found) == 1 and "likely waiting on the embedding server" in found[0]
+
+
+# ---- DEC-1018 item 1: no landing claimed before the nightly has started ------------------------------------------------
+
+HELD_FOR_NIGHTLY = "held for the nightly (DEC-1018) until it starts"
+
+
+def at(hh, mm):
+    """NOW's day at a local time (the dispatcher runs in the same time zone as the test)."""
+    return datetime.fromtimestamp(NOW).replace(hour=hh, minute=mm, second=0, microsecond=0).timestamp()
+
+
+def nightly_running(w, mtime):
+    m = w.orch / "NIGHTLY-RUNNING"
+    m.write_text("nightly: running\n")
+    os.utime(m, (mtime, mtime))
+
+
+def test_nightly_hold_inside_the_window_claims_nothing(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(3, 30))
+    assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY and (w.d / "land.txt").exists()
+
+
+def test_nightly_hold_not_before_the_window(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(3, 14))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_does_not_hold_starts(w):
+    tick(w, DISPATCH_NOW=at(3, 30))
+    assert [c for c in calls(w) if c.startswith("launch")] and status(w)["land"] == HELD_FOR_NIGHTLY
+
+
+def test_nightly_hold_released_by_nightly_running(w):
+    land_one(w)
+    nightly_running(w, at(4, 1))
+    tick(w, DISPATCH_NOW=at(4, 10))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_released_by_a_status_line_for_today(w):
+    land_one(w)
+    nd = w.orch / "log" / "nightly"
+    nd.mkdir(parents=True)
+    today = datetime.fromtimestamp(NOW).strftime("%Y-%m-%d")
+    (nd / "status.txt").write_text(f"{today} FAILED | nightly NOT STARTED: by the latest start, ...\n")
+    tick(w, DISPATCH_NOW=at(4, 55))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_released_by_the_until_time(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(5, 30))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_a_stale_nightly_running_from_yesterday_does_not_release(w):
+    land_one(w)
+    nightly_running(w, at(4, 1) - 86400)
+    nd = w.orch / "log" / "nightly"
+    nd.mkdir(parents=True)
+    yesterday = datetime.fromtimestamp(NOW - 86400).strftime("%Y-%m-%d")
+    (nd / "status.txt").write_text(f"{yesterday} ran | verdict: green\n")  # yesterday's line does not release either
+    tick(w, DISPATCH_NOW=at(4, 10))
+    assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY
+
+
+def test_nightly_hold_a_landing_in_flight_is_finalised_not_stopped(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(3, 10))  # claimed before the hold
+    assert calls(w) == ["land W2-A=abcdef1"] and (w.d / "land-inflight.txt").exists()
+    tick(w, DISPATCH_NOW=at(3, 20))
+    assert not (w.d / "land-inflight.txt").exists() and "CLOSED" in (w.d / "land-done.txt").read_text()
+
+
+def test_nightly_hold_times_are_configured(w):
+    conf(w, nightly_hold_from="02:00", nightly_hold_until="02:30")
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(2, 10))
+    assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY
+    tick(w, DISPATCH_NOW=at(3, 30))  # outside the configured window: the default window does not apply
+    assert calls(w) == ["land W2-A=abcdef1"]

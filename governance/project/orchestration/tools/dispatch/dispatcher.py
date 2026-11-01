@@ -16,6 +16,8 @@ error in its own checks; every external command has a 60 s limit, a timeout coun
      the owner's launch form (tools/launch_when_gate_opens.sh, as lead_chain2.sh starts it), recorded before launch;
   4. land: land.txt claimed by an atomic rename, every line in one tools/land.py call, only when the queue is free,
      no close runs, the main tree is clean and on w2/integrate; its outcome becomes land-done.txt and an inbox item;
+     from `nightly_hold_from` (03:15) until the nightly has started (or `nightly_hold_until`, 05:30) nothing is
+     claimed (DEC-1018 item 1); a landing already in flight is finalised as usual;
   5. the guard harvest, when due: detached, with its own lock and time limit, after the start and land decisions;
      its last result is shown in the status, and a failure or timeout is one of the pass's failures;
   5b. the embedding server's health (DEC-1015 item 2): a test request every `embed_check_every` passes; failures in
@@ -285,7 +287,9 @@ def config():
          # DEC-1015 item 2: the embedding server's health, and the slot holders' progress
          "embed_check_every": 1, "embed_timeout_s": 30, "embed_hung_after": 3, "embed_restart_cmd": None,
          "embed_restart_after_s": 900, "embed_restart_min_gap_s": 1800, "embed_model": "qwen3-embedding:0.6b",
-         "embed_url": EMBED_URL, "slot_idle_s": 900}
+         "embed_url": EMBED_URL, "slot_idle_s": 900,
+         # DEC-1018 item 1: no landing claimed from this time until the nightly has started, or until the second
+         "nightly_hold_from": "03:15", "nightly_hold_until": "05:30"}
     try:
         c.update(json.loads(CONFIG.read_text()))
     except (OSError, ValueError):
@@ -1315,9 +1319,48 @@ def finalise_land(t, dry):
     return "finished"
 
 
+def clock_today(text, default):
+    """Today's local time HH:MM as a timestamp (a malformed value: the default)."""
+    for v in (text, default):
+        try:
+            h, m = (int(x) for x in str(v).split(":"))
+            return datetime.fromtimestamp(now()).replace(hour=h, minute=m, second=0, microsecond=0).timestamp()
+        except (ValueError, TypeError):
+            continue
+
+
+NIGHTLY_HELD = "held for the nightly (DEC-1018) until it starts"
+
+
+def nightly_hold(c):
+    """DEC-1018 item 1: the nightly (cron 04:00) starts only after 5 quiet minutes in a clean main tree, and a landing
+    run takes about 45 minutes; so from `nightly_hold_from` no new landing is claimed until the nightly has started
+    (ORCH/NIGHTLY-RUNNING newer than today's hold start, or a line for today in log/nightly/status.txt), and never
+    after `nightly_hold_until`. Returns the hold's reason, or None."""
+    start = clock_today(c.get("nightly_hold_from"), "03:15")
+    until = clock_today(c.get("nightly_hold_until"), "05:30")
+    if not start <= now() < until:
+        return None
+    try:
+        if (ORCH / "NIGHTLY-RUNNING").stat().st_mtime >= start:
+            return None
+    except OSError:
+        pass
+    today = datetime.fromtimestamp(now()).strftime("%Y-%m-%d")
+    try:
+        if any(l.startswith(today) for l in (LOG / "nightly" / "status.txt").read_text().splitlines()):
+            return None
+    except OSError:
+        pass
+    return NIGHTLY_HELD
+
+
 def land_step(t, dry):
     if (D / "land-inflight.txt").exists():
-        return finalise_land(t, dry)
+        return finalise_land(t, dry)  # a landing in flight is never stopped by the nightly hold
+    held = nightly_hold(t.get("_c") or {})
+    if held:
+        return held
     if not read_list(D / "land.txt"):
         return "nothing to land"
     if t["queue_busy"]:

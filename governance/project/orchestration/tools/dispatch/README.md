@@ -43,6 +43,16 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
    landing's tickets (its arguments' W2 ids), or one committing its records (only `.tickets/` or `closes/` files
    modified in the main tree: one pass); any other close does not. `land.py`'s own close commit retries up to 3
    times while another commit holds `index.lock`.
+   **The nightly's hold (DEC-1018 item 1):** the nightly (cron 04:00) starts only after 5 quiet minutes with a clean
+   main tree and an unchanged `w2/integrate`, and gives up at its latest start; a landing run takes about 45 minutes.
+   So from `nightly_hold_from` (config, "03:15", local time) no landing is claimed until the nightly has started:
+   `NIGHTLY-RUNNING` in the orchestrator folder newer than today's hold start, or a line for today in
+   `log/nightly/status.txt` (written only from 08:00 by `nightly_check.sh`, or after a reboot, so in practice the marker is
+   what releases it; a night that gives up, or exits early and removes its marker, stays held until the end). The hold
+   always ends at `nightly_hold_until` ("05:30").
+   Status: `land: held for the nightly (DEC-1018) until it starts`. A landing already in flight is finalised as usual,
+   never stopped; starts and the inbox are not held. The dispatcher's own writes stay in its state folder under
+   `.gov-runtime/` (ignored by git), so they never make the main tree unclean.
 4b. **The CTO's watchers, as passes (DEC-1014 item 3), each finding one inbox item, once:** a lead's new commit not on
    `w2/integrate` whose subject marks a key result (baseline, measure, figures, hit@5, findings report, probe record,
    research record, PACKAGE; `interim-seen.txt`, keyed by the commit's patch-id, else its subject and tree, so a
