@@ -1,0 +1,8 @@
+2026-11-01 13:16:38 W2-11 waits: SHUT leads=3 load=28.0/28.9 nproc=20 have=19512000kB need=12091428kB: load 28.0/28.9 >= nproc 20
+2026-11-01 13:17:45 W2-11 waits: SHUT leads=3 load=46.2/30.3 nproc=20 have=19357748kB need=13101324kB: load 46.2/30.3 >= nproc 20
+2026-11-01 13:18:52 W2-11 waits: SHUT leads=3 load=35.6/30.6 nproc=20 have=20172272kB need=12065316kB: load 35.6/30.6 >= nproc 20
+2026-11-01 13:20:00 W2-11 waits: SHUT leads=3 load=24.4/29.8 nproc=20 have=20305580kB need=12071684kB: load 24.4/29.8 >= nproc 20
+2026-11-01 13:21:03 W2-11 waits: SHUT leads=3 load=24.0/29.3 nproc=20 have=19578380kB need=12068612kB: load 24.0/29.3 >= nproc 20
+2026-11-01 13:22:10 W2-11 waits: SHUT leads=3 load=25.6/29.2 nproc=20 have=20092280kB need=12066352kB: load 25.6/29.2 >= nproc 20
+2026-11-01 13:23:18 starting W2-11 (DAEO-k7hz), 3 lead(s) running
+2026-11-01 13:25:32 chain done

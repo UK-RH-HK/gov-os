@@ -1,0 +1,6 @@
+#!/usr/bin/env -S PYTHONPATH=/home/usain/gov-os-runs/W2-13/base/src python3
+# W2-13's measure: the base clone's own code as the retriever (as W2-86's gov-wt did for its tree).
+import sys
+from gov.cli.main import main
+if __name__ == '__main__':
+    sys.exit(main())

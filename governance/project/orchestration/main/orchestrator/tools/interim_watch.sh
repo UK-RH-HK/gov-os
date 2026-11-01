@@ -5,7 +5,7 @@
 # log/interim-seen.txt, and exits. Re-arm after each. The first run of a worktree marks its history seen silently.
 SEEN=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/interim-seen.txt
 touch "$SEEN"
-KEY='baseline|measure|figures|hit@5|findings report|probe record|research record|the record|PACKAGE|returns? PACKAGES'
+KEY='baseline|measure|figures|hit@5|findings report|probe record|research record|PACKAGE|returns? PACKAGES'
 while true; do
   for wt in /home/usain/gov-os-worktrees/*/; do
     name=$(basename "$wt")

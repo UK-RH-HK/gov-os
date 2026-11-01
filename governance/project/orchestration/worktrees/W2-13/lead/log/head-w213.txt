@@ -1,0 +1,247 @@
+...FF...FF.F.F.F.F........F................F..........                   [100%]
+=================================== FAILURES ===================================
+________ test_the_lexical_route_hands_the_fusion_its_ranking_best_first ________
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+
+    def test_the_lexical_route_hands_the_fusion_its_ranking_best_first(box, built):
+        """No endpoint and no reranker: the lexical route alone reaches the fusion, and the fused list keeps the route's
+        own order (one route's list keeps its order through the fusion, W1-19), best first."""
+        env = box.scratch_env()
+        route = support.ranked_paths(box.search(built, support.PLAIN_QUESTION, env=env))
+        answer, _ = fused(box, built, support.PLAIN_QUESTION, env, support.ABSENT_RERANKER)
+        paths = list(dict.fromkeys(hit["path"] for hit in answer["hits"]))
+        assert paths, f"the fusion holds no hit for {support.PLAIN_QUESTION!r} without the semantic route"
+        assert not any(support.ROUTE_SEMANTIC in hit["routes"] for hit in answer["hits"]), \
+            f"premise: a hit came from the semantic route, which has no endpoint: {answer['hits'][:3]!r}"
+        assert paths[0] == support.BEST, f"the fused list does not start with the best lexical match: {paths}"
+>       assert paths == route[:len(paths)], f"the fused order is not the lexical route's ranking:\n  fused: {paths}\n" \
+                                            f"  route: {route}"
+E       AssertionError: the fused order is not the lexical route's ranking:
+E           fused: ['rank/z-best.md', 'rank/m-second.md', 'rank/a-third.md']
+E           route: []
+E       assert ['rank/z-best...k/a-third.md'] == []
+E         
+E         Left contains 3 more items, first extra item: 'rank/z-best.md'
+E         Use -v to get more diff
+
+tests/acceptance/W2-13/test_w2_13_fusion.py:57: AssertionError
+_ test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question _
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x7fbd611788f0>
+
+    def test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question(box, built, ollama):
+        bundle = support.check_bundle(box.retrieve(built, support.PLAIN_QUESTION, host=ollama.host).result(), root=built)
+        lexical = [item["path"] for item in bundle[support.K_EVIDENCE] if support.ROUTE_LEXICAL in item["routes"]]
+>       assert support.BEST in lexical, \
+            f"gov retrieve does not cite {support.BEST} by the lexical route; cited by it: {lexical}; " \
+            f"all cited: {support.cited_paths(bundle)}"
+E       AssertionError: gov retrieve does not cite rank/z-best.md by the lexical route; cited by it: []; all cited: ['records/dec-0042.md', 'rank/z-best.md', 'rank/m-second.md', 'rank/a-third.md', 'fields/e-id.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', 'exact/two.py', 'fields/d-title.md', 'spans/tool.py']
+E       assert 'rank/z-best.md' in []
+E        +  where 'rank/z-best.md' = support.BEST
+
+tests/acceptance/W2-13/test_w2_13_fusion.py:64: AssertionError
+_______________ test_a_plain_word_question_returns_lexical_hits ________________
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+
+    def test_a_plain_word_question_returns_lexical_hits(box, built):
+        """W2-M292: no line holds the question as a phrase; its words are matched, and the file that holds them all is
+        a hit."""
+        assert not any(support.PLAIN_QUESTION in text for text in support.corpus().values()), \
+            "premise: a line of the fixture holds the question verbatim"
+        paths = order(box, built, support.PLAIN_QUESTION)
+>       assert paths, f"the plain-word question {support.PLAIN_QUESTION!r} returns no lexical hit"
+E       AssertionError: the plain-word question 'pilot tide harbour' returns no lexical hit
+E       assert []
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:67: AssertionError
+_______ test_hits_are_ranked_best_first_by_how_well_they_match_the_words _______
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+
+    def test_hits_are_ranked_best_first_by_how_well_they_match_the_words(box, built):
+        """Three files of the same length hold three, two and one of the question's words; their paths sort the other
+        way round, so an order by path, by row or by line is red. BM25 ranks them three, two, one."""
+        paths = order(box, built, support.PLAIN_QUESTION)
+>       assert before(paths, support.BEST, support.SECOND) and before(paths, support.SECOND, support.THIRD), \
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"not ranked best first ({support.BEST}, {support.SECOND}, {support.THIRD}): {paths}"
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = [], first = 'rank/z-best.md', second = 'rank/m-second.md'
+
+    def before(paths, first, second):
+        """Whether ``first`` is ranked above ``second``; both must be hits."""
+        missing = [rel for rel in (first, second) if rel not in paths]
+>       assert not missing, f"{missing} are not lexical hits; the route ranked {paths}"
+E       AssertionError: ['rank/z-best.md', 'rank/m-second.md'] are not lexical hits; the route ranked []
+E       assert not ['rank/z-best.md', 'rank/m-second.md']
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:28: AssertionError
+_ test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body[title, the body first by path] _
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+pair = 'title, the body first by path'
+
+    @pytest.mark.parametrize("pair", list(support.FIELD_PAIRS), ids=list(support.FIELD_PAIRS))
+    def test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body(box, built, pair):
+        """The two files of a pair hold the same words, the same number of times: only whether the question's word is
+        in the record's id (or the heading) or in the body tells them apart, so a ranking with no field weights ties
+        them. Each pair has a mirror whose paths sort the other way, so a tie broken by path, row or insertion order
+        passes at most one of the two."""
+        question, weighted, body = support.FIELD_PAIRS[pair]
+        paths = order(box, built, question)
+>       assert before(paths, weighted, body), \
+            f"{weighted} (the word in its {pair.split(',')[0]}) is not ranked above {body} (the word in its body) " \
+            f"for {question!r}: {paths}"
+E       AssertionError: fields/d-title.md (the word in its title) is not ranked above fields/c-body.md (the word in its body) for 'Beacon': ['fields/c-body.md', 'fields/d-title.md']
+E       assert False
+E        +  where False = before(['fields/c-body.md', 'fields/d-title.md'], 'fields/d-title.md', 'fields/c-body.md')
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:88: AssertionError
+_ test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body[id, the body first by path] _
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+pair = 'id, the body first by path'
+
+    @pytest.mark.parametrize("pair", list(support.FIELD_PAIRS), ids=list(support.FIELD_PAIRS))
+    def test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body(box, built, pair):
+        """The two files of a pair hold the same words, the same number of times: only whether the question's word is
+        in the record's id (or the heading) or in the body tells them apart, so a ranking with no field weights ties
+        them. Each pair has a mirror whose paths sort the other way, so a tie broken by path, row or insertion order
+        passes at most one of the two."""
+        question, weighted, body = support.FIELD_PAIRS[pair]
+        paths = order(box, built, question)
+>       assert before(paths, weighted, body), \
+            f"{weighted} (the word in its {pair.split(',')[0]}) is not ranked above {body} (the word in its body) " \
+            f"for {question!r}: {paths}"
+E       AssertionError: fields/h-id.md (the word in its id) is not ranked above fields/g-body.md (the word in its body) for 'QUINCE': ['fields/g-body.md', 'fields/h-id.md']
+E       assert False
+E        +  where False = before(['fields/g-body.md', 'fields/h-id.md'], 'fields/h-id.md', 'fields/g-body.md')
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:88: AssertionError
+________ test_an_exact_identifier_ranks_first[the identifier and words] ________
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+question = 'QX-4471 gauge reading'
+
+    @pytest.mark.parametrize("question", support.EXACT_QUESTIONS, ids=["the identifier alone", "the identifier and words"])
+    def test_an_exact_identifier_ranks_first(box, built, question):
+        """One file holds ``QX-4471``; two others hold ``QX`` and ``4471``, and the question's other words, far more
+        often. The file that holds the identifier verbatim is the first hit."""
+        paths = order(box, built, question)
+>       assert paths and paths[0] == support.EXACT_HOLDER, \
+            f"{support.EXACT_HOLDER} holds {support.EXACT_ID} verbatim and is not the first hit for {question!r}: {paths}"
+E       AssertionError: ids/z-holder.md holds QX-4471 verbatim and is not the first hit for 'QX-4471 gauge reading': []
+E       assert ([])
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:100: AssertionError
+______ test_letter_case_does_not_change_what_a_plain_word_question_finds _______
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+
+    def test_letter_case_does_not_change_what_a_plain_word_question_finds(box, built):
+        """W2-M072: the same words in capitals find the same files."""
+        lower, upper = support.PLAIN_QUESTION, support.PLAIN_QUESTION.upper()
+        found_lower, found_upper = order(box, built, lower), order(box, built, upper)
+>       assert support.BEST in found_lower, f"{lower!r} does not find {support.BEST}: {found_lower}"
+E       AssertionError: 'pilot tide harbour' does not find rank/z-best.md: []
+E       assert 'rank/z-best.md' in []
+E        +  where 'rank/z-best.md' = support.BEST
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:123: AssertionError
+_______ test_an_id_that_exists_nowhere_given_with_its_id_is_a_stated_gap _______
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x7fbd611788f0>
+
+    def test_an_id_that_exists_nowhere_given_with_its_id_is_a_stated_gap(box, built, ollama):
+        question = support.GAP_QUESTIONS[1]
+        bundle = support.check_bundle(box.retrieve(built, question, "--id", support.MISSING_ID, host=ollama.host).result(),
+                                      root=built)
+>       stated_gap(bundle, f"{question!r} --id {support.MISSING_ID}")
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5441}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...}
+where = "'What does DEC-9999 decide?' --id DEC-9999"
+
+    def stated_gap(bundle, where):
+        assert support.MISSING_ID in support.gap_names(bundle), \
+            f"{where}: {support.MISSING_ID} is not named among the gaps: {bundle[support.K_GAPS]!r}"
+        reason = bundle[support.K_REASON]
+        assert reason not in support.NOT_A_STATED_GAP and reason in support.STATED_GAP, \
+            f"{where}: the bundle stops with {reason}, not a reason that names the gap ({support.STATED_GAP})"
+>       assert bundle[support.K_CONTINUATION] is None, f"{where}: the bundle does not stop: it carries a continuation"
+E       AssertionError: 'What does DEC-9999 decide?' --id DEC-9999: the bundle does not stop: it carries a continuation
+E       assert 'eyJiYiI6bnVsbCwiYnMiOjEwLCJpIjpbIkRFQy05OTk5Il0sIm8iOjIwLCJxIjoiV2hhdCBkb2VzIERFQy05OTk5IGRlY2lkZT8iLCJyIjowLCJ0IjpudWxsfQ==' is None
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:35: AssertionError
+_ test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback[not a database] _
+
+box = <w2_13_support.Box object at 0x7fbd610c7050>
+repo = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/test_gov_retrieve_on_an_unusab0/repo')
+state = 'not a database'
+
+    @pytest.mark.parametrize("state", STORES)
+    def test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback(box, repo, state):
+        make_store(box, repo, state)
+>       support.no_traceback(box.retrieve(repo, support.PLAIN_QUESTION))
+
+tests/acceptance/W2-13/test_w2_13_unavailable.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = <w2_13_support.Run object at 0x7fbd61087e90>
+
+    def no_traceback(run):
+        """A command answers an envelope (a bundle, or ``ok: false`` with a governance error), never a traceback."""
+>       assert "Traceback (most recent call last)" not in run.stderr + run.stdout, f"a traceback:\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a traceback:
+E       gov retrieve --json --root /tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-1/test_gov_retrieve_on_an_unusab0/repo pilot tide harbour
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       Traceback (most recent call last):
+E         File "<frozen runpy>", line 198, in _run_module_as_main
+E         File "<frozen runpy>", line 88, in _run_code
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/cli/main.py", line 261, in <module>
+E           sys.exit(main())
+E                    ^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/cli/main.py", line 246, in main
+E           outcome = command.handler(root, args, config)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/retrieve/command.py", line 85, in run
+E           bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/retrieval/retrieve.py", line 119, in retrieve
+E           record_of, not_current, record_types = _graph(root)
+E                                                  ^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/retrieval/retrieve.py", line 47, in _graph
+E           known = records.records(root)
+E                   ^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/records/queries.py", line 34, in records
+E           rows = _rows(root, "SELECT records.id, type, status, path, heading, title, span, content_hash FROM records"
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13/src/gov/records/queries.py", line 22, in _rows
+E           return sorted(connection.execute(sql, tuple(given.values())).fetchall())
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.DatabaseError: file is not a database
+
+tests/acceptance/W2-13/w2_13_support.py:482: AssertionError
+10 failed, 44 passed, 2 deselected in 66.27s (0:01:06)

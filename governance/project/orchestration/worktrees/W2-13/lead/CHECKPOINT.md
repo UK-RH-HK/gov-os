@@ -1,0 +1,39 @@
+# W2-13 lead checkpoint (DAEO-zqvn), run 1
+
+- Updated: 2026-11-01 12:45 UTC
+- Branch w2/W2-13, head c38a5b49bc86 (base = w2/integrate head at claim). No commits of this ticket yet.
+- State: step 1 (test designer and engineer in parallel).
+  - Store rebuild of this worktree (rebuild-1): **the lead's mistake.** At 12:52 the lead killed pid 1048898, taking it for its own queued rebuild. It was the W2-92 lead's queued rebuild (session w2-92-5d, cwd W2-92; it was still waiting and had not started). W2-92's lead was told by SendMessage at about 13:20. The lead's own rebuild (subshell 1053654, flock 1053655) took the lock at 12:47:27 and ran to 13:11:57 with exit 0, ok: lexical, semantic and codeintel recreated, digest 6ea77de7b6f7, 1,470 s. It used base code (the lexical stage ran at 12:47, before the engineer started) and overlapped the engineer from 12:53. This breaches "no rebuild while a worker runs here": report it. The store exists now (base code). A rebuild here with the engineer's code is still due before verification.
+  - Sandbox placeholders: 0-byte read-only files appear while sandboxed commands run (W2-13 root: .bash_profile .bashrc .gitconfig .gitmodules .idea .mcp.json .profile .ripgreprc .vscode .zprofile; .gov-runtime/s, sc, scr, scra, scrat, scratc at 13:12). Check after the workers end and name any that are left.
+  - Engineer eng-1 launched 12:53 UTC, sandboxed (gov launch engineer, effort high), log log/eng-1.json, tripwire tripwire-before-2.json.
+  - Base measure clone /home/usain/gov-os-runs/W2-13/base at c38a5b49bc86 (detached); its rebuild (its own code) queued on the lock: log/rebuild-base.json, exit log/rebuild-base.exit. Launcher bin/gov-base (base code).
+  - Dev queryset lexical-only hit@5 on base: 0.0 (0 of 52 hits, no raise, p95 0.003 s), log/hit5-base.json; script lexical_hit5.py.
+  - Tests worktree /home/usain/gov-os-worktrees/W2-13-tests (branch w2/W2-13-tests, from c38a5b49bc86) added.
+  - Test designer td-1: launched 12:41 UTC, sandboxed (gov launch independent-test-designer, effort xhigh), brief briefs/td-1.md, log log/td-1.json, tripwire tripwire-before-1.json.
+  - Engineer eng-1: brief briefs/eng-1.md written; launch after the rebuild ends (tripwire-before-2).
+- td-1 returned 13:15 (12:41:29 to 13:15:20, 31 min of session, $9.42, 114 turns, xhigh). Commit 5500ef08b6be on w2/W2-13-tests (trailers ok), 56 cases. Tripwire: in the tests worktree only the W2-13 acceptance folder and its head. Packages P-W2-13-TD-1 (W2-M098), TD-2 (whole tokens vs trigram), TD-3 (paths: retrieve.py, records). Revisions named: W1-17 exact_query (3 cases) and freshness (7 cases); W1-20 and W1-21 only under TD-1 (a); latency file belongs in serial-only.txt. Left behind: tests/acceptance/W2-13/__pycache__ in the tests worktree (removal was refused).
+- Red check (lead, 13:18, tests worktree = base + tests, real-model cases deselected): 17 failed, 37 passed, 2 deselected, 88.6 s. Each red matches its README reason. gov.__file__ = W2-13-tests/src.
+- eng-1 committed 44993791bf93 (trailers ok) while still running.
+- eng-1 returned 13:39 (50 min, $4.81, 105 turns, session b6ced9ac). Second commit ad72198e4474 (trailers ok). Tripwire: W2-13 head only, plus the stray untracked pytest-of-usain/ in the worktree root (79 inodes, 428K, holds a unit test's planted secret.md). The lead's rm was refused (permission prompt); not retried; name it in the return. Package P-W2-13-1: retrieve.py line 127 (W2-92's route list) must take answer.get("ranked", answer["hits"]) for gov retrieve's bundle to fuse the ranked list. Outside the paths, so S2's bundle case and the memory measure wait on it.
+- Merged tests: bd329ce3b402 (merge --no-ff, trailers ok). TESTS-READY written. eng-1 resumed 13:45 for gov accept (log/eng-1-accept.json, tripwire-before-3).
+- Measure clones: base (c38a5b49bc86), rebuild running since about 13:45; head (bd329ce3b402), rebuild queued; launchers bin/gov-base, bin/gov-head, bin/gov-head-a (option (a) shim: retrieve's lexical reference gets ranked as hits; no source edit).
+- eng-1 accept resume (13:45–13:52, $0.24 extra): gov accept timed out at its own 590 s guard in the sandbox; the sandbox denied ollama.com:443 three times. Its "ESCALATION_BLOCKED" is its own label, not a gov answer.
+- Lead's gov accept (13:52–13:57, lead session, head bd329ce3b402, gov.__file__ in W2-13/src): exit 3, 45 passed, 11 failed. S1 fail (7/6), S2 fail (1/2), S3 fail (23/2), S4 fail (7/1), F1 pass (3/0), F2 pass (4/0). Lead's diagnostic pytest (real-model cases deselected): 10 failed, 44 passed. So the 11th failure is a real-model case: the latency case (F1 passed). Re-run it alone (DEC-372).
+  - S1 x6 and S2 x1: the tests read the ranking from lexical.search's `hits`; the engineer kept `hits` exact (W1-17, W2-87) and put the ranking in a new `ranked` list: interface dispute, new package P-W2-13-3.
+  - S2 x1 (gov retrieve's lexical route): P-W2-13-1 (retrieve.py line 127).
+  - S4 x1 (--id still has a continuation) and S3 x1 (traceback from records under gov retrieve on a non-database store): inside command.py. Engineer resumed 14:05 for both (briefs/eng-1-resume-repair.md, log/eng-1-repair.json, tripwire-before-4).
+- Repair resume 14:00–14:02: commit b555d200b5f6 (trailers ok; command.py: stated gap with --id/--ticket when every named id exists nowhere; DatabaseError -> STORE_UNREADABLE). Tripwire: head only. Lead's check of the two cases: 14 passed.
+- Checks at b555d200b5f6: collect-only 19112/19114 collected (2 deselected), no error; trailer_gate "DAEO-zqvn: 8 commits, 8 judged, 0 lacking, 0 Implements item(s) not a decision or Contract id that resolves"; keyword_warn 0.
+- Base clone rebuild ok (digest 6ea77de7b6f7, 1,067 s, lock 13:46:56–14:04:43). Base measure (gov-base, visible): hit@5 11/20, full 11/20, in bundle 15/20 (log/measure-base.json; record /home/usain/gov-os-runs/W2-13/records/base/).
+- Head clone rebuild (bd329ce3b402): queued on the lock since 13:49 (W2-81 holds it; W2-11 and the merge queue also wait).
+- Packages drafted: packages.md (P-W2-13-3 interface, P-W2-13-1 retrieve.py line, TD-1, TD-2, TD-3 settled).
+- Decision: no scoped verification and no review on this head; both wait for P-W2-13-3 and P-W2-13-1, since the head will change.
+- Dev queryset lexical-only hit@5: base 0.0 (0/52); head 85.0 class mean (44/52 hit), exact-hits list 0.0, no raise, p95 0.0098 s (log/hit5-head.json).
+- Next: when td-1 returns, check tripwire, trailers, merge w2/W2-13-tests --no-ff (only while no worker runs here), write TESTS-READY; red check at c38a5b49bc86 (scratch clone at merge base with tests merged, or tests worktree); engineer's gov accept; measure (clones under /home/usain/gov-os-runs/W2-13/{base,head}, each its own code, --part visible); dev queryset lexical-only hit@5; scoped verification; reviewer (max); probe record.
+- Readings recorded for the return: id/title/body field reading given to both workers (lead's reading of the KPI, P3); retrieve budget read as W1-19's warm p95 0.5 s; retrieve.py outside paths (W2-M296 may need command.py or a package; W2-M098 may be out of reach).
+- Brief gaps (running list):
+  - the "retrieve budget" is not defined anywhere by that name; read as W1-19's warm p95 (estimate 5 min) | this ticket's part
+  - src/gov/rebuild/lexical* names no existing file; the rebuild's lexical stage is in rebuild/command.py, outside paths (estimate 3 min) | the ticket file
+  - W2-86's record is not on w2/integrate; read from its commit 362bb64f6 (estimate 3 min) | this ticket's part
+- Guard refusals: none so far. Read refusals: none so far.
+- Loop count: held by the lead.

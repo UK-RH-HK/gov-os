@@ -1,0 +1,22 @@
+#!/usr/bin/env -S PYTHONPATH=/home/usain/gov-os-runs/W2-13/head/src python3
+# W2-13's measure, P-W2-13-1 option (a) simulated without a source edit: the head clone's own code, with the bundle's
+# lexical route (gov.retrieval.retrieve's own reference to the lexical module, and only it) given the ranked list as its
+# hits, as the one-line change of retrieve.py would. gov retrieve's stated-gap check keeps the exact hits.
+import sys
+import gov.retrieval.lexical as _lexical
+import gov.retrieval.retrieve as _retrieve
+
+
+class _Ranked:
+    def __getattr__(self, name):
+        return getattr(_lexical, name)
+
+    def search(self, root, query, refresh=True):
+        answer = _lexical.search(root, query, refresh)
+        return {**answer, "hits": answer.get("ranked", answer["hits"])}
+
+
+_retrieve.lexical = _Ranked()
+from gov.cli.main import main
+if __name__ == '__main__':
+    sys.exit(main())

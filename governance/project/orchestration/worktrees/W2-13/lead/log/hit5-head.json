@@ -1,0 +1,492 @@
+{
+ "gov_file": "/home/usain/gov-os-runs/W2-13/head/src/gov/__init__.py",
+ "queries": 52,
+ "per_class": {
+  "decisions": 100.0,
+  "failed-approaches": 100.0,
+  "tests": 80.0,
+  "stale-evidence": 83.33333333333333,
+  "current-vs-superseded": 100.0,
+  "deletable": 40.0,
+  "callers-impact": 100.0,
+  "where-defined": 83.33333333333333,
+  "why": 80.0,
+  "history": 83.33333333333333
+ },
+ "hit_at_5": 85.0,
+ "exact_hits_hit_at_5": 0.0,
+ "hits": 44,
+ "asked": 52,
+ "raised": 0,
+ "p95_s": 0.009830937022343278,
+ "rows": [
+  {
+   "id": "DQ-A-01",
+   "class": "decisions",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-02",
+   "class": "decisions",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-03",
+   "class": "decisions",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-04",
+   "class": "failed-approaches",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-05",
+   "class": "failed-approaches",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-06",
+   "class": "tests",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-07",
+   "class": "tests",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-08",
+   "class": "stale-evidence",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-09",
+   "class": "stale-evidence",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-10",
+   "class": "stale-evidence",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-11",
+   "class": "current-vs-superseded",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-12",
+   "class": "current-vs-superseded",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-13",
+   "class": "deletable",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-14",
+   "class": "deletable",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-15",
+   "class": "callers-impact",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-16",
+   "class": "callers-impact",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-17",
+   "class": "where-defined",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-18",
+   "class": "where-defined",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-19",
+   "class": "where-defined",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-20",
+   "class": "why",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-21",
+   "class": "why",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-22",
+   "class": "history",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-23",
+   "class": "history",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-A-24",
+   "class": "history",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 14,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-01",
+   "class": "decisions",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-02",
+   "class": "decisions",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-03",
+   "class": "decisions",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-04",
+   "class": "failed-approaches",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-05",
+   "class": "failed-approaches",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-06",
+   "class": "tests",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-07",
+   "class": "tests",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-08",
+   "class": "tests",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-09",
+   "class": "stale-evidence",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-10",
+   "class": "stale-evidence",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-11",
+   "class": "stale-evidence",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-12",
+   "class": "current-vs-superseded",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-13",
+   "class": "current-vs-superseded",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-14",
+   "class": "deletable",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-15",
+   "class": "deletable",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-16",
+   "class": "callers-impact",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-17",
+   "class": "callers-impact",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-18",
+   "class": "where-defined",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 17,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-19",
+   "class": "where-defined",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-20",
+   "class": "where-defined",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-21",
+   "class": "why",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-22",
+   "class": "why",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-23",
+   "class": "why",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-24",
+   "class": "history",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-25",
+   "class": "history",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-26",
+   "class": "history",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-27",
+   "class": "callers-impact",
+   "hit": true,
+   "available": true,
+   "hits": 0,
+   "ranked": 30,
+   "raised": null
+  },
+  {
+   "id": "DQ-B-28",
+   "class": "deletable",
+   "hit": false,
+   "available": true,
+   "hits": 0,
+   "ranked": 4,
+   "raised": null
+  }
+ ]
+}

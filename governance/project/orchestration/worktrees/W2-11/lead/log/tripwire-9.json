@@ -1,0 +1,116 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11-tests",
+   "change": "head",
+   "before": "d7a9e4af0df1",
+   "after": "38887d51e76c"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11-tests",
+   "change": "acceptance folder",
+   "folder": "W1-35"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-11-tests",
+   "change": "acceptance folder",
+   "folder": "W2-11"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13",
+   "change": "status line added",
+   "line": " M src/gov/retrieval/fusion.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13",
+   "change": "status line added",
+   "line": " M src/gov/retrieval/lexical.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13",
+   "change": "status line added",
+   "line": " M src/gov/retrieve/command.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-13-tests",
+   "change": "status line gone",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "head",
+   "before": "8190522a8cac",
+   "after": "5af074057782"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-81/test_w2_81_runner.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": " M tests/acceptance/W2-81/w2_81_judge.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "status line gone",
+   "line": "?? tests/acceptance/W2-81/test_w2_81_round2.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-81",
+   "change": "acceptance folder",
+   "folder": "W2-81"
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+# W2-92 packages (draft, lead)
+
+## P-W2-92-1: a missing record store (KPI 3) against the brief's scope ("retrieve.py: the route list only")
+1. Context: KPI 3 says a missing or unreadable record store is named for that route, never a failure of the whole answer. Today `retrieve()` reads the record graph and W2-87's authority order (retrieve.py lines ~119-123) before any route runs and raises STORE_MISSING for every question. The run brief limits retrieve.py to the route list and says W2-87's ranking is not touched.
+2. What happened: acceptance case f3 (`test_f3_a_missing_record_store_is_named_and_the_code_routes_evidence_is_returned`) is red at the base and stays red at the head with STORE_MISSING. The engineer (batch 1) proposed the smallest change: catch STORE_MISSING from the record-graph read, use empty records and edges, skip the register-entry map and the authority order, leave out the closure and record routes, set `facets.closure` unavailable with the reason; about 12 lines, in the setup block, outside the route list. The test designer raised the same as its P-1 (whether plain questions with no record should also answer: recommended yes).
+3. Why it matters: KPI 3's failure line ("failing the whole answer") stays unmet for a store whose record graph is missing; memory is judged per DEC-957.
+4. Options: (a) apply now in W2-92: widen its retrieve.py scope to the record-graph read (~12 lines, one more engineer batch, ~30 min; the authority order is skipped only when there is no record graph, unchanged otherwise); (b) defer to W2-32 (holds src/gov/retrieval/** broadly) or a W2-87 follow-up: W2-92 closes with f3 red and named; (c) re-baseline KPI 3 to the code index only, and f3 retired by a test designer under that decision.
+5. Recommendation: (a), confidence medium. Classification: Ordinary work: yes (a project whose store was never loaded); Consequence: other (the answer refuses closed, it does not fail open).
+6. Blocks: only f3 (one of 30 cases); everything else of the ticket proceeds.
+
+## P-W2-92-2: acceptance case f1 asserts evidence the lexical route cannot return (a test defect)
+1. Context: `test_f1_a_code_index_that_cannot_answer_is_named_and_the_rest_is_returned[never indexed | tool cannot read it | tool not on PATH]` checks, with the code index broken, that the bundle for the question `w92_leaf` holds the lexical route's evidence `app/leaf.py`, `app/middle.py` and `app/top.py`.
+2. What happened: `app/top.py` in the planted project is `from app.middle import w92_mid` / `def w92_top(value): return w92_mid(value) - 3`: it never contains `w92_leaf`. The base code's own bundle for the same question on the same planted store (lead probe, base clone's src) holds leaf.py 1-2, middle.py 1-9, 8-9, 4-5: no top.py. The head returns exactly the same evidence plus `facets.code = {available: false, reason: "the code index is missing: ..."}`. At the base the case failed earlier, on the facet check, which hid the wrong premise.
+3. Why it matters: three cases stay red against correct behaviour; nobody may edit them without a decision.
+4. Options: (a) a test designer batch revises f1's expected set to the lexical route's actual evidence for the question (today's bundle's paths), with `Rewrite-Reason:`; ~15 min; (b) keep it and accept the red: no; (c) re-plant top.py to contain the word: same cost as (a), changes the fixture other cases share.
+5. Recommendation: (a), confidence high. Classification: Ordinary work: n/a (a test defect, no product finding).
+6. Blocks: the three f1 cases only.

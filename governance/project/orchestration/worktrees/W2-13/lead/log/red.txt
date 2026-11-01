@@ -1,0 +1,425 @@
+/home/usain/gov-os-worktrees/W2-13-tests/src/gov/__init__.py
+..FFF...FF.F.F.F.F......FFF..FF..F....F....F..........                   [100%]
+=================================== FAILURES ===================================
+____________ test_lexical_semantic_and_the_reranker_each_contribute ____________
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+
+    def test_lexical_semantic_and_the_reranker_each_contribute(box, built, ollama):
+        answer, outcome = fused(box, built, support.PLAIN_QUESTION, box.scratch_env(ollama.host), support.RERANKER,
+                                favour=("pilot",))
+        facets = answer.get("facets", {})
+        for route in (support.ROUTE_LEXICAL, support.ROUTE_SEMANTIC):
+            assert facets.get(route, {}).get("available") is True, f"premise: the {route} route is not available: {facets!r}"
+        routes = {route for hit in answer["hits"] for route in hit["routes"]}
+>       assert support.ROUTE_LEXICAL in routes, \
+            f"no fused hit came from the lexical route for {support.PLAIN_QUESTION!r}: routes {sorted(routes)}"
+E       AssertionError: no fused hit came from the lexical route for 'pilot tide harbour': routes ['semantic']
+E       assert 'lexical' in {'semantic'}
+E        +  where 'lexical' = support.ROUTE_LEXICAL
+
+tests/acceptance/W2-13/test_w2_13_fusion.py:36: AssertionError
+________ test_the_lexical_route_hands_the_fusion_its_ranking_best_first ________
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+
+    def test_the_lexical_route_hands_the_fusion_its_ranking_best_first(box, built):
+        """No endpoint and no reranker: the lexical route alone reaches the fusion, and the fused list keeps the route's
+        own order (one route's list keeps its order through the fusion, W1-19), best first."""
+        env = box.scratch_env()
+        route = support.ranked_paths(box.search(built, support.PLAIN_QUESTION, env=env))
+        answer, _ = fused(box, built, support.PLAIN_QUESTION, env, support.ABSENT_RERANKER)
+        paths = list(dict.fromkeys(hit["path"] for hit in answer["hits"]))
+>       assert paths, f"the fusion holds no hit for {support.PLAIN_QUESTION!r} without the semantic route"
+E       AssertionError: the fusion holds no hit for 'pilot tide harbour' without the semantic route
+E       assert []
+
+tests/acceptance/W2-13/test_w2_13_fusion.py:53: AssertionError
+_ test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+
+    def test_gov_retrieve_cites_what_the_lexical_route_ranks_for_a_plain_word_question(box, built, ollama):
+        bundle = support.check_bundle(box.retrieve(built, support.PLAIN_QUESTION, host=ollama.host).result(), root=built)
+        lexical = [item["path"] for item in bundle[support.K_EVIDENCE] if support.ROUTE_LEXICAL in item["routes"]]
+>       assert support.BEST in lexical, \
+            f"gov retrieve does not cite {support.BEST} by the lexical route; cited by it: {lexical}; " \
+            f"all cited: {support.cited_paths(bundle)}"
+E       AssertionError: gov retrieve does not cite rank/z-best.md by the lexical route; cited by it: []; all cited: ['records/dec-0042.md', 'rank/z-best.md', 'rank/m-second.md', 'rank/a-third.md', 'fields/e-id.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', 'exact/two.py', 'fields/d-title.md', 'spans/tool.py']
+E       assert 'rank/z-best.md' in []
+E        +  where 'rank/z-best.md' = support.BEST
+
+tests/acceptance/W2-13/test_w2_13_fusion.py:64: AssertionError
+_______________ test_a_plain_word_question_returns_lexical_hits ________________
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+
+    def test_a_plain_word_question_returns_lexical_hits(box, built):
+        """W2-M292: no line holds the question as a phrase; its words are matched, and the file that holds them all is
+        a hit."""
+        assert not any(support.PLAIN_QUESTION in text for text in support.corpus().values()), \
+            "premise: a line of the fixture holds the question verbatim"
+        paths = order(box, built, support.PLAIN_QUESTION)
+>       assert paths, f"the plain-word question {support.PLAIN_QUESTION!r} returns no lexical hit"
+E       AssertionError: the plain-word question 'pilot tide harbour' returns no lexical hit
+E       assert []
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:67: AssertionError
+_______ test_hits_are_ranked_best_first_by_how_well_they_match_the_words _______
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+
+    def test_hits_are_ranked_best_first_by_how_well_they_match_the_words(box, built):
+        """Three files of the same length hold three, two and one of the question's words; their paths sort the other
+        way round, so an order by path, by row or by line is red. BM25 ranks them three, two, one."""
+        paths = order(box, built, support.PLAIN_QUESTION)
+>       assert before(paths, support.BEST, support.SECOND) and before(paths, support.SECOND, support.THIRD), \
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"not ranked best first ({support.BEST}, {support.SECOND}, {support.THIRD}): {paths}"
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+paths = [], first = 'rank/z-best.md', second = 'rank/m-second.md'
+
+    def before(paths, first, second):
+        """Whether ``first`` is ranked above ``second``; both must be hits."""
+        missing = [rel for rel in (first, second) if rel not in paths]
+>       assert not missing, f"{missing} are not lexical hits; the route ranked {paths}"
+E       AssertionError: ['rank/z-best.md', 'rank/m-second.md'] are not lexical hits; the route ranked []
+E       assert not ['rank/z-best.md', 'rank/m-second.md']
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:28: AssertionError
+_ test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body[title, the body first by path] _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+pair = 'title, the body first by path'
+
+    @pytest.mark.parametrize("pair", list(support.FIELD_PAIRS), ids=list(support.FIELD_PAIRS))
+    def test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body(box, built, pair):
+        """The two files of a pair hold the same words, the same number of times: only whether the question's word is
+        in the record's id (or the heading) or in the body tells them apart, so a ranking with no field weights ties
+        them. Each pair has a mirror whose paths sort the other way, so a tie broken by path, row or insertion order
+        passes at most one of the two."""
+        question, weighted, body = support.FIELD_PAIRS[pair]
+        paths = order(box, built, question)
+>       assert before(paths, weighted, body), \
+            f"{weighted} (the word in its {pair.split(',')[0]}) is not ranked above {body} (the word in its body) " \
+            f"for {question!r}: {paths}"
+E       AssertionError: fields/d-title.md (the word in its title) is not ranked above fields/c-body.md (the word in its body) for 'Beacon': ['fields/c-body.md', 'fields/d-title.md']
+E       assert False
+E        +  where False = before(['fields/c-body.md', 'fields/d-title.md'], 'fields/d-title.md', 'fields/c-body.md')
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:88: AssertionError
+_ test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body[id, the body first by path] _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+pair = 'id, the body first by path'
+
+    @pytest.mark.parametrize("pair", list(support.FIELD_PAIRS), ids=list(support.FIELD_PAIRS))
+    def test_a_word_in_the_id_or_the_title_ranks_above_the_same_word_in_the_body(box, built, pair):
+        """The two files of a pair hold the same words, the same number of times: only whether the question's word is
+        in the record's id (or the heading) or in the body tells them apart, so a ranking with no field weights ties
+        them. Each pair has a mirror whose paths sort the other way, so a tie broken by path, row or insertion order
+        passes at most one of the two."""
+        question, weighted, body = support.FIELD_PAIRS[pair]
+        paths = order(box, built, question)
+>       assert before(paths, weighted, body), \
+            f"{weighted} (the word in its {pair.split(',')[0]}) is not ranked above {body} (the word in its body) " \
+            f"for {question!r}: {paths}"
+E       AssertionError: fields/h-id.md (the word in its id) is not ranked above fields/g-body.md (the word in its body) for 'QUINCE': ['fields/g-body.md', 'fields/h-id.md']
+E       assert False
+E        +  where False = before(['fields/g-body.md', 'fields/h-id.md'], 'fields/h-id.md', 'fields/g-body.md')
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:88: AssertionError
+________ test_an_exact_identifier_ranks_first[the identifier and words] ________
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+question = 'QX-4471 gauge reading'
+
+    @pytest.mark.parametrize("question", support.EXACT_QUESTIONS, ids=["the identifier alone", "the identifier and words"])
+    def test_an_exact_identifier_ranks_first(box, built, question):
+        """One file holds ``QX-4471``; two others hold ``QX`` and ``4471``, and the question's other words, far more
+        often. The file that holds the identifier verbatim is the first hit."""
+        paths = order(box, built, question)
+>       assert paths and paths[0] == support.EXACT_HOLDER, \
+            f"{support.EXACT_HOLDER} holds {support.EXACT_ID} verbatim and is not the first hit for {question!r}: {paths}"
+E       AssertionError: ids/z-holder.md holds QX-4471 verbatim and is not the first hit for 'QX-4471 gauge reading': []
+E       assert ([])
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:100: AssertionError
+______ test_letter_case_does_not_change_what_a_plain_word_question_finds _______
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+
+    def test_letter_case_does_not_change_what_a_plain_word_question_finds(box, built):
+        """W2-M072: the same words in capitals find the same files."""
+        lower, upper = support.PLAIN_QUESTION, support.PLAIN_QUESTION.upper()
+        found_lower, found_upper = order(box, built, lower), order(box, built, upper)
+>       assert support.BEST in found_lower, f"{lower!r} does not find {support.BEST}: {found_lower}"
+E       AssertionError: 'pilot tide harbour' does not find rank/z-best.md: []
+E       assert 'rank/z-best.md' in []
+E        +  where 'rank/z-best.md' = support.BEST
+
+tests/acceptance/W2-13/test_w2_13_ranked_route.py:123: AssertionError
+___ test_an_id_that_exists_nowhere_asked_alone_is_a_stated_gap[the id alone] ___
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+asked = 'the id alone'
+
+    @pytest.mark.parametrize("asked", list(ALONE), ids=list(ALONE))
+    def test_an_id_that_exists_nowhere_asked_alone_is_a_stated_gap(box, built, ollama, asked):
+        bundle = support.check_bundle(box.retrieve(built, ALONE[asked], host=ollama.host).result(), root=built)
+        assert bundle[support.K_FACETS][support.ROUTE_SEMANTIC]["available"] is True, "premise: the semantic route is down"
+>       stated_gap(bundle, f"{ALONE[asked]!r} with no --id")
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5716}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...}
+where = "'DEC-9999' with no --id"
+
+    def stated_gap(bundle, where):
+>       assert support.MISSING_ID in support.gap_names(bundle), \
+            f"{where}: {support.MISSING_ID} is not named among the gaps: {bundle[support.K_GAPS]!r}"
+E       AssertionError: 'DEC-9999' with no --id: DEC-9999 is not named among the gaps: [{'path': 'ids/a-noise.md', 'chunk_id': '0cd4d6f190f33cb3e778c5a5', 'reason': 'NOT_GATHERED'}, {'path': 'manual/manual.md', 'chunk_id': '138968498d08a5c0c53572ba', 'reason': 'NOT_GATHERED'}, {'path': 'exact/two.py', 'chunk_id': '145e7357dec994c86a6e54a9', 'reason': 'NOT_GATHERED'}, {'path': 'manual/manual.md', 'chunk_id': '17089d6294623750e801f185', 'reason': 'NOT_GATHERED'}, {'path': 'fields/d-title.md', 'chunk_id': '1756ecee8610a7f0870ccf8b', 'reason': 'NOT_GATHERED'}, {'path': 'governance/project/path-map.yaml', 'chunk_id': '2825bf61fa9aba499a41773f', 'reason': 'NOT_GATHERED'}, {'path': 'manual/manual.md', 'chunk_id': '3250f1bed65707a0bc711033', 'reason': 'NOT_GATHERED'}, {'path': 'spans/tool.py', 'chunk_id': '44e30a11e4555bc1b4adf13d', 'reason': 'NOT_GATHERED'}, {'path': 'governance/project/path-map.yaml', 'chunk_id': '4d27165eebf472817cf0fc60', 'reason': 'NOT_GATHERED'}, {'path': 'fields/b-body.md', 'chunk_id': '5270f88800cd35e0845e7ce0', 'reason': 'NOT_GATHERED'}]
+E       assert 'DEC-9999' in {'exact/two.py', 'fields/b-body.md', 'fields/d-title.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', ...}
+E        +  where 'DEC-9999' = support.MISSING_ID
+E        +  and   {'exact/two.py', 'fields/b-body.md', 'fields/d-title.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', ...} = <function gap_names at 0x790c32db3920>({'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5716}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...})
+E        +    where <function gap_names at 0x790c32db3920> = support.gap_names
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:30: AssertionError
+_ test_an_id_that_exists_nowhere_asked_alone_is_a_stated_gap[a question naming the id] _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+asked = 'a question naming the id'
+
+    @pytest.mark.parametrize("asked", list(ALONE), ids=list(ALONE))
+    def test_an_id_that_exists_nowhere_asked_alone_is_a_stated_gap(box, built, ollama, asked):
+        bundle = support.check_bundle(box.retrieve(built, ALONE[asked], host=ollama.host).result(), root=built)
+        assert bundle[support.K_FACETS][support.ROUTE_SEMANTIC]["available"] is True, "premise: the semantic route is down"
+>       stated_gap(bundle, f"{ALONE[asked]!r} with no --id")
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5441}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...}
+where = "'What does DEC-9999 decide?' with no --id"
+
+    def stated_gap(bundle, where):
+>       assert support.MISSING_ID in support.gap_names(bundle), \
+            f"{where}: {support.MISSING_ID} is not named among the gaps: {bundle[support.K_GAPS]!r}"
+E       AssertionError: 'What does DEC-9999 decide?' with no --id: DEC-9999 is not named among the gaps: [{'path': 'governance/project/path-map.yaml', 'chunk_id': 'f22bbc3c2f5305dd0f32c09d', 'reason': 'NOT_GATHERED'}, {'path': 'ids/a-noise.md', 'chunk_id': '0cd4d6f190f33cb3e778c5a5', 'reason': 'NOT_GATHERED'}, {'path': 'manual/manual.md', 'chunk_id': '138968498d08a5c0c53572ba', 'reason': 'NOT_GATHERED'}, {'path': 'exact/two.py', 'chunk_id': '145e7357dec994c86a6e54a9', 'reason': 'NOT_GATHERED'}, {'path': 'manual/manual.md', 'chunk_id': '17089d6294623750e801f185', 'reason': 'NOT_GATHERED'}, {'path': 'fields/d-title.md', 'chunk_id': '1756ecee8610a7f0870ccf8b', 'reason': 'NOT_GATHERED'}, {'path': 'governance/project/path-map.yaml', 'chunk_id': '2825bf61fa9aba499a41773f', 'reason': 'NOT_GATHERED'}, {'path': 'manual/manual.md', 'chunk_id': '3250f1bed65707a0bc711033', 'reason': 'NOT_GATHERED'}, {'path': 'spans/tool.py', 'chunk_id': '44e30a11e4555bc1b4adf13d', 'reason': 'NOT_GATHERED'}, {'path': 'governance/project/path-map.yaml', 'chunk_id': '4d27165eebf472817cf0fc60', 'reason': 'NOT_GATHERED'}]
+E       assert 'DEC-9999' in {'exact/two.py', 'fields/d-title.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', 'spans/tool.py'}
+E        +  where 'DEC-9999' = support.MISSING_ID
+E        +  and   {'exact/two.py', 'fields/d-title.md', 'governance/project/path-map.yaml', 'ids/a-noise.md', 'manual/manual.md', 'spans/tool.py'} = <function gap_names at 0x790c32db3920>({'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5441}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...})
+E        +    where <function gap_names at 0x790c32db3920> = support.gap_names
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:30: AssertionError
+_______ test_an_id_that_exists_nowhere_given_with_its_id_is_a_stated_gap _______
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+built = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/w2-13-built0/repo')
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+
+    def test_an_id_that_exists_nowhere_given_with_its_id_is_a_stated_gap(box, built, ollama):
+        question = support.GAP_QUESTIONS[1]
+        bundle = support.check_bundle(box.retrieve(built, question, "--id", support.MISSING_ID, host=ollama.host).result(),
+                                      root=built)
+>       stated_gap(bundle, f"{question!r} --id {support.MISSING_ID}")
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5441}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...}
+where = "'What does DEC-9999 decide?' --id DEC-9999"
+
+    def stated_gap(bundle, where):
+        assert support.MISSING_ID in support.gap_names(bundle), \
+            f"{where}: {support.MISSING_ID} is not named among the gaps: {bundle[support.K_GAPS]!r}"
+        reason = bundle[support.K_REASON]
+        assert reason not in support.NOT_A_STATED_GAP and reason in support.STATED_GAP, \
+            f"{where}: the bundle stops with {reason}, not a reason that names the gap ({support.STATED_GAP})"
+>       assert bundle[support.K_CONTINUATION] is None, f"{where}: the bundle does not stop: it carries a continuation"
+E       AssertionError: 'What does DEC-9999 decide?' --id DEC-9999: the bundle does not stop: it carries a continuation
+E       assert 'eyJiYiI6bnVsbCwiYnMiOjEwLCJpIjpbIkRFQy05OTk5Il0sIm8iOjIwLCJxIjoiV2hhdCBkb2VzIERFQy05OTk5IGRlY2lkZT8iLCJyIjowLCJ0IjpudWxsfQ==' is None
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:35: AssertionError
+_______ test_retr_x_02_on_a_dev_tier_asked_with_no_id_is_a_stated_gap[A] _______
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x790c32f8b020>, _basetemp=PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='failed')
+programme = 'A'
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("programme", sorted(support.TIERS))
+    def test_retr_x_02_on_a_dev_tier_asked_with_no_id_is_a_stated_gap(box, ollama, tmp_path_factory, programme):
+        """W2-M296 where it was seen: each dev tier, rebuilt through the stand-in endpoint (no model runs), asked
+        RETR-X-02's question with no ``--id``."""
+        tier = support.TIERS[programme]
+        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w2-13-gap-{tier}") / tier)
+        if root is None:
+            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+        box.rebuild(root, host=ollama.host)
+        question = support.GAP_QUESTIONS[1]
+        bundle = support.check_bundle(box.retrieve(root, question, "--radius", "1", host=ollama.host).result(), root=root)
+>       stated_gap(bundle, f"{tier}: {question!r} with no --id")
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5849}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '78fbbfb1c8cf419c93a5ba41', 'end_line': 554, 'id': '78fbbfb1c8cf419c93a5ba41', ...}, ...], ...}
+where = "a-dev: 'What does DEC-9999 decide?' with no --id"
+
+    def stated_gap(bundle, where):
+>       assert support.MISSING_ID in support.gap_names(bundle), \
+            f"{where}: {support.MISSING_ID} is not named among the gaps: {bundle[support.K_GAPS]!r}"
+E       AssertionError: a-dev: 'What does DEC-9999 decide?' with no --id: DEC-9999 is not named among the gaps: [{'path': 'crates/orion-runtime/src/state.rs', 'chunk_id': '1ba075d3005ff5d9ce96cc9d', 'reason': 'NOT_GATHERED'}, {'path': '.gitleaks.toml', 'chunk_id': 'c7b6981530607892e638a9de', 'reason': 'NOT_GATHERED'}, {'path': 'research/experiments/exp-003-plan.md', 'chunk_id': 'cb74f2733875f0b9806af4e0', 'reason': 'NOT_GATHERED'}, {'path': 'governance/project/path-map.yaml', 'chunk_id': '01d9e619f6150f8a547fa25d', 'reason': 'NOT_GATHERED'}, {'path': 'decisions/adr-010.md', 'chunk_id': '446562014743630ec49c2cd5', 'reason': 'NOT_GATHERED'}, {'path': 'specs/nfr/recovery-strategy.md', 'chunk_id': 'b114aa3bd21a9558f8094c0b', 'reason': 'NOT_GATHERED'}, {'path': 'interfaces/test-vector-format.md', 'chunk_id': '18ae56bb035fb3e61656c571', 'reason': 'NOT_GATHERED'}, {'path': 'specs/math/dimensional-analysis.md', 'chunk_id': 'bcbdaf7c63e535aa1d3f9ae4', 'reason': 'NOT_GATHERED'}, {'path': 'research/investigations/note-003.md', 'chunk_id': '0396d6191eafb6423427051a', 'reason': 'NOT_GATHERED'}, {'path': 'docs/cross-validation.md', 'chunk_id': 'c77db74425ff7b8b780a0e98', 'reason': 'NOT_GATHERED'}]
+E       assert 'DEC-9999' in {'.gitleaks.toml', 'crates/orion-runtime/src/state.rs', 'decisions/adr-010.md', 'docs/cross-validation.md', 'governance/project/path-map.yaml', 'interfaces/test-vector-format.md', ...}
+E        +  where 'DEC-9999' = support.MISSING_ID
+E        +  and   {'.gitleaks.toml', 'crates/orion-runtime/src/state.rs', 'decisions/adr-010.md', 'docs/cross-validation.md', 'governance/project/path-map.yaml', 'interfaces/test-vector-format.md', ...} = <function gap_names at 0x790c32db3920>({'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 5849}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '78fbbfb1c8cf419c93a5ba41', 'end_line': 554, 'id': '78fbbfb1c8cf419c93a5ba41', ...}, ...], ...})
+E        +    where <function gap_names at 0x790c32db3920> = support.gap_names
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:30: AssertionError
+_______ test_retr_x_02_on_a_dev_tier_asked_with_no_id_is_a_stated_gap[B] _______
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+ollama = <w2_13_support.OllamaStandIn object at 0x790c32e81940>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x790c32f8b020>, _basetemp=PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0'), _retention_count=3, _retention_policy='failed')
+programme = 'B'
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("programme", sorted(support.TIERS))
+    def test_retr_x_02_on_a_dev_tier_asked_with_no_id_is_a_stated_gap(box, ollama, tmp_path_factory, programme):
+        """W2-M296 where it was seen: each dev tier, rebuilt through the stand-in endpoint (no model runs), asked
+        RETR-X-02's question with no ``--id``."""
+        tier = support.TIERS[programme]
+        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w2-13-gap-{tier}") / tier)
+        if root is None:
+            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+        box.rebuild(root, host=ollama.host)
+        question = support.GAP_QUESTIONS[1]
+        bundle = support.check_bundle(box.retrieve(root, question, "--radius", "1", host=ollama.host).result(), root=root)
+>       stated_gap(bundle, f"{tier}: {question!r} with no --id")
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 3947}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...}
+where = "b-dev: 'What does DEC-9999 decide?' with no --id"
+
+    def stated_gap(bundle, where):
+>       assert support.MISSING_ID in support.gap_names(bundle), \
+            f"{where}: {support.MISSING_ID} is not named among the gaps: {bundle[support.K_GAPS]!r}"
+E       AssertionError: b-dev: 'What does DEC-9999 decide?' with no --id: DEC-9999 is not named among the gaps: [{'path': 'pyargus/src/pyargus/analysis/stats.py', 'chunk_id': '099e0e1eb96a1a763f111e4a', 'reason': 'NOT_GATHERED'}, {'path': 'spec/requirements/req-005.md', 'chunk_id': '58136b17fab43c4e8b97425c', 'reason': 'NOT_GATHERED'}, {'path': 'pyargus/src/pyargus/analysis/stats.py', 'chunk_id': '08c35a966c21c53a53fcff61', 'reason': 'NOT_GATHERED'}, {'path': 'spec/requirements/req-005.md', 'chunk_id': '30c8735e23275b164a5de385', 'reason': 'NOT_GATHERED'}, {'path': 'spec/data-format.md', 'chunk_id': '28551ef3b94e3238dd1920d5', 'reason': 'NOT_GATHERED'}, {'path': 'decisions/dec-005.md', 'chunk_id': '9d933c5b694af29929431db3', 'reason': 'NOT_GATHERED'}, {'path': '.github/copilot-instructions.md', 'chunk_id': 'd558f0a826add86de5a80a22', 'reason': 'NOT_GATHERED'}, {'path': 'research/notes/rn-005.md', 'chunk_id': 'c00714a045dc07d673abaaeb', 'reason': 'NOT_GATHERED'}, {'path': 'pyargus/src/pyargus/pipeline/transform.py', 'chunk_id': '6d62cfcd9cfd790bb52d305a', 'reason': 'NOT_GATHERED'}, {'path': 'decisions/dec-005.md', 'chunk_id': '955b3be9c7e27a408e50f798', 'reason': 'NOT_GATHERED'}]
+E       assert 'DEC-9999' in {'.github/copilot-instructions.md', 'decisions/dec-005.md', 'pyargus/src/pyargus/analysis/stats.py', 'pyargus/src/pyargus/pipeline/transform.py', 'research/notes/rn-005.md', 'spec/data-format.md', ...}
+E        +  where 'DEC-9999' = support.MISSING_ID
+E        +  and   {'.github/copilot-instructions.md', 'decisions/dec-005.md', 'pyargus/src/pyargus/analysis/stats.py', 'pyargus/src/pyargus/pipeline/transform.py', 'research/notes/rn-005.md', 'spec/data-format.md', ...} = <function gap_names at 0x790c32db3920>({'batches': [{'size': 10}, {'size': 10}], 'budget': {'bundle': {'limit': 6000, 'used': 3947}, 'rounds': {'limit': 1, '...'batch': 1, 'chunk_id': '299cfdc249a2722a747965d9', 'end_line': 245, 'id': '299cfdc249a2722a747965d9', ...}, ...], ...})
+E        +    where <function gap_names at 0x790c32db3920> = support.gap_names
+
+tests/acceptance/W2-13/test_w2_13_stated_gap.py:30: AssertionError
+_ test_a_search_of_an_unusable_index_answers_unavailable_and_never_raises[not a database] _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+repo = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/test_a_search_of_an_unusable_i0/repo')
+state = 'not a database'
+
+    @pytest.mark.parametrize("state", STORES)
+    def test_a_search_of_an_unusable_index_answers_unavailable_and_never_raises(box, repo, state):
+        make_store(box, repo, state)
+        outcome = box.run([(support.LEXICAL, "search", [support.path_arg(repo), support.PLAIN_QUESTION],
+                            {"refresh": False})])
+        error = outcome.error()
+>       assert error is None, f"lexical search raised {error['type']} on a store that is {state}: {error['message']}"
+E       AssertionError: lexical search raised DatabaseError on a store that is not a database: file is not a database
+E       assert {'code': None, 'message': 'file is not a database', 'type': 'DatabaseError'} is None
+
+tests/acceptance/W2-13/test_w2_13_unavailable.py:75: AssertionError
+_ test_a_default_search_that_may_refresh_never_raises_on_an_unreadable_store[not a database] _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+repo = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/test_a_default_search_that_may0/repo')
+state = 'not a database'
+
+    @pytest.mark.parametrize("state", [state for state in STORES if state not in ("missing", "stale")])
+    def test_a_default_search_that_may_refresh_never_raises_on_an_unreadable_store(box, repo, state):
+        """A default search may rebuild first (DEC-342); whatever it does with a store it cannot read, it answers."""
+        make_store(box, repo, state)
+        outcome = box.run([(support.LEXICAL, "search", [support.path_arg(repo), support.PLAIN_QUESTION], {"refresh": True})])
+        error = outcome.error()
+>       assert error is None, f"a default lexical search raised {error['type']} on a store that is {state}: " \
+                              f"{error['message']}"
+E       AssertionError: a default lexical search raised DatabaseError on a store that is not a database: file is not a database
+E       assert {'code': None, 'message': 'file is not a database', 'type': 'DatabaseError'} is None
+
+tests/acceptance/W2-13/test_w2_13_unavailable.py:86: AssertionError
+_ test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback[not a database] _
+
+box = <w2_13_support.Box object at 0x790c32e5b110>
+repo = PosixPath('/tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/test_gov_retrieve_on_an_unusab0/repo')
+state = 'not a database'
+
+    @pytest.mark.parametrize("state", STORES)
+    def test_gov_retrieve_on_an_unusable_index_answers_without_a_traceback(box, repo, state):
+        make_store(box, repo, state)
+>       support.no_traceback(box.retrieve(repo, support.PLAIN_QUESTION))
+
+tests/acceptance/W2-13/test_w2_13_unavailable.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = <w2_13_support.Run object at 0x790c32d3bb00>
+
+    def no_traceback(run):
+        """A command answers an envelope (a bundle, or ``ok: false`` with a governance error), never a traceback."""
+>       assert "Traceback (most recent call last)" not in run.stderr + run.stdout, f"a traceback:\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a traceback:
+E       gov retrieve --json --root /tmp/gov-os-lead-W2-13/pytest-of-usain/pytest-0/test_gov_retrieve_on_an_unusab0/repo pilot tide harbour
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       Traceback (most recent call last):
+E         File "<frozen runpy>", line 198, in _run_module_as_main
+E         File "<frozen runpy>", line 88, in _run_code
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/cli/main.py", line 261, in <module>
+E           sys.exit(main())
+E                    ^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/cli/main.py", line 246, in main
+E           outcome = command.handler(root, args, config)
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/retrieve/command.py", line 29, in run
+E           bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/retrieval/retrieve.py", line 119, in retrieve
+E           record_of, not_current, record_types = _graph(root)
+E                                                  ^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/retrieval/retrieve.py", line 47, in _graph
+E           known = records.records(root)
+E                   ^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/records/queries.py", line 34, in records
+E           rows = _rows(root, "SELECT records.id, type, status, path, heading, title, span, content_hash FROM records"
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-worktrees/W2-13-tests/src/gov/records/queries.py", line 22, in _rows
+E           return sorted(connection.execute(sql, tuple(given.values())).fetchall())
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.DatabaseError: file is not a database
+
+tests/acceptance/W2-13/w2_13_support.py:482: AssertionError
+17 failed, 37 passed, 2 deselected in 88.60s (0:01:28)

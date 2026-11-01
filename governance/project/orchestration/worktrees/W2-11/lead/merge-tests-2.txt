@@ -1,0 +1,10 @@
+W2-11 (DAEO-k7hz): merge the test designer's DEC-992 revisions (P-W2-11-7, P-W2-11-6, P-W2-11-8)
+
+The tests worktree's branch w2/W2-11-tests: W2-11's code-under-test case in the language-neutral form (DEC-534
+stands), W1-35's brief record-type case for the briefs' record front matter (W2-L258), W1-35's discovery
+work-order case on the skill's body only (DEC-981, DEC-832 item 2). Merged while no worker runs here (DEC-963).
+
+Task: DAEO-k7hz
+Implements: DEC-992, DEC-963, DEC-959
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

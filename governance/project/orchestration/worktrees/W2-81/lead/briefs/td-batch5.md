@@ -1,0 +1,50 @@
+# Batch 5 (round 2, DEC-993): behaviours the proving ground still gets wrong (W2-81, DAEO-l78m)
+
+Your four batches are committed (head 8190522a8cac now: the integration branch was merged into this branch, touching nothing under `tests/acceptance/W2-81/`). A second independent review probed your batch 4 and found behaviour the self-tests miss. The orchestrator has declared a second round for it (DEC-993). This batch fixes it, in the suite only (`tests/acceptance/W2-81/**`, your only allowed path).
+
+Every standing rule of your first brief still holds, word for word: step 0's sandbox check (report it first again: (a) `python3 -c "open('/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-l78m','w').write('x')"` must fail; (b) `echo sandbox-trial | git hash-object -w --stdin` and `git update-index --refresh` must work; otherwise stop and return); Policy 2 (c) and (d): you never read this ticket's implementation (here there is none outside your own tests) and you never read the real hidden half or any hidden evaluation material, only stand-ins you build in your temp folder; the guard's command forms (no shell variable as a write target, no here-document, no backticks, no `bash -c`, no long inline `python3 -c` with braces: put anything longer in a script file in your temp folder and run it); the guard's read refusals until W2-58 (searches from the repository root, `governance/project/` or `.claude/` may be refused: take the refusal, search named folders instead, and count the refusals in your return); refused twice for the same call, stop and say so; no copy of the tree; protected material (never read the held-out material's contents, never print a secret, never write in `~/gov-os-workbench`, `GOV_DEV_TIERS` by name only); the disk share (yours: 8 GB and 400,000 files and folders of the lead's 20 GB / 1,000,000, in your sandbox's temp folder; pytest's own retention, never `--basetemp`; clean as you go, and name what you cannot remove); row W2-L423's rule (12-digit hashes under `.gov-runtime/`, never the keywords of the rule that takes a bare 40-hex string for a token); the hooks check before your commit (`/home/usain/Dynamic-Agentic-Engineering-OS/.git/hooks` holds only `*.sample` files, else stop); no amend, no rebase, no reset; the trailers; the twelve fields first.
+
+**The code under test (DEC-732), word for word:** in this worktree, **every test run and every `gov` command used for verification runs this worktree's own `src/`**: `PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src` set **per command** (never in a session's `--settings` env).
+
+**Retrieval (DEC-836, DEC-860, DEC-859):** use `gov retrieve` (`PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src python3 -m gov.cli.main retrieve "<question>" --json`, small questions, `--batch-size` and `--continue <token>` for a large one; code questions through the code graph's own small traversals) for what you need to know before reading files at random. This worktree has no store yet and the integration store's network check fails inside your sandbox: if one try answers STORE_MISSING or a network error, do not try again and do not route round the sandbox; read the named files directly and say so in your return. Drop unread any result under this ticket's implementation paths (none outside `tests/acceptance/`) and name any you were served (P-R1).
+
+For each behaviour below: make the proving ground behave as stated, and add a self-test that fails on the current head and passes after your change (say which in your return). Lower no existing expectation. Keep the whole suite under about 80 s alone on this machine; report plain and `-n auto` timings.
+
+## Must fix (it lets the proving ground pass an adoption that is not ready)
+
+1. **A large file that leaves its place by a reviewed move is judged where it used to be.** The README lets a large file leave its place through an A3 move reviewed at A5. When it does, today's judge still reads the large-file handling (its namespace class, whether the namespace is embedded, whether the semantic vectors hold it) at the file's old path. So a reviewed batch that moves a dataset or a media file into a folder whose namespace is embedded, while the not-embedded namespace still names the old folder, is FOUND_AND_HANDLED, even when the index holds the moved file with semantic vectors. This holds with today's capabilities, and it is the one planted kind judged on today's code. The handling must hold where the file now is: follow a reviewed move to its target, judge the target path's namespace, embedding and vectors (and its presence in the lexical index, as the README states for the large files), and give MISHANDLED with the evidence naming the target when it is embedded or vectorised there. A file moved without a reviewed action stays MISHANDLED as today. Test it in both shapes that hold large files, with the move reviewed, the file at its target and gone from its old place, with and without vectors at the target.
+
+## Riding along (DEC-802; no round of their own)
+
+2. **More configuration files can keep the orphaned test out.** The judge's list of skip forms misses configuration files the runners read: pytest 9 reads `pytest.toml`, `.pytest.toml` and `.pytest.ini` (as well as `pytest.ini`, `pyproject.toml`, `tox.ini`, `setup.cfg`); vitest reads a Vite config (`vite.config.ts`, `.mts`, `.js`, `.mjs`, `.cts`, `.cjs`) when the package has no vitest config, as well as `vitest.config.*` and a workspace file. A new or changed file of any of these forms that ignores, excludes or deselects the orphaned test must be MISHANDLED, as the listed `pytest.ini` and `vitest.config.ts` already are. Prefer a rule that does not depend on a list (for example any new or changed file the runner reads as configuration in the test's tree or its parents); where a list is needed, cover every form above and test each.
+3. **The successor plan proposed for deletion or retirement.** An A3 action proposing that the successor (current) plan be deleted from the active tree or retired, proposed but not carried out, is judged NOT_BUILT on today's code, although the same proposal for the superseded plan is MISHANDLED today; with everything counted as built it is FOUND_AND_HANDLED. It must be MISHANDLED in every repository that holds a superseded plan, read from the same record and with today's capabilities, as the superseded plan's proposal is.
+4. **The runner leaves built repositories behind.** The runner's run-mode case and its hidden-half case leave the repositories they built (and the stand-in hidden half) in pytest's temp folder, about a dozen repositories after a passing run, though the README and KPI line 10 say the cases remove what they build. Every case must remove what it built when it ends, pass or fail; add a self-test that checks the case's folders are gone (or a fixture that checks it after each runner case).
+5. **The markdown report drops the budget clause.** The judgement and the JSON report say that the large files' "within the budget" clause is not measured; the markdown report does not. The markdown report must say it wherever it reports the large files, in the same words as the JSON.
+
+## Optional, only if they fit in this batch without another
+
+6. **The report names hidden variants by their paths.** With a hidden half present (a stand-in in your temp folder, never the real one), the JSON and markdown reports show a variant's literal file paths, and the JSON its variant name, though the README treats a variant's paths as hidden; the paths are the same at every seed. The report must name a hidden variant by its number and id only (as the hook's errors already do), never by its paths, names, texts or values; test it on the stand-in, checking the whole JSON, markdown and log.
+7. **A control in a namespace the path map holds but does not embed.** Such a control is CLEAN today, though it is still in the lexical index. Decide the reading from the KPI line on controls and the README's own rule for "flagging", apply it, and state it in the README with its reason; if you leave it CLEAN, say why.
+
+Update the README for each (the handling, the record and field read, the new mutants or cases), commit with your trailers (`Task: DAEO-l78m`, `Role: independent-test-designer`, `Implements:` with the ids this batch implements, for example `DEC-993, DEC-936, DEC-941, DEC-820, CAP-44.b, CAP-44.e, CAP-44.g`, each checked to exist in the register or the Contract, and `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`), then run the whole suite to the end plain and with `-n auto`, the collect-only check once (`PYTHONPATH=/home/usain/gov-os-worktrees/W2-81/src python3 -m pytest tests/acceptance/W2-81 --collect-only -q -p no:cacheprovider --no-header`), and `gitleaks` on the suite (count only).
+
+## Return
+
+Your commit's 12-digit hash and trailers; files; for each of 1 to 7, what changed and the self-test that shows it (and that it failed before), or why an optional one was left; the suite's count and both timings; the collect-only line; gitleaks count; whether you used `gov retrieve` and what it answered; guard refusals and read refusals; temp folder size (`du -sh` and `du -s --inodes`).
+
+Your last message has the twelve fields first, each as a labelled line, with any payload after them. Refused twice for the same call: stop and say so.
+
+```
+task: <what you were asked to do, in one line>
+status: <DONE | PACKAGES | ESCALATION | ESCALATION_BLOCKED | LAUNCH_BLOCKED | AUTH_REQUIRED, and one line of why>
+work_completed: <what was done>
+files_changed: <each path, or "none">
+evidence: <commits with their trailers, logs, command outputs that show it>
+tests: <each suite run, with its counts, or "none run">
+discoveries: <what you found that was not known, or "none">
+risks: <what could go wrong with what was done, or "none">
+lessons: <what the next worker should know, or "none">
+proposed_decisions: <each package, with your recommendation and confidence, or "none">
+unresolved: <what is still open, or "none">
+recommended_next_action: <one line>
+```
