@@ -22,7 +22,13 @@ def add_arguments(parser) -> None:
 
 
 def run(root: Path, args, config: dict) -> dict:
+    from gov.decisions.register import leave_out
     from gov.retrieval.retrieve import retrieve
 
-    return retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
-                    batch_size=args.batch_size, bundle_budget=args.bundle_budget, continuation=args.continuation)
+    bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
+                      batch_size=args.batch_size, bundle_budget=args.bundle_budget, continuation=args.continuation)
+    # W2-55 (DEC-791 item 1): the register's superseded and done entries are left out, and counted
+    bundle["evidence"], left_out = leave_out(root, bundle["evidence"])
+    if left_out:
+        bundle["left_out"] = left_out
+    return bundle
