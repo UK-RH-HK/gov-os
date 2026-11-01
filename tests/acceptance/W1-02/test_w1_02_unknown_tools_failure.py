@@ -19,7 +19,9 @@ In the form of ``test_w1_02_deadline.py``:
 - **a decision that cannot end** (the first program the hook starts does not
   end) is answered with a refusal by ``w1_02_deadline_support.UPPER_S``: at
   once where the guard refuses the tool before it starts a program, at the
-  deadline otherwise. The hook processes are started side by side, so the
+  freeze look-up's own limit of 15 s or at the deadline otherwise (since
+  W2-L160 the first program is the look-up's real git, made to wait on the
+  repository's configuration). The hook processes are started side by side, so the
   module waits once.
 
 **Green today, and green after the round**: the inputs the guard cannot use
@@ -116,25 +118,29 @@ def test_a_ticket_file_the_guard_cannot_use_lets_no_tool_of_the_round_through(pr
 # A decision that cannot end
 # --------------------------------------------------------------------------
 
-NEVER = (deadline.STAND_IN_ENDS_S,)      # the first program the hook starts does not end before the case does
+# The first program the hook starts, the freeze look-up's real git, waits for ever on the repository's configuration.
+# Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160 (was: a stand-in first on the search path, which the
+# look-up no longer starts; the guard starts no other program from it for these tools). Refused at once, at the
+# look-up's limit or at the deadline: each is by UPPER_S.
+NEVER = deadline.NEVER
 
 LATE = (
     deadline.Call("a-made-up-tool-by-the-orchestrator", tools.MADE_UP, lambda project: {"note": deadline.MARKER},
-                  deadline.ORCHESTRATOR, sleeps=NEVER),
+                  deadline.ORCHESTRATOR, config_after=NEVER),
     deadline.Call("a-tool-of-an-mcp-server-by-an-engineer", "mcp__notes__add",
                   lambda project: {"note": {"title": "a note", "body": deadline.MARKER}}, deadline.ENGINEER,
-                  sleeps=NEVER),
+                  config_after=NEVER),
     deadline.Call("Monitor-by-the-orchestrator", "Monitor",
                   lambda project: {"command": "echo " + deadline.MARKER, "description": "wait for a line"},
-                  deadline.ORCHESTRATOR, sleeps=NEVER),
+                  deadline.ORCHESTRATOR, config_after=NEVER),
     deadline.Call("a-MultiEdit-inside-the-ticket-s-paths-by-an-engineer", "MultiEdit",
                   lambda project: tools.multiedit_input(project / deadline.IN_TICKET_REL, [
                       {"old_string": "VALUE = 1", "new_string": deadline.MARKER}]),
-                  deadline.ENGINEER, sleeps=NEVER),
+                  deadline.ENGINEER, config_after=NEVER),
     deadline.Call("a-MultiEdit-outside-them-by-a-session-with-no-role", "MultiEdit",
                   lambda project: tools.multiedit_input(project / deadline.OUTSIDE_TICKET_REL, [
                       {"old_string": "VALUE = 1", "new_string": deadline.MARKER}]),
-                  deadline.NO_ROLE, sleeps=NEVER),
+                  deadline.NO_ROLE, config_after=NEVER),
 )
 LABELS = [call.label for call in LATE]
 

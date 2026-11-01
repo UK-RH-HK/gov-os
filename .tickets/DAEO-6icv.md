@@ -1,7 +1,7 @@
 ---
 id: DAEO-6icv
 status: open
-deps: []
+deps: [DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:54Z
 type: task
@@ -14,7 +14,7 @@ title: 'Domain skills B: frontend, UI/UX and DevOps, each the engineer''s skill 
 class: specification
 state_class: AUTHORITATIVE
 role: product-spec
-depends_on: []
+depends_on: [DAEO-drhj]
 allowed_paths:
 - template/governance/kernel/skills/frontend/**
 - .claude/skills/frontend/**
@@ -57,5 +57,7 @@ track: B
 list_rows: []
 ---
 # W2-101 Domain skills B
+
+**Dependencies (PLAN-GROWTH-1 §2 gaps 3 and 4):** after ACT 2, the WBS milestone row (the one re-pin, DEC-954 item 6), and after W2-104 (the skill harness, DEC-959 item 5).
 
 Card: ROLES-RESEARCH-1 §5.3 item 10, approved (DEC-959 item 4): **after ACT 2, still in Wave 2.**

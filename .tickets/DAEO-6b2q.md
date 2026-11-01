@@ -1,6 +1,6 @@
 ---
 id: DAEO-6b2q
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-31T12:40:26Z

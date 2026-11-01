@@ -5,8 +5,20 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 ## Working with the owner
 - DEC-065: master rules MR-1 to MR-6. The owner decides (MR-6), the builder never writes its own acceptance tests (MR-3), review and audit stay independent (MR-4).
 - DEC-220, DEC-093: the orchestrator decides a P2/P3 itself only if it is reversible, agreed, at least medium confidence, and touches no Charter, MR, Contract scope, guard, install, merge or release. Each is listed for the owner to overturn.
-- DEC-949, DEC-850, DEC-855: P1s and owner-only decisions are sent as they arise: a package file, then `owner-ping` as the last act, 07:30 to midnight. Only the orchestrator asks the owner.
+- DEC-949 (the owner's reminder of 2026-11-01: every OWNER_ACTION item, not only the day's urgent ones), DEC-850, DEC-855, DEC-972: P1s and owner-only decisions are sent as they arise, 07:30 to midnight: a package file, then the line logged (`tools/ping_log.sh`, no ask) and sent by `PushNotification` (it does not stop the CTO); a daytime P1 needed that day that shows "not sent" falls back to the blocking `owner-ping`. None from 02:00 to 07:30 (the morning package, DEC-973). Only the orchestrator asks the owner.
 - DEC-818: a P1 package stands alone, in six parts.
+- DEC-994, DEC-998: quiet-hours hook in; push for waiting prompts on; the dead-man's switch is a Claude-only sentinel session; each CTO session confirms Remote Control, sends a test push and registers in `log/cto-session.txt` at its start.
+- DEC-995, DEC-996: a role is its reads and writes, a skill never widens them; mixed tickets are split before they start (the 13 approved splits filed at each parent's claim); measurement records are the implementer's evidence; the test designer writes `fixtures/evaluation/**`; one folder per research ticket; the launcher keeps one role per ticket. DEC-997 (delegated): W2-81's batch 6 and second review.
+- DEC-991: the CTO knows its allow list and checks each command; one that could need approval is never chained to other work; by day it pings first, then runs; in the quiet hours (02:00 to 07:30) it never runs it, queues it (`log/approval-queue.jsonl`) for the 09:00 package. Safety net ACT-QUIET-DENY-1, Gov OS placement P1-ORCH-APPROVALS-1, last net ACT-DEADMAN-1.
+- DEC-990 to DEC-993 (delegated): the tools folder in the path map; W2-11's packages (the CTO writes the `.claude/` copies with the owner's daytime approval); W2-81's round 2 for F1.
+- DEC-989: baseline = the last nightly with a verdict (its reds known) until a green nightly after ACT 1; then the last green one. Once the queue lands, merge and close are one step on the queue's green run; nothing sits merged but not closed.
+- DEC-988: test before merge (W2-97's queue for every merge); one merge per ticket (rounds stay on the branch); attribution against the last green nightly's head, never undone merges; a dead-man's switch on the CTO's session (an ACT). P-W2-110-4 (a); P-W2-55-HOOK (b) then (a); the backfill after a product-spec pass and the owner's sample.
+- DEC-984: the nightly takes all three heavy-job slots while its suites run (until its latest start at most); released before its light steps.
+- DEC-983: SMART-WORK-1 decided (W2-115 smart close after W2-55, W2-116, W2-119 before EXAMIN's copy; W2-117, W2-118 after; ten tickets' KPIs). The heavy-job slots in force from 2026-10-31 23:50 (3 x 6 workers, tools/heavy_slots.conf); the leads' load wait removed.
+- DEC-982: W2-112 (shared reranker), W2-113 (CTO named at adoption), W2-114 (W1-28's copy check) filed. The smart way of working goes into the product through tickets (SMART-WORK-1), not only the CTO's tools.
+- DEC-979: CAPACITY-1 decided: a heavy-job limit (slots for test runs and rebuilds, load near 20) replaces the leads' load wait once it runs; the load in every status block; P-LATENCY-1 (a) (a ticket after W2-90b); the CTO's tools in the lighter lane (own tests; a review only if fail-open or work-losing; logged daily; no WBS ticket); no query-embedding batching yet; W2-90b approved; no bigger machine until the re-measure. Batch closes send back only the culprit. The order: speed-ups first (W2-107, the batch of seven, W2-108, the limit, W2-97), then memory's chain with the roles in parallel, then ACT 2 and the three layers; W2-81, W2-88, W2-96 alongside.
+- DEC-975: W2-107 first: no new lead until it is closed; merged on DONE, reviewed on its final head, closed alone at once. CAPACITY-1 re-measured after it. The query embedder stays on the CPU (DEC-798) until W2-15b's GPU-against-CPU KPI is decided by the owner.
+- DEC-974: a new ticket in the WBS (follow-up, split, a red's ticket) is a P1 to the owner with the CTO's recommendation before it is filed; never delegated. Leads name a needed ticket in their return.
 - DEC-925 item 2, DEC-846: every ACT is a file of exact operator commands, and it is pinged. A settings change runs in full on a clone first.
 - DEC-945: no paid notifier and no app install.
 - DEC-105: a finding against a closed specification gets three costed options: apply now, defer or re-baseline.
@@ -87,9 +99,10 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-939 item 1: long commands run in the background. A watchdog fires at 07:45 if the package is late.
 
 ## Reporting
-- DEC-948, DEC-878, DEC-952: every report ends with the five-line block, plus the memory-chain line and the leads' interim results.
+- DEC-948, DEC-878, DEC-952, DEC-974: every report ends with the five-line block (the load shown, DEC-979), plus the memory-chain line (never left out) and the leads' interim results.
 - DEC-938, DEC-951 B: one P1-MORNING file and one ping at 07:30. No long foreground work runs from 07:15 to 07:35.
 - DEC-941 item 4.3, DEC-930 item 2: one daily document, and the weekly numbers (with ticket growth and drift).
 - DEC-953: three milestone reports, each pinged. Between them, the block plus at most five lines.
 - DEC-966: the template's install block removed and its hook lines pinned (two tickets, before EXAMIN's copy); rebuild speed a priority (gitleaks results by content hash, a full scan nightly).
 - DEC-968: a close is refused only by a failure its own change caused (each red alone re-run with the batch's merges reverted); a failure it did not cause is named in the close record and dealt with at once (fixed on the spot, or a P1); no accepted-reds list.
+- DEC-973: the nightly at 04:00 (to about 07:00); its check at 08:00 (re-checks 08:30, 09:00); the CTO's investigation and the designers' store refresh right after the nightly ends; the morning package with any ACTs at 09:00; the fresh-session handover after it; quiet hours 02:00 to 07:30.

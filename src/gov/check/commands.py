@@ -11,7 +11,7 @@ RESERVED_COMMANDS = (
     "closure", "retrieve", "checkpoint", "close", "adopt", "pause",
 )
 # Recorded in the command list beside the twelve (DEC-542).
-RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry")
+RECORDED_GOV_COMMANDS = ("accept", "ci", "launch", "telemetry")
 # Recorded as the module command it is, ``python3 -m gov.<name>``: no ``gov`` command of that name exists.
 RECORDED_MODULE_COMMANDS = ("lock",)
 
