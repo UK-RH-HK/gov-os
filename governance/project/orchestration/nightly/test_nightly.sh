@@ -61,6 +61,48 @@ rb=$(grep -n 'gov.cli.main rebuild' "$HERE/nightly.sh")
 echo "$rb" | grep -q 'GOV_SECRETS_FULL_SCAN=1 ' || fail "N10: the rebuild line does not set GOV_SECRETS_FULL_SCAN=1"
 grep -v 'gov.cli.main rebuild' "$HERE/nightly.sh" | grep -v '^ *#' | grep -q 'GOV_SECRETS_FULL_SCAN' && fail "N11: GOV_SECRETS_FULL_SCAN set outside the rebuild line"
 
+# ---- nightly.sh: the nightly takes all the heavy-job slots while its suites run (DEC-984) ------------------------
+sb="$work/slots"; mkdir -p "$sb/dir"
+sed -n '/^SLOT_DIR=\${NIGHTLY_SLOT_DIR/,/^setup=/p' "$HERE/nightly.sh" | sed '$d' > "$sb/block.sh"
+grep -q 'flock -w' "$sb/block.sh" && grep -q '^noslot()' "$sb/block.sh" || fail "N12: the slot block was not found"
+# one slot is busy for 3 s: the block waits for it and then holds all three
+flock "$sb/dir/gov-os-heavy-slot-2.lock" sleep 3 & busy=$!
+sleep 0.5
+printf '%s\n' 'OUT=$1; mkdir -p "$OUT"; MODE=night; latest=$(( $(date +%s) + 30 )); lock_wait=0; NIGHTLY_SLOT_DIR=$2' \
+  ". $sb/block.sh" \
+  'for i in 1 2 3; do flock -n "$NIGHTLY_SLOT_DIR/gov-os-heavy-slot-$i.lock" true && echo "free $i" >> "$OUT/probe"; done' \
+  '( noslot bash -c "ls -l /proc/self/fd" ) > "$OUT/fds" 2>&1' > "$sb/run.sh"
+bash "$sb/run.sh" "$sb/out" "$sb/dir"; wait $busy
+grep -q "heavy-job slots held: 3 of 3" "$sb/out/run.txt" || fail "N12: not all three slots held: $(cat "$sb/out/run.txt" 2>/dev/null)"
+[ ! -s "$sb/out/probe" ] || fail "N12: a slot was free while the nightly held them: $(cat "$sb/out/probe")"
+grep -q "heavy-slot" "$sb/out/fds" && fail "N13: a run inherits a slot's lock"
+# after the block's script ends, every slot is free again
+for i in 1 2 3; do flock -n "$sb/dir/gov-os-heavy-slot-$i.lock" true || fail "N13: slot $i still held after the nightly ended"; done
+grep -q 'eval "exec \$f>&-"; done' "$HERE/nightly.sh" && grep -q "heavy-job slots released after the suites" "$HERE/nightly.sh" || fail "N14: the slots are not released after the suites"
+# N15: a lock folder that cannot be written: the nightly runs without the slots, says so, and its output is intact
+mkdir -p "$sb/ro"; chmod 555 "$sb/ro"
+printf '%s\n' 'OUT=$1; mkdir -p "$OUT"; MODE=night; latest=$(( $(date +%s) + 30 )); lock_wait=0; NIGHTLY_SLOT_DIR=$2' \
+  ". $sb/block.sh" '( noslot echo still-writes ) > "$OUT/stdout" 2>&1' > "$sb/run_ro.sh"
+bash "$sb/run_ro.sh" "$sb/out_ro" "$sb/ro"
+grep -q "heavy-job slots held: 0 of 3" "$sb/out_ro/run.txt" || fail "N15: $(cat "$sb/out_ro/run.txt" 2>/dev/null)"
+grep -q still-writes "$sb/out_ro/stdout" || fail "N15: a run's output was lost"
+chmod 755 "$sb/ro"
+# N16: a slot that never frees: the wait stops at its cap, the nightly goes on with the slots it has
+flock "$sb/dir/gov-os-heavy-slot-1.lock" sleep 20 & busy=$!
+sleep 0.5; t0=$(date +%s)
+NIGHTLY_SLOT_WAIT=3 bash "$sb/run.sh" "$sb/out_cap" "$sb/dir"; t=$(( $(date +%s) - t0 ))
+kill $busy 2>/dev/null; wait $busy 2>/dev/null
+grep -q "heavy-job slots held: 2 of 3" "$sb/out_cap/run.txt" || fail "N16: $(cat "$sb/out_cap/run.txt" 2>/dev/null)"
+[ "$t" -le 10 ] || fail "N16: the wait ran $t s past its 3 s cap"
+# N17: after the block, the script's own errors still reach its log (no lasting redirect of stderr)
+printf '%s\n' 'OUT=$1; mkdir -p "$OUT"; MODE=night; latest=$(( $(date +%s) + 30 )); lock_wait=0; NIGHTLY_SLOT_DIR=$2' \
+  ". $sb/block.sh" 'echo err-visible >&2' > "$sb/run_err.sh"
+bash "$sb/run_err.sh" "$sb/out_err" "$sb/dir" 2> "$sb/err.txt"
+grep -q err-visible "$sb/err.txt" || fail "N17: stderr lost after the slot block"
+bash "$sb/run_err.sh" "$sb/out_err2" "$sb/ro" 2> "$sb/err2.txt"
+grep -q err-visible "$sb/err2.txt" || fail "N17: stderr lost after a failed open"
+[ "$(grep -c '( noslot env' "$HERE/nightly.sh")" -eq 2 ] || fail "N14: not both suites run under noslot"
+
 # ---- nightly_cron.sh: committed code only, a session's PATH, a log ----------------------------------------------
 mkdir -p "$work/repo/governance/project/orchestration/nightly"
 printf '#!/bin/bash\necho "NIGHTLY RAN $1 PATH=$PATH"\n' > "$work/repo/governance/project/orchestration/nightly/nightly.sh"
@@ -284,5 +326,5 @@ NIGHTLY_ORCH=$work/orch NIGHTLY_JUNIT_ROOT=$work/junit bash "$HERE/rotate.sh" > 
 [ ! -e "$work/orch/log/nightly/20261001-0200" ] && [ -e "$work/orch/log/nightly/20261002-0200" ] || fail "R3: the budget did not remove the oldest run folder only"
 
 rm -rf "$work"
-[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N11, nightly_cron.sh C1-C3, nightly_check.sh K1-K17, ping_gate.sh G1-G11, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
+[ "$fails" -eq 0 ] && echo "PASS: nightly.sh N1-N17, nightly_cron.sh C1-C3, nightly_check.sh K1-K17, ping_gate.sh G1-G11, nightly_estimate.py E1-E2, runs_sweep.sh S1-S7, rotate.sh R1-R3"
 exit "$fails"

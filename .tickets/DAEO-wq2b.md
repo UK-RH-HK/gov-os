@@ -21,9 +21,9 @@ allowed_paths:
 - governance/project/orchestration/tools/README.md
 kpis:
   success:
-  - 'A ticket enters the queue only with its Senior Engineer''s approval (until the three layers start, the CTO''s); the queue makes the --no-ff merge of the ticket onto w2/integrate''s current head in a clean clone, runs the scoped set once on that merged result under the test lock, and on green advances w2/integrate to that same merge commit (--ff-only), so the commit tested is the commit landed [DEC-959 item 1, DEC-848]'
+  - 'A ticket enters the queue only with its Senior Engineer''s approval (until the three layers start, the CTO''s); the queue makes the --no-ff merge of the ticket onto w2/integrate''s current head in a clean clone, runs the scoped set once on that merged result in a heavy-job slot (DEC-979), or freely until the slots run [DEC-962, DEC-983, DEC-982], and on green advances w2/integrate to that same merge commit (--ff-only), so the commit tested is the commit landed [DEC-959 item 1, DEC-848]'
   - 'On red, w2/integrate does not move: the ticket is ejected back to its Senior Engineer (or the CTO) with the failing tests'' names and the run''s log path; a red that passes alone is a flaky candidate, named, and decides nothing on its own [DEC-959 item 1, DEC-953]'
-  - 'Tests run no more than this: the queue runs the scoped set once per batch on the merged result, and skips the run when the merged code is identical to what the lead tested (same tree for the code paths, governance records left out), recording why it skipped; the full suite runs only for a change to the core (the selection''s own rule) [DEC-959 item 1]'
+  - 'Tests run no more than this: the queue runs the scoped set once per batch on the merged result, and skips the run when the merged code is identical to what the lead tested (same tree for the code paths, governance records left out), recording why it skipped; the full suite never runs here; it runs only in the nightly [DEC-968, DEC-983, DEC-982] [DEC-959 item 1]'
   - 'A batch of queued tickets on one head gives one merged result and one run; a red batch is bisected by ticket, the good ones advance and the causing one is ejected [DEC-959 item 1]'
   - 'Each advance writes the record the close cites (the head, the tickets, the selection, the counts, the time); close_build cites it instead of running its own tests on the same code [DEC-959 item 1]'
   - 'When the head moves while a candidate is under test, the candidate is re-merged and re-tested, never advanced onto a head it was not tested on [DEC-959 item 1]'
@@ -38,6 +38,7 @@ sources:
 - DEC-953
 - DEC-848
 - DEC-954
+- DEC-983
 est_loc: 250
 acceptance_tests:
   path: tests/acceptance/W2-97/
