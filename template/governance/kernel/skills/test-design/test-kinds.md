@@ -26,13 +26,30 @@ otherwise in <the project's test settings>.
 
 ## The README map
 
-For each KPI line: the line, the tests under it, and the expected red reason of each. The project's opaque
-acceptance runner reads the map and reports pass or fail per line, with counts, and nothing of the tests' content;
-a test the map does not name is counted as unmapped, never named, and a README with no map is refused (DEC-959
-item 6). The exact syntax follows that runner. In the form its in-progress code reads, a table with a `KPI` column
-naming the line (`success-1`, `failure-2`) and a `Test` column naming files or cases in backticks:
+For each KPI line: the line, the tests under it, and the expected red reason of each. The opaque acceptance
+runner, `gov accept`, reads the map and reports pass or fail per line, with counts, and nothing of the tests'
+content; a test the map does not name is counted as unmapped, never named, and a README with no map is refused
+(DEC-959 item 6). The form it reads:
+
+- **A table with a KPI column and a test column.** Its header row has a column whose title starts with `KPI` and
+  one whose title starts with `Test` or `File`. Each row names its line at the start of the KPI cell, and its tests
+  in the test cell, each item a code span: a test file, a file and one case (`<file>::<case>`, as the project's
+  test runner names a case), or a case's bare name. Text outside the code spans (the red reason, a note) is not
+  read as a test.
+- **Or a table under a heading that names its line** (`## success-1`): a table with a test or file column and no
+  KPI column takes its line from the nearest heading above it.
+- **The line names** are `success-N` and `failure-N`, N the line's number among the ticket's success or failure
+  KPI lines, from 1. Accepted spellings: `success 1`, `S1`, `s-1`, `failure 2`, `F2`; `KPI 3` and `K3` name
+  `success-3`. A cell or heading may name several lines, joined by `/`, `,`, `;` or `and`; bold marks are ignored.
+  A table inside a fenced block is not read.
+- **Refused, never answered with raw output:** a README with no map (`ACCEPT_NO_MAP`); a row with tests whose KPI
+  cell names no line, or a table of tests under a heading that starts with `success`, `failure` or `KPI` but names
+  no line (`ACCEPT_MAP_UNREADABLE`).
+- **Counted:** a test the map does not name is counted under unmapped (passed and failed), never named; any failed
+  test, mapped or not, fails the run. A line passes when at least one of its tests passed, none failed, and every
+  test it names was found.
 
 | KPI | Test | Red reason |
 |---|---|---|
-| success-1 | `test_example.py::test_the_command_reports_each_line` | the command does not exist yet |
-| failure-1 | `test_example.py::test_a_run_error_names_only_its_kind` | the error carries its message |
+| success-1 | `<test file>::<case that reports each line>` | the command does not exist yet |
+| failure-1 | `<test file>::<case that names only an error's kind>` | the error carries its message |

@@ -47,7 +47,7 @@ The tests are shown red against the ticket's base: run in the designer's own wor
 
 ## The README map
 
-The README maps each KPI line to the tests under it and the expected red reason of each, in the table form gov accept reads (the project's acceptance runner), so the implementer sees pass or fail per line and never a test's content (DEC-959 item 6). The form: [test-kinds.md](test-kinds.md).
+The README maps each KPI line to the tests under it and the expected red reason of each, in the table form gov accept reads, so the implementer sees pass or fail per line and never a test's content (DEC-959 item 6): a table with a KPI column naming each line (`success-N`, `failure-N`, N its number in the ticket) and a test or file column whose items are code spans, or a table under a heading that names its line. A README with no map is refused; a test the map does not name is counted, never named. The form in full: [test-kinds.md](test-kinds.md).
 
 ## Handling probe findings
 

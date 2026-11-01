@@ -55,11 +55,12 @@ orchestrator's, in the main tree. It never pushes, tags or rebases. It decides n
 delegation of DEC-220 is the main orchestrator's. It never writes the acceptance tests (MR-3), and it writes no
 file that a worker is started to write.
 
-What a lead returns. One summary, its last message, which starts with one of these forms (DEC-236). DONE: the
+What a lead returns. One summary, its last message, which starts with the twelve labelled fields, its status
+field carrying DONE, PACKAGES, ESCALATION or `AUTH_REQUIRED`; any payload comes after them (CAP-37, DEC-236). DONE: the
 branch head, the commits, each suite's result as the lead ran it, the reviewer's findings and what was done with
 each, the residuals and the learning metrics (DEC-106). PACKAGES: each package in full, with the lead's
 recommendation and confidence, and the state of the branch. ESCALATION: what does not converge after three
 consecutive iterations, with the evidence (DEC-096). The lead uses its model's full window and writes its
 checkpoint in the worktree at every handover; a fresh lead resumes from it if its session ends early (DEC-837,
 DEC-838). On an authentication or access error it starts nothing
-more and returns with `AUTH_REQUIRED` as its first line (DEC-420).
+more and returns with `AUTH_REQUIRED` as its status (DEC-420).

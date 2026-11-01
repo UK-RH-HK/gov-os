@@ -97,8 +97,9 @@ code that fulfils the ticket's specification and its KPI lines, never code made 
 - Your test-driven development means your own unit tests. Builder tests go in <builder test path>, as regression
   evidence only (MR-3).
 - When `<the lead's tests-ready marker>` exists, the lead has merged the acceptance tests into this worktree: run
-  them once, with <the project's acceptance test command>, to the end of the suite, never stopping at the first
-  failure, reading results only (names, pass or fail, failure messages). If you have returned before then, a fresh
+  them once, with `gov accept <ticket id>`, your only way to run them (DEC-959 items 6 and 7), to the end of the
+  suite, never stopping at the first failure, reading results only: pass or fail per KPI line and the counts,
+  never a test's source, assertion text or traceback (DEC-820 (c)). If you have returned before then, a fresh
   engineer runs them.
 
 ## What you write
@@ -108,9 +109,10 @@ code that fulfils the ticket's specification and its KPI lines, never code made 
   worked around.
 - Proportion (DEC-135): no code for edge cases beyond the KPI lines. Never make a guard decision fail open, nor
   a gate decision: each failure KPI must still refuse. No check is weakened to let a close pass (DEC-768 item 4).
-- Run the ticket's acceptance tests with <the project's test command> in the foreground, each suite to its end,
-  never stopping at the first failure, once they are ready (the work order above), reading results only; then
-  the builder tests.
+- Run the ticket's acceptance tests only with `gov accept <ticket id>`, in the foreground, once they are ready (the
+  work order above), reading results only (pass or fail per KPI line and the counts); then the builder tests and
+  your own unit tests with <the project's test command> in the foreground, each suite to its end, never stopping
+  at the first failure.
 - A rebuild of the store is a full rebuild, never one without embeddings, and never while another session's
   command runs in this tree (DEC-719).
 

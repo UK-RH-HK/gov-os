@@ -24,6 +24,7 @@ Read first:
 - the ticket's acceptance tests and their README, and the code at the head to review;
 - the lead's results of its one scoped run, with the selection's scope;
 - the project's threat-model record, `<the project's threat-model record>`, and the audit skill's judgement rules.
+- where the rules this skill uses stand: the two questions and the two lines under "Judgement rules" in the audit skill's `SKILL.md`; the twelve return fields under "The return" in the orchestration skill's `briefs-and-returns.md`.
 
 What else it needs to know, it asks `gov retrieve` first (DEC-836). It reads everything, tests and code alike (DEC-820 item 3).
 

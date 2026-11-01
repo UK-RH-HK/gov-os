@@ -178,7 +178,9 @@ while you work, and only your final message is read.
 2. **When the designer's tests are committed,** merge the tests branch into this worktree while no worker's command
    runs here, with the trailers `Task: <ticket id>` and `Role: orchestrator`, and write
    `<the tests-ready marker>` naming the commit. The implementer then runs the acceptance tests once, reading
-   results only; if it has returned, a fresh implementer does.
+   results only; if it has returned, a fresh implementer does. It runs them only with `gov accept <ticket id>`,
+   which reports pass or fail per KPI line and the counts, never a test's source, assertion text or traceback
+   (DEC-959 items 6 and 7, DEC-820 (c)).
 3. **Check red yourself,** to the end of the suite: the tests fail for the reason their README states. Nobody
    edits a test; a disputed test is a package. Red is against the ticket's base (DEC-959 item 7).
 4. **Verify yourself, once, in this worktree, with <the project's test command>** (DEC-959 item 1, DEC-968): first one full rebuild of the store, never one without

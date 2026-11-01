@@ -23,7 +23,7 @@ A method for the orchestrator role and its ticket leads: the way a wave is run. 
 1. The lead returns DONE. The orchestrator verifies the return itself, by its own runs: it reads every KPI clause against the tests and the code, and the governance checks of `gov check` against the last known state (DEC-236, DEC-449).
 2. For a FULL ticket a fresh reviewer probes the final code before the merge, and nothing is committed after the probed head (DEC-498) but its passing probe record (DEC-733).
 3. Only the orchestrator merges into the integration branch, and never into the main branch (DEC-235, DEC-416).
-4. Then the close: `gov close` runs the ticket's tests and the regression on the merge commit. Where the close does not follow the merge directly, a full regression runs (DEC-536): the nightly's, as a close runs the scoped set (DEC-968).
+4. Then the close: `gov close` runs the ticket's tests and the regression on the merge commit. Where the close does not follow the merge directly, a full regression runs (DEC-536), which since DEC-968 is the next nightly's; a close runs the scoped set.
 5. Residuals are recorded, and the worktree and the branch are removed (DEC-135, DEC-235).
 
 The merge queue: [integration-queue.md](integration-queue.md). A red nightly: [nightly-sheriff.md](nightly-sheriff.md). An Emergency: [incident-response.md](incident-response.md).
@@ -56,7 +56,8 @@ The lead runs the loop from `brief-lead.md`, which states each step in full.
 
 - A worker's identity (role and ticket) goes through the settings argument, which the launcher builds for a worker and the orchestrator passes for a lead (DEC-371).
 - The model `<model>` is named on every launch (DEC-460); no launch sets a compaction threshold (DEC-838).
-- Leads and workers run in the background: a lead with the absolute path of the CLI, `<absolute path of the CLI>`, a worker through the launcher; never a bare call in the foreground (DEC-371, DEC-537).- Never two writing sessions in one tree, and never a commit in a tree while a worker's command runs there: containment would attribute the change to the worker (DEC-254, DEC-537).
+- Leads and workers run in the background: a lead with the absolute path of the CLI, `<absolute path of the CLI>`, a worker through the launcher; never a bare call in the foreground (DEC-371, DEC-537).
+- Never two writing sessions in one tree, and never a commit in a tree while a worker's command runs there: containment would attribute the change to the worker (DEC-254, DEC-537).
 - On an authentication or access error there is no retry loop: nothing more is started, the checkpoint is written, and the stop is named `AUTH_REQUIRED` (DEC-420).
 - The orchestrator reads only a lead's final summary, never its workers' output (DEC-236).
 
@@ -64,7 +65,6 @@ The lead runs the loop from `brief-lead.md`, which states each step in full.
 
 - A session is started from a filled template: `brief-test-designer.md`, `brief-engineer.md`, `brief-reviewer.md`, `brief-product-spec.md` or `brief-lead.md`. Each carries the standing sentences word for word (DEC-537).
 - Every return starts with the twelve fields, each a labelled line: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action (CAP-37). Any payload comes after them. Stop after two identical refusals and return (AR-6).
-- Policy 2: reads are open; only secrets, the held-out material's contents (its file names are readable), the counterpart's work on the same ticket and the hidden half of an evaluation set are refused (DEC-820).
 - A worker gets only its brief and the decisions that apply, never the orchestrator's notes, the loop count or another worker's output (DEC-096, DEC-537).
 - A test designer's brief states behaviour and sources only, never the names of the implementation's private parts (DEC-462).
 - Tests are in proportion to the profile: FULL thorough; STANDARD every KPI line's success and failure plus the key edge cases; LITE one test per KPI line; no combinatorial expansion beyond what a KPI demands (DEC-221).
@@ -87,6 +87,8 @@ The lead runs the loop from `brief-lead.md`, which states each step in full.
 ## Temp hygiene and protected files
 
 - A session's temporary folder is its own and is removed with it; nothing is left in or read from another session's folders (DEC-386, DEC-537).
+- Policy 2: reads are open; only secrets, the held-out material's contents (its file names are readable), the counterpart's work on the same ticket and the hidden half of an evaluation set are refused (DEC-820).
+
 ## Learning metrics
 
 - The metrics are recorded at each close: KPI disputes; acceptance tests rewritten after implementation began, with reasons; lines against the estimate; wall time from claim to close; merge conflicts; false findings; governance share (DEC-106, DEC-135, DEC-491).

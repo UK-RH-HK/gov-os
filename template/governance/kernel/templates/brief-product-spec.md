@@ -92,8 +92,9 @@ lines, never only to pass the tests (DEC-957).
   acceptance tests at the same time, from the same specification, in its own worktree; neither of you reads the
   other's work (DEC-963).
 - When `<the lead's tests-ready marker>` exists, the lead has merged the acceptance tests into this worktree: run
-  them once, with <the project's acceptance test command>, to the end of the suite, reading results only (names,
-  pass or fail, failure messages). If you have returned before then, a fresh worker runs them.
+  them once, with `gov accept <ticket id>`, your only way to run them (DEC-959 items 6 and 7), to the end of the
+  suite, reading results only: pass or fail per KPI line and the counts, never a test's source, assertion text or
+  traceback (DEC-820 (c)). If you have returned before then, a fresh worker runs them.
 
 ## Ticket mode: what you write
 
@@ -105,9 +106,9 @@ lines, never only to pass the tests (DEC-957).
 - Proportion: write what the specification asks, and add no rule of your own. Every rule you write comes from a
   named source and is stated with it, by id. Anything that would give a text authority of its own is the owner's:
   return it as a package (MR-6).
-- Run the ticket's acceptance tests with <the project's test command> in the foreground, to the end, once they
-  are ready (the work order above), reading results only; then the other suites your files could turn red:
-  <other suites>.
+- Run the ticket's acceptance tests only with `gov accept <ticket id>`, in the foreground, once they are ready
+  (the work order above), reading results only (pass or fail per KPI line and the counts); then, with
+  <the project's test command>, to the end, the other suites your files could turn red: <other suites>.
 - A kernel text (a skill, a role file, a template, a schema, a hook or the policy) is written for any adopted
   repository: a project's own values stand as `<placeholders>`, and nothing names this repository's tickets,
   paths or tools (DEC-539). A kernel change follows CAP-33: evidence, a change proposal (CIT-P), independent
