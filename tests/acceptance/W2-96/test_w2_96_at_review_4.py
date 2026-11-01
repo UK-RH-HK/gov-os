@@ -236,7 +236,7 @@ def test_premise_r16_the_token_search_finds_a_process_of_its_own_session_and_its
     token = f"qzv96leak-r16-{uuid.uuid4().hex}"
     child = "import subprocess, sys, time; subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); " \
             "time.sleep(60)"
-    parent = subprocess.Popen([sys.executable, "-c", child], env={**os.environ, support.R16_TOKEN_KEY: token},
+    parent = subprocess.Popen([sys.executable, "-c", child], env={**os.environ, support.R16_RUN_VAR: token},
                               stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                               start_new_session=True)
     try:
