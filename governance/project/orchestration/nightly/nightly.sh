@@ -141,20 +141,54 @@ else
   lock_wait=$(( $(date +%s) - lw0 ))
   WITH_LOCK=""
 fi
+# DEC-984 (owner): the nightly takes all of the machine's heavy-job slots while it runs (DEC-979 D1's slots, the
+# CTO's heavy_slot.sh: /tmp/gov-os-heavy-slot-<n>.lock), so leads' and closes' runs wait for it. Each slot is waited
+# for at most until the latest start at night (an hour by day); the slots held and the wait are recorded, and the wait
+# is kept out of the setup like the gate's. The locks stay in this script; the runs start with them closed, so a
+# daemon a test leaves behind never keeps a slot. They are released when this script ends.
+SLOT_DIR=${NIGHTLY_SLOT_DIR:-/tmp}
+SLOTS=${NIGHTLY_SLOTS:-3}
+# At most 30 minutes, and never past the latest start: a slot wait never costs the night (review of 2026-11-01).
+slot_deadline=$(( $(date +%s) + ${NIGHTLY_SLOT_WAIT:-1800} ))
+if [ "$MODE" = night ] && [ "$latest" -lt "$slot_deadline" ]; then slot_deadline=$latest; fi
+sw0=$(date +%s)
+held=0
+SLOT_FDS=()
+for i in $(seq 1 "$SLOTS"); do
+  unset sfd
+  # cannot open: run without that slot. The group keeps the 2>/dev/null to this open (an exec line's own
+  # redirections would last for the rest of the script and hide its errors: review of 2026-11-01).
+  { exec {sfd}>"$SLOT_DIR/gov-os-heavy-slot-$i.lock"; } 2>/dev/null || continue
+  [ -n "$sfd" ] || continue
+  SLOT_FDS+=("$sfd")
+  wait_s=$(( slot_deadline - $(date +%s) )); [ "$wait_s" -lt 1 ] && wait_s=1
+  flock -w "$wait_s" "$sfd" && held=$((held + 1))
+done
+echo "heavy-job slots held: $held of $SLOTS (waited $(( $(date +%s) - sw0 )) s)" >> "$OUT/run.txt"
+lock_wait=$(( lock_wait + $(date +%s) - sw0 ))
+noslot() {  # run a command with the slots' descriptors closed
+  local f
+  for f in "${SLOT_FDS[@]}"; do [ -n "$f" ] && eval "exec $f>&-"; done
+  exec "$@"
+}
 setup=$(( $(date +%s) - t0 - lock_wait ))
 start=$(date +%s)
 # shellcheck disable=SC2086
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
+( noslot env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
   $WITH_LOCK python3 -m pytest tests -n auto -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
-  --junitxml="$JUNIT/parallel.xml" > "$OUT/parallel.txt" 2>&1
+  --junitxml="$JUNIT/parallel.xml" ) > "$OUT/parallel.txt" 2>&1
 p_exit=$?
 mid=$(date +%s)
 # shellcheck disable=SC2086
-env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
+( noslot env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
   GOV_CLOSE_SERIAL_ONLY_GIVEN="$ENTRIES" \
   $WITH_LOCK python3 -m pytest $ENTRIES -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
-  --junitxml="$JUNIT/serial.xml" > "$OUT/serial.txt" 2>&1
+  --junitxml="$JUNIT/serial.xml" ) > "$OUT/serial.txt" 2>&1
 s_exit=$?
+# The suites are the heavy part: the slots are released now, so the light steps after them (each red alone, the
+# bisect) neither hold them nor pass them to anything they leave behind.
+for f in "${SLOT_FDS[@]}"; do [ -n "$f" ] && eval "exec $f>&-"; done
+echo "heavy-job slots released after the suites" >> "$OUT/run.txt"
 end=$(date +%s)
 echo "parallel exit $p_exit in $((mid - start)) s: $(tail -1 "$OUT/parallel.txt")" >> "$OUT/run.txt"
 echo "serial exit $s_exit in $((end - mid)) s: $(tail -1 "$OUT/serial.txt")" >> "$OUT/run.txt"

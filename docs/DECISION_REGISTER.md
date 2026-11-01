@@ -12348,3 +12348,13 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.366 | 2026-10-31 | Owner (recorded by the orchestrator, DEC-861): DEC-983 (SMART-WORK-1: W2-115 to W2-119, ten tickets' KPIs; the heavy-job slots in force 23:50). Next free id: DEC-984. |
+
+### DEC-984 — The nightly takes all three heavy-job slots while its suites run (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-979 D1, DEC-983 item 6, DEC-973 · **Changes:** DEC-961 ("the nightly takes no lock and holds nothing") for the heavy-job slots
+- **Decision:** the 04:00 nightly takes all three heavy-job slots while its two suites run, so leads' and closes' runs wait for it. It waits for each slot at most until the night's latest start (an hour by day), records the slots held and the wait (kept out of the setup time), runs its suites with the slots' locks closed (nothing a test leaves behind keeps one), and releases them right after the suites, before the light steps (each red alone, the bisect). A reviewed change to the nightly folder with `test_nightly.sh` (N12 to N14). Leads' runs held past 90 minutes by it return PACKAGES (the common brief's rule).
+- **Also (the CTO's, the lighter lane):** `tools/heavy_slot.sh` now locks with `flock -o`, so a daemon a run leaves behind (the embedder `gov` starts on demand) never keeps a slot (test H6).
+- **Where it goes (DEC-851):** this register (DEC-961 marked); the nightly folder; the prompt §0 (v3.64); the decisions-in-force list; RESUME HERE.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.367 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-984 (the nightly takes all three heavy-job slots while its suites run). Next free id: DEC-985. |
