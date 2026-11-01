@@ -12694,3 +12694,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.397 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1015 (item 4 delegated). Next free id: DEC-1016. |
+
+### DEC-1016 — W2-90b's P-W2-90b-1 goes to the owner; S4's two live-session harnesses move to W2-90c unchanged; W2-90b lands (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: a scope move with nothing lowered; the package's own choice is left to the owner, since DEC-1014 item 1 does not count a lead's agreement as corroboration on a decision that touches verification) · **Under:** DEC-970, DEC-999, DEC-822, DEC-784, DEC-1014
+- **Decision:** (1) P-W2-90b-1 (how W1-46's live sessions and W1-50's freeze launcher judge the worktree's code: (a) a stand-in HOME with `CLAUDE_CONFIG_DIR`, a P1 exception to DEC-784; (b) S4 re-baselined under DEC-822 item 3, the lead's and designer's recommendation; (c) a launcher override, not recommended) goes to the owner in the next package. (2) Until then those two harnesses' part of W2-90b's KPI S4 moves to W2-90c (`DAEO-fu3n`) word for word, with their two test files added to its paths; W2-90b keeps W1-47's part, which is met. (3) W2-90b lands at `73c18fea1e1f` (verified head `d2408361d185` plus its records commit) through the dispatcher's landing.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.398 | 2026-11-01 | Orchestrator (delegated): DEC-1016. Next free id: DEC-1017. |
