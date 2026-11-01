@@ -141,6 +141,8 @@ def indexed(tmp_path, monkeypatch):
         (tmp_path / rel).write_text(text, encoding="utf-8")
     calls = []
     monkeypatch.setattr(codeintel, "_Session", lambda _root: Planted(calls))
+    # No session kept from another test: a passed test's folder is removed, and the next can be given its path.
+    monkeypatch.setattr(code_route, "_SESSIONS", {})
     return tmp_path, calls
 
 
