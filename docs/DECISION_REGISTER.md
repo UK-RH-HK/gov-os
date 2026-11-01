@@ -12601,3 +12601,17 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.388 | 2026-11-01 | Orchestrator (delegated): DEC-1006. Next free id: DEC-1007. |
+
+### DEC-1007 — The dispatcher: keeping the machine full and the work moving never depends on a session's memory (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-999, DEC-1003, DEC-979 item 2 (the tools lane), DEC-942 · **Why (the owner's words, short):** in six hours one ticket closed; the status said 9 leads when 5 ran; four returns sat unread for hours because the return watcher was not re-armed; the machine ran at a load of about 7 of 20.
+- **Decision:**
+  1. **The dispatcher, tonight's top priority:** the CTO's own tool, a plain program, no AI, running outside any Claude session and restarted after a reboot or WSL restart; every minute it reads the gate (load, memory, heavy-job slots) and starts the next ticket from the ready list when there is room; notices every finished lead, puts its return in an inbox and wakes the CTO; puts every ticket ready to land into the merge queue as one batch whenever the queue is free; writes the true status (leads from the processes, the load, the queue, the inbox) to a file every status block reads.
+  2. Its order comes from the plan, never its own choice: the CTO keeps the ready list in the WBS's order and dependencies and RESUME HERE's priorities, each ticket's brief built and readiness checked; the dispatcher starts only what is on it; the CTO keeps the ready list, the WBS and RESUME HERE consistent.
+  3. Its state survives any session: the ready list, the inbox and the status are files the checkpoint and RESUME HERE point to.
+  4. It has its own tests and an independent review before it goes on; its design to the owner in short at the start; switched on once the review passes unless the owner objects, and the owner told; aim: running within five hours.
+  5. The Gov OS feature (DEC-1003): its spec and KPIs as KPI changes to W2-20, W2-117, W2-118 or a new ticket, as a P1 to the owner; it may land later as its own ticket.
+  6. **Until it is on, the CTO does its job by hand** at every wake (the gate, the leads from the processes, the returns; start ready tickets up to capacity, with a reason for any not started; land every ready ticket as one batch when the queue is free; the lead count in every status block from the processes, never from memory). W2-11's queue run (over 30 more minutes) was stopped at 19:48; W2-11 and W2-105 landing as one batch on warm clones, W2-05, W2-55, W2-96 closing alongside.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.389 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1007 (the dispatcher). Next free id: DEC-1008. |
