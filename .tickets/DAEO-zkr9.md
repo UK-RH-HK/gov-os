@@ -27,6 +27,7 @@ kpis:
   - '`gov queue` gives W2-97''s queue in the product: the commit tested is the commit landed; one run per batch on the merged result, in a heavy-job slot (W2-20); a run skipped when the merged code is identical to what the lead tested, with its reason; a red batch''s culprit ejected and the rest advanced (W2-115''s attribution) [DEC-959 item 1, DEC-983, DEC-982]'
   - 'Each advance writes the record the close cites, and the close cites it instead of running its own tests on the same code [DEC-959 item 1, DEC-983, DEC-982]'
   - 'Nothing project-specific: no branch, path or ticket of this repository is named in the code; this repository''s queue moves onto it and W2-97''s tool is retired [DEC-983, DEC-982]'
+  - 'After each landing, the queue starts the integration store''s refresh (W2-116) and seeds its own warm clones from it [DEC-1014 items 4 and 6, SMART-WORK-5 E, DEC-1015 item 3]'
   failure:
   - 'A branch advanced to a commit that was not the one tested, or after a red.'
   - 'A second run on identical code, or a skip without its reason.'
