@@ -2,6 +2,7 @@
 
 ``gov retrieve [--ticket <id>] [--id <id>]... [--radius <R>] [--batch-size <N>] [--bundle-budget <N>]
 [--continue <token>] <query>`` prints the evidence bundle of ``gov.retrieval.retrieve``. It only reads (CAP-27).
+The register's superseded and done entries are left out of it, and its ``left_out`` counts them (W2-55).
 Exit code 1: ``STORE_MISSING``, no store was loaded; ``CONTINUATION_INVALID``, the token is none.
 """
 

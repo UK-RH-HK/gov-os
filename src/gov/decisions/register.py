@@ -143,6 +143,8 @@ def leave_out(root: Path, evidence: list[dict]) -> tuple[list[dict], dict | None
     from gov import records
     from gov.retrieval import authority, lexical
 
+    if not any("start_line" in item for item in evidence):  # an item without lines is no entry's span
+        return evidence, None
     register = read(root)
     if register is None:
         return evidence, None

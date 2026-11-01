@@ -294,7 +294,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     dropped: list[dict] = []
 
     # Supplementary context
-    supplementary, supp_dropped, left_out = _try_supplementary(root, ticket, max(0, budget_remaining))
+    supplementary, supp_dropped, *left = _try_supplementary(root, ticket, max(0, budget_remaining))
+    left_out = left[0] if left else None
     dropped.extend(supp_dropped)
     # one order whatever order the retrieval returned its items in (DEC-768): an entry is its id and its reason,
     # so the two decide every pair that differ; what is kept still follows the retrieval's rank
