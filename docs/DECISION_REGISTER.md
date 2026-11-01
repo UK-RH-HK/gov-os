@@ -12501,3 +12501,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.378 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-996 (P1-DEC995-APPLY as recommended). Next free id: DEC-997. |
+
+### DEC-997 — W2-81's P-W2-81-R2-1 not accepted: round 2's batch 6 and second review (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: P2, within the declared round 2, reversible; confidence high) · **Under:** DEC-993, DEC-916, DEC-803, DEC-968, MR-4
+- **Context:** W2-81's round 2 review 3 judged FAIL on F1 and F2 (fail open once a capability counts as built); the lead committed the probe record as PASS, reclassifying both as entry criteria (DEC-803), and proposed that the CTO accept it. It also found F3: the runner's READY self-test fails about one seed in seven.
+- **Decision:** not accepted. A reviewer's fail is answered by a fix or by the round's second review, never relabelled by the lead (MR-4); F3 must not land (a known flaky test, DEC-968). Batch 6: F3 first (proven on at least 50 seeds in a row), F1 and F2, F4, F5, F7 and F9 riding along; then round 2's second and last review (DEC-916); the earlier record marked superseded by a new commit. A fail then is returned as PACKAGES, no further round.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.379 | 2026-11-01 | Orchestrator (delegated): DEC-997 (W2-81's batch 6 and second review). Next free id: DEC-998. |
