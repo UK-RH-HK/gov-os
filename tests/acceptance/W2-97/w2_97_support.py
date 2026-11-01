@@ -164,7 +164,11 @@ if CFG.get("refuse"):
     sys.exit(2)
 ticket = ARGS[1] if len(ARGS) > 1 else ""
 targets = CFG.get("targets", {}).get(ticket, CFG.get("default", ["tests"]))
-print(json.dumps({"scope": "scoped", "why_full": [], "core_changed": CFG.get("core_changed", []),
+# "full": a selection that answers the full suite (with targets), which the queue never runs (DEC-983, DEC-968).
+full = bool(CFG.get("full"))
+print(json.dumps({"scope": "full" if full else "scoped",
+                  "why_full": [{"reason": "stand-in full answer"}] if full else [],
+                  "core_changed": CFG.get("core_changed", []),
                   "unplaced": CFG.get("unplaced", []), "base": None, "head": None, "governance_left_out": [],
                   "changed": [], "selected": [{"target": t, "why": [{"reason": "OWN"}]} for t in targets],
                   "pytest_options": [], "ignore": [], "deselect": [], "per_test_timeout": None}, indent=1))
