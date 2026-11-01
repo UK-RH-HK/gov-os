@@ -12543,3 +12543,17 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 |---|---|---|
 | 0.382 | 2026-11-01 | Orchestrator (delegated): DEC-1000 (W2-13's packages). Next free id: DEC-1001. |
 
+
+### DEC-1001 — The queue's waits cut: record-only head moves, warm clones, the nightly's results as the baseline; the one-rebuild lock ended (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-999 item 4, DEC-988, DEC-989, DEC-979 D1, DEC-983 · **Changes:** DEC-962's "one store rebuild at a time" and DEC-971 item 5 (the week's measurement ends early); DEC-939 item 2
+- **Decision:**
+  1. **(a)** When `w2/integrate` moved during a queue run only by records, the queue re-merges onto the new head and still re-runs the record-reading tests (those that read the register, tickets and other records); it skips only the rest. Any code in the move: the full re-run as before.
+  2. **(b)** The queue keeps its clones warm between runs (incremental rebuilds).
+  3. **(c)** The baseline's verdict on a red is read from the nightly's own results where they hold it (the same failure); otherwise traced as before; the check on the head without the batch stays.
+  4. **(d)** The one-rebuild-at-a-time lock ends now: rebuilds share the three heavy-job slots with test runs (each tree its own rebuild lock, so two rebuilds of one tree still exclude each other). First one rebuild's memory is measured so the gate stays honest. The first day is watched: if rebuilds side by side fail again (the code graph, gitleaks), the lock goes back and the owner is told.
+- **Where it goes (DEC-851):** this register; the prompt §0 and §15 (the rebuild rule); the decisions-in-force list; RESUME HERE; the common lead brief (the rebuild command); the tools README.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.383 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1001 (the queue's waits cut; the one-rebuild lock ended for the heavy-job slots). Next free id: DEC-1002. |
+
