@@ -97,9 +97,12 @@ ALL_OF = {"large-file"}  # every capability listed is needed; for the others, an
 # Where each kind's files must stay as built, and how each may leave (README, "Planted files stay as built"):
 # "move" a MOVE or RENAME in A3 reviewed at A5 whose target holds the file as built; "retire" a RETIRE reviewed at A5;
 # None never. A file that changes content, or leaves otherwise, is MISHANDLED.
-_TEST_CONFIG = ("conftest.py", "pytest.ini", "pyproject.toml", "setup.cfg", "tox.ini", "noxfile.py", "package.json",
-                "Cargo.toml", "build.rs", "go.mod", "go.work")
-_TEST_CONFIG_PREFIXES = ("vitest.config", "vitest.workspace", "jest.config", "tsconfig", "karma.conf", ".mocharc")
+# The configuration the test runners read in a test's parent folders. In the test's own folder no list is needed:
+# every file there other than the test is held to the build's (``_collection_kept``).
+_TEST_CONFIG = ("conftest.py", "pytest.ini", ".pytest.ini", "pytest.toml", ".pytest.toml", "pyproject.toml",
+                "setup.cfg", "tox.ini", "noxfile.py", "package.json", "Cargo.toml", "build.rs", "go.mod", "go.work")
+_TEST_CONFIG_PREFIXES = ("vitest.config", "vitest.workspace", "vitest.projects", "vite.config", "jest.config",
+                         "tsconfig", "karma.conf", ".mocharc", "pytest.", ".pytest.")
 NOT_MEASURED = {"large-file": "`within the budget`: no budget for the index is stated in the path map (its schema has "
                               "no such field), in the index's records or in the Contract, so the judge has none to "
                               "read; the clause is not measured today"}
@@ -433,11 +436,14 @@ def _collection_kept(case, view, test):
     a test kept from being collected is skipped, whatever the form."""
     if view.built is None:
         return
-    folders = [Path(test).parent] + list(Path(test).parent.parents)
+    own = Path(test).parent
+    folders = [own] + list(own.parents)
 
     def configuration(rel):
-        name = Path(rel).name
-        return Path(rel).parent in folders and (name in _TEST_CONFIG or name.startswith(_TEST_CONFIG_PREFIXES))
+        name, parent = Path(rel).name, Path(rel).parent
+        if parent == own:  # the test's own folder: any file but the test itself, whatever its name
+            return rel != test
+        return parent in folders and (name in _TEST_CONFIG or name.startswith(_TEST_CONFIG_PREFIXES))
     now = set()
     for folder in folders:
         here = view.root / folder
@@ -495,6 +501,10 @@ def _superseded_plan(case, view, ev, built):
     entry = view.entry("A3", plan)
     if entry and entry.get("action") in LEAVING:
         case.add(MISHANDLED, record_name("A3"), "artefacts[].action", f"{plan}: {entry['action']}")
+    following = view.entry("A3", successor)  # the current plan proposed out of the active tree (read today)
+    if following and following.get("action") in ("DELETE_FROM_ACTIVE_TREE", "RETIRE"):
+        case.add(MISHANDLED, record_name("A3"), "artefacts[].action", f"the successor {successor}: "
+                 f"{following['action']}")
     if "A2-content-class" in built and not _missing_records(case, view, "A2"):
         a2 = view.entry("A2", plan) or {}
         if a2.get("class") == "superseded" and a2.get("superseded_by") == successor:
@@ -614,26 +624,61 @@ def _legacy_document(case, view, ev, built):
                  f"{ev['path']} {entry['disposition']}, not {wanted}")
 
 
+def moved_to(view, path):
+    """Where ``path`` now is when a MOVE or RENAME in A3, reviewed at A5, took it there and its target holds it as
+    built; None otherwise (a file in its place, or one that left without such an action)."""
+    if view.built is None or view.exists(path) or not view.built.get(path):
+        return None
+    entry = view.entry("A3", path)
+    if not entry or entry.get("action") not in ("MOVE", "RENAME") or not view.reviewed():
+        return None
+    target = entry.get("target")
+    return target if isinstance(target, str) and view.blob_of(target) == view.built[path] else None
+
+
+def namespace_by_patterns(view, path):
+    """The namespace the path map's patterns give ``path`` now, as the adoption tool classes (the code under test's
+    own matcher); None when none holds it or the path map cannot be read."""
+    if not isinstance(view.spaces, dict):
+        return None
+    from gov.adopt.project import classify
+
+    try:
+        return classify({"path-map.yaml": {"namespaces": view.spaces}}, [path]).get(path)
+    except Exception:  # noqa: BLE001 - a path map the matcher refuses holds nothing
+        return None
+
+
 def _large_file(case, view, ev, built):
+    """Kept out of the semantic index where the file now is: at its place, or at the target of a reviewed move."""
     path = ev["path"]
     if _missing_records(case, view, "A2"):
         return
-    entry = view.entry("A2", path)
+    target = moved_to(view, path)
+    where = target or path
+    moved = f" (moved there from {path} by a reviewed action)" if target else ""
     if view.index is None:
         case.add(MISSED, STORE, None, f"the index is {view.index_why}")
-    elif path in view.index["semantic"]:
-        case.add(MISHANDLED, STORE, "semantic_vector", f"{path} is in the semantic index")
+    elif where in view.index["semantic"]:
+        case.add(MISHANDLED, STORE, "semantic_vector", f"{where} is in the semantic index{moved}")
     if view.spaces is None:
         case.add(MISSED, PATH_MAP, None, f"the path map is {view.map_why}")
         return
-    space = view.spaces.get(entry.get("namespace")) if entry and isinstance(entry.get("namespace"), str) else None
+    if target:  # the record of where it was no longer says where it is: the path map's patterns do
+        name, field_read = namespace_by_patterns(view, target), "namespaces.paths"
+    else:
+        entry = view.entry("A2", path)
+        name, field_read = (entry.get("namespace") if entry else None), "artefacts[].namespace"
+    space = view.spaces.get(name) if isinstance(name, str) else None
     if not isinstance(space, dict):
-        case.add(MISSED, record_name("A2"), "artefacts[].namespace", f"{path} is not classed")
+        case.add(MISSED, PATH_MAP if target else record_name("A2"), field_read, f"{where} is not classed{moved}")
     elif space.get("embedding_policy") != NOT_EMBEDDED:
-        case.add(MISHANDLED, PATH_MAP, "namespaces.embedding_policy", f"{path}'s namespace is embedded")
-    elif view.index is not None and path not in view.index["semantic"]:
-        case.add(FOUND, record_name("A2"), "artefacts[].namespace", f"{path} classed in a namespace not embedded, "
-                 "and absent from the semantic vectors")
+        case.add(MISHANDLED, PATH_MAP, "namespaces.embedding_policy", f"{where}'s namespace `{name}` is "
+                 f"embedded{moved}")
+    elif view.index is not None and where not in view.index["semantic"]:
+        lexical = "in" if where in view.index["lexical"] else "not in"
+        case.add(FOUND, PATH_MAP if target else record_name("A2"), field_read, f"{where} classed in a namespace not "
+                 f"embedded, absent from the semantic vectors, {lexical} the lexical index{moved}")
 
 
 def _control(view, control):
@@ -711,7 +756,7 @@ def judge_repository(manifest, root, beside=None, secrets=(), built=None):
             _legacy_document(case, view, ev, built)
         elif kind == "large-file":
             _large_file(case, view, ev, built)
-        planted.append(case.result())
+        planted.append(_public(entry, case.result()))
     stages = {}
     for stage in STAGES:
         record = view.records[stage]
@@ -728,6 +773,18 @@ def judge_repository(manifest, root, beside=None, secrets=(), built=None):
             "not_measured": sorted({f"{e['kind']}: {NOT_MEASURED[e['kind']]}" for e in manifest["planted"]
                                     if e["kind"] in NOT_MEASURED}),
             "adoption_verdict": verdict}
+
+
+def _public(entry, result):
+    """A hidden variant's result names it by its number and id only: its kind, variant name, paths and texts are the
+    hidden half's, so its evidence keeps each status (and a capability not built) and withholds the rest."""
+    if not entry.get("hidden"):
+        return result
+    label = f"hidden variant #{entry.get('number', '?')} ({entry.get('hidden_id', '?')})"
+    return {"id": label, "kind": "hidden", "variant": "hidden", "status": result["status"],
+            "evidence": [{"status": s["status"], "record": None,
+                          "field": s["field"] if s["status"] == NOT_BUILT else None,
+                          "said": "withheld: a hidden variant"} for s in result["evidence"]]}
 
 
 def own_value(manifest, entry, secrets):

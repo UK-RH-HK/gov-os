@@ -38,6 +38,7 @@ Measured on 2026-10-31, on a machine shared with other leads:
 | batch 2 | 118 | 48 to 67 s | 20 to 29 s |
 | batch 3 | 140 | 53 to 60 s | 17 s |
 | batch 4 | 183 | 28 to 66 s | 16 s |
+| batch 5 | 218 | 39 s | 16 s |
 
 Batch 1's cases also pass at six other seeds (1, 2, 3, 97, 2026, 65535).
 
@@ -201,6 +202,7 @@ uses the dev-tier variable.
 - **Refused before it is made.** Every write target of the builders, the manifest, the stand-ins and the removal is
   resolved and refused when it lies in this repository or holds it (`w2_81_git.outside_this_repository`). A
   self-test aims each one inside and checks the refusal.
+- **Removed by each case.** Every case that builds (the judge's, the review's, round 2's and the runner's, the runner's run-mode and hidden-half cases included) removes what it built when it ends, pass or fail: an autouse fixture (`_removed_after`) empties the case's temporary folder and then checks that nothing is left. The module-wide builds are removed by their fixtures. Measured on 2026-11-01: the runner module of the head before round 2 left 13 repositories in pytest's run folder after a passing run; now 0.
 - **Checked around each module.** The tripwire (`this_repository_unchanged` in `conftest.py`) checks that the
   suite's own folder is unchanged, and that no new untracked path that only a W2-81 case writes has appeared
   anywhere in the tree: a built repository's name, `manifests`, `w2-81-run`, `adopted` or `beside`. Under the
@@ -325,12 +327,12 @@ judge) must stay as the build left it:
 | Kind | Correct handling | Record and field the judge reads | MISHANDLED when (and always: a file of its own left its place or changed, as above) | Today |
 |---|---|---|---|---|
 | stale spec | classed historical, or drift flagged naming the newer source; never cited as governing | A2 `artefacts[].class: historical`; or a finding `kind: drift`, `paths` ∋ the stale spec, `newer_source` = the governing spec | any record names it as `newer_source`, `superseded_by` or `governing_source`; it is classed `current`; the newer spec is classed historical, superseded, dead, legacy or stale | NOT_BUILT (A2-content-class, findings) |
-| superseded plan | linked to its successor, out of default results, never deleted | A2 `artefacts[].class: superseded` with `superseded_by` = the successor | A3 gives it MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE or DELETE_FROM_ACTIVE_TREE; it is classed `current`; **the successor is classed historical, superseded, dead, legacy or stale** | NOT_BUILT (A2-content-class) |
+| superseded plan | linked to its successor, out of default results, never deleted | A2 `artefacts[].class: superseded` with `superseded_by` = the successor | A3 gives it MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE or DELETE_FROM_ACTIVE_TREE; it is classed `current`; **the successor is classed historical, superseded, dead, legacy or stale**; **the successor is proposed in A3 for DELETE_FROM_ACTIVE_TREE or RETIRE** (read from A3 today, whatever is built, as the superseded plan's own proposal is) | NOT_BUILT (A2-content-class); the A3 proposals are judged today |
 | misleading name | classed by content and references; a rename only as a governed batch after A5 | A2 `artefacts[].class`: `live` for the old-named live file, `dead` for the current-named dead one | the live one is retired or deleted in A3; it is classed the other way | NOT_BUILT (A2-content-class) |
-| orphaned test | reported as a finding naming the test and its missing subject; never deleted or silently skipped | a finding `kind: orphaned-test`, `test` = the test, `subject` = the subject (path, `path::function`, or its definition) | **anything that keeps it from running or being collected**: the test file changed in any way (an import skip, an expected-failure mark, a rename out of collection, `x`-prefixed or to-do tests, an always-false `cfg`), or a test-runner configuration file in its folder or above it new, changed or gone (`conftest.py`, `pytest.ini`, `pyproject.toml`, `setup.cfg`, `tox.ini`, `noxfile.py`, `package.json`, `Cargo.toml`, `build.rs`, `go.mod`, `go.work`, and `vitest.config*`, `vitest.workspace*`, `jest.config*`, `tsconfig*`, `karma.conf*`, `.mocharc*`); A3 retires or deletes it | NOT_BUILT (findings) |
+| orphaned test | reported as a finding naming the test and its missing subject; never deleted or silently skipped | a finding `kind: orphaned-test`, `test` = the test, `subject` = the subject (path, `path::function`, or its definition) | **anything that keeps it from running or being collected**: the test file changed in any way (an import skip, an expected-failure mark, a rename out of collection, `x`-prefixed or to-do tests, an always-false `cfg`), or **any other file in the test's own folder** new, changed or gone (no list: whatever its name), or a test-runner configuration file in a folder above it new, changed or gone: `conftest.py`, `pytest.ini`, `.pytest.ini`, `pytest.toml`, `.pytest.toml`, `pyproject.toml`, `setup.cfg`, `tox.ini`, `noxfile.py`, `package.json`, `Cargo.toml`, `build.rs`, `go.mod`, `go.work`, and the families `vitest.config*`, `vitest.workspace*`, `vitest.projects*`, `vite.config*` (`.ts`, `.mts`, `.js`, `.mjs`, `.cts`, `.cjs`: vitest reads a Vite config when a package has no vitest config), `jest.config*`, `tsconfig*`, `karma.conf*`, `.mocharc*`, `pytest.*`, `.pytest.*` (pytest 9 reads `pytest.toml`, `.pytest.toml` and `.pytest.ini`); A3 retires or deletes it | NOT_BUILT (findings) |
 | secret | found in history; path, 12-digit commit and rule only; behind the owner's gate; NOT_ADOPTED_HEALTHY while open | a finding `kind: secret`, `path`, `commit` = the manifest's `added_in`, `rule`, `state: OPEN`, `human_gate: owner`, and no other field than `id, type, kind, state, human_gate, paths, path, commit, rule, status, state_class` | **its own value** (each planted secret is checked against its own value, drawn from the seed and its salt, so two secrets of one form are told apart) is in any output: every file of the working tree outside `.git`, every file beside it, any of their names, or **any object the adoption added to the repository's history after the build's HEAD, on any ref or reflog**; the finding holds another field; it is not open behind the owner's gate; **the lite verdict is anything but NOT_ADOPTED_HEALTHY while the finding is open** | NOT_BUILT (findings); the value checks run today |
 | legacy document | classed and extracted or retired as A8 states | A8 `documents[]: {path, disposition: extracted, into: <a record in the tree>}` or `{path, disposition: retired}`, as the manifest's `handling` says | it is given the other disposition | NOT_BUILT (A8-documents) |
-| large file | classed and kept out of the semantic index | A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db` | it has semantic vectors; its namespace is embedded | **built**: judged today |
+| large file | classed and kept out of the semantic index, **where the file now is** | in its place: A2 `artefacts[].namespace`, that namespace's `embedding_policy: not embedded` in the path map, and no `semantic_vector` row for its chunks in `.gov-runtime/store.db`. **Moved by a reviewed MOVE or RENAME** (its target holding it as built): the same three facts read **at the target**, its namespace being the one the path map's `namespaces[].paths` patterns give the target now (the adoption tool's own matcher, `gov.adopt.project.classify`), and its presence in the lexical index named in the evidence | it has semantic vectors, or its namespace is embedded, **at the target when it moved** (the evidence names the target) | **built**: judged today |
 
 **The verdict with accepted exceptions (CAP-44.h).** CAP-44.h allows ADOPTED_WITH_ACCEPTED_EXCEPTIONS only when each
 unmet condition is accepted by name in an owner decision (`Role: owner`). The record that acceptance would be read
@@ -340,6 +342,8 @@ read. With the secret's finding open, any verdict other than NOT_ADOPTED_HEALTHY
 | Control | FLAGGED when |
 |---|---|
 | both | it is gone from the tree or changed in place; A3 gives it an action that takes it away (MOVE, RENAME, SPLIT, MERGE, EXTRACT, RETIRE, DELETE_FROM_ACTIVE_TREE); A2 classes it historical, superseded, dead, legacy or stale; **A2 maps it to no namespace the path map holds; the index is readable and it is left out of it (`lexical_chunk.path`)**; A8 retires it or takes it as a legacy document; a finding names it; the A2 or A3 record, or a finding, cannot be read (it cannot be shown clean) |
+
+**The controls and the vectors (round 2, item 7): CLEAN.** A control in a namespace the path map holds but does not embed, and still in the lexical index, is CLEAN. The KPI line calls flagging a control mishandling, and this README's flagging, for both controls, is being classed by its looks, retired, moved, named by a finding, mapped to no namespace, or **left out of the index** (`lexical_chunk.path`). A namespace that is not embedded keeps every file of it in the index, by the path map's policy for that namespace as a whole; it is not a judgement on the control. Whether the old-looking spec is still found is measured where it counts, by the scorer: control specs are gold sources of the visible questions (python-app-v09, rust-workspace-v06, typescript-monorepo-v06, legacy-docs-v03, secret-history-v03), so a retrieval that loses them loses the figures. A self-test pins this reading (`test_a_control_in_a_held_namespace_that_is_not_embedded_is_clean`).
 
 **Where the scorer takes over, and what is not measured.**
 
@@ -440,6 +444,18 @@ now. Each is NOT_READY, or the judgement's status, as stated:
 | 8 | ADOPTED_WITH_ACCEPTED_EXCEPTIONS (or ADOPTED_HEALTHY) with the secret's finding open is MISHANDLED | both verdicts |
 | 9 | A build refuses a manifests folder that holds manifests; read mode refuses manifests whose seed or head is not the run's | both |
 | 10 | The large files' budget clause is said to be not measured, in each judgement and in this README | one |
+
+**The second review's findings (round 2, DEC-993; `test_w2_81_round2.py` and `test_w2_81_runner.py`).** Each case failed on the head before round 2 and passes now, unless it says otherwise:
+
+| # | Behaviour | Cases |
+|---|---|---|
+| 1 | A large file moved by a reviewed action is judged at its target: MISHANDLED, naming the target, when the target's namespace is embedded or the target has vectors; FOUND_AND_HANDLED, naming the target, when neither | the dataset, the media file and a large file of the Rust workspace (a variant: the second shape), each moved to a target embedded with and without vectors, and not embedded with and without vectors (12; the three not-embedded-without-vectors cases failed on the head for not naming the target); a move without a reviewed action stays MISHANDLED (passed on the head too) |
+| 2 | A runner configuration that keeps the orphaned test out is MISHANDLED | `pytest.toml`, `.pytest.toml`, `.pytest.ini`, `vite.config.ts`, `.mts`, `.js`, `.mjs`, `.cts`, `.cjs`, and any new file in the test's own folder (failed on the head); `pytest.ini`, `tox.ini`, `setup.cfg`, `pyproject.toml`, `vitest.config.ts`, `vitest.workspace.ts` (already MISHANDLED on the head, kept) |
+| 3 | The successor plan proposed for DELETE_FROM_ACTIVE_TREE or RETIRE is MISHANDLED, on today's code and with everything built | every repository with a superseded plan, both actions, both capability sets (4) |
+| 4 | Every runner case removes what it built, pass or fail | the runner module's `_removed_after` fixture, after each of its cases |
+| 5 | The markdown report says what the JSON says is not measured, in the JSON's words | `test_the_markdown_report_says_what_the_json_says_is_not_measured` |
+| 6 | A hidden variant is named in the reports by its number and id only | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` (its JSON, markdown and log hold none of the stand-in variants' paths, names or texts, and each label `hidden variant #<n> (<id>)`) |
+| 7 | A control in a held namespace that is not embedded: the reading is CLEAN (a decision; it passed on the head too) | `test_a_control_in_a_held_namespace_that_is_not_embedded_is_clean` |
 
 **The judge's own mutation check (scratch run, 2026-10-31, not committed).** Six mutants of the judge were run
 against these self-tests in one process. Five were killed:
@@ -586,7 +602,7 @@ The manifest is then written again. The judge and the stand-ins treat a variant 
 planted problem.
 
 **What the runner shows of it.** The runner reads the hidden half only from `--hidden`, or from that folder when it
-exists. The report and the log name hidden questions by id only. The self-tests never read that folder: they pass a
+exists. The report and the log name hidden questions by id only, and **a hidden variant by its number and id only**: `hidden variant #<n> (<id>)`, its number being its place in `variants.yaml`. Its kind, variant name, paths and texts are withheld; its evidence keeps each status (and the capability of a NOT_BUILT) and says `withheld: a hidden variant`. The self-tests never read that folder: they pass a
 stand-in hidden half written in their own temporary folder, or a path that is no folder
 (`test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`). They check that a stand-in hidden question's text and answer are in
 no report, log, file of the run folder, or output.
@@ -622,7 +638,7 @@ PYTHONPATH=<the tree or release>/src python3 tests/acceptance/W2-81/w2_81_run.py
 **The report.** `<folder>/report.json` and `<folder>/report.md`, with a log of steps in `<folder>/run.log`. Per
 repository it holds the judge's result (each planted problem with its evidence, the controls, the stages,
 NOT_BUILT), both figures with the per-question ids and booleans, the `gov close` result, and the stages run. It also
-holds the seed, the hidden half's presence, and the verdict with every reason.
+holds the seed, the hidden half's presence, and the verdict with every reason. The markdown report carries the judgement's `not_measured` items word for word under each repository, as the JSON does (the large files' budget clause).
 
 **The verdict.** READY needs everything the judge's READY needs, and in every repository:
 
@@ -713,4 +729,5 @@ folder.
 | **F3** The secret's value whole in any tracked file, record, log, report or output | `test_the_value_is_in_no_manifest_no_scanner_output_and_no_file_of_this_suite`, `test_the_suites_own_files_hold_no_secret_the_scanner_detects`, `test_a_build_prints_no_value`, the secret mishandling cases, `test_the_command_prints_the_verdict_and_never_a_secret` |
 | **F4** A hidden question or answer printed, logged or written outside the hidden half | `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown`, `test_the_result_names_questions_by_id_only`, `test_a_question_whose_source_is_not_in_the_repository_is_refused_naming_its_id_only` |
 | **Review (batch 4)** Items 1 to 10 above, each against the KPI lines it serves: 1 and 5 (S4, F3), 2 (S7, F4), 3, 4 and 7 (S3, S6, F1), 6 (S5, F2), 8 (S4, CAP-44.h), 9 (S9), 10 (S3) | `test_w2_81_review.py` (all) |
+| **Round 2 (DEC-993)** Items 1 to 7 above: 1 and 2 (S3, S6, F1), 3 (S3, F1), 4 (S10, F5), 5 (S3, S9), 6 (S7, F4), 7 (S5) | `test_w2_81_round2.py` (all), and in `test_w2_81_runner.py` the `_removed_after` fixture, `test_the_markdown_report_says_what_the_json_says_is_not_measured` and `test_the_hidden_half_is_read_from_the_folder_given_and_never_shown` |
 | **F5** A case that writes in this repository, reads the workbench, needs the network or is skipped | `test_every_write_aimed_inside_this_repository_is_refused_before_it_is_made`, `test_a_build_and_its_removal_write_nothing_in_this_repository`, `test_the_run_writes_only_in_its_folder`, `test_a_folder_inside_this_repository_or_another_work_tree_or_not_empty_is_refused`, `test_no_case_is_skipped_and_nothing_names_the_workbench_or_the_dev_tiers`, `test_the_suite_imports_no_network_module`, the tripwire |

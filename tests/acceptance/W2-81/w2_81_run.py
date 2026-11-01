@@ -314,6 +314,7 @@ def _markdown(report):
                  f"gov close: {repo['close']}; not built: {', '.join(repo['not_built'] or []) or 'none'}", "",
                  "| Planted problem | Status | Evidence |", "|---|---|---|"]
         rows += [f"| `{p['id']}` | {p['status']} | {p['evidence'][0]['said']} |" for p in j.get("planted", [])]
+        rows += [""] + [f"Not measured: {item}" for item in j.get("not_measured") or []]  # the JSON's own words
         rows += ["", "| Control | Status |", "|---|---|"]
         rows += [f"| `{c['id']}` | {c['status']} |" for c in j.get("controls", [])]
     return "\n".join(rows) + "\n"

@@ -65,6 +65,8 @@ def two_tokens(tmp_path_factory):
     base = tmp_path_factory.mktemp("w2-81-two-tokens")
     built = build.build_typescript(base / "repos" / "typescript-monorepo", 31, base)
     build.apply_variants({"typescript-monorepo": built}, [SECOND_TOKEN], 31, base)
+    for entry in built.manifest["planted"]:  # this case's own second token, not hidden material: judged by its id
+        entry.pop("hidden", None)
     yield built
     shutil.rmtree(base)
 

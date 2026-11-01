@@ -43,6 +43,18 @@ def _options(folder, mode="read", **more):
     return runner.parse(argv)
 
 
+@pytest.fixture(autouse=True)
+def _removed_after(tmp_path):
+    """Round 2, item 4: each case removes what it built (repositories, the stand-in hidden half, its govs), pass or
+    fail, and the check that nothing is left runs after every case of this module."""
+    yield
+    folder = tmp_path
+    for child in folder.iterdir():
+        shutil.rmtree(child) if child.is_dir() and not child.is_symlink() else child.unlink()
+    left = [p for p in folder.rglob("*")]
+    assert not left, f"a runner case left {len(left)} paths it built"
+
+
 @pytest.fixture(scope="module")
 def ready_run(tmp_path_factory):
     """A run folder built with a fresh seed, adopted by the stand-in in place, and stand-in govs beside it."""
@@ -235,3 +247,23 @@ def test_the_hidden_half_is_read_from_the_folder_given_and_never_shown(tmp_path,
     for held in repos["legacy-docs"].secrets:
         for name in ("report.json", "report.md", "run.log"):
             assert_absent(held, (folder / name).read_text(), f"the runner's {name}")
+    # round 2, item 6: a hidden variant is named by its number and id only, never by its paths, names or texts
+    shown = {name: (folder / name).read_text() for name in ("report.json", "report.md", "run.log")}
+    for name, text in shown.items():
+        for word in ("docs/frames/frame-limits.md", "notes/handover.txt", "front-matter-status", "token-in-notes",
+                     "Frame limits", "Handover notes", "Maximum frame: 512", "frame-limits"):
+            assert word not in text, f"{name} shows a hidden variant's {word!r}"
+    for label in ("hidden variant #1 (f1)", "hidden variant #2 (s1)"):
+        assert label in shown["report.json"] and label in shown["report.md"], label
+
+
+def test_the_markdown_report_says_what_the_json_says_is_not_measured(ready_run):
+    """Round 2, item 5: the budget clause of the large files, in the markdown report too, in the JSON's words."""
+    govs = ready_run["govs"]
+    _read(ready_run, gov=govs["good"], pinned_gov=govs["good"], close_ticket="PG-1")
+    saved = json.loads((ready_run["folder"] / "report.json").read_text())
+    markdown = (ready_run["folder"] / "report.md").read_text()
+    said = [item for repo in saved["repositories"].values() for item in (repo["judgement"] or {}).get("not_measured")]
+    assert said, "the JSON report names what is not measured"
+    for item in said:
+        assert item in markdown, f"the markdown report drops: {item}"

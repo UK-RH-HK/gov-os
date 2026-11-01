@@ -725,6 +725,7 @@ def _apply_one(built, number, variant, seed, manifests_root):
     data["planted"].append({
         "id": f"{target.name}.{variant['kind']}.hidden-{variant['id']}", "kind": variant["kind"],
         "variant": str(variant["variant"]), "shape": data["shape"], "hidden": True,
+        "number": number, "hidden_id": _ident(variant),  # how the report names it (README, "The hidden half's form")
         "paths": _put(variant["paths"], hashes, facts, where), "commits": [h[:12] for h in hashes],
         "detectable_by": manifest_form.DETECTABLE_BY[variant["kind"]],
         "correct_handling": manifest_form.CORRECT_HANDLING[variant["kind"]], "evidence": evidence})
