@@ -12576,3 +12576,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 |---|---|---|
 | 0.385 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1003 (same-day mapping of the CTO's practices into the product). Next free id: DEC-1004. |
 
+
+### DEC-1004 — SMART-WORK-2 approved; each KPI change applied when its ticket next runs; W2-20 carries DEC-1001 (d)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`) · **Under:** DEC-1003, DEC-1001, DEC-1002
+- **Decision:** every KPI change in `packages/SMART-WORK-2.md` as proposed (W2-117: record-only head moves, warm clones, merge and close in one step; W2-115: records select the record-reading suites, S4 and S6 replaced, a warm close clone; W2-20: rebuilds in the slots with a per-tree lock, `src/gov/rebuild/watch.py` in its paths; Wave 3 row W3-P16), each applied to its ticket file when that ticket next runs. (d) is a P2: W2-20 carries DEC-1001; W2-76 stays closed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.386 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1004 (SMART-WORK-2 approved). Next free id: DEC-1005. |
