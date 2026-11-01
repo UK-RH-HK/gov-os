@@ -125,7 +125,7 @@ before this ticket. "Change" says what W2-05 did. A call in a file another ticke
 | 21 | `src/gov/guard/containment_merge.py` | `_run` -> `containment._git`: `rev-list`, `diff-tree`, `merge-base` (`read_merge`) | the repository of the merge | as row 19 | through row 19: trace variables cleared, `GIT_NO_LAZY_FETCH` set, configuration pinned (W2-M105), git by absolute path. The file starts no process of its own |
 | 22 | `src/gov/pause/command.py` | `_git`: `git -C <root> <args>` (`gov pause`) | the project root | yes | `env=git_env(root)` |
 | 23 | `src/gov/pause/command.py` | `_mirror_path`: `git rev-parse --git-common-dir` | the project root | yes | `env=git_env(root)` |
-| 24 | `src/gov/retrieval/lexical.py` | `_git`: `git -C <root> <args>` (the lexical index) | the project root, or the check's temporary clone | yes | `env=git_env(root)`. W2-87 holds the file now: unchanged in batch 2 |
+| 24 | `src/gov/retrieval/lexical.py` | `_git`: `git -C <root> <args>` (the lexical index: `_tracked`'s `ls-files -z` and `hash-object --stdin-paths`; W2-108's freshness key, `_tree`'s `rev-parse HEAD --git-path index` and `ls-files -z`, which every `gov check`, `gov retrieve` and `gov close` works out) | the project root, or the check's temporary clone | yes | `env=git_env(root)`. W2-87 holds the file now: unchanged in batch 2. After W2-108 merged (`d1533bf30a10`): `git_env(root, pinned=True)`: every call only reads, and a close reaches them (W2-M161). A person's `trace2.eventTarget` took 20 events from them (review R6-2) and three of the close's (W2-05's planted case). `hash-object` has no `-w`; pinned, its blob id still follows the repository's own attributes and configuration, and is the same for an ordinary project; a person's global `core.autocrlf` no longer changes it (a store built under one sees such a file stale once). An inherited index of the root's own git directory is kept |
 | 25 | `src/gov/retrieval/retrieve_check.py` | `main`: `git clone -q --no-hardlinks <tier> <dest>` | a temporary folder (**another folder**) | yes: **the DEC-710 cause** | `env=git_env(None, pinned=True)` |
 | 26 | `src/gov/retrieval/retrieve_check.py` | `main`: `git -C <dest> add -A` | the temporary clone (**another folder**) | yes: **the DEC-710 cause** | `env=git_env(dest, pinned=True)` |
 | 27 | `src/gov/retrieval/retrieve_check.py` | `main`: `git -C <dest> commit -q --allow-empty -m adopted` | the temporary clone (**another folder**) | yes: **the DEC-710 cause** (the foreign commits) | `env=git_env(dest, pinned=True)` |
@@ -191,7 +191,8 @@ batch 2: rows 2 to 8, 10 to 12, 15, 29 and 31 (pinned: reads a close reaches), 1
 were changed in the first runs and are recorded only since. 5 marked "after <W2 id> merges": rows 61 (W2-84), 62
 (W2-107), 63 (W2-87), 64 (W2-76) and 65 (W2-60a). No row is open for W2-50, W2-53 or W2-03: those have merged.
 Package I (b) (DEC-970) changed rows 36 and 55, and through row 36 rows 51 and 52; its review's finding R4-1
-changed row 55 again (the step's tests). 1 open: row 66 (W2-16's
+changed row 55 again (the step's tests). The round after W2-108's merge changed row 24 again (pinned, W2-M161,
+R6-2). 1 open: row 66 (W2-16's
 `gov release`, merged after batch 2), recorded in package I (b)'s round and unchanged.
 
 The test helpers outside `src/` (`tests/**/*support*.py`) build their own environments and are not Gov OS calls.
