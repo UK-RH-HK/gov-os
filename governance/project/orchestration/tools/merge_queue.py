@@ -192,6 +192,36 @@ def failing(xml_paths, where, targets):
     return list(dict.fromkeys(out))
 
 
+def failure_kinds(xml_paths):
+    """The exception types the JUnit files name for their failing cases (`<failure message="Type: ...">`, or an
+    error's `failed on setup with "Type: ..."`), as a sorted list: close_build.py's same-failure rule (DEC-989: a red
+    is cleared only if the baseline has it red with the same failure)."""
+    found = set()
+    for p in xml_paths:
+        try:
+            cases = list(ET.parse(p).iter("testcase"))
+        except (OSError, ET.ParseError):
+            continue
+        for case in cases:
+            for el in [case.find("failure"), case.find("error")]:
+                if el is None:
+                    continue
+                msg = el.get("message") or ""
+                inner = re.search(r'failed on \w+ with "(.*)', msg, re.S)
+                msg = inner.group(1) if inner else msg
+                if re.match(r"\s*assert\b", msg):  # pytest gives a bare assert's message without its type
+                    found.add("AssertionError")
+                    continue
+                m = re.match(r"\s*([A-Za-z_][\w.]*)\s*(:|$)", msg)
+                found.add(m.group(1) if m else el.tag)
+    return sorted(found)
+
+
+def same_failure(a, b):
+    """Two failure lists match only when both are known: an empty list (a timeout, no JUnit file) never matches."""
+    return bool(a) and bool(b) and a == b
+
+
 def totals(xml_paths):
     t = {"tests": 0, "failures": 0, "errors": 0, "skipped": 0}
     for p in xml_paths:
@@ -259,7 +289,7 @@ class Queue:
         self.ref = f"refs/heads/{a.integration}"
         self.rounds = a.rounds
         self.ejected, self.handled, self.n, self.with_rc = [], set(), 0, {}
-        self.log = self.work = self.clone = self.alt = None
+        self.log = self.work = self.clone = self.alt = self.base = None
         name = sh(["git", "-C", str(self.repo), "config", "user.name"]).stdout.strip()
         email = sh(["git", "-C", str(self.repo), "config", "user.email"]).stdout.strip()
         self.ident = ["-c", f"user.name={name or 'orchestrator'}", "-c", f"user.email={email or 'orchestrator@localhost'}"]
@@ -469,17 +499,56 @@ class Queue:
                 out["flaky"].append(node)
                 self.note(f"flaky candidate (passes alone, decides nothing): {node}")
         reds = [n for n in reds if out["with_rc"][n] != 0]
+        out["trace_base"] = self.base or head
         if reds:
             self.alt = self.fresh("alt")
-            self.build(self.alt, head, [])
+            # DEC-988, DEC-989: with --base, a red is traced against a known state (the last nightly with a verdict,
+            # its reds known), never against code made by undoing merges; without it, the head without the batch.
+            self.build(self.alt, self.base or head, [])
+            where = f"the baseline {self.base[:12]}" if self.base else "the head without the batch"
             if not self.prepared(self.alt):
-                raise Stop("the prepare command failed on the head without the batch")
+                raise Stop(f"the prepare command failed on {where}")
             for node in reds:
                 verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(self.alt, node),
                                         self.rounds)
+                if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
+                    kw, kb = self.kinds(self.clone, node), self.kinds(self.alt, node)
+                    if not same_failure(kw, kb):
+                        verdict = "owned"
+                        self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
                 out[verdict].append(node)
-                self.note(f"red alone, traced without the batch ({c}): {verdict}: {node}")
+                self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
+            if self.base and (out["owned"] or out["unowned"]):
+                # The head without the batch decides the rest (code that exists; nothing is undone). A red the
+                # baseline had stays cleared only if that head has it too, the same way: else the batch broke again
+                # what a later merge had fixed (review of 2026-11-01). A red the baseline did not clear that the head
+                # has too, the same way, came from a merge already on the branch since the baseline: nothing
+                # advances and nobody is ejected; the CTO investigates at once (DEC-968, DEC-989). Fail closed.
+                self.build(self.alt, head, [])
+                if not self.prepared(self.alt):
+                    raise Stop("the prepare command failed on the head without the batch")
+
+                def on_head(n):
+                    return red_alone(lambda: self.alone(self.alt, n), self.rounds) and \
+                        same_failure(self.kinds(self.alt, n), self.kinds(self.clone, n))
+                for n in list(out["unowned"]):
+                    if not on_head(n):
+                        out["unowned"].remove(n)
+                        out["owned"].append(n)
+                        self.note(f"red at the baseline but not, the same way, on the head without the batch: the "
+                                  f"batch's: {n}")
+                since = [n for n in out["owned"] if on_head(n)]
+                if since:
+                    rest = [n for n in out["owned"] if n not in since]
+                    raise Stop(f"red since the baseline {self.base[:12]}, already on {head[:12]} without the batch "
+                               f"(not this batch's; investigate at once, DEC-968, DEC-989): {', '.join(since)}"
+                               + (f"; also red, the batch's: {', '.join(rest)}" if rest else ""))
         return out
+
+    def kinds(self, where, node):
+        """The failure's exception types for one case run alone (the same-failure rule)."""
+        _, junits = self.tests(where, "alone", [node])
+        return failure_kinds(junits)
 
     def culprits(self, head, merged, owned):
         """DEC-979 item 3: eject only the tickets that caused the reds; the rest are returned for a new run."""
@@ -582,6 +651,7 @@ class Queue:
                              "selection": out["selection"] if out else {"targets": [], "core_changed": [], "unplaced": []},
                              "counts": out["counts"] if out else None, "flaky": out["flaky"] if out else [],
                              "unowned": out["unowned"] if out else [], "ejected": list(self.ejected),
+                             "trace_base": out["trace_base"] if out else None,
                              "log": str(self.log), "started": started, "finished": now()})
             for e, m in merged:
                 write_json(self.q / "landed" / f"{e['ticket']}.json", dict(e, merge=m, record=str(rec), landed_at=now()))
@@ -591,6 +661,11 @@ class Queue:
 
     def run(self):
         started = now()
+        if getattr(self.a, "base", None):
+            r = sh(["git", "-C", str(self.repo), "rev-parse", "--verify", "-q", self.a.base + "^{commit}"])
+            if r.returncode:
+                raise Stop(f"the baseline {self.a.base} is not a commit in {self.repo}")
+            self.base = r.stdout.strip()
         while True:
             pending = [e for e in self.approved() if e["ticket"] not in self.handled]
             if not pending:
@@ -648,6 +723,8 @@ def main(argv=None):
     r.add_argument("--select-cmd")
     r.add_argument("--prepare-cmd")
     r.add_argument("--rounds", type=int, default=3)
+    r.add_argument("--base", help="the known state reds are traced against: the last nightly with a verdict until a "
+                                  "green one after ACT 1, then the last green one (DEC-989); default the head")
     a = ap.parse_args(argv)
     return {"enqueue": enqueue, "approve": approve, "run": run}[a.cmd](a)
 

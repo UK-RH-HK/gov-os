@@ -29,7 +29,8 @@ python3 merge_queue.py run --repo <repo> --queue <dir>
   form). A ticket with no request is refused (non-zero exit, nothing written).
 - `run` processes every approved entry, in approval order, as one batch on one head.
 
-`run`'s options: `--integration` (default `w2/integrate`); `--work` (the clean clones; default
+`run`'s options: `--base <commit>` (the known state reds are traced against: the last nightly with a verdict until a
+green one after ACT 1, then the last green one, DEC-988, DEC-989; see below); `--integration` (default `w2/integrate`); `--work` (the clean clones; default
 `~/gov-os-runs/W2-00/merge-queue/`, each run's own folder removed when the run ends); `--rounds` (default 3, the
 re-runs of each red alone); and the three stand-ins below.
 
@@ -112,3 +113,25 @@ Every command runs with `PYTHONPATH=<checkout>/src` (DEC-732) and without `PYTES
 | 0 | every approved entry landed, or there were none |
 | 3 | at least one ticket was ejected (others may have landed) |
 | 4 | the run stopped on a step it could not do, or another run holds the lock; entries kept, the branch unmoved by that step; the reason on stderr |
+
+### `--base`: attribution against a known state (DEC-988, DEC-989; the CTO's tools lane, reviewed 2026-11-01)
+
+With `--base`, a red that fails alone is traced against that commit (never against code made by undoing merges). It
+is cleared (`unowned`) only if it is red, in every traced round, failing the same way (the same exception types, a
+bare `assert` counted as `AssertionError`; an unknown failure such as a timeout never matches) both at the baseline
+and on the head without the batch. A red the baseline does not clear that the head without the batch has too, the
+same way, came from a merge already on the branch since the baseline: the run stops (exit 4), nothing advances and
+nobody is ejected, for the CTO to investigate at once (DEC-968). Every other red is the batch's, as before. The record
+gains `trace_base`. The CTO runs the queue through `.gov-runtime/scratch/orchestrator/tools/land.py`, which passes
+the baseline and closes each ticket that lands in the same step.
+
+## The CTO's safety nets (DEC-991)
+
+- `permission_request.py`: a Claude Code `PermissionRequest` hook (ACT-QUIET-DENY-1, in the owner's local settings).
+  Between 02:00 and 07:30 it refuses, at once and with a message, a call that would ask the owner, and queues it in
+  `.gov-runtime/scratch/orchestrator/log/approval-queue.jsonl` for the 09:00 package; by day it says nothing (the
+  normal prompt appears). Any error inside the quiet hours still refuses.
+- `deadman.py` (cron every 15 minutes, ACT-DEADMAN-1) and `win_toast.ps1`: alerts when the CTO session's last
+  `assistant` entry is over 60 minutes old (2 hours in the quiet hours), naming a tool call left waiting. Channels:
+  a Windows toast, a headless `claude -p` PushNotification, the pings log.
+- Tests: `tests/unit/orchestration/test_cto_safety_nets.py`, `tests/unit/orchestration/test_merge_queue_base.py`.
