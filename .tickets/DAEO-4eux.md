@@ -1,6 +1,6 @@
 ---
 id: DAEO-4eux
-status: open
+status: in_progress
 deps: []
 links: [DAEO-zoex]
 created: 2026-10-31T23:05:58Z
