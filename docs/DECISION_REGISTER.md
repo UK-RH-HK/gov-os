@@ -12369,3 +12369,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.368 | 2026-11-01 | Delegated (orchestrator): DEC-985 (P-W2-97-ENQ-1 (b); W2-97's resume takes DEC-983's KPIs). Next free id: DEC-986. |
+
+### DEC-986 — W2-114's P-W2-114-1 (a): the check's module joins its paths (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: a P2, "changes a ticket's scope within the approved spec"; the revision of W1-28's check is the owner's named decision, DEC-982 (DEC-906); reversible; for the owner to overturn) · **Under:** DEC-982, DEC-906, DEC-385 · **Basis:** `log/W2-114-A5-run1-dec983.json` (PACKAGES)
+- **Decision:** W1-28's check module `w1_28_copy_check.py` (its `_analyse` reads skip, fail and assertion messages as code; W1-50's suite shares it) joins W2-114's paths; KPIs unchanged; one fresh test designer revises it with the planted cases and the README; W1-28's and W1-50's files run alone.
+- **Where it goes (DEC-851):** this register; W2-114's ticket; its resume brief.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.369 | 2026-11-01 | Delegated (orchestrator): DEC-986 (W2-114's check module in its paths). Next free id: DEC-987. |

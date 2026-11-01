@@ -18,6 +18,7 @@ depends_on: []
 allowed_paths:
 - tests/acceptance/W1-28/test_w1_28_fixture_copies.py
 - tests/acceptance/W1-28/README.md
+- tests/acceptance/W1-28/w1_28_copy_check.py
 kpis:
   success:
   - 'The check ignores the text of `pytest.skip`, `pytest.fail` and assertion messages, and looks for whole-tree routes only in argument lists and in `subprocess`, `os.system` and copy calls; a test whose message names the repository root and the words of a route is not reported [DEC-982, DEC-385]'
@@ -45,3 +46,5 @@ The owner's decision on P1-NEW-TICKETS-2026-10-31 T2 (DEC-982; the revision is t
 
 - **Why:** on 2026-10-31 the check refused a batch of six on W2-108's scope test, which copies nothing: its `pytest.skip(f"{REPO_ROOT} is not a git worktree")` names the root and the words "git worktree" in a message (DEC-977). The next such message refuses a close for nothing and costs a resume.
 - **Order:** none; it can run any time. A fresh independent test designer, LITE.
+
+**DEC-986 (P-W2-114-1 (a)):** W1-28's check module `w1_28_copy_check.py` (its `_analyse` reads the text; W1-50's suite shares it) is in this ticket's paths; the KPIs are unchanged; W1-28's and W1-50's files run alone after the revision.
