@@ -14,15 +14,31 @@ importing it leaves ``tree-gov-<pid>``, and a ``sitecustomize`` beside it leaves
 
 Never fail open: an inherited variable never turns the pin's refusal into an allow, and with no pin the guard line
 still blocks.
+
+Rewrite-Reason: DEC-953 item 2 (W2-90b, DEC-965 item 4, DEC-999 item 1). Since W2-106 the template's three guard lines
+take the pinned form. The preToolUse, postToolUse and postToolUseFailure ids are parametrized over the template's lines
+(``template/.rulesync/hooks.jsonc``), each run in a project holding the kernel's programs at
+``governance/kernel/hooks/``, where the line looks: the preToolUse ids no longer run this repository's five-rule line,
+and the two post-tool ids ACT 1 removed exist again. The lifecycle lines' ids stay on this repository's lines (the
+template's keep DEC-608's plain form, DEC-917) (``tests/acceptance/W2-90b/README.md``).
 """
 
 from __future__ import annotations
+
+import sys
+from pathlib import Path
 
 import pytest
 
 import w2_59_support as support
 
-ENTRIES = support.hook_entries()
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W2-90"))
+
+import w2_90_kernel_wiring as kernel_wiring  # noqa: E402
+
+# W2-90b: the guard and containment lines are the template's; the lifecycle lines this repository's.
+ENTRIES = kernel_wiring.template_hook_entries() + [
+    entry for entry in support.hook_entries() if entry[0] not in kernel_wiring.KERNEL_GUARD_EVENTS]
 IDS = [f"{event}[{index}]" for event, index, _ in ENTRIES]
 
 
@@ -58,7 +74,7 @@ def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_sessio
     """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
     decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
     box = support.make_box(tmp_path / "box", pin_markers)
-    project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+    project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers, src_in_project=True)
     inherited = _worker(src) if inherits == "worker-pythonpath" else {}
     done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
                                  payload=support.refused_write(project))
@@ -80,7 +96,7 @@ def test_with_a_worker_s_pythonpath_and_no_pin_the_guard_line_still_blocks(event
     for the pin."""
     box = support.make_box(tmp_path / "box", None)
     path = f"{box.local_bin}:{box.decoy_bin}:{support.SYSTEM_PATH}"
-    project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+    project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers, src_in_project=True)
     done = support.run_hook_line(entry["command"], event, project, box, path=path, inherited=_worker(src),
                                  payload=support.refused_write(project))
     assert support.denies(done), (
@@ -102,7 +118,7 @@ def test_after_the_rollback_with_a_worker_s_pythonpath_the_guard_line_runs_the_e
     the rollback's package."""
     box = support.make_box(tmp_path / "box", None)
     rollback = support.install_rollback(box)
-    project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+    project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers, src_in_project=True)
     done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src),
                                  payload=support.refused_write(project))
     assert not box.marks("tree-gov-"), (
@@ -129,7 +145,8 @@ def test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code(
     inherited path names (subagentStop, which imports none: the pin's interpreter starts without the inherited
     folder on its import path)."""
     box = support.make_box(tmp_path / "box", pin_markers)
-    project, src = support.worker_project(tmp_path, box.markers, src_in_project=event not in PROGRAM_ADDS_SRC)
+    project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers,
+                                                      src_in_project=event not in PROGRAM_ADDS_SRC)
     done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src))
     assert not box.marks("tree-gov-"), (
         f"with PYTHONPATH={src}, {event}[{index}]'s program imported that folder's gov, not the pin's\n"
@@ -158,7 +175,7 @@ def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_
     package. Whatever the line does with the session's environment, the variable is not taken from the session
     nor refused to the command."""
     box = support.make_box(tmp_path / "box", pin_markers)
-    project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+    project, src = kernel_wiring.w2_59_worker_project(entry, tmp_path, box.markers, src_in_project=True)
     command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
     payload = {**support.hook_input("preToolUse", project),
                "tool_input": {"command": command, "description": "w259: the code under test"}}
