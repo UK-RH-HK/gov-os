@@ -9,10 +9,12 @@ import pytest
 
 import w2_92_support as support
 
-# A question whose symbol is answered by today's lexical route as well (four items of app/), so a missing code
-# index leaves evidence from another route.
+# A question whose symbol is answered by today's lexical route as well, so a missing code index leaves evidence
+# from another route. Today's lexical evidence for it is the planted files whose text holds the word (DEC-1006,
+# P-W2-92-2): app/leaf.py and app/middle.py, not app/top.py, which only calls w92_mid. The base 7ca16b19df3f (no new
+# routes) answered exactly these on the planted store: app/leaf.py 1-2 and app/middle.py 1-9, 4-5, 8-9.
 SYMBOL_ONLY = support.LEAF
-LEXICAL_PATHS = {support.LEAF_REL, support.MID_REL, support.TOP_REL}
+LEXICAL_PATHS = {rel for rel, text in support.corpus().items() if SYMBOL_ONLY in text}
 
 CODE_CASES = [
     ("never indexed", "nocode", support.RECORDING),
