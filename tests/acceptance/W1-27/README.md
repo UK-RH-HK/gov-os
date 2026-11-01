@@ -589,7 +589,7 @@ and a stand-in for the endpoint's program that records a start.
 | `test_the_mode_says_the_semantic_store_was_not_built_because_it_was_not_asked_for` | the semantic entry as above | red |
 | `test_the_mode_builds_everything_else_a_rebuild_builds` | the same digest, the same store names, lexical `recreated`, the same code-index status as a rebuild of the same project without the argument; no vector in the store | red |
 | `test_two_rebuilds_in_the_mode_give_the_same_digest` | determinism (CAP-46.a) | red |
-| `test_the_mode_writes_only_under_gov_runtime` | the working tree and the sandbox's home outside the project's `.gov-runtime/` are as before | red |
+| `test_the_mode_writes_only_under_gov_runtime` | the working tree and the sandbox's home outside the project's `.gov-runtime/` are as before; left out, and nothing else (rewritten, reason DEC-967; DEC-978): W2-107's secrets scan cache, exactly `.cache/gov-os/secrets-scan.sqlite`, its `-wal` and `-shm`, and `.cache`, `.cache/gov-os` only where they hold nothing else, under that home | red |
 | `test_a_retrieval_on_a_store_whose_vectors_could_not_be_built_says_so` | the control of retrieval honesty: after a rebuild whose endpoint has no model, `gov retrieve` says the semantic facet is not available and gives lexical evidence | green |
 | `test_a_retrieval_on_a_store_rebuilt_without_embeddings_says_so` | the same after the mode: the facet is not available, the stopping reason says so, no route of the evidence names it, and the endpoint was asked nothing | red |
 

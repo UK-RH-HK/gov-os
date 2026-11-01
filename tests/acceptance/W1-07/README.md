@@ -224,8 +224,8 @@ failure says:
 DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list, each with one test-designer
 line." DEC-546: the lines are written by a test designer in the follow-up, "with the list itself".
 
-**The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`)
-and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
+**The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`,
+and `accept` since DEC-970, W2-96) and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
 (CAP-28.b): no existing list, case or invocation of this suite changed, and only those lines were added to the
 support.
 

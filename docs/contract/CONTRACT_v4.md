@@ -1,24 +1,25 @@
 ---
 id: CONTRACT-v4
 status: ACCEPTED
-version: "4.1"
-revised: 2026-10-03
+version: "4.2"
+revised: 2026-10-17
 depends_on: [CHARTER-v5, ADR-0001, ADR-0002]
-decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174]
+decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174, DEC-722]
 type: specification
 state_class: AUTHORITATIVE
 ---
 
-# Governance OS — Capability Acceptance Contract v4 (version 4.1)
+# Governance OS — Capability Acceptance Contract v4 (version 4.2)
 
 Contract v4 states what the Gov OS must do, as outcomes with **one observable acceptance check each**. It replaces Contract v3 as the working text (DEC-058). `contract.yaml` holds the same content in machine-readable form; `readiness-dimensions.yaml` defines the 26 readiness rows that Wave 1's OpenSpec schema implements.
 
-**Version 4.1** (2026-10-03). The file names and the id `CONTRACT-v4` are unchanged.
+**Version 4.2** (2026-10-17). The file names and the id `CONTRACT-v4` are unchanged.
 
 | Version | Date | Change |
 |---|---|---|
 | 4.0 | 2026-09-30 | Contract v4 as closed by S1 and audited by S1-A (DEC-083…DEC-096). |
 | 4.1 | 2026-10-03 | S2 specification change (docs/changes/S2-CIT-P.md, S2-CIT-E.md). Carries DEC-102…DEC-106, DEC-136, DEC-137 and the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended. MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session's Bash) and the guard (file tools, the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied). New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48, same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability). Owner decision during Wave 1, same version: new `CAP-37.g` on the new ticket W1-49 (DEC-248: light auto-resume hooks, a light form of CAP-37). Owner decision during Wave 1, same version: new `CAP-58.h` on the new ticket W1-50 (DEC-255: containment attribution by commit trailers). |
+| 4.2 | 2026-10-17 | W2-49 specification change (docs/changes/W2-49-CIT-P.md, W2-49-CIT-E.md), approved by the owner (DEC-741). Carries DEC-722: the adoption verdict (CAP-44.h) and the A7 and A10 gates of CAP-44.f come into Wave 2, lite; the release contents of CAP-43.b come into Wave 2, lite: the manifest and file hashes. What stays in Wave 3 is split into new covers items: CAP-44.k (A9, A11, and A7 and A10 beyond their lite form), CAP-44.l (the verdict with the ten ADOPTED_HEALTHY conditions) and CAP-43.d (the rest of the release contents). CAP-44.h lists the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, each marked W2 or W3, from the named read of Adoption Protocol v3.0 §20 and Distribution Protocol v1.2 §18 the owner allowed for this change (DEC-741 C). CAP-45.a gets a Wave 2 wording: in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3). CAP-02.c (signed release tags) and CAP-43.c stay in Wave 3. Wave notes in CAP-43, CAP-44 and CAP-47. Status ACCEPTED in both files (row W2-L343; DEC-741). No capability changes wave; 62 capabilities; 211 → 214 covers items. |
 
 **Precedence:** Charter v5 → Contract v4 → ADRs → everything else. The ADRs supersede the originals where they conflict.
 
@@ -674,35 +675,38 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** The owner can tell exactly which Gov OS version a repository runs; releases never change once tagged.
 - **Acceptance:** `framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of them disagrees with the installed kernel.
-- **Wave:** W1 (Release 1 tag at the end of qualification)
+- **Wave:** W1 (Release 1 tag at the end of qualification; the manifest and file hashes of a release are W2 (CAP-43.b, lite, DEC-722); release contents of CAP-43.d built before W3 are delivered ahead of that item's wave)
 - **Provider:** Copier 9.18.2, W1-39
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate S1, S2; Framework v4.1.2 §75A-75D; Distribution Protocol v1.2 §1-8; DEC-023; DEC-027; DEC-064
+- **Sources:** Contract v3 Gate S1, S2; Framework v4.1.2 §75A-75D; Distribution Protocol v1.2 §1-8; DEC-023; DEC-027; DEC-064; DEC-722
 - **Covers:**
   - `CAP-43.a` [W1] Canonical OS repository separation; developed once — Contract v3 S1; Framework v4.1.2 §75A, §75B · delivered by W1-39
-  - `CAP-43.b` [W3] Release contents: semantic version, manifest, file hashes, supported migrations, schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure — Contract v3 S2; Framework v4.1.2 §75D
+  - `CAP-43.b` [W2] Release contents, lite: the release's own manifest and file hashes, built with the release (the lock on the install side is CAP-02.a, W1); a release is pinned and hash-verified, not signed — Contract v3 S2; Framework v4.1.2 §75D; DEC-722
   - `CAP-43.c` [W3] Release certification by qualification — Framework v4.1.2 §75C; DEC-067
+  - `CAP-43.d` [W3] Release contents beyond the lite manifest and file hashes of CAP-43.b: semantic version, supported migrations, schema versions, CLI/runtime versions, adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure — Contract v3 S2; Framework v4.1.2 §75D; DEC-722
 - **Scenarios:** dev CHAOS-X-01 · qual CHAOS-X-Q01
 
 ### CAP-44 — gov init and gov adopt lifecycle
 
 - **Outcome:** The owner can install the Gov OS into a new repository, or adopt an existing one through the staged A0–A11 transaction with one evidence record per stage, ending in a verdict.
 - **Acceptance:** On b-dev, `gov adopt` produces the evidence tree with one record per stage A0–A11; no move happens before an A5 verdict; a failed batch rolls back to its recorded point; the run ends with ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY.
-- **Wave:** W3 (W1 delivers gov init (copier copy) and adoption stages A0-A6 and A8 with baseline, rollback points and the A5 independent path-map review (W1-39, W1-41); the independent gates A7, A10, A11 and the final verdict are W3 with CAP-47 (DEC-090))
-- **Provider:** Copier 9.18.2, W1-39, W1-41, W3: A7/A10/A11 gates + verdict (with CAP-47)
+- **Wave:** W3 (W1 delivers gov init (copier copy) and adoption stages A0-A6 and A8 with baseline, rollback points and the A5 independent path-map review (W1-39, W1-41); the lite A7 and A10 gates and the lite verdict are W2 (CAP-44.f, CAP-44.h; DEC-722); A9, A11, the full A7 and A10 gates and the verdict with the ten ADOPTED_HEALTHY conditions are W3 with CAP-47 (CAP-44.k, CAP-44.l; DEC-090))
+- **Provider:** Copier 9.18.2, W1-39, W1-41, W2: lite A7/A10 gates + lite verdict (DEC-722), W3: A9/A11 + full A7/A10 gates + full verdict (with CAP-47)
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate S3, S4; Framework v4.1.2 §77-79; Adoption Protocol v3.0 §2-16; Distribution Protocol v1.2 §9, §10; DEC-006; DEC-023; DEC-090
+- **Sources:** Contract v3 Gate S3, S4; Framework v4.1.2 §77-79; Adoption Protocol v3.0 §2-16; Distribution Protocol v1.2 §9, §10; DEC-006; DEC-023; DEC-090; DEC-722
 - **Covers:**
   - `CAP-44.a` [W1] gov init: kernel, overlay, repository contract, initial state, health checks — Contract v3 S3; Framework v4.1.2 §77, §78; Distribution Protocol v1.2 §9 · delivered by W1-39
   - `CAP-44.b` [W1] A0 safety baseline (clean tree, backup ref); A1 cold inventory; A2 classification; A3 target path map; A4 batched plan with rollback points — Contract v3 S4; Adoption Protocol v3.0 §2, §6–§9; Distribution Protocol v1.2 §10 · delivered by W1-41
   - `CAP-44.c` [W1] A5 independent review of the path map before any move (Independent Auditor) — Contract v3 S4; Adoption Protocol v3.0 §10; DEC-090 · delivered by W1-41
   - `CAP-44.d` [W1] A6 controlled migration; failed batch rolls back; moves precede new indexing — Adoption Protocol v3.0 §11; Distribution Protocol v1.2 §10, §11 · delivered by W1-41
   - `CAP-44.e` [W1] A8 legacy memory extraction/retirement — Adoption Protocol v3.0 §13; Distribution Protocol v1.2 §10 · delivered by W1-41
-  - `CAP-44.f` [W3] A7 independent migration verification; A9 new knowledge fabric; A10 independent memory verification; A11 full audit — Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10
+  - `CAP-44.f` [W2] A7 independent migration verification and A10 independent memory verification, lite: each by a fresh Independent Auditor session and recorded as its own stage; A7 checks the A6 migration against the A3 path map and the A4 plan reviewed at A5; A10 checks the A8 legacy memory extraction and retirement, the derived state rebuilt from git and the canary of each index (CAP-55) — Adoption Protocol v3.0 §12, §15; Distribution Protocol v1.2 §10; DEC-722
   - `CAP-44.g` [W3] Remediation, finding states, human gates during adoption — Adoption Protocol v3.0 §17–§19
-  - `CAP-44.h` [W3] Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY conditions — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006
+  - `CAP-44.h` [W2] Adoption verdict, lite: ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY from a fresh Independent Auditor against the lite conditions: A0–A6 and A8 with their stage records and the A5 review, the native layout kept, the lite A7 and A10 gates passed, the pinned, hash-verified release (gov doctor MATCH), gov doctor green (exit 0), gov check with no RED family, and one ticket closed by gov close at exit 0 with the repository's own test command; of the ten ADOPTED_HEALTHY conditions of Adoption Protocol v3.0 §20, the lite conditions check those marked W2 and the lite part named for those marked W3: (1) certified kernel pinned: W3 (the certification by qualification is CAP-43.c), its lite part the pinned, hash-verified release (CAP-02.a, CAP-43.b), (2) project overlay separate: W3, no lite part, (3) path mapping, with the A5 independent review passed: W2 (the A3 path map, the A5 review and the native layout kept, CAP-44.b, CAP-44.c, CAP-44.j), (4) migration independently verified: W3 (a separate verifier role, CAP-47.a), its lite part the lite A7 gate (CAP-44.f), (5) legacy authority retired: W3 (no accidental legacy authority, CAP-48.b), its lite part A8's retirement of legacy memory (CAP-44.e), (6) memory independently verified: W3 (over the A9 knowledge fabric and by a separate role, CAP-44.k, CAP-47.a), its lite part the lite A10 gate (CAP-44.f), (7) comprehensive v4 audit completed: W3 (A11, CAP-44.k), no lite part, (8) critical/high unaccepted findings resolved: W3 (finding states and remediation, CAP-44.g, and the A11 audit), no lite part, (9) runtime rebuildable: W3 (derived memory rebuildable, CAP-48.b), its lite part the derived state rebuilt from git that the lite A10 gate checks (CAP-20), (10) clean-machine reconstruction demonstrated: W3 (CAP-48.b), no lite part; ADOPTED_HEALTHY when every lite condition is met; ADOPTED_WITH_ACCEPTED_EXCEPTIONS when each lite condition not met is accepted by name in an owner decision (Role: owner); otherwise NOT_ADOPTED_HEALTHY; only the owner accepts an exception; the auditor accepts none; the verdict record names itself lite and names the conditions it does not check — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
   - `CAP-44.i` [W3] Interrupted-session recovery and freeze during adoption — Adoption Protocol v3.0 §4
   - `CAP-44.j` [W1] The path map keeps a healthy native framework/package layout unless the target structure is materially better and the migration risk is justified — Framework v4.1.2 §79.3; Distribution Protocol v1.2 §10 A3 · delivered by W1-41
+  - `CAP-44.k` [W3] A9 new knowledge fabric; A11 full audit; A7 and A10 beyond their lite form in CAP-44.f (separate verifier roles, A10 over the A9 knowledge fabric) — Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10; DEC-722
+  - `CAP-44.l` [W3] Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY conditions, after A0–A11 — Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006; DEC-722
 - **Scenarios:** dev B-01, B-04, B-05, B-X-01 · qual B-X-Q01
 
 ### CAP-45 — gov update lifecycle
@@ -714,7 +718,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-023; DEC-165
 - **Covers:**
-  - `CAP-45.a` [W2] gov update: check/impact, authenticated source (signed tag), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance — Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12
+  - `CAP-45.a` [W2] gov update: check/impact, authenticated source (the signed tag in W3, CAP-02.c), compatibility/migration, overlay preserved, adapters regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance; in Wave 2 the authenticated source is the release's manifest and file hashes (CAP-43.b, lite); the signed tag goes with CAP-02.c (W3), DEC-722 — Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12; DEC-722
   - `CAP-45.b` [W3] In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update` — DEC-165
 - **Scenarios:** dev CHAOS-A-10, CHAOS-X-01 · qual CHAOS-X-Q01
 
@@ -734,7 +738,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** The owner gets independent verification from fresh sessions that did not build what they check.
 - **Acceptance:** A fresh verifier session with only the bounded context pack runs held-out tests and reports; its transcript contains no builder chat.
-- **Wave:** W3 (Independent Test Designer and Independent Auditor roles in W1 (W1-33), including the A5 path-map review (DEC-090); full independent adoption/audit roles and the A7, A10, A11 gates W3)
+- **Wave:** W3 (Independent Test Designer and Independent Auditor roles in W1 (W1-33), including the A5 path-map review (DEC-090); the lite A7 and A10 gates W2 by that Independent Auditor role (CAP-44.f, DEC-722); full independent adoption/audit roles and the full A7, A10 and A11 gates W3)
 - **Provider:** W1-33, W3: independent adoption/audit roles, W1-13, W1-35, W1-36, W1-43
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate T1, T2, T3; Adoption Protocol v3.0 §3; DEC-042 (builder tests are regression, not certification); DEC-066; DEC-070; DEC-088; DEC-090

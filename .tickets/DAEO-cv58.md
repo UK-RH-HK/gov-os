@@ -37,6 +37,7 @@ kpis:
   - 'The arguments the launcher now sets itself are refused after --: --agent, --append-system-prompt and its file form, --session-id [lens E R6, DEC-826 Q5]'
   - 'Every launch writes one launch record, keyed by the session id the launcher gives with --session-id, before the session starts: role, ticket, the ticket''s class, model, effort, subagent model, threshold none, the role text''s and each skill''s version and hash, the CLI''s version and the start time; in one folder every worktree of the repository shares, stated in the CIT-E; a record that cannot be written refuses the launch [DEC-826 Q1, CAP-36.a lite, lens F R6]'
   - 'Research first, by the lead before the engineer starts: whether a paths:-scoped .claude/rules/ file loads in a headless worker started by gov launch, its token cost, and whether the worker can change it; recorded in docs/research/W2-60-rules-probe.md [lens G Q4]'
+  - 'On a FULL ticket that could fail open, the second review is launched with a different model or effort setting from the first, taken from the role defaults; the launch record shows both, and the same setting twice is refused unless the owner named it [DEC-1014 item 1, SMART-WORK-5 A, DEC-1015 item 3]'
   failure:
   - A launch that starts with no role text, an unrecorded skill, a model not the role's, a compaction threshold, a user-level agent, skill or connector, or model-side memory.
   - A role file without its default line that still launches; a launch with no record, or a record naming another session.

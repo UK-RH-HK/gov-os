@@ -34,7 +34,7 @@ import struct
 import urllib.request
 from pathlib import Path
 
-from gov.config.loader import load_config
+from gov.config.loader import KNOWN_FILES, PROJECT_DIR, load_config
 from gov.retrieval import lexical, ollama, rerank
 from gov.secrets import _matches
 from gov.store import STORE_REL
@@ -75,6 +75,7 @@ _QUERY_VECTOR = "SELECT embedding FROM device_query_vector " \
                 "WHERE model = ? AND revision = ? AND device = ? AND text_sha256 = ?"
 _OLDER_HALF = "DELETE FROM device_query_vector " \
               "WHERE rowid <= (SELECT (min(rowid) + max(rowid)) / 2 FROM device_query_vector)"
+_STATUS: dict = {}  # resolved root -> (key, status): the vectors' status worked out last in this process (W2-108)
 
 
 def _report(reason: str | None, **more) -> dict:
@@ -268,10 +269,21 @@ def _build(root: Path) -> str | None:
 
 
 def _status(root: Path) -> str | None:
-    """Why the vectors cannot be answered from as they stand (missing, empty or stale), or None. Writes nothing."""
-    status = lexical.freshness(root)["status"]
+    """Why the vectors cannot be answered from as they stand (missing, empty or stale), or None. Writes nothing.
+    Worked out once per store, tree and configuration in a process, keyed by their fingerprints, and again whenever a
+    fingerprint changes or cannot be read (W2-108); the lexical index's freshness is kept the same way."""
+    tree, status, _ = lexical._checked(root)  # the store's and the tree's key, taken with the lexical answer
     if status != "fresh":
         return status
+    config = lexical._stamps(Path(root) / PROJECT_DIR / name for name in KNOWN_FILES)  # what ``_wanted`` reads
+    key, place = None if tree is None or config is None else (tree, config), Path(root).resolve()
+    if key is None or _STATUS.get(place, (None,))[0] != key:
+        _STATUS[place] = (key, _vectors(root))
+    return _STATUS[place][1]
+
+
+def _vectors(root: Path) -> str | None:
+    """The status of the vectors, worked out from the store and the path map as they stand."""
     connection = _open(root)
     if connection is None:
         return "missing"

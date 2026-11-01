@@ -173,6 +173,9 @@ files as TOML, and the one that reads what the wrapper's source imports).
   dump. None may exist in the repository outside `.gov-runtime/` and `.git/`, nor in the child's `HOME`, `TMPDIR`,
   runtime directory or working directory. The child's `~/.cache/codebase-memory-mcp` must stay empty, and the
   user's own must not gain, lose or change a file.
+- **Left out, and nothing else** (rewritten, reason DEC-967; DEC-970, P-W2-107-2 (a)): W2-107's secrets scan cache,
+  exactly `~/.cache/gov-os/secrets-scan.sqlite` and its `-wal` and `-shm` under the child's `HOME`; any other file there
+  or anywhere, or that name in another place, still fails the case.
 
 ### This repository's index stores (DEC-322; rewritten, reason "owner decision P-25", DEC-563)
 

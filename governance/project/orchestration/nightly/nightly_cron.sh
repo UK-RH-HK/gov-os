@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# cron's entry for the nightly (owner, standing, DEC-933 item 2, DEC-934). The owner's crontab runs it at 02:00:
-#   0 2 * * * bash /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/nightly/nightly_cron.sh
+# cron's entry for the nightly (owner, standing, DEC-933 item 2, DEC-934). The owner's crontab runs it at 04:00 (DEC-973):
+#   0 4 * * * bash /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/nightly/nightly_cron.sh
 #
 # 1. Committed, reviewed code only: it refuses to run (a P1) unless this folder in the main tree is exactly its
 #    commit at HEAD (no change, nothing staged, no untracked file). What runs is what was committed and reviewed.
@@ -13,7 +13,8 @@ REPO=/home/usain/Dynamic-Agentic-Engineering-OS
 HERE=$REPO/governance/project/orchestration/nightly
 ORCH=$REPO/.gov-runtime/scratch/orchestrator
 LOGDIR=$ORCH/log/nightly/cron
-# Every ping through the gate: at night a ping waits until 07:30 unless the owner is active (DEC-936).
+# Every ping through the gate: in the quiet hours (02:00 to 07:30, DEC-973) a ping is held unless the owner is active,
+# and goes out with the 08:00 check (DEC-936).
 PING=$HERE/ping_gate.sh
 export HOME=/home/usain
 export LANG=C.UTF-8

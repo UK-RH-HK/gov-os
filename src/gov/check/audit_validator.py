@@ -17,6 +17,8 @@ from pathlib import Path
 
 import yaml
 
+from gov.util.gitenv import git_env
+
 _VALID_CLASSES = frozenset({
     "OK", "MISSING", "WEAKENED", "CONTRADICTS",
     "UNJUSTIFIED_DROP", "SCOPE_CREEP",
@@ -47,7 +49,7 @@ def _git_repo_root() -> str | None:
     try:
         r = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True, text=True,
+            capture_output=True, text=True, env=git_env(".", pinned=True),
         )
         if r.returncode == 0:
             return r.stdout.strip()
@@ -59,7 +61,7 @@ def _git_repo_root() -> str | None:
 def _commit_resolves(commit: str, repo_root: str) -> bool:
     r = subprocess.run(
         ["git", "rev-parse", "--verify", commit + "^{commit}"],
-        cwd=repo_root, capture_output=True, text=True,
+        cwd=repo_root, capture_output=True, text=True, env=git_env(repo_root, pinned=True),
     )
     return r.returncode == 0
 
@@ -67,7 +69,7 @@ def _commit_resolves(commit: str, repo_root: str) -> bool:
 def _path_exists_at_commit(path: str, commit: str, repo_root: str) -> bool:
     r = subprocess.run(
         ["git", "cat-file", "-e", f"{commit}:{path}"],
-        cwd=repo_root, capture_output=True, text=True,
+        cwd=repo_root, capture_output=True, text=True, env=git_env(repo_root, pinned=True),
     )
     return r.returncode == 0
 

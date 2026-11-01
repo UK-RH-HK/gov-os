@@ -41,6 +41,8 @@ run used gitleaks 8.30.1 at `~/.local/bin`). The 23 cases of `test_w2_50_secrets
 gitleaks too; its three large cases each write a 160 MiB store in their temporary folder and take about 65 s each
 before DEC-853's implementation and about 85 to 175 s each after it, so a run of that file alone takes about 5 to 10
 minutes (run its large cases, `-k large`, in a command of their own where a command is limited to 10 minutes).
+W2-67 (DEC-914) revised the three large cases and the hang form to run against a declared short limit: they now
+write a 16 MiB store and take about 15 to 50 s each; see `README-W2-67.md`.
 
 ## How the suite is built
 

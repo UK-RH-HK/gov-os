@@ -36,6 +36,7 @@ if _W1_07_DIR not in sys.path:
     sys.path.insert(0, _W1_07_DIR)
 
 import w1_07_support as base  # noqa: E402
+import w2_67_codegraph  # noqa: E402
 
 REPO_ROOT = base.REPO_ROOT
 PATH_MAP_REL = base.PATH_MAP_REL
@@ -83,6 +84,7 @@ def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
         "LC_ALL": "C.UTF-8",
         "PYTHONPATH": str(Path(code_root) / "src"),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
     started = time.perf_counter()
     try:
@@ -344,7 +346,7 @@ def make_rebuild_project_no_path_map(cli, destination):
     Same as ``make_rebuild_project`` but does not write
     ``governance/project/path-map.yaml``.
     """
-    destination = Path(destination)
+    destination = Path(w2_67_codegraph.note(destination))   # its daemon folder goes when the case is over
     destination.mkdir(parents=True, exist_ok=True)
     gitleaks = Path(cli) / ".gitleaks.toml"
     if gitleaks.is_file():
@@ -374,9 +376,10 @@ def make_rebuild_project(cli, destination):
     filter on every tracked file (DEC-440).  On the full tree (~955 files)
     this takes about 160 s; on a 3-file project it takes about 2–3 s.
     The code under test lives in ``cli`` (the session-scope copy) and is
-    passed to ``run_gov_with_code`` as the code root.
+    passed to ``run_gov_with_code`` as the code root. Its daemon folder under ``/tmp/gov-cbm-<uid>`` goes when the
+    case is over (``w2_67_codegraph``; W2-67 batch 8).
     """
-    destination = Path(destination)
+    destination = Path(w2_67_codegraph.note(destination))
     destination.mkdir(parents=True, exist_ok=True)
     gitleaks = Path(cli) / ".gitleaks.toml"
     if gitleaks.is_file():

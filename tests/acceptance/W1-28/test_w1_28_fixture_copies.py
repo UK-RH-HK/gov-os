@@ -160,3 +160,99 @@ def test_the_reading_route_does_not_flag_this_suite_or_a_named_folder(tmp_path):
     assert own == [], own
     named = [function.name for function in check.whole_tree_copiers(_planted(tmp_path, _NO_ROOT_PARAMETER))]
     assert "copy_one_folder" not in named
+
+
+# --------------------------------------------------------------------------
+# The reading route reads code, not message text (DEC-982, W2-114)
+# --------------------------------------------------------------------------
+
+_TRUE_COPIES = '''
+import shutil, subprocess
+from pathlib import Path
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_cp_r_of_the_root(tmp_path):
+    subprocess.run(f"cp -r {REPO_ROOT} {tmp_path / 'copy'}", shell=True, check=True)
+
+
+def test_copytree_of_the_root(tmp_path):
+    shutil.copytree(REPO_ROOT, tmp_path / "copy", symlinks=True)
+
+
+def test_git_worktree_add(tmp_path):
+    subprocess.run(["git", "-C", str(REPO_ROOT), "worktree", "add", str(tmp_path / "copy")], check=True)
+
+
+def test_git_clone_of_the_repository(tmp_path):
+    subprocess.run(["git", "clone", "-q", str(REPO_ROOT), str(tmp_path / "copy")], check=True)
+
+
+def test_a_skip_message_then_a_clone(tmp_path):
+    """A message next to a real copy hides nothing."""
+    if not (REPO_ROOT / ".git").exists():
+        pytest.skip(f"{REPO_ROOT} is not a git worktree")
+    subprocess.run(["git", "clone", "-q", str(REPO_ROOT), str(tmp_path / "copy")], check=True)
+'''
+
+_MESSAGES = '''
+import subprocess
+from pathlib import Path
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_w2_108_old_skip_message():
+    """W2-108's scope test before 6c8afc7fd29a: it copies nothing."""
+    if not (REPO_ROOT / ".git").exists():
+        pytest.skip(f"{REPO_ROOT} is not a git worktree")
+
+
+def test_fail_and_assertion_messages():
+    status = subprocess.run(["git", "-C", str(REPO_ROOT), "status", "--short"], capture_output=True, text=True)
+    if status.returncode:
+        pytest.fail(f"{REPO_ROOT}: no git clone, cp -r or rsync of it was made")
+    assert status.stdout == "", "{} changed: is it a git worktree?".format(REPO_ROOT)
+    assert status.returncode == 0, " ".join([str(REPO_ROOT), "git", "worktree", "clone"])
+'''
+
+_ARGV_ITEMS = '''
+import subprocess
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_cp_r_as_separate_argv_items(tmp_path):
+    subprocess.run(["cp", "-r", str(REPO_ROOT), str(tmp_path / "copy")], check=True)
+
+
+def test_tar_c_as_separate_argv_items(tmp_path):
+    subprocess.run(["tar", "-czf", str(tmp_path / "copy.tgz"), "-C", str(REPO_ROOT), "."], check=True)
+'''
+
+
+def test_a_true_whole_tree_copy_in_a_test_function_is_still_reported(tmp_path):
+    """KPI success 2: `cp -r`, `copytree`, `git worktree add` and `git clone` of the root, as the check found them."""
+    reported = sorted(function.name for function in check.whole_tree_copiers(_planted(tmp_path, _TRUE_COPIES)))
+    assert reported == ["test_a_skip_message_then_a_clone", "test_copytree_of_the_root", "test_cp_r_of_the_root",
+                        "test_git_clone_of_the_repository", "test_git_worktree_add"], (
+        f"a real whole-tree copy is no longer reported: {reported}"
+    )
+
+
+def test_a_message_that_names_the_root_and_a_route_is_not_a_copy(tmp_path):
+    """KPI success 1: the text of `pytest.skip`, `pytest.fail` and assertion messages is not read as code."""
+    reported = sorted(function.name for function in check.whole_tree_copiers(_planted(tmp_path, _MESSAGES)))
+    assert reported == [], f"a message that names the repository root was read as a whole-tree copy: {reported}"
+
+
+def test_cp_r_and_tar_c_given_as_separate_argv_items_are_reported(tmp_path):
+    """A widening (README, part B): the shell routes given as an argv list's separate items."""
+    reported = sorted(function.name for function in check.whole_tree_copiers(_planted(tmp_path, _ARGV_ITEMS)))
+    assert reported == ["test_cp_r_as_separate_argv_items", "test_tar_c_as_separate_argv_items"], reported

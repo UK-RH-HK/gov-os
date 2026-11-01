@@ -1,7 +1,7 @@
 ---
 id: CAP-06.d
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Imports/references/consumers represented; path-map compliance machine-checkable
 depends_on:
@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-06.d: Imports/references/consumers represented; path-map compliance machine-checkable
 
-A covers item of CAP-06 (Repository contract and path map). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-06 (Repository contract and path map). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Imports/references/consumers represented; path-map compliance machine-checkable
 - **Wave:** W1

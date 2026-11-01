@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import shlex
 import shutil
@@ -15,6 +14,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.checks import CHECKS_DIRS, ENFORCES_FIELD, TIMEOUT_FIELD, load_declarations
+from gov.util.gitenv import git_env, program_env
 
 VERSION = "1.0.0"
 
@@ -56,7 +56,7 @@ def _head(root: Path) -> str:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "rev-parse", "HEAD"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, env=git_env(root, pinned=True),
         )
         return result.stdout.strip()
     except (subprocess.CalledProcessError, OSError):
@@ -92,7 +92,7 @@ def _judged(command: str) -> str:
 def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[int | None, str, str]:
     """The exit code, output and error output of ``command``. The exit code is None when it passed ``timeout`` seconds."""
     command = _judged(command)
-    env = dict(os.environ)
+    env = program_env()  # a declared check may start git anywhere: no inherited GIT_* variable, no index (P-1)
     xdg_tmp = tempfile.mkdtemp(prefix="gov-check-")
     env.setdefault("XDG_CONFIG_HOME", xdg_tmp)
     env.setdefault("XDG_DATA_HOME", xdg_tmp)
@@ -238,7 +238,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
         try:
             diff_result = subprocess.run(
                 ["git", "-C", str(root), "diff", "HEAD~1", "--name-only", "--", SKILL_DIR],
-                capture_output=True, text=True,
+                capture_output=True, text=True, env=git_env(root, pinned=True),
             )
             if diff_result.returncode == 0 and diff_result.stdout.strip():
                 changed_files = [f for f in diff_result.stdout.strip().split("\n") if f]
@@ -253,7 +253,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
 
                     old_result = subprocess.run(
                         ["git", "-C", str(root), "show", f"HEAD~1:{rel}"],
-                        capture_output=True, text=True,
+                        capture_output=True, text=True, env=git_env(root, pinned=True),
                     )
                     if old_result.returncode != 0:
                         continue

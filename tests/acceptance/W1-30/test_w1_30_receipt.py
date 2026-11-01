@@ -120,27 +120,25 @@ def test_close_record_has_tests_and_deviations(project, sandbox, interface):
 
 
 def test_close_record_packet_hash_matches_context(project, sandbox, interface):
-    """KPI S5, CAP-50.c: the packet_hash equals the one from gov context."""
+    """KPI S5, CAP-50.c: the packet_hash equals the one from gov context.
+
+    Revised for W2-67 (I2 F2, PF9): when ``gov context`` could not be read, the case accepted any string of more than
+    eight characters, and it could not be read: the record store is loaded only by the close. The store is now
+    loaded first, the case fails when ``gov context`` does not answer, and the close record's packet hash must be
+    exactly the hash it gives."""
     _green_project(project)
+    support.load_store(project, sandbox)
     ctx_run = project.gov(sandbox, "context", TICKET, "--json")
-    ctx_data = {}
-    try:
-        ctx_data = json.loads(ctx_run.stdout)
-    except Exception:
-        pass
-    ctx_hash = None
-    if isinstance(ctx_data, dict):
-        result = ctx_data.get("result", ctx_data)
-        ctx_hash = result.get("hash") if isinstance(result, dict) else None
+    ctx_data = json.loads(ctx_run.stdout)
+    assert ctx_data.get("ok") is True, \
+        f"gov context does not answer for the ticket, so its hash cannot be compared\n{ctx_run.describe()}"
+    ctx_hash = ctx_data["result"].get("hash")
+    assert isinstance(ctx_hash, str) and len(ctx_hash) > 8, f"gov context gives no hash: {ctx_data['result']}"
 
     front = _close_and_find_record(project, sandbox)
     record_hash = front.get("packet_hash") or front.get("hash")
-    if ctx_hash:
-        assert record_hash == ctx_hash, \
-            f"packet_hash {record_hash!r} must match context hash {ctx_hash!r}"
-    else:
-        assert isinstance(record_hash, str) and len(record_hash) > 8, \
-            "packet_hash must be non-trivial even when context is unavailable"
+    assert record_hash == ctx_hash, \
+        f"packet_hash {record_hash!r} must match context hash {ctx_hash!r}"
 
 
 # --------------------------------------------------------------------------

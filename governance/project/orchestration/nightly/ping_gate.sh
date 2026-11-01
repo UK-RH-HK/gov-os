@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Every ping of the nightly goes through here (owner, 2026-10-28, DEC-936: a night's P1s wait until 07:30 unless the
-# owner is already active).
-#   ping_gate.sh "<message>"   from 07:30 to midnight: pings at once. From midnight to 07:30: pings at once only if
+# Every ping of the nightly goes through here (owner, DEC-936, DEC-973: a P1 in the quiet hours, 02:00 to 07:30, is
+# held unless the owner is already active; held pings go out with the 08:00 check, or as soon as the owner is active).
+#   ping_gate.sh "<message>"   from 07:30 to 02:00: pings at once. From 02:00 to 07:30 (the owner's quiet hours, DEC-973): pings at once only if
 #                              the owner has used Windows in the last 15 minutes; otherwise holds the message in
 #                              log/nightly/pending-pings.txt, with the time it was held.
 #   ping_gate.sh --flush       pings every held message, marked "held from <time>", and empties the file.
-#   ping_gate.sh --wait-flush  waits (a check every 5 minutes) until 07:30 or until the owner is active, then flushes.
+#   ping_gate.sh --wait-flush  waits (a check every 5 minutes) until the quiet hours end (07:30) or the owner is active,
+#                              then flushes; called at 08:00 by the morning check, it flushes at once.
 # The owner is "active" when Windows' last input (GetLastInputInfo, read through PowerShell) is under 15 minutes old.
-# If that cannot be read, the owner is taken as not active: a held ping still goes at 07:30, never lost.
+# If that cannot be read, the owner is taken as not active: a held ping still goes out with the 08:00 check, never lost.
 ORCH=${NIGHTLY_ORCH:-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator}
 PING=${NIGHTLY_PING:-/home/usain/.local/bin/owner-ping}
 PENDING=$ORCH/log/nightly/pending-pings.txt
@@ -46,7 +47,7 @@ owner_active() {
   [ -n "$idle" ] && [ "$idle" -lt "$ACTIVE_S" ]
 }
 
-daytime() { [ "$((10#$(now_hm)))" -ge 730 ]; }
+daytime() { local hm=$((10#$(now_hm))); [ "$hm" -ge 730 ] || [ "$hm" -lt 200 ]; }  # quiet hours 02:00-07:30 (DEC-973)
 
 flush() {
   [ -s "$PENDING" ] || return 0

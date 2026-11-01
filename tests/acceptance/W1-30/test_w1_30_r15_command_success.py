@@ -90,7 +90,7 @@ def test_the_fresh_agent_reconstruction_check_is_green_where_the_resume_brief_ca
     PATH being this worktree's command line. Red before the round: RED, its finding the success envelope of
     ``gov checkpoint --resume --json``."""
     project = scratch()
-    project.write(r15.PATH_MAP_REL, "namespaces: {}\n")
+    project.write(r15.PATH_MAP_REL, "namespaces: {all: {paths: ['**']}}\n")
     project.base_source()
     project.write(f".tickets/{TICKET}.md", r15.ticket_text(TICKET, "W9-01"))
     project.declare_as_the_kernel_does(FRESH_AGENT)

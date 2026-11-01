@@ -2,6 +2,7 @@
 
 ``gov retrieve [--ticket <id>] [--id <id>]... [--radius <R>] [--batch-size <N>] [--bundle-budget <N>]
 [--continue <token>] <query>`` prints the evidence bundle of ``gov.retrieval.retrieve``. It only reads (CAP-27).
+The register's superseded and done entries are left out of it, and its ``left_out`` counts them (W2-55).
 Exit code 1: ``STORE_MISSING``, no store was loaded; ``CONTINUATION_INVALID``, the token is none.
 """
 
@@ -22,7 +23,13 @@ def add_arguments(parser) -> None:
 
 
 def run(root: Path, args, config: dict) -> dict:
+    from gov.decisions.register import leave_out
     from gov.retrieval.retrieve import retrieve
 
-    return retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
-                    batch_size=args.batch_size, bundle_budget=args.bundle_budget, continuation=args.continuation)
+    bundle = retrieve(root, args.query, ids=args.ids, ticket=args.ticket, radius=args.radius,
+                      batch_size=args.batch_size, bundle_budget=args.bundle_budget, continuation=args.continuation)
+    # W2-55 (DEC-791 item 1): the register's superseded and done entries are left out, and counted
+    bundle["evidence"], left_out = leave_out(root, bundle["evidence"])
+    if left_out:
+        bundle["left_out"] = left_out
+    return bundle

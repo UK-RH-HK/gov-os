@@ -8,6 +8,10 @@ Three comparisons, each a finding when it fails or cannot be made:
    temporary folder; a file of the generated folders that rulesync does not write has no source.
    When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
    applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
+And, where the kernel is the template's, the template's hooks source with the repository's, by hook events
+and matchers with the paths normalised (DEC-805), except that postToolUse and postToolUseFailure, which ACT 1
+lifted from the repository's source only, are no drift while the template alone has them (DEC-971 item 3; it
+ends with W2-08, when they return).
 
 Prints ``{"findings": [...], "compared": {...}}`` and exits 0 only without findings.
 """
@@ -30,6 +34,11 @@ from gov.guard import heldout
 REGISTRY = "governance/project/tool-registry.yaml"
 KERNEL_ROOTS = ("governance/kernel", "template/governance/kernel")  # adopted project, this repository
 SOURCES = ".rulesync"
+HOOKS_SOURCE = "hooks.jsonc"
+# The two hook events ACT 1 lifted from the repository's hooks source and not the template's (DEC-953 item 2):
+# no drift while only the template has them (DEC-971 item 3). It ends with W2-08: once they are back in both
+# sources they are compared as any other event, and this constant goes.
+LIFTED_HOOK_EVENTS = frozenset({"postToolUse", "postToolUseFailure"})
 GENERATE = ("generate", "--targets", "claudecode,agentsmd",
             "--features", "rules,hooks,permissions,subagents,commands,skills", "--input-roots")
 GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")  # rulesync alone writes here (DEC-471)
@@ -162,6 +171,77 @@ def _kernel_findings(root: Path) -> tuple[list[dict], int]:
     return findings, len(pairs)
 
 
+def _jsonc(text: str) -> object:
+    """``text`` read as JSON with comments and trailing commas, both outside strings only."""
+    out, i, quoted = [], 0, False
+    while i < len(text):
+        char = text[i]
+        if quoted:
+            out.append(char)
+            if char == "\\":
+                out.append(text[i + 1:i + 2])
+                i += 1
+            elif char == '"':
+                quoted = False
+        elif text.startswith("//", i):
+            i = text.find("\n", i)
+            i = len(text) if i < 0 else i
+            continue
+        elif text.startswith("/*", i):
+            end = text.find("*/", i + 2)
+            i = len(text) if end < 0 else end + 2
+            continue
+        elif char == ",":
+            rest = text[i + 1:].lstrip()
+            if not rest.startswith(("}", "]")):
+                out.append(char)
+        else:
+            quoted = char == '"'
+            out.append(char)
+        i += 1
+    return json.loads("".join(out))
+
+
+def _hook_matchers(path: Path) -> dict[str, list[str]]:
+    """Each hook event of a rulesync hooks source with the sorted matchers of its hooks (``""`` for none)."""
+    hooks = _jsonc(path.read_text(encoding="utf-8")).get("hooks")
+    if not isinstance(hooks, dict):
+        raise ValueError("no hooks object")
+    return {event: sorted(str(entry.get("matcher") or "") if isinstance(entry, dict) else "" for entry in entries)
+            for event, entries in hooks.items() if isinstance(entries, list)}
+
+
+def _hooks_findings(root: Path) -> list[dict]:
+    """The template's hooks source against the repository's, where the kernel is the template's (DEC-805): by
+    hook events and matchers, so that the hooks' paths, their order and the command around them are no drift.
+    One finding per drifted event, naming it, but none for a lifted event only the template has (DEC-971 item 3);
+    none where the template has no hooks source."""
+    template = root / "template" / SOURCES / HOOKS_SOURCE
+    if not (root / KERNEL_ROOTS[1]).is_dir() or not template.is_file():
+        return []
+    kept_rel, ours_rel = str(template.relative_to(root)), f"{SOURCES}/{HOOKS_SOURCE}"
+    read = []
+    for rel in (kept_rel, ours_rel):
+        try:
+            read.append(_hook_matchers(root / rel))
+        except (OSError, UnicodeDecodeError, ValueError, AttributeError) as exc:
+            return [_finding("HOOKS_UNREADABLE", f"cannot be read as a hooks source ({type(exc).__name__}); "
+                             "the hooks sources were not compared", rel)]
+    kept, ours = read
+    findings = []
+    for event in sorted(set(kept) | set(ours)):
+        if event in LIFTED_HOOK_EVENTS and event in kept and event not in ours:
+            continue
+        if event not in ours or event not in kept:
+            where = kept_rel if event in kept else ours_rel
+            findings.append(_finding("HOOKS_EVENT_DIFFERS", f"hook event {event} is only in {where}", ours_rel))
+        elif kept[event] != ours[event]:
+            here, there = ([m or "(none)" for m in side[event]] for side in (ours, kept))
+            findings.append(_finding("HOOKS_MATCHER_DIFFERS",
+                                     f"hook event {event}: matchers {here} here, {there} in {kept_rel}", ours_rel))
+    return findings
+
+
 def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
     """Comparison 3: ``(findings, number of files compared)``. rulesync generates from the project's
     sources into an empty temporary folder; each file it writes there is compared byte for byte with the
@@ -201,6 +281,7 @@ def main() -> int:
     binary = _find_rulesync()
     version = _version_finding(root, binary)
     findings, kernel_files = _kernel_findings(root)
+    findings += _hooks_findings(root)
     generated_files = 0
     if version is not None:
         version["message"] += "; the generated files were not compared"

@@ -159,14 +159,17 @@ def _supplementary_query(root: Path, ticket: str) -> str:
     return title or ticket
 
 
-def _try_supplementary(root: Path, ticket: str, budget_remaining: int) -> tuple[list, list]:
+def _try_supplementary(root: Path, ticket: str, budget_remaining: int) -> tuple[list, list, dict | None]:
+    """The supplementary items, the dropped ones, and the register's superseded and done entries left out (W2-55,
+    DEC-791 item 1; None where none was)."""
     try:
+        from gov.decisions.register import leave_out
         from gov.retrieval.retrieve import retrieve
         query = _supplementary_query(root, ticket)
         bundle = retrieve(root, query, ticket=ticket)
-        evidence = bundle.get("evidence", [])
+        evidence, left_out = leave_out(root, bundle.get("evidence", []))
         if not evidence:
-            return [], []
+            return [], [], left_out
         supplementary, dropped = [], []
         for item in evidence:
             text = item.get("text", "")
@@ -184,9 +187,9 @@ def _try_supplementary(root: Path, ticket: str, budget_remaining: int) -> tuple[
                     "id": item.get("id", item.get("chunk_id", "")),
                     "reason": "budget exceeded",
                 })
-        return supplementary, dropped
+        return supplementary, dropped, left_out
     except Exception as exc:
-        return [], [{"id": "supplementary", "reason": _lookup_failure(root, exc)}]
+        return [], [{"id": "supplementary", "reason": _lookup_failure(root, exc)}], None
 
 
 def _lookup_failure(root: Path, exc: Exception) -> str:
@@ -291,7 +294,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     dropped: list[dict] = []
 
     # Supplementary context
-    supplementary, supp_dropped = _try_supplementary(root, ticket, max(0, budget_remaining))
+    supplementary, supp_dropped, *left = _try_supplementary(root, ticket, max(0, budget_remaining))
+    left_out = left[0] if left else None
     dropped.extend(supp_dropped)
     # one order whatever order the retrieval returned its items in (DEC-768): an entry is its id and its reason,
     # so the two decide every pair that differ; what is kept still follows the retrieval's rank
@@ -313,6 +317,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     }
     if external:  # absent where the ticket declares none: the packet and its hash stay W1-24's
         packet_for_hash["external"] = external
+    if left_out:  # absent where nothing was left out, so the packet and its hash stay as before (W2-55)
+        packet_for_hash["left_out"] = left_out
     canonical =json.dumps(packet_for_hash, sort_keys=True, separators=(",", ":"))
     packet_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
@@ -328,6 +334,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
     }
     if external:
         packet["external"] = external
+    if left_out:
+        packet["left_out"] = left_out
 
     if brief:
         summary_parts = [f"Context for {ticket}:"]
@@ -339,6 +347,8 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
             summary_parts.append(f"  + {len(supplementary)} supplementary items")
         if dropped:
             summary_parts.append(f"  - {len(dropped)} items dropped")
+        if left_out:
+            summary_parts.append(f"  - {left_out['count']} superseded or done register entries left out")
         summary = "\n".join(summary_parts)
         if _tokens(summary) > BRIEF_LIMIT:
             summary = summary[:BRIEF_LIMIT * TOKEN_CHARS]

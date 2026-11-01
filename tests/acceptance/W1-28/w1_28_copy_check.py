@@ -15,6 +15,9 @@ Two routes, both without ever opening the committed file:
   route (``copytree``, ``git clone``, ``git archive``, ``git worktree``,
   ``cp -r``, ``rsync``, ``tar``) with the repository root as its source. Such a
   function must be one ``copiers`` finds, so that the first route runs it.
+  Routes are read in code only: in argument lists and in ``subprocess``,
+  ``os.system`` and copy calls; the text of ``pytest.skip``, ``pytest.fail``
+  and assertion messages is never read (DEC-982).
 
 Only the sources of the test suites are parsed (``ast``); nothing here names,
 opens, hashes or compares the committed held-out file. The README says what
@@ -60,6 +63,13 @@ _MODULE_COPY_CALLS = {("shutil", "copy"), ("shutil", "move"), ("os", "link"), ("
 _LISTERS = {"walk", "rglob", "glob", "iterdir", "scandir", "listdir"}
 _ARGV_ROUTES = {"clone", "archive", "worktree", "checkout-index", "bundle"}
 _SHELL_ROUTE = re.compile(r"\b(cp\s+-\w*[rRa]\w*|rsync|git\s+(?:archive|clone|worktree)|tar\s+-?\w*c\w*)\b")
+# The calls whose arguments are a command, read whole for a shell route (DEC-982).
+_COMMAND_CALLS = {"run", "call", "check_call", "check_output", "Popen", "getoutput", "getstatusoutput",
+                  "system", "popen", "create_subprocess_exec", "create_subprocess_shell"}
+# Message text, never read as code (DEC-982): every argument of these, an ``assert``'s message, ``reason=``, ``msg=``.
+_MESSAGE_CALLS = {"skip", "fail", "xfail", "exit"}
+_MESSAGE_KEYWORDS = {"reason", "msg"}
+_ARGUMENT = "\0"   # a non-constant item of an argv, so that items on either side of it are not read as one
 
 
 @dataclass(frozen=True)
@@ -121,8 +131,74 @@ def _whole_roots(node, names):
     return any(_whole_roots(child, names) for child in ast.iter_child_nodes(node))
 
 
-def _strings(node):
-    return [item.value for item in ast.walk(node) if isinstance(item, ast.Constant) and isinstance(item.value, str)]
+def _strings(node, messages=frozenset()):
+    return [item.value for item in ast.walk(node) if isinstance(item, ast.Constant) and isinstance(item.value, str)
+            and id(item) not in messages]
+
+
+def _owner(call):
+    func = call.func
+    return func.value.id if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name) else None
+
+
+def _message_parts(statements):
+    """The ids of every node of message text: the call ``pytest.skip``/``fail``/``xfail``/``exit`` with its
+    arguments, an ``assert``'s message, a ``reason=`` or ``msg=`` value. None of it is read as code (DEC-982)."""
+    parts = []
+    for node in (item for statement in statements for item in ast.walk(statement)):
+        if isinstance(node, ast.Assert) and node.msg is not None:
+            parts.append(node.msg)
+        elif isinstance(node, ast.Call):
+            if _callee(node) in _MESSAGE_CALLS and _owner(node) == "pytest":
+                parts.append(node)
+            parts += [keyword.value for keyword in node.keywords if keyword.arg in _MESSAGE_KEYWORDS]
+    return {id(item) for part in parts for item in ast.walk(part)}
+
+
+def _arguments(call):
+    """What ``call`` is given, its message keywords left out."""
+    return [*call.args, *(keyword.value for keyword in call.keywords if keyword.arg not in _MESSAGE_KEYWORDS)]
+
+
+def _item_text(node):
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.JoinedStr):
+        return "".join(part.value if isinstance(part, ast.Constant) else _ARGUMENT for part in node.values)
+    return _ARGUMENT
+
+
+def _argv(call):
+    """The argument list of ``call``: the strings it is given, also as items of a list, a tuple, a ``+`` or a ``*``
+    there; and each such list or tuple as one text, its items joined by spaces (``["cp", "-r", ...]``)."""
+    words, sequences = [], []
+    pending = _arguments(call)
+    while pending:
+        node = pending.pop()
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            words.append(node.value)
+        elif isinstance(node, ast.Starred):
+            pending.append(node.value)
+        elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+            pending += [node.left, node.right]
+        elif isinstance(node, (ast.List, ast.Tuple)):
+            pending += node.elts
+            sequences.append(" ".join(_item_text(item) for item in node.elts))
+    return words, sequences
+
+
+def _names_a_route(call, messages):
+    """A whole-tree route in the code of ``call``, never in message text (DEC-982): an argv word (``clone``,
+    ``worktree``, ...) in its argument list or a shell route in an argv list of it; in a ``subprocess``,
+    ``os.system`` or copy call, also a shell route in any string it is given."""
+    words, sequences = _argv(call)
+    if any(word in _ARGV_ROUTES for word in words) or any(_SHELL_ROUTE.search(text) for text in sequences):
+        return True
+    callee, owner = _callee(call), _owner(call)
+    if callee in _COMMAND_CALLS or callee in _COPY_CALLS or (owner, callee) in _MODULE_COPY_CALLS:
+        texts = [text for argument in _arguments(call) for text in _strings(argument, messages)]
+        return any(text in _ARGV_ROUTES or _SHELL_ROUTE.search(text) for text in texts)
+    return False
 
 
 def _unlimited_listing(sequence):
@@ -140,7 +216,8 @@ def _unlimited_listing(sequence):
 
 def _analyse(path, name, body, root_parameters, top_level):
     names = {ROOT_NAME, *root_parameters}
-    nodes = [node for statement in body for node in ast.walk(statement)]
+    messages = _message_parts(body)
+    nodes = [node for statement in body for node in ast.walk(statement) if id(node) not in messages]
     mentions_root = any(_is_root(node, names) for node in nodes
                         if isinstance(node, (ast.Name, ast.Attribute)))
     copies = lists = route = False
@@ -149,20 +226,18 @@ def _analyse(path, name, body, root_parameters, top_level):
             lists = True
         if not isinstance(node, ast.Call):
             continue
-        callee = _callee(node)
-        owner = node.func.value.id if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name) \
-            else None
+        callee, owner = _callee(node), _owner(node)
         if callee in _COPY_CALLS or (owner, callee) in _MODULE_COPY_CALLS:
             copies = True
         if _unlimited_listing(node.args) and mentions_root:
             lists = True
-        whole = any(_whole_roots(argument, names) for argument in (*node.args, *(k.value for k in node.keywords)))
+        whole = any(_whole_roots(argument, names) for argument in _arguments(node))
         receiver = isinstance(node.func, ast.Attribute) and _whole_roots(node.func.value, names)
         if callee in _LISTERS and (whole or receiver):
             lists = True
         if callee == "copytree" and node.args and _whole_roots(node.args[0], names):
             route = True
-        if whole and any(text in _ARGV_ROUTES or _SHELL_ROUTE.search(text) for text in _strings(node)):
+        if whole and _names_a_route(node, messages):
             route = True
     return Function(path, name, tuple(root_parameters), top_level, copies, lists, route)
 

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
+import shutil
 
 import pytest
 import yaml
 
-from gov.lock import ANSWERS_REL, HEADER, KERNEL_REL, LOCK_REL, LockError, compare, write
+from gov.lock import ANSWERS_REL, HEADER, KERNEL_REL, LOCK_REL, SHIPPED_PATHS, LockError, compare, write
 
 HOOK = f"{KERNEL_REL}/hooks/guard.py"
 COMMIT = "a" * 40
@@ -66,7 +68,94 @@ def test_no_lock_beside_an_answers_file_is_unlocked_and_names_the_lock(tmp_path)
     assert answer.verdict == "UNLOCKED" and answer.drifted_files == ()
     assert "framework.lock" in answer.reason and ANSWERS_REL in answer.reason
     (root / ANSWERS_REL).unlink()
+    answer = compare(root)                                   # W2-H029: an installed kernel cannot silence it
+    assert answer.verdict == "UNLOCKED" and "framework.lock" in answer.reason and "copier" in answer.reason
+    shutil.rmtree(root / KERNEL_REL)
     assert compare(root).verdict == "MISSING"
+
+
+@pytest.mark.parametrize("change", ("lose the executable bit", "gain the executable bit", "add an empty folder"))
+def test_modes_and_folders_are_compared(tmp_path, change):
+    root = _project(tmp_path)
+    (root / HOOK).chmod(0o755)
+    write(root)
+    assert compare(root).verdict == "MATCH"
+    rel = HOOK
+    if change == "lose the executable bit":
+        (root / HOOK).chmod(0o644)
+    elif change == "gain the executable bit":
+        rel = f"{KERNEL_REL}/settings.json"
+        (root / rel).chmod(0o755)
+    else:
+        rel = f"{KERNEL_REL}/empty"
+        (root / rel).mkdir()
+    assert compare(root).drifted_files == (rel,)
+
+
+def test_a_declared_path_outside_the_kernel_is_locked(tmp_path):
+    root = _project(tmp_path)
+    declared = f"{SHIPPED_PATHS[1]}/schema.yaml"
+    (root / declared).parent.mkdir(parents=True)
+    (root / declared).write_text("name: x\n", encoding="utf-8")
+    write(root)
+    assert declared in yaml.safe_load((root / LOCK_REL).read_text(encoding="utf-8"))["manifest"]
+    (root / declared).write_text("name: y\n", encoding="utf-8")
+    assert compare(root).drifted_files == (declared,)
+
+
+def test_a_lock_without_modes_or_folders_is_an_error(tmp_path):
+    root = _project(tmp_path)
+    _rewrite(root, lambda lock: lock.pop("executables"))
+    assert compare(root).verdict == "ERROR"
+
+
+def _release(root, files):
+    data = json.dumps({"version": "1.4.0", "files": files}).encode()
+    write(root, release=("1.4.0", data))
+    return hashlib.sha256(data).hexdigest()
+
+
+def test_a_release_lock_records_version_and_manifest_hash_and_matches(tmp_path):
+    root = _project(tmp_path)
+    files = {rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in (HOOK, f"{KERNEL_REL}/settings.json")}
+    digest = _release(root, files)
+    release = yaml.safe_load((root / LOCK_REL).read_text(encoding="utf-8"))["release"]
+    assert release["version"] == "1.4.0" and release["manifest_sha256"] == digest
+    assert compare(root).verdict == "MATCH"
+
+
+def test_a_release_lock_whose_manifest_hash_is_wrong_is_an_error(tmp_path):
+    root = _project(tmp_path)
+    _release(root, {HOOK: hashlib.sha256((root / HOOK).read_bytes()).hexdigest()})
+    _rewrite(root, lambda lock: lock["release"].update(manifest_sha256="0" * 64))
+    assert compare(root).verdict == "ERROR"
+
+
+def test_a_kernel_file_edited_with_its_lock_entry_differs_from_the_release(tmp_path):
+    root = _project(tmp_path)
+    files = {rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in (HOOK, f"{KERNEL_REL}/settings.json")}
+    _release(root, files)
+    (root / HOOK).write_text("print('edited')\n", encoding="utf-8")
+    new = hashlib.sha256((root / HOOK).read_bytes()).hexdigest()
+    _rewrite(root, lambda lock: lock["manifest"].update({HOOK: new}))
+    assert compare(root).drifted_files == (HOOK,)
+
+
+def test_a_lock_without_a_release_states_release_null_and_matches(tmp_path):
+    root = _project(tmp_path)
+    assert yaml.safe_load((root / LOCK_REL).read_text(encoding="utf-8"))["release"] is None
+    assert compare(root).verdict == "MATCH"
+
+
+@pytest.mark.parametrize("released", (False, True))
+def test_a_lock_that_does_not_state_its_release_is_an_error(tmp_path, released):
+    root = _project(tmp_path)
+    if released:
+        _release(root, {rel: hashlib.sha256((root / rel).read_bytes()).hexdigest()
+                        for rel in (HOOK, f"{KERNEL_REL}/settings.json")})
+    _rewrite(root, lambda lock: lock.pop("release"))
+    answer = compare(root)
+    assert answer.verdict == "ERROR" and "release" in answer.reason
 
 
 @pytest.mark.parametrize("answers", ("empty", "not a map", "folder", "dangling link"))

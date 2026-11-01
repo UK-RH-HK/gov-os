@@ -1,7 +1,7 @@
 ---
 id: CAP-41
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Lesson records with scope
 depends_on:
@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-41: Lesson records with scope
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent receives the lessons that apply to its task, scoped, and lessons stay in the repository.
 - **Acceptance:** A committed lesson whose scope matches a ticket is returned by `gov retrieve` for that ticket and not for an out-of-scope ticket.

@@ -18,6 +18,7 @@ depends_on: []
 allowed_paths:
 - src/gov/accept/**
 - tests/unit/accept/test_w2_96*
+- src/gov/check/commands.py
 kpis:
   success:
   - 'gov accept <ticket> runs that ticket''s acceptance tests (its declared acceptance_tests.path) with the tree''s own src/ and reports, per KPI line of the designer''s README map, pass or fail, with the counts of tests passed and failed under each line; --json gives the same in the API-0002 envelope [DEC-959 item 6, DEC-957]'
@@ -46,6 +47,8 @@ track: A
 list_rows: []
 ---
 # W2-96 The opaque acceptance runner
+
+**DEC-970 (2026-10-31):** `src/gov/check/commands.py` is in the paths for one line only, `accept` in `RECORDED_GOV_COMMANDS` (P-W2-96-CMDLIST (a)); W2-16, W2-20 and W2-37 hold the rest of that file, split by line, and whichever merges second merges back. For the independent test designer, not in allowed_paths: W1-07's support list of recorded commands and W1-07's and W1-32's pinned command tuples gain `accept` (`tests/acceptance/W1-07/`, `tests/acceptance/W1-32/`; `Rewrite-Reason: DEC-959 item 6`). PKG-1 (a): any failed or errored case, mapped or not, fails the run (exit 3); PKG-2 (c).
 
 Card: ROLES-RESEARCH-1 §5.3 item 6, approved by the owner as a priority now (DEC-959 item 6): the five-rule guard lets engineers read the acceptance tests, so "pass or fail only" (DEC-957's work order) needs a runner that enforces it.
 

@@ -35,7 +35,7 @@ kpis:
   - 'Fail closed: a ticket file, the register or the store that cannot be read, or a condition that cannot be judged, is NOT_READY with the code UNJUDGED and its reason; nothing is ready by default [DEC-944 item 2, DEC-820]'
   - 'The kernel carries it, so an adopted product inherits it: the ticket template states each field the Definition of Ready reads, with its rule; ticket.schema.json gains stacked_on (the base and the decision); the judge reads the register''s place from the path map and holds no rule of this repository [DEC-944 item 2, CAP-44.a]'
   - 'CIT-P for the kernel template and the schema only (docs/changes/W2-82-CIT-P.md), written before either file changes, reviewed independently and approved by the owner before the merge; the CIT-E after [CAP-33.a, DEC-944 item 2]'
-  - 'Nothing else changes: the vendored tk is byte-identical; no containment or guard rule rewrites a ticket file (Wave 3, DEC-944 item 2); gov.tasks.queue''s READY rule and W1-13''s gov readiness are unchanged; the full regression in the close''s form is green apart from reds the ticket does not own [DEC-880, DEC-866]'
+  - 'Nothing else changes: the vendored tk is byte-identical; no containment or guard rule rewrites a ticket file (Wave 3, DEC-944 item 2); gov.tasks.queue''s READY rule and W1-13''s gov readiness are unchanged; the scoped set in the close''s form is green; every red the ticket did not cause is named for the CTO [DEC-968, DEC-983, DEC-982] [DEC-880, DEC-866]'
   failure:
   - 'gov claim sets in_progress on a ticket that fails a condition.'
   - 'gov launch starts a lead on a ticket that is not ready.'
@@ -56,6 +56,7 @@ sources:
 - CAP-31.a
 - CAP-31.d
 - CAP-33.a
+- DEC-983
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W2-82/

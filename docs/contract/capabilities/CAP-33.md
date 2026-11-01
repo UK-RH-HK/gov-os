@@ -1,7 +1,7 @@
 ---
 id: CAP-33
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Change-impact transactions (CIT-P simulation, CIT-E execution)
 depends_on:
@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-33: Change-impact transactions (CIT-P simulation, CIT-E execution)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can simulate a change before making it (CIT-P) and record what it changed (CIT-E).
 - **Acceptance:** A decision change raises a CIT-P listing the affected specs, decisions, tickets, tests and code from both graphs, with a radius; after apply/archive the CIT-E record matches the proposal or lists the differences.

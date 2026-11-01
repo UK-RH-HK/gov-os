@@ -1,6 +1,6 @@
 ---
 id: DAEO-gdzh
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-30T10:16:24Z

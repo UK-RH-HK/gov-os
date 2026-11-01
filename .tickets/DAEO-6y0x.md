@@ -6,16 +6,17 @@ links: []
 created: 2026-10-30T22:14:08Z
 type: task
 priority: 1
-assignee: independent-auditor
+assignee: independent-test-designer
 external-ref: W2-93
 tags: [wave-2, audit, evaluation, held-out, standard, proving-ground]
 wbs_id: W2-93
 title: 'W2-81''s held-out half: hidden questions and planted-problem variants per synthetic repository, by an independent session'
 class: audit
 state_class: AUTHORITATIVE
-role: independent-auditor
+role: independent-test-designer
 depends_on: [DAEO-l78m, DAEO-m1u3]
 allowed_paths:
+- fixtures/evaluation/adoption-proving-ground/validate_hidden.py
 - fixtures/evaluation/adoption-proving-ground/hidden/**
 kpis:
   success:
@@ -23,6 +24,7 @@ kpis:
   - 'At least one hidden planted-problem variant per kind that the visible builders do not produce, so an adoption tuned to the visible generator is caught [DEC-941]'
   - 'Written by a session independent of the sessions it measures; nothing hidden written outside the hidden folder; no question or answer quoted in a commit message, a return, a log or a ticket note [DEC-820 (d), DEC-845, DEC-873]'
   - 'Every gold answer is held by the repository the builder builds, checked on a built copy [DEC-828]'
+  - 'The hidden half proves its own data valid with an automatic check (`validate_hidden.py`, beside the data, run before every commit of the hidden half and recorded): every forbidden ("must not cite") file names a file of the repository the builder builds, checked on a built copy; every kind of planted problem the visible generator does not produce has at least one hidden variant per repository; anything it cannot read refuses (fail closed); W2-81''s files are not touched [DEC-1010 item 4]'
   failure:
   - 'A hidden question or answer readable by a measured session by a route an honest agent takes in ordinary work.'
   - 'A question whose gold answer the built repository does not hold.'

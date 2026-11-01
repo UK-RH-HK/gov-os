@@ -429,6 +429,7 @@ def environment(sandbox, without=()):
         "GIT_CONFIG_NOSYSTEM": "1",
         "GIT_AUTHOR_NAME": "W1-41 tests", "GIT_AUTHOR_EMAIL": "w1-41@example.invalid",
         "GIT_COMMITTER_NAME": "W1-41 tests", "GIT_COMMITTER_EMAIL": "w1-41@example.invalid",
+        **{k: v for k, v in os.environ.items() if k == "GOV_REBUILD_LOCK"},  # DEC-956 item 2, DEC-964
     }
 
 

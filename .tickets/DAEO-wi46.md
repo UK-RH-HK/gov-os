@@ -1,7 +1,7 @@
 ---
 id: DAEO-wi46
 status: open
-deps: []
+deps: [DAEO-k7hz, DAEO-drhj]
 links: []
 created: 2026-10-30T23:20:53Z
 type: task
@@ -14,7 +14,7 @@ title: 'The spec-writing skill for product-spec: problem, goals and non-goals, K
 class: specification
 state_class: AUTHORITATIVE
 role: product-spec
-depends_on: []
+depends_on: [DAEO-k7hz, DAEO-drhj]
 allowed_paths:
 - template/governance/kernel/skills/spec-writing/**
 - .claude/skills/spec-writing/**
@@ -50,6 +50,8 @@ track: B
 list_rows: []
 ---
 # W2-98 The spec-writing skill for product-spec
+
+**Dependencies (PLAN-GROWTH-1 §2 gaps 2 and 3):** after W2-11's round 1 (the skill template) and W2-104 (the skill harness, which runs its three scenarios before adoption, DEC-959 item 5).
 
 Card: ROLES-RESEARCH-1 §5.3 item 7, approved (DEC-959 item 8), with the owner's test-data section.
 

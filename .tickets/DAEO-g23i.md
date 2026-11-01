@@ -27,12 +27,13 @@ allowed_paths:
 kpis:
   success:
   - An R0 change runs only the LITE checks, and an R3 change raises the FULL gate and readiness rows, with the profile computed by gov impact [CAP-53.b].
-  - A close runs the tests gov impact names, on top of W2-66's path-scoped selection (W2-48's cache was withdrawn, DEC-880). The full suite runs at milestones and in CI [W2-H043, W2-M240, W2-M241, W2-M163].
+  - A close runs the tests gov impact names, on top of W2-66's path-scoped selection (W2-48's cache was withdrawn, DEC-880). The full suite runs only in the nightly [DEC-968, DEC-983, DEC-982] [W2-H043, W2-M240, W2-M241, W2-M163].
   failure:
   - A change whose impact misses a test that would fail is caught by the milestone run and recorded as a learning event.
 profile: FULL
 sources:
 - CAP-53.b
+- DEC-983
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-38/

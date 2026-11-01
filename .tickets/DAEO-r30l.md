@@ -28,15 +28,16 @@ kpis:
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
   - 'The gate also reads the shared disk: it shuts below a floor of free space and of free inodes (100 GiB and 10,000,000, set in the gate''s one configuration file); gov launch refuses to start a session while it is shut, naming the reading, and the reading is one function gov close can call before a close (its call is W2-07''s or W2-66''s, whose paths hold the close) [DEC-898 item 1]'
   - 'The gate opens on load only while min(1-minute load, 15-minute load) < nproc: a short peak does not shut it; both at or above nproc does [DEC-942 item 2, DEC-942 item 3, DEC-950 item 2]'
-  - 'The gate opens on memory only while MemAvailable plus the running sessions'' live memory (each one''s whole process tree, read at the check) is at least the floor + one verification run''s peak (reserved once) + a working size for each running session and for the new one; a session inside another live session''s process tree is counted in that one and charged no working size of its own [DEC-947, DEC-942 item 2, DEC-950 item 2]'
-  - 'No fixed number: no ceiling on leads or sessions, weighted or not; only the load, memory, disk, inode and (for a start that declares one) GPU conditions shut the gate [DEC-942 item 1, DEC-950 item 2]'
+  - 'The gate opens on memory while MemAvailable plus the running sessions'' live memory is at least the floor plus a working size for each running session and for the new one; nothing is reserved for a run that has not started [DEC-961, DEC-983, DEC-982]'
+  - 'Heavy jobs take a slot: a test run and a rebuild each wait for one of a configured number of machine-wide slots (the number in the gate''s configuration file, sized from a measure so that the load stays near the number of processors); sessions, reviews and single-process runs take no slot and are gated only by load, memory and disk; no other fixed ceiling on leads or sessions [DEC-979 item 1 D1, DEC-983, DEC-982]'
   - 'All values in one configuration file (floor, verification peak, working size, disk and inode floors, verification lock, GPU margin), each with its date and source; a value missing or malformed shuts the gate, naming it; the reading names a measured figure older than seven days as due for re-measure [DEC-947 item 3, DEC-950 item 2]'
   - 'The re-measure: gov resources records samples of each live session''s process-tree memory, noting whether a verification run holds the configured lock, and from them writes the verification peak (largest sample) and the working size (largest outside verification) with the date into the configuration file, showing old and new side by side [DEC-947 items 2 and 3, DEC-950 item 2]'
   - 'GPU, minimal: a start that declares a GPU need opens only when a GPU''s free memory, read with nvidia-smi, is at least the need plus 10%; no nvidia-smi or no GPU shuts such a start, named; a start with no declared need never reads the GPU [DEC-950 item 2, DEC-941 item 6]'
+  - 'The out-of-memory trip-wire: below a second, lower memory floor (in the configuration file), the gate names the largest heavy job and stops it before the kernel''s out-of-memory killer would end a session, and the stop is a finding; nothing else is stopped [DEC-947, DEC-983, DEC-982]'
   failure:
   - A session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
   - A launch or a close that starts with the disk below either floor; a gate that reads disk space but not inodes.
-  - 'Any fixed ceiling on leads or sessions.'
+  - 'Any fixed ceiling on leads or sessions other than the heavy-job slots (DEC-983).'
   - 'A value the gate uses not taken from the configuration file, or a reading that cannot be taken treated as met.'
   - 'A worker''s memory charged twice (in its lead''s tree and as its own session).'
 profile: STANDARD
@@ -50,6 +51,7 @@ sources:
 - DEC-947
 - DEC-950
 - DEC-954
+- DEC-983
 est_loc: 320
 acceptance_tests:
   path: tests/acceptance/W2-20/

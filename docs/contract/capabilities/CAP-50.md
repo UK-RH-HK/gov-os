@@ -1,7 +1,7 @@
 ---
 id: CAP-50
 type: capability
-status: PROPOSED
+status: ACCEPTED
 state_class: DERIVED
 title: Artifact flow, dependency consumption and end-to-end traceability
 depends_on:
@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-50: Artifact flow, dependency consumption and end-to-end traceability
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can tell which evidence becomes stale when a requirement changes.
 - **Acceptance:** Changing a requirement marks every dependent test result, packet and synthesis note stale, listed by id.

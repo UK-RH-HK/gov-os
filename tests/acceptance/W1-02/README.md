@@ -2510,6 +2510,136 @@ wall-clock limits that went red under load, by a limit a loaded machine meets or
   behaviour (DEC-580) and is not changed here; running those cases alone would cost every close minutes for one red
   seen at 2.6 times the machine's cores. That choice is returned to the lead as a package (W2-57's README).
 
+## Revision of DEC-951 item 2 (2026-10-31): the deadline cases slow the hook by a route the guard still takes
+
+`Rewrite-Reason: DEC-951 (P-B1-1); DEC-783 item 2; W2-L160`. Ticket `DAEO-0z8c` (W2-05), written by its independent
+test designer on `w2/W2-05-tests` from the ticket's head `04bd5e11b01b`, without reading the ticket's implementation.
+
+- **Why.** W2-L160, as W2-05 built it: the freeze look-up (`git rev-parse --git-common-dir` in the project, the first
+  program a decision starts) runs git by absolute path from the system folders, with a pinned environment and a limit
+  of its own of 15 s (DEC-783 item 2); it refuses when the look-up fails or times out, and never allows. The hook's
+  deadline stays 20 s (DEC-580). The ninth batch slowed the hook through a stand-in `git` first on the hook's search
+  path, which the look-up no longer starts. 14 cases went red at `04bd5e11b01b`: 11 in `test_w1_02_deadline.py`, 2 in
+  `test_w1_02_deadline_in_time.py`, 1 in `test_w1_02_unknown_tools_failure.py`. A Read, a Write, a `MultiEdit` and the
+  tools the guard does not know started no stand-in at all (answered in 0.4 s); a Bash call by an engineer whose first
+  stand-in did not end was allowed after about 10.5 s, its stand-in's child still running.
+- **The routes now** (`w1_02_deadline_support.py`, its head). Never a `git` first on the search path for a revised
+  case, never a slow machine, a weaker rule or a switch of the product:
+  - **the repository's own configuration file as a named pipe** (`Call.config_after`, class `_ConfigPipe`): the
+    temporary project's `.git/config` is replaced by a pipe just before the hook starts. Every git that opens the
+    repository, the look-up's real git first, waits on it; the case serves the file's real content to each such git
+    from `config_after` seconds after the hook's start, and then git runs as it would. `NEVER` serves nothing: the
+    look-up does not end. Afterwards the case lets go whoever still waits and puts the real file back. The processes
+    the hook starts are seen in the project (their working folder, or an argument naming the project), every 0.25 s
+    while the hook runs; that is how "nothing the hook started is left running" is held for them;
+  - **the named pipe among the pending calls**, as in the ninth batch, for a slow step after the look-up (point 4);
+  - **that pipe let go late** (`Call.release_after`): the case opens and closes it that many seconds after it sent
+    the input, so that the bookkeeping step ends (the late input).
+  - The stand-in stays, unchanged, for the cases whose slow program the hook still starts from its search path (the
+    bookkeeping of a Bash call: four starts per call at `04bd5e11b01b`); it goes on the search path only for a call
+    that names `sleeps` or `every` (`Call.stand_in`), no longer for every call.
+- **The look-up's 15 s, taken in.** A case whose slow step is the look-up is held to a refusal in a rule's form (exit
+  code 0, a deny decision with a reason; `refusal_of`), not before `LOOK_UP_LOWER_S` = **14.5 s** (the limit less half
+  a second for a clock's grain: the look-up was waited for) and by `LOOK_UP_UPPER_S` = **21 s** (the limit and the
+  same 6 s for a loaded machine that the deadline's 26 s gives to its 20 s), on the test's clock from the start of
+  the hook's process to its end (`assert_refused_by_the_look_up_s_limit`). The reason's words are not held there:
+  DEC-783 item 2 gives a limit, not a text. An allowed or unanswered call still fails with "the guard keeps no deadline
+  of its own", in this check and in `assert_refused_at_the_deadline`, which is unchanged.
+- **DEC-580's 20 s, kept.** Every case that showed the deadline (point 4, the late input, and the three cases already
+  on pipes) still shows it, by a slow step the 15 s does not cover, with its reason (DEC-580 and "could not decide in
+  time") and its window: not before 19 s, by 26 s.
+- **The code under test.** The hook processes import the package beside this folder: `support.hook_environment` sets
+  `PYTHONPATH` to `REPO_ROOT/src` (`REPO_ROOT` is three folders above `w1_02_support.py`), and
+  `w1_02_deadline_support.py` puts the same folder first on `sys.path` before it imports the bookkeeping names. Keep
+  both so: a run of this worktree's suite tests this worktree's `src/`, whatever `PYTHONPATH` the run has.
+
+| Case (labels unchanged) | Slow step now | Held | Red when |
+|---|---|---|---|
+| `test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused` `[a-Bash-call-by-an-engineer-whose-first-program-does-not-end]`, `[a-Write-by-the-orchestrator-…]`, `[a-Read-by-a-session-with-no-role-…]` (3) | the look-up's real git, the configuration never served | a refusal in a rule's form, 14.5 s to 21 s | the call is allowed, or answered otherwise than by a refusal; answered before 14.5 s (the look-up not waited for) or after 21 s; no answer by 32 s. Not told apart: a look-up with no limit of its own whose call the deadline refuses at about 20 s falls inside 21 s; the look-up's limit itself is W2-05's to hold |
+| `…::test_a_decision_still_running_at_the_deadline_is_refused` `[a-Bash-call-by-an-engineer-whose-input-comes-late-and-whose-first-program-is-slow]` (1) | the input after 2 s, then the pending calls' pipe, let go 19.5 s after the input | the deadline's refusal (DEC-580, "in time"), 19 s to 26 s | a deadline counted from the input's end (the step ends at 21.5 s and the call goes on), or any of the deadline's reds |
+| `…::test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off` (5) | the pending calls' pipe, never let go | the deadline's refusal, 19 s to 26 s | a field, variable or file that moves or switches off the deadline; no deadline |
+| `…::test_the_deadline_s_refusal_carries_nothing_of_the_call` (1, over all 12 processes) | as above | every answer a refusal in a rule's form, none carrying a value of the call | an answer not a refusal, or carrying the call's words, its paths or a protected file's path |
+| `…::test_nothing_the_hook_started_is_left_running_after_its_answer` (1) | the stand-in (the orchestrator's Bash call), the real git (the three look-up cases) | the stand-in was started, or a process of the hook was seen in the project; none left 5 s after the answer | a git or another process of the hook still in the project 5 s after its answer |
+| `test_w1_02_deadline_in_time.py::test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed[a-Read-by-a-session-with-no-role]` (1) | the look-up's real git, the configuration served after 4 s | the configuration was served (or the stand-in started); answered at 4 s or later; allowed, no finding | allowed before the slow step ended; refused; a finding; the deadline's answer |
+| `…::test_a_step_that_ends_before_the_deadline_leaves_a_refused_call_refused_with_its_own_reason` (1) | the same, for the engineer's Write outside its ticket | refused with the reason the same call has at once | a reason changed by a slow step that ended in time; any red above |
+| `test_w1_02_unknown_tools_failure.py::test_a_decision_that_cannot_end_is_a_refusal_for_a_tool_of_the_round[a-MultiEdit-inside-the-ticket-s-paths-by-an-engineer]` (1) | the look-up's real git, the configuration never served | refused (deny), by 26 s | the call allowed, or no answer by 26 s |
+
+The other four calls of that last block (a made-up tool, an MCP tool, `Monitor`, a `MultiEdit` with no role) were
+green at `04bd5e11b01b` without starting the stand-in: they were refused at once. They move to the same route, since
+the block's text says "the first program the hook starts does not end"; they stay green (refused after 15.6 s to
+16.7 s, the look-up running first, by 26 s). The Bash call by an engineer of the in-time module, its tiny-limit call
+with a slow step and the orchestrator's Bash call whose every program takes a few seconds keep the stand-in: their
+programs are the Bash bookkeeping's, which the hook still starts from its search path.
+
+**Measured** (2026-10-31, load about 90 to 100 on this machine, the 19 revised and kept calls side by side): the
+three look-up cases refused after 15.6 s to 15.9 s, two processes of the hook seen in each project, none left; the
+deadline cases after 20.2 s to 20.9 s; the in-time Read and Write after 4.2 s, the configuration served twice to each;
+the five calls of the unknown-tools block after 15.7 s to 16.7 s. At a load of about 140, a look-up refusal took 18 s
+to 20 s (about 3 s of the hook's own start). The three files: 47 passed in 67 s.
+
+**Not kept, returned as a package (P-W1-02-CHILD).** The ninth batch's first call had the stand-in start a child of
+its own, so that "nothing the hook started is left running" covered a grandchild of the hook. The look-up's
+`rev-parse` starts no child, and no route the guard still takes, other than a program on the search path, gives the
+look-up's git one. The check for a child (`WITH_A_CHILD`) stays in the case and is empty now. The Bash bookkeeping's
+programs, started from the search path, are where a grandchild would still be met: at `04bd5e11b01b`, the ninth
+batch's call left one running after the hook allowed the call at 10.5 s.
+
+## Revision of DEC-802 (P-B1-2, 2026-10-31): the Bash bookkeeping's cases on routes that still reach it
+
+`Rewrite-Reason: DEC-951 (P-B1-1); DEC-802 (P-B1-2): the Bash bookkeeping starts git by absolute path; W2-L160`.
+Ticket `DAEO-0z8c` (W2-05), written by its independent test designer on `w2/W2-05-tests` from the ticket's head
+`f217353e59fa`, under DEC-906's repair batch, without reading the ticket's implementation.
+
+- **Why.** The previous revision (`a8b9cd07e1ae`) kept a stand-in `git` first on the search path for the cases whose
+  slow step is the Bash bookkeeping (the git calls the hook makes around a Bash call). The ticket's batch 2 then
+  gave that bookkeeping git by the same absolute path as the freeze look-up (the system folders, never by name from
+  `PATH`; refused, never passed, when no git is found). The stand-in was never started, and five cases went red at
+  `f217353e59fa` for that reason alone: the orchestrator's Bash call whose every program takes a few seconds was
+  allowed after 0.4 s to 1.2 s (three cases through that call), and the two slow Bash calls of the in-time module
+  failed "the hook neither started the stand-in program nor waited on the repository's configuration".
+- **What the hook's real git does with the repository's configuration** (measured black-box, 2026-10-31, the
+  project's `.git/config` as a pipe that logs each opening and the process that holds it): an allowed Bash call
+  opens it 13 to 26 times from five git processes, one look-up (`-C <project>`) and four of the bookkeeping; a Read
+  opens it twice, from the look-up alone. The number of openings per process varies from run to run (two to nine
+  for the look-up); the number of processes was the same in every run. So a pipe paced per opening cannot keep the look-up inside
+  its 15 s (at 2.5 s per opening the look-up's limit refused at 15.5 s); a pipe paced per process can.
+- **The routes now** (`w1_02_deadline_support.py`). The stand-in is gone from the support (`_STAND_IN`,
+  `_make_stand_in`, `Call.sleeps`, `every`, `child`, `stand_in`, `Outcome.stand_in_starts`, `children`): no case
+  used it any more. Added:
+  - **the repository's configuration paced by program** (`Call.config_every`, `_ConfigPipe(every=...)`): each git
+    process that opens the pipe is held `config_every` seconds the first time, and served at once on its later
+    openings. The process is the one that holds the pipe open, read from `/proc` (`FIND_READER_S` = 1 s to find
+    it; one not found is held as a new one), never from its arguments. Once the hook has answered, nothing more is
+    served: a git the hook left behind stays where it waits, is seen in the project, and counts as left running.
+    `Outcome.held` is the number of processes held;
+  - **the bookkeeping's pipe let go, recorded** (`Outcome.released`): whether the case let go a pipe among the
+    pending calls on which the hook waited.
+
+| Case | Slow step now | Held (unchanged) |
+|---|---|---|
+| `test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused[a-Bash-call-by-the-orchestrator-whose-every-program-takes-a-few-seconds]` | every git the hook starts held 5.5 s, once (`config_every=A_FEW_SECONDS`): the look-up ends after one such step, inside its 15 s; the bookkeeping's four pass 20 s together, none of them near it | the deadline's refusal (DEC-580, "in time"), not before 19 s, by 26 s |
+| `…::test_the_deadline_s_refusal_carries_nothing_of_the_call` | the same call, among the twelve | every answer a refusal in a rule's form, none carrying a value of the call |
+| `…::test_nothing_the_hook_started_is_left_running_after_its_answer` | the same call: a git of the hook seen in the project, and held by the configuration (was: the stand-in's own record) | none of them still running 5 s after the answer |
+| `test_w1_02_deadline_in_time.py::test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed[a-Bash-call-by-an-engineer]` | the bookkeeping before the decision waits on a pipe among the pending calls, let go 4 s after the input | the pipe was let go (or the configuration served); answered at 4 s or later; allowed, no finding, the bookkeeping noted for the check after the call; not the deadline's answer |
+| `…::test_a_tiny_limit_named_stops_no_work[a-Bash-call-by-an-engineer-with-a-tiny-limit-named-and-a-slow-step]` | the same pipe, beside the tiny limit's fields, variables and files | the same, allowed as today |
+
+The slow-step check of the in-time module now reads "the hook neither waited on the repository's configuration nor
+on a pipe of its bookkeeping". "The guard keeps no deadline of its own" stays reachable unchanged: it is the message
+of `assert_refused_at_the_deadline` and `assert_refused_by_the_look_up_s_limit` for an unanswered or allowed call,
+neither of which this revision touches. Measured: with every opening held 1 s, the steps ended just inside 20 s on
+the hook's clock and the call was allowed at 20.2 s, which `refusal_of` rejects. Not measured, by arithmetic: with
+five processes held 5.5 s each and no deadline, the call would be allowed after about 28 s (outside 26 s) or have
+no answer by 32 s.
+
+**Measured** (2026-10-31, inside the launched sandbox, load about 70): the orchestrator's paced call refused at
+20.1 s with DEC-580's reason, four gits held, five seen, none left; the two in-time Bash calls allowed after 4.3 s
+and 4.4 s, the pipe let go, the bookkeeping noted, no finding. The three files: 47 passed in 48 s.
+
+**P-W1-02-CHILD is unchanged.** The child check (`WITH_A_CHILD`) was empty since `a8b9cd07e1ae`; it goes with the
+stand-in whose child it counted, and the case's docstring names the package. The package's question (where a
+grandchild of the hook could still be met, now that no git of the hook is started from the search path) is the
+orchestrator's, as before.
+
 ## Not tested
 
 Tenth batch (DEC-685), each with its reason under "The forms not held" there: the count of an allowed `MultiEdit`

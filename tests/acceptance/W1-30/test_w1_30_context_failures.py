@@ -1,5 +1,7 @@
 """A ticket whose context cannot be built does not close (KPI S5 "packet hash", S6 "with whole-system context
-from gov context"; DEC-454 "A context that cannot be built refuses the close"; DEC-455: it is one iteration).
+from gov context"; DEC-454 "A context that cannot be built refuses the close"). Since DEC-868 item 3 (DEC-455's
+"counted iteration" for a context failure changed, DEC-908) the refusal is the pre-close gate's: at once, before
+any test, and not counted.
 
 ``tests/acceptance/W1-24/README.md`` gives the errors ``gov context`` has for a ticket (its S5 line and its
 command section):
@@ -11,28 +13,34 @@ command section):
 
 One case each. Each first runs ``gov context`` in its project and holds that it gives that error, so the case
 cannot pass on a project whose context builds. Then ``gov close`` on the ticket, which is otherwise green and
-clean: refused with exit code 3, the answer says the context failed and names the record, no close record, the
-ticket in progress, and the refusal counted as one iteration.
+clean: refused with exit code 3 by the pre-close ``gov check`` (its ``context-reproducibility`` check RED), the
+answer says the context failed and names the record, no test runs, no close record, the ticket in progress, and
+no attempt is spent.
 
 The decision checker (W1-11) being unable to run is the fifth reason. ``tests/acceptance/W1-11/README.md``: a
 history the checker cannot read raises ``GovError`` (a shallow clone, DEC-387). The case holds first that the
-checker raises in its project.
+checker raises in its project. There ``gov context`` builds and ``gov check`` is green, so the pre-close gate does
+not see it: the close runs the tests and refuses at its own context step, counted. Which refusal DEC-868 item 3
+gives a checker that cannot run is not settled (W2-67 run 3, batch 6, package P-W2-67-TD6-1); until it is, the
+case holds the counted refusal it held before.
 
 No record store is the sixth (DEC-470): ``gov context`` answers ``STORE_MISSING`` in a project whose store was
-never loaded. The close is refused with that reason and counted, and it does not build the store itself:
-after the refusal ``gov context`` still answers ``STORE_MISSING``. So every other project of this suite is
+never loaded. The close is refused with that reason, at once and not counted, and it does not build the store
+itself: after the refusal ``gov context`` still answers ``STORE_MISSING``. So every other project of this suite is
 given its store by its fixture (``support.run_close`` loads it before the close, or the case does and passes
 ``store=False``); the cases here are the only ones that close without one.
 
 Last, a failing close that is given a class (DEC-454: "with it, the context is built first and its hash is
-recorded"): when that context cannot be built, the answer and the repair ticket say so and carry no hash.
+recorded"): when that context cannot be built, the pre-close gate refuses at once, before the failing tests run,
+and the answer and the repair ticket say so and carry no hash.
 
 **Revised for W2-07 (DEC-868 item 3; DEC-455's "counted iteration" for a context failure changed, DEC-908).** A
 context that cannot be built turns the kernel's ``context-reproducibility`` check RED, and ``gov check`` runs on
 every close as the pre-close gate. So the close refuses at once, naming that check, before any test runs (the
 ticket's acceptance test tells into a folder outside the project whenever it runs, and does not), states no test
 run, and spends no attempt (``counted: false``, the count stays 0). The refusal still names the record and the
-context's reason where the check carries them.
+context's reason where the check carries them. This docstring was brought to the same rules by W2-67 (row
+W2-L420).
 """
 
 import re

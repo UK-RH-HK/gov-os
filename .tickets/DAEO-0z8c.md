@@ -35,6 +35,7 @@ kpis:
 profile: FULL
 sources:
 - DEC-710
+- DEC-971
 est_loc: 140
 acceptance_tests:
   path: tests/acceptance/W2-05/
@@ -53,6 +54,8 @@ list_rows:
 - W2-M281
 ---
 # W2-05 The git environment of every check, hook and helper; the settings re-sort
+
+**DEC-971 item 3 (owner, 2026-10-31), package H (a), refined:** DEC-805's comparison of the template's hooks source with this repository's (`src/gov/adapters/portability.py`, the adapter-portability check, inside this ticket's `src/gov/**/*.py`) gets an exception covering **exactly the two hook events ACT 1 lifted** (`postToolUse` and `postToolUseFailure`), **named in the comparison**, and **ending when those events return** (with W2-08). A test designer revises the two cases (`test_adapter_portability_is_green_over_this_repository_s_two_hooks_sources`, `test_this_repository_s_two_hooks_sources_agree`) to the exception, lowering nothing else. R3-1 is W2-08's entry criterion (DEC-971 item 3).
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-05), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
