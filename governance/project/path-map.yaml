@@ -4,6 +4,7 @@
 state_class: AUTHORITATIVE
 
 namespaces:
+  # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the root files are embedded.
   root-files:
     paths: ["*"]
     memory_class: governance
@@ -11,7 +12,7 @@ namespaces:
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: allowed
-    embedding_policy: not embedded
+    embedding_policy: embedded
     provenance: written by hand under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
   agent-settings:
@@ -57,6 +58,8 @@ namespaces:
   # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
   # orchestration record moved to the branch record/w2; only its searchable part (the README, the sync script,
   # packages, session summaries and the checkpoint copy) stays in this tree, under this namespace.
+  # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the overlay is embedded. Its sensitivity and export policy
+  # stay as they are: the indexer reads embedding_policy only.
   project-overlay:
     paths:
       - "governance/*"
@@ -80,7 +83,7 @@ namespaces:
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: kept in git history
     export_policy: denied
-    embedding_policy: not embedded
+    embedding_policy: embedded
     provenance: the project overlay, written by the orchestrator or under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
   # DEC-887 (owner, 2026-10-21): the raw orchestration record (DEC-856's `orchestration-record` namespace) lives on
@@ -166,14 +169,26 @@ namespaces:
     embedding_policy: not embedded
     provenance: synthetic product repositories, written under a ticket; stand-ins for product data, kept out of governance memory
     deletion_rebuild: authoritative; restored from git only
+  # DEC-957 (owner, 2026-10-30; MEMORY-SPEC-MAP gap 1): the old carried cli/ stays out; schemas/ has the namespace
+  # below it and is embedded.
   carried-code:
-    paths: ["cli/**", "schemas/**"]
+    paths: ["cli/**"]
     memory_class: governance
     sensitivity: internal
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
     retention: until the tickets that reuse it have ported it into src/gov/; then removed
     export_policy: allowed
     embedding_policy: not embedded
+    provenance: carried from the earlier implementation (ADR-0002 §5); not authoritative for the Gov OS
+    deletion_rebuild: removed after porting; restored from git only
+  carried-schemas:
+    paths: ["schemas/**"]
+    memory_class: governance
+    sensitivity: internal
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: until the tickets that reuse it have ported it into src/gov/; then removed
+    export_policy: allowed
+    embedding_policy: embedded
     provenance: carried from the earlier implementation (ADR-0002 §5); not authoritative for the Gov OS
     deletion_rebuild: removed after porting; restored from git only
 
