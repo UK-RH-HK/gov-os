@@ -12710,3 +12710,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.399 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1017. Next free id: DEC-1018. |
+
+### DEC-1018 — The main tree clean for the 04:00 nightly; W2-122 and W2-123 started at once, ahead of every other lead; the guard's acceptance-folder fix now; tonight's handover
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; item 1 standing) · **Under:** DEC-973, DEC-1014, DEC-958, DEC-994, DEC-1012
+- **Decision:** (1) The nightly runs at 04:00 (DEC-973, ACT-NIGHTLY-0400), not 02:00 as the orchestrator wrote tonight. The main tree must be clean when it starts: on 2026-11-01 it never started ("by the latest start, the main tree is not clean"). Mechanism: the dispatcher claims no landing from 03:15 until the nightly has started (its `NIGHTLY-RUNNING` marker or today's status line), or 05:30 at the latest (dispatcher v4.3). The night session makes no commit and leaves no file in the main tree from 03:15 until then. The handover and the prompt say 04:00. (2) W2-122 and W2-123 start now, ahead of every other lead, even if fewer other leads run meanwhile. They are started past the dispatcher's memory admission, on this order only (`tools/start_owner_order.sh`), after its readiness checks, recorded in `started.txt` under its tick lock. (3) The guard: 57 of 61 refusals since ACT 1 were false, far past DEC-958's threshold. The fix for the acceptance-folder rule is designed and measured now (ACT-GUARD-FIX-3), not held until the hooks return. (4) Tonight as planned: the handover before 02:00, the sentinel started, and the fresh session's test push.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.400 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1018. Next free id: DEC-1019. |
