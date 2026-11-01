@@ -12378,3 +12378,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.369 | 2026-11-01 | Delegated (orchestrator): DEC-986 (W2-114's check module in its paths). Next free id: DEC-987. |
+
+### DEC-987 — P-W2-96-R4 (a): W2-96's W1 fixed now, the two cases first, a third review of that change alone (the owner's exception to DEC-916)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`) · **Under:** DEC-916, DEC-959 item 6, MR-3 · **Changes:** DEC-916's two-review limit, for W2-96's run 2 round only · **Basis:** `packages/P-W2-96-R4.md` (`1aae2867`)
+- **Decision:** W2-96's review-4 finding W1 (after a stop of `gov accept` while a suite has started processes in a session of their own, test-named folders stay in the caller's temporary folder) is fixed now: first a fresh independent test designer writes the two cases in the harness's form (red on the head); then an engineer makes `gov` stop and reap every process the run started, whatever its session (a Linux subreaper), before its clean-up (about 30 to 40 lines); then **a third review of that change alone**, the owner's exception to DEC-916 for this ticket; then the scoped run and the probe record.
+- **Where it goes (DEC-851):** this register (DEC-916 marked for W2-96); W2-96's resume brief.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.370 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-987 (P-W2-96-R4 (a), a third review for W2-96). Next free id: DEC-988. |
