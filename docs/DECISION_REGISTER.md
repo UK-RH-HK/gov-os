@@ -12358,3 +12358,14 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.367 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-984 (the nightly takes all three heavy-job slots while its suites run). Next free id: DEC-985. |
+
+### DEC-985 — W2-97's P-W2-97-ENQ-1 (b); its resume takes DEC-983's KPI changes (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: the lead's P3, inside the ticket's paths, no KPI lowered; for the owner to overturn) · **Under:** DEC-959 item 1, DEC-983 item 4, DEC-906 · **Basis:** `log/W2-97-A5-run1-dec979.json` (00:21, PACKAGES)
+- **Decision:**
+  1. **P-W2-97-ENQ-1 (b):** the lead's interface spec names `enqueue --repo <repo>` (default: the current folder), which the tool already has; a fresh independent test designer adds `--repo` to the case's helper (one line, `Rewrite-Reason: P-W2-97-ENQ-1`), no other expectation lowered; then the engineer's one acceptance run, the rebuild and the scoped run.
+  2. **W2-97's resume carries DEC-983's two KPI changes** (its lead started before them): the full suite never runs in the queue (only in the nightly), and the queue's run takes a heavy-job slot (`verify_lock.sh` / `heavy_slot.sh`), not a test lock.
+- **Where it goes (DEC-851):** this register; W2-97's resume brief.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.368 | 2026-11-01 | Delegated (orchestrator): DEC-985 (P-W2-97-ENQ-1 (b); W2-97's resume takes DEC-983's KPIs). Next free id: DEC-986. |
