@@ -12412,3 +12412,13 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.372 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-989 (the last nightly with a verdict as the baseline until a green one after ACT 1; merge and close one step through the queue). Next free id: DEC-990. |
+
+### DEC-990 — P-W2-97-PM-1 (a): the path map's project overlay holds the orchestration tools folder (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220 and DEC-936 item 2.5; P2, reversible; the lead's recommendation and mine agree; confidence high) · **Under:** DEC-959 item 1, DEC-988 item 1, DEC-989
+- **Context:** W2-97's merge queue lives at `governance/project/orchestration/tools/` (its ticket fixes the place). The `project-overlay` namespace of `governance/project/path-map.yaml` lists the orchestration folder's subfolders one by one and not `tools/**`, so the two new tracked files fall in no namespace: W1-08's "every tracked path matches exactly one namespace" case and `core-pathmap` go red. Nobody in W2-97 may write the path map.
+- **Decision:** add `governance/project/orchestration/tools/**` to `project-overlay` (governance, not embedded, like its siblings). W2-86's branch edits the `kernel-template` block of the same file, a different hunk.
+- **Where it goes:** the path map; this register.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.373 | 2026-11-01 | Orchestrator (delegated): DEC-990 (P-W2-97-PM-1 (a), the tools folder in the project overlay). Next free id: DEC-991. |
