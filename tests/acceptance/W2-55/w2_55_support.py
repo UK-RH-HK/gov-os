@@ -346,8 +346,12 @@ def naming(found, code=None, entry_id=None):
     return [f for f in found if (code is None or f["code"] == code) and (entry_id is None or entry_id in f["ids"])]
 
 
-def holds_number(message, number):
-    return re.search(rf"(?<!\d){number}(?!\d)", message) is not None
+def names_line(message, rel, number):
+    """The message names the place ``rel`` at line ``number``: ``<rel>:<number>`` or ``line <number>``, the number
+    not followed by another digit (a lone digit elsewhere, in a path or an id, is no line)."""
+    at_place = rf"{re.escape(rel)}:{number}(?!\d)"
+    in_words = rf"(?<![\w-])line {number}(?!\d)"
+    return re.search(f"{at_place}|{in_words}", message) is not None
 
 
 def entries_of(item, register_text):
