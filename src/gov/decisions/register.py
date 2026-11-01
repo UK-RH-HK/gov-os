@@ -56,7 +56,7 @@ def _entry(live: dict) -> dict:
     fields = [(name.strip(), text) for name, text in _FIELD.findall(status_line)]
     successor = _SUCCESSOR.match(status_line.split("**Status:**", 1)[-1])
     entry = {"id": live["id"], "title": live["title"], "line": live["line"], "status": live["status"],
-             "status_line": status_line, "tags": None, "values": [], "kept": {},
+             "status_line": status_line, "span": live["span"], "tags": None, "values": [], "kept": {},
              "successor": successor.group(1) if successor else None, "supersedes": [], "changes": [],
              "named": ids(status_line.split("**Status:**", 1)[-1].split("·", 1)[0]),  # the ids its status word names
              "changed_by": [i for name, text in fields if name == "Changed by" for i in ids(text)]}
