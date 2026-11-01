@@ -18,7 +18,6 @@ answer, or the record graph cannot be read, nothing is decided here and the requ
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 
@@ -56,7 +55,7 @@ def _nowhere(root: Path, query: str, named: list[str] = ()) -> tuple[list[str], 
         answer = lexical.search(root, name, refresh=False)
         if not answer["available"]:
             return None
-        whole = re.compile(rf"(?<![\w-]){re.escape(name)}(?![\w]|-\w)")
+        whole = lexical.whole_id(name)
         if any(whole.search(hit["text"]) for hit in answer["hits"]):
             return None
     return names, {"available": True, "reason": None}

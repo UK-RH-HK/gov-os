@@ -21,10 +21,16 @@ function's ``def`` line). ``search`` gives two lists:
   FTS5 finds the chunks that hold the question's tokens as a phrase, and the lines are then matched exactly, so a
   string that starts or ends inside a token is matched only where it is a whole token: the choice of W2-M072 and
   W2-M100 is whole tokens. The hits come by path and line, as before W2-13, each named by the first chunk that holds it.
-- ``ranked``, the chunks for the fusion, best first: the exact route's chunks first (the boost, so an exact
-  identifier ranks first), then at most ``TOP_K`` more chunks that match the question's words (W2-M292). A word is
+- ``ranked``, the chunks for the fusion, best first: the boosted chunks first, marked ``exact`` (the boost, so an
+  exact identifier ranks first, KPI success 1), then at most ``TOP_K`` more chunks that match the question's words
+  (W2-M292), not ``exact``. A chunk is boosted when it holds the exact route's string (a hit's chunk), or when it
+  holds verbatim, case and all and as a whole token (``whole_id``), an id the question holds among other words
+  (``ids_in``): asked ``QX-4471 gauge reading``, the chunks that hold ``QX-4471`` come first, though no line holds
+  the whole question and ``hits`` stays empty. The boosted chunks are found by one FTS5 query, the question as a
+  phrase or any of its ids as one, and come in that query's BM25 order; every chunk is in the list once. A word is
   matched as a whole token, case-folded and Porter-stemmed (the tokenizer's); an id in the question is matched as
   its tokens in a row; the words of ``STOPWORDS`` are not asked. Each chunk carries its ``bm25`` (lower is better).
+  A question costs two FTS5 queries at most: the boost's and the words'.
 
 A store whose ``lexical_fts`` lacks these columns (built before W2-13) is stale: ``search(refresh=False)`` reports it
 unavailable, and a refresh drops the old index and builds it again. ``search`` never raises: an unreadable store or
@@ -123,6 +129,13 @@ def _tracked(root: Path) -> dict[str, str]:
 def ids_in(text: str) -> list[str]:
     """The id-shaped tokens of ``text``, each once, in order."""
     return list(dict.fromkeys(name for name in ID_SHAPE.findall(text) if any(char.isdigit() for char in name)))
+
+
+def whole_id(name: str) -> re.Pattern:
+    """``name`` verbatim as a whole token: no word character or ``-`` before it, and after it neither a word
+    character nor a ``-`` that a word character follows (``DEC-12`` is held by ``DEC-12.`` and ``DEC-12-``, not by
+    ``DEC-123`` or ``DEC-12-b``)."""
+    return re.compile(rf"(?<![\w-]){re.escape(name)}(?![\w]|-\w)")
 
 
 def _lead_id(line: str) -> str | None:
@@ -386,15 +399,19 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
 def _ranked(connection: sqlite3.Connection, query: str) -> dict:
     """``hits`` and ``ranked`` of ``query`` in the open, fresh index."""
     keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "bm25")
+    names = [name for name in ids_in(query) if name != query][:MAX_TERMS]  # the ids it holds among other words
     if any(char.isalnum() or char == "_" for char in query):
-        # FTS5 finds the chunks that hold the query's tokens as a phrase; the lines are then matched exactly.
-        rows = connection.execute(_RANKED_TEXT, (_phrase(query),))
+        # FTS5 finds the chunks that hold the query's tokens, or an id's, as a phrase; they are then matched exactly.
+        rows = connection.execute(_RANKED_TEXT, (" OR ".join(map(_phrase, [query, *names])),))
     else:  # no token to match by: every chunk is read
         rows = connection.execute("SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, NULL, f.text "
                                   "FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
                                   "ORDER BY c.path, c.start_line")
-    rows = [row for row in rows if any(query in content for content in row[-1].splitlines())]
-    ranked = {row[0]: {**dict(zip(keys, row[:-1])), "exact": True} for row in rows}  # in bm25 order
+    held = [whole_id(name) for name in names]
+    rows = [(row, any(query in content for content in row[-1].splitlines())) for row in rows]
+    rows = [(row, hit) for row, hit in rows if hit or any(pattern.search(row[-1]) for pattern in held)]
+    ranked = {row[0]: {**dict(zip(keys, row[:-1])), "exact": True} for row, _ in rows}  # the boost, in bm25 order
+    rows = [row for row, hit in rows if hit]  # the exact route's chunks: those that hold the whole string
     hits, seen = [], set()
     for chunk_id, path, start_line, _, parent_id, _, text in sorted(rows, key=lambda row: (row[1], row[2])):
         for line, content in enumerate(text.splitlines(), start_line):
