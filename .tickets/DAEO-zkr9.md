@@ -1,7 +1,7 @@
 ---
 id: DAEO-zkr9
 status: open
-deps: [DAEO-wq2b, DAEO-emq1, DAEO-r30l, DAEO-h4rh]
+deps: [DAEO-wq2b, DAEO-emq1, DAEO-r30l]
 links: []
 created: 2026-10-31T23:52:57Z
 type: task
@@ -18,7 +18,6 @@ depends_on:
 - DAEO-wq2b
 - DAEO-emq1
 - DAEO-r30l
-- DAEO-h4rh
 allowed_paths:
 - src/gov/queue/**
 - src/gov/cli/main.py
@@ -45,7 +44,7 @@ list_rows: []
 ---
 # W2-117 The merge queue in the product
 
-The owner's SMART-WORK-1 decision 3 (DEC-983): after EXAMIN's copy (Wave 3 work, in the WBS for its order).
+The owner's SMART-WORK-1 decision 3 (DEC-983); moved before EXAMIN's copy by DEC-1010 item 5, so the dispatcher (W2-121) lands batches through it and EXAMIN gets test-before-merge.
 
 - **Why:** W2-97 builds this repository's queue as its own tool (`governance/project/orchestration/tools/`), which is right for now; an adopted product with streams needs it as a `gov` command. EXAMIN's copy runs one LITE ticket, which needs no queue.
 - **Order:** after W2-97 (measured in use here first), W2-115 (its attribution), W2-20 (its slots) and W2-27 (EXAMIN's copy).
