@@ -25,6 +25,7 @@ kpis:
   - '`gov rebuild --seed <store folder>` copies a warm base''s stores (the lexical, semantic and code-graph stores and the secrets cache''s entries) into the tree before rebuilding, then rebuilds incrementally: only files whose content differs from the base are re-embedded; the result is the same store, entry for entry, as a cold rebuild of the same tree (checked on a planted repository: the digests and every chunk''s vector equal) [DEC-1014, SIZING-1]'
   - 'A seed whose code fingerprint, embedder model or schema differs from the tree''s is refused, named, and the rebuild runs cold (fail closed: never a store that mixes two embedders) [DEC-1014]'
   - 'Measured, in docs/changes/W2-122-evidence.md: a new worktree''s first rebuild seeded from the integration store against a cold one, alone and with two others running, on this repository (the semantic stage''s seconds and the embedding requests sent) [DEC-1014, DEC-996 item 3 A]'
+  - 'A product feature for every adopted repository: the warm base is the project''s configured integration store (W2-116''s, a path in the project''s configuration), never a path of this repository in the code; a project without one rebuilds cold, named [DEC-1014 item 6, DEC-982]'
   failure:
   - 'A seeded store that differs from a cold rebuild''s; a seed from another embedder or schema used [DEC-1014]'
 profile: STANDARD
