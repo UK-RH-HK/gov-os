@@ -20,7 +20,7 @@ function's ``def`` line). ``search`` gives two lists:
 - ``hits``, the exact route (CAP-11): every line that holds the exact string, case and all, with its file and line.
   FTS5 finds the chunks that hold the question's tokens as a phrase, and the lines are then matched exactly, so a
   string that starts or ends inside a token is matched only where it is a whole token: the choice of W2-M072 and
-  W2-M100 is whole tokens. The hits come in the BM25 order of their chunks, then by line.
+  W2-M100 is whole tokens. The hits come by path and line, as before W2-13, each named by the first chunk that holds it.
 - ``ranked``, the chunks for the fusion, best first: the exact route's chunks first (the boost, so an exact
   identifier ranks first), then at most ``TOP_K`` more chunks that match the question's words (W2-M292). A word is
   matched as a whole token, case-folded and Porter-stemmed (the tokenizer's); an id in the question is matched as
@@ -393,15 +393,15 @@ def _ranked(connection: sqlite3.Connection, query: str) -> dict:
         rows = connection.execute("SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, NULL, f.text "
                                   "FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id "
                                   "ORDER BY c.path, c.start_line")
-    hits, seen, ranked = [], set(), {}
-    for *record, text in rows:
-        chunk_id, path, start_line, _, parent_id, _ = record
+    rows = [row for row in rows if any(query in content for content in row[-1].splitlines())]
+    ranked = {row[0]: {**dict(zip(keys, row[:-1])), "exact": True} for row in rows}  # in bm25 order
+    hits, seen = [], set()
+    for chunk_id, path, start_line, _, parent_id, _, text in sorted(rows, key=lambda row: (row[1], row[2])):
         for line, content in enumerate(text.splitlines(), start_line):
             if query in content and (path, line) not in seen:
                 seen.add((path, line))
                 hits.append({"path": path, "line": line, "text": content, "chunk_id": chunk_id,
                              "parent_id": parent_id})
-                ranked.setdefault(chunk_id, {**dict(zip(keys, record)), "exact": True})
     words, added = _words(query), 0
     if words:
         for record in connection.execute(_RANKED_TOP, (words, TOP_K + len(ranked))):

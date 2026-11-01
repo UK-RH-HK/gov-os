@@ -71,7 +71,7 @@ def test_a_word_is_matched_as_a_whole_token(root):
 
 def test_the_id_column_ranks_the_entry_an_id_heads_first(root):
     answer = _ranked(root, "DEC-12")
-    assert {hit["line"] for hit in answer["hits"]} == {3, 9}  # every line that holds it, CAP-11
+    assert [hit["line"] for hit in answer["hits"]] == [3, 9]  # every line that holds it, by line as before, CAP-11
     first = answer["ranked"][0]
     assert (first["path"], first["start_line"]) == ("docs/register.md", 3)
 
