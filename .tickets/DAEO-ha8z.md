@@ -1,6 +1,6 @@
 ---
 id: DAEO-ha8z
-status: in_progress
+status: closed
 deps: [DAEO-g0ip, DAEO-egsy]
 links: []
 created: 2026-10-16T16:35:12Z

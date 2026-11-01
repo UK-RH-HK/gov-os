@@ -19,6 +19,7 @@ allowed_paths:
 - template/governance/kernel/hooks/pretooluse.py
 - src/gov/guard/install.py
 - tests/unit/guard/test_w2_110*
+- tests/unit/install/test_install.py
 kpis:
   success:
   - 'In a project generated from the template (copier, then rulesync generate), an install by the orchestrator on the project''s coordination ticket is asked of the owner; by any other session, a lead (the orchestrator on another ticket) included, it is refused, and the refusal tells the session to raise it as a P1 escalation, as this repository''s guard does after DEC-957 [DEC-971 item 4, DEC-957]'
@@ -52,3 +53,5 @@ From the owner's DEC-971 item 4 (P1-MORNING-2026-10-31 item 4, W2-105's P-W2-105
 - **The fix:** the kernel's install branch asks only for the orchestrator on the project's coordination ticket, named in the project's configuration; every other session is refused.
 - **Paths, split by file:** the kernel hook's install branch, and `src/gov/guard/install.py` for the helper. W2-05 (running) lists `src/gov/**/*.py` for its git-environment sweep; it does not change the install rule, and whichever merges second merges back. W2-60b holds `src/gov/guard/decide.py`, which is not touched. W2-106 (merged) pinned the template's hook lines.
 - **FULL:** it is the guard. An independent review probes for any session other than the CTO's that is asked or let through.
+
+**DEC-980 (P-W2-110-1 (a)):** a test-design batch (`Rewrite-Reason: DEC-957, DEC-971 item 4`) gives each fixture of the older cases that still assert "any orchestrator is asked" (about 420 in W1-04, W1-47, W1-50, W1-03, W1-46 and W1-05's live-hook case) a roster whose `coordination_ticket` names its orchestrator ticket, which keeps their asks; the cases of an orchestrator subagent in a worker's session flip to refused; nothing else lowered. `tests/unit/install/test_install.py` (five cases) is in this ticket's paths for the engineer's same revision.

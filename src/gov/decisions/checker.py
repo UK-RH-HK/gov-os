@@ -53,6 +53,7 @@ from gov.cli.errors import GovError
 from gov.guard.containment_merge import read_merge
 from gov.store.loader import TRAILER_RULE_DATE, _frontmatter, _ids
 from gov.tasks.tickets import TICKETS_REL
+from gov.util.gitenv import git_env
 
 DECISION_ID = re.compile(r"(ADR|DEC)-[0-9]{3,}")  # the kernel's decision_id grammar (common.schema.json)
 CANONICAL = re.compile(r"[A-Z][A-Z_-]*")  # a status word in capitals, as the sources write it (W2-M106)
@@ -64,16 +65,18 @@ _GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false", "-c", "pr
 _HEAD = re.compile(r"---(\s.*)?")  # a first line that opens frontmatter for a reader, as `--- # c` does
 
 
-def _environment() -> dict:
-    """The caller's environment without its git variables, which may name another repository, and no fetching."""
-    return {**{key: value for key, value in os.environ.items() if not key.startswith("GIT_")},
-            "GIT_NO_LAZY_FETCH": "1", "GIT_GRAFT_FILE": os.devnull, "GIT_SHALLOW_FILE": os.devnull}
+def _environment(root: Path) -> dict:
+    """The caller's environment without its git variables, which may name another repository, and no fetching:
+    the helper's for ``root``, with the system and the person's configuration unread (it only reads)."""
+    return {**git_env(root, pinned=True,
+                      base={key: value for key, value in os.environ.items() if not key.startswith("GIT_")}),
+            "GIT_GRAFT_FILE": os.devnull, "GIT_SHALLOW_FILE": os.devnull}
 
 
 def _git(root: Path, *args: str) -> bytes:
     try:
         return subprocess.run([*_GIT, "-C", str(root), *args], capture_output=True, check=True,
-                              env=_environment()).stdout
+                              env=_environment(root)).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         reason = " ".join(getattr(exc, "stderr", b"").decode("utf-8", "replace").split()) or str(exc)
         raise GovError("DECISIONS_GIT_FAILED", f"git {args[0]} failed in {root}: {reason}",
@@ -182,7 +185,7 @@ class _Objects:
     def __init__(self, root: Path):
         self.root, self.fronts, self.known = root, {}, {}
         self.process = subprocess.Popen([*_GIT, "-C", str(root), "cat-file", "--batch"], stdin=subprocess.PIPE,
-                                        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=_environment())
+                                        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=_environment(root))
 
     def close(self) -> None:
         self.process.stdin.close()

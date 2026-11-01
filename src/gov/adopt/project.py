@@ -14,6 +14,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
+from gov.util.gitenv import git_env
 
 FOLDER = "governance/adoption"  # the tool's own records: no artefact of the project, so not in its inventory
 STAGES = ("A0", "A1", "A2", "A3", "A4", "A5", "A6", "A8")
@@ -38,7 +39,7 @@ def record_path(stage: str) -> str:
 def _run(root: Path, args: tuple, ok: tuple, data: bytes | None = None) -> tuple[int, bytes]:
     try:
         done = subprocess.run(["git", "-C", str(root), "-c", "core.quotePath=false", *args], capture_output=True,
-                              input=data, stdin=None if data is not None else subprocess.DEVNULL)
+                              input=data, stdin=None if data is not None else subprocess.DEVNULL, env=git_env(root))
     except OSError as exc:
         raise refuse("GIT_FAILED", f"git {args[0]} could not be run in {root}: {exc}") from None
     if done.returncode not in ok:
