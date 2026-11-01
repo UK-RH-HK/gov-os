@@ -865,6 +865,132 @@ def nested_files(kind):
 
 
 # --------------------------------------------------------------------------------------------------------------
+# Review 4's planted projects (W1, given as R16, DEC-987). The outer planted test runs gov accept on a nested planted
+# project in a session of its own, with as TMPDIR a new folder of its own ``tmp_path`` (the form in which this suite's
+# harness runs every planted run), and an environment carrying the case's token, by which the case finds every
+# process of the nested run still alive.
+# --------------------------------------------------------------------------------------------------------------
+
+R16_SLEEP_S = 5            # R16: the nested test's sleep, long enough for a stop to land while it runs under load
+R16_TOKEN_KEY = "QZV96LEAK_R16_RUN"
+
+_RUN_NESTED_R16 = '''
+
+QZV96LEAK_NESTED_ROOT = @NESTED_ROOT@
+QZV96LEAK_NESTED_HOME = @NESTED_HOME@
+QZV96LEAK_NESTED_PROBE = @NESTED_PROBE@
+QZV96LEAK_GOV_SRC = @GOV_SRC@
+QZV96LEAK_RUN_TOKEN = @TOKEN@
+
+
+def qzv96leak_start_nested_in(tmp_path):
+    """qzv96leak: gov accept on the nested planted project, in a session of its own, its TMPDIR a new folder of
+    the test's tmp_path, its environment carrying the case's token."""
+    import subprocess
+    given = os.path.join(str(tmp_path), "qzv96leak-given-1")
+    os.mkdir(given)
+    env = {key: os.environ[key] for key in ("PATH", "USER", "LOGNAME", "LANG", "LC_ALL", "PYTHONUSERBASE")
+           if key in os.environ}
+    env.update(HOME=QZV96LEAK_NESTED_HOME, TMPDIR=given, PYTHONPATH=QZV96LEAK_GOV_SRC)
+    env["@TOKEN_KEY@"] = QZV96LEAK_RUN_TOKEN
+    return subprocess.Popen([sys.executable, "-m", "gov.cli.main", "accept", "@TICKET@", "--json"],
+                            cwd=QZV96LEAK_NESTED_ROOT, env=env, stdin=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+
+
+def qzv96leak_nested_sleeping(wait_s=120):
+    """qzv96leak: back once the nested test has recorded that it sleeps."""
+    import time
+    deadline = time.monotonic() + wait_s
+    while time.monotonic() < deadline:
+        for name in os.listdir(QZV96LEAK_NESTED_PROBE):
+            if not name.endswith(".json"):
+                continue
+            try:
+                with open(os.path.join(QZV96LEAK_NESTED_PROBE, name), encoding="utf-8") as handle:
+                    if json.load(handle).get("kind") == "nested_sleeping":
+                        return
+            except (OSError, ValueError):
+                continue
+        time.sleep(0.01)
+    raise AssertionError("qzv96leak: the nested test never began its sleep")
+'''.replace("@TICKET@", TICKET_ID).replace("@TOKEN_KEY@", R16_TOKEN_KEY)
+
+
+def run_nested_r16_extra(nested, token):
+    """``_RUN_NESTED_R16`` for the nested ``Project`` ``nested`` and the case's ``token``."""
+    return (_RUN_NESTED_R16.replace("@NESTED_ROOT@", repr(str(nested.root)))
+            .replace("@NESTED_HOME@", repr(str(nested.home))).replace("@NESTED_PROBE@", repr(str(nested.probe)))
+            .replace("@GOV_SRC@", repr(str(SRC))).replace("@TOKEN@", repr(token)))
+
+
+_CASES.update({
+    # R16 (outer): runs gov accept on the nested project and waits for it by polling (the stopped run), or returns
+    # once the nested test sleeps, without waiting for it (the run that does not wait). Need ``run_nested_r16_extra``.
+    "r16_nested_waits": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    nested = qzv96leak_start_nested_in(tmp_path)
+    qzv96leak_record("nested", name="@NAME@", nested=nested.pid)
+    while nested.poll() is None:
+        time.sleep(0.01)
+''',
+    "r16_nested_returns": '''
+
+def @NAME@(tmp_path):
+    qzv96leak_noise(tmp_path, "@NAME@")
+    nested = qzv96leak_start_nested_in(tmp_path)
+    qzv96leak_record("nested", name="@NAME@", nested=nested.pid)
+    qzv96leak_nested_sleeping()
+''',
+    # R16 (nested): records that it sleeps (and when, on the clock every process of the machine shares), sleeps
+    # R16_SLEEP_S, then passes; its pytest then writes its report.
+    "r16_sleep_then_pass": '''
+
+def @NAME@(tmp_path):
+    import time
+    qzv96leak_noise(tmp_path, "@NAME@")
+    qzv96leak_record("nested_sleeping", name="@NAME@", at=time.monotonic())
+    time.sleep(@SLEEP@)
+'''.replace("@SLEEP@", str(R16_SLEEP_S)),
+})
+
+R16_NESTED_FILE = "test_qzv96leak_nested_sleep.py"
+R16_NESTED_README = rows_readme(("Success 1: qzv96leak", f"`{R16_NESTED_FILE}`"))
+R16_NESTED_FILES = {R16_NESTED_FILE: planted_file(("r16_sleep_then_pass", "test_qzv96leak_nested_sleep"))}
+
+
+def processes_carrying(token):
+    """The process ids, still running, whose command line or environment holds ``token`` (review 4, R16)."""
+    needle = token.encode()
+    found = []
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit() or int(entry) == os.getpid():
+            continue
+        for part in ("cmdline", "environ"):
+            try:
+                data = Path(f"/proc/{entry}/{part}").read_bytes()
+            except OSError:
+                continue
+            if needle in data:
+                if pid_running(entry):
+                    found.append(int(entry))
+                break
+    return sorted(found)
+
+
+def command_line(pid):
+    """``pid``'s command line, shortened, for a finding ("?" once it is gone)."""
+    try:
+        text = Path(f"/proc/{int(pid)}/cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", "replace")
+    except (OSError, ValueError):
+        return "?"
+    return text.strip()[:160]
+
+
+# --------------------------------------------------------------------------------------------------------------
 # The expected result (the design note's §6).
 # --------------------------------------------------------------------------------------------------------------
 
