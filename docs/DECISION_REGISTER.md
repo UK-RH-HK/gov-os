@@ -12644,3 +12644,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.392 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1010. Next free id: DEC-1011. |
+
+### DEC-1011 — SMART-WORK-3 applied as tickets run; a sizing package on post-W2-107 figures; landings take the next free heavy-job slot first (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-1010, DEC-1003, DEC-979 D1, DEC-983, CAPACITY-1
+- **Decision:** (1) SMART-WORK-3: every line applied when its ticket next runs, as proposed. (2) A bigger-machine sizing package, on the figures measured after W2-107 (merged 2026-10-31 18:47), not today's alone. (3) No slot reserved for landings: the merge queue and the closes take the next free heavy-job slot before any lead's heavy step, so closes flow without a slot left idle. Applied: `tools/heavy_slot.sh` (a priority waiter registers while it waits, checks every 2 s, and its registration ends the moment it takes a slot; a lead's step does not take a free slot while a live priority waiter exists; tests H7, H8), `merge_queue.py` and `close_build.py` set `GOV_HEAVY_PRIORITY=1` for their run.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.393 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1011. Next free id: DEC-1012. |
