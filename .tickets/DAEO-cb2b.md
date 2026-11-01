@@ -36,6 +36,7 @@ kpis:
   - 'The dispatcher alerts when the orchestrator''s session or its sentinel has no heartbeat for a configured time [DEC-1014 item 2, SMART-WORK-4 line 11]'
   - 'No watcher needs re-arming; every wake is an inbox item a pass writes [DEC-1014 item 2, SMART-WORK-4 line 12]'
   - 'While ready work waits, busy cores stay within a configured band for at least 80 % of the hours; time below or above the band is reported daily with its cause [DEC-1014 item 2, SMART-WORK-4 line 13]'
+  - 'The project''s nightly is never kept from starting by a landing: from a configured time before its start until it has started (its running marker), or a configured latest time, the dispatcher claims no landing; one already running is finalised; the status names the hold [DEC-1018 item 1]'
   failure:
   - 'A session started for an entry not on the ready list, not ready, already running, or without room for its peak; a ticket landed that was not approved, or twice; a return never put in the inbox; a lead count not from the processes [DEC-1007, DEC-1008]'
 profile: FULL
