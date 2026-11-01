@@ -12461,3 +12461,43 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.375 | 2026-11-01 | Orchestrator (delegated): DEC-992 (W2-11's P-W2-11-1 to 8), DEC-993 (W2-81's round 2 for F1). Next free id: DEC-994. |
+
+### DEC-994 — The owner's answers to ACT-DEADMAN-1, ACT-QUIET-DENY-1 and P1-ORCH-APPROVALS-1 (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-991, DEC-988 item 4, DEC-974, DEC-982
+- **Decision:**
+  1. **ACT-DEADMAN-1: channel (b) only,** the push to the owner's phone through Remote Control (`--channel push`). Tested well before the crontab line goes in: (1) a forced test alert while the owner is away from the PC (the owner locks it for 20 minutes and says when); (2) a simulated stall, replaying a transcript, through the whole path to the push (in cron's bare environment), not just the alert call. The owner confirms on the phone whether each arrived; then the CTO brings the crontab line with `--channel push`. If (b) fails: why, and the options.
+  2. **ACT-QUIET-DENY-1: yes, with `onFailure: block`;** the owner's operator added it (checked 12:57: the block is in `.claude/settings.local.json`; a session started in the main tree with the clock forced to 03:00 had a prompting `rm` refused at once and queued).
+  3. **P1-ORCH-APPROVALS-1: (a), with one change:** W2-10 is in Wave 3 under the approved plan, so the product's quiet-hours hook goes into a ticket that lands before EXAMIN's copy. **The CTO names W2-113** (an adopted product's CTO named at adoption; before EXAMIN's copy, W2-27): it already writes the adopted product's coordination ticket and holds the adopt step and the CTO's role file, so it also ships the hook in the kernel and wires it into the adopted CTO's local settings. KPI lines: W2-11 (the orchestration skill's approvals section and the orchestrator brief template, in its round 2), W2-33 (the CTO role file's approval classes and quiet hours from the project's configuration), W2-113 (the kernel hook and its wiring at adoption). The dead-man's switch as a product feature goes to `docs/plan/WAVE_3_PARKING.md`.
+- **Where it goes (DEC-851):** this register; the prompt §0 (v3.68); the decisions-in-force list; RESUME HERE; the three ticket files (each its own commit); the Wave 3 parking list.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.376 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-994 (the dead-man's switch by push only, tested first; the quiet-hours hook in with onFailure block; the approvals discipline into W2-11, W2-33 and W2-113). Next free id: DEC-995. |
+
+### DEC-995 — A role is what it may read and write; a skill never widens it; mixed tickets are split before they start; P-W2-11-9 (c) (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-957 (the work order), DEC-954 Q6/Q13, DEC-959 item 4, DEC-974, DEC-944 item 2 · **Changes:** P-W2-11-9's option (b) is refused, not parked
+- **Decision:**
+  1. **P-W2-11-9 (c):** a child engineer ticket (W2-120) holds W2-11's validator failure line ("the skill validator refuses a brief without the twelve-field rule") and row W2-L097, on `src/gov/check/skill_validator.py` and its unit tests, after W2-11; W2-11 closes on its other lines. **(b) is dropped: the launcher must not accept a second role on a ticket.**
+  2. **The rule:** a role is defined by what it may read and write; a skill only changes how a role works and never widens what it may touch. Work that needs different permissions is a different role: spec writing is the product-spec role (with the spec-writing skill), never an engineer loading a spec-writing skill. Work that shares the engineer's permissions (backend, frontend, API, data, security, DevOps) is a skill of the engineer role.
+  3. **Apply it:** ROLES-SPEC-1 and the roles tickets (W2-33, W2-60b, W2-11) are checked against the rule, so each role's defaults list its permissions and the skills it may load, and no skill changes permissions; the Definition of Ready (W2-82) refuses a ticket whose KPIs need another role's permissions, so mixed tickets are split before they start. The CTO proposes the KPI edits.
+  4. **Every open ticket is checked now for mixed work** (W2-33 and W2-83a first); the splits come to the owner before those tickets start.
+- **Until W2-82 checks it:** the CTO checks it by hand at every claim (DEC-944 item 2): a ticket whose KPIs or paths need more than its declared role's writes is not claimed until split.
+- **Where it goes (DEC-851):** this register; the prompt §0 (v3.69); the decisions-in-force list; RESUME HERE; the common lead brief (a lead never asks for a second role; a part of its ticket that needs one is named in its return); W2-11's ticket (the moved line); W2-120's ticket and WBS row.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.377 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-995 (roles by permissions, skills never widen them, mixed tickets split before they start; W2-120 for W2-11's validator line; the launcher keeps one role per ticket). Next free id: DEC-996. |
+
+### DEC-996 — P1-DEC995-APPLY decided as recommended: the splits, W2-52, four gaps, the roles KPI edits, vendored allowed-tools stripped (standing)
+- **Status:** ACCEPTED (owner, 2026-11-01, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-01)`; standing) · **Under:** DEC-995, DEC-974, DEC-105, DEC-957
+- **Decision:**
+  1. **The 13 splits approved as a list** (`packages/P1-DEC995-APPLY.md` §2 and the sweep it cites): W2-83a, W2-113, W2-21, W2-88 (two children), W2-82, W2-109, W2-35, W2-55, W2-19, W2-78, W2-34, W2-60a; W2-96's kernel brief half already done in W2-11. Each child is filed when its parent is next to be claimed, in the order the sweep gives; W2-33's path gaps (`.rulesync/subagents/**`, the roster) are added at its claim; its role files' `.claude/` copies are the CTO's step.
+  2. **W2-52 (DEC-105, applied now):** its adopt-skill clause moves to W2-83a; W2-52 keeps its code.
+  3. **The four gaps:** (A) a ticket's measurement of its own change is the implementer's evidence, at `docs/changes/<id>-evidence.md`; the research role is kept for work needing the network, a venv or an open question. (B) The independent test designer's writes gain `fixtures/evaluation/**` (it authors evaluation sets; the guard's rule 5 is unchanged). (C) A research ticket names one folder, its record inside it (W2-40, W2-15a, W2-15b paths fixed). (D) A ticket's CIT-E is written by the role that made the change; its CIT-P by the product-spec child when there is one, else drafted by the lead; kernel check YAML, maps, registries, lefthook and workflows are engineer config; schemas, templates and `.rulesync` sources are product-spec.
+  4. **The roles KPI edits** as proposed (W2-33, W2-60a, W2-60b, W2-11 round 2, W2-120, W2-82's seventh condition ROLE_SCOPE) and a product-spec pass on ROLES-SPEC-1 (nine section edits).
+  5. **`allowed-tools` is stripped from our copies of the vendored skills** (the six openspec skills), recorded in the tool registry.
+- **Where it goes (DEC-851):** this register; the prompt §0; the decisions-in-force list; RESUME HERE; each ticket file edited (its own commit); the common lead brief (measurement records as evidence, A).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.378 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-996 (P1-DEC995-APPLY as recommended). Next free id: DEC-997. |
