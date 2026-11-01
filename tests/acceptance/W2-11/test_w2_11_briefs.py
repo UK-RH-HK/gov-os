@@ -120,7 +120,10 @@ LEAD_RULES = {
     "gov retrieve first": ("DEC-836", [r"gov retrieve"]),
     "retrieval in batches": ("DEC-860", [r"batch"]),
     "small code-graph queries": ("DEC-859", [r"code[- ]graph"]),
-    "the code under test per command": ("DEC-732", [r"PYTHONPATH"]),
+    # DEC-534: in the language-neutral form; no language's variable name is required (DEC-992, P-W2-11-7).
+    "the code under test per command": ("DEC-732", [r"\btests?\b", r"verif", r"worktree", r"\bown\b",
+                                                    r"\bsrc\b|source|code under test", r"per[- ]command",
+                                                    r"session"]),
     "the scratch budget and TMPDIR": ("DEC-898", [r"TMPDIR"]),
     "a checkpoint at every handover": ("DEC-837", [r"checkpoint", r"handover"]),
     "the work order in parallel": ("DEC-959", [r"parallel", r"test designer", r"engineer|implementer"]),
@@ -132,7 +135,8 @@ LEAD_RULES = {
 def test_the_lead_brief_carries_the_role_independent_rule(rule):
     decision, ideas = LEAD_RULES[rule]
     text = _text(f"{s.TEMPLATES}/brief-lead.md")
-    assert s.cites(text, decision) and s.stated(text, ideas), f"brief-lead.md does not state {rule} ({decision})"
+    found = s.cites(text, decision) and bool(s.stated(text, ideas))
+    assert found, f"brief-lead.md does not state {rule} ({decision})"
 
 
 # KPI 15, DEC-791 (ii): the standing decisions distilled, one case per group --------------------------------------
