@@ -12660,3 +12660,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.394 | 2026-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1012. Next free id: DEC-1013. |
+
+### DEC-1013 — W2-91's P-W2-91-TD-1 (a), TD-2 (a), VERIFY-1 by the merge queue (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated: P2s within the approved spec under DEC-957's rubric; confidence medium-high) · **Under:** DEC-957, DEC-959 item 1, DEC-1010
+- **Decision:** TD-1 (a): W2-91's KPI 3 narrowed to what exists (the overlay stays restricted, the indexer reads embedding_policy only); an export command refusing a denied namespace is Wave 3 row W3-P18. TD-2 (a): W2-91's test designer revises W2-86's guard case to leave DEC-957's three newly embedded sets out (`Rewrite-Reason: DEC-957`), nothing else lowered; the path joins W2-91's ticket. VERIFY-1: the merge queue's scoped run on the merged result is W2-91's verification (tests run once per level, DEC-959 item 1), since its own rebuild waited 90 minutes for a slot.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.395 | 2026-11-01 | Orchestrator (delegated): DEC-1013. Next free id: DEC-1014. |
