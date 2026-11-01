@@ -1,22 +1,27 @@
 """The code route of a plain question: the symbols it names, their callers and callees (W2-92; DEC-957, CAP-12).
 
 ``route`` asks the code index for each word of the question that names a function, method or class: a word shaped
-as code (``_CODE_SHAPED``: in backticks, called, or with an underscore or a capital inside it), or a plain word that
-a code file of the store, no test, defines (``def`` or ``class``). It asks with the code-graph tool's own traversal
-(DEC-859): ``search_graph`` for the definitions, then for each a targeted ``query_graph`` of the CALLS edges into
+as code (``_CODE_SHAPED``: in backticks, called, or with an underscore or a capital inside it), or a plain word
+that a code file of the store, no test, defines (``def`` or ``class``), but only in a question with a code cue
+(``_CUE``: a word such as calls, callers or defined, or backticks or a call anywhere; DEC-1006). It asks with the
+code-graph tool's own traversal (DEC-859): ``search_graph`` for the definitions, then for each a targeted
+``query_graph`` of the CALLS edges into
 and out of that one qualified name, which gives the callers' and callees' files and lines in one answer. Every
 answer is a small page (``PAGE`` rows, far under the tool's cap), followed by its continuation; nothing loads the
 whole graph. A span is a file of the index's staged copy, given back as the repository's path, and joins the fusion
 as the store's lexical chunks that cover it. As the tool's ``trace_path`` does by default, test files are left out.
 
-A question whose plain words no code file defines asks nothing of the index, and its daemon is not started: no
-route and no facet, today's bundle. A missing or unreadable code index gives the facet unavailable with its reason,
-and no hit, for a question that names a symbol. The other routes still answer (DEC-957, DEC-860).
+A question that names no symbol asks nothing of the index, and its daemon is not started: no route and no facet,
+today's bundle. A missing or unreadable code index gives the facet unavailable with its reason, and no hit, for a
+question that names a symbol. The other routes still answer (DEC-957, DEC-860). One session of the tool serves every
+question of a process on one code index (``_session``): started at the first, ended at exit, and started anew when
+the index's file changes or a question fails (DEC-1006, P-W2-92-4).
 Everything is sorted. It only reads: it builds no index.
 """
 
 from __future__ import annotations
 
+import atexit
 import re
 from pathlib import Path
 
@@ -29,7 +34,11 @@ _TRACED = {"Function", "Method"}
 _WORD = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 # A word that names a symbol by its form: in backticks, called, or with an underscore or a capital inside it.
 _CODE_SHAPED = re.compile(r"`[^`\s]+`|\b[A-Za-z_]\w*\(|\b\w*_\w+|\b\w*[a-z0-9][A-Z]\w*")
+# A question about code: a cue word, or backticks or a call anywhere. Only then does a plain word join (DEC-1006).
+_CUE = re.compile(r"`[^`\s]+`|\b[A-Za-z_]\w*\(|\b(?:call(?:s|ed|ing|ers?|ees?)?|defin(?:e|es|ed|itions?)|functions?"
+                  r"|methods?|class(?:es)?)\b", re.IGNORECASE)
 _CODE_FILES = (".py",)
+_SESSIONS: dict[Path, tuple[tuple, object]] = {}  # code index -> (its file's stat, the tool's session on it)
 _NEIGHBOURS = ("MATCH (a)-[:CALLS]->(b) WHERE {near}.qualified_name = '{qualified}' "
                "RETURN {far}.qualified_name, {far}.label, {far}.file_path, {far}.start_line, {far}.end_line")
 
@@ -90,15 +99,42 @@ def _near(session, qualified: str) -> set[tuple[str, str, str, str]]:
     return near
 
 
+def _session(root: Path):
+    """The tool's session on the code index at ``root``: the process's one, unless the index's file has changed."""
+    root = Path(root).resolve()
+    try:
+        stat = (root / codeintel.BASE_REL / "home" / f"{codeintel.PROJECT}.db").stat()
+        mark = (stat.st_ino, stat.st_size, stat.st_mtime_ns)
+    except OSError:
+        mark = ()
+    if root in _SESSIONS and _SESSIONS[root][0] != mark:
+        _SESSIONS.pop(root)[1].__exit__(None, None, None)
+    if root not in _SESSIONS:
+        _SESSIONS[root] = (mark, codeintel._Session(root))
+    return _SESSIONS[root][1]
+
+
+@atexit.register
+def _end_sessions() -> None:
+    """End every session of the tool this process started."""
+    while _SESSIONS:
+        _SESSIONS.popitem()[1][1].__exit__(None, None, None)
+
+
 def _spans(root: Path, words: list[str]) -> list[tuple[str, int, int]]:
     """The spans of the symbols named ``words``, then of their callers and callees, sorted within each."""
-    with codeintel._Session(Path(root).resolve()) as session:
+    session = _session(root)
+    try:
         found = _search(session, name_pattern=f"^({'|'.join(words)})$")
         named = sorted({row for row in found if row[1] in words and row[2] in _SYMBOLS and not _test_file(row[3])})
         near = set()
         for qualified, _, label, _, _ in named:
             if label in _TRACED:
                 near |= _near(session, qualified)
+    except BaseException:  # a session that failed is ended, and the next question starts another
+        _SESSIONS.pop(Path(root).resolve(), None)
+        session.__exit__(None, None, None)
+        raise
     named_keys = {row[0] for row in named}
     others = sorted(row for row in near if row[0] not in named_keys and row[1] in _SYMBOLS and not _test_file(row[2]))
     spans = []
@@ -112,7 +148,8 @@ def _spans(root: Path, words: list[str]) -> list[tuple[str, int, int]]:
 def route(root: Path, query: str, chunks: dict[str, dict]) -> tuple[list[dict], dict] | None:
     """The code route's hits (chunks of ``chunks``) and its facet, or None when ``query`` names no symbol."""
     shaped = {word for form in _CODE_SHAPED.findall(query) for word in _WORD.findall(form)}
-    words = sorted(shaped | _defined(root, set(_WORD.findall(query)) - shaped, chunks))
+    plain = set(_WORD.findall(query)) - shaped if _CUE.search(query) else set()  # a plain word only with a cue
+    words = sorted(shaped | _defined(root, {word for word in plain if not _CUE.fullmatch(word)}, chunks))
     if not words:  # no word names a symbol: the index is not asked, today's bundle
         return None
     index, spans, reason = Path(root) / codeintel.BASE_REL, [], None

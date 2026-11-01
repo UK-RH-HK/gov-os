@@ -60,6 +60,16 @@ def test_a_records_title_is_read_from_the_frontmatter_that_declares_it(tickets):
     assert graph_route.start_ids(tickets, "what about intelligence?", KNOWN) == []  # a title is found whole
 
 
+def test_a_title_read_once_is_read_again_when_its_file_changes(tickets):
+    record = tickets / "docs/contract/CAP-12.md"
+    record.parent.mkdir(parents=True)
+    record.write_text("---\nid: CAP-12\ntitle: Code intelligence\n---\n", encoding="utf-8")
+    assert graph_route.start_ids(tickets, "code intelligence", KNOWN) == ["CAP-12"]
+    record.write_text("---\nid: CAP-12\ntitle: Harbour charts\n---\n", encoding="utf-8")
+    assert graph_route.start_ids(tickets, "code intelligence", KNOWN) == []
+    assert graph_route.start_ids(tickets, "the harbour charts", KNOWN) == ["CAP-12"]
+
+
 # The planted code graph: qualified name -> (name, label, file, lines); and the calls between them.
 NODES = {"code.src.fus.rrf": ("rrf", "Function", "src/fus.py", "10-14"),
          "code.tests.test_fus.rrf": ("rrf", "Function", "tests/test_fus.py", "1-3"),
@@ -246,3 +256,129 @@ def test_a_symbol_named_in_a_question_joins_as_the_code_route(repo, monkeypatch)
     assert bundle["facets"]["code"] == {"available": True, "reason": None}
     assert [(item["path"], sorted(item["routes"])) for item in bundle["evidence"]] == [("src/fus.py",
                                                                                          ["code", "lexical"])]
+
+
+# DEC-1006 (P-W2-92-1, -3, -4): the cue gate, one session per process, a missing record store named for its route.
+
+@pytest.mark.parametrize("query", ["Which paths are embedded for semantic rrf?", "How is the rrf summed?",
+                                   "Which ranks does the helper keep?"])
+def test_a_plain_word_without_a_code_cue_asks_nothing(indexed, query):
+    root, calls = indexed
+    assert code_route.route(root, query, CHUNKS) is None and calls == []
+
+
+@pytest.mark.parametrize("query, asked", [
+    ("Who calls rrf?", "^(rrf)$"), ("Where is rrf defined?", "^(rrf)$"), ("Which functions reach rrf?", "^(rrf)$"),
+    ("What are the callers of rrf?", "^(rrf)$"), ("Which class is Fused?", "^(Fused)$"),
+    ("Does `helper` reach rrf?", "^(helper|rrf)$"), ("Does helper() reach rrf?", "^(helper|rrf)$"),
+    ("Is rrf faster than fuse_scores?", "^(fuse_scores)$"),  # shaped as code without a cue: that word alone
+])
+def test_a_plain_word_joins_only_with_a_code_cue(indexed, query, asked):
+    root, calls = indexed
+    code_route.route(root, query, CHUNKS)
+    assert calls[0][1]["name_pattern"] == asked
+
+
+class Counted(Planted):
+    """A planted session that counts its starts and its ends."""
+    started, ended = [], []
+
+    def __init__(self, calls, fail=False):
+        super().__init__(calls, fail)
+        Counted.started.append(self)
+
+    def __exit__(self, *_):
+        Counted.ended.append(self)
+
+
+@pytest.fixture()
+def counted(indexed, monkeypatch):
+    root, calls = indexed
+    monkeypatch.setattr(Counted, "started", []), monkeypatch.setattr(Counted, "ended", [])
+    monkeypatch.setattr(codeintel, "_Session", lambda _root: Counted(calls))
+    monkeypatch.setattr(code_route, "_SESSIONS", {})
+    return root, calls
+
+
+def test_one_session_serves_every_question_of_a_process(counted):
+    root, _ = counted
+    first = code_route.route(root, "Who calls rrf?", CHUNKS)
+    assert code_route.route(root, "Who calls `helper`?", CHUNKS)[1]["available"] is True
+    assert code_route.route(root, "Who calls rrf?", CHUNKS) == first  # the same answer from the reused session
+    assert len(Counted.started) == 1 and Counted.ended == []
+    code_route._end_sessions()  # at exit
+    assert Counted.ended == Counted.started and code_route._SESSIONS == {}
+
+
+def test_a_changed_index_or_a_failed_question_starts_another_session(counted, monkeypatch):
+    root, calls = counted
+    code_route.route(root, "Who calls rrf?", CHUNKS)
+    (root / codeintel.BASE_REL / "home" / f"{codeintel.PROJECT}.db").write_bytes(b"rebuilt")
+    code_route.route(root, "Who calls rrf?", CHUNKS)
+    assert len(Counted.started) == 2 and Counted.ended == Counted.started[:1]
+    monkeypatch.setattr(codeintel, "_Session", lambda _root: Counted(calls, fail=True))
+    monkeypatch.setattr(code_route, "_SESSIONS", {})
+    hits, facet = code_route.route(root, "Who calls rrf?", CHUNKS)
+    assert hits == [] and "code index is unreadable" in facet["reason"]  # a reused session still names it
+    assert Counted.ended[-1] is Counted.started[-1] and code_route._SESSIONS == {}
+
+
+def _break_records(repo, sql):
+    import sqlite3
+    connection = sqlite3.connect(repo / ".gov-runtime/store.db")
+    connection.execute(sql)
+    connection.commit()
+    connection.close()
+
+
+@needs_gitleaks
+@pytest.mark.parametrize("sql, named", [("DROP TABLE records", "the record store is missing"),
+                                        ("ALTER TABLE records RENAME COLUMN status TO state",
+                                         "the record store is unreadable")])
+def test_a_missing_or_unreadable_record_store_is_named_and_the_other_routes_answer(repo, monkeypatch, sql, named):
+    (repo / codeintel.BASE_REL / "home").mkdir(parents=True)
+    (repo / codeintel.BASE_REL / "files").mkdir()
+    monkeypatch.setattr(code_route, "_spans", lambda _root, words: [("src/fus.py", 1, 2)])
+    _break_records(repo, sql)
+    bundle = retrieve(repo, "fuse_scores and DEC-001", ids=("DEC-001",), reranker=lambda: None)
+    assert bundle["facets"]["closure"]["available"] is False and named in bundle["facets"]["closure"]["reason"]
+    assert bundle["facets"]["code"] == {"available": True, "reason": None} and bundle["facets"]["lexical"]["available"]
+    assert bundle["stopping_reason"] == "FACET_UNAVAILABLE"
+    assert [(item["path"], item["routes"]) for item in bundle["evidence"]] == [("src/fus.py", ["code"])]
+    assert sorted(retrieve(repo, "fuse_scores", reranker=lambda: None)["evidence"][0]["routes"]) == ["code", "lexical"]
+    assert bundle == retrieve(repo, "fuse_scores and DEC-001", ids=("DEC-001",), reranker=lambda: None)
+
+
+@needs_gitleaks
+def test_no_store_at_all_is_named_never_refused(repo):
+    (repo / ".gov-runtime/store.db").unlink()
+    bundle = retrieve(repo, "What does DEC-001 say?", reranker=lambda: None)
+    assert "the record store is missing" in bundle["facets"]["closure"]["reason"] and bundle["evidence"] == []
+
+
+@needs_gitleaks
+def test_a_fault_that_is_not_the_stores_is_raised(repo, monkeypatch):
+    import sqlite3
+
+    from gov import records
+
+    for fault in (sqlite3.ProgrammingError("a bad query"), TypeError("a bad argument")):
+        def faulty(*_args, fault=fault, **_kwargs):
+            raise fault
+
+        monkeypatch.setattr(records, "records", faulty)
+        with pytest.raises(type(fault)):
+            retrieve(repo, "heron ledger", reranker=lambda: None)
+
+
+@needs_gitleaks
+def test_the_authority_order_is_kept_with_a_record_graph_and_skipped_without(repo, monkeypatch):
+    from gov.retrieval import authority
+
+    ordered, real = [], authority.order
+    monkeypatch.setattr(authority, "order", lambda *args: ordered.append(args) or real(*args))
+    retrieve(repo, "heron ledger", reranker=lambda: None)
+    assert len(ordered) == 1 and ordered[0][1]  # the store's records
+    _break_records(repo, "DROP TABLE records")
+    retrieve(repo, "heron ledger", reranker=lambda: None)
+    assert len(ordered) == 1

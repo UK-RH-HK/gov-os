@@ -9,6 +9,7 @@ whole, by word, in any case. Everything is sorted. It only reads.
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -19,6 +20,7 @@ W2_ID = re.compile(r"W2-[0-9]+[a-z]?")
 TASK = "task"
 # A ticket's W2 id stands in its frontmatter, never in the store (the ticket schema's wbs_id and external-ref).
 _WBS = re.compile(r"^(?:wbs_id|external-ref):\s*['\"]?(W2-[0-9]+[a-z]?)['\"]?\s*$", re.MULTILINE)
+_FRONTS: dict[tuple, object] = {}  # (file, size, time) -> its parsed frontmatter
 
 
 def _front(root: Path, path: str) -> str:
@@ -40,14 +42,27 @@ def _wbs_ids(root: Path, known: list[dict]) -> dict[str, str]:
     return tickets
 
 
+def _parsed(root: Path, path: str):
+    """The parsed frontmatter of the file at ``path``, None when it cannot be read or parsed; parsed once a process
+    while the file keeps its size and time (DEC-1006: every question reads every record's title)."""
+    try:
+        stat = (root / path).stat()
+    except OSError:
+        return None
+    key = (os.path.abspath(root / path), stat.st_size, stat.st_mtime_ns)
+    if key not in _FRONTS:
+        try:
+            _FRONTS[key] = yaml.safe_load(_front(root, path))
+        except yaml.YAMLError:
+            _FRONTS[key] = None
+    return _FRONTS[key]
+
+
 def _title(root: Path, record: dict) -> str:
     """The record's title: a register entry's from the store, any other record's from its file's frontmatter."""
     if record.get("title"):
         return record["title"]
-    try:
-        front = yaml.safe_load(_front(root, record["path"]))
-    except yaml.YAMLError:
-        return ""
+    front = _parsed(root, record["path"])
     if not isinstance(front, dict) or front.get("id") != record["id"] or not isinstance(front.get("title"), str):
         return ""
     return front["title"]
@@ -73,6 +88,6 @@ def start_ids(root: Path, query: str, known: list[dict]) -> list[str]:
     words = " ".join(query.split()).casefold()
     for record in known:
         title = " ".join(_title(Path(root), record).split()).casefold()
-        if title and re.search(rf"(?<!\w){re.escape(title)}(?!\w)", words):
+        if title and title in words and re.search(rf"(?<!\w){re.escape(title)}(?!\w)", words):
             found.add(record["id"])
     return sorted(found)

@@ -39,17 +39,15 @@ ROUNDS_BY_RADIUS = {0: 1, 1: 1, 2: 3, 3: 8, 4: 8}
 DEFAULT_BATCH_SIZE = 10
 MUST_NOT_CITE_STATUSES = frozenset({"DEPRECATED", "REJECTED", "WITHDRAWN"})
 AHEAD_TYPES = frozenset({"failure", "lesson"})
+# What sqlite raises for a store that cannot be opened, holds no record graph or is no database; no fault of a query
+STORE_FAULTS = (sqlite3.OperationalError, sqlite3.DatabaseError)
 
 
 def _graph(root: Path) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     """``path -> id`` of every record, ``id -> reason`` for not-current records (superseded or must-not-cite),
-    and ``id -> type`` for every record."""
-    try:
-        known = records.records(root)
-        superseded_edges = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
-    except sqlite3.OperationalError:
-        raise GovError("STORE_MISSING", f"no record graph in the store at {root}; load it first",
-                       {"root": str(root)}) from None
+    and ``id -> type`` for every record. Raises what the store raises when it is missing or cannot be read."""
+    known = records.records(root)
+    superseded_edges = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
     record_of = {record["path"]: record["id"] for record in known}
     not_current: dict[str, str] = {}
     for record in known:
@@ -117,11 +115,20 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         offset = _decode_continuation(continuation, query, tuple(ids), ticket, radius, batch_size, bundle_budget)
 
     root = Path(root)
-    record_of, not_current, record_types = _graph(root)
-    # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
-    known, edges = records.records(root), records.edges(root, type=authority.SUPERSEDES)
+    unread = None  # W2-92: a missing or unreadable record store fails the record and closure routes, not the answer
+    try:
+        record_of, not_current, record_types = _graph(root)
+        # W2-87: a register chunk is the entry whose span holds it, never the register's last entry (DEC-952)
+        known, edges = records.records(root), records.edges(root, type=authority.SUPERSEDES)
+    except (GovError, sqlite3.DatabaseError) as error:
+        if not (error.code == "STORE_MISSING" if isinstance(error, GovError) else type(error) in STORE_FAULTS):
+            raise  # a fault that is not the store's is no unavailable route
+        missing = isinstance(error, GovError) or str(error).startswith("no such table")
+        unread = f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure"
+        record_of, not_current, record_types, known, edges = {}, {}, {}, [], []
     register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)
-    order = authority.order(root, known, edges, entry_of)  # DEC-952 item 1: the path map's retrieval_authority
+    order = (authority.order(root, known, edges, entry_of) if unread is None  # DEC-952 item 1: retrieval_authority
+             else authority.Order(None, known, edges, entry_of))  # no record graph: no authority order (DEC-1006)
     answers = {lexical.FACET: lexical.search(root, query, refresh=False),
                semantic.FACET: semantic.search(root, query, refresh=False)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
@@ -131,7 +138,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     depth = closures.depth_of_radius(radius if start else min(radius, 1))  # W2-92: a question's records at R0 or R1
     start += [rid for rid in graph_route.start_ids(root, query, known) if rid not in start]  # W2-92: the record route
     reached = set()
-    if start:
+    if unread is not None:
+        facets[CLOSURE] = {"available": False, "reason": unread}
+    elif start:
         closed = closures.closure(root, start, depth)
         reached = {item["id"] for item in closed["closure"]}
         routes[CLOSURE] = [chunk for chunk in chunks.values()
