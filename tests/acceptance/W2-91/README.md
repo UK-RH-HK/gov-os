@@ -64,8 +64,8 @@ not vacuous.
 
 - **The export half of success 3** ("the export path still refuses the overlay, with a planted export case"). On
   `w2/integrate`, no public command or module reads a namespace's `export_policy`. The only code that reads it is
-  the schema check, `gov.config.path_map_schema`. No stand-in is invented here. The question goes back as a package
-  in the test designer's return.
+  the schema check, `gov.config.path_map_schema`. No stand-in is invented here. DEC-1013 (TD-1 (a)) dropped this
+  clause from success 3; an export command that refuses a `denied` namespace is Wave 3 row W3-P18.
 - **The vector counts per set in success 1**, which are read from the clone's store; **success 6** (W2-61's
   re-measure); and **failure 4** (a figure reported alone, or the hidden half read or run). These need the real
   embedder and built stores. They belong to the lead's measurement record, `docs/changes/W2-91-evidence.md`.
@@ -94,6 +94,9 @@ embedded files.
 
 `tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base`
 compares every verdict outside `template/` with W2-86's base `9dc5288161c4`. DEC-957 embeds the root files,
-`governance/**` and `schemas/**`, all of them outside `template/`, so that case turns red. It is not revised here.
-Its revision is a P2 question under DEC-957's rubric, it lies outside this ticket's test paths, and it goes back
-in the return.
+`governance/**` and `schemas/**`, all of them outside `template/`, so that case turned red. It was revised under
+DEC-1013 TD-2 (a) in commit `a31d314e5091`, which added its path to this ticket's paths. DEC-957's three newly
+embedded sets are now left out of its comparison: the tracked root files, every tracked file under `governance/**`
+and every tracked file under `schemas/**`. The sets are defined the same way as `newly_embedded_area` in
+`w2_91_support.py`. Every other tracked path outside `template/` is still compared with the base, in both
+directions, and the case fails if nothing is left to compare.
