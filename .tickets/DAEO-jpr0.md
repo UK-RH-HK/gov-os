@@ -29,6 +29,7 @@ kpis:
   - 'Bounded: a configured size limit (default from the measured corpus: about 2 corpora) with least-recently-used eviction; a model or revision change starts a new key space and never serves another model''s vector [DEC-1032]'
   - 'The retrieval check''s dev tiers (a-dev, b-dev) and their 52 questions are embedded once on the machine and hit the cache in every later `gov check`, with no cold embedding per check [DEC-1032, P1-LOAD-BALANCE-1 b.6]'
   - 'Measured, in docs/changes/W2-126-evidence.md: the texts sent to the embedder per day before and after (target: under one corpus, about 54,000, against about 503,000 in 13 hours on 2026-11-01/02); a lead''s first rebuild of a code-changing ticket and a close''s clone, before and after; the cache''s size [DEC-1032]'
+  - 'The bounded retry (W2-123, DEC-1026) also covers a transient server error (HTTP 5xx) and a reset or refused connection, within the same bound, still failing closed after its last try; W2-123''s acceptance case that a 500 is not retried is revised by the test designer with `Rewrite-Reason: P-W2-123-4` (evidence: W2-123''s rebuild of 2026-11-02 10:39-11:12, `not_recreated` after a transient error; the same batch answered 200 in 2.6 s at 11:16) [P-W2-123-4, DEC-1033]'
   failure:
   - 'A vector served for a different text, model or revision.'
   - 'A store built with the cache that differs from one built without it.'

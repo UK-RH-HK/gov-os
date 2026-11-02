@@ -52,7 +52,7 @@ def embedder(tmp_path, monkeypatch):
     monkeypatch.setenv(ollama.QUERY_HOST_SETTING, QUERY_HOST)
     monkeypatch.setattr(semantic, "_embed", embed)
     monkeypatch.setattr(semantic, "_revision", lambda host=None: state["revision"])
-    monkeypatch.setattr(semantic, "_on_cpu", lambda host: state["on_cpu"])
+    monkeypatch.setattr(semantic, "_device", lambda host: "cpu" if state["on_cpu"] else None)
     return tmp_path, state
 
 

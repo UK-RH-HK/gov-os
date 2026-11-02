@@ -82,6 +82,8 @@ def w(tmp_path, healthy_embed):
                # DEC-1030, all planted: no nvidia-smi (unless a test plants one), the two servers' logs in the folder
                DISPATCH_NVIDIA_SMI=str(tmp_path / "nvidia-smi"), DISPATCH_GPU_LOG_SHARED=str(tmp_path / "serve-11434.log"),
                DISPATCH_GPU_LOG_QUERY=str(tmp_path / "serve-11435.log"),
+               # DEC-1032, all planted: no ss (unless a test plants one), the rerankers' GPU lock files in the folder
+               DISPATCH_SS=str(tmp_path / "ss"), DISPATCH_RERANK_GLOB=str(tmp_path / "rerank" / "gov-os-rerank-gpu-*.lock"),
                DISPATCH_WORKTREES=str(wt), DISPATCH_FAKE_PROCS=str(procs), DISPATCH_FAKE_HELD=str(held),
                DISPATCH_GATE_CMD="echo OPEN", DISPATCH_DISK_CMD="true",
                DISPATCH_LAUNCH_CMD=f"{sys.executable} {launcher}", DISPATCH_LAND_CMD=f"{sys.executable} {lander}",
@@ -455,11 +457,27 @@ def test_admits_when_the_peaks_fit(wp):
     assert status(wp)["admit"] and calls(wp) == ["launch W2-A T-A A.md W2-A-A5-run1.json"]
 
 
-def test_the_cpu_rule_caps_leads_at_slots_times_k(wp):
-    leads(wp, 6)
+def test_the_lead_cap_comes_from_memory_not_slots_times_k(wp):
+    """DEC-1032: lead_cap = floor(room / a lead's p95), room = available + the leads' trees - the floor - the slot
+    runs - the services' headroom; slots x K (6) no longer caps."""
+    leads(wp, 6)  # 6 leads at 0.3 GB: the old rule (3 slots x K 2) refused a seventh whatever the memory
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
     tick(wp)
-    assert not status(wp)["admit"] and "allows 6" in status(wp)["admit_reason"] and calls(wp) == []
+    s = status(wp)
+    # room: 60 GB + 6 x 0.3 GB - floor 3 GB - the embedding p95 headroom 600,000 kB; a lead (literal) 2,500,000 kB
+    room = 60 * GB + 6 * 300_000 - 3 * GB - 600_000
+    assert s["admit"] and f"of {room // 2_500_000} leads (cap from memory)" in s["admit_reason"]
+    assert s["lead_cap"] == {"cap": room // 2_500_000, "room_kb": room, "p95_kb": 2_500_000}
+    assert f"lead cap {room // 2_500_000} from memory" in (wp.d / "status.txt").read_text()
+    assert calls(wp)[0].startswith("launch W2-A")
+    leads(wp, 6)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {18 * GB} kB\n")  # room for 6 leads, not 7
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 300)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"].startswith("memory: lead cap 6 (literal rule: ")
+    assert "6 leads running and 0 launching" in s["admit_reason"] and calls(wp) == []
 
 
 def test_stale_peaks_fall_back_to_gate_check(wp):
@@ -552,7 +570,7 @@ def test_the_slots_rule_without_enough_history_falls_back_to_gate_check(wp):
 # ---- the review of dispatcher_next.py (F1 to F5) ------------------------------------------------------------------
 
 def test_f1_a_waiting_launcher_counts_as_a_lead(wp):
-    (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {18 * GB} kB\n")  # DEC-1032: a lead cap of 6 from memory
     leads(wp, 5, extra=[{"cmd": "bash /x/dispatch/launch_now.sh W2-Q T-Q Q.md W2-Q-A5-run1.json", "cwd": "/"}])
     tick(wp)
     s = status(wp)
@@ -562,6 +580,7 @@ def test_f1_a_waiting_launcher_counts_as_a_lead(wp):
 def test_f1_a_recent_start_without_a_process_counts_as_a_lead(wp):
     (wp.tmp / "meminfo").write_text(f"MemAvailable: {60 * GB} kB\n")
     (wp.d / "started.txt").write_text(f"{datetime.fromtimestamp(NOW - 300):%Y-%m-%d %H:%M:%S} W2-Q Q.md W2-Q-A5-run1.json\n")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {18 * GB} kB\n")  # DEC-1032: a lead cap of 6 from memory
     leads(wp, 5)
     tick(wp, DISPATCH_NOW=NOW)
     assert status(wp)["pending_launches"] == ["W2-Q"] and not status(wp)["admit"]
@@ -601,7 +620,7 @@ def test_f3_a_bad_peaks_value_refuses_and_the_tick_goes_on(wp):
 
 
 def test_f3_a_bad_config_value_refuses(wp):
-    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "literal", "K": "two"}))
+    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "literal", "cpu_margin": "two"}))  # K unused (DEC-1032)
     tick(wp)
     assert not status(wp)["admit"] and "error" in status(wp)["admit_reason"] and calls(wp) == []
 
@@ -1213,6 +1232,7 @@ REFUSED = "http://127.0.0.1:9/api/embed"  # nothing listens: a refused connectio
 
 
 def test_embed_refused_three_times_is_not_running_one_item_and_recovery_clears_it(w, server):
+    conf(w, embed_check_every=1)  # the fallback test request every pass (DEC-1032's default: every 5)
     (w.d / "ready.txt").write_text("")
     for t in (NOW, NOW + 60):
         tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
@@ -1232,7 +1252,7 @@ def test_embed_refused_three_times_is_not_running_one_item_and_recovery_clears_i
 def test_embed_a_configured_restart_applies_to_not_running(w):
     r = w.tmp / "restart.py"
     r.write_text(f"open({str(w.calls)!r}, 'a').write('restart\\n')\n")
-    conf(w, embed_hung_after=1, embed_restart_after_s=60, embed_restart_cmd=f"{sys.executable} {r}")
+    conf(w, embed_hung_after=1, embed_restart_after_s=60, embed_restart_cmd=f"{sys.executable} {r}", embed_check_every=1)
     (w.d / "ready.txt").write_text("")
     for t in (NOW, NOW + 30, NOW + 90, NOW + 150):
         tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
@@ -1244,7 +1264,7 @@ HELD = "embedding server hung: starts held (DEC-1015)"
 
 @pytest.mark.parametrize("why", ["hung", "refused"])
 def test_embed_starts_are_held_while_the_server_is_down_and_landings_are_not(w, server, why):
-    conf(w, embed_timeout_s=0.5, embed_hung_after=1)
+    conf(w, embed_timeout_s=0.5, embed_hung_after=1, embed_check_every=1)
     server["m"] = "hang"
     url = server["url"] if why == "hung" else REFUSED
     tick(w, DISPATCH_EMBED_URL=url, DISPATCH_NOW=NOW)  # starts W2-A (no state yet), then finds the server down
@@ -1261,7 +1281,7 @@ def test_embed_starts_are_held_while_the_server_is_down_and_landings_are_not(w, 
 
 
 def test_embed_timeouts_count_to_hung_one_item_and_recovery_clears_it(w, server):
-    conf(w, embed_timeout_s=0.5)
+    conf(w, embed_timeout_s=0.5, embed_check_every=1)
     server["m"] = "hang"
     etick(w, server, NOW)
     etick(w, server, NOW + 60)
@@ -1291,7 +1311,7 @@ def test_embed_a_configured_restart_waits_for_its_time_and_is_rate_limited(w, se
     r = w.tmp / "restart.py"
     r.write_text(f"open({str(w.calls)!r}, 'a').write('restart\\n')\n")
     conf(w, embed_timeout_s=0.5, embed_hung_after=1, embed_restart_after_s=60,
-         embed_restart_cmd=f"{sys.executable} {r}")
+         embed_restart_cmd=f"{sys.executable} {r}", embed_check_every=1)
     server["m"] = "hang"
     for t in (NOW, NOW + 30, NOW + 90, NOW + 150, NOW + 1900):  # HUNG at NOW; 30 s: too soon; 150 s: within 30 min
         etick(w, server, t)
@@ -1703,3 +1723,481 @@ def test_gpu_a_dry_pass_reads_nothing(w):
     glog(w, "shared", LOADED)
     tick(w, "--dry")
     assert smi_calls(w) == [] and not (w.d / "gpu-health.json").exists()
+
+
+# ---- DEC-1032: the whole machine balanced by measured peaks --------------------------------------------------------------
+
+TASKS = ("slot launch_slot_: id  0 | task 7 | processing task, is_child = 0\n"
+         "slot      release: id  0 | task 7 | stop processing: n_tokens = 129, truncated = 0\n"
+         "srv  update_slots: all slots are idle\n")
+GIN = '[GIN] 2026/11/02 - 12:45:47 | 200 |  1.414239796s |       127.0.0.1 | POST     "/api/embed"\n'
+
+
+def sock_listen(port=11434):
+    return f"LISTEN    0      4096   127.0.0.1:{port}   0.0.0.0:*\n\t cubic cwnd:10\n"
+
+
+def sock_waiting(port=11434, age_ms=100_000, local=34494):
+    """A client socket whose request has had no answer yet (no byte received)."""
+    return (f"ESTAB     0      0      127.0.0.1:{local} 127.0.0.1:{port}\n\t cubic wscale:10,10 rto:204 "
+            f"rtt:0.042/0.027 bytes_sent:6698 bytes_acked:6699 segs_out:4 lastsnd:{age_ms} lastrcv:{age_ms} lastack:4\n")
+
+
+def sock_idle(port=11434, local=34500):
+    """An idle keep-alive connection: its answer arrived after its last send."""
+    return (f"ESTAB     0      0      127.0.0.1:{local} 127.0.0.1:{port}\n\t cubic bytes_sent:500 bytes_acked:501 "
+            "bytes_received:9000 lastsnd:90000 lastrcv:89990 lastack:89990\n")
+
+
+def plant_ss(w, *socks):
+    """A stand-in ss: prints the planted sockets (ss -Htnia's form), whatever its arguments."""
+    exe = w.tmp / "ss"
+    (w.tmp / "ss.txt").write_text("".join(socks))
+    exe.write_text(f"#!{sys.executable}\nimport sys\nsys.stdout.write(open({str(w.tmp / 'ss.txt')!r}).read())\n")
+    exe.chmod(0o755)
+
+
+def ptick(w, server, t, **env):
+    """One pass with the planted server as the fallback's target (its hits count the test requests)."""
+    return tick(w, DISPATCH_EMBED_URL=server["url"], DISPATCH_NOW=t, **env)
+
+
+def server_stale(w):
+    """The inbox-stale lines of the servers' causes (an inbox line keeps its first wording, which may name an item)."""
+    text = (w.d / "inbox-stale.txt").read_text() if (w.d / "inbox-stale.txt").exists() else ""
+    return [l for l in text.splitlines() if l.startswith("server")]
+
+
+def emb_shared(w):
+    return json.loads((w.d / "embed-health.json").read_text())["servers"]["shared"]
+
+
+def test_progress_a_busy_runner_with_slow_requests_is_never_hung(w, server):
+    """Requests wait 150 s each (the CPU fallback's slow requests), but tasks complete every pass: BUSY, never HUNG,
+    no item, starts not held, and no test request is sent (the log is readable)."""
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen(), sock_waiting(age_ms=150_000), sock_waiting(age_ms=40_000, local=34495))
+    ptick(w, server, NOW)
+    for n in range(1, 11):  # ten minutes, far past embed_stall_s (180 s)
+        glog(w, "shared", TASKS * 3 + GIN)
+        ptick(w, server, NOW + 60 * n)
+        sv = emb_shared(w)
+        assert sv["state"] == "BUSY" and sv["tasks_per_min"] == 3 and sv["waiting"] == 2
+    assert not items_with(w, "Server:") and server["hits"] == 0
+    assert status(w)["embedding_server"]["state"] == "BUSY" and status(w)["embedding_server"]["how"] == "progress"
+    text = (w.d / "status.txt").read_text()
+    assert "embedding server: shared BUSY 3 tasks/min (2 waiting, the oldest 150.0 s)" in text
+    assert "embedders: shared BUSY 3 tasks/min" in next(l for l in text.splitlines() if l.startswith("Balance: "))
+    assert server_stale(w) == []
+    assert len([c for c in calls(w) if c.startswith("launch")]) == 2  # W2-A, then W2-B: never held
+
+
+def test_progress_waiting_requests_and_no_task_for_the_stall_time_is_hung_once(w, server):
+    glog(w, "shared", LOADED + TASKS)
+    plant_ss(w, sock_listen(), sock_waiting(age_ms=5_000))
+    ptick(w, server, NOW)  # the first read: the stall is measured from here
+    for t in (NOW + 60, NOW + 120):
+        ptick(w, server, t)
+        assert emb_shared(w)["state"] == "WAITING" and not items_with(w, "Server:")
+    ptick(w, server, NOW + 180)  # embed_stall_s with requests waiting and no task: HUNG
+    hung = items_with(w, "Server:")
+    assert len(hung) == 1 and "HUNG since" in hung[0] and "1 request(s) waiting on port 11434" in hung[0]
+    assert "no task completed for 180 s" in hung[0] and "W2:" not in hung[0]
+    assert (w.d / "inbox-stale.txt").read_text().startswith("server: the embedding server HUNG since")
+    ptick(w, server, NOW + 240)
+    assert len(items_with(w, "Server:")) == 1  # once per incident
+    assert status(w)["ready_waits"]["W2-B T-B"] == HELD and server["hits"] == 0
+    assert "embedding server: shared HUNG since" in (w.d / "status.txt").read_text()
+    for i in (w.d / "inbox").glob("*.txt"):
+        i.rename(w.d / "inbox" / (i.name + ".read"))
+    glog(w, "shared", TASKS)  # progress again: cleared
+    ptick(w, server, NOW + 300)
+    assert emb_shared(w)["state"] == "BUSY" and server_stale(w) == []
+    ptick(w, server, NOW + 420)
+    assert any(c.startswith("launch") and "W2-B" in c for c in calls(w))
+
+
+def test_progress_nothing_waiting_is_idle_never_hung(w, server):
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen(), sock_idle())  # a keep-alive connection, its answer received: not waiting
+    for n in range(0, 12):
+        ptick(w, server, NOW + 60 * n)
+    sv = emb_shared(w)
+    assert sv["state"] == "IDLE" and sv["waiting"] == 0 and sv["quiet_s"] == 660
+    assert not items_with(w, "Server:") and server["hits"] == 0
+
+
+def test_progress_nothing_listening_is_not_running_once(w, server):
+    (w.d / "ready.txt").write_text("")
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen(11435))  # the query server listens; nothing on 11434
+    for n in range(4):
+        ptick(w, server, NOW + 60 * n)
+    down = items_with(w, "Server:")
+    assert len(down) == 1 and "NOT RUNNING since" in down[0] and "nothing listens on port 11434" in down[0]
+    assert emb_shared(w)["state"] == "NOT RUNNING"
+
+
+def test_progress_the_query_server_hung_is_its_own_item_and_line_and_holds_no_start(w, server):
+    glog(w, "shared", LOADED)
+    glog(w, "query", "time=x msg=start\n")
+    plant_ss(w, sock_listen(), sock_listen(11435), sock_waiting(11435, age_ms=200_000))
+    for n in range(4):
+        glog(w, "shared", TASKS)
+        ptick(w, server, NOW + 60 * n)
+    hung = items_with(w, "Server:")
+    assert len(hung) == 1 and "Server: the query embedding server" in hung[0] and "starts are not held" in hung[0]
+    assert "-server-query-hung" in next(i.name for i in (w.d / "inbox").glob("*.txt") if "Server:" in i.read_text())
+    assert "server query: the query embedding server HUNG since" in (w.d / "inbox-stale.txt").read_text()
+    assert status(w)["embedding_server"]["state"] == "BUSY"  # the shared server's: starts not held
+    assert HELD not in status(w)["ready_waits"].values() and [c for c in calls(w) if c.startswith("launch")]
+
+
+def test_progress_an_unreadable_log_falls_back_to_the_test_request_every_5_passes(w, server):
+    plant_ss(w, sock_listen())  # no log planted: progress cannot be judged
+    for n in range(6):
+        ptick(w, server, NOW + 60 * n)
+    assert server["hits"] == 2  # passes 1 and 6
+    assert status(w)["embedding_server"]["how"] == "probe" and status(w)["embedding_server"]["state"] == "healthy"
+    glog(w, "shared", LOADED)  # the log readable again: by progress, no more test requests
+    for n in range(6, 12):
+        ptick(w, server, NOW + 60 * n)
+    assert server["hits"] == 2 and status(w)["embedding_server"]["how"] == "progress"
+
+
+def gpu_used(w, used_mib):
+    smi(w, gpu=f"NVIDIA GeForce RTX 5070 Ti, {used_mib}, 16303, 5")
+
+
+def hold_rerank_gpu(w, *slots):
+    d = w.tmp / "rerank"
+    d.mkdir(exist_ok=True)
+    with open(w.tmp / "proc" / "locks", "a") as f:
+        for i in slots:
+            p = d / f"gov-os-rerank-gpu-{i}.lock"
+            p.write_text("")
+            f.write(f"1: FLOCK  ADVISORY  WRITE {4000 + i} 08:30:{os.stat(p).st_ino} 0 EOF\n")
+
+
+def own_max_history(wp, tid, kb):
+    lines = (wp.orch / "log" / "lead-mem.jsonl").read_text().splitlines()
+    r = json.loads(lines[0])
+    r["leads_kb"][tid] = kb
+    lines[0] = json.dumps(r)
+    (wp.orch / "log" / "lead-mem.jsonl").write_text("\n".join(lines) + "\n")
+
+
+@pytest.mark.parametrize("short", ["cpu", "ram", "gpu", "lead cap"])
+def test_admission_refuses_for_each_short_resource_naming_it(wp, short):
+    """DEC-1032: a newcomer starts only with room on every resource; each refusal names the one that is short."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    if short == "ram":  # the running lead once used 20 GB: the cap fits, its own max does not
+        own_max_history(wp, "T-L0", 20 * GB)
+    gpu_used(wp, 12000 if short == "gpu" else 3584)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU; nothing starts (no peaks yet)
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    leads(wp, 1)
+    if short == "lead cap":
+        (wp.tmp / "meminfo").write_text(f"MemAvailable: {5 * GB} kB\n")
+    if short == "cpu":
+        cpu_prev(wp, busy=1000, total=10000)
+        (wp.tmp / "procstat").write_text(PROCSTAT.format(busy=2900, idle=9100, iowait=0))
+    tick(wp, minute=short != "cpu", DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    want = {"cpu": "real CPU: 19.0 busy cores", "ram": "memory: available + leads'",
+            "gpu": "GPU memory: 4303 MiB free < 5632 MiB (a reranker's 3584 MiB (a GPU reranker slot free: 0 of 2 held)"
+                   " + headroom 2048 MiB)", "lead cap": "memory: lead cap 0 (literal rule: "}[short]
+    assert not s["admit"] and s["admit_reason"].startswith(want), s["admit_reason"]
+    assert all(r.startswith("not admitted: " + want[:20]) for r in s["ready_waits"].values()) and calls(wp) == []
+
+
+def test_admission_gpu_need_is_only_the_headroom_when_both_reranker_gpu_slots_are_held(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 12000)  # 4303 MiB free: a reranker's share would not fit, the headroom does
+    hold_rerank_gpu(wp, 0, 1)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert s["admit"] and "GPU memory 4303 MiB free >= 2048 MiB" in s["admit_reason"]
+    assert s["rerankers"]["gpu_held"] == 2 and calls(wp)[0].startswith("launch W2-A")
+
+
+def test_admission_a_gpu_read_older_than_its_limit_is_not_judged(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 16000)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    conf(wp, memory_rule="literal", gpu_check_every=100)  # no new read: the last is 400 s old at the next pass
+    tick(wp, DISPATCH_NOW=NOW + 400)
+    s = status(wp)
+    assert s["admit"] and "GPU memory: not judged" in s["admit_reason"]
+
+
+def test_slots_follow_the_shared_embedders_device(wp):
+    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
+    mixed_history(wp)
+    (wp.d / "ready.txt").write_text("")
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    smi(wp)
+    glog(wp, "shared", LOADED)
+
+    def target(t):
+        tick(wp, DISPATCH_NOW=t)
+        return status(wp)["slots_target"], status(wp)["admit_reason"], (wp.d / "status.txt").read_text()
+    target(NOW)  # the first pass reads the layers
+    n, why, text = target(NOW + 60)
+    assert n == 3 and "+ 3 slot runs at" in why and "slots 3 by device (gpu 29/29)" in text
+    glog(wp, "shared", "load_tensors: offloaded 20/29 layers to GPU\n")
+    target(NOW + 120)
+    n, why, text = target(NOW + 180)
+    assert n == 2 and "+ 2 slot runs at" in why and "slots 2 by device (partial 20/29)" in text
+    glog(wp, "shared", ON_CPU)
+    target(NOW + 240)
+    assert target(NOW + 300)[0] == 2 and "slots 2 by device (cpu 0/29)" in target(NOW + 360)[2]
+    conf(wp, memory_rule="slots", slots_gpu=4, slots_cpu=1)  # configured
+    glog(wp, "shared", LOADED)
+    target(NOW + 420)
+    assert target(NOW + 480)[0] == 4
+
+
+def test_slots_never_count_fewer_than_the_slots_held(wp):
+    (wp.d / "config.json").write_text(json.dumps({"memory_rule": "slots"}))
+    mixed_history(wp)
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    smi(wp)
+    glog(wp, "shared", ON_CPU)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    wp.held.write_text(json.dumps(["/tmp/gov-os-heavy-slot-1.lock", "/tmp/gov-os-heavy-slot-2.lock",
+                                   "/tmp/gov-os-heavy-slot-3.lock"]))
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    assert status(wp)["slots_target"] == 2 and "+ 3 slot runs at" in status(wp)["admit_reason"]
+
+
+def test_gpu_a_partial_load_is_one_alert_per_incident(w):
+    smi(w)
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", "load_tensors: offloaded 20/29 layers to GPU\n")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = gpu_items(w)
+    assert len(items) == 1 and "GPU: partial 20/29 layers (shared)" in items[0].read_text()
+    assert "only 20/29 layers on the GPU" in items[0].read_text() and "offloaded 20/29 layers" in items[0].read_text()
+    glog(w, "shared", "load_tensors: offloaded 18/29 layers to GPU\n")  # still short: the same incident
+    items[0].rename(w.d / "inbox" / (items[0].name + ".read"))
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert gpu_items(w) == [] and (w.d / "inbox-stale.txt").read_text().startswith("gpu: ")
+    glog(w, "shared", LOADED)  # all layers again: cleared
+    tick(w, DISPATCH_NOW=NOW + 180)
+    assert not (w.d / "inbox-stale.txt").exists()
+    glog(w, "shared", "load_tensors: offloaded 1/29 layers to GPU\n")  # a new incident
+    tick(w, DISPATCH_NOW=NOW + 240)
+    assert len(gpu_items(w)) == 1
+
+
+def test_gpu_a_partial_load_already_current_at_the_first_pass_alerts(w):
+    smi(w)
+    glog(w, "shared", "load_tensors: offloaded 27/29 layers to GPU\n")
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1 and "partial 27/29 layers (shared)" in gpu_items(w)[0].read_text()
+
+
+def test_gpu_the_query_server_expected_on_the_gpu_alerts_on_0_and_partial_loads(w):
+    smi(w)
+    conf(w, gpu_expected={"query": True})  # the CTO's switch after the query server moves to the GPU
+    glog(w, "query", ON_CPU)
+    tick(w)
+    assert len(gpu_items(w)) == 1 and "0 layers (query)" in gpu_items(w)[0].read_text()
+    glog(w, "query", LOADED + "load_tensors: offloaded 10/29 layers to GPU\n")
+    gpu_items(w)[0].rename(w.d / "inbox" / "read-1.txt.read")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1 and "partial 10/29 layers (query)" in gpu_items(w)[0].read_text()
+    conf(w)  # the default: CPU-only by design, a partial load is no alert either
+    glog(w, "query", LOADED + "load_tensors: offloaded 10/29 layers to GPU\n")
+    gpu_items(w)[0].rename(w.d / "inbox" / "read-2.txt.read")
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert gpu_items(w) == []
+
+
+def test_balance_line_shows_every_resource_and_the_rerankers(wp):
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    smi(wp, gpu="NVIDIA GeForce RTX 5070 Ti, 7168, 16303, 30", apps="4001, x, [N/A]\n")
+    fake_proc(wp, 4001, 1, 0, cmd="/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Qwen/Q")
+    glog(wp, "shared", LOADED + TASKS)
+    plant_ss(wp, sock_listen(), sock_listen(11435))
+    hold_rerank_gpu(wp, 0)
+    rr = [{"cmd": "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Qwen/Q", "cwd": "/",
+           "pid": 4000 + i, "ppid": 100 if i == 0 else 1, "rss_kb": GB} for i in range(3)]
+    leads(wp, 1, extra=rr)
+    cpu_prev(wp, busy=1000, total=10000)
+    (wp.tmp / "procstat").write_text(PROCSTAT.format(busy=2600, idle=9400, iowait=0))  # 16 busy cores
+    tick(wp, minute=False)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    line = next(l for l in (wp.d / "status.txt").read_text().splitlines() if l.startswith("Balance: "))
+    for part in ("CPU ", "/20 busy (band 14-18: ", "RAM 16.0 GB available (floor 3.0 GB)",
+                 "GPU 7.0/15.9 GB used, 8.9 free (headroom 2.0 GB; embedders' layers: shared 29/29; holders: reranker 1)",
+                 "embedders: shared IDLE", "slots 3 by device (gpu 29/29)", "lead cap ", " from memory (",
+                 "rerankers 3 (3.0 GB RSS; 1 of 2 GPU slots held; reserve "):
+        assert part in line, (part, line)
+    b = status(wp)["balance"]
+    assert b["rerankers"]["n"] == 3 and b["rerankers"]["outside_kb"] == 2 * GB and b["slots_target"] == 3
+    assert b["gpu"]["free_mib"] == 16303 - 7168 and b["lead_cap"]["cap"] >= 1
+
+
+def test_balance_the_cpu_band(w):
+    for busy, band in ((1200, "below"), (2600, "within"), (2900, "above")):  # 2, 16 and 19 cores of 20
+        cpu_prev(w, busy=1000, total=10000)
+        (w.tmp / "procstat").write_text(PROCSTAT.format(busy=busy, idle=12000 - busy, iowait=0))
+        tick(w, minute=False)
+        assert status(w)["balance"]["cpu_in_band"] == band
+
+
+# ---- the review of v4.6 (F1 to F4) --------------------------------------------------------------------------------------
+
+def gin(code):
+    return f'[GIN] 2026/11/02 - 12:45:47 | {code} |  1.0s |       127.0.0.1 | POST     "/api/embed"\n'
+
+
+def test_review46_f1_a_first_request_after_an_idle_spell_is_not_hung_its_wait_is_timed(w, server):
+    """The stall clock starts when the wait starts, never at the last task: idle 10 minutes, then a request caught in
+    flight (sent 0.4 s ago) is WAITING; HUNG only once it has waited embed_stall_s with no task done."""
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen())
+    for n in range(11):  # 10 idle minutes: no task, nothing waiting
+        ptick(w, server, NOW + 60 * n)
+    assert emb_shared(w)["state"] == "IDLE" and emb_shared(w)["quiet_s"] == 600
+    plant_ss(w, sock_listen(), sock_waiting(age_ms=400))
+    ptick(w, server, NOW + 660)
+    assert emb_shared(w)["state"] == "WAITING" and not items_with(w, "Server:")
+    for t in (NOW + 720, NOW + 780):  # the same wait goes on, under 180 s
+        ptick(w, server, t)
+        assert emb_shared(w)["state"] == "WAITING" and not items_with(w, "Server:")
+    ptick(w, server, NOW + 840)  # 180.4 s of waiting with no task: HUNG, since the wait began
+    hung = items_with(w, "Server:")
+    assert len(hung) == 1 and f"HUNG since {datetime.fromtimestamp(NOW + 659.6):%Y-%m-%d %H:%M:%S}" in hung[0]
+    plant_ss(w, sock_listen(), sock_waiting(age_ms=150_000))  # a request found already waiting 150 s: timed from its send
+    glog(w, "shared", TASKS)
+    ptick(w, server, NOW + 900)  # progress: cleared
+    ptick(w, server, NOW + 960)
+    assert emb_shared(w)["state"] == "WAITING" and emb_shared(w)["stalled_s"] == 60  # since the last task, not 150 s
+
+
+def test_review46_f2_failed_requests_are_not_progress_and_a_run_of_them_is_failing(w, server):
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen())
+    rtick = lambda t: tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)  # the fallback test request fails too
+    rtick(NOW)
+    glog(w, "shared", gin(500) + gin(200) + gin(499) + gin(500) + gin(500))  # a 2xx breaks the run; a 499 is the
+    rtick(NOW + 60)                                                          # client's: 2 in a row, not failing
+    assert emb_shared(w)["state"] == "BUSY" and emb_shared(w)["fails_in_a_row"] == 2
+    glog(w, "shared", gin(500))  # the third failure in a row, no success: FAILING
+    rtick(NOW + 120)
+    sv = emb_shared(w)
+    assert sv["state"] == "FAILING" and sv["requests_per_min"] == 0 and sv["failed_per_min"] == 1
+    failing = items_with(w, "Server:")
+    assert len(failing) == 1 and "FAILING since" in failing[0] and "3 requests in a row failed" in failing[0]
+    assert "the last with status 500" in failing[0] and "starts are held" in failing[0]
+    assert (w.d / "inbox-stale.txt").read_text().startswith("server: the embedding server FAILING since")
+    glog(w, "shared", gin(500) * 4)
+    rtick(NOW + 180)  # starts held, once per incident
+    assert len(items_with(w, "Server:")) == 1 and status(w)["ready_waits"]["W2-B T-B"] == HELD
+    glog(w, "shared", gin(200))
+    rtick(NOW + 240)
+    assert emb_shared(w)["state"] == "BUSY" and server_stale(w) == []
+
+
+def test_review46_f2_a_5xx_line_never_clears_a_hang(w, server):
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen(), sock_waiting(age_ms=5_000))
+    for t in (NOW, NOW + 60, NOW + 120, NOW + 180):
+        ptick(w, server, t)
+    assert emb_shared(w)["state"] == "HUNG" and len(items_with(w, "Server:")) == 1
+    glog(w, "shared", gin(500))  # a failed request: not progress (v4.6 counted it and cleared the hang)
+    ptick(w, server, NOW + 240)
+    sv = emb_shared(w)
+    assert sv["state"] == "HUNG" and sv["hung_since"] == NOW and sv["requests_per_min"] == 0
+    assert len(items_with(w, "Server:")) == 1 and server_stale(w)
+
+
+def test_review46_f3_a_connection_that_sent_nothing_is_not_waiting(w, server):
+    glog(w, "shared", LOADED)
+    never_used = ("ESTAB     0      0      127.0.0.1:34600 127.0.0.1:11434\n\t cubic wscale:10,10 rto:204 rtt:0.03/0.01 "
+                  "lastsnd:900000 lastrcv:900000 lastack:900000\n")  # -i prints lastsnd though nothing was sent
+    plant_ss(w, sock_listen(), never_used)
+    for n in range(6):
+        ptick(w, server, NOW + 60 * n)
+    sv = emb_shared(w)
+    assert sv["state"] == "IDLE" and sv["waiting"] == 0 and not items_with(w, "Server:")
+
+
+def test_review46_f4_the_rerankers_reserve_is_repriced_from_their_peak_since_the_era(wp):
+    plant_reranker_peak(wp)  # the rerankers' p95: 3 GB
+    queue_rr = [{"cmd": "/usr/bin/python3 /x/tools/land.py W2-Q=abcdef1", "cwd": "/", "pid": 800, "ppid": 1},
+                {"cmd": "/home/u/.local/share/gov-os/reranker-venv/bin/python -I serve.py", "cwd": "/", "pid": 801,
+                 "ppid": 800, "rss_kb": 600_000}]
+    leads(wp, 1, extra=queue_rr)
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 300)  # 1 sample of 30: the old p95
+    assert f"services' headroom {(600_000 + 3 * GB - 600_000) // 1024} MB" in status(wp)["admit_reason"]
+    assert "reserve 3.0 GB: the rerankers' p95 (1 of 30 samples, 0.0 of 24 h, since 2026-11-02 13:00)" in \
+        (wp.d / "status.txt").read_text()
+    many = [{"cmd": "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q", "cwd": "/",
+             "pid": 900 + i, "ppid": 100, "rss_kb": 500_000} for i in range(29)]  # inside the lead: sampled only
+    leads(wp, 1, extra=queue_rr + many)
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 360)  # 31 samples over 60 s: under a day, the p95 (G2)
+    assert status(wp)["reranker_reserve"]["kb"] == 3 * GB and "31 of 30 samples, 0.0 of 24 h" in \
+        status(wp)["reranker_reserve"]["how"]
+    leads(wp, 1, extra=queue_rr)
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 300 + 86400)  # 32 samples over a day: the peak
+    s = status(wp)
+    # reserved: 2 allowed x the 600,000 kB peak = 1,200,000, less the 600,000 held outside the leads now
+    assert f"services' headroom {(600_000 + 600_000) // 1024} MB" in s["admit_reason"]
+    assert s["reranker_reserve"]["kb"] == 1_200_000 and s["reranker_reserve"]["samples"] == 32
+    assert "reserve 1.1 GB: 2 x the 585 MB peak (32 samples since 2026-11-02 13:00)" in (wp.d / "status.txt").read_text()
+    conf(wp, memory_rule="literal", reranker_era_from="2099-01-01 00:00")  # an era not begun: no samples, the p95
+    tick(wp, DISPATCH_NO_PEAKS_REFRESH=1, DISPATCH_NOW=NOW + 360 + 86400)
+    assert status(wp)["reranker_reserve"]["samples"] == 0 and status(wp)["reranker_reserve"]["kb"] == 3 * GB
+
+
+# ---- review round 2 (G1, G2) ----------------------------------------------------------------------------------------------
+
+def test_round2_g1_client_4xx_never_fail_the_server_and_5xx_failing_clears_after_a_quiet_span(w, server):
+    """Three 400s (and 404s, 499s) on a quiet server: the client's, never FAILING. Three 500s: FAILING (the fallback
+    test request refused, so it cannot clear it), then cleared after embed_fail_clear_s with nothing new."""
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen())
+    rtick = lambda t: tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
+    rtick(NOW)
+    glog(w, "shared", gin(400) * 3 + gin(404) + gin(499))
+    for n in range(1, 8):  # and seven quiet passes after them
+        rtick(NOW + 60 * n)
+        sv = emb_shared(w)
+        assert sv["state"] == "IDLE" and sv["fails_in_a_row"] == 0 and not items_with(w, "Server:")
+    glog(w, "shared", gin(500) * 3)
+    rtick(NOW + 480)
+    assert emb_shared(w)["state"] == "FAILING" and len(items_with(w, "Server:")) == 1
+    for t in (NOW + 540, NOW + 600, NOW + 720):  # quiet, under 300 s since the last failure: still FAILING
+        rtick(t)
+        assert emb_shared(w)["state"] == "FAILING"
+    assert status(w)["ready_waits"]["W2-B T-B"] == HELD
+    rtick(NOW + 780)  # 300 s with no new failure: the run ends, the incident clears, starts are free
+    sv = emb_shared(w)
+    assert sv["state"] == "IDLE" and sv["fails_in_a_row"] == 0 and not sv["hung_since"] and server_stale(w) == []
+    assert status(w)["embedding_server"]["state"] == "IDLE" and len(items_with(w, "Server:")) == 1
+    rtick(NOW + 900)
+    assert any(c.startswith("launch") and "W2-B" in c for c in calls(w))
+
+
+def test_round2_g1_the_test_request_clears_failing_and_a_runner_task_error_counts(w, server):
+    conf(w, embed_fail_clear_s=3600)  # the quiet span apart: only the test request can clear it here
+    glog(w, "shared", LOADED)
+    plant_ss(w, sock_listen())
+    rtick = lambda t: tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
+    rtick(NOW)
+    glog(w, "shared", gin(500) + "srv    send_error: task id = 42, error: the runner failed\n" + gin(503))
+    rtick(NOW + 60)  # three server failures, the test request refused: FAILING
+    assert emb_shared(w)["state"] == "FAILING" and emb_shared(w)["last_fail_code"] == 503
+    for n in range(2, 6):  # passes 3 to 6: within embed_check_every (5) passes of the last test request: none sent
+        ptick(w, server, NOW + 60 * n)
+        assert server["hits"] == 0 and emb_shared(w)["state"] == "FAILING"
+    ptick(w, server, NOW + 360)  # pass 7, five after the refused one: one test request, it answers: cleared
+    assert server["hits"] == 1 and emb_shared(w)["state"] == "IDLE" and server_stale(w) == []

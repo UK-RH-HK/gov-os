@@ -1,3 +1,5 @@
+**SUPERSEDED by ACT-QUERY-GPU-2 (DEC-1033): never apply this one; with the old code every new search would lose its semantic facet.**
+
 # ACT-QUERY-GPU-1: the query embedder on the GPU (DEC-1032, the sprint's step 2; DEC-798 and DEC-975 amended)
 
 For the owner's operator, in a plain terminal (it restarts the query embedding server at 127.0.0.1:11435, which runs
