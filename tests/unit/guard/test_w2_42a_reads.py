@@ -63,8 +63,13 @@ PASS = [
     "grep -n x n.md",
     # A git commit message read from a heredoc.
     "git commit -q -F - <<'EOF'\nfor f in $(ls eval); do cat $f; done is the form refused\nEOF",
-    # A number from nproc as an option's value.
+    # A number from nproc, wc or date as an option's value or a name's part.
     "grep -m $(nproc) x docs/q.md",
+    "head -n $(wc -l < docs/n.md) docs/q.md",
+    "grep -c x docs/q.md > /tmp/w242a-$(date +%s).txt; cat docs/q.md $(wc -l docs/n.md)",
+    # Text in single quotes is no substitution; an apostrophe in double quotes opens no quote (log lines 84, 85).
+    "grep -n \"A process's cores\" -A1 docs/q.md; grep -n '| `rerank_gpu_slots` |' docs/q.md",
+    "python3 tool.py docs/q.md 'for f in $(cat list.txt); do cat $f; done' 'cat list.txt | xargs cat'",
 ]
 
 
@@ -93,6 +98,16 @@ REFUSE = [
     ("cat <<'EOF' | bash\nfind eval | xargs cat\nEOF", HIDDEN_REFUSAL),
     ("tk create x <<'EOF'\nsee eval/hidden/a.yaml\nEOF", HIDDEN_REFUSAL),
     ("cat 'unbalanced <<EOF\neval/hidden/a.yaml", None),
+    ("cat .e\\\nnv", SECRET_REFUSAL),
+    ("cat eval/hid\\\nden/a.yaml", HIDDEN_REFUSAL),
+    ("cat $(date)", RUNTIME_REFUSAL),
+    ("cat $(date +%Y/%m)", RUNTIME_REFUSAL),
+    ("cat $(wc -l eval/hidden/a.yaml)", HIDDEN_REFUSAL),
+    ("grep -n \"it's\" docs/q.md $(cat list.txt)", RUNTIME_REFUSAL),  # outside the quotes
+    ("grep -n \"x$(cat list.txt)'y\" docs/q.md; cat $(cat list.txt)", RUNTIME_REFUSAL),
+    ("cat 'a' $(cat list.txt) 'b'", RUNTIME_REFUSAL),
+    ("cat $'it\\'s' $(cat list.txt) 'x'", RUNTIME_REFUSAL),  # $'...': unsure, no quote is read
+    ("cat \"$(cat list.txt)\"", RUNTIME_REFUSAL),
 ]
 
 

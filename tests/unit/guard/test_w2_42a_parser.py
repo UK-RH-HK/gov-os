@@ -175,6 +175,28 @@ def test_a_run_the_parser_cannot_read_is_unresolvable(root):
     assert SENT in got("cat > s.sh <<'EOF'\ntouch x\nEOF\nchmod +x s.sh; ./s.sh", root)  # no #! line
 
 
+def test_a_python_script_written_and_run_is_judged_as_its_code(root):
+    t = got(f"cat > s.py <<'EOF'\nopen('{A}/py', 'w').write('x')\nEOF\npython3 s.py", root)
+    assert "R/" + A + "/py" in t
+    assert SENT in got("cat > s.py <<'EOF'\nimport sys\nopen(sys.argv[1] + 'x', 'w')\nEOF\npython3 s.py $Q", root)
+
+
+def test_a_python_heredoc_the_shell_rewrites_unpredictably_is_unresolvable(root):
+    assert SENT in got("python3 - <<EOF\nprint('$(echo x | sed s/x/y/)')\nEOF", root)
+    assert got("python3 - <<'EOF'\nprint('it''s $(x)')\nEOF", root) == []
+
+
+@pytest.mark.parametrize("command", ['eval "$W242A_UNSET"', 'sh -c "$W242A_UNSET"', "bash -c 'echo \"x > f'"])
+def test_an_inner_command_the_guard_cannot_read_is_unresolvable(root, command, monkeypatch):
+    monkeypatch.delenv("W242A_UNSET", raising=False)
+    assert SENT in got(command, root)
+
+
+def test_an_inner_command_from_a_known_variable_is_judged(root, monkeypatch):
+    monkeypatch.setenv("W242A_SET", f"touch {A}/e")
+    assert "R/" + A + "/e" in got('eval "$W242A_SET"', root)
+
+
 def test_a_script_only_read_is_no_run(root):
     assert got("cat > /tmp/w242a.md <<'EOF'\nrm -rf src\nEOF\ntail -3 /tmp/w242a.md", root) == ["/tmp/w242a.md"]
 

@@ -81,6 +81,9 @@ _COVERAGE_VALUED = frozenset("--concurrency --context --data-file --debug --incl
 # A substitution's place in a command once it is set aside (item 1).
 _SUB_RE = re.compile(r"__gov_sub(\d+)__")
 _NUMERIC_RE = re.compile(r"[-+]?[0-9]+(\.[0-9]+)?")
+# date +FORMAT of numeric fields only: its output is digits and separators, no slash (W2-42a).
+_DATE_FORMAT_RE = re.compile(r"\+(%[sYmdHMSNjuwyekIFTRGgVUWCz]|[-_:.T0-9])+")
+_WC_COUNTS = frozenset("-l -c -w -m -L --lines --bytes --words --chars --max-line-length".split())
 # The words of a program's code in a heredoc, judged as paths (W2-42a): split where no path goes on.
 _CODE_PIECE_RE = re.compile(r"""[\s'"()\[\]{},;=<>|&`]+""")
 # The writes the write rules do not read as writes (DEC-821, no write rule
@@ -728,15 +731,45 @@ def _names_used(loop: list[str], command: str, subs: list[str]) -> bool:
     return len(uses) > 1
 
 
+def _single_quoted(command: str) -> list[tuple[int, int]]:
+    """Where *command*'s single-quoted text lies, as the shell reads it
+    (W2-42a): an apostrophe inside double quotes or after a backslash opens
+    none.  Unsure (a heredoc is left in the text, or a quote is not closed):
+    none, so every substitution is taken as one (fail closed)."""
+    if "'" not in command or "<<" in command or "$'" in command:
+        return []
+    out: list[tuple[int, int]] = []
+    double, i = False, 0
+    while i < len(command):
+        c = command[i]
+        if c == "\\":
+            i += 2
+            continue
+        if c == '"':
+            double = not double
+        elif c == "'" and not double:
+            end = command.find("'", i + 1)
+            if end < 0:
+                return []
+            out.append((i, end + 1))
+            i = end + 1
+            continue
+        i += 1
+    return [] if double else out
+
+
 def _set_aside(command: str) -> tuple[str, list[str]]:
     """*command* with each outermost ``$(...)`` and backtick substitution
     replaced by a word of its own, and the commands they hold.  An
     arithmetic expansion is none (W2-42a): what it holds is set aside on its
     own."""
     outer: list[tuple[int, int, int, int]] = []  # its text's ends, its command's
+    quoted = _single_quoted(command)
     for s, e in sorted(_spans(command)):
         if command[s - 2:s] == "$(" and _arithmetic(command, s, e):
             continue
+        if any(a <= s - 1 < b for a, b in quoted):
+            continue  # inside single quotes: text, not a substitution (W2-42a)
         if command[s - 2:s] == "$(":
             a, b = s - 2, min(e + 1, len(command))
         elif command[s - 1:s] == "`":
@@ -918,7 +951,13 @@ class _Judge:
         if tool_name == "Bash":
             # W2-42a (KPI 6, 10): a data heredoc's body is no command, nor $((...)) a substitution; a program's
             # code in a heredoc is judged by the paths it names, as a python3 -c string is.
-            command, codes = bash_writes.read_view(text("command"))
+            whole = text("command")
+            if "\\\n" in whole:
+                # KPI 7: a name continued over a line is read joined too (it only names more).
+                why = self._tool(tool_name, dict(tool_input, command=whole.replace("\\\n", "")), cwd)
+                if why:
+                    return why
+            command, codes = bash_writes.read_view(whole)
             for code in codes:
                 for piece in _CODE_PIECE_RE.split(code):
                     if piece and not piece.startswith("-"):
@@ -1509,6 +1548,13 @@ class _Judge:
                 name == "nproc" and all(a in ("--all",) for a in args)):
             # W2-42a (KPI 10): numbers, read as names in the folder it runs in; placed there.
             return True, self.at(".", cwd, False) or self.numbered(cwd)
+        if name == "date" and len(args) == 1 and _DATE_FORMAT_RE.fullmatch(args[0]):
+            return True, self.at(".", cwd, False) or self.numbered(cwd)  # a date in digits
+        if name == "wc" and all(a in _WC_COUNTS for a in args if a.startswith("-")):
+            # Counts, and the names of the files it was given (its own words, judged as paths).
+            operands = [a for a in args if not a.startswith("-")]
+            return True, next((why for a in operands for why in [self.at(a, cwd, False)] if why), "") or \
+                self.at(".", cwd, False) or self.numbered(cwd)
         if name in _FILTERS:
             return False, ""
         return None, ""

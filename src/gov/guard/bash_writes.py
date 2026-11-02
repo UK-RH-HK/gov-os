@@ -1200,9 +1200,9 @@ class Judgement:
                 elif name in _SHELLS and any(_short(a, "c") for a in args):
                     i = next(i for i, a in enumerate(args) if _short(a, "c"))
                     if i + 1 < len(args):
-                        self.sub(args[i + 1], ecwd, whole, depth)
+                        self.inner(args[i + 1], ecwd, whole, depth)
                 elif name == "eval":
-                    self.sub(" ".join(args), ecwd, whole, depth)
+                    self.inner(" ".join(args), ecwd, whole, depth)
                 elif _PY.match(name):
                     self.inline_python(args, part, ecwd, whole, depth)
                 elif name in ("git", "dd", "truncate", "sort", "rsync", "patch"):
@@ -1291,7 +1291,12 @@ class Judgement:
         if how == "python":
             i = next((i for i, w in enumerate(head) if self.basename(w) in names), None)
             argv = [self.expand(w) for w in head[i:]] if i is not None else None
+            at = len(self.findings)
             self.code(body["text"], part, ecwd, whole, depth, shell_text=not body["quoted"], argv=argv)
+            # The product (W2-42a, KPI 8): a Python file the command writes and runs is judged as its code.
+            for targets, _scope, _code in self.findings[at:]:
+                self.writes += [SENT if raw == SENT or full is None else os.path.realpath(full)
+                                for raw, full in targets]
         elif how == "shell" and (body["quoted"] or not _EXPANSION.search(body["text"])):
             self.script_shell(body["text"], part, ecwd, whole, depth)
         else:
@@ -1352,6 +1357,20 @@ class Judgement:
                 return None
             i += 2 if a in ("-W", "-X") else 1
         return [self.expand(w) for w in args[i:]] or ["-"]
+
+    def inner(self, command, ecwd, whole, depth):
+        """An sh -c string or eval's words (W2-42a, failure line 2): a word that does not expand to text the guard
+        knows, or a string the scan cannot read, is unresolvable; otherwise it is judged as a command."""
+        if re.fullmatch(r"\$\{?[A-Za-z_]\w*\}?|\$[0-9@*#?]", command.strip()):
+            value = self.expand(command.strip())
+            if value is None:
+                self.unread.append(SENT)
+                return
+            command = value
+        try:
+            self.sub(command, ecwd, whole, depth)
+        except Unreadable:
+            self.unread.append(SENT)
 
     def sub(self, command, ecwd, whole, depth):
         """A command inside this one (a substitution, an sh -c string, eval's words, a shell heredoc)."""
@@ -1423,6 +1442,7 @@ class Judgement:
             if not texts or None in texts:
                 texts = [code]
                 self.findings.append(([(SENT, None)], whole, False))
+                self.unread.append(SENT)  # the product: code the shell rewrites unpredictably (W2-42a)
         for text in dict.fromkeys(texts):
             try:
                 targets = python_writes(text, ecwd, self.nested(whole), depth, argv, self.getenv)
