@@ -966,3 +966,14 @@ from W2-126's ticket and README interface, without its implementation.
   (it reaches this machine's Ollama): 13 passed, the replaced case red as stated; the keep-apart pair, the round-3
   case and the changed query-cache cases: 12 passed; `test_w2_54_query_cache.py`, `test_w2_54_cpu_embedder.py` and
   `test_w2_54_dropped_order.py` whole, with the per-case cache folder: 43 passed.
+- **The packet-hash case's states hold for both caches** (P-W2-126-QC (a), `Rewrite-Reason: DEC-1033`; DEC-1042):
+  `test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` read "the context left no cache file to make
+  read-only" from the tree's own file alone, and W2-126 answers a question its machine-wide cache already holds
+  without writing that file. The case now names its own machine-wide folder (`<tmp_path>/case-vector-cache`, on the
+  build and every context); "deleted" removes the tree's cache files and the machine folder's (the premise: at least
+  one existed, and none survives); ".gov-runtime/ read-only" makes the machine folder (made if absent) read-only as
+  well, each checked to refuse a new file; "the cache's files read-only" acts on the files either cache holds (the
+  premise: at least one); "full" lowers both bounds (`GOV_QUERY_VECTOR_CACHE_MAX_BYTES` and
+  `GOV_VECTOR_CACHE_MAX_BYTES`, 256 KiB). What it guards is unchanged: one ticket, one packet and one hash, the first
+  context's in a new store, in every state; its row above is unchanged. Run on `w2/integrate`'s code (this
+  tree's `src/`, no W2-126 code): `test_w2_54_query_cache.py` whole, 14 passed (the case 8.7 s).
