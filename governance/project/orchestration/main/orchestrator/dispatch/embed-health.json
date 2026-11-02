@@ -1,1 +1,1 @@
-{"passes": 750, "last_check_at": 1793616099.1851304, "last_result": "timeout", "last_secs": 33.61, "last_why": "no answer in 30 s", "fails": 2, "first_fail_at": 1793616038.684307, "hung_since": null, "last_ok_at": 1793615973.177906, "state": "failing"}
+{"passes": 767, "last_check_at": 1793617114.742901, "last_result": "timeout", "last_secs": 33.4, "last_why": "no answer in 30 s", "fails": 5, "first_fail_at": 1793616878.550163, "hung_since": 1793616878.550163, "last_ok_at": 1793616810.041147, "state": "HUNG"}

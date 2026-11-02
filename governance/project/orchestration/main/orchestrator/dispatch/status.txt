@@ -1,13 +1,13 @@
-dispatcher 2026-11-02 10:41:05
+dispatcher 2026-11-02 10:58:01
 leads running (4, from the processes): W2-04, W2-122, W2-123, W2-61h
-load 11.5/14.2/14.7; real busy cores 8.16 of 20 (the embedding server 7.37); memory available 17276 MB; gate_check (for comparison) open (OPEN leads=4 load=11.5/14.7 nproc=20 have=21853456kB need=14715024kB); disk open
-admission (by peaks, DEC-1008 item 5): memory: available + leads' 21342 MB < 23089 MB (slots rule: floor + 4 running + 0 launching at 2274 MB (outside verification) or their own max + the newcomer 2274 MB + 3 slot runs at 1660 MB + service
+load 10.1/11.2/12.6; real busy cores 8.43 of 20 (the embedding server 8.12); memory available 18089 MB; gate_check (for comparison) open (OPEN leads=4 load=10.1/12.6 nproc=20 have=20175064kB need=13846908kB); disk open
+admission (by peaks, DEC-1008 item 5): a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 19 min, /home/usain/gov-os-worktrees/W2-61h)
 peaks 2026-11-02 10:26:05: a lead p95 4084 MB, max 9580 MB
-heavy steps outside a slot: none
-heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: nothing to land; main tree NOT clean on w2/integrate
+FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 19 min, /home/usain/gov-os-worktrees/W2-61h); python3 -m gov.cli.main check (pid 3871460, 8 min, /home/usain/gov-os-worktrees/W2-61h)
+heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: nothing to land; main tree clean on w2/integrate
 inbox unread: 0
-ready list: stagger: last start 117 s ago (< 120 s)
+ready list: W2-123 DAEO-qzrq: embedding server hung: starts held (DEC-1015); W2-04 DAEO-u4oz: embedding server hung: starts held (DEC-1015); W2-122 DAEO-blwa: embedding server hung: starts held (DEC-1015); W2-66b DAEO-zuiy: embedding server hung: starts held (DEC-1015); W2-81 DAEO-l78m: embedding server hung: starts held (DEC-1015); W2-92 DAEO-n0wb: embedding server hung: starts held (DEC-1015); W2-104 DAEO-drhj: embedding server hung: starts held (DEC-1015); W2-61h DAEO-h2k3: embedding server hung: starts held (DEC-1015)
 sentinel: watched
-guard harvest: last 2026-11-02 10:40:21, rc 0, 16.5 s of 300 s
-embedding server: failing (2 in a row; no answer in 30 s)
-heavy slot holders: slot 1 pid 3684083 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min; slot 2 pid 3835744 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 3837482 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min
+guard harvest: last 2026-11-02 10:50:18, rc 0, 13.0 s of 300 s
+embedding server: HUNG since 2026-11-02 10:54:38 (5 failed checks; no answer in 30 s); starts held
+heavy slot holders: slot 1 pid 3902161 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min; slot 2 pid 3835744 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 3837482 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min

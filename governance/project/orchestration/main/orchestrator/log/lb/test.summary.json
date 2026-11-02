@@ -1,0 +1,42 @@
+{
+ "from": "2026-11-02 10:56:32",
+ "to": "2026-11-02 10:57:05",
+ "samples": 3,
+ "interval_s": 10,
+ "shared": {
+  "cores_mean": 7.05,
+  "cores_p95": 7.22,
+  "rss_mb_max": 1218,
+  "log": {
+   "embed_requests": 5,
+   "errors": 1,
+   "p50_s": 1.0,
+   "p95_s": 30.01,
+   "max_s": 30.01,
+   "over_120_s": 0,
+   "runner_tasks_in_whole_log": 540950
+  }
+ },
+ "query": {
+  "cores_mean": 0.0,
+  "cores_p95": 0.0,
+  "rss_mb_max": 21,
+  "log": {
+   "embed_requests": 0,
+   "errors": 0,
+   "p50_s": null,
+   "p95_s": null,
+   "max_s": null,
+   "over_120_s": 0,
+   "runner_tasks_in_whole_log": 4407
+  }
+ },
+ "gpu_util_mean": 13.3,
+ "client_connection_samples": {
+  "shared|worktree W2-61h": 6,
+  "shared|worktree W2-122": 3,
+  "shared|worktree W2-123": 3,
+  "shared|worktree W2-04": 3,
+  "shared|dispatcher": 1
+ }
+}

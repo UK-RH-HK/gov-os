@@ -104,6 +104,14 @@ queued; **W2-05 + W2-96 re-close against tonight's nightly once it has a verdict
 held: asked the owner how its table stays current** (my package mis-described P-W2-55-HOOK). E: ACT-STOP-WAITER-1
 `36970e6f` (script + 6 tests) for the operator. P1-GUARD-PARSER-W2 `f614ec78` pinged. Guard 71 = first false positive
 under the new hook (F4 rule).
+**11:05 (owner) DEC-1028 `79fa030f`:** push test PASSED; ACT-STOP-WAITER-1 applied (live check in the next fresh
+session); quiet-hours test confirmed to the owner (backups may go). Standing: no main-tree commit while an owner ACT is
+applied (`log/act-in-progress.txt`, prompt §0). W2-42a `DAEO-03ub` filed (FULL; split files from W2-09; claim when a
+K3 slot opens). W2-55: KPI line `09a1ac54`, run-2 brief `W2-55-A5-r2-append.md` queued (test reads the register at the
+proposal's commit; append mode); **TODO when it returns: wire its append command into a decision-recording tool and
+use it for every register entry.** A: the load-balancing plan: `tools/lb_measure.py` runs 10:57-11:57
+(`log/lb/hour-20261102.*`); sections a-d drafted by a research subagent into `drafts/LB-PLAN-sections-a-d.md`; the CTO
+writes e and f, then the package `packages/P1-LOAD-BALANCE-1.md`.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

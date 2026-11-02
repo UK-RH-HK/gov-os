@@ -160,3 +160,9 @@
 2026-11-02 10:39:08 started W2-122 (DAEO-blwa) W2-122-A5-r2-nok5.md -> W2-122-A5-r2-nok5.json (launcher exit 0)
 2026-11-02 10:40:21 guard harvest: rc 0 in 16.5 s
 2026-11-02 10:41:05 guard refusals: 1 new
+2026-11-02 10:42:35 embedding server: HUNG since 2026-11-02 10:40:38 (no answer in 30 s)
+2026-11-02 10:43:33 embedding server: answering again after HUNG since 2026-11-02 10:40:38
+2026-11-02 10:46:39 embedding server: HUNG since 2026-11-02 10:44:38 (no answer in 30 s)
+2026-11-02 10:49:35 embedding server: answering again after HUNG since 2026-11-02 10:44:38
+2026-11-02 10:50:18 guard harvest: rc 0 in 13.0 s
+2026-11-02 10:56:38 embedding server: HUNG since 2026-11-02 10:54:38 (no answer in 30 s)

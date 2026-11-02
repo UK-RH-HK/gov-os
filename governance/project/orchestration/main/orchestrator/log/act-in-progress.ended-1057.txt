@@ -1,0 +1,1 @@
+2026-11-02 10:55:42 ACT-STOP-WAITER-1 being applied by the owner's operator (DEC-1028 item 6): no main-tree commit by the CTO or its tools until the owner says it is done.

@@ -1,1 +1,1 @@
-server: the embedding server HUNG since 2026-11-02 08:40:34
+server: the embedding server HUNG since 2026-11-02 10:54:38
