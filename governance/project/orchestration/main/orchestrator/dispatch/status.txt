@@ -1,7 +1,7 @@
-dispatcher 2026-11-02 09:27:04
+dispatcher 2026-11-02 09:35:05
 leads running (4, from the processes): W2-04, W2-104, W2-61h, W2-92
-load 19.2/23.9/22.4; real busy cores 14.01 of 20 (the embedding server 7.32); memory available 16865 MB; gate_check (for comparison) open (OPEN leads=4 load=19.2/22.4 nproc=20 have=20955984kB need=14104080kB); disk open
-admission (by peaks, DEC-1008 item 5): admits: 4 of 6 leads; memory 20796 MB >= 20151 MB (slots rule: floor + 4 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1648 MB + serv
+load 16.3/20.8/21.9; real busy cores 9.78 of 20 (the embedding server 7.18); memory available 16794 MB; gate_check (for comparison) open (OPEN leads=4 load=16.3/21.9 nproc=20 have=21966704kB need=15172980kB); disk open
+admission (by peaks, DEC-1008 item 5): admits: 4 of 6 leads; memory 21415 MB >= 21309 MB (slots rule: floor + 4 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1648 MB + serv
 peaks 2026-11-02 09:26:05: a lead p95 4090 MB, max 9580 MB
 heavy steps outside a slot: none
 heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock; queue free; land: nothing to land; main tree clean on w2/integrate
@@ -9,5 +9,5 @@ inbox unread: 1 (oldest 0 min)
 ready list: W2-04 DAEO-u4oz: embedding server hung: starts held (DEC-1015); W2-122 DAEO-blwa: embedding server hung: starts held (DEC-1015); W2-123 DAEO-qzrq: embedding server hung: starts held (DEC-1015); W2-81 DAEO-l78m: embedding server hung: starts held (DEC-1015); W2-92 DAEO-n0wb: embedding server hung: starts held (DEC-1015); W2-104 DAEO-drhj: embedding server hung: starts held (DEC-1015); W2-61h DAEO-h2k3: embedding server hung: starts held (DEC-1015); W2-91 DAEO-a3u2: embedding server hung: starts held (DEC-1015)
 sentinel: watched
 guard harvest: last 2026-11-02 09:27:21, rc 0, 16.0 s of 300 s
-embedding server: healthy (24.21 s)
+embedding server: healthy (9.44 s)
 heavy slot holders: slot 1 pid 2939584 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min; slot 2 pid 3362478 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min

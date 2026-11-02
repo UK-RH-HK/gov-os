@@ -1,0 +1,6 @@
+W2-91: merge the test designer's revision of W2-86's guard case and the README note (w2/W2-91-tests; DEC-1013 TD-2 (a), TD-1 (a))
+
+Task: DAEO-a3u2
+Implements: DEC-957,DEC-1013
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

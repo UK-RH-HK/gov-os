@@ -137,3 +137,7 @@
 2026-11-02 09:26:38 embedding server: HUNG since 2026-11-02 09:24:41 (no answer in 30 s)
 2026-11-02 09:27:21 guard harvest: rc 0 in 16.0 s
 2026-11-02 09:27:29 embedding server: answering again after HUNG since 2026-11-02 09:24:41
+2026-11-02 09:28:06 started W2-91 (DAEO-a3u2) W2-91-A5-td.md -> W2-91-A5-td.json (launcher exit 0)
+2026-11-02 09:30:38 embedding server: HUNG since 2026-11-02 09:28:39 (no answer in 30 s)
+2026-11-02 09:35:05 return: W2-91-A5-td.json -> inbox/20261102-093505-W2-91-A5-td.txt
+2026-11-02 09:35:14 embedding server: answering again after HUNG since 2026-11-02 09:28:39

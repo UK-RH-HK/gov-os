@@ -1,0 +1,7 @@
+log: W2-91-A5-td.json
+W2: W2-91
+status: DONE. The branch head is `55b47e075b3b`. `gov accept` passes all 8 of 8 KPI lines. As VERIFY-1 says, I did no rebuild and no scoped run; the merge queue's run on the merged result is the verification.
+
+task: Resume W2-91 (DAEO-a3u2) under DEC-1013: apply TD-1 (a) and TD-2 (a), merge the tests, run `gov accept` once, and leave verification to the merge queue (VERIFY-1).
+status: DONE. The branch head is `55b47e075b3b`. `gov accept` passes all 8 of 8 KPI lines. As VERIFY-1 says, I did no rebuild and no scoped run; the merge queue's run on the merged result is the verification.
+work_completed: TD-1 (a): no W2-91 case tested the dropped export clause, so no test changed. Only the README's notes now point to DEC-1013 and W3-P18. TD-2 (a): a fresh, sandboxed independent test designer revised W2-86'
