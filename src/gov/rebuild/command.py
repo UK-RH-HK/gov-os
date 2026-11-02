@@ -99,7 +99,7 @@ def _build(root: Path, args, config: dict, watch) -> dict:
     from gov.cli.errors import GovError
     from gov.retrieval import lexical
     from gov.retrieval.lexical import refresh as lexical_refresh
-    from gov.secrets import scan_counts
+    from gov.secrets import SCAN_OFF, scan_counts, scan_on
     from gov.store import load as store_load
 
     has_path_map = "path-map.yaml" in config
@@ -203,10 +203,16 @@ def _build(root: Path, args, config: dict, watch) -> dict:
                                                     for path in tool_home.rglob("*") if path.is_file())
                                    if tool_home.is_dir() else ())
 
-    return {
+    built = {
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
         "compaction": compaction,
         "secrets_counts": secrets_counts,
     }
+    if not scan_on(root):  # DEC-1045: the filter gave nothing to gitleaks, and the report says so
+        secrets_counts["scan"] = built["secrets_scan"] = SCAN_OFF
+        import sys
+
+        print(f"rebuild: {SCAN_OFF}", file=sys.stderr)
+    return built
