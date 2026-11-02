@@ -49,12 +49,21 @@ def _ask(box, project, env, question, what):
     return answers[0]
 
 
+def _reference_cache(tmp_path):
+    """A machine-wide vector cache folder for a reference store only (Rewrite-Reason: DEC-1033, item 3; DEC-1042
+    item 2): a reference is computed as in a new store on another machine, so it warms nothing in the case's own
+    cache (W2-126 shares one cache by model, revision and text) and every cache state the case sets stays what it
+    names."""
+    return tmp_path / "reference-vector-cache"
+
+
 def _first_answer(box, tmp_path, question, files=None, name="reference"):
-    """The answer ``question`` gets as the very first text a fresh embedder sees, in a new store built alike."""
+    """The answer ``question`` gets as the very first text a fresh embedder sees, in a new store built alike (with a
+    cache of its own: ``_reference_cache``)."""
     fresh = S.EmbedderStandIn()
     try:
-        project = S.semantic_project(box, tmp_path / name, fresh, files)
-        return _ask(box, project, S.embed_env(box, fresh), question, "the reference")
+        project = S.semantic_project(box, tmp_path / name, fresh, files, cache=_reference_cache(tmp_path))
+        return _ask(box, project, S.embed_env(box, fresh, cache=_reference_cache(tmp_path)), question, "the reference")
     finally:
         fresh.close()
 
@@ -167,14 +176,19 @@ def test_several_processes_reading_at_once_on_a_cold_cache_get_the_one_answer_an
     (each in its own order) and 4 of its own: 40 distinct texts. None errors; every answer is the one the text gets
     as the first text in a new store; afterwards, asking every text again in one process gives the same answers and
     sends **none** of them to the embedder (no entry was lost or torn); and ``.gov-runtime/`` holds the store and at
-    most one other file (no lock or temporary file left behind). Today the answers depend on the interleaving."""
+    most one other file (no lock or temporary file left behind). Today the answers depend on the interleaving.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
+    own (``_reference_cache``), so the case's cache is still cold when the six processes start; the assertions are
+    unchanged."""
     shared = S.questions(SHARED)
     own = [S.questions(OWN, start=100 + OWN * n) for n in range(PROCESSES)]
     texts = shared + [text for group in own for text in group]
     fresh = S.EmbedderStandIn()
     try:
-        twin = S.semantic_project(box, tmp_path / "reference", fresh)
-        references = {text: _ask(box, twin, S.embed_env(box, fresh), text, "the reference") for text in texts}
+        twin = S.semantic_project(box, tmp_path / "reference", fresh, cache=_reference_cache(tmp_path))
+        reference_env = S.embed_env(box, fresh, cache=_reference_cache(tmp_path))
+        references = {text: _ask(box, twin, reference_env, text, "the reference") for text in texts}
     finally:
         fresh.close()
     project = S.semantic_project(box, tmp_path / "p", embedder)
@@ -227,13 +241,18 @@ def test_the_cache_never_grows_past_its_bound_and_reads_at_the_bound_give_the_sa
     least 819,200 bytes of vectors, so the bound is reached). After every process the files beside the store hold
     at most 256 KiB; every read ends cleanly with an answer; and the first and last ten texts, asked again at the
     bound, get the answers they got in a new store without a bound. Today the setting changes nothing: the cache
-    grows past the bound."""
+    grows past the bound.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
+    own (``_reference_cache``), so the case's reads at the bound are not served from the reference's; the
+    assertions are unchanged."""
     assert BOUNDED * S.VECTOR_BYTES > 3 * S.LOW_BOUND
     texts = S.questions(BOUNDED, start=1000)
     fresh = S.EmbedderStandIn()
     try:
-        twin = S.semantic_project(box, tmp_path / "reference", fresh)
-        answers, done = S.drive_run(box, twin, S.embed_env(box, fresh), *[("search", text) for text in texts])
+        twin = S.semantic_project(box, tmp_path / "reference", fresh, cache=_reference_cache(tmp_path))
+        answers, done = S.drive_run(box, twin, S.embed_env(box, fresh, cache=_reference_cache(tmp_path)),
+                                    *[("search", text) for text in texts])
         assert not S.clean(done), done.describe()
         references = dict(zip(texts, answers))
     finally:
@@ -326,12 +345,16 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     other questions: cold, warm, the cache deleted, ``.gov-runtime/`` read-only, the cache's files read-only, and the
     cache full (bound lowered, 200 other texts): one packet and one hash, the one the ticket gets as the first
     context in a new store built alike. Every run ends with exit code 0 and no traceback. Today the hash depends on
-    what was embedded before the ticket's question was first asked."""
+    what was embedded before the ticket's question was first asked.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
+    own (``_reference_cache``), so "cold" is still cold in the case's cache; the assertions are unchanged."""
     files = S.ticket_files()
     fresh = S.EmbedderStandIn()
     try:
-        twin = S.semantic_project(box, tmp_path / "reference", fresh, files)
-        reference = S.gov(box, "context", "--json", "--root", twin, TICKET, env=S.embed_env(box, fresh))
+        twin = S.semantic_project(box, tmp_path / "reference", fresh, files, cache=_reference_cache(tmp_path))
+        reference = S.gov(box, "context", "--json", "--root", twin, TICKET,
+                          env=S.embed_env(box, fresh, cache=_reference_cache(tmp_path)))
         assert not S.clean(reference), reference.describe()
         reference = reference.envelope()["result"]
     finally:

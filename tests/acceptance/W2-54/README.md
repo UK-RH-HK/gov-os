@@ -273,7 +273,8 @@ this worktree's `src/` on `PYTHONPATH`, DEC-732), `OLLAMA_HOST` naming the stand
 | 3: a text that differs in any character | `test_a_text_that_differs_in_any_character_gets_its_own_answer[case, spacing, trailing-newline, unicode-normal-form]` | pass | — |
 | **4. the first answer is unchanged** | `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it` | pass | — |
 | **5. nothing is left behind by a failed or partial call** | `test_a_failed_embedding_gives_no_hit_and_leaves_nothing_a_later_search_uses[fail, short]` | pass | — |
-| **6. one project's vectors are never another's** | `test_two_projects_do_not_share_query_vectors` | pass | — |
+| **6. two projects on one machine** (rewritten under DEC-1033 for W2-126's machine-wide cache: "The rewrite for W2-126" at the end): one text, model and revision, one vector | `test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache` | **red until W2-126** | "the second project sent the embedder the question 1 time(s)" |
+| 6: another revision or another text is never shared | `test_two_projects_never_share_a_vector_for_another_revision_or_another_text[revision, text]` | pass | — |
 | 1 with **the real embedder** | `test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before` | **red** (here) | answer 2 differs from the first: kiln at 0.36549 then 0.36438, orchard at 0.72068 then 0.72273 (the real variation) |
 
 **Count:** 15 cases (11 functions); 7 red today, 8 pass today.
@@ -297,9 +298,12 @@ under a store that gets the key wrong.
 - **A failed or partial call** (HTTP 500; one vector fewer than asked): unavailable, no hit, as today; the next
   search with a healthy embedder **asks the embedder again** and gets its vector. A store that kept anything from
   the failed call (an empty or partial vector, a marker) would not ask again or would answer from it.
-- **Two projects**: the same model, revision and question, two stores, two embedders that answer differently: each
-  project gets its own embedder's answer; the second project's search changes no file of the first project's
-  runtime folder and writes nothing under `HOME` (a vector kept for every project, under `HOME`, would show there).
+- **Two projects** (rewritten under DEC-1033, item 3, for W2-126; "The rewrite for W2-126" at the end): the same
+  model, revision and question, two stores, two embedders that would answer differently: the second project is
+  served the first's vector from the machine-wide cache and sends its embedder nothing for the question; its search
+  changes no file of the first project's runtime folder and writes nothing under `HOME` (the cache sits in the
+  case's own `GOV_VECTOR_CACHE_DIR`). Another revision or another spelling of the question is never served the
+  first project's vector: its own embedder is asked and its answer is the forge's.
 
 ## The real embedder
 
@@ -872,3 +876,93 @@ own run outside a close. `test_the_suite_runs_this_worktree_s_code` is unchanged
 none (8 passed in 0.05 s). The four route cases fail on the old support module, which has no `green_here_check`.
 
 **Counts.** `test_w2_54_green_here.py`: 8 cases where there were 4; the suite: 103 where there were 99.
+
+# DEC-1033: six cases revised (owner, 2026-11-02; emergency, `Rewrite-Reason: DEC-1033`)
+
+DEC-1033 item 2 (b) replaced DEC-798 (the query embedder on the CPU only): a question's vector is accepted from any
+device, and the query embedder is started with the GPU left visible (the code since `6ed6a5ae`: the query embedder
+reports the model loaded, `size` above 0 and `size_vram` 0 or above, after computing a well-formed vector, and the
+vector is used and cached under that device; `ensure_query_available` passes the caller's environment with only
+`OLLAMA_HOST` set). Item 3: a test designer revises the acceptance tests the patches turn red. Six cases of
+`test_w2_54_cpu_embedder.py` still enforced DEC-798 and were red on `w2/integrate` (the merge queue refused every
+landing on them). Revised by an independent test designer; each change carries `Rewrite-Reason: DEC-1033` in the
+file. No case is retired; the count stays 14 in the file and 103 in the suite.
+
+| old case | new case | what it now checks |
+|---|---|---|
+| `test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[gpu]` | `test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on[gpu]` | the query embedder reports the model in GPU memory: the question is embedded there and answered with its vector (the kiln), the vector cached and served again without asking, `gov retrieve` clean with the semantic facet available, nothing to the shared runner |
+| `…[partial]` | `test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on[partial]` | the same with half the model in GPU memory |
+| `…[nothing]`, `…[other-model]` (green; renamed with their function) | `test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector[nothing, other-model]` | unchanged: no vector, unavailable with a reason, nothing cached, no fallback; once loaded, answered |
+| `test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | `test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` | a read with an environment that says nothing about the GPU starts the executable found as DEC-260 finds it as `serve` at the query address, told nothing about the GPU (none of `CUDA_VISIBLE_DEVICES`, `HIP_VISIBLE_DEVICES`, `ROCR_VISIBLE_DEVICES`, `GPU_DEVICE_ORDINAL`, `OLLAMA_LLM_LIBRARY`), so it serves on the GPU; the read gets its semantic answer; never stopped; a second read starts nothing |
+| `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | `test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer` | two reads at once: both answered, every start told the address and nothing about the GPU, one embedder serving there on the GPU, nothing stopped |
+
+**What was removed:** only what DEC-1033 replaced: the demand that a vector computed on the GPU (wholly or half) gives
+none, and the demand that every start hides the GPU (`gpu_hidden`). The start cases now hold the opposite, the GPU
+left visible, since DEC-1033 puts the query server on the GPU; a caller's own GPU variables are not judged (the cases
+give none). What each case guarded that still holds is kept.
+
+**Shown red and green.** On `w2/integrate` `3630679c` (this tree's `src`), the old file: 6 failed, 8 passed; the
+`gpu` and `partial` cases on "the CPU address reports 'gpu', yet the search answered (available is True …)", the four
+start cases on "the executable was started without being told to use no GPU … {'OLLAMA_HOST': …}". The revised file:
+14 passed. The revised six against a throwaway copy with `6ed6a5ae^1`'s `semantic.py` and `ollama.py` (DEC-798's
+code, outside the tree): 6 failed for the stated reasons ("… available False, reason 'the query embedder does not
+report qwen3-embedding:0.6b wholly on the CPU …'" and "the executable was told about the GPU what its caller did not
+set … {'CUDA_VISIBLE_DEVICES': '-1'}"); the two not-loaded cases passed there as here.
+
+**What else states DEC-798, listed and not revised (not red for this reason in any run the queue makes):**
+
+- In `test_w2_54_cpu_embedder.py`, the names and texts "the CPU embedder" in
+  `test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner`,
+  `test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shared_runner_and_none_to_the_cpu_one`,
+  `test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback` and
+  `test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers`:
+  their stand-in (the fixture `cpu`) is on the CPU and what they hold (questions to the query embedder only, chunks to
+  the shared runner, no fallback) is in force; green. The name stands for the query embedder (the module docstring).
+- `test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80` (success 6): reads the
+  figure the change record holds from DEC-798's measurement; green.
+- `test_w2_54_shared_gpu.py` (2 cases, `shared_gpu`, deselected unless `-m shared_gpu`, run by a lead on the real
+  servers only): `test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_embedder_holds_it_on_the_cpu`
+  requires the query embedder at `127.0.0.1:11435` to hold the model with `size_vram` 0, which ACT-QUERY-GPU-2 ended;
+  `test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whatever_the_cache_s_state` holds one answer
+  per text, which DEC-1033 accepted may drift on the GPU. Both would be red if run now; neither is run by the queue or
+  the closes, and this designer may not reach the real servers, so neither was revised (a decision package).
+- The round-4 sections above (the interfaces, "told to use no GPU", the KPI table, the risks) describe round 4 as
+  written under DEC-798; this section supersedes them for the six cases. The ticket's own KPI line 5
+  (`.tickets/DAEO-0rfi.md`, closed) still states the CPU-only embedder.
+
+## The rewrite for W2-126 (`Rewrite-Reason: DEC-1033`; DEC-1042 items 2 and 3, 2026-11-02)
+
+W2-126 (`DAEO-jpr0`, DEC-1032) adds one vector cache shared by every process on the machine, keyed by the model, the
+revision `/api/tags` reports and the sha256 of the exact text, in the folder `GOV_VECTOR_CACHE_DIR` names (default
+in the user's own folder). One text, model and revision is then one vector on the machine, in every project. Written
+from W2-126's ticket and README interface, without its implementation.
+
+- **Each case its own cache folder.** `Box.env` names `GOV_VECTOR_CACHE_DIR` in every child; the autouse fixture
+  `_own_vector_cache` (conftest) points it at `<tmp_path>/vector-cache` for each case, and fixtures of wider scope
+  keep `<box>/vector-cache`. `real_env` names it too, so the real-embedder case never writes the owner's cache. Without
+  this every case would share the session's `HOME` cache, and the cases whose stand-ins send one question to
+  different places (kiln, forge, orchard) would be served one another's vectors.
+- **Replaced:** `test_two_projects_do_not_share_query_vectors` (it read "the second project never asked its embedder"
+  as the failure) becomes
+  `test_two_projects_asking_one_text_of_one_model_and_revision_get_one_vector_from_the_machine_wide_cache`: the
+  second project sends the embedder nothing for the question and answers with the first project's vector, hit for
+  hit and distance for distance; the first project's runtime folder and `HOME` stay untouched. Red on `w2/integrate`
+  (`d72e8dbe`), the stated reason: "the second project sent the embedder the question 1 time(s)". Green once W2-126
+  is in.
+- **New, from the old case's other half:**
+  `test_two_projects_never_share_a_vector_for_another_revision_or_another_text[revision, text]`: another digest, or
+  the question with one letter's case changed, is sent to the second project's own embedder and answered with its
+  vector (the forge; under another revision, or unavailable with no hit), never the first project's; every request
+  names the pinned model. Passes on `w2/integrate`, and must stay green with the cache. `test_w2_54_query_vector.py`
+  now holds 17 cases (12 functions), the suite 98.
+- **Reference stores get a cache of their own** (`cache=` on `semantic_project` and `embed_env`): the twin of
+  `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it`, the twin of
+  `test_a_vector_cached_under_round_3_s_key_is_never_served` (sharing the case's cache, W2-126 would rightly serve
+  the project the twin's vector, and the case's "the CPU embedder was never asked the question" would fail for it),
+  and the references of `test_w2_54_query_cache.py` (`_first_answer`, the cold-cache concurrency case, the bound
+  case, the packet-hash case), so a reference warms nothing the case then measures and "cold" stays cold. No
+  assertion of these cases changed.
+- **Run on `w2/integrate` (`d72e8dbe`, no W2-126 code):** `test_w2_54_query_vector.py` without the real-embedder case
+  (it reaches this machine's Ollama): 13 passed, the replaced case red as stated; the keep-apart pair, the round-3
+  case and the changed query-cache cases: 12 passed; `test_w2_54_query_cache.py`, `test_w2_54_cpu_embedder.py` and
+  `test_w2_54_dropped_order.py` whole, with the per-case cache folder: 43 passed.
