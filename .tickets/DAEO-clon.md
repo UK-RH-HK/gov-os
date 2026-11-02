@@ -21,6 +21,9 @@ allowed_paths:
 - src/gov/retrieval/rerank_service.py
 - src/gov/retrieval/retrieve.py
 - src/gov/status/command.py
+- tests/unit/semantic/test_rerank_process.py
+- tests/unit/orchestration/test_gov_reranker_gpu_slot.py
+- tests/unit/status/test_status.py
 - tests/unit/retrieval/test_w2_112*
 - docs/research/W2-112-shared-reranker.md
 kpis:
@@ -30,7 +33,7 @@ kpis:
   - 'The same answers: for the same inputs on the same device, the order and the scores match a private reranker''s (within float rounding; ties keep the given order), measured on the 20 visible memory questions and, after W2-61h, the 48 [DEC-979 item 4, DEC-374]'
   - 'If the service is down (it cannot start, does not answer within about 2 s, or answers with an error), the search falls back to a private reranker as today; where that cannot start either (a sandboxed worker, the memory floor reached), the fused order is kept and the bundle is marked `rerank: unavailable` (DEC-374); a search never fails or hangs because of the service; each fallback is logged and `gov status` counts them [DEC-979 item 4, DEC-374]'
   - 'Measured, in docs/research/W2-112-shared-reranker.md: memory with 10 concurrent searches before and after (today up to 9 rerankers, 9.4 GiB at peak), and the searches'' times [DEC-979 item 4, CAPACITY-1]'
-  - 'The service runs its one model on the GPU when there is one, within the GPU budget (DEC-1032: the embedder first, about 3.5 GB; the shared reranker second, about 2.5 to 3.5 GB; at least 2 GB headroom): it never starts on the GPU when less than its share is free (it starts on the CPU, named, and alerts), and never more than one copy on the GPU; measured: the GPU''s memory with the embedder and the service under 20 concurrent searches [DEC-1032, DEC-1031 item 2]'
+  - 'The service runs its one model on the GPU, within the GPU budget (DEC-1032: the embedder first, about 3.5 GB; the shared reranker second, about 2.5 to 3.5 GB; at least 2 GB headroom); it holds one of the two GPU reranker slots (it waits for one like any reranker, or fails named), so at most one private reranker runs beside it; below its share it does not start (never on the CPU) and searches fall back through the slot rule or go unranked, named; measured: the GPU''s memory with the embedder and the service under 20 concurrent searches [DEC-1032, DEC-1033, DEC-1036]'
   - 'When it lands, the stopgap that caps private rerankers on the GPU (the `gov-reranker-gpu-slot.pth` in the reranker environment, ACT-RERANK-GPU-SLOTS-1) is retired by an owner ACT the lead prepares, and when the service is down the search falls back to a private reranker through the GPU slot rule (it waits for one of the slots, else the search goes on unranked, named: `merge.reranked` false with its reason); it never runs a reranker on the CPU (DEC-1033: on the CPU a query takes over 100 s) [DEC-1032, DEC-1033]'
   failure:
   - 'A search that fails, hangs, or returns another session''s scores because of the service.'
