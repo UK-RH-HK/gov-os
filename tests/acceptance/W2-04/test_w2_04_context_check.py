@@ -5,12 +5,20 @@ are the only content the message says so (never "every ticket's context computat
 name ends otherwise than in lowercase ``.md`` is named, never unseen; two ticket files with one id are named as a
 duplicate id, and the check is not green.
 
+Addendum 3's S8a (F3; DEC-1025 item 2): when the check computed at least one ticket's context and every one it
+computed refused over the ceiling, no packet was built twice. The check is then not green: it prints a line
+beginning ``unmeasured:`` that says no packet was built, keeps each refusal's ``REFUSED:`` line, and exits non-zero.
+A tree where at least one packet was built twice alike keeps its result, green with its ``REFUSED:`` lines.
+
 Red reasons, today: a README alone prints "unmeasured: every ticket's context computation failed"; a ``.MD`` or
 ``.markdown`` ticket is seen by nothing and the check is green without naming it; a duplicate id is not named as
-one. The README beside a ticket passes today (it keeps the check red, DEC-628).
+one. The README beside a ticket passes today (it keeps the check red, DEC-628). Tickets over the ceiling never
+refuse today, so the check is green with no ``REFUSED:`` line and no ``unmeasured:`` line.
 """
 
 from __future__ import annotations
+
+import re
 
 import pytest
 
@@ -18,6 +26,12 @@ import w2_04_support as s
 
 OK_TICKET = "TK-W204-OK"
 FAILED_ALL = "every ticket's context computation failed"
+# A charter of about 35,000 tokens: a ticket that cites it is over the default ceiling by its mandatory inputs alone.
+BIG_ID, BIG_REL = "CHARTER-W204-BIG", "docs/charter/big.md"
+BIG_TEXT = " ".join(f"Clause {n}: every agent sees one packet under its ceiling." for n in range(2400))
+OVER_TICKETS = ("TK-W204-OVER-A", "TK-W204-OVER-B")
+# "Says no packet was built" (R11): the line names a packet with a negation.
+NO_PACKET = re.compile(r"\b(no|none|not)\b.*\bpackets?\b|\bpackets?\b.*\b(none|not)\b", re.IGNORECASE)
 
 
 def _project(api, root, files):
@@ -66,3 +80,61 @@ def test_two_ticket_files_with_one_id_are_named_as_a_duplicate_and_not_green(api
     lines = [line for line in answer.stdout.splitlines() if duplicate in line]
     assert any("duplicate" in line.lower() for line in lines), \
         f"the id {duplicate} is not named as a duplicate id\n{answer.describe()}"
+
+
+# --------------------------------------------------------------------------
+# Addendum 3's S8a (F3; DEC-1025 item 2): the check when no packet is built
+# --------------------------------------------------------------------------
+
+def _over(ticket_id):
+    return s.ticket(ticket_id, f"A ticket over the ceiling, {ticket_id}", [BIG_ID])
+
+
+def _refused(stdout, ticket_id):
+    """The lines of the check's output that carry ``REFUSED:`` and name ``ticket_id``."""
+    return [line for line in stdout.splitlines() if "REFUSED:" in line and ticket_id in line]
+
+
+def _unmeasured(stdout):
+    return [line for line in stdout.splitlines() if line.startswith("unmeasured:")]
+
+
+def test_when_every_ticket_refuses_over_the_ceiling_the_check_is_unmeasured_never_green(api, tmp_path):
+    """Addendum 3's S8a. Two tickets, each over the default ceiling by its mandatory inputs alone: every computation
+    refuses, so no packet was built twice. Exit non-zero; a line beginning ``unmeasured:`` says no packet was built;
+    a ``REFUSED:`` line names each ticket."""
+    assert s.tokens(BIG_TEXT) > s.DEFAULT_CEILING, "the fixture is wrong: the charter fits the default ceiling"
+    project = _project(api, tmp_path / "repo", {BIG_REL: s.record(BIG_ID, "charter", "ACTIVE", BIG_TEXT),
+                                                **{f".tickets/{tid}.md": _over(tid) for tid in OVER_TICKETS}})
+
+    answer = api.context_check(project.root)
+
+    unmeasured = _unmeasured(answer.stdout)
+    assert unmeasured, (f"every ticket refuses over the ceiling, so no packet was built, yet no line begins "
+                        f"`unmeasured:`\n{answer.describe()}")
+    assert any(NO_PACKET.search(line) for line in unmeasured), \
+        f"the `unmeasured:` line does not say no packet was built: {unmeasured}\n{answer.describe()}"
+    for ticket_id in OVER_TICKETS:
+        assert _refused(answer.stdout, ticket_id), \
+            f"{ticket_id} refuses over the ceiling, and no `REFUSED:` line names it\n{answer.describe()}"
+    assert answer.returncode != 0, f"no packet was built, yet the check exits 0 (green)\n{answer.describe()}"
+
+
+def test_when_one_ticket_refuses_and_one_fits_the_check_stays_green_with_its_refused_line(api, tmp_path):
+    """Addendum 3's S8a, what it keeps: one packet built twice alike keeps the check green (exit 0), with a
+    ``REFUSED:`` line for the ticket over the ceiling, none for the one that fits, and no ``unmeasured:`` line."""
+    over = OVER_TICKETS[0]
+    project = _project(api, tmp_path / "repo", {
+        BIG_REL: s.record(BIG_ID, "charter", "ACTIVE", BIG_TEXT), f".tickets/{over}.md": _over(over),
+        f".tickets/{OK_TICKET}.md": s.ticket(OK_TICKET, "A ticket that is measured", [s.CHARTER_ID])})
+
+    answer = api.context_check(project.root)
+
+    assert _refused(answer.stdout, over), \
+        f"{over} refuses over the ceiling, and no `REFUSED:` line names it\n{answer.describe()}"
+    assert not _refused(answer.stdout, OK_TICKET), f"{OK_TICKET} fits, yet a `REFUSED:` line names it\n" \
+                                                   f"{answer.describe()}"
+    assert not _unmeasured(answer.stdout), \
+        f"one packet was built twice alike, yet the check says unmeasured\n{answer.describe()}"
+    assert answer.returncode == 0, \
+        f"one packet was built twice alike and one ticket refused: the check is not green\n{answer.describe()}"
