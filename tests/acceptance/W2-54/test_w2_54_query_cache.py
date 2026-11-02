@@ -57,6 +57,17 @@ def _reference_cache(tmp_path):
     return tmp_path / "reference-vector-cache"
 
 
+# W2-126's bound on the machine-wide vector cache (its README, "Interface the cases need", 2; Rewrite-Reason: DEC-1033)
+MACHINE_BOUND_SETTING = "GOV_VECTOR_CACHE_MAX_BYTES"
+
+
+def _machine_files(folder):
+    """Every file the machine-wide vector cache folder ``folder`` holds (none when it is absent; Rewrite-Reason:
+    DEC-1033, item 3; DEC-1042): what a case deletes or makes read-only beside the tree's own cache files."""
+    folder = S.Path(folder)
+    return sorted(path for path in folder.rglob("*") if path.is_file()) if folder.is_dir() else []
+
+
 def _first_answer(box, tmp_path, question, files=None, name="reference"):
     """The answer ``question`` gets as the very first text a fresh embedder sees, in a new store built alike (with a
     cache of its own: ``_reference_cache``)."""
@@ -348,7 +359,14 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     what was embedded before the ticket's question was first asked.
 
     Rewrite-Reason: DEC-1033 (item 3; DEC-1042 item 2): the reference store has a machine-wide vector cache of its
-    own (``_reference_cache``), so "cold" is still cold in the case's cache; the assertions are unchanged."""
+    own (``_reference_cache``), so "cold" is still cold in the case's cache; the assertions are unchanged.
+
+    Rewrite-Reason: DEC-1033 (item 3; DEC-1042, P-W2-126-QC (a)): W2-126's machine-wide vector cache answers a
+    question it already holds without writing the tree's own cache file, so every state now holds for both caches:
+    the case names its own machine-wide folder (``machine``); "deleted" removes the tree's files and the machine
+    folder's; ".gov-runtime/ read-only" makes the machine folder read-only too; "the cache's files read-only" acts
+    on the files either cache holds (the premise: at least one); "full" lowers both bounds. The packet-hash
+    assertions are unchanged."""
     files = S.ticket_files()
     fresh = S.EmbedderStandIn()
     try:
@@ -360,9 +378,20 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     finally:
         fresh.close()
     assert reference[S.K_SUPPLEMENTARY], "the premise: the ticket's context holds no retrieval item"
-    project = S.semantic_project(box, tmp_path / "p", embedder, files)
-    env = S.embed_env(box, embedder)
+    machine = tmp_path / "case-vector-cache"   # this case's own machine-wide vector cache (GOV_VECTOR_CACHE_DIR)
+    project = S.semantic_project(box, tmp_path / "p", embedder, files, cache=machine)
+    env = S.embed_env(box, embedder, cache=machine)
     runtime = project / S.RUNTIME_REL
+
+    def cache_files():
+        """Every file either cache holds: the tree's (beside the store, under .gov-runtime/) and the machine's."""
+        return [project / rel for rel in S.runtime_others(project)] + _machine_files(machine)
+
+    def delete_caches():
+        gone = cache_files()
+        for path in gone:
+            path.unlink()
+        return gone
 
     def context(what, ticket=TICKET, env=env):
         done = S.gov(box, "context", "--json", "--root", project, ticket, env=env)
@@ -380,19 +409,23 @@ def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedde
     same("cold, after another ticket")
     context("another ticket", ticket="TK-W254-ORCHARD")
     same("warm, after another ticket")
-    assert S.delete_cache(project), "the premise: the contexts left no cache to delete"
+    assert delete_caches(), "the premise: the contexts left no cache (the tree's or the machine's) to delete"
+    assert not cache_files(), f"the premise: a cache file survived its deletion: {cache_files()}"
     context("another ticket", ticket="TK-W254-BAKERY")
-    same("the cache deleted, after another ticket")
-    S.delete_cache(project)
-    with S.ReadOnly(runtime):
+    same("the caches deleted, after another ticket")
+    delete_caches()
+    machine.mkdir(parents=True, exist_ok=True)   # an absent folder would be made anew: it must exist to be read-only
+    with S.ReadOnly(runtime, machine):
         assert S.cannot_create_in(runtime), "the premise: .gov-runtime/ still takes a new file"
+        assert S.cannot_create_in(machine), "the premise: the machine-wide cache folder still takes a new file"
         context("another ticket", ticket="TK-W254-ORCHARD")
-        same(".gov-runtime/ read-only, after another ticket")
+        same(".gov-runtime/ and the machine-wide cache folder read-only, after another ticket")
     context("another ticket", ticket="TK-W254-BAKERY")
-    assert S.runtime_others(project), "the premise: the context left no cache file to make read-only"
-    with S.ReadOnly(*[project / rel for rel in S.runtime_others(project)]):
-        same("the cache's files read-only, after another ticket")
-    bounded = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND)}
+    held = cache_files()
+    assert held, "the premise: the context left no cache file (the tree's or the machine's) to make read-only"
+    with S.ReadOnly(*held):
+        same("the caches' files read-only, after another ticket")
+    bounded = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND), MACHINE_BOUND_SETTING: str(S.LOW_BOUND)}
     answers, done = S.drive_run(box, project, bounded, *[("search", text) for text in S.questions(BOUNDED, start=5000)])
     assert not S.clean(done), done.describe()
     same("the cache full, after 200 other texts", env=bounded)
