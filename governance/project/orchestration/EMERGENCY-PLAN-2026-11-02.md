@@ -47,7 +47,7 @@
   started); **W2-126**: the dispatcher had started its run 1 at 17:07 (the CTO's slip: the ready list was not emptied
   at the 17:00 stop); its `retrieve_check`/`context_check` restarted the query server at 18:14 (through the wrapper: on
   the GPU with its caps; `~/.ollama/query-autostart.log`); its verification run stopped at 18:25 (8 processes; its
-  tree clean at `75c4db0e`); its lead asked to checkpoint and exit (see the stops log for its reply).
+  tree clean at `75c4db0e`); its lead stopped at a safe point and exited (tests ready, 17 cases, `f90b34c47fdd`; no engineer started; see the stops log).
 - `tools/tree_busy.sh --cmd <path>` is the ACTs' process check (ACT-QUERY-GPU-2, the re-pin template), never `pgrep -f`.
 
 Rewritten 2026-11-02 15:55 by session `07f25884` (W2O V3); updated 16:15 and ~17:15. Read this before anything
