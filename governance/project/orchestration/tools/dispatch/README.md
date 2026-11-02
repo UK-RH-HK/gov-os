@@ -98,7 +98,7 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
    layers is an alert. **At once, once per incident**, one `<stamp>-gpu-alert.txt` item (`log:`, `GPU: <kinds>`,
    `status:`, the matching lines, the GPU's state, layers and holders at that moment) and a `gpu:` line in
    `inbox-stale.txt`, for a new `CUDA error` / `out of memory` / `cudaMalloc failed` line (errors more than
-   `gpu_alert_gap_s`, 1800, after the last are a new incident) or a load with 0 layers where the GPU is expected (the
+   `gpu_alert_gap_s`, default 0: every pass with new error lines alerts, DEC-1030) or a load with 0 layers where the GPU is expected (the
    incident lasts until a load with layers on the GPU; a 0-layer load already current at the first read alerts too).
    Status: `GPU: RTX 5070 Ti 9.7/15.9 GB, 24 %; holders: embedder shared (0), reranker (1); layers: shared 29/29,
    query cpu-only by design` and the last alert of the last 24 hours. On WSL nvidia-smi lists the reranker but not the
