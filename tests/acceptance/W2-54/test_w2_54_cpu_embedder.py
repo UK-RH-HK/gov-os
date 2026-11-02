@@ -16,6 +16,16 @@ Seen from outside, through public interfaces only: which stand-in a command asks
 ``options``), what ``/api/ps`` reports there; what a read answers (``gov retrieve --json``, ``gov context --json``,
 ``gov.retrieval.semantic.search``); what is left on disk; what the stand-in executable was told when a read started it.
 No case names the code that does it.
+
+Rewrite-Reason: DEC-1033 (owner, 2026-11-02; item 2 (b) replaces DEC-798's CPU-only rule; item 3, a test designer
+revises the acceptance tests the patches turn red): a question's vector is accepted from any device the query embedder
+reports the model loaded on, and the query embedder is started with the GPU left visible. Six cases enforced DEC-798
+(README, "DEC-1033: six cases revised"). What still holds is kept: the questions go to the query embedder at its own
+address and only there, the chunks to the shared runner, never a runner option to it; a read starts the query
+embedder at its address as ``serve`` and never stops it; two reads at once leave one serving and both answered; an
+embedder that does not report the model loaded gives no vector, named, nothing cached, no fallback. "The CPU
+embedder" in the names and texts that remain is the query embedder at ``GOV_QUERY_OLLAMA_HOST`` (the fixture ``cpu``,
+its stand-in on the CPU).
 """
 
 from __future__ import annotations
@@ -173,21 +183,73 @@ def test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shar
 # ---- 2. the device ---------------------------------------------------------------------------------------------------
 
 @STAND_IN
-@pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
-def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+@pytest.mark.parametrize("reported", ("gpu", "partial"))
+def test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on(
         box, shared, cpu, tmp_path, reported):
-    """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
-    there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
-    gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
-    code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
-    cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
-    embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
-    Today the question is answered by the shared runner at OLLAMA_HOST.
+    """The embedder at the query address reports, at ``/api/ps``, the model in GPU memory (``gpu``) or half of it
+    there (``partial``). A new question is embedded there and answered with its vector (the kiln, where the shared
+    runner's would be the forge): the semantic search is available, and ``gov retrieve`` ends with exit code 0, no
+    traceback and its semantic facet available. The vector is cached (the file beside the store changes), and asked
+    again once the embedder reports the model on the CPU, the same answer is served without asking the embedder the
+    question again. The question is never sent to the shared runner.
+
+    Rewrite-Reason: DEC-1033 (owner, 2026-11-02, item 2 (b) replacing DEC-798; item 3). Before: the ``gpu`` and
+    ``partial`` cases of ``test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector``
+    required no vector from a query embedder that reported the GPU; DEC-1033 accepts a question's vector from any
+    device, so these two expect the answer instead. What they kept: the question goes to the query embedder only,
+    never to the shared runner; ``gov retrieve`` stays clean."""
+    project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+    env = S.embed_env(box, shared, cpu)
+    warm, done = S.drive_run(box, project, env, ("search", OTHER))
+    assert not S.clean(done), done.describe()
+    beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+    cpu.ps, sent = reported, cpu.asked_for(QUESTION)
+    answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+    assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+    assert cpu.asked_for(QUESTION) > sent, f"the query embedder reports {reported!r} and was not asked the question"
+    assert answers[0].get("available") is True and _nearest(answers[0]) == [S.KILN], (
+        f"the query address reports {reported!r}, and the search did not answer with that embedder's vector (the "
+        f"kiln): available {answers[0].get('available')!r}, reason {answers[0].get('reason')!r}, nearest "
+        f"{S.hits_of(answers[0])[:2]}")
+    after = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+    assert after != beside, f"the vector computed on {reported!r} was not cached: no file beside the store changed"
+    run = S.gov(box, "retrieve", "--json", "--root", project, PHRASE, env=env)
+    assert not S.clean(run), f"gov retrieve was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+    assert (S.facets_of(run).get("semantic") or {}).get("available") is True, \
+        f"the query address reports {reported!r}, and gov retrieve's semantic facet is not available: {S.facets_of(run)}"
+    cpu.ps, asked = None, cpu.asked_for(QUESTION)
+    again, done = S.drive_run(box, project, env, ("search", QUESTION))
+    assert not S.clean(done), done.describe()
+    assert S.hits_of(again[0]) == S.hits_of(answers[0]), \
+        f"asked again, the answer changed: {S.hits_of(again[0])[:3]} (first: {S.hits_of(answers[0])[:3]})"
+    assert cpu.asked_for(QUESTION) == asked, "the vector cached from the first read was not served: the question was asked again"
+    assert not S.sent_for([shared], PHRASE), \
+        f"the question was sent to the shared runner: {S.sent_for([shared], PHRASE)}"
+    _no_option_and_on_gpu(shared)
+
+
+@STAND_IN
+@pytest.mark.parametrize("reported", ("nothing", "other-model"))
+def test_an_embedder_at_the_query_address_that_does_not_report_the_model_loaded_gives_no_query_vector(
+        box, shared, cpu, tmp_path, reported):
+    """*Red.* The embedder at the query address reports, at ``/api/ps``, nothing (``nothing``), or only another model
+    (``other-model``, on the CPU). A new question then gets no query vector: the semantic search is unavailable with a
+    reason and no hit, ``gov retrieve`` ends with exit code 0 and no traceback, its semantic facet is unavailable with
+    a reason and the lexical route answers; nothing is cached (no file beside the store changes); the question is
+    never sent to the shared runner instead. Once the embedder reports the model loaded (here on the CPU), the
+    question is embedded there and answered with its vector (the kiln). Today the question is answered by the shared
+    runner at OLLAMA_HOST.
 
     Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-1 (a): ``gov retrieve`` asks PHRASE, a
     phrase the kiln note holds, where it asked QUESTION, which no note holds as a phrase (so the lexical route had no
     evidence to give whatever the semantic facet did); the no-fallback check looks for PHRASE, which every text sent
-    for either read ends with. The lexical route and every other assertion are unchanged."""
+    for either read ends with. The lexical route and every other assertion are unchanged.
+
+    Rewrite-Reason: DEC-1033 (owner, 2026-11-02, item 2 (b) replacing DEC-798; item 3): renamed from
+    ``test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector``, which
+    stated DEC-798's rule; its ``gpu`` and ``partial`` cases moved to
+    ``test_a_question_s_vector_from_the_query_embedder_is_used_whatever_device_it_reports_the_model_on``. These two
+    cases and every assertion of theirs are unchanged."""
     project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
     env = S.embed_env(box, shared, cpu)
     warm, done = S.drive_run(box, project, env, ("search", OTHER))
@@ -197,7 +259,7 @@ def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cp
     answers, done = S.drive_run(box, project, env, ("search", QUESTION))
     assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
     faults = S.unavailable_with_reason(answers[0])
-    assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+    assert not faults, (f"the query address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
                         f"nearest {S.hits_of(answers[0])[:2]}")
     run = S.gov(box, "retrieve", "--json", "--root", project, PHRASE, env=env)
     assert not S.clean(run), f"gov retrieve was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
@@ -206,17 +268,17 @@ def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cp
         f"gov retrieve's semantic facet is not unavailable with a reason: {facets.get('semantic')}"
     assert (facets.get("lexical") or {}).get("available") is True and run.envelope()["result"].get("evidence"), \
         f"the lexical route did not answer: {facets.get('lexical')}"
-    assert len(cpu.requests) > contacted, "the premise: the reads never asked the embedder at the CPU address"
+    assert len(cpu.requests) > contacted, "the premise: the reads never asked the embedder at the query address"
     assert not S.sent_for([shared], PHRASE), \
         f"the question was sent to the shared runner instead: {S.sent_for([shared], PHRASE)}"
     after = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
-    assert after == beside, f"a read that got no CPU vector changed the files beside the store: {S.tree_change(beside, after)}"
+    assert after == beside, f"a read that got no query vector changed the files beside the store: {S.tree_change(beside, after)}"
     cpu.ps, sent = None, cpu.asked_for(QUESTION)
     answers, done = S.drive_run(box, project, env, ("search", QUESTION))
     assert not S.clean(done), done.describe()
-    assert cpu.asked_for(QUESTION) > sent, "once the model is on the CPU, the question was not embedded there"
+    assert cpu.asked_for(QUESTION) > sent, "once the model is reported loaded, the question was not embedded there"
     assert answers[0].get("available") is True and _nearest(answers[0]) == [S.KILN], \
-        f"once the model is on the CPU, the answer is not the CPU embedder's vector: {S.hits_of(answers[0])[:2]}"
+        f"once the model is reported loaded, the answer is not the query embedder's vector: {S.hits_of(answers[0])[:2]}"
     assert not S.sent_for([shared], QUESTION), "the question was sent to the shared runner"
 
 
@@ -264,18 +326,40 @@ def test_a_vector_cached_under_round_3_s_key_is_never_served(box, shared, cpu, t
 
 # ---- 4. started on demand, on its own port, never stopped -----------------------------------------------------------
 
+# Rewrite-Reason: DEC-1033 (owner, 2026-11-02, item 2 (b) replacing DEC-798; item 3): every variable that could tell a
+# started Ollama about the GPU, as the stand-in executable records them. The start cases give the read an environment
+# with none of them, so any one the started embedder was told came from ``gov``.
+GPU_VARIABLES = ("CUDA_VISIBLE_DEVICES", "HIP_VISIBLE_DEVICES", "ROCR_VISIBLE_DEVICES", "GPU_DEVICE_ORDINAL",
+                 "OLLAMA_LLM_LIBRARY")
+
+
+def _hiding_nothing(env):
+    """``env`` without any variable that tells an Ollama about the GPU: a caller that leaves the GPU visible."""
+    return {key: value for key, value in env.items() if key not in GPU_VARIABLES}
+
+
 def _started_alone_at(daemons, address):
-    """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+    """The runs of ``serve``: each told to serve at ``address`` and told nothing about the GPU, so the started
+    embedder serves on it.
+
+    Rewrite-Reason: DEC-1033 (owner, 2026-11-02, item 2 (b) replacing DEC-798; item 3): where each start had to be
+    told to use no GPU (``CUDA_VISIBLE_DEVICES=-1`` or ``OLLAMA_LLM_LIBRARY=cpu``), each is now told nothing about the
+    GPU its caller did not set (the query embedder runs on the GPU), and the started embedder reports the GPU. The
+    address, ``serve`` and the rest are unchanged."""
     serves = daemons.serves()
     assert serves, "the read started no Ollama executable"
     for entry in serves:
         told = S.host_of(entry["env"].get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT)
         assert told == S.host_of(address), \
-            f"the executable was told to serve at {told}, not at the CPU embedder's address {address}: {entry}"
-        assert S.gpu_hidden(entry["env"]), (
-            f"the executable was started without being told to use no GPU (CUDA_VISIBLE_DEVICES=-1, or "
-            f"OLLAMA_LLM_LIBRARY=cpu): {entry['env']}")
+            f"the executable was told to serve at {told}, not at the query embedder's address {address}: {entry}"
+        about_gpu = {key: entry["env"][key] for key in GPU_VARIABLES if key in entry["env"]}
+        assert not about_gpu and not S.gpu_hidden(entry["env"]), (
+            f"the executable was told about the GPU what its caller did not set (DEC-1033: the query embedder is "
+            f"started with the GPU left visible): {about_gpu}")
         assert entry["argv"] == ["serve"], f"the executable was run as {entry['argv']}"
+    devices = [entry.get("device") for entry in daemons.serving()]
+    assert devices and all(device == "gpu" for device in devices), \
+        f"the started embedder does not serve on the GPU: {daemons.serving()}"
     return serves
 
 
@@ -286,21 +370,27 @@ def _never_stopped(daemons, address):
         f"(alive: {[daemons.alive(entry['pid']) for entry in serving]})")
     assert not daemons.records("signal"), f"gov stopped the embedder it started: {daemons.records('signal')}"
     reply = S.answers(address)
-    assert reply and reply[0] == 200, f"after the reads nothing answers at the CPU embedder's address: {reply}"
+    assert reply and reply[0] == 200, f"after the reads nothing answers at the query embedder's address: {reply}"
 
 
 @STAND_IN
 @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
-def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+def test_a_read_starts_the_query_embedder_at_its_address_and_never_stops_it(
         box, shared, daemons, tmp_path, place):
-    """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
-    (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
-    told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
-    answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
-    was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+    """*Red.* Nothing answers at the query embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+    (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``); the read's environment says nothing
+    about the GPU. ``gov retrieve`` starts it as ``serve``, told to serve at that address (its OLLAMA_HOST) and told
+    nothing about the GPU (so it serves on the GPU), asks it the question and gets the semantic answer, with exit
+    code 0; the shared runner is asked nothing. After the read the started embedder still serves and was sent no stop;
+    a second read uses it and starts nothing. Today no read starts anything at that address.
+
+    Rewrite-Reason: DEC-1033 (owner, 2026-11-02, item 2 (b) replacing DEC-798; item 3): renamed from
+    ``test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it``; "with no GPU" became "told
+    nothing about the GPU" (``_started_alone_at``), and the read's semantic answer now comes from an embedder on the
+    GPU. Every other assertion is unchanged."""
     address = f"127.0.0.1:{S._dead_port()}"
     project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
-    env = daemons.env(S.embed_env(box, shared, address), place)
+    env = _hiding_nothing(daemons.env(S.embed_env(box, shared, address), place))
     run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
                       env=env)
     assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
@@ -322,15 +412,20 @@ def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_sto
 
 
 @STAND_IN
-def test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer(
+def test_two_reads_at_once_leave_one_query_embedder_serving_and_both_get_their_answer(
         box, shared, daemons, tmp_path):
-    """*Red.* Two ``gov retrieve`` started together, nothing at the CPU embedder's address, the stand-in executable
-    at ``GOV_OLLAMA_BIN`` (it takes a second to listen, so both reads find nothing): both end with exit code 0 and
-    their semantic answer; every start was told that address and no GPU; afterwards one embedder serves there, and
-    nothing stopped it. Today neither read starts anything at that address."""
+    """*Red.* Two ``gov retrieve`` started together, nothing at the query embedder's address, the stand-in executable
+    at ``GOV_OLLAMA_BIN`` (it takes a second to listen, so both reads find nothing), the reads' environment saying
+    nothing about the GPU: both end with exit code 0 and their semantic answer; every start was told that address and
+    nothing about the GPU; afterwards one embedder serves there, on the GPU, and nothing stopped it. Today neither
+    read starts anything at that address.
+
+    Rewrite-Reason: DEC-1033 (owner, 2026-11-02, item 2 (b) replacing DEC-798; item 3): renamed from
+    ``test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer``; "no GPU" became "nothing
+    about the GPU" (``_started_alone_at``). Every other assertion is unchanged."""
     address = f"127.0.0.1:{S._dead_port()}"
     project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
-    env = daemons.env(S.embed_env(box, shared, address), "GOV_OLLAMA_BIN")
+    env = _hiding_nothing(daemons.env(S.embed_env(box, shared, address), "GOV_OLLAMA_BIN"))
     waits = [daemons.start(S.gov_argv("retrieve", "--json", "--root", project, text), cwd=box.workdir / "elsewhere",
                            env=env) for text in (QUESTION, OTHER)]
     runs = [wait(S.CALL_TIMEOUT_S) for wait in waits]
