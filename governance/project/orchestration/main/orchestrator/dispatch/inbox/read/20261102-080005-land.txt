@@ -1,0 +1,14 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261102-075604.out
+W2: (land batch)
+status: W2-11=c9f99b28b88b not landed (still approved); W2-105=fa653609cc93 not landed (still approved); W2-90b=73c18fea1e1f not landed (still approved); W2-123=9bb92097c811 not landed (still approved); W2-81=e78e6af7530d not landed (still approved)
+
+last output:
+026-11-02 07:59:04 STOPPED: the prepare command failed on the merged result; nothing advanced by this step, entries kept
+merge queue: stopped: the prepare command failed on the merged result; entries kept
+queue run exit 4
+W2-11: not landed (still approved)
+W2-105: not landed (still approved)
+W2-90b: not landed (still approved)
+W2-123: not landed (still approved)
+W2-81: not landed (still approved)
+

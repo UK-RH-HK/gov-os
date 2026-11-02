@@ -105,3 +105,5 @@
 2026-11-02 07:55:04 started W2-92 (DAEO-n0wb) W2-92-A5-run3-dec1019.md -> W2-92-A5-run3-dec1019.json (launcher exit 0)
 2026-11-02 07:55:04 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (ejected: red)'}
 2026-11-02 07:56:04 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-123=9bb92097c811', 'W2-81=e78e6af7530d'] -> land-dispatch-20261102-075604.out (launcher exit 0)
+2026-11-02 08:00:05 nightly: 1 new status line(s) for 2026-11-02
+2026-11-02 08:00:05 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (still approved)'}

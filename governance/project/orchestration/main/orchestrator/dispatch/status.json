@@ -1,19 +1,20 @@
 {
- "time": "2026-11-02 07:55:03",
+ "time": "2026-11-02 08:00:04",
  "leads": [
-  "W2-04"
+  "W2-04",
+  "W2-92"
  ],
- "lead_count": 1,
+ "lead_count": 2,
  "load": [
-  29.96,
-  24.09,
-  19.02
+  22.97,
+  23.39,
+  20.07
  ],
- "mem_available_mb": 17046,
- "gate_open": true,
- "gate": "OPEN leads=1 load=30.0/19.0 nproc=20 have=21753040kB need=9638980kB",
+ "mem_available_mb": 15817,
+ "gate_open": false,
+ "gate": "SHUT leads=2 load=23.0/20.1 nproc=20 have=22057540kB need=11146276kB: load 23.0/20.1 >= nproc 20",
  "disk_open": true,
- "disk": "disk gate open: 844 GiB free, 64282305 inodes free",
+ "disk": "disk gate open: 844 GiB free, 64295059 inodes free",
  "slots_held": [
   "gov-os-heavy-slot-2.lock"
  ],
@@ -25,19 +26,23 @@
  "main_dirty": [],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
-  "DAEO-u4oz"
+  "DAEO-u4oz",
+  "DAEO-n0wb"
  ],
  "lead_rss_kb": {
-  "W2-04": 3981348
+  "W2-04": 3186724,
+  "W2-92": 2618324
  },
- "outside_slot": [],
+ "outside_slot": [
+  "/usr/bin/python3 -m pytest -q (pid 2525970, 5 min, /gov-os-runs/W2-00/nightly/20261102-0400)"
+ ],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1297552,
-  "codegraph": 13368
+  "embedding": 1297400,
+  "codegraph": 30860
  },
- "busy_cores": 14.5,
- "embedding_cores": 7.28,
+ "busy_cores": 14.2,
+ "embedding_cores": 5.97,
  "cpu_measuring": false,
  "nproc": 20,
  "rerankers_outside_kb": 0,
@@ -47,16 +52,20 @@
   "lead_p95_mb": 4095,
   "lead_max_mb": 9580
  },
- "admit": true,
- "admit_reason": "admits: 1 of 6 leads; memory 20934 MB >= 14392 MB (slots rule: floor + 1 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + services' headroom 1771 MB)",
- "inbox_unread": 1,
+ "admit": false,
+ "admit_reason": "a heavy step runs outside a slot over 5 min: /usr/bin/python3 -m pytest -q (pid 2525970, 5 min, /gov-os-runs/W2-00/nightly/20261102-0400)",
+ "inbox_unread": 2,
  "inbox_oldest_age_s": 33,
- "started_this_tick": "W2-92",
+ "started_this_tick": null,
  "ready_waits": {
   "W2-122 DAEO-blwa": "already started for W2-122-A5-run1.json",
   "W2-123 DAEO-qzrq": "already started for W2-123-A5-run1.json",
   "W2-81 DAEO-l78m": "already started for W2-81-A5-r4-records.json",
-  "W2-04 DAEO-u4oz": "running"
+  "W2-04 DAEO-u4oz": "running",
+  "W2-92 DAEO-n0wb": "running",
+  "W2-104 DAEO-drhj": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -m pytest -q (pid 2525970, 5 min, /gov-os-runs/W2-00/nightly/20261102-0400)",
+  "W2-61h DAEO-h2k3": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -m pytest -q (pid 2525970, 5 min, /gov-os-runs/W2-00/nightly/20261102-0400)",
+  "W2-91 DAEO-a3u2": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -m pytest -q (pid 2525970, 5 min, /gov-os-runs/W2-00/nightly/20261102-0400)"
  },
  "land": "finished",
  "land_pending": [],
@@ -72,23 +81,23 @@
   "tail": "guard refusals since ACT 1: 71 total, 67 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 584,
-  "last_check_at": 1793606137.4275,
-  "last_result": "ok",
-  "last_secs": 33.04,
-  "last_why": "",
-  "fails": 0,
-  "first_fail_at": null,
+  "passes": 589,
+  "last_check_at": 1793606439.1403134,
+  "last_result": "timeout",
+  "last_secs": 33.51,
+  "last_why": "no answer in 30 s",
+  "fails": 1,
+  "first_fail_at": 1793606439.140331,
   "hung_since": null,
-  "last_ok_at": 1793606137.4275026,
-  "state": "healthy"
+  "last_ok_at": 1793606358.0783963,
+  "state": "failing"
  },
  "slot_holders": [
   {
    "slot": "2",
    "pid": 2316687,
-   "cpu": 29537,
-   "since": 1793606137.4736485,
+   "cpu": 30286,
+   "since": 1793606439.1771038,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/home/usain/gov-os-w",
    "cwd": "/home/usain/gov-os-worktrees/W2-04"

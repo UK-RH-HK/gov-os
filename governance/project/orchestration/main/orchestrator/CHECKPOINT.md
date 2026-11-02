@@ -71,6 +71,8 @@ dispatcher does not retry kept entries by itself: a gap, morning draft).
 **07:56:** landing of five STOPPED 07:54 (semantic not recreated: the embedder); relisted. Nightly: parallel 21 F + 2 E,
 serial 3 F + 8 E; re-running alone. W2-04 verify run 4 running (scoped). Morning package at 09:00 from the draft,
 with the push-on-prompt re-test (DEC-1022 item 1).
+**08:01:** retry STOPPED 07:59 (semantic not recreated in 121 s, server healthy): W2-123 (its new embedding client) is
+the suspect; its approval moved to `merge-queue/held/` (not ejected); W2-11, W2-105, W2-90b, W2-81 relisted.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

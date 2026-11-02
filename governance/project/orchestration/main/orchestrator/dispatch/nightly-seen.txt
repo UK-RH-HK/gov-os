@@ -1,1 +1,2 @@
 2026-11-01 FAILED | 2026-11-01 04:54:43 nightly NOT STARTED: by the latest start, the main tree is not clean
+2026-11-02 running | serial exit 1 in 5858 s: 3 failed, 171 passed, 8 errors in 5349.37s (1:29:09)
