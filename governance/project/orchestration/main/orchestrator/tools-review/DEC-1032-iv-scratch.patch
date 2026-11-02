@@ -1,0 +1,83 @@
+--- ../tools-review/orig/land.py	2026-11-02 13:13:59.799969679 +0000
++++ ../tools-review/land.py	2026-11-02 13:13:46.438516879 +0000
+@@ -33,6 +33,9 @@
+ NIGHTLY = ORCH / "log/nightly"
+ JUNIT = Path("/tmp/gov-os-nightly-junit")  # the nightly's JUnit folders (nightly.sh)
+ WARM = Path.home() / "gov-os-runs/W2-00/merge-queue/warm"  # the queue's warm clones (DEC-1001 (b))
++# DEC-1032 (iv): the integration store (the link to its ready half): the queue seeds its clones from it, re-runs the
++# head without the batch in it (never rebuilt), and promotes each landed result's stores into it.
++STORE = Path.home() / "gov-os-worktrees/W2-00-store"
+ ACT1_FIRST_NIGHT = "2026-10-31"  # ACT 1 was committed on 2026-10-30 evening; the first nightly after it is 10-31's
+ 
+ 
+@@ -192,7 +195,8 @@
+                 sys.exit(f"{i['w2']}: merge_queue {cmd[0]} failed: {r.stderr.strip()[:300]}")
+     started = time.strftime("%F %T")
+     junit, nightly_run = base_record(base[:12])
+-    extra = ["--warm", str(WARM)]
++    extra = ["--warm", str(WARM), "--integration-store", str(STORE), "--nightly-log", str(NIGHTLY),
++             "--nightly-junit", str(JUNIT)]
+     if junit and nightly_run:
+         extra += ["--base-results", str(junit), "--base-run", str(nightly_run)]
+         print(f"the baseline's own record: {junit}, {nightly_run}", flush=True)
+--- ../tools-review/orig/close_build.py	2026-11-02 13:13:59.800047630 +0000
++++ ../tools-review/close_build.py	2026-11-02 13:13:46.438573431 +0000
+@@ -41,9 +41,15 @@
+ REBUILD_SLOT = ORCH / "tools/rebuild_slot.sh"  # DEC-1001 (d): a heavy-job slot, a lock of the tree's own
+ 
+ 
++SEEDER = ORCH / "tools/seed_store.py"  # DEC-1032 (iv): no cold rebuild: a new clone seeded from the integration store
++
++
+ def rebuild_cmd(tree):
+-    """The rebuild of one tree: in a heavy-job slot with its own lock (DEC-1001 (d)); the old shared lock only if the
+-    wrapper is missing."""
++    """The rebuild of one tree: seeded first from the integration store when it has no store (seed_store.py: the
++    whole store at the same commit, else its vectors; a seed refused is named and the rebuild runs as before), in a
++    heavy-job slot with its own lock (DEC-1001 (d)); the old shared lock only if the wrappers are missing."""
++    if SEEDER.is_file() and REBUILD_SLOT.is_file():
++        return [sys.executable, str(SEEDER), "rebuild", str(tree), "--who", f"close {Path(tree).name}"]
+     if REBUILD_SLOT.is_file():
+         return ["env", f"GOV_REBUILD_PYTHON={sys.executable}", "bash", str(REBUILD_SLOT), str(tree)]
+     return ["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"]
+--- ../tools-review/orig/refresh_integration_store.sh	2026-11-02 13:13:59.800101068 +0000
++++ ../tools-review/refresh_integration_store.sh	2026-11-02 13:13:46.438607439 +0000
+@@ -2,18 +2,32 @@
+ # DEC-963: the integration branch's store for test designers' retrieval, double-buffered so it never answers
+ # "stale" while it rebuilds. ~/gov-os-worktrees/W2-00-store is a link to the ready one of two detached worktrees
+ # (-a, -b) at w2/integrate's head; this builds the other at the current head and switches the link only on success.
+-# Run after code merges.   bash refresh_integration_store.sh [--force]
++# DEC-1032 (iv): after a landing the merge queue promotes the landed result's stores into the standby half instead
++# (merge_queue.py promote); this refresh is the fallback (a skipped run, a moved head, a failed promotion), the twice-
++# daily check (store_refresh_daily.sh) and the by-hand run. It shares one lock with the promotion (<link>.lock; the
++# queue's re-runs in the ready half hold it shared), and rebuilds through seed_store.py: in a heavy-job slot with the
++# tree's own lock (DEC-1001 (d), not the old machine-wide lock), incrementally on the half's own stores, or seeded
++# from the ready half when it has none; "ok" with the semantic store not recreated is a failure (exit 75): the link
++# stays. GOV_STORE_LINK, GOV_STORE_REPO, GOV_STORE_REF: the merge queue's and the tests' (default: this machine's).
++#   bash refresh_integration_store.sh [--force]
++HERE=$(cd "$(dirname "$0")" && pwd)
+ W=/home/usain/gov-os-worktrees
+-LINK=$W/W2-00-store
+-LOG=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/integration-store.log
+-want=$(git -C /home/usain/Dynamic-Agentic-Engineering-OS rev-parse w2/integrate)
++LINK=${GOV_STORE_LINK:-$W/W2-00-store}
++REPO=${GOV_STORE_REPO:-/home/usain/Dynamic-Agentic-Engineering-OS}
++REF=${GOV_STORE_REF:-w2/integrate}
++LOG=${GOV_STORE_LOG:-/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/integration-store.log}
++exec 9>>"$LINK.lock"
++if ! flock -w "${GOV_STORE_LOCK_WAIT:-7200}" 9; then
++  echo "$(date '+%F %T') not refreshed: the store's lock ($LINK.lock) was held past the wait" | tee -a "$LOG"; exit 3
++fi
++want=$(git -C "$REPO" rev-parse "$REF")
+ cur=$(readlink -f "$LINK")
+ if [ "$1" != "--force" ] && [ "$(git -C "$cur" rev-parse HEAD)" = "$want" ]; then echo "fresh at ${want:0:12} ($cur)"; exit 0; fi
+-case "$cur" in *-a) next=$W/W2-00-store-b ;; *) next=$W/W2-00-store-a ;; esac
++case "$cur" in *-a) next=$LINK-b ;; *) next=$LINK-a ;; esac
+ git -C "$next" checkout -q --detach "$want" || exit 2
+ cd "$next" || exit 2
+ t0=$(date +%s)
+-PYTHONPATH="$next/src" flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json > "$LOG.json" 2> "$LOG.err"
++python3 "$HERE/seed_store.py" rebuild "$next" --base "$cur" --who "refresh $(basename "$next")" > "$LOG.json" 2> "$LOG.err"
+ rc=$?
+ if [ "$rc" = 0 ]; then ln -sfn "$next" "$LINK.tmp" && mv -T "$LINK.tmp" "$LINK"; fi
+ echo "$(date '+%F %T') built ${want:0:12} in $(basename "$next") rc=$rc in $(( $(date +%s) - t0 )) s; link -> $(basename "$(readlink -f "$LINK")")" | tee -a "$LOG"

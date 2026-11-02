@@ -1,0 +1,490 @@
+diff --git a/governance/project/orchestration/nightly/nightly.sh b/governance/project/orchestration/nightly/nightly.sh
+index e02357ea..f1abbdc8 100644
+--- a/governance/project/orchestration/nightly/nightly.sh
++++ b/governance/project/orchestration/nightly/nightly.sh
+@@ -107,6 +107,14 @@ PLUG=$CLONE/src/gov/close/pytest_plugin
+ # One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 builds it into gov rebuild).
+ # The nightly's rebuild scans every file in full (DEC-966 item 4, W2-107): GOV_SECRETS_FULL_SCAN=1 reads nothing from
+ # the machine's secrets-scan cache and refreshes it. Only the rebuild: the suites keep their own cache settings.
++# DEC-1032 (iv): no cold rebuild. The clone is first seeded with the integration store's vectors only (the CTO's
++# seed_store.py --vectors-only: the record store, the lexical index and every secrets judgement are still built by
++# the clone's own code with the full scan; only chunks with no vector are embedded). A seed that cannot be applied is
++# named in run.txt and the rebuild runs cold, as before; no seeder, no seed.
++SEED=${NIGHTLY_SEED:-$ORCH/tools/seed_store.py}
++if [ -f "$SEED" ]; then
++  echo "$(python3 "$SEED" seed "$CLONE" --vectors-only --who nightly 2>&1 | tail -1)" >> "$OUT/run.txt"
++fi
+ env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
+   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
+ echo "clone rebuilt" >> "$OUT/run.txt"
+diff --git a/governance/project/orchestration/tools/README.md b/governance/project/orchestration/tools/README.md
+index 182452c5..b1357d33 100644
+--- a/governance/project/orchestration/tools/README.md
++++ b/governance/project/orchestration/tools/README.md
+@@ -154,3 +154,29 @@ the baseline and closes each ticket that lands in the same step.
+   <tree>` takes a heavy-job slot and rebuilds with a lock of the tree's own (`GOV_REBUILD_LOCK`), so rebuilds of
+   different trees run side by side, at most as many as there are slots.
+ - `land.py` passes `--warm` and the baseline nightly's record. Tests: `tests/unit/orchestration/test_merge_queue_speed.py`.
++
++### No cold rebuild (DEC-1032 step (iv); for review)
++
++`--integration-store <link>` (the link to the integration store's ready half, `~/gov-os-worktrees/W2-00-store`) turns
++on three things; without it the queue works as before. `land.py` passes it, with `--nightly-log` and `--nightly-junit`.
++- **Seed:** a clone with no `.gov-runtime/store.db` (a fresh `merged` or `alt`, or one replaced) is seeded before its
++  first rebuild by `.gov-runtime/scratch/orchestrator/tools/seed_store.py`: where the clone's own `gov rebuild` offers
++  `--seed` (W2-122), the rebuild gets `--seed <the ready half>`; otherwise the seeder copies the ready half's store
++  (the whole store at the same commit, else its vectors only, where the code that makes a chunk's text is the same),
++  so only chunks with no vector are embedded. A seed refused, or a seeder that cannot answer, is named in `queue.txt`
++  and the rebuild runs as before. Every prepare is one line of the run's `prepares.jsonl`.
++- **Promotion:** after a landing, when the `merged` clone's stores were rebuilt at exactly the landed commit (and the
++  branch is still there), the standby half is checked out at that commit, seeded from the clone (`--replace`), rebuilt
++  (nothing left to embed; the code index is made anew, since it holds its tree's absolute path) and the link moved,
++  under the store's lock (`<link>.lock`, which `refresh_integration_store.sh` takes too). Otherwise (a skipped run, a
++  moved head, the lock held, a failed step) the normal refresh is started apart, named.
++- **The head without the batch is never rebuilt.** A red the baseline cleared, or one the batch may own, is first
++  judged from the nightly of exactly that head (its `run.txt` names it, it has a verdict and JUnit files): green there
++  means not on the head; red alone there with the same failure means on the head only for a red that would stop the
++  queue, never to keep one cleared. Otherwise the case is re-run alone, `--rounds` rounds, as before, in the
++  integration store's ready tree (a worktree already built at that head), under a shared hold of the store's lock;
++  a store behind the head is refreshed first (its standby half, incrementally), and a Stop if it still is not at the
++  head. A run that changes that tree is undone (`checkout --force`, `clean -fdq`, the ignored stores kept) and named.
++  With no `--base`, the trace against the head without the batch runs there too. The `alt` clone is built only at the
++  baseline (a red its nightly's record does not clear) and for the culprit search.
++- Tests: `tests/unit/orchestration/test_merge_queue_seed.py`; the seeder's: `.gov-runtime/scratch/orchestrator/tools/test_seed_store.py`.
+diff --git a/governance/project/orchestration/tools/merge_queue.py b/governance/project/orchestration/tools/merge_queue.py
+index c82f8c07..5b87033a 100644
+--- a/governance/project/orchestration/tools/merge_queue.py
++++ b/governance/project/orchestration/tools/merge_queue.py
+@@ -8,6 +8,10 @@ tested. On red the branch stays; the ticket that caused the red is ejected, the
+     python3 merge_queue.py approve --queue <dir> --ticket <W2> --by <who>
+     python3 merge_queue.py run --repo <repo> --queue <dir> [--integration <branch>] [--work <dir>] [--test-cmd <cmd>]
+                                [--select-cmd <cmd>] [--prepare-cmd <cmd>] [--rounds <n>]
++                               [--integration-store <link> [--nightly-log <dir> --nightly-junit <dir>]]
++
++With --integration-store (DEC-1032 (iv)): clones without a store are seeded from it, the landed result's stores are
++promoted into it, and the head without the batch is read from that head's nightly or re-run in it, never rebuilt.
+ 
+ Exit codes of run: 0 every approved entry landed (or none); 3 at least one ejected; 4 a step could not be done, or
+ another run holds the queue's lock (entries kept, the branch unmoved by that step). See README.md beside this file.
+@@ -31,6 +35,12 @@ ORCH_TOOLS = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scrat
+ WORK = Path.home() / "gov-os-runs/W2-00/merge-queue"
+ REBUILD_LOCK = "/tmp/gov-os-rebuild.lock"
+ REBUILD_SLOT = ORCH_TOOLS / "rebuild_slot.sh"  # DEC-1001 (d): a rebuild in a heavy-job slot, a lock of its own tree
++# DEC-1032 (iv): a clone with no store is seeded from the integration store before its rebuild; the landed result's
++# stores become the integration store's; the head without the batch is never rebuilt. MERGE_QUEUE_SEEDER and
++# MERGE_QUEUE_REFRESH name stand-ins (tests only).
++SEEDER = Path(os.environ.get("MERGE_QUEUE_SEEDER") or ORCH_TOOLS / "seed_store.py")
++REFRESH = Path(os.environ.get("MERGE_QUEUE_REFRESH") or ORCH_TOOLS / "refresh_integration_store.sh")
++STORE_REL = ".gov-runtime/store.db"
+ SLOT = ORCH_TOOLS / "verify_lock.sh"  # a heavy-job slot (DEC-979 D1, DEC-983): waits for one, exits with the run's code
+ NODE = "/home/usain/.nvm/versions/node/v22.23.3/bin"
+ MAP_REL = "governance/project/test-map.yaml"
+@@ -227,7 +237,18 @@ def record_only_change(names, places):
+ 
+ 
+ def failing_cases(xml_paths, where, targets):
+-    """The failing cases (path::name, their failure kinds) of JUnit files, paths relative to `where`. pytest names a case by its path
++    """The failing cases (path::name, their failure kinds) of JUnit files, paths relative to `where`."""
++    return [(node, kinds) for node, kinds, failed in junit_cases(xml_paths, where, targets) if failed]
++
++
++def passing_cases(xml_paths, where, targets):
++    """The cases that ran and passed (no failure, error or skip) in JUnit files, paths relative to `where`."""
++    return [node for node, _, failed in junit_cases(xml_paths, where, targets, skipped=False) if not failed]
++
++
++def junit_cases(xml_paths, where, targets, skipped=True):
++    """Every case of JUnit files as (path::name, failure kinds, failed), paths relative to `where` (skipped cases
++    left out when `skipped` is false). pytest names a case by its path
+     relative to its rootdir, which without an ini file is the targets' common folder: each folder from there up to
+     `where` is tried for the file the dotted classname names."""
+     where = Path(where)
+@@ -249,7 +270,8 @@ def failing_cases(xml_paths, where, targets):
+     out = []
+     for p in xml_paths:
+         for case in ET.parse(p).iter("testcase"):
+-            if case.find("failure") is None and case.find("error") is None:
++            failed = case.find("failure") is not None or case.find("error") is not None
++            if not failed and not skipped and case.find("skipped") is not None:
+                 continue
+             if case.get("file"):
+                 node = f"{case.get('file')}::{case.get('name')}"
+@@ -257,7 +279,7 @@ def failing_cases(xml_paths, where, targets):
+                 node = locate(case.get("classname").split("."), case.get("name"))
+             else:  # a collection error: pytest names the module (dotted) in `name`
+                 node = locate(case.get("name", "").split("."), None)
+-            out.append((node, case_kinds(case)))
++            out.append((node, case_kinds(case) if failed else set(), failed))
+     return out
+ 
+ 
+@@ -372,6 +394,13 @@ class Queue:
+         self.rounds = a.rounds
+         self.ejected, self.handled, self.n, self.with_rc = [], set(), 0, {}
+         self.log = self.work = self.clone = self.alt = self.base = self._base_record = None
++        # DEC-1032 (iv): the integration store (a link to the ready one of two worktrees of this repository): the seed
++        # of every clone without a store, the tree the head without the batch is re-run in, and where a landed
++        # result's stores go. None: the earlier way (no seed, the alt clone rebuilt at the head, no promotion).
++        store = getattr(a, "integration_store", None)
++        self.store = Path(store).expanduser() if store else None
++        self.built = {}  # tree -> the commit its stores were last rebuilt at, successfully, in this run
++        self._head_record = {}  # head -> the nightly's record of exactly that head (or None)
+         name = sh(["git", "-C", str(self.repo), "config", "user.name"]).stdout.strip()
+         email = sh(["git", "-C", str(self.repo), "config", "user.email"]).stdout.strip()
+         self.ident = ["-c", f"user.name={name or 'orchestrator'}", "-c", f"user.email={email or 'orchestrator@localhost'}"]
+@@ -494,12 +523,48 @@ class Queue:
+             merged.append((e, self.git(where, "rev-parse", "HEAD")))
+         return merged, failed
+ 
+-    def prepared(self, where):
++    def seed(self, where, base, *more):
++        """DEC-1032 (iv): `where` seeded from `base` by the seeder (seed_store.py) before its rebuild; the extra rebuild
++        arguments it answers (the product's `--seed <base>`), none when it seeded by copy, or did not seed. Fail
++        closed: a seed refused or a seeder that cannot answer leaves the normal rebuild, named."""
++        if not SEEDER.is_file():
++            self.note(f"no seeder at {SEEDER}: {where.name} rebuilds without a seed")
++            return []
++        r = sh([sys.executable, str(SEEDER), "seed", str(where), "--base", str(base), "--json",
++                "--who", f"queue {where.name}", *more])
++        try:
++            ans = json.loads(r.stdout.strip().splitlines()[-1])
++            assert isinstance(ans, dict) and isinstance(ans.get("rebuild_args", []), list)
++        except (IndexError, ValueError, AssertionError):
++            self.note(f"seed of {where.name} not applied (the seeder answered exit {r.returncode}: "
++                      f"{(r.stderr or r.stdout).strip()[-200:]}): a normal rebuild")
++            return []
++        what = ans.get("reason") or (f"{ans.get('kept')}, {ans.get('vectors')} vectors" if ans.get("status") == "seeded"
++                                     else " ".join(ans.get("rebuild_args") or []))
++        self.note(f"seed of {where.name} from {base}: {ans.get('status')} ({ans.get('mode')}): {what}"
++                  + ("" if ans.get("status") in ("seeded", "deferred") else "; a normal rebuild"))
++        return [str(x) for x in ans.get("rebuild_args") or []]
++
++    def prepared(self, where, extra=None, seed=True):
++        """The rebuild of `where` (the prepare command), after its seed when it has no store (DEC-1032 (iv)). Records
++        the commit it was built at, for the promotion."""
++        extra = list(extra or [])
++        if seed and self.store and not (where / STORE_REL).exists():
++            extra += self.seed(where, self.store)
+         cmd = shlex.split(self.a.prepare_cmd) if self.a.prepare_cmd else \
+             (["env", f"GOV_REBUILD_PYTHON={sys.executable}", "bash", str(REBUILD_SLOT), str(where)] if REBUILD_SLOT.is_file()
+              else ["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"])
+-        r = sh(cmd, cwd=where, env=self.env(where))
++        t0 = time.time()
++        r = sh(cmd + extra, cwd=where, env=self.env(where))
+         (self.log / f"prepare-{where.name}.txt").write_text(r.stdout[-4000:] + r.stderr[-4000:], encoding="utf-8")
++        at = sh(["git", "-C", str(where), "rev-parse", "HEAD"]).stdout.strip()
++        with open(self.log / "prepares.jsonl", "a", encoding="utf-8") as f:  # one line per rebuild (rebuild_counts.py)
++            f.write(json.dumps({"tree": where.name, "at": at, "rc": r.returncode, "seconds": round(time.time() - t0, 1),
++                                "args": extra, "finished": now()}) + "\n")
++        if r.returncode == 0 and at:
++            self.built[str(where)] = at
++        else:
++            self.built.pop(str(where), None)
+         return r.returncode == 0
+ 
+     # -- the tests
+@@ -628,43 +693,66 @@ class Queue:
+                 need.append(node)
+         reds = need
+         if reds:
+-            self.alt = self.fresh("alt")
+             # DEC-988, DEC-989: with --base, a red is traced against a known state (the last nightly with a verdict,
+-            # its reds known), never against code made by undoing merges; without it, the head without the batch.
+-            self.build(self.alt, self.base or head, [])
+-            if not self.prepared(self.alt):
+-                raise Stop(f"the prepare command failed on {where}")
+-            for node in reds:
+-                verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(self.alt, node),
+-                                        self.rounds)
+-                if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
+-                    kw, kb = self.kinds(self.clone, node), self.kinds(self.alt, node)
+-                    if not same_failure(kw, kb):
+-                        verdict = "owned"
+-                        self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
+-                out[verdict].append(node)
+-                self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
++            # its reds known), never against code made by undoing merges; without it, the head without the batch,
++            # which is never rebuilt where the integration store is given (DEC-1032 (iv), head_tree).
++            if self.base:
++                self.alt = self.fresh("alt")
++                self.build(self.alt, self.base, [])
++                if not self.prepared(self.alt):
++                    raise Stop(f"the prepare command failed on {where}")
++                other, hold = self.alt, None
++            else:
++                other, hold = self.head_held(head)
++            try:
++                for node in reds:
++                    verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(other, node),
++                                            self.rounds)
++                    if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
++                        kw, kb = self.kinds(self.clone, node), self.kinds(other, node)
++                        if not same_failure(kw, kb):
++                            verdict = "owned"
++                            self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
++                    out[verdict].append(node)
++                    self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
++            finally:
++                self.restore(other, head)
++                if hold:
++                    hold.close()
+         if self.base and (out["owned"] or out["unowned"]):
+-            self.alt = self.alt or self.fresh("alt")
+             # The head without the batch decides the rest (code that exists; nothing is undone). A red the
+             # baseline had stays cleared only if that head has it too, the same way: else the batch broke again
+             # what a later merge had fixed (review of 2026-11-01). A red the baseline did not clear that the head
+             # has too, the same way, came from a merge already on the branch since the baseline: nothing
+             # advances and nobody is ejected; the CTO investigates at once (DEC-968, DEC-989). Fail closed.
+-            self.build(self.alt, head, [])
+-            if not self.prepared(self.alt):
+-                raise Stop("the prepare command failed on the head without the batch")
+-
+-            def on_head(n):
+-                return red_alone(lambda: self.alone(self.alt, n), self.rounds) and \
+-                    same_failure(self.kinds(self.alt, n), self.kinds(self.clone, n))
++            # DEC-1032 (iv): that head is never rebuilt: the nightly's record of exactly that head answers first (a
++            # case green there is not on the head; a case red alone there with the same failure is, for a red that
++            # would stop the queue, never for one it would clear), else the case is re-run alone, as before, on the
++            # integration store's tree, already built at that head (head_tree).
++            def on_head(n, clearing):
++                known = self.head_known(head, n)
++                if known == "passed":
++                    self.note(f"green on the head without the batch in that head's own nightly (no run): {n}")
++                    return False
++                if known is not None and not clearing and same_failure(known, self.kinds(self.clone, n)):
++                    self.note(f"red alone on the head without the batch in that head's own nightly, the same "
++                              f"failure ({known}; no run): {n}")
++                    return True
++                tree, hold = self.head_held(head)
++                try:
++                    return red_alone(lambda: self.alone(tree, n), self.rounds) and \
++                        same_failure(self.kinds(tree, n), self.kinds(self.clone, n))
++                finally:
++                    self.restore(tree, head)
++                    if hold:
++                        hold.close()
+             for n in list(out["unowned"]):
+-                if not on_head(n):
++                if not on_head(n, clearing=True):
+                     out["unowned"].remove(n)
+                     out["owned"].append(n)
+                     self.note(f"red at the baseline but not, the same way, on the head without the batch: the "
+                               f"batch's: {n}")
+-            since = [n for n in out["owned"] if on_head(n)]
++            since = [n for n in out["owned"] if on_head(n, clearing=False)]
+             if since:
+                 rest = [n for n in out["owned"] if n not in since]
+                 raise Stop(f"red since the baseline {self.base[:12]}, already on {head[:12]} without the batch "
+@@ -702,6 +790,183 @@ class Queue:
+         _, junits = self.tests(where, "alone", [node])
+         return failure_kinds(junits)
+ 
++    # -- DEC-1032 (iv): the integration store: the head without the batch, never rebuilt; the landed result promoted
++    def store_lock(self):
++        return self.store.with_name(self.store.name + ".lock")  # refresh_integration_store.sh takes the same
++
++    def head_tree(self, head):
++        """A tree at `head` (the head without the batch) whose stores are built, never rebuilt here: the integration
++        store's ready tree when it is at that head; when it is not, its normal refresh first (its standby half,
++        incrementally, then the link moved), and a Stop if it still is not. It is used under a shared hold of the
++        store's lock (hold_store), so no refresh moves it meanwhile. Without --integration-store, the earlier way:
++        the alt clone checked out and rebuilt at the head (once per head while it stays there)."""
++        if self.store is None:
++            if self.alt and self.built.get(str(self.alt)) == head and \
++                    sh(["git", "-C", str(self.alt), "rev-parse", "HEAD"]).stdout.strip() == head:
++                return self.alt
++            self.alt = self.alt or self.fresh("alt")
++            self.build(self.alt, head, [])
++            if not self.prepared(self.alt):
++                raise Stop("the prepare command failed on the head without the batch")
++            return self.alt
++        for attempt in (0, 1):
++            tree = self.store.resolve()
++            at = sh(["git", "-C", str(tree), "rev-parse", "HEAD"]).stdout.strip()
++            if at == head and (tree / STORE_REL).is_file():
++                if getattr(self, "_head_noted", None) != (str(tree), head):
++                    self._head_noted = (str(tree), head)
++                    self.note(f"the head without the batch: the integration store's tree {tree}, already built at "
++                              f"{head[:12]} (no rebuild)")
++                return tree
++            if attempt == 0:
++                self.note(f"the integration store {tree} is at {at[:12] or 'an unreadable head'}, not at the head "
++                          f"{head[:12]}: its normal refresh first (its standby half, incrementally; no clone rebuilt)")
++                if not self.refresh(wait=True):
++                    break
++        raise Stop(f"the head without the batch cannot be judged without rebuilding a clone: the integration store "
++                   f"{self.store} is not at {head[:12]} and its refresh did not bring it there")
++
++    def head_held(self, head):
++        """head_tree's tree and a shared hold of the integration store's lock while cases run in it (a refresh or a
++        promotion takes the lock whole, so neither moves the tree under a run; none for the queue's own clones):
++        (tree, the open lock file to close, or None). The tree is checked again under the hold."""
++        for _ in range(3):
++            tree = self.head_tree(head)
++            if self.store is None or tree in (self.clone, self.alt):
++                return tree, None
++            f = open(self.store_lock(), "a")
++            fcntl.flock(f, fcntl.LOCK_SH)
++            if sh(["git", "-C", str(tree), "rev-parse", "HEAD"]).stdout.strip() == head:
++                return tree, f
++            f.close()  # moved between the look and the hold: looked at again
++        raise Stop(f"the integration store's tree kept moving away from {head[:12]}")
++
++    def restore(self, tree, head):
++        """The integration store's tree left as found after cases ran in it: at `head`, no tracked change and no
++        untracked file (its ignored stores kept); a test that changed it is named. The queue's own clones are not
++        touched here."""
++        if self.store is None or tree is None or tree in (self.clone, self.alt):
++            return
++        at = sh(["git", "-C", str(tree), "rev-parse", "HEAD"]).stdout.strip()
++        dirty = sh(["git", "-C", str(tree), "status", "--porcelain"]).stdout.strip()
++        if at != head or dirty:
++            sh(["git", "-C", str(tree), "checkout", "-q", "--force", "--detach", head])
++            sh(["git", "-C", str(tree), "clean", "-fdq"])
++            self.note(f"a re-run changed the integration store's tree {tree} ("
++                      + ("moved to " + at[:12] if at != head else "") + (" " if at != head and dirty else "")
++                      + ("files: " + dirty.replace(chr(10), "; ")[:200] if dirty else "") + f"): restored to {head[:12]}")
++
++    def head_known(self, head, node):
++        """What the nightly of exactly `head` (its run file's `head <id>` line; its JUnit folder beside the others;
++        a verdict line, so its reds were re-run alone) says of a case: "passed" (it ran and passed in its suites),
++        the failure kinds (red alone there, its JUnit naming the failure), or None (no such nightly, a record that
++        cannot be read, or the case is in neither: the case is then re-run on the head)."""
++        nlog, njunit = getattr(self.a, "nightly_log", None), getattr(self.a, "nightly_junit", None)
++        if not (nlog and njunit):
++            return None
++        if head not in self._head_record:
++            rec = None
++            for run in sorted(Path(nlog).glob("*/run.txt"), reverse=True):
++                try:
++                    text = run.read_text(encoding="utf-8")
++                except (OSError, UnicodeDecodeError):
++                    continue
++                if not re.search(r"^head " + re.escape(head[:12]) + r"\b", text, re.M):
++                    continue
++                xmls = sorted((Path(njunit) / run.parent.name).glob("*.xml"))
++                if xmls and re.search(r"^verdict:", text, re.M):
++                    try:
++                        alone = {m.group(1) for m in re.finditer(r"^red-alone (.+?): ", text, re.M)}
++                        cases = junit_cases(xmls, self.clone, ["tests"], skipped=False)
++                        failed = {n for n, _, bad in cases if bad}
++                        red = {}
++                        for n, k, bad in cases:
++                            if bad and n in alone and k:
++                                red.setdefault(n, set()).update(k)
++                        rec = {"red": red, "passed": {n for n, _, bad in cases if not bad} - failed}
++                        self.note(f"the head without the batch has its own nightly: {run.parent.name}")
++                    except (OSError, ET.ParseError) as exc:
++                        self.note(f"the nightly of {head[:12]} cannot be read ({exc.__class__.__name__}): re-run")
++                break
++            self._head_record[head] = rec
++        rec = self._head_record[head]
++        if rec is None:
++            return None
++        if node in rec["red"]:
++            return sorted(rec["red"][node])
++        return "passed" if node in rec["passed"] else None
++
++    def refresh(self, wait):
++        """The integration store's normal refresh (refresh_integration_store.sh: its standby half rebuilt at the head
++        of the integration branch, incrementally, the link moved on success; it takes the store's lock itself). With
++        `wait`, run now: whether it succeeded. Else started apart, its output in this run's log: True."""
++        if not REFRESH.is_file():
++            self.note(f"no refresh tool at {REFRESH}: the integration store is not refreshed")
++            return False
++        env = dict(os.environ, GOV_STORE_LINK=str(self.store), GOV_STORE_REPO=str(self.repo),
++                   GOV_STORE_REF=self.a.integration)
++        out = open(self.log / "refresh.txt", "a", encoding="utf-8")
++        try:
++            if wait:
++                return subprocess.run(["bash", str(REFRESH)], env=env, stdout=out, stderr=subprocess.STDOUT,
++                                      stdin=subprocess.DEVNULL).returncode == 0
++            subprocess.Popen(["bash", str(REFRESH)], env=env, stdout=out, stderr=subprocess.STDOUT,
++                             stdin=subprocess.DEVNULL, start_new_session=True)
++            return True
++        finally:
++            out.close()
++
++    def promote(self, result):
++        """After a landing, the merged clone's stores, rebuilt at exactly the landed commit, become the integration
++        store's instead of building it again: its standby half checked out at that commit, seeded from the clone
++        (the whole store: the same commit), its rebuild (nothing is left to embed; the code index is made anew, as it
++        holds its tree's absolute path), then the link moved, as refresh_integration_store.sh moves it. Where the
++        clone's stores are not at that commit (a skipped run, a rebuild elsewhere, the branch moved on), the store's
++        lock is held, or a step fails: the normal refresh, started apart, named."""
++        if self.store is None:
++            return
++        why = None
++        if self.built.get(str(self.clone)) != result:
++            why = (f"the merged clone's stores were not rebuilt at the landed commit {result[:12]} (the run was "
++                   f"skipped, or its last rebuild was at {str(self.built.get(str(self.clone)))[:12]})")
++        elif sh(["git", "-C", str(self.clone), "rev-parse", "HEAD"]).stdout.strip() != result:
++            why = "the merged clone is no longer at the landed commit"
++        elif self.head() != result:
++            why = f"{self.ref} moved on past the landed commit {result[:12]}"
++        if why is None:
++            lock = open(self.store_lock(), "a")
++            try:
++                try:
++                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
++                except OSError:
++                    why = "a refresh holds the integration store's lock"
++                else:
++                    why = self._promote(result)
++            finally:
++                lock.close()
++        if why:
++            self.note(f"integration store not promoted: {why}; its normal refresh runs apart")
++            self.refresh(wait=False)
++
++    def _promote(self, result):
++        """The promotion's steps, under the store's lock; None when done, else why not (the link unmoved)."""
++        cur = self.store.resolve()
++        standby = self.store.with_name(self.store.name + ("-b" if cur.name.endswith("-a") else "-a"))
++        if standby.resolve() == cur or not (standby / ".git").exists():
++            return f"no standby half at {standby}"
++        if sh(["git", "-C", str(standby), "checkout", "-q", "--force", "--detach", result]).returncode:
++            return f"the standby half {standby.name} cannot be checked out at {result[:12]}"
++        extra = self.seed(standby, self.clone, "--replace")
++        if not self.prepared(standby, extra, seed=False) or self.built.get(str(standby)) != result:
++            return f"the rebuild of the standby half {standby.name} at {result[:12]} failed"
++        tmp = self.store.with_name(self.store.name + ".tmp")
++        tmp.unlink(missing_ok=True)
++        os.symlink(standby, tmp)
++        os.replace(tmp, self.store)
++        self.note(f"integration store promoted: the merged clone's stores at {result[:12]} into {standby.name}; "
++                  f"the link moved (its own rebuild of the landing's change not needed)")
++        return None
++
+     def culprits(self, head, merged, owned):
+         """DEC-979 item 3: eject only the tickets that caused the reds; the rest are returned for a new run."""
+         entries = [e for e, _ in merged]
+@@ -712,6 +977,7 @@ class Queue:
+                                       "closed)", head)
+         files = {e["ticket"]: set(self.git(self.clone, "diff", "--name-only", m + "^1", m).split()) for e, m in merged}
+         cur = {}
++        self.alt = self.alt or self.fresh("alt")  # the head without the batch may have been judged without it
+ 
+         def prepare(cand):
+             cur["c"] = cand
+@@ -803,6 +1069,7 @@ class Queue:
+             else:
+                 self.advance(head, result)
+                 self._landed(head, result, merged, skipped, out, light, started)
++                self.promote(result)  # DEC-1032 (iv): the landed result's stores become the integration store's
+                 return
+             pending = [e for e, _ in merged]
+             continue
+@@ -944,6 +1211,12 @@ def main(argv=None):
+     r.add_argument("--base-run", help="the baseline nightly's run file, whose `red-alone <case>:` lines it reads")
+     r.add_argument("--base", help="the known state reds are traced against: the last nightly with a verdict until a "
+                                   "green one after ACT 1, then the last green one (DEC-989); default the head")
++    r.add_argument("--integration-store", help="the link to the integration store's ready half (DEC-1032 (iv)): "
++                   "the seed of a clone without a store, the tree the head without the batch is re-run in (never "
++                   "rebuilt), and where a landed result's stores are promoted")
++    r.add_argument("--nightly-log", help="the nightlies' run folders (<stamp>/run.txt): the head without the batch "
++                                         "is read from the nightly of exactly that head, where there is one")
++    r.add_argument("--nightly-junit", help="the nightlies' JUnit folders (<stamp>/*.xml), with --nightly-log")
+     a = ap.parse_args(argv)
+     return {"enqueue": enqueue, "approve": approve, "run": run}[a.cmd](a)
+ 

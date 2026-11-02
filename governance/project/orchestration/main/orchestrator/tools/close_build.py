@@ -41,15 +41,9 @@ REBUILD_LOCK = "/tmp/gov-os-rebuild.lock"
 REBUILD_SLOT = ORCH / "tools/rebuild_slot.sh"  # DEC-1001 (d): a heavy-job slot, a lock of the tree's own
 
 
-SEEDER = ORCH / "tools/seed_store.py"  # DEC-1032 (iv): no cold rebuild: a new clone seeded from the integration store
-
-
 def rebuild_cmd(tree):
-    """The rebuild of one tree: seeded first from the integration store when it has no store (seed_store.py: the
-    whole store at the same commit, else its vectors; a seed refused is named and the rebuild runs as before), in a
-    heavy-job slot with its own lock (DEC-1001 (d)); the old shared lock only if the wrappers are missing."""
-    if SEEDER.is_file() and REBUILD_SLOT.is_file():
-        return [sys.executable, str(SEEDER), "rebuild", str(tree), "--who", f"close {Path(tree).name}"]
+    """The rebuild of one tree: in a heavy-job slot with its own lock (DEC-1001 (d)); the old shared lock only if the
+    wrapper is missing."""
     if REBUILD_SLOT.is_file():
         return ["env", f"GOV_REBUILD_PYTHON={sys.executable}", "bash", str(REBUILD_SLOT), str(tree)]
     return ["flock", REBUILD_LOCK, sys.executable, "-m", "gov.cli.main", "rebuild", "--json"]

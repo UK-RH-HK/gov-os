@@ -33,9 +33,6 @@ STATUS = ORCH / "log/nightly/status.txt"
 NIGHTLY = ORCH / "log/nightly"
 JUNIT = Path("/tmp/gov-os-nightly-junit")  # the nightly's JUnit folders (nightly.sh)
 WARM = Path.home() / "gov-os-runs/W2-00/merge-queue/warm"  # the queue's warm clones (DEC-1001 (b))
-# DEC-1032 (iv): the integration store (the link to its ready half): the queue seeds its clones from it, re-runs the
-# head without the batch in it (never rebuilt), and promotes each landed result's stores into it.
-STORE = Path.home() / "gov-os-worktrees/W2-00-store"
 ACT1_FIRST_NIGHT = "2026-10-31"  # ACT 1 was committed on 2026-10-30 evening; the first nightly after it is 10-31's
 
 
@@ -195,8 +192,7 @@ def main():
                 sys.exit(f"{i['w2']}: merge_queue {cmd[0]} failed: {r.stderr.strip()[:300]}")
     started = time.strftime("%F %T")
     junit, nightly_run = base_record(base[:12])
-    extra = ["--warm", str(WARM), "--integration-store", str(STORE), "--nightly-log", str(NIGHTLY),
-             "--nightly-junit", str(JUNIT)]
+    extra = ["--warm", str(WARM)]
     if junit and nightly_run:
         extra += ["--base-results", str(junit), "--base-run", str(nightly_run)]
         print(f"the baseline's own record: {junit}, {nightly_run}", flush=True)

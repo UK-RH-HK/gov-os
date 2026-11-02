@@ -161,6 +161,11 @@ W2-122 and W2-123 have merged 6ed6a5ae (messaged; background watch), then to the
 (tools/gov_reranker_gpu_slot.py + 14 tests, uncommitted) in review (`reviews/emg-rerank-slot.md`); then commit and the
 owner's install ACT (commands in the engineer's return). Follow-ups: W2-54 acceptance revision (5 groups), review F1
 (zero vector) and F2 (list answers), the automatic start's caps.
+**13:30:** reranker interim LIVE (ACT-RERANK-WAIT-1 applied, `81b7a739`). v4.6 review FAILED health (F1 first request
+after idle = HUNG; F2 5xx counted as progress): engineer fixing F1-F4 live-by-rename after tests; then review round 2
+(health only). Seeding (d) built and NOT live (`tools-review/`, both patches + seed_store.py, new_worktree.sh,
+rebuild_counts.py); in review (`reviews/emg-seeding.md`). After install: refresh the integration store once by hand
+past 6ed6a5ae (it is at 6ebd7b56 of 11-01). W2-123: success-7/8 amended `0fa24eda`; P-W2-123-4 to W2-126 `5e67a14d`.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

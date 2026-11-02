@@ -35,6 +35,20 @@
 - rebuild 2 (incremental) started ~11:21: log/verify-r2/rebuild-2.{log,exit}. Then verify_r2.sh (scoped run once),
   then gov check in heavy_slot.
 
+## 13:20 UTC: the CTO's messages (cross-session, W2O V3)
+- DEC-1032 line: returned as package P-W2-123-5 (live NOT_ON_CPU risk found and sent); the CTO agreed. Then the
+  owner's EMERGENCY DEC-1033: w2/integrate holds the patch (6ed6a5ae: semantic.py any-device vector, ollama.py query
+  start without NO_GPU) and 0fa24eda (success-7 amended to "GPU visible", success-8 kept, Rewrite-Reason DEC-1033).
+  CTO asks: merge w2/integrate before DONE, resolve keeping both, unit tests and gov accept once. P-W2-123-4 goes to
+  W2-126 (now on w2/integrate as 5e67a14d). Also name in the return whether run 1's query start keeps the cap.
+- git merge-tree: semantic.py merges cleanly; ollama.py conflicts (2 hunks).
+- Scoped run (pre-merge head e17efc47): parallel 4515 passed / 11 failed (5 known W2-05/W2-59; 6 test_dispatcher
+  from 66b08891, red in any worktree, skip guard 7f81f91a on w2/integrate); serial part running (log/verify-r2/).
+- td-3 launched 13:20 in W2-123-tests (at e17efc47): revise GPU-hidden cases, map to success-8. tripwire-before-8.
+- Next: when serial ends: git merge --no-ff w2/integrate (message file), leave ollama.py conflicted; launch eng-5
+  (briefs/eng-5.md) to resolve and stage; then commit the merge; merge td-3's branch; gov accept; unit tests seen in
+  eng-5's return; remove tests worktree; gov checkpoint record; return DONE.
+
 ## Next (as first planned)
 1. On td-2's return: tripwire compare, check twelve fields and commit trailers; merge w2/W2-123-tests when eng-4 is
    not running (message file, Task/Role trailers); write TESTS-READY ("run 2").
