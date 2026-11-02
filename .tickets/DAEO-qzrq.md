@@ -29,6 +29,7 @@ kpis:
   - 'A product feature for every adopted repository: the parallel requests and the CPU cap are read from the gate''s configuration file (W2-20), with the measured defaults; nothing of this machine (its CPU numbers, its ports) is written in the code [DEC-1014 item 6, DEC-982]'
   - 'The shared embedding server comes with a health probe (a fixed text embedded within a configured time, stated healthy, slow or hung) and a safe restart (the hung server stopped, started again under its configured cap, the restart recorded), both callable by the dispatcher (W2-121); a restart never happens while the server is answering [DEC-1015 item 2]'
   - 'Both servers the Gov OS starts (`ensure_available` and `ensure_query_available`) start under their cap from the gate''s configuration file (W2-20), the query server CPU-only; every restart, whether the Gov OS''s own or the dispatcher''s safe restart (W2-121), keeps the cap; a planted start of each shows it [ACT-OLLAMA-CAP-2, DEC-1017]'
+  - 'The query embedder may use the GPU (DEC-1032 amends DEC-798 and DEC-975): `ensure_query_available` starts the query server without hiding the GPU (no `CUDA_VISIBLE_DEVICES=-1`), so a server restarted by the code comes back on the GPU like the one the owner restarted (ACT-QUERY-GPU-1); a test that enforced the CPU-only start is revised by the test designer with `Rewrite-Reason: DEC-1032` [DEC-1032]'
   failure:
   - 'Parallel requests that change a vector; a server started uncapped; a setting chosen without its measure [DEC-1014]'
 profile: STANDARD
