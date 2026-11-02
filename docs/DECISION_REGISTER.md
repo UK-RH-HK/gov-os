@@ -12925,3 +12925,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.423 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1040. Next free id: DEC-1041. |
+
+### DEC-1041 — The gitleaks fix's three questions (delegated): slots confined to their CPU share, measured in CPU-seconds; the children's lost budget accepted for now; codeintel's pool and W2-20's paths as a follow-up
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1033/DEC-1039: P2, reversible, inside the owner's DEC-1039 item 1 ("each gate slot confined to its CPU share with taskset"), the engineer's recommendations; confidence medium-high; for the owner to overturn) · **Under:** DEC-1039, DEC-1038, DEC-1033, DEC-1003
+- **Decision:** (1) P-EMG-GITLEAKS-1 (a): the candidate gate as built (each slot on its contiguous CPU share, 0-5, 6-12, 13-19; the budget from the share), live after its one review; the brief's time bound ("no more than 20 % slower") re-measured as CPU-seconds and as three slots' throughput, since a run confined to a third of the machine cannot keep an unconfined run's wall time; a lone run is about three times slower, and the overload ends. (2) P-EMG-GITLEAKS-2 (a) now: the CPU set is the guarantee for children whose environment is built from scratch (W2-69's test helpers); (b) the helpers passing the gate's variables through, by a test designer, with the DEC-1039 (2) test refactor. (3) P-EMG-GITLEAKS-3: `src/gov/codeintel/__init__.py`'s 24-wide `ThreadPoolExecutor()` (one gitleaks per path) gets the same width rule (`gov.secrets._workers`, made public) as an emergency follow-up after the review; W2-20's allowed paths gain `src/gov/secrets/__init__.py`, `src/gov/codeintel/__init__.py` and `tests/unit/secrets_check/test_w2_20_*` (its own ticket-file commit). (4) Recorded: at 20:27-20:29 the CTO stopped the engineer's scoped run and the W2-123 + W2-122 landing at their test phases (load 54: 17 to 22 unconfined gitleaks from those two runs), staggered W2-126's and W2-42a's heavy runs until the confined gate is live (`log/emergency-stops-20261102.md`).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.424 | 2026-11-02 | Orchestrator (delegated): DEC-1041. Next free id: DEC-1042. |
