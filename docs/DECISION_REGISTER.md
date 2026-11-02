@@ -12851,3 +12851,21 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.416 | 2026-11-02 | Orchestrator (delegated): DEC-1034. Next free id: DEC-1035. |
+
+### DEC-1035 — Dispatcher v4.6's G1 fix live without a third review; P-W2-112-T2: (c) now, (a) as W2-127
+- **Status:** ACCEPTED (owner, 2026-11-02, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`) · **Under:** DEC-1010, DEC-1033, DEC-1034
+- **Decision:** (1) G1 (a): the G1/G2 fix of dispatcher v4.6 (FAILING on 5xx and runner errors only, self-clearing; the reranker peak only after a day of samples) installed when its tests passed, without a third review (DEC-1010's owner-once); done (164 tests, one clean live pass, committed `b06ee350`). (2) P-W2-112-T2 (c) now: sandboxed sessions fall back (a GPU slot or unranked, named) while the shared reranker cannot be reached from the sandbox; and (a) as a follow-up ticket filed now, W2-127 (`DAEO-1vka`): the shared reranker's one socket path allowed in the launch sandbox, nothing else; it runs right after W2-112 lands, before EXAMIN's copy, since many of the agents that search memory are sandboxed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.417 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1035. Next free id: DEC-1036. |
+
+### DEC-1036 — W2-112's KPI 6: below its GPU share the service does not start; the service holds one of the two GPU slots (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: P2, a KPI made stricter inside the owner's DEC-1033 and DEC-1032; the lead's and designer's recommendations; confidence medium-high; for the owner to overturn) · **Under:** DEC-1033, DEC-1032, DEC-1034
+- **Decision:** (1) P-W2-112-T5 (b): below its GPU share the shared reranker service does not start (KPI 6 said it starts on the CPU, named, and alerts): on the CPU a query takes over 100 s, the grind DEC-1033 forbids for the fallback and, for the same reason, for the service; searches fall back through the GPU slot rule or go unranked, named; four test cases revised by the test designer (`Rewrite-Reason: DEC-1036`). (2) P-W2-112-T6 (b): the service holds one of the two GPU reranker slots (it waits for one like any reranker, or fails named), so at most one private reranker beside it: about 10.5 GB with the embedder, DEC-1032's 2 GB headroom kept (under (a), a failing service plus two privates reached about 14 of 16.3 GB); this reverses the CTO's earlier "the service takes no slot" (DEC-1034's message).
+(3) P-W2-112-UNIT-1 (a): three unit test files outside W2-112's paths, out of date by the intended design (each search tries the service first; `gov status` gains a `reranker` part), join its allowed paths for about 15 lines: `tests/unit/semantic/test_rerank_process.py`, `tests/unit/orchestration/test_gov_reranker_gpu_slot.py`, `tests/unit/status/test_status.py` (unit tests: MR-3 does not apply). The lead's P3s logged: at most 512 texts per request ((rounds + 1) x batch size is 90 at the defaults), a cold start waits at most 60 s, the bundle carries `rerank {by: service|private|unavailable, device, reason}`.
+(4) The CTO as moderator (DEC-1010, P3): W2-112's success-2 test dispute decided (a): the service's answer is an object carrying the scores, one per text, in the request's order (with the device); the two cases that expected a bare list are revised by the test designer; neither P-RERANKER-1 nor the KPIs fix the answer's form. A Wave 3 row for W2-96's acceptance runner: a README row naming a parametrized case bare (`test_x[param]`) matches its case or is refused as unreadable, never counted as a silent fail.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.418 | 2026-11-02 | Orchestrator (delegated): DEC-1036. Next free id: DEC-1037. |
