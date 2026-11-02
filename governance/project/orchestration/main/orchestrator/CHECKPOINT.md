@@ -33,6 +33,9 @@ unclassified after classifying).
 **00:58:** review round 2 PASS, READY true (`tools/verdict.py`); package in `packages/` (`49158e13`: .md with the review
 summary, .diff, test file); ACT pinged (sent). Waiting on the owner's operator to apply it. Round 2's low findings and
 F5-F7 are Wave 3 rows to add to WAVE_3_PARKING.md with the morning records.
+**01:02 (owner) DEC-1023:** ACT-GUARD-FIX-3 (a) approved; the owner's operator applies it THIS MORNING with the owner
+present (not overnight). Morning list: remind the owner at 09:00; after it is applied, confirm guard4 PASS and the
+test file's result, and watch the next refusals harvested.
 **00:15:** W2-104 returned DONE at `ac2d92af8c0e` with P-W2-104-CMDLIST: decided (a) + CLAUDEPATH (c), DEC-1020
 `235c4d5d`, ticket paths `d942524f`; run 2 brief `briefs/W2-104-A5-run2-dec1020.md` on the ready list after W2-92.
 Guard 64 (the reviewer's heredoc probe) false; 61 of 65 false. Leftover scratch for removal (rm: by day only, pinged):

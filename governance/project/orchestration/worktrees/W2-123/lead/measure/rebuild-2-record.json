@@ -1,0 +1,47 @@
+{
+  "timing": {
+    "record_s": 14.5,
+    "lexical_s": 27.5,
+    "secrets_s": 17.3,
+    "semantic_s": 4087.0,
+    "codeintel_s": 50.7,
+    "compaction_s": 3.5,
+    "total_s": 4183.3
+  },
+  "lock": {
+    "path": "/tmp/gov-os-rebuild-8d5685c3444b.lock",
+    "source": "GOV_REBUILD_LOCK",
+    "wait_s": 0.0,
+    "holder": null,
+    "held_by_caller": false,
+    "taken_at": "2026-11-01T23:56:13.810730+00:00",
+    "released_at": "2026-11-02T01:05:57.080042+00:00"
+  },
+  "slow": true,
+  "slow_after_s": 1800,
+  "stages_done": {
+    "record": 14.5,
+    "lexical": 27.5,
+    "semantic": 4087.0,
+    "codeintel": 50.7,
+    "compaction": 3.5
+  },
+  "stage_running": null,
+  "stage_running_s": null,
+  "processes": [
+    {
+      "pid": 1945664,
+      "ppid": 1945663,
+      "state": "R",
+      "wchan": "0",
+      "cmdline": "python3 -m gov.cli.main rebuild --json"
+    }
+  ],
+  "load": [
+    20.75,
+    18.62,
+    21.44
+  ],
+  "written_at": "2026-11-02T01:09:12.788760+00:00",
+  "watchdog_faults": []
+}

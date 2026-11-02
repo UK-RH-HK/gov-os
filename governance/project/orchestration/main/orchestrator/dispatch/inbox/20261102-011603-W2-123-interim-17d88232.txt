@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-123
+status: interim result 17d88232: W2-123 KPI 3: the evidence of the measure; the defaults' comments name their figures (values unchanged)

@@ -77,7 +77,15 @@ says it is the shared server's own rebuild. Raw records sit beside this file.
    then (the sweep's check refused 3 of 8 cases, at random across settings).
 4. **A cold rebuild's real semantic stage on the shared server** (127.0.0.1:11434, capped by ACT-OLLAMA-CAP-1: CPUs
    12-19, nice 10, -np 1, on the GPU), the lead's rebuild of the ticket's worktree, started 2026-11-01 23:56:13 UTC:
-   {{REBUILD_STAGE}}
+   the semantic stage took **4,087.0 s (68.1 minutes) for 54,463 chunks, 13.3 chunks per second**; the whole rebuild
+   4,183.3 s (record 14.5, lexical 27.5, secrets 17.3, code graph 50.7, compaction 3.5); `gov rebuild` flagged it slow
+   (over 1,800 s). Other trees' rebuilds used the same one-at-a-time server meanwhile and the load was 17 to 48, so
+   this is the "three at once, capped" situation of the table (extrapolated 5,231 to 7,146 s for 50,740 chunks), on
+   real work. Record: the rebuild's own `.gov-runtime/rebuild/record.json` (copied as `rebuild-2-record.json`), log
+   `../log/rebuild-2.log`. SIZING-1 measured 12 to 25 minutes for this stage on a quieter machine.
+6. **The ticket's probe on the real servers, once each** (2026-11-02 01:07, the lead, during that rebuild): the shared
+   server `healthy` in 1.6 s; the CPU-only query server `slow`, 54.3 s for one text (CPU-only at nice 10 on a loaded
+   machine, its model likely loaded cold). Both answered; nothing was stopped or started.
 5. **The probe's times:** a cold model load to the first vector took 8.0 s (`np_check-2314.log`: server up at
    23:14:32.28, runner set up at 23:14:40.27); a warm one-text request took 0.03 to 0.06 s under load (the matrix:
    384 single requests in 10.0 to 15.1 s).
