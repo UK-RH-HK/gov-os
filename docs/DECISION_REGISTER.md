@@ -12843,3 +12843,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.415 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1033. Next free id: DEC-1034. |
+
+### DEC-1034 — W2-112's run: its engineer outside the sandbox (a reading of DEC-799); two files added; its P3s (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1033: P2 and P3 inside W2-112's KPIs; the lead's recommendations; confidence medium-high; for the owner to overturn; P-W2-112-T2 goes to the owner) · **Under:** DEC-799, DEC-1033, DEC-1032, DEC-995
+- **Decision:** (1) The `gov launch` sandbox refuses `socket(AF_UNIX)` (EPERM), so a sandboxed engineer cannot run the shared reranker service's own tests. Read under DEC-799 (a worker whose suites need what the sandbox cannot give starts in the old launch form, its identity in `--settings` and DEC-789's tripwire around it, as for the code graph): W2-112's engineer starts unsandboxed in that form, `GOV_ROLE=engineer`; the tripwire and the guard's five rules apply as ever. Not a new exception to the sandbox: the same class as the code graph's. (2) P-W2-112-SCOPE-1 (P2): `src/gov/retrieval/retrieve.py` (the bundle's `rerank: unavailable` mark with its reason) and `src/gov/status/command.py` (the fallback count in `gov status`) join W2-112's allowed paths; W2-92 (which holds `retrieve.py`) has finished its work and waits to land; the merge order settles any overlap. (3) The lead's P3s accepted: T1 the settings `GOV_RERANK_IDLE_S` and `GOV_RERANK_TIMEOUT_S`; T3 "about 2 s" bounds the connection and the answer is bounded by the request's time limit; T4 the fallback log and alert under `~/.cache/gov-os/`. (4) P-W2-112-T2 (sandboxed sessions can never reach the service: allow the socket path in the sandbox, a loopback TCP port with a token file, or accept the fallback) is a containment question: the owner's (P1).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.416 | 2026-11-02 | Orchestrator (delegated): DEC-1034. Next free id: DEC-1035. |
