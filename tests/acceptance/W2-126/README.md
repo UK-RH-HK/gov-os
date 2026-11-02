@@ -70,23 +70,30 @@ What the cases rely on, and nothing more (no module, function or table of the co
 The base has no machine-wide cache: a second tree re-sends its texts, there is no cache file, no setting is
 honoured and the results do not name a cache. Seen on the base (`2a3c998fe786`), every case fails, each as below.
 
-| KPI | test | red on the base |
+The map `gov accept DAEO-jpr0` reads (DEC-1042 item 3): the KPI column names each line as `gov accept` reads it,
+`S<n>` for the ticket's success line n and `F<n>` for its failure line n; the test column holds only test names in
+backticks, a parameterised case once per parameter (`name[id]`); notes on a case are in the third column.
+
+| KPI | test | notes, and the red reason on the base |
 |---|---|---|
-| 1 | `test_w2_126_hits.py::test_a_second_tree_and_a_clone_send_nothing` | "a tree whose texts are all cached sent texts to the embedder" |
-| 1, F1 | `test_w2_126_hits.py::test_a_changed_text_is_a_miss` (one letter's case changed) | "texts already cached were sent again" |
-| 1 | `test_w2_126_hits.py::test_a_question_from_two_trees_is_embedded_once` | "the question was embedded once per tree" (2 == 1) |
-| 1 | `test_w2_126_hits.py::test_the_cache_is_one_file_of_mode_0600` | "the cache folder must hold one file, not []" |
-| 1 | `test_w2_126_hits.py::test_by_default_the_cache_sits_in_the_users_own_folder` | "without the location setting, a second tree sent its texts again" |
-| 2 | `test_w2_126_same_vector.py::test_a_cached_vector_is_the_one_the_embedder_returned` (varying stand-in; also `hits`/`misses`/`skipped`) | "a tree whose texts are all cached sent texts to the embedder" |
-| 2, F2 | `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache` | "the rebuild of an all-cached tree embedded texts" |
-| 3, F1, F3 | `test_w2_126_writers.py::test_concurrent_rebuilds_and_searches_serve_only_right_vectors` (4 processes) | "texts every writer stored were sent again: a write was lost" |
-| 3 | `test_w2_126_writers.py::test_no_lock_is_held_across_an_embedding_request` (one request held open) | "the result does not name the vector cache ('vector_cache')" |
-| 3, F3 | `test_w2_126_writers.py::test_an_unusable_cache_is_skipped_and_named[unreadable, locked, garbage]` | "the cache folder must hold one file, not []" (each) |
-| 4 | `test_w2_126_bound.py::test_least_recently_used_entries_go_first` (96 KiB bound, 1 KiB vectors) | "the most recently used entry was evicted" (the base caches no question for a tree without a `.gov-runtime/` folder, so every ask is sent) |
-| 4, F1 | `test_w2_126_bound.py::test_a_revision_change_is_a_new_key_space` | "the first revision's entries were lost when the revision changed" |
-| 5 | `test_w2_126_dev_tiers.py::test_a_later_check_embeds_nothing` (a planted `GOV_DEV_TIERS` folder: two small tiers, four questions) | "a later check embedded 60 texts cold" |
-| 5 | `test_w2_126_dev_tiers.py::test_a_later_check_on_this_machines_dev_tiers_embeds_nothing` (`local_only`: this machine's dev tiers by `GOV_DEV_TIERS`'s name, skipped where absent) | "a later check embedded … texts cold" |
-| 6 | `test_w2_126_evidence.py::test_the_evidence_file_states_the_named_figures` (light: the file exists and names the figures; never their values) | "docs/changes/W2-126-evidence.md does not exist" |
+| S1 | `test_w2_126_hits.py::test_a_second_tree_and_a_clone_send_nothing` | "a tree whose texts are all cached sent texts to the embedder" |
+| S1, F1 | `test_w2_126_hits.py::test_a_changed_text_is_a_miss` | one letter's case changed; "texts already cached were sent again" |
+| S1 | `test_w2_126_hits.py::test_a_question_from_two_trees_is_embedded_once` | "the question was embedded once per tree" (2 == 1) |
+| S1 | `test_w2_126_hits.py::test_the_cache_is_one_file_of_mode_0600` | "the cache folder must hold one file, not []" |
+| S1 | `test_w2_126_hits.py::test_by_default_the_cache_sits_in_the_users_own_folder` | "without the location setting, a second tree sent its texts again" |
+| S2 | `test_w2_126_same_vector.py::test_a_cached_vector_is_the_one_the_embedder_returned` | varying stand-in; also the result's hits, misses and skipped; "a tree whose texts are all cached sent texts to the embedder" |
+| S2, F2 | `test_w2_126_same_vector.py::test_an_all_cached_rebuild_gives_the_store_built_without_the_cache` | "the rebuild of an all-cached tree embedded texts" |
+| S3, F1, F3 | `test_w2_126_writers.py::test_concurrent_rebuilds_and_searches_serve_only_right_vectors` | 4 processes; "texts every writer stored were sent again: a write was lost" |
+| S3 | `test_w2_126_writers.py::test_no_lock_is_held_across_an_embedding_request` | one request held open; "the result does not name the vector cache ('vector_cache')" |
+| S3, F3 | `test_w2_126_writers.py::test_an_unusable_cache_is_skipped_and_named[unreadable]`, `test_w2_126_writers.py::test_an_unusable_cache_is_skipped_and_named[locked]`, `test_w2_126_writers.py::test_an_unusable_cache_is_skipped_and_named[garbage]` | "the cache folder must hold one file, not []" (each) |
+| S4 | `test_w2_126_bound.py::test_least_recently_used_entries_go_first` | 96 KiB bound, 1 KiB vectors; "the most recently used entry was evicted" (the base caches no question for a tree without a `.gov-runtime/` folder, so every ask is sent) |
+| S4, F1 | `test_w2_126_bound.py::test_a_revision_change_is_a_new_key_space` | "the first revision's entries were lost when the revision changed" |
+| S5 | `test_w2_126_dev_tiers.py::test_a_later_check_embeds_nothing` | a planted GOV_DEV_TIERS folder: two small tiers, four questions; "a later check embedded 60 texts cold" |
+| S5 | `test_w2_126_dev_tiers.py::test_a_later_check_on_this_machines_dev_tiers_embeds_nothing` | marked local_only: this machine's dev tiers by GOV_DEV_TIERS's name, skipped where absent; "a later check embedded … texts cold" |
+| S6 | `test_w2_126_evidence.py::test_the_evidence_file_states_the_named_figures` | light: the file exists and names the figures, never their values; "docs/changes/W2-126-evidence.md does not exist" |
+
+Success line 7 (the bounded retry's cover of a transient server error, W2-123's case revised under
+`Rewrite-Reason: P-W2-123-4`) is not in this map: DEC-1042 item 4 does it after W2-123 lands.
 
 Failure lines: **F1** (a vector for a different text, model or revision): the changed-text, concurrent-writers and
 revision cases. **F2** (a store built with the cache differs): the all-cached rebuild, the cached-vector case and
@@ -104,6 +111,11 @@ because of the cache): the concurrent-writers, held-request and unusable-cache c
   the call within the driver's limit (300 s).
 - **"Garbage"** (the file overwritten with other bytes) must not fail a rebuild or a search, and must not give
   wrong vectors; whether it is skipped (named) or replaced is the engineer's choice and is not tested.
+- **The root conftest's per-test cache folder** (W2-126's own fixture, DEC-1042 item 1) sets `GOV_VECTOR_CACHE_DIR`
+  in the pytest process only. No case here reads it: every child process gets an environment built from scratch
+  (`Box.env`: only `PATH` is taken from the pytest process), naming the case's own folder, or, in the
+  default-location case (`use_setting=False`), no `GOV_VECTOR_CACHE_DIR` at all, so that case sees the default
+  under its temporary `HOME` and `XDG_CACHE_HOME` whatever the pytest process holds.
 - **The user's own folder** already holds what the base writes there besides the cache (its secrets scan, under
   `~/.cache/gov-os/`): the default-location case counts only what appears once the location setting is left out.
 - **Lever b.6 through public interfaces**: the retrieval check clones the tiers into a new temporary folder on
