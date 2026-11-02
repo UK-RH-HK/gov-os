@@ -1,0 +1,4 @@
+== 2026-11-02 04:00:04 nightly_cron: start
+code: governance/project/orchestration/nightly at 91615f9d, tree f952ac9e21b4
+rotate: removed /tmp/gov-os-nightly-junit/20261029-0200 (past the newest 3)
+rotate: done

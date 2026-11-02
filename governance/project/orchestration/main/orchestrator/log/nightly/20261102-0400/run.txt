@@ -1,0 +1,4 @@
+2026-11-02 04:00:06 nightly night: estimate {"estimate_s": 11176, "parallel_s": 6008, "serial_s": 3135, "setup_s": 1016, "effective_workers": 7.05, "margin": 1.1, "runs": ["history", "history", "history"]}
+latest start 04:53
+head 9d605eba20a2
+clone rebuilt

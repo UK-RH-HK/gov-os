@@ -1,1 +1,1 @@
-{"passes": 307, "last_check_at": 1793589501.2347434, "last_result": "ok", "last_secs": 15.07, "last_why": "", "fails": 0, "first_fail_at": null, "hung_since": null, "last_ok_at": 1793589501.2347713, "state": "healthy"}
+{"passes": 388, "last_check_at": 1793594374.3851871, "last_result": "timeout", "last_secs": 32.3, "last_why": "no answer in 30 s", "fails": 9, "first_fail_at": 1793593901.6530325, "hung_since": 1793593901.6530325, "last_ok_at": 1793593807.342049, "state": "HUNG"}

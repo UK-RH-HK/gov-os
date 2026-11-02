@@ -56,6 +56,11 @@ W2-55 back for its table + P-W2-55-HOOK. Inbox waiter re-armed 02:52.
 **03:17:** W2-123 DONE (verified `17d88232b287`, head `9bb92097c811`): added to `dispatch/land.txt` (held for the
 nightly); its three P1s (Ollama `-np 1`; embedder not bit-reproducible; the query server starved: an ACT for its own
 CPUs, first) in the morning draft §5. Leads now 1 (W2-122). Waiter re-armed 03:17.
+**04:45:** nightly started 04:00 on `9d605eba20a2`. First landing batch STOPPED 04:32 (baseline prepare failed),
+nothing landed. Culprit of its owned reds: **W2-81** (both probe records fail `probe.schema.json`; reproduced, edit
+undone): back to its lead. Dispatcher batch of five started 04:33 (`land-dispatch-20261102-043305.out`). Embedding
+servers hung/overloaded since 04:31 (11434 reloading its model; 11435's runner 490 % CPU for ~5 h); a background
+probe (task bydgl3oz2) watches; no restart (caps would be lost; the owner's). Waiter re-armed 04:45. Draft §6.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

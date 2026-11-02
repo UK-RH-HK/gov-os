@@ -42,6 +42,12 @@
 - Removed: tests worktree + branch w2/W2-122-tests (merged), all measurement worktrees and /home/usain/gov-os-runs/W2-122.
 - Running: scoped parallel run (log/parallel.log, .exit, parallel.xml) via /tmp/gov-os-lead-W2-122/verify.py; then serial (3 cases), gov check --json via heavy_slot, trailer_gate, gov checkpoint record, commit it, return DONE.
 
+## Update 03:45 (2026-11-02)
+- Scoped parallel run at 98d46fbc: 79 failed, 5694 passed, 2 skipped, 23 errors (4631 s). Classified (/tmp/gov-os-lead-W2-122/classified.txt): 100 reds = K5 effect (semantic store now required): W1-41 legacy 52, migration 4, embedding_policy 4, dev_tier 2 (gov adopt A6 INDEX_REFRESH_FAILED); W1-27 rebuild 6, r2 3, r3 3, r4 5, r5 4 (no path map), r8 3, recovery 1+2, doctor 2, w2_67_codegraph_folders 5; W2-76 unchanged 1, timings 1; unit W2-107 record 2. 2 reds = REGRESSION: W2-76 watchdog x2 (seed.forget NotADirectoryError when .gov-runtime/rebuild is a file).
+- Serial: 3 passed, 1 failed: W2-54 green_here (context-reproducibility past its 600 s limit; timing; re-run alone later).
+- eng-6 (fresh, repair iteration 2) running for the watchdog regression; tripwire-before-8.
+- Then: re-run the whole scoped selection once more (DEC-952, never my own choice), W2-54 alone, gov check, trailer_gate, checkpoint record, return PACKAGES (K5 blast radius P-K5; TD-1/P-1; TD-2; P-2; P-3).
+
 ## Lead readings (P3, logged for the CTO)
 - Interface fixed for both workers: `--seed [folder]` (folder = base tree root, link followed); `--json` result `seed: {status: seeded|refused|none, base, reason}`; every full rebuild writes `.gov-runtime/rebuild/stores.json` {code, embedder{model,revision}, schema}; configured base = `integration_store` (absolute path) in `governance/project/rebuild.yaml`; K5 = GovError REBUILD_FAILED with store "semantic".
 - "Code fingerprint" in KPI 2 read as the Gov OS builder code's fingerprint, not the repository content's (W2-68's of_commit would refuse every seed whose tree differs, contradicting KPI 1).

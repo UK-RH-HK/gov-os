@@ -48,3 +48,14 @@
 2026-11-02 02:58:01 guard harvest: rc 0 in 52.1 s
 2026-11-02 03:08:40 guard harvest: rc 0 in 35.4 s
 2026-11-02 03:17:06 return: W2-123-A5-run1.json -> inbox/20261102-031706-W2-123-A5-run1.txt
+2026-11-02 03:20:03 guard harvest: rc 0 in 117.0 s
+2026-11-02 03:30:01 guard harvest: rc 0 in 57.5 s
+2026-11-02 03:40:00 guard harvest: rc 0 in 54.0 s
+2026-11-02 03:50:34 guard harvest: rc 0 in 28.1 s
+2026-11-02 04:02:33 guard harvest: rc 0 in 87.6 s
+2026-11-02 04:13:13 guard harvest: rc 0 in 70.1 s
+2026-11-02 04:22:47 guard harvest: rc 0 in 41.5 s
+2026-11-02 04:33:05 land started: ['W2-90b=73c18fea1e1f', 'W2-123=9bb92097c811'] -> land-dispatch-20261102-043305.out (launcher exit 0)
+2026-11-02 04:33:38 embedding server: HUNG since 2026-11-02 04:31:41 (no answer in 30 s)
+2026-11-02 04:34:07 guard harvest: rc 0 in 62.2 s
+2026-11-02 04:38:04 land finished: {'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)'}
