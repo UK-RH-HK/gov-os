@@ -81,3 +81,27 @@
 2026-11-02 06:10:35 embedding server: HUNG since 2026-11-02 06:08:37 (no answer in 30 s)
 2026-11-02 06:16:18 embedding server: answering again after HUNG since 2026-11-02 06:08:37
 2026-11-02 06:19:04 return: W2-81-A5-r4-records.json -> inbox/20261102-061904-W2-81-A5-r4-records.txt
+2026-11-02 06:20:02 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-123=9bb92097c811', 'W2-81=e78e6af7530d'] -> land-dispatch-20261102-062002.out (launcher exit 0)
+2026-11-02 06:20:20 guard harvest: rc 0 in 18.0 s
+2026-11-02 06:26:37 embedding server: HUNG since 2026-11-02 06:24:37 (no answer in 30 s)
+2026-11-02 06:27:16 embedding server: answering again after HUNG since 2026-11-02 06:24:37
+2026-11-02 06:30:23 guard harvest: rc 0 in 15.6 s
+2026-11-02 06:40:23 guard harvest: rc 0 in 15.6 s
+2026-11-02 06:46:39 embedding server: HUNG since 2026-11-02 06:44:37 (no answer in 30 s)
+2026-11-02 06:50:29 embedding server: answering again after HUNG since 2026-11-02 06:44:37
+2026-11-02 06:51:23 guard harvest: rc 0 in 18.5 s
+2026-11-02 06:54:34 embedding server: HUNG since 2026-11-02 06:52:41 (no answer in 30 s)
+2026-11-02 06:55:19 embedding server: answering again after HUNG since 2026-11-02 06:52:41
+2026-11-02 06:59:37 embedding server: HUNG since 2026-11-02 06:57:38 (no answer in 30 s)
+2026-11-02 07:00:25 embedding server: answering again after HUNG since 2026-11-02 06:57:38
+2026-11-02 07:02:19 guard harvest: rc 0 in 14.7 s
+2026-11-02 07:13:19 guard harvest: rc 0 in 14.1 s
+2026-11-02 07:23:19 guard harvest: rc 0 in 11.7 s
+2026-11-02 07:33:20 guard harvest: rc 0 in 12.9 s
+2026-11-02 07:38:38 embedding server: HUNG since 2026-11-02 07:36:38 (no answer in 30 s)
+2026-11-02 07:43:25 embedding server: answering again after HUNG since 2026-11-02 07:36:38
+2026-11-02 07:44:23 guard harvest: rc 0 in 18.6 s
+2026-11-02 07:54:28 guard harvest: rc 0 in 22.8 s
+2026-11-02 07:55:04 started W2-92 (DAEO-n0wb) W2-92-A5-run3-dec1019.md -> W2-92-A5-run3-dec1019.json (launcher exit 0)
+2026-11-02 07:55:04 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (ejected: red)'}
+2026-11-02 07:56:04 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-123=9bb92097c811', 'W2-81=e78e6af7530d'] -> land-dispatch-20261102-075604.out (launcher exit 0)

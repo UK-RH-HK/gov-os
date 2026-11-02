@@ -8,6 +8,25 @@
 - rebuild-6 rc 0 (waited for a slot 06:03-06:17; semantic_s 0.8, all three stores recreated; completeness check
   passed). gov.__file__ in this tree. select-3: scoped, core_changed [], unplaced [], 192 opts = select-2; serial-3 =
   serial-2 (4 W2-54). keyword_warn 0. run_scoped_3.sh started ~06:20 (parallel-3, serial-3 .rc/.xml/.txt).
+- parallel-3 (06:18-06:49, 30m40s): 2 failed / 5634 passed / 3 skipped.
+  (1) OWN: W2-05 test_w2_05_sweep::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep: the branch's
+      context_check.py stale_store() starts git itself (d78d31f216ed); not in docs/research/AR-2-git-sweep.md.
+  (2) NOT OURS: W2-55 test_w2_55_backfill::test_one_row_per_register_entry_at_the_base_in_its_order: proposal
+      docs/research/W2-55-backfill.md stops at DEC-983, register at base 904bb3a0e7c6 has DEC-984..1004 (21 missing);
+      branch touches neither file; not on accepted_reds. Report; follow-up ticket needed (W2-55 owner / proposal refresh).
+- serial-3 waited for a slot 06:52-07:12 (a landing or close first); STOPPED by me (head will change). No serial result.
+- Loop: fix iteration 2 -> eng-5 (brief briefs/eng-5.md; fresh engineer, sandboxed, high), launched 07:13.
+  Tripwire snapshot 6. After: tripwire compare, trailers, rebuild_slot (with PYTHONPATH), select_tests again,
+  run_scoped (new -4 names), gov check, collect-only, trailer_gate, keyword_warn, DONE.
+- eng-5 DONE 07:15 (twelve fields ok): b37b5c8f1741 (Task, Role engineer, Implements CAP-15.d, DEC-860, Co-Authored-By);
+  context_check.py reads HEAD via gov.store.loader._git (sweep row 41), fails closed on GovError/empty; +3 unit tests;
+  unit/context 75P; W2-05 sweep 4P; gov accept 60P/0F/1S all 7 KPI lines. gov retrieve not used (brief said so).
+  Tripwire-6: this tree head only. Loop: converged. Its TMPDIR files (accept.json/.err/.exit) left (quiet hours rm).
+  Next: rebuild-7, select-4, run_scoped_4.sh, gov check, collect-only, trailer_gate, keyword_warn, DONE at b37b5c8f1741.
+- rebuild-7 rc 0 (slot wait 07:16-07:36; semantic_s 107). trailer_gate: 16 commits, 0 lacking. collect-3:
+  19154/19156 collected (2 deselected), no error. select-4 at b37b5c8f1741: scoped, core_changed [], unplaced [],
+  opts = select-3; serial-4 = 4 W2-54. keyword_warn 0. run_scoped_4.sh started ~07:41 (parallel-4, serial-4).
+- rm of briefs/eng-4.md and briefs/eng-4.spec.part refused (quiet hours, DEC-991, queued for morning): files left.
 
 ## Round 2 (resume after DEC-1005, 2026-11-01)
 - CTO decided P-W2-04-2 (A), P-W2-04-3 (b); P3 calls stand; needed tickets go as P1s from the CTO (do nothing).

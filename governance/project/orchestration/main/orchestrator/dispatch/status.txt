@@ -1,13 +1,13 @@
-dispatcher 2026-11-02 06:19:04
+dispatcher 2026-11-02 07:55:03
 leads running (1, from the processes): W2-04
-load 11.3/13.0/20.6; real busy cores 9.09 of 20 (the embedding server 7.48); memory available 17395 MB; gate_check (for comparison) open (OPEN leads=1 load=11.3/20.6 nproc=20 have=19266080kB need=7426200kB); disk open
-admission (by peaks, DEC-1008 item 5): a heavy step runs outside a slot over 5 min: python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 18 min, /gov-os-runs/W2-00/nightly/20261102-0400)
-peaks 2026-11-02 05:23:08: a lead p95 4096 MB, max 9580 MB
-FINDING: heavy step(s) outside a slot: python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 18 min, /gov-os-runs/W2-00/nightly/20261102-0400); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 1708101, 12 min, /home/usain/gov-os-worktrees/W2-81)
-heavy slots held: gov-os-heavy-slot-1.lock; queue free; land: nothing to land; main tree clean on w2/integrate
-inbox unread: 0
-ready list: W2-122 DAEO-blwa: already started for W2-122-A5-run1.json; W2-123 DAEO-qzrq: already started for W2-123-A5-run1.json; W2-81 DAEO-l78m: already started for W2-81-A5-r4-records.json; W2-04 DAEO-u4oz: running; W2-92 DAEO-n0wb: not admitted: a heavy step runs outside a slot over 5 min: python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 18 min, /gov-os-runs/W2-00/nightly/20261102-0400); W2-104 DAEO-drhj: not admitted: a heavy step runs outside a slot over 5 min: python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 18 min, /gov-os-runs/W2-00/nightly/20261102-0400); W2-61h DAEO-h2k3: not admitted: a heavy step runs outside a slot over 5 min: python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 18 min, /gov-os-runs/W2-00/nightly/20261102-0400); W2-91 DAEO-a3u2: not admitted: a heavy step runs outside a slot over 5 min: python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 18 min, /gov-os-runs/W2-00/nightly/20261102-0400)
+load 30.0/24.1/19.0; real busy cores 14.5 of 20 (the embedding server 7.28); memory available 17046 MB; gate_check (for comparison) open (OPEN leads=1 load=30.0/19.0 nproc=20 have=21753040kB need=9638980kB); disk open
+admission (by peaks, DEC-1008 item 5): admits: 1 of 6 leads; memory 20934 MB >= 14392 MB (slots rule: floor + 1 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + serv
+peaks 2026-11-02 07:24:04: a lead p95 4095 MB, max 9580 MB
+heavy steps outside a slot: none
+heavy slots held: gov-os-heavy-slot-2.lock; queue free; land: finished; main tree clean on w2/integrate
+inbox unread: 1 (oldest 0 min)
+ready list: W2-122 DAEO-blwa: already started for W2-122-A5-run1.json; W2-123 DAEO-qzrq: already started for W2-123-A5-run1.json; W2-81 DAEO-l78m: already started for W2-81-A5-r4-records.json; W2-04 DAEO-u4oz: running; started W2-92
 sentinel: watched
-guard harvest: last 2026-11-02 06:09:17, rc 0, 12.5 s of 300 s
-embedding server: failing (1 in a row; no answer in 30 s)
-heavy slot holders: slot 1 pid 1782661 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min
+guard harvest: last 2026-11-02 07:54:28, rc 0, 22.8 s of 300 s
+embedding server: healthy (33.04 s)
+heavy slot holders: slot 2 pid 2316687 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min

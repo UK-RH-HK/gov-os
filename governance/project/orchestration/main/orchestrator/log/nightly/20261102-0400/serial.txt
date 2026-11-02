@@ -1,3 +1,422 @@
 ........................................................................ [ 39%]
 ........................................................................ [ 79%]
-................F..
+................F..EEEE.......EEEE..FF                                   [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80 _
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def measured(api, tmp_path_factory):
+        """``tier -> {"queries", "answers", "seconds", "peaks", "watched_answers"}`` for the two dev tiers, one after
+        the other.
+    
+        Rewrite-Reason (W2-M332, I3 O3 (b); DEC-925 item 3, B3 (a)): the memory sampler scans every process of the
+        machine every 50 ms inside the process it watches, so a query timed in that process holds the sampler's work.
+        Per tier, two passes of the same calls (``_one_pass``), each in a process of its own on a clone of its own:
+        - the timed pass first, unwatched: ``seconds`` come from it, and no question was asked before it, as before;
+          ``answers`` (the hit@5 case and the fused-list case) come from it too, the first asking of each question;
+        - the watched pass after it: ``peaks`` come from it, watched over the whole pass, the build included, as before.
+        Nothing a case asserts changes: the same limits, the same queries timed.
+        """
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        results = {}
+        for programme, tier in support.TIERS.items():
+            asked = [query for query in queries if query["programme"] == programme]
+>           answers, seconds, unwatched = _one_pass(api, tmp_path_factory, tier, asked, watch=False)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+tier = 'a-dev'
+asked = [{'caps': ['CAP-51', 'CAP-10'], 'class': 'decisions', 'gold': {'answer': 'ADR-006 superseded ADR-002: JSON is directly...ntum tests.', 'must_cite': ['python/orion_ref/tests/test_kepler.py'], 'must_not_cite': []}, 'id': 'DQ-A-06', ...}, ...]
+
+    def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
+        """One process on a fresh clone of ``tier``: the index built, the three warm-up questions, then each question
+        of ``asked`` once. ``(answers, seconds per question, peaks)``; the memory sampler runs only when ``watch``."""
+        name = "watched" if watch else "timed"
+        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}-{name}") / tier)
+        if root is None:
+            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+        # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
+        search = {"limit": None, "refresh": False}
+        calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
+        calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
+        calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
+        outcome = api.run(calls, env=api.real_env(), watch=watch, timeout=support.MEASURE_TIMEOUT_S)
+        values = outcome.values()
+>       assert support.check_facet(values[0], support.SEMANTIC_FACET)["available"] is True, \
+            f"the vectors of {tier} were not built in the {name} pass: {values[0]!r}"
+E       AssertionError: the vectors of a-dev were not built in the timed pass: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E       assert False is True
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:120: AssertionError
+___ ERROR at setup of test_a_warm_query_answers_within_half_a_second_at_p95 ____
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def measured(api, tmp_path_factory):
+        """``tier -> {"queries", "answers", "seconds", "peaks", "watched_answers"}`` for the two dev tiers, one after
+        the other.
+    
+        Rewrite-Reason (W2-M332, I3 O3 (b); DEC-925 item 3, B3 (a)): the memory sampler scans every process of the
+        machine every 50 ms inside the process it watches, so a query timed in that process holds the sampler's work.
+        Per tier, two passes of the same calls (``_one_pass``), each in a process of its own on a clone of its own:
+        - the timed pass first, unwatched: ``seconds`` come from it, and no question was asked before it, as before;
+          ``answers`` (the hit@5 case and the fused-list case) come from it too, the first asking of each question;
+        - the watched pass after it: ``peaks`` come from it, watched over the whole pass, the build included, as before.
+        Nothing a case asserts changes: the same limits, the same queries timed.
+        """
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        results = {}
+        for programme, tier in support.TIERS.items():
+            asked = [query for query in queries if query["programme"] == programme]
+>           answers, seconds, unwatched = _one_pass(api, tmp_path_factory, tier, asked, watch=False)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+tier = 'a-dev'
+asked = [{'caps': ['CAP-51', 'CAP-10'], 'class': 'decisions', 'gold': {'answer': 'ADR-006 superseded ADR-002: JSON is directly...ntum tests.', 'must_cite': ['python/orion_ref/tests/test_kepler.py'], 'must_not_cite': []}, 'id': 'DQ-A-06', ...}, ...]
+
+    def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
+        """One process on a fresh clone of ``tier``: the index built, the three warm-up questions, then each question
+        of ``asked`` once. ``(answers, seconds per question, peaks)``; the memory sampler runs only when ``watch``."""
+        name = "watched" if watch else "timed"
+        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}-{name}") / tier)
+        if root is None:
+            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+        # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
+        search = {"limit": None, "refresh": False}
+        calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
+        calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
+        calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
+        outcome = api.run(calls, env=api.real_env(), watch=watch, timeout=support.MEASURE_TIMEOUT_S)
+        values = outcome.values()
+>       assert support.check_facet(values[0], support.SEMANTIC_FACET)["available"] is True, \
+            f"the vectors of {tier} were not built in the {name} pass: {values[0]!r}"
+E       AssertionError: the vectors of a-dev were not built in the timed pass: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E       assert False is True
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:120: AssertionError
+_ ERROR at setup of test_the_rerank_process_stays_within_two_and_a_half_gigabytes _
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def measured(api, tmp_path_factory):
+        """``tier -> {"queries", "answers", "seconds", "peaks", "watched_answers"}`` for the two dev tiers, one after
+        the other.
+    
+        Rewrite-Reason (W2-M332, I3 O3 (b); DEC-925 item 3, B3 (a)): the memory sampler scans every process of the
+        machine every 50 ms inside the process it watches, so a query timed in that process holds the sampler's work.
+        Per tier, two passes of the same calls (``_one_pass``), each in a process of its own on a clone of its own:
+        - the timed pass first, unwatched: ``seconds`` come from it, and no question was asked before it, as before;
+          ``answers`` (the hit@5 case and the fused-list case) come from it too, the first asking of each question;
+        - the watched pass after it: ``peaks`` come from it, watched over the whole pass, the build included, as before.
+        Nothing a case asserts changes: the same limits, the same queries timed.
+        """
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        results = {}
+        for programme, tier in support.TIERS.items():
+            asked = [query for query in queries if query["programme"] == programme]
+>           answers, seconds, unwatched = _one_pass(api, tmp_path_factory, tier, asked, watch=False)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+tier = 'a-dev'
+asked = [{'caps': ['CAP-51', 'CAP-10'], 'class': 'decisions', 'gold': {'answer': 'ADR-006 superseded ADR-002: JSON is directly...ntum tests.', 'must_cite': ['python/orion_ref/tests/test_kepler.py'], 'must_not_cite': []}, 'id': 'DQ-A-06', ...}, ...]
+
+    def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
+        """One process on a fresh clone of ``tier``: the index built, the three warm-up questions, then each question
+        of ``asked`` once. ``(answers, seconds per question, peaks)``; the memory sampler runs only when ``watch``."""
+        name = "watched" if watch else "timed"
+        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}-{name}") / tier)
+        if root is None:
+            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+        # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
+        search = {"limit": None, "refresh": False}
+        calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
+        calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
+        calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
+        outcome = api.run(calls, env=api.real_env(), watch=watch, timeout=support.MEASURE_TIMEOUT_S)
+        values = outcome.values()
+>       assert support.check_facet(values[0], support.SEMANTIC_FACET)["available"] is True, \
+            f"the vectors of {tier} were not built in the {name} pass: {values[0]!r}"
+E       AssertionError: the vectors of a-dev were not built in the timed pass: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E       assert False is True
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:120: AssertionError
+_ ERROR at setup of test_every_answer_is_one_fused_list_from_both_routes_reranked _
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def measured(api, tmp_path_factory):
+        """``tier -> {"queries", "answers", "seconds", "peaks", "watched_answers"}`` for the two dev tiers, one after
+        the other.
+    
+        Rewrite-Reason (W2-M332, I3 O3 (b); DEC-925 item 3, B3 (a)): the memory sampler scans every process of the
+        machine every 50 ms inside the process it watches, so a query timed in that process holds the sampler's work.
+        Per tier, two passes of the same calls (``_one_pass``), each in a process of its own on a clone of its own:
+        - the timed pass first, unwatched: ``seconds`` come from it, and no question was asked before it, as before;
+          ``answers`` (the hit@5 case and the fused-list case) come from it too, the first asking of each question;
+        - the watched pass after it: ``peaks`` come from it, watched over the whole pass, the build included, as before.
+        Nothing a case asserts changes: the same limits, the same queries timed.
+        """
+        queries = support.dev_queries()
+        if queries is None:
+            pytest.skip(f"no dev query set at {support.QUERY_SET} (GOV_DEV_TIERS)")
+        results = {}
+        for programme, tier in support.TIERS.items():
+            asked = [query for query in queries if query["programme"] == programme]
+>           answers, seconds, unwatched = _one_pass(api, tmp_path_factory, tier, asked, watch=False)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+api = <w1_19_support.Api object at 0x77ce12075ee0>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+tier = 'a-dev'
+asked = [{'caps': ['CAP-51', 'CAP-10'], 'class': 'decisions', 'gold': {'answer': 'ADR-006 superseded ADR-002: JSON is directly...ntum tests.', 'must_cite': ['python/orion_ref/tests/test_kepler.py'], 'must_not_cite': []}, 'id': 'DQ-A-06', ...}, ...]
+
+    def _one_pass(api, tmp_path_factory, tier, asked, *, watch):
+        """One process on a fresh clone of ``tier``: the index built, the three warm-up questions, then each question
+        of ``asked`` once. ``(answers, seconds per question, peaks)``; the memory sampler runs only when ``watch``."""
+        name = "watched" if watch else "timed"
+        root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-19-{tier}-{name}") / tier)
+        if root is None:
+            pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+        # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
+        search = {"limit": None, "refresh": False}
+        calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
+        calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
+        calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
+        outcome = api.run(calls, env=api.real_env(), watch=watch, timeout=support.MEASURE_TIMEOUT_S)
+        values = outcome.values()
+>       assert support.check_facet(values[0], support.SEMANTIC_FACET)["available"] is True, \
+            f"the vectors of {tier} were not built in the {name} pass: {values[0]!r}"
+E       AssertionError: the vectors of a-dev were not built in the timed pass: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E       assert False is True
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:120: AssertionError
+____ ERROR at setup of test_retr_a_04_finds_and_cites_both_implementations _____
+
+api = <w1_21_support.Api object at 0x77ce1205b770>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def real_tiers(api, tmp_path_factory):
+        """The same with this machine's Ollama and the pinned embedder."""
+>       return _tiers(tmp_path_factory, "real", lambda root: api.build(root, env=api.real_env()))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+label = 'real'
+build = <function real_tiers.<locals>.<lambda> at 0x77ce11c13920>
+
+    def _tiers(tmp_path_factory, label, build):
+        roots = {}
+        for programme, tier in support.TIERS.items():
+            root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-21-{label}-{tier}") / tier)
+            if root is None:
+                pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+            _, semantic, _ = build(root)
+>           assert semantic["available"], f"the vectors of {tier} were not built: {semantic!r}"
+E           AssertionError: the vectors of a-dev were not built: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E           assert False
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:39: AssertionError
+____ ERROR at setup of test_the_dev_query_set_meets_the_hit_at_5_pass_line _____
+
+api = <w1_21_support.Api object at 0x77ce1205b770>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def real_tiers(api, tmp_path_factory):
+        """The same with this machine's Ollama and the pinned embedder."""
+>       return _tiers(tmp_path_factory, "real", lambda root: api.build(root, env=api.real_env()))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+label = 'real'
+build = <function real_tiers.<locals>.<lambda> at 0x77ce11c13920>
+
+    def _tiers(tmp_path_factory, label, build):
+        roots = {}
+        for programme, tier in support.TIERS.items():
+            root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-21-{label}-{tier}") / tier)
+            if root is None:
+                pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+            _, semantic, _ = build(root)
+>           assert semantic["available"], f"the vectors of {tier} were not built: {semantic!r}"
+E           AssertionError: the vectors of a-dev were not built: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E           assert False
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:39: AssertionError
+_ ERROR at setup of test_the_dev_query_set_meets_the_forbidden_citation_baseline _
+
+api = <w1_21_support.Api object at 0x77ce1205b770>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def real_tiers(api, tmp_path_factory):
+        """The same with this machine's Ollama and the pinned embedder."""
+>       return _tiers(tmp_path_factory, "real", lambda root: api.build(root, env=api.real_env()))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+label = 'real'
+build = <function real_tiers.<locals>.<lambda> at 0x77ce11c13920>
+
+    def _tiers(tmp_path_factory, label, build):
+        roots = {}
+        for programme, tier in support.TIERS.items():
+            root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-21-{label}-{tier}") / tier)
+            if root is None:
+                pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+            _, semantic, _ = build(root)
+>           assert semantic["available"], f"the vectors of {tier} were not built: {semantic!r}"
+E           AssertionError: the vectors of a-dev were not built: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E           assert False
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:39: AssertionError
+__ ERROR at setup of test_every_measured_bundle_was_reranked_from_both_routes __
+
+api = <w1_21_support.Api object at 0x77ce1205b770>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+
+    @pytest.fixture(scope="module")
+    def real_tiers(api, tmp_path_factory):
+        """The same with this machine's Ollama and the pinned embedder."""
+>       return _tiers(tmp_path_factory, "real", lambda root: api.build(root, env=api.real_env()))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x77ce122dc440>, _basetemp=PosixPath('/tmp/pytest-of-usain/pytest-7241'), _retention_count=3, _retention_policy='failed')
+label = 'real'
+build = <function real_tiers.<locals>.<lambda> at 0x77ce11c13920>
+
+    def _tiers(tmp_path_factory, label, build):
+        roots = {}
+        for programme, tier in support.TIERS.items():
+            root = support.clone_tier(tier, tmp_path_factory.mktemp(f"w1-21-{label}-{tier}") / tier)
+            if root is None:
+                pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
+            _, semantic, _ = build(root)
+>           assert semantic["available"], f"the vectors of {tier} were not built: {semantic!r}"
+E           AssertionError: the vectors of a-dev were not built: {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E           assert False
+
+tests/acceptance/W1-21/test_w1_21_dev_tier.py:39: AssertionError
+=================================== FAILURES ===================================
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The probe did not run. The Bash call was refused by a PreToolUse hook before the script executed. The hook failed because `/tmp/pytest-of-usain/pytest-7241/test_inside_a_launched_sandbox0/repo/.claude/hooks/pretooluse.py` does not exist. I did not retry or work around it, as you asked.
+
+I can't answer DONE, since the step failed. The hook file is missing from the repo, and restoring it or changing the hook config is your call.
+
+stderr:
+
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds < limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+>       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (152.2 s)
+E         stdout:
+E         ERROR: DAEO-i89t: mandatory input 'AR-5' not found in the store
+E         context-reproducibility: 0 ticket(s) failed, 1 error(s)
+E         
+E         stderr:
+E         
+E         Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]
+E         Loading weights: 100%|██████████| 310/310 [00:00<00:00, 3257.65it/s]
+E         Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x77ce141eaea0>.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.Run object at 0x77ce11e45a90>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '9d605eba20a2dba7ef8d7a5b2764515cca7f8c7f', 'inputs_hash': '6a7e11ca605f9b24'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "ERROR: DAEO-i89t: mandatory input 'AR-5' not found in the store\ncontext-reproducibility: 0 ticket(s) failed, 1 error(s)"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written
+FAILED tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit
+FAILED tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here
+ERROR tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+ERROR tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+ERROR tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes
+ERROR tests/acceptance/W1-19/test_w1_19_real_models.py::test_every_answer_is_one_fused_list_from_both_routes_reranked
+ERROR tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_retr_a_04_finds_and_cites_both_implementations
+ERROR tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_hit_at_5_pass_line
+ERROR tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_forbidden_citation_baseline
+ERROR tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_every_measured_bundle_was_reranked_from_both_routes
+3 failed, 171 passed, 8 errors in 5349.37s (1:29:09)

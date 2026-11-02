@@ -68,6 +68,9 @@ list. The four others stay approved; the dispatcher retries.
 embedder) is the owner's P1: morning draft §7, rec (b) then (a). W2-122 waits. W2-81's records repair running.
 **06:20:** W2-81 repair DONE `e78e6af7530d` (records only, checked). All five relisted in `dispatch/land.txt` (the
 dispatcher does not retry kept entries by itself: a gap, morning draft).
+**07:56:** landing of five STOPPED 07:54 (semantic not recreated: the embedder); relisted. Nightly: parallel 21 F + 2 E,
+serial 3 F + 8 E; re-running alone. W2-04 verify run 4 running (scoped). Morning package at 09:00 from the draft,
+with the push-on-prompt re-test (DEC-1022 item 1).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

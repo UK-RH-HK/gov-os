@@ -4,3 +4,6 @@ head 9d605eba20a2
 clone rebuilt
 gate: OPEN full-run leads=1 load=19.0/39.0 nproc=20 have=14752324kB need=12690456kB
 heavy-job slots held: 2 of 3 (waited 1 s)
+heavy-job slots released after the suites
+parallel exit 1 in 3854 s: 21 failed, 18943 passed, 35 skipped, 2 errors in 3567.44s (0:59:27)
+serial exit 1 in 5858 s: 3 failed, 171 passed, 8 errors in 5349.37s (1:29:09)
