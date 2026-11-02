@@ -186,8 +186,14 @@ the GPU" is read as the service's: one service loads one copy however many searc
 | `test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` (T6 (b)) | the base ignores the slots: its private reranker scores the search |
 | `test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason` (both parameters: service-down, no-service-yet; T6 (b)) | the base reranks the bundle (`merge.reranked: true`) |
 | `test_w2_112_bundle.py::test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down` | the bundle has no `rerank` entry |
+| `test_w2_112_retirement_act.py` (three cases: the precondition names the installed, pinned `gov` or its re-pin; it covers every other tree; no step removes the slot lock files; review round 1, F1, a described behaviour, DEC-136) | there is no `docs/research/W2-112-shared-reranker.md` in this worktree; against the reviewed record (`0b9deb2d`) all three fail for F1's reasons |
 
-The stopgap's retirement (ACT-RERANK-GPU-SLOTS-1's `.pth`) is an owner ACT the lead prepares, not code; no test.
+The stopgap's retirement (ACT-RERANK-GPU-SLOTS-1's module and `.pth`) is an owner ACT the lead prepares, written
+as the research record's last section. `test_w2_112_retirement_act.py` reads that section loosely, as a document
+test: its precondition names the installed, pinned `gov` (`~/.local/bin/gov`, ACT 2's re-pin), not W2-112's merge
+alone, and the other checkouts and worktrees; and no command or step removes, or lets the operator remove, the slot
+lock files `/tmp/gov-os-rerank-gpu-<i>.lock`. A sentence that explains why the files stay is to carry its "never" or
+"not" in the same sentence.
 
 ### Failure lines
 
