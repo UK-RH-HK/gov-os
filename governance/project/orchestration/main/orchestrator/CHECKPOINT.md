@@ -129,6 +129,10 @@ W1-21 x4 (real-model errors: the embedder was on the CPU; re-run alone after the
 W2-59 x4 (known install/hook-line, W2-90c/W2-105); W2-54 x3 (AR-5: DEC-1024 after the head; sandboxed worker; time
 limit); W2-55, W2-66 (their runs); W1-01 x2 (history: DEC-906's known red; integration merges: to check). B: W2-05 + W2-96
 re-close started 11:26 against it (`log/close-two-20261102-1127.out`). W2-61h DONE `ac7dfa1790c7` in land.pending.txt.
+**11:46:** P1-NIGHTLY-2026-11-02 `578203ec` pinged (one decision: W1-01's merge rule and 0568d91baf56, rec (a)).
+Dispatcher v4.4 `7f81f91a` LIVE (DEC-1030 item 1): GPU line in status, `gpu-alert` inbox items (the quiet waiter wakes
+on them: push the owner at once); the 6 scratch-tools tests skip by name; review by Sonnet running
+(`reviews/dispatch-v4.4.md`). The background log watch b7ulw6ru4 stays as a second net.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

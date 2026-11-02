@@ -1,5 +1,5 @@
 {
- "time": "2026-11-02 11:26:05",
+ "time": "2026-11-02 11:47:08",
  "leads": [
   "W2-04",
   "W2-122",
@@ -7,29 +7,29 @@
  ],
  "lead_count": 3,
  "load": [
-  33.06,
-  31.62,
-  23.62
+  42.04,
+  43.41,
+  38.36
  ],
- "mem_available_mb": 13052,
+ "mem_available_mb": 11566,
  "gate_open": false,
- "gate": "SHUT leads=3 load=33.1/23.6 nproc=20 have=16557572kB need=11706672kB: load 33.1/23.6 >= nproc 20",
+ "gate": "SHUT leads=3 load=42.0/38.4 nproc=20 have=19584576kB need=14389172kB: load 42.0/38.4 >= nproc 20",
  "disk_open": true,
- "disk": "disk gate open: 842 GiB free, 64170837 inodes free",
+ "disk": "disk gate open: 842 GiB free, 64160412 inodes free",
  "slots_held": [
+  "gov-os-heavy-slot-1.lock",
   "gov-os-heavy-slot-2.lock",
   "gov-os-heavy-slot-3.lock"
  ],
  "land_running": true,
- "close_running": false,
- "closing_w2s": [],
- "queue_busy": true,
- "main_clean": false,
- "main_dirty": [
-  "governance/project/orchestration/tools/dispatch/README.md",
-  "governance/project/orchestration/tools/dispatch/dispatcher.py",
-  "tests/unit/orchestration/test_dispatcher.py"
+ "close_running": true,
+ "closing_w2s": [
+  "W2-05",
+  "W2-96"
  ],
+ "queue_busy": true,
+ "main_clean": true,
+ "main_dirty": [],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
   "DAEO-u4oz",
@@ -37,25 +37,21 @@
   "DAEO-blwa"
  ],
  "lead_rss_kb": {
-  "W2-04": 1474576,
-  "W2-123": 260608,
-  "W2-122": 1402152
+  "W2-04": 1634272,
+  "W2-123": 4827492,
+  "W2-122": 1565816
  },
- "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 45 min, /home/usain/gov-os-worktrees/W2-61h)",
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3930069, 18 min, /home/usain/gov-os-worktrees/W2-61h)",
-  "python3 -m gov.retrieval.measure memory-retrieval (pid 3968810, 8 min, /tmp/tmp.chzdEiVAhl)"
- ],
+ "outside_slot": [],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 2424296,
-  "codegraph": 0
+  "embedding": 2659268,
+  "codegraph": 13388
  },
- "busy_cores": 19.63,
- "embedding_cores": 6.08,
+ "busy_cores": 19.68,
+ "embedding_cores": 5.83,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 2610280,
+ "rerankers_outside_kb": 0,
  "outside_reranker_possible": true,
  "peaks": {
   "computed": "2026-11-02 11:26:05",
@@ -63,17 +59,17 @@
   "lead_max_mb": 9580
  },
  "admit": false,
- "admit_reason": "real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
- "inbox_unread": 1,
- "inbox_oldest_age_s": 0,
+ "admit_reason": "real CPU: 19.68 busy cores + 2.31 for the embedding server's p95 >= 20 - margin 2",
+ "inbox_unread": 0,
+ "inbox_oldest_age_s": null,
  "started_this_tick": null,
  "ready_waits": {
   "W2-123 DAEO-qzrq": "running",
   "W2-04 DAEO-u4oz": "running",
   "W2-122 DAEO-blwa": "running",
-  "W2-66b DAEO-zuiy": "not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
-  "W2-104 DAEO-drhj": "not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
-  "W2-55 DAEO-arrl": "not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
+  "W2-66b DAEO-zuiy": "not admitted: real CPU: 19.68 busy cores + 2.31 for the embedding server's p95 >= 20 - margin 2",
+  "W2-104 DAEO-drhj": "not admitted: real CPU: 19.68 busy cores + 2.31 for the embedding server's p95 >= 20 - margin 2",
+  "W2-55 DAEO-arrl": "not admitted: real CPU: 19.68 busy cores + 2.31 for the embedding server's p95 >= 20 - margin 2",
   "W2-81 DAEO-l78m": "already started for W2-81-A5-r4-records.json",
   "W2-92 DAEO-n0wb": "already started for W2-92-A5-run3-dec1019.json",
   "W2-61h DAEO-h2k3": "already started for W2-61h-A5-verify.json",
@@ -86,30 +82,39 @@
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 11:21:54",
+  "at": "2026-11-02 11:43:54",
   "rc": 0,
-  "secs": 44.9,
+  "secs": 45.0,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 72 total, 68 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 795,
-  "last_check_at": 1793618766.3947248,
+  "passes": 816,
+  "last_check_at": 1793620029.1803062,
   "last_result": "ok",
   "last_secs": 0.07,
   "last_why": "",
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1793618766.3947291,
+  "last_ok_at": 1793620029.180311,
   "state": "healthy"
  },
  "slot_holders": [
   {
+   "slot": "1",
+   "pid": 4062893,
+   "cpu": 39739,
+   "since": 1793620029.5100238,
+   "reported": false,
+   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --ignore=/home/usain/gov-os-wor",
+   "cwd": "/home/usain/gov-os-worktrees/W2-123"
+  },
+  {
    "slot": "2",
    "pid": 3976885,
-   "cpu": 21042,
-   "since": 1793618766.6877198,
+   "cpu": 45727,
+   "since": 1793620029.5109499,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/home/usain/gov-os-w",
    "cwd": "/home/usain/gov-os-worktrees/W2-04"
@@ -117,25 +122,25 @@
   {
    "slot": "3",
    "pid": 3982619,
-   "cpu": 19202,
-   "since": 1793618766.6879742,
+   "cpu": 40451,
+   "since": 1793620029.5110626,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/tmp/gov-os-lead-W2-",
    "cwd": "/home/usain/gov-os-worktrees/W2-122"
   }
  ],
  "gpu": {
-  "line": "GPU: RTX 5070 Ti 10.4/15.9 GB, 5 %; holders: embedder shared (0), reranker (1); layers: shared 29/29, query cpu-only by design",
+  "line": "GPU: RTX 5070 Ti 8.3/15.9 GB, 1 %; holders: embedder shared (0), reranker (1); layers: shared 29/29, query cpu-only by design",
   "state": {
    "ok": true,
-   "at": 1793618766.4966385,
+   "at": 1793620029.2919285,
    "name": "NVIDIA GeForce RTX 5070 Ti",
-   "used_mib": 10615,
+   "used_mib": 8548,
    "total_mib": 16303,
-   "util": 5,
+   "util": 1,
    "holders": [
     {
-     "pid": 3966518,
+     "pid": 47866,
      "name": "[Not Found]",
      "mib": null,
      "kind": "reranker"
