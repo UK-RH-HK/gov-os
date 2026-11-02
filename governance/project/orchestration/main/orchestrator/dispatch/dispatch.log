@@ -144,3 +144,12 @@
 2026-11-02 09:37:05 return: W2-92-A5-run3-dec1019.json -> inbox/20261102-093705-W2-92-A5-run3-dec1019.txt
 2026-11-02 09:37:18 guard harvest: rc 0 in 11.9 s
 2026-11-02 09:39:04 return: W2-04-A5-review.json -> inbox/20261102-093904-W2-04-A5-review.txt
+2026-11-02 09:48:20 guard harvest: rc 0 in 16.0 s
+2026-11-02 09:58:17 guard harvest: rc 0 in 11.6 s
+2026-11-02 10:01:38 embedding server: HUNG since 2026-11-02 09:59:35 (no answer in 30 s)
+2026-11-02 10:03:35 embedding server: answering again after HUNG since 2026-11-02 09:59:35
+2026-11-02 10:06:39 embedding server: HUNG since 2026-11-02 10:04:38 (no answer in 30 s)
+2026-11-02 10:09:20 guard harvest: rc 0 in 15.3 s
+2026-11-02 10:17:09 embedding server: answering again after HUNG since 2026-11-02 10:04:38
+2026-11-02 10:18:05 return: W2-104-A5-run2-dec1020.json -> inbox/20261102-101805-W2-104-A5-run2-dec1020.txt
+2026-11-02 10:18:05 started W2-04 (DAEO-u4oz) W2-04-A5-r5-repair.md -> W2-04-A5-r5-repair.json (launcher exit 0)

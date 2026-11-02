@@ -1,0 +1,7 @@
+log: W2-104-A5-run2-dec1020.json
+W2: W2-104
+status: DONE — verified code head `9fc5bcc3f90d`, branch head `909d7ff0a926` (my checkpoint record only on top; the selection is the same at both). No red is this ticket's.
+
+task: W2-104 (DAEO-drhj) run 2 after P-W2-104-CMDLIST (a), DEC-1020: merge `w2/integrate`, have one engineer add `skilleval` to `RECORDED_GOV_COMMANDS`, run W1-26 and the scoped selection once, and return DONE with the exact head.
+status: DONE — verified code head `9fc5bcc3f90d`, branch head `909d7ff0a926` (my checkpoint record only on top; the selection is the same at both). No red is this ticket's.
+work_completed: (1) Head at start was `ac2d92af8c0e`, clean. I merged `w2/integrate` (at `9d605eba20a2`, which holds the ticket file change `d942524f`) with `--no-ff`; it merged without conflicts 

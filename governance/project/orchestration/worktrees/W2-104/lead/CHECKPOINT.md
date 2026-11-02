@@ -1,29 +1,36 @@
-# Lead checkpoint, DAEO-drhj (W2-104), run 2 (P-W2-104-CMDLIST (a), DEC-1020)
+# Lead checkpoint, DAEO-drhj (W2-104), run 2 — FINAL (returned DONE)
 
 ## Run 1 (returned DONE at ac2d92af8c0e)
-- Verified code head 738cec98cf63; gov accept 43 passed, 7/7 KPI lines. One P2 open: skilleval not in
-  RECORDED_GOV_COMMANDS (W1-26 [skilleval] x2 red). Decided: DEC-1020 (a) path addition; CLAUDEPATH (c) residual.
+- Verified code head 738cec98cf63; gov accept 43 passed, 7/7 KPI lines. One P2 (P-W2-104-CMDLIST) decided by
+  DEC-1020 (a); P-W2-104-CLAUDEPATH (c): a residual.
 
-## Run 2 state
-- Start head ac2d92af8c0e, clean. Merged w2/integrate (9d605eba..., ticket file d942524f) --no-ff: 4ee33fec (lead),
-  clean merge; allowed_paths now include src/gov/check/commands.py.
-- Engineer eng-3 launched (gov launch, sandboxed, effort high), brief briefs/eng-3.md, log log/eng-3.json,
-  tripwire-before-5.json. Task: append "skilleval" to RECORDED_GOV_COMMANDS, commit.
-- eng-3 returned DONE (twelve fields): commit 9fc5bcc3f90d (Role: engineer, Implements: DEC-747,DEC-1020), one
-  line; tripwire-5: only this tree's head moved (allowed). Unit tests 97 passed. Session 2690bd5e (sandboxed).
-- select-3.json: scoped, core_changed [src/gov/check/commands.py], unplaced []; 66 targets (W1-26 in it; adds W2-96).
-- W1-26 folder alone: 419 passed, 1 skipped (/tmp/gov-os-lead-W2-104/run2-w1_26.txt). The two [skilleval] reds gone.
-- collect-only: 19263/19265 tests collected (2 deselected), exit 0.
-- rebuild-6: exit 75, semantic not_recreated (Ollama did not embed, 704 s; other leads' suites on the embedder).
-  rebuild-7 retry running (log/rebuild-7.json).
-- Then: scoped parallel + serial (run_verify2.py, output /tmp/gov-os-lead-W2-104/run2/).
-- Older next list: tripwire compare, check commit trailers; disk gate; select_tests.py; run W1-26 folder + scoped parallel +
-  serial through verify_lock.sh (output under /tmp/gov-os-lead-W2-104/run2/); gov check if needed; collect-only;
-  trailer_gate; keyword_warn; gov checkpoint record; DONE.
-- Loop: converged (no repair round).
+## Run 2
+- Head at start ac2d92af8c0e, clean.
+- 4ee33fecc23b (lead): merge of w2/integrate (head 9d605eba20a2, ticket file d942524f), --no-ff, clean.
+- 9fc5bcc3f90d (engineer eng-3, gov launch, sandboxed, effort high, session 2690bd5e): "skilleval" appended to
+  RECORDED_GOV_COMMANDS; one line; trailers Task/Role: engineer/Implements: DEC-747,DEC-1020/Co-Authored-By.
+  Tripwire 5: only this tree's head moved. Its unit run: 97 passed.
+- 909d7ff0a926 (lead): CP-DAEO-drhj-0006 (gov checkpoint). Selection is the same at 909d7ff0a926 and
+  9fc5bcc3f90d.
+- Verified head: 9fc5bcc3f90d (code); returned head 909d7ff0a926.
+- select-3/-4: scoped, core_changed [src/gov/check/commands.py], unplaced [], 66 targets.
+- W1-26 folder: 419 passed, 1 skipped. Scoped parallel: 17 failed, 9882 passed, 4 skipped, 2 errors (W2-104 43/43;
+  W1-26, W1-07, W1-32, W2-96, unit check and unit skilleval all green). Serial (13 of 65 entries): 3 failed,
+  63 passed (W2-54 x3, inherited).
+- No red is this ticket's. The run-1 reds W1-26 [skilleval] x2 are gone. New inherited reds: test_dispatcher x6 (from
+  integrate 66b08891; it reads .gov-runtime/scratch/orchestrator/tools/{land,close_build}.py in the tree, which
+  exists only in the main tree; also red when run alone). DEC-919 known: W2-66 lead_verification (W2-104 conftest).
+- gov check exit 3: RED context-reproducibility (DAEO-i89t AR-5 not in store), core-mutation (.tickets/DAEO-a3u2.md),
+  retrieval-regression (600 s limit); YELLOW core-decision-citations, openspec-validate. All inherited.
+- rebuild-6 and rebuild-7: exit 75, semantic not_recreated (Ollama did not embed; a 1-word embed probe timed out
+  at 30 s). The record and lexical stores were recreated.
+- collect-only: 19263/19265 tests collected (2 deselected). trailer_gate: 14 judged, 0 lacking. keyword_warn: 0.
+- Outputs: /tmp/gov-os-lead-W2-104/run2/{w1_26,parallel,serial}.xml and run2-*.txt.
 
-## Brief gaps (running)
-- none yet
+## Brief gaps
+- jq is not installed (I wrote small Python summarisers) | tool | ~2 min
+- The sandbox shows 11 /dev/null mount points as untracked in git status (from the engineer) | common brief | ~1 min (engineer)
+- A rebuild_slot exit 75 because the shared embedder is hung: the brief has no rule for it | common brief | ~35 min (two rebuilds)
 
 ## Leftovers for the orchestrator
-- /tmp/gov-os-lead-W2-104/ ; engineer session TMPDIRs under /tmp/gov-launch-engineer-*
+- /tmp/gov-os-lead-W2-104/ (329 MB, 39,650 inodes); /tmp/gov-launch-engineer-* (tiny)

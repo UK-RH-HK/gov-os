@@ -1,0 +1,5 @@
+Merge w2/integrate into w2/W2-04: JUDGEMENT.md with DEC-1010's rules, the register to DEC-1025 (DEC-1025's repair round)
+
+Task: DAEO-u4oz
+Implements: CAP-15.d,DEC-860
+Role: orchestrator
