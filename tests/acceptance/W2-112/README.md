@@ -59,7 +59,7 @@ Beyond the base's public `gov.retrieval.rerank` (`rerank(query, candidates, rera
 | What | Value | Source |
 |---|---|---|
 | The service's socket | `~/.cache/gov-os/rerank.sock`, mode 0600 | P-RERANKER-1 |
-| A request on it | one line `[query, [text, ...]]`, answered by one line of scores, one per text, in the order given | P-RERANKER-1 ("as today") |
+| A request on it | one line `[query, [text, ...]]`, answered by one line: a JSON object whose `scores` holds one number per text, in the request's order (other keys such as `device` beside it), or a bare list of those numbers | P-RERANKER-1 ("as today"); the answer's form by DEC-1036 (the moderator's (a)) |
 | The idle time | `GOV_RERANK_IDLE_S` (seconds), in the environment of the search that starts the service | DEC-1034 item 3 |
 | A request's time limit | `GOV_RERANK_TIMEOUT_S` (seconds), in the searches' environment | DEC-1034 item 3 |
 | "About 2 s" | bounds the connection; the answer is bounded by the request's time limit. A search whose service is down answers within 20 s (2 s, a private reranker's start, a loaded machine's slack), plus the slot wait where a case makes it wait | the KPI, DEC-1034 item 3 |
@@ -89,6 +89,10 @@ Red reasons are as seen against the base (`src/` of this worktree; `rerank.py` a
 on `w2/integrate`), where the service does not exist: every search starts a private reranker that ends with it,
 loads where the library chooses (the GPU when one is visible) and knows no slot. "Green on the base" cases hold a
 rule the base already keeps and the service must not break.
+
+The tables below are the map `gov accept` reads: in a table's test column, each backticked item is a test, as
+`file.py`, `file.py::test_x`, `file.py::test_x[param]` or a bare `test_x` (all its parameters); parameters named
+in plain words beside an item are notes for the reader only.
 
 ### Success 1: one reranker process serves every session (pins, socket, lock, idle end) — `test_w2_112_service.py`
 
@@ -128,11 +132,11 @@ The measurement on the 20 visible questions and the 48 is the research document'
 |---|---|
 | `test_when_the_service_cannot_start_the_search_falls_back_to_a_private_reranker` | green on the base (a private reranker, as today) |
 | `test_when_the_services_model_cannot_load_the_search_still_gets_a_private_rerankers_answer` | the one load the base tries fails, so the search comes back unranked |
-| `test_a_service_that_does_not_answer_is_passed_over[full]`, `[silent]` (failure 1) | green on the base where Unix sockets are allowed (the base never asks a socket); **in a sandbox that refuses Unix sockets they fail at making the stand-in broken service** |
-| `test_a_service_that_answers_with_an_error_is_passed_over[error]`, `[garbage]` (failure 1) | as above |
+| `test_a_service_that_does_not_answer_is_passed_over` (both parameters: full, silent; failure 1) | green on the base where Unix sockets are allowed (the base never asks a socket); **in a sandbox that refuses Unix sockets they fail at making the stand-in broken service** |
+| `test_a_service_that_answers_with_an_error_is_passed_over` (both parameters: error, garbage; failure 1) | as above |
 | `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back` | no service stays up after the first search |
 | `test_a_service_killed_mid_run_leaves_every_search_answered` (the central case; failures 1, 2) | no service stays up after the first search |
-| `test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored[no reranker environment]`, `[no model loads]` | green on the base (DEC-374) |
+| `test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored` (both parameters: no reranker environment, no model loads) | green on the base (DEC-374) |
 | `test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error` (DEC-1034 item 4) | green on the base (the base never asks a socket) |
 | `test_each_fallback_is_logged_under_the_users_cache_folder` | no file under `~/.cache/gov-os/` logs the fallback |
 | `test_w2_112_bundle.py::test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank` | the bundle has no `rerank` entry (only `merge.reranked: false`) |
@@ -156,11 +160,11 @@ These hold only that the record exists and carries figures of each kind; the fig
 | Test | Red reason on the base |
 |---|---|
 | `test_with_room_on_the_gpu_the_service_runs_its_one_model_there` | no service stays up after the first search |
-| `test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[less-than-its-share-free]` | green on the base (no service ever starts; its private reranker loads on the stand-in GPU) |
-| `test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[no-gpu]` | the base's private reranker loads on the CPU |
-| `test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder[less-than-its-share-free]`, `[no-gpu]` | no file under `~/.cache/gov-os/` logs the fallback with its reason |
+| `test_w2_112_gpu.py::test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[less-than-its-share-free]` | green on the base (no service ever starts; its private reranker loads on the stand-in GPU) |
+| `test_w2_112_gpu.py::test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[no-gpu]` | the base's private reranker loads on the CPU |
+| `test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder` (both parameters: less-than-its-share-free, no-gpu) | no file under `~/.cache/gov-os/` logs the fallback with its reason |
 | `test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu` | six searches put 6 copies of the model on the GPU |
-| `test_w2_112_bundle.py::test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason[less-than-its-share-free]`, `[no-gpu]` ("named") | the bundle has no `rerank` entry |
+| `test_w2_112_bundle.py::test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason` (both parameters: less-than-its-share-free, no-gpu; "named") | the bundle has no `rerank` entry |
 | `test_w2_112_bundle.py::test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers` | the bundle has no `rerank` entry |
 
 Below its share, a search answered at all is answered by a private reranker on the GPU; otherwise it goes on
@@ -176,22 +180,25 @@ the GPU" is read as the service's: one service loads one copy however many searc
 | `test_with_a_gpu_slot_free_the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot` | the private reranker loads on the GPU without holding a slot in `GOV_RERANK_GPU_LOCK_DIR` |
 | `test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu` | the base ignores the slots: it reranks at once |
 | `test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees` | the private reranker loads 1.5 s before a slot frees |
-| `test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu]`, `[gpu-hidden]` | the private reranker loads on the CPU |
+| `test_a_fallback_never_runs_a_reranker_on_the_cpu` (both parameters: no-gpu, gpu-hidden) | the private reranker loads on the CPU |
 | `test_the_service_holds_one_of_the_two_gpu_slots` (DEC-1036 T6 (b)) | no service stays up after the first search |
 | `test_with_the_service_up_and_the_other_slot_held_a_fallback_waits_then_goes_on_unranked` (T6 (b)) | no service stays up after the first search |
 | `test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` (T6 (b)) | the base ignores the slots: its private reranker scores the search |
-| `test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason[service-down]`, `[no-service-yet]` (T6 (b)) | the base reranks the bundle (`merge.reranked: true`) |
+| `test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason` (both parameters: service-down, no-service-yet; T6 (b)) | the base reranks the bundle (`merge.reranked: true`) |
 | `test_w2_112_bundle.py::test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down` | the bundle has no `rerank` entry |
 
 The stopgap's retirement (ACT-RERANK-GPU-SLOTS-1's `.pth`) is an owner ACT the lead prepares, not code; no test.
 
 ### Failure lines
 
-| Failure | Tests |
+| KPI | Tests |
 |---|---|
-| A search that fails, hangs, or returns another session's scores because of the service | the 20-concurrent case, arrival order, the cap, the time limit, the same inputs from several sessions, every fallback and slot case, the sandboxed session (each session is bounded: hung at 120 s; a fallback within 20 s plus any slot wait) |
-| Two services started at once, or a socket another user can open | the two-together, 20-concurrent and one-copy cases, the service's one slot, the socket case, the case after the service died, the killed mid-run case |
-| Answers that differ from a private reranker's on the same inputs and device | the three answers cases; every scored result is checked against the private reranker's order and scores |
+| Failure 1: a search that fails, hangs, or returns another session's scores because of the service | `test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_requests_are_answered_in_arrival_order`, `test_a_search_with_more_texts_than_the_cap_still_answers`, `test_a_request_past_its_time_limit_does_not_hold_the_search`, `test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model`, `test_a_service_that_does_not_answer_is_passed_over`, `test_a_service_that_answers_with_an_error_is_passed_over`, `test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back`, `test_a_service_killed_mid_run_leaves_every_search_answered`, `test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error`, `test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu` |
+| Failure 2: two services started at once, or a socket another user can open | `test_two_searches_starting_together_start_one_service`, `test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores`, `test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu`, `test_the_service_holds_one_of_the_two_gpu_slots`, `test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port`, `test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second`, `test_a_service_killed_mid_run_leaves_every_search_answered` |
+| Failure 3: answers that differ from a private reranker's on the same inputs and device | `test_the_services_answers_match_a_private_rerankers_on_the_same_inputs`, `test_candidates_the_service_scores_alike_keep_the_order_given`, `test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model` |
+
+Every session is bounded (hung at 120 s; a fallback within 20 s plus any slot wait), and every scored result in
+the suite is checked against a private reranker's order and scores.
 
 ## What fails inside the launch sandbox for that reason alone
 
