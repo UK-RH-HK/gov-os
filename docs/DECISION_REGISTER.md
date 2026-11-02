@@ -12774,3 +12774,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.407 | 2026-11-02 | Orchestrator (delegated): DEC-1025. Next free id: DEC-1026. |
+
+### DEC-1026 — The rebuild retries a timed-out embedding request, bounded: W2-123's run 2 (delegated; P1-MORNING-2026-11-02 A option (d))
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and DEC-957's rubric: P2, a ticket's scope and KPIs changed within the approved spec, shared code, reversible, still failing closed; confidence high; for the owner to overturn; the rest of decision A stays the owner's) · **Under:** DEC-1015 item 4, DEC-1014, DEC-957, DEC-1010
+- **Context:** eight tickets are ready to land, memory's critical path among them, and six landing attempts failed since 04:37 the same way: `src/gov/retrieval/semantic.py` gives each embedding request `TIMEOUT_S = 120.0` with no retry, so one batch queued behind another client on the one-at-a-time shared server ends the semantic stage `not_recreated` (07:56: `semantic_s` 120.9). The owner had not answered decision A by 10:20.
+- **Decision:** W2-123 (`DAEO-qzrq`) takes `src/gov/retrieval/semantic.py` and one KPI line: a timed-out request is retried, at most three tries with a growing wait, each under the existing timeout, and the stage still ends `not_recreated`, named, after the last failed try (never a partial store reported as built); the tries are stated in the rebuild's result. Run 2: test designer and engineer in parallel (DEC-959 item 7), `gov accept`, the scoped run once. W2-123 then lands with the batch, whose own rebuild runs the merged code and so retries. The CPU ACT (P-W2-123-3), real parallel embedding (P-W2-123-1) and W2-122's K5 stay with the owner.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.408 | 2026-11-02 | Orchestrator (delegated): DEC-1026. Next free id: DEC-1027. |
