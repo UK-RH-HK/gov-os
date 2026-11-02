@@ -176,13 +176,124 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
 (7 days). `config.json` (state folder) holds `cpu_margin`, `memory_rule`, `min_outside_samples` and the rest; every
 key has its default in the code (`K` is kept for the record but no longer used).
 
+## The Gov Load Balancer (owner, DEC-1039 (1b); DEC-1037 (4), DEC-1038 (4))
+The arithmetic is `balancer.py` beside the dispatcher (pure functions, tested alone in `tests/unit/orchestration/
+test_balancer.py`); the dispatcher reads the machine, the processes and the samples and calls it.
+
+**The GPU rule.** The GPU's dedicated memory never spills into shared memory and never runs out into a CUDA crash:
+the dedicated memory used (nvidia-smi) plus the running jobs' forecast stays at most total minus `gpu_headroom_mib`,
+and the shared GPU memory in use stays under `gpu_shared_floor_mib`. The embedders come first, the rerankers second
+(at most `rerank_gpu_slots` of them, the rest end, DEC-1033), even when that holds leads to two or three. Every pass
+checks both: (1) **the budget**: this pass's nvidia-smi `memory.used` plus each running job's current-phase GPU peak
+above what it holds (`GPU rule:` line; above it: one `gpu-alert` item at once, `GPU: GPU budget`, once per incident);
+(2) **no spill**: WSL's shared GPU memory, read only through the Windows counters `\GPU Adapter Memory(*)\Dedicated
+Usage` and `...\Shared Usage` (`powershell.exe -NoProfile -Command Get-Counter ...`, about 2 s, limit
+`gpu_shared_timeout_s` 10; the adapter with the most dedicated memory in use is the card: a virtual display adapter has
+none). A reading above `gpu_shared_floor_mib` (1/16 of the card: 1,019 MiB here; the desktop alone holds about 580 MiB,
+measured 2026-11-02 19:40) is one `gpu-alert` item at once (`GPU: GPU spill`), once per incident (it ends on a reading
+under the floor); an unreadable counter is a status line, never a failure. Both feed the quiet waiter like every
+`gpu-alert`. T3 (below) makes a lasting budget breach an incident too.
+
+**The phases of each kind of work, and how a running job's phase is found** (`find_jobs`, `tree_phase`). A job is a
+lead (the launch form's marker in a lead worktree), a landing (`land.py`), a close (`close_build.py`), the nightly
+(`nightly.sh`, `nightly_cron.sh`), each with its whole process tree; then each rebuild (`gov rebuild`, `-m
+gov.cli.main rebuild`) and each heavy-slot run (its `flock ... gov-os-heavy-slot-N.lock`, or a heavy pytest outside a
+slot) under none of them. A `heavy_slot.sh` or `rebuild_slot.sh` still waiting for its slot runs nothing and is no job
+(its flock, once it has the slot, is). A process's cores: its utime + stime since the last pass; one not in the last
+sample at its lifetime's average. Its phase is read from what its tree runs, in this order: **a rebuild**
+(`rebuild.embedding` while the shared embedder makes progress or has requests waiting, by the last pass's 4d state;
+else `rebuild.lexical`); **a test run** (a heavy pytest or a heavy-slot lock in the tree: `test`); then, for a lead, **a
+review** (a reviewer's session, `GOV_ROLE` independent-auditor / reviewer / independent-test-designer, in its tree:
+`review`), **a retrieval** (`gov retrieve`, `gov check`, a retrieval module, a reranker: `retrieval`), **its start**
+(its first `lead_start_s`, 600 s: `start`), else **building** (`build`); for the others `other`. A landing or a close
+is `rebuild.*`, then `test`; a rebuild `rebuild.*`; a slot run `test`; the nightly `rebuild.*`, `test`. Each job's
+measures this pass: its tree's cores (each process's utime + stime since the last pass, `jobs-prev.json`), its RSS and
+the GPU reranker slots its tree holds (the `rerank_gpu_glob` lock holders). `Jobs by phase:` in the status.
+
+**Each phase's measured peak on every resource** (`phase_peaks`, `phase-peaks.json`, refreshed every
+`phase_refresh_s` 600 from the balance rows of the last `phase_window_h` 72): CPU cores busy, RAM, GPU memory and GPU
+use, per kind and phase (`lead.retrieval`, `slot.test`, `landing.rebuild.embedding`, ...): a p95 once the phase has
+`phase_min_samples` (30), before that the larger of today's figure (the floor) and the samples. GPU memory: a
+retrieval or review holds one reranker's share, measured as (GPU used - the embedders' share) / the GPU slots held,
+the embedders' share as the GPU used while no reranker runs (each a p95, floors 3,584 and 5,734 MiB). GPU use: the
+pass's utilisation while the job is the only GPU-heavy one. RAM, while a phase's own samples are few, comes from the
+7-day history the memory rule uses (`peaks.json`: a lead's p95 outside verification, 2.1 GB today; inside it 4.1 GB; a
+slot run 1.9 GB; a rebuild 0.5 GB). Today's floors (2026-11-02):
+| Phase | CPU cores | RAM | GPU memory | GPU use | Heavy | Source |
+|---|---|---|---|---|---|---|
+| start, retrieval, review | 2.0 | 2.1 GB | one reranker, 3.5 GiB | 10 % | GPU | LB-PLAN-gpu section 5; lead-mem p95 outside verification |
+| build | 1.0 | 2.1 GB | 0 | 0 | none | kinds.jsonl `claude` p95 |
+| test (a slot run) | 5.9 | 1.9 GB (a lead's tree 4.1 GB) | 0 | 0 | CPU | kinds.jsonl `test_run` per run p95 11-02; peaks.json `slot_run_kb` |
+| rebuild.lexical | 2.5 | 0.5 GB | 0 | 0 | CPU | kinds.jsonl `rebuild` p95 11-02 |
+| rebuild.embedding | 6.0 | 0.5 GB | 0 (the embedder is resident) | 65 % | GPU | LB-PLAN-gpu section 2a: 5.6 cores, 48-65 % |
+| other | 1.0 | 0.5 GB | 0 | 0 | none | |
+
+**The forecast before admission** (`forecast`). A start is admitted only if, for every resource, the running jobs'
+current-phase peaks plus the newcomer's worst-phase peak stay within capacity: **CPU** busy cores + each job's peak
+above what it uses now + the newcomer's ≤ the top of `cpu_band`; **RAM** available - each job's peak above its RSS now -
+the newcomer's ≥ the floor; **GPU memory** used + each job's peak above what it holds + the newcomer's ≤ total -
+`gpu_headroom_mib`, the rerankers' part at most the free GPU reranker slots' share. A lead's own admission covers the
+phases it enters with no other gate (start, retrieval, building, review; and its entry's `first=<phase>` when given):
+its test runs and rebuilds are admitted when they take their slot. The forecast applies after the rules of step 3
+(`forecast_admission`, default true; false: shown, not applied), and the admission line names **the binding resource**
+either way (`forecast admits (binding GPU: GPU memory 12.6 of 13.9 GB ...)`, `forecast refuses (GPU binding): ...`).
+The `Forecast:` line gives the verdict for a lead, a slot grant and a rebuild; `forecast.json` (state) holds them for
+`heavy_slot.sh` and `rebuild_slot.sh` to consult (a proposal: neither reads it yet, and `heavy_slot.sh` is another
+engineer's).
+
+**Pairing** (`pair`). When several starts are possible in a pass, the one whose heavy resource is the idler goes first:
+the CPU's load is its forecast cores against the band's top, the GPU's the larger of its memory against its budget and
+the running phases' GPU use. A lead starts GPU-heavy (its retrieval); a ready entry may name another first phase,
+`<W2> <ticket> <brief> <log> first=test` (a lead resuming with its tests ready: CPU-heavy). So a GPU-heavy start goes
+beside running test slots and a CPU-heavy one while the GPU embeds; equals keep the list's order. The others wait
+`paired: ...` (still one start a pass).
+
+**Limits from the machine** (`derive_limits`, DEC-1037 (4)). Detected each pass: logical CPUs (the affinity set),
+physical cores (`/proc/cpuinfo`), RAM (MemTotal), the GPU's model and memory (the last nvidia-smi read; `machine.json`).
+Every limit is a ratio of it, each giving today's number on this machine (20 CPUs, 24 GB, 16,303 MiB):
+| Limit | Rule | Here |
+|---|---|---|
+| `cpu_band` | 0.70-0.90 of the CPUs | 14-18 |
+| `cpu_margin` | 0.10 of the CPUs | 2 |
+| heavy slots x workers | slots 0.15 of the CPUs; workers 0.90 of the CPUs / slots | 3 x 6 (heavy_slots.conf: shown beside, the owner's file) |
+| `slots_gpu` / `slots_cpu` | the heavy slots / 2/3 of them | 3 / 2 |
+| `gpu_headroom_mib` | 0.1256 of the GPU's memory | 2,048 |
+| `rerank_gpu_slots` | (GPU memory - the embedders' measured share - headroom) / one reranker's measured peak | 2 |
+| `gpu_shared_floor_mib` | 1/16 of the GPU's memory | 1,019 |
+(32 CPUs, 64 GB, 24 GB GPU: 22-29, 3, 5 x 5, 5/3, 3,085, 4; 8 CPUs, 16 GB, no GPU: 6-7, 1, 1 x 7, 1/1, 0, 0.) An
+explicit number in `config.json` still wins (the owner's override) and the `Limits:` line says so (`config.json
+overrides: cpu_band [12, 16] (derived [14, 18])`). A GPU not read yet uses today's GPU figures. A machine change (CPUs,
+cores, RAM by the half GB, the GPU) is one `Machine:` inbox item with the new limits. `limits.json` (state) holds them;
+`gov_reranker_gpu_slot.py` reads its lock count from it when `GOV_RERANK_GPU_SLOTS` is unset (installing that copy is
+the owner's ACT). The servers' CPU sets stay owner ACTs.
+
+**The standing targets and their incidents** (DEC-1038 (4)). Each pass appends one row to `log/capacity/balance.jsonl`
+(the readings, the jobs and phases, the targets, the forecast; renamed to `balance-<stamp>.jsonl` past
+`balance_max_mb` 20, the newest 30 kept by `nightly/rotate.sh`). Targets, judged each pass: **T1** busy cores within
+the band (above it, or below it while work waits refused by admission or a landing waits, is a breach); **T2** memory
+available above the floor; **T3** GPU used at most total minus headroom; **T4** no timed-out embedding (a `[GIN]` line
+with 499 or 5xx, or a time at or over `embed_client_timeout_s` 120, in either server's log since the last pass; and the
+give-ups in `embed_retry_log`, W2-123's retry log, when configured); **T5** no cold rebuild (`tools/rebuild_counts.py`'s
+rule on `log/seed.jsonl`'s new rebuild rows: a seed not used, or a semantic stage of `cold_rebuild_s` 1500 s or more);
+**outside-slot** the "heavy steps outside a slot" finding. A breach lasting more than 15 minutes (`breach_open_s`; T1-T3
+and outside-slot), or any T4/T5 event, opens **one incident**: one inbox item `incident-<target>-<HHMM>` (label
+`Incident:`, it holds no lead) and the record `log/incidents/<date>-<HHMM>-<target>.md` (the readings, the running jobs
+and their phases, the top processes by CPU and by memory grouped by tree and session, the events, and empty **Cause**
+and **Fix** for the CTO). None again while it lasts (more events are added to the record); it closes when the target
+has held for 15 minutes (`breach_close_s`), and the record says when. State: `targets.json`. Status: `Targets:` with
+the incidents open. `tools/targets_report.py [--since] [--hours 07:30-02:00]` (scratch tools) gives the morning
+package's shares (T1 at least 80 %; T2, T3 and outside-slot 100 %; T4, T5 zero events), the incidents with their causes
+and the worst hour.
+
 ## The state folder
 `ready.txt` and `land.txt` (the CTO's), `started.txt`, `land-done.txt`, `land-inflight.*`, `never-ran.txt`, `inbox/`
 (the CTO moves read items to `inbox/read/`), `status.*`, `peaks.json`, `config.json`, `cpu_prev.json`, `gpu-health.json`,
-`dispatch.log`, `tick.lock`, `loop.lock`, `loop.pid`, `OFF` (while present, every pass does nothing).
+`dispatch.log`, `tick.lock`, `loop.lock`, `loop.pid`, `OFF` (while present, every pass does nothing); the balancer's
+`jobs-prev.json`, `phase-peaks.json`, `forecast.json`, `limits.json`, `machine.json`, `targets.json`.
 
 ## Running it
 - The owner's crontab line (ACT): `* * * * * /usr/bin/bash /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/tools/dispatch/run_tick.sh`
 - Without cron: `setsid -f bash /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/orchestration/tools/dispatch/loop.sh`.
 - Stop: `touch .gov-runtime/scratch/orchestrator/dispatch/OFF`. A dry pass: `bash run_tick.sh --dry`.
-- Tests: `python3 -m pytest -q tests/unit/orchestration/test_dispatcher.py`.
+- Tests: `python3 -m pytest -q tests/unit/orchestration/test_dispatcher.py tests/unit/orchestration/test_balancer.py`
+  (through the gate, `heavy_slot.sh`).

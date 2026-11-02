@@ -64,6 +64,8 @@ from pathlib import Path
 E = os.environ.get
 ORCH = Path(E("DISPATCH_ORCH", "/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator"))
 CODE = Path(__file__).resolve().parent  # the committed code (DEC-1010 item 6): this folder
+sys.path.insert(0, str(CODE))
+import balancer  # noqa: E402 - the Gov Load Balancer's arithmetic (DEC-1039 (1b)), beside this file
 # the dispatcher's state (ready.txt, land.txt, inbox/, status, peaks.json, config.json, started.txt, logs, locks, OFF)
 # stays in the scratch folder; DISPATCH_STATE (or the older DISPATCH_DIR) moves it, for the tests only
 D = STATE = Path(E("DISPATCH_STATE") or E("DISPATCH_DIR") or str(ORCH / "dispatch"))
@@ -231,6 +233,7 @@ def truth():
         c = None
         t["config_error"] = f"config: {exc!r}"[:200]
     facts = proc_facts()
+    t["_facts"] = facts
     leads = {}
     for f in facts:
         w2 = lead_w2(f["argv"], f["cwd"])
@@ -286,6 +289,30 @@ def truth():
         t["slots_target"], t["slots_device"] = slots_by_device(c or {})
     except Exception as exc:  # fail closed: admission refuses, naming why
         t["config_error"] = f"balance: {exc!r}"[:200]
+    try:  # DEC-1039 (1b): the running jobs by their phases, the phases' peaks, the forecast for each kind of start
+        dry = bool(E("DISPATCH_DRY_FLAG"))
+        try:
+            held = lock_holders(E("DISPATCH_RERANK_GLOB") or (c or {}).get("rerank_gpu_glob") or RERANK_GPU_GLOB)
+        except OSError:
+            held = {}
+        rr_pids = {p for pids in held.values() for p in pids}
+        shared = (load_json("embed-health.json", {}).get("servers") or {}).get("shared") or {}
+        cores = job_cores(facts, dry)
+        t["_proc_cores"] = cores
+        t["jobs"] = find_jobs(facts, c or {}, rr_pids, shared.get("state") in ("BUSY", "WAITING"), cores)
+        pk2 = phase_peaks_current(c or {}, dry)
+        hist = {"lead_outside_kb": ((pk or {}).get("lead_outside") or {}).get("rss_kb_p95"),
+                "lead_inside_kb": ((pk or {}).get("lead_inside") or {}).get("rss_kb_p95"),
+                "slot_run_kb": (pk or {}).get("slot_run_kb"),
+                "rebuild_kb": (((pk or {}).get("kinds") or {}).get("rebuild") or {}).get("rss_kb_p95")}
+        t["_phase_peaks"] = pk2 = balancer.with_history(pk2, hist)
+        fs = forecast_state(t, c or {})
+        t["forecast"] = {k: balancer.forecast(fs, pk2, k) for k in ("lead", "slot", "rebuild")}
+        t["pair_load"] = balancer.loads(fs, pk2)
+    except Exception as exc:  # noqa: BLE001 - the forecast unknown: a lead's admission refuses, naming why
+        t["jobs"], t["forecast"], t["pair_load"] = t.get("jobs", []), None, None
+        t["forecast_error"] = f"forecast: {exc!r}"[:200]
+    t["machine"] = (c or {}).get("_machine")
     t["admit"], t["admit_reason"] = admit_safely(t, None)  # the status shows the admission of a plain newcomer
     try:
         t["lead_cap"] = lead_cap(t, c, t["_pk"]) if c and t["_pk"] else None
@@ -301,6 +328,9 @@ CONFIG = D / "config.json"
 PEAKS = D / "peaks.json"
 KINDS_HIST = Path(E("DISPATCH_KINDS", str(LOG / "capacity/kinds.jsonl")))
 LEADMEM_HIST = Path(E("DISPATCH_LEADMEM", str(LOG / "lead-mem.jsonl")))
+BALANCE_LOG = Path(E("DISPATCH_BALANCE", str(LOG / "capacity/balance.jsonl")))  # DEC-1038 (4): one row a pass
+INCIDENTS = Path(E("DISPATCH_INCIDENTS", str(LOG / "incidents")))
+SEED_LOG = Path(E("DISPATCH_SEED_LOG", str(LOG / "seed.jsonl")))  # T5: tools/rebuild_counts.py's seeded rebuilds
 GATE_CONFIG = Path(E("DISPATCH_GATE_CONFIG", str(ORCH / "tools/gate-config.json")))
 HEAVY = ("gov.context.context_check", "gov.retrieval.retrieve_check", "gov.check.schema", "gov.retrieval.measure")
 
@@ -331,18 +361,78 @@ def config():
          # rerankers' 7-day p95 only while fewer than reranker_min_samples
          "reranker_era_from": "2026-11-02 13:00", "reranker_min_samples": 30, "reranker_min_span_s": 86400,
          # DEC-1018 item 1: no landing claimed from this time until the nightly has started, or until the second
-         "nightly_hold_from": "03:15", "nightly_hold_until": "05:30"}
+         "nightly_hold_from": "03:15", "nightly_hold_until": "05:30",
+         # DEC-1039 (1b): the Gov Load Balancer. The forecast before a lead's admission (False: shown, not applied);
+         # the phases' peaks from the balance rows of the last phase_window_h, refreshed every phase_refresh_s, a
+         # p95 from phase_min_samples on; a lead's start phase lasts lead_start_s; the shared GPU memory read (the
+         # Windows counter, WSL) every gpu_shared_every passes; the standing targets (DEC-1038 (4)) and incidents
+         "forecast_admission": True, "phase_window_h": 72, "phase_refresh_s": 600, "phase_min_samples": 30,
+         "lead_start_s": 600, "gpu_shared_every": 1, "gpu_shared_timeout_s": 10, "gpu_shared_cmd": None,
+         "breach_open_s": balancer.OPEN_AFTER_S, "breach_close_s": balancer.CLOSE_AFTER_S, "balance_max_mb": 20,
+         "embed_client_timeout_s": 120, "embed_retry_log": None, "cold_rebuild_s": 1500}
+    explicit = {}
     try:
-        c.update(json.loads(CONFIG.read_text()))
+        explicit = json.loads(CONFIG.read_text())
+        explicit = explicit if isinstance(explicit, dict) else {}
     except (OSError, ValueError):
         pass
+    c.update(explicit)
     try:
         conf = Path(E("DISPATCH_SLOTS_CONF", str(ORCH / "tools/heavy_slots.conf"))).read_text()
         m = re.search(r"^SLOTS=(\d+)", conf, re.M)
         c.setdefault("slots", int(m.group(1)) if m else 3)
+        w = re.search(r"^WORKERS=(\d+)", conf, re.M)
+        c["_conf_workers"] = int(w.group(1)) if w else None
     except OSError:
         c.setdefault("slots", 3)
+    # DEC-1037 (4): every limit from the detected machine (an explicit number in config.json still wins)
+    mach = machine_now()
+    sh = load_json("phase-peaks.json", {}).get("_shares") or {}
+    known = mach if mach["gpu_known"] else dict(mach, gpu_total_mib=balancer.REFERENCE["gpu_total_mib"])
+    derived = balancer.derive_limits(known, sh)
+    c["_machine"], c["_derived"] = mach, derived
+    c["_overrides"] = balancer.apply_limits(c, explicit, derived)
     return c
+
+
+def machine_now():
+    """The machine as detected (DEC-1037 (4)): logical CPUs (the affinity set; DISPATCH_NPROC for the tests), physical
+    cores (/proc/cpuinfo), RAM (MemTotal), the GPU's model and memory (the last successful nvidia-smi read, kept in
+    machine.json; no nvidia-smi at all: no GPU; not read yet: unknown, and today's GPU figures are used)."""
+    try:
+        cpus = int(E("DISPATCH_NPROC") or len(os.sched_getaffinity(0)))
+    except (AttributeError, OSError, ValueError):
+        cpus = os.cpu_count() or 1
+    cores = None
+    try:
+        pairs, phys = set(), None
+        for line in Path(E("DISPATCH_CPUINFO", "/proc/cpuinfo")).read_text().splitlines():
+            k, _, v = line.partition(":")
+            if k.strip() == "physical id":
+                phys = v.strip()
+            elif k.strip() == "core id":
+                pairs.add((phys, v.strip()))
+        cores = len(pairs) or None
+    except OSError:
+        pass
+    try:
+        m = re.search(r"MemTotal:\s+(\d+)", Path(E("DISPATCH_MEMINFO", "/proc/meminfo")).read_text())
+        mem = int(m.group(1)) if m else None
+    except OSError:
+        mem = None
+    out = {"cpus": cpus, "cores": cores, "mem_total_kb": mem,
+           "mem_total_gb": None if mem is None else round(mem / 1048576 * 2) / 2,
+           "gpu_name": None, "gpu_total_mib": None, "gpu_known": False}
+    g = load_json("gpu-health.json", {}).get("gpu") or {}
+    prev = load_json("machine.json", {})
+    if g.get("ok") and g.get("total_mib"):
+        out.update(gpu_name=g.get("name"), gpu_total_mib=g["total_mib"], gpu_known=True)
+    elif prev.get("gpu_known"):
+        out.update(gpu_name=prev.get("gpu_name"), gpu_total_mib=prev.get("gpu_total_mib"), gpu_known=True)
+    elif "No such file" in str(g.get("why") or "") and not any(  # no nvidia-smi and no GPU device: no GPU
+            os.path.exists(p) for p in (E("DISPATCH_GPU_DEVICES") or "/dev/dxg:/dev/nvidia0").split(":") if p):
+        out.update(gpu_name="none", gpu_total_mib=None, gpu_known=True)
+    return out
 
 
 def proc_facts():
@@ -353,7 +443,8 @@ def proc_facts():
         for i, p in enumerate(json.loads(Path(fake).read_text())):
             out.append({"argv": p["cmd"].split(), "cwd": p.get("cwd", ""), "pid": p.get("pid", 1000 + i),
                         "ppid": p.get("ppid", 1), "age_s": p.get("age_s", 0), "rss_kb": p.get("rss_kb", 0),
-                        "cpu_ticks": p.get("cpu_ticks", 0)})
+                        "cpu_ticks": p.get("cpu_ticks", 0),
+                        "cpu_ticks_all": p.get("cpu_ticks_all", p.get("cpu_ticks", 0))})
         return out
     try:
         uptime = float(Path("/proc/uptime").read_text().split()[0])
@@ -372,7 +463,9 @@ def proc_facts():
         if argv:
             out.append({"argv": argv, "cwd": cwd, "pid": int(p.rsplit("/", 1)[1]), "ppid": int(stat[1]),
                         "age_s": max(0.0, uptime - int(stat[19]) / hz), "rss_kb": int(rss.group(1)) if rss else 0,
-                        "cpu_ticks": int(stat[11]) + int(stat[12])})
+                        "cpu_ticks": int(stat[11]) + int(stat[12]),
+                        # with its reaped children's (cutime, cstime): a test's short-lived programs (DEC-1039)
+                        "cpu_ticks_all": sum(int(x) for x in stat[11:15])})
     return out
 
 
@@ -484,12 +577,27 @@ def services_resident(facts):
     return out
 
 
-def admit_safely(t, newcomer_tid):
-    """F3: a bad peaks.json or config never raises out of the tick: it refuses, naming why."""
+def admit_safely(t, newcomer_tid, phases=None):
+    """F3: a bad peaks.json or config never raises out of the tick: it refuses, naming why. DEC-1039 (1b): what the
+    rules admit, the forecast must admit too (`forecast_admission`): the running jobs' current-phase peaks plus the
+    newcomer's worst phase (a lead: its phases without another gate, and `phases`, its first one when given) within
+    every resource; the reason names the binding resource either way."""
     if t.get("config_error"):
         return False, "not admitted: " + t["config_error"]
     try:
-        return admission(t, t["_c"], t["_pk"], newcomer_tid)
+        ok, why = admission(t, t["_c"], t["_pk"], newcomer_tid)
+        if not ok:
+            return ok, why
+        c = t["_c"] or {}
+        if t.get("forecast_error"):
+            return (False, t["forecast_error"]) if c.get("forecast_admission", True) else (ok, why)
+        f = t["forecast"]["lead"]
+        if phases:
+            f = balancer.forecast(forecast_state(t, c), t["_phase_peaks"], "lead",
+                                  tuple(balancer.UNGATED) + tuple(phases))
+        if not f["ok"] and c.get("forecast_admission", True):
+            return False, f["reason"]
+        return ok, f"{why}; {f['reason']}" + ("" if f["ok"] else " (not applied: forecast_admission false)")
     except Exception as exc:
         return False, f"admission error: {exc!r}"[:200]
 
@@ -608,6 +716,208 @@ def heavy_outside_slots(facts, limit_s):
         if heavy and f["age_s"] > limit_s and not in_slot(facts, f):
             found.append(f"{' '.join(a[:4])[:80]} (pid {f['pid']}, {int(f['age_s'] // 60)} min, {f['cwd'][-40:]})")
     return found
+
+
+# ---- DEC-1039 (1b): the Gov Load Balancer: the running jobs and their phases --------------------------------------
+
+def is_rebuild(a):
+    """A store rebuild: `gov rebuild` (the shim), `python -m gov.cli.main rebuild`, or rebuild_slot.sh."""
+    for i, x in enumerate(a[:5]):
+        if (os.path.basename(x) == "gov" or x == "gov.cli.main") and i + 1 < len(a) and a[i + 1] == "rebuild":
+            return True
+    return any(x.endswith("rebuild_slot.sh") for x in a[:3])
+
+
+def is_retrieval(a):
+    """A search: `gov retrieve`, `gov check` (its retrieval checks), a retrieval module (HEAVY), or a reranker."""
+    for i, x in enumerate(a[:5]):
+        if (os.path.basename(x) == "gov" or x == "gov.cli.main") and i + 1 < len(a) and a[i + 1] == "retrieve":
+            return True
+    return is_gov_check(a) or any(h in a for h in HEAVY) or is_reranker(a)
+
+
+def is_slot_flock(a):
+    return bool(a) and os.path.basename(a[0]) == "flock" and any("gov-os-heavy-slot" in x for x in a[1:6])
+
+
+def is_gate_wrapper(a):
+    """`bash heavy_slot.sh <command>` or `bash rebuild_slot.sh <tree>`: while it waits for a slot nothing runs; once
+    it has one, its flock runs the command (live dry pass, 2026-11-02 20:05: three waiting wrappers were not tests)."""
+    return any(x.endswith(("heavy_slot.sh", "rebuild_slot.sh")) for x in a[:3])
+
+
+def is_test_proc(a):
+    """A test run that runs: a heavy-slot lock held (its flock), or a heavy pytest that is not a waiting wrapper."""
+    return is_slot_flock(a) or (is_pytest(a) and not single_file_pytest(a) and not is_gate_wrapper(a))
+
+
+def is_rebuild_proc(a):
+    """A rebuild that runs: `gov rebuild` or `-m gov.cli.main rebuild` (not rebuild_slot.sh waiting for a slot)."""
+    return is_rebuild(a) and not is_gate_wrapper(a)
+
+
+REVIEW_ROLES = ('GOV_ROLE":"independent-auditor', 'GOV_ROLE":"reviewer', 'GOV_ROLE":"independent-test-designer')
+
+
+def job_root(f):
+    """(kind, name) when the process starts a job of its own: a lead, a landing (land.py), a close (close_build.py),
+    the nightly (nightly.sh, nightly_cron.sh); else None."""
+    a = f["argv"]
+    w2 = lead_w2(a, f["cwd"])
+    if w2:
+        return "lead", w2
+    if runs_script(a, "land.py"):
+        return "landing", "land"
+    if runs_script(a, "close_build.py"):
+        return "close", ",".join(x for x in a if re.fullmatch(r"W2-[0-9A-Za-z]+", x)) or "close"
+    if any(re.search(r"/nightly/(nightly|nightly_cron)\.sh$", x) for x in a[:3]):
+        return "nightly", "nightly"
+    return None
+
+
+def tree_phase(kind, procs, root, embed_busy, c):
+    """A job's phase from what its tree runs (the README's rule, in this order): a rebuild (embedding while the shared
+    embedder makes progress or has requests waiting, else lexical); a test run (a heavy pytest or a heavy-slot lock
+    in its tree); for a lead: a review (a reviewer session in its tree), a retrieval (gov retrieve, gov check, a
+    retrieval module, a reranker), its start (its first `lead_start_s`), else building; for the others: other."""
+    args = [p["argv"] for p in procs]
+    if any(is_rebuild_proc(a) for a in args):
+        return "rebuild.embedding" if embed_busy else "rebuild.lexical"
+    if any(is_test_proc(a) for a in args):
+        return "test"
+    if kind != "lead":
+        return "other"
+    if any(p is not root and any(r in x for x in p["argv"] for r in REVIEW_ROLES) for p in procs):
+        return "review"
+    if any(is_retrieval(a) for a in args):
+        return "retrieval"
+    if root.get("age_s", 0) < float(c.get("lead_start_s", 600)):
+        return "start"
+    return "build"
+
+
+def find_jobs(facts, c, rr_pids, embed_busy, cores):
+    """The running jobs: each lead, landing, close and the nightly with its process tree; then the rebuilds and the
+    heavy-slot runs (and heavy test runs outside a slot) under none of them, each its own job. Each with its phase,
+    its tree's cores since the last pass (None when not measured), its RSS and the GPU reranker slots its tree holds.
+    [{kind, name, phase, pid, cpu, rss_kb, rr}]"""
+    by_pid = {f["pid"]: f for f in facts}
+    kids = {}
+    for f in facts:
+        kids.setdefault(f["ppid"], []).append(f)
+
+    def tree(root):
+        out, stack, seen = [], [root], set()
+        while stack:
+            f = stack.pop()
+            if f["pid"] in seen:
+                continue
+            seen.add(f["pid"])
+            out.append(f)
+            stack.extend(kids.get(f["pid"], []))
+        return out
+
+    def under(f, pids):
+        cur, seen = by_pid.get(f["ppid"]), set()
+        while cur and cur["pid"] not in seen:
+            if cur["pid"] in pids:
+                return True
+            seen.add(cur["pid"])
+            cur = by_pid.get(cur["ppid"])
+        return False
+
+    roots = [(f, job_root(f)) for f in facts]
+    roots = [(f, r) for f, r in roots if r]
+    root_pids = {f["pid"] for f, _ in roots}
+    roots = [(f, r) for f, r in roots if not under(f, root_pids)]  # a lead's own close is the lead's
+    taken = set()
+    jobs = []
+
+    def add(kind, name, root):
+        procs = tree(root)
+        taken.update(p["pid"] for p in procs)
+        cs = [cores.get(p["pid"]) for p in procs]
+        jobs.append({"kind": kind, "name": name, "pid": root["pid"],
+                     "phase": tree_phase(kind, procs, root, embed_busy, c),
+                     "cpu": None if not cores or all(x is None for x in cs) else round(sum(x or 0 for x in cs), 2),
+                     "rss_kb": sum(p["rss_kb"] for p in procs), "rr": sum(1 for p in procs if p["pid"] in rr_pids)})
+    for f, (kind, name) in roots:
+        add(kind, name, f)
+    loose = [f for f in facts if f["pid"] not in taken]
+    loose_pids = {f["pid"] for f in loose if is_rebuild_proc(f["argv"]) or is_test_proc(f["argv"])}
+    for f in loose:
+        if f["pid"] in loose_pids and f["pid"] not in taken and not under(f, loose_pids):
+            add("rebuild" if any(is_rebuild_proc(p["argv"]) for p in tree(f)) else "slot", f"pid {f['pid']}", f)
+    return jobs
+
+
+def job_cores(facts, dry):
+    """{pid: cores} of every process: its utime + stime with its reaped children's (cutime + cstime: a test's
+    short-lived programs, as kind_sampler.py counts them) since the last pass (jobs-prev.json, an interval of at most
+    3 minutes); a process not in the last sample (a first pass, a dry pass, a new process) at its lifetime's average
+    when it is at least 10 s old, else 0. A dry pass records nothing."""
+    prev = load_json("jobs-prev.json", {})
+    t_now, hz = now(), os.sysconf("SC_CLK_TCK")
+    cur = {str(f["pid"]): f.get("cpu_ticks_all", f.get("cpu_ticks", 0)) for f in facts}
+    if not dry:
+        D.mkdir(parents=True, exist_ok=True)
+        tmp = D / "jobs-prev.json.tmp"
+        tmp.write_text(json.dumps({"t": t_now, "ticks": cur}))
+        os.replace(tmp, D / "jobs-prev.json")
+    wall = t_now - float(prev.get("t") or 0)
+    old = (prev.get("ticks") or {}) if prev and 0 < wall <= 180 else {}
+    out = {}
+    for f in facts:
+        p, ticks = str(f["pid"]), cur[str(f["pid"])]
+        if p in old:
+            out[f["pid"]] = max(0, ticks - old[p]) / hz / wall
+        else:
+            age = float(f.get("age_s") or 0)
+            out[f["pid"]] = ticks / hz / age if age >= 10 else 0.0
+    return out
+
+
+def phase_peaks_current(c, dry):
+    """phase-peaks.json, refreshed at most every `phase_refresh_s` from log/capacity/balance.jsonl's rows of the last
+    `phase_window_h` (the rolling window); the floors (today's figures) when there are none."""
+    cur = load_json("phase-peaks.json", {})
+    if cur.get("_at") and now() - float(cur["_at"]) < float(c.get("phase_refresh_s", 600)) and cur.get("_shares"):
+        return cur
+    cutoff = datetime.fromtimestamp(now() - float(c.get("phase_window_h", 72)) * 3600).strftime("%Y-%m-%dT%H:%M:%S")
+    rows = []
+    try:
+        with open(BALANCE_LOG) as fh:
+            for line in fh:
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                if isinstance(r, dict) and r.get("t", "") >= cutoff:
+                    rows.append(r)
+    except OSError:
+        pass
+    pk = balancer.phase_peaks(rows, int(c.get("phase_min_samples", 30)))
+    pk["_at"], pk["_rows"] = now(), len(rows)
+    if not dry:
+        D.mkdir(parents=True, exist_ok=True)
+        tmp = D / "phase-peaks.json.tmp"
+        tmp.write_text(json.dumps(pk))
+        os.replace(tmp, D / "phase-peaks.json")
+    return pk
+
+
+def forecast_state(t, c, jobs=None):
+    """The forecast's inputs from the truth (balancer.forecast)."""
+    try:
+        floor = json.loads(GATE_CONFIG.read_text())["floor_kb"]
+    except (OSError, ValueError, KeyError):
+        floor = None
+    rr = t.get("rerankers") or {}
+    avail = t.get("mem_available_mb")
+    return {"busy_cores": t.get("busy_cores"), "band_hi": (c.get("cpu_band") or [14, 18])[1],
+            "mem_available_kb": None if avail is None else avail * 1024, "floor_kb": floor, "gpu": t.get("gpu_last"),
+            "headroom_mib": int(c.get("gpu_headroom_mib", 2048)), "rr_held": rr.get("gpu_held"),
+            "rr_slots": rr.get("gpu_slots"), "jobs": t.get("jobs", []) if jobs is None else jobs}
 
 
 def pct(values, q):
@@ -1222,6 +1532,22 @@ def ss_connections(c, ports):
     return out
 
 
+def gin_seconds(line):
+    """A [GIN] line's request time in seconds (Go's duration: `1m2.5s`, `850ms`, `12.3µs`), or None."""
+    parts = line.split("|")
+    if len(parts) < 3:
+        return None
+    text = parts[2].strip()
+    units = {"h": 3600, "m": 60, "s": 1, "ms": 1e-3, "µs": 1e-6, "us": 1e-6, "ns": 1e-9}
+    found = re.findall(r"([\d.]+)(h|ms|µs|us|ns|m|s)", text)
+    if not found or "".join(a + b for a, b in found) != text.replace(" ", ""):
+        return None
+    try:
+        return sum(float(a) * units[b] for a, b in found)
+    except ValueError:
+        return None
+
+
 def judge_progress(name, path, port, sv, conns, c):
     """DEC-1032: one server judged by its runner's progress. The log read on from its saved offset (the first read
     starts at its end): tasks done (`release: ... stop processing`) and requests done (`[GIN] ... POST /api/embed`)
@@ -1242,6 +1568,7 @@ def judge_progress(name, path, port, sv, conns, c):
     sv["off"] = off
     tasks, ok, failed, client, last_code = 0, 0, 0, 0, None
     run = int(sv.get("fails_in_a_row") or 0)
+    t4 = []  # DEC-1038 (4) T4: a timed-out embedding (499, 5xx, or a time at or over the client's timeout)
     for l in lines:
         if TASK_DONE.search(l):
             tasks += 1
@@ -1252,6 +1579,9 @@ def judge_progress(name, path, port, sv, conns, c):
         m = REQ_DONE.search(l)
         if m:
             code = int(m.group(1))
+            secs = gin_seconds(l)
+            if code == 499 or code >= 500 or (secs is not None and secs >= float(c.get("embed_client_timeout_s", 120))):
+                t4.append(l.strip()[:200])
             if 200 <= code < 300:
                 ok, run = ok + 1, 0
             elif code >= 500:
@@ -1268,6 +1598,8 @@ def judge_progress(name, path, port, sv, conns, c):
         sv["fail_run_since"] = t
     sv["fails_in_a_row"], sv["last_fail_code"] = run, last_code or (sv.get("last_fail_code") if run else None)
     sv["client_errors"] = client
+    sv["t4_new"] = t4[:20]
+    sv["t4_n"] = len(t4)
     prev = sv.get("read_at")
     if first or not prev or not 0 < t - prev <= 600:
         sv["tasks_per_min"] = sv["requests_per_min"] = sv["failed_per_min"] = None
@@ -1755,6 +2087,97 @@ def watch_gpu(dry, c):
     return st
 
 
+SHARED_COUNTER = ("(Get-Counter '\\GPU Adapter Memory(*)\\Dedicated Usage','\\GPU Adapter Memory(*)\\Shared Usage')"
+                  ".CounterSamples | ForEach-Object { $_.Path + ' ' + $_.CookedValue }")
+POWERSHELL = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+
+
+def gpu_shared_read(c):
+    """WSL's shared GPU memory in use (DEC-1039 (1b)): the Windows counters `\\GPU Adapter Memory(*)\\Dedicated Usage`
+    and `...\\Shared Usage` through `powershell.exe -NoProfile` (read only; about 2 s; limit `gpu_shared_timeout_s`).
+    The adapter is the one with the most dedicated memory in use (the NVIDIA card; a virtual display adapter has
+    none). Returns {"ok": True, "shared_mib", "dedicated_mib", "adapter"} or {"ok": False, "why"}."""
+    cmd = E("DISPATCH_GPU_SHARED_CMD")
+    argv = shlex.split(cmd) if cmd else (c.get("gpu_shared_cmd") or [POWERSHELL, "-NoProfile", "-Command",
+                                                                       SHARED_COUNTER])
+    try:
+        r = sh(argv, limit=float(c.get("gpu_shared_timeout_s", 10)))
+    except OSError as exc:
+        return {"ok": False, "why": f"{os.path.basename(str(argv[0]))}: {exc.strerror or repr(exc)}"[:160]}
+    if r.returncode:
+        return {"ok": False, "why": f"exit {r.returncode}: {(r.stderr or r.stdout).strip()[:120]}"}
+    ad = {}
+    for line in r.stdout.splitlines():
+        m = re.search(r"\(([^)]+)\)\\(dedicated|shared) usage\s+([\d.]+)\s*$", line.strip(), re.I)
+        if m:
+            ad.setdefault(m.group(1), {})[m.group(2).lower()] = float(m.group(3)) / 2 ** 20
+    ad = {k: v for k, v in ad.items() if "shared" in v}
+    if not ad:
+        return {"ok": False, "why": "no GPU Adapter Memory counter in the answer"}
+    name = max(ad, key=lambda k: ad[k].get("dedicated", 0))
+    return {"ok": True, "shared_mib": int(ad[name]["shared"]), "dedicated_mib": int(ad[name].get("dedicated", 0)),
+            "adapter": name}
+
+
+def watch_gpu_rules(dry, c, t):
+    """The GPU rule, each pass (DEC-1039 (1b)): (1) the dedicated memory used (this pass's nvidia-smi read) plus the
+    running jobs' current-phase peaks above what they hold never above total minus `gpu_headroom_mib`; (2) no spill
+    into shared memory: WSL's shared GPU memory (gpu_shared_read, every `gpu_shared_every` passes) never above
+    `gpu_shared_floor_mib` (1/16 of the card; the desktop alone holds about 580 MiB). Either broken is one gpu-alert
+    item at once, once per incident (it ends when the rule holds again). A dry pass reads, writes nothing.
+    Returns {budget: {used, need, cap, ok}, shared: {...}, spill: bool} for the status and the balance row."""
+    st = load_json("gpu-health.json", {})
+    g = st.get("gpu") or {}
+    out = {"budget": None, "shared": None, "spill": None}
+    if g.get("ok") and g.get("used_mib") is not None and g.get("total_mib"):
+        fs = forecast_state(t, c)
+        fs["gpu"] = {"used_mib": g["used_mib"], "total_mib": g["total_mib"]}
+        f = balancer.forecast(fs, t.get("_phase_peaks") or {}, "slot", ("other",)).get("resources", {}).get("gpu")
+        if f:
+            out["budget"] = {"used": g["used_mib"], "need": f["need"], "cap": f["cap"], "ok": f["ok"], "text": f["text"]}
+    rules = st.setdefault("rules", {})
+    passes = int(st.get("passes") or 1)
+    every = max(1, int(c.get("gpu_shared_every", 1)))
+    if g.get("ok") and ((passes - 1) % every == 0 or dry):
+        out["shared"] = gpu_shared_read(c)
+        rules["shared"] = out["shared"]
+    else:
+        out["shared"] = rules.get("shared")
+    floor = int(c.get("gpu_shared_floor_mib") or 0)
+    sh_ok = out["shared"] and out["shared"].get("ok")
+    out["spill"] = bool(sh_ok and floor and out["shared"]["shared_mib"] > floor) if sh_ok else None
+    if dry:
+        return out
+    alerts = []
+    b = out["budget"]
+    if b and not b["ok"] and not rules.get("budget_since"):
+        rules["budget_since"] = now()
+        alerts.append(("budget", f"GPU budget: {b['text']} above total minus headroom"))
+    elif b and b["ok"] and rules.get("budget_since"):
+        log(f"gpu rule: within its budget again ({b['text']})")
+        rules["budget_since"] = None
+    if out["spill"] and not rules.get("spill_since"):
+        rules["spill_since"] = now()
+        alerts.append(("spill", f"GPU spill: {out['shared']['shared_mib']} MiB of shared GPU memory in use > the "
+                                f"floor {floor} MiB (dedicated {out['shared']['dedicated_mib']} MiB): the card's "
+                                "memory is spilling into the host's"))
+    elif out["spill"] is False and rules.get("spill_since"):
+        log(f"gpu rule: no spill again ({out['shared']['shared_mib']} MiB shared)")
+        rules["spill_since"] = None
+    for kind, why in alerts:
+        what = "GPU budget" if kind == "budget" else "GPU spill"
+        item = inbox_item("gpu-alert", f"log: dispatch.log\nGPU: {what}\nstatus: {why}; the GPU now: {gpu_line(g)}\n"
+                                       f"\n{layers_line(st, c)}\nholders:\n" + ("\n".join(
+                                           f"  pid {h['pid']} {h['kind']} ({h['name']})" for h in g.get("holders", []))
+                                           or "  none listed") + "\nrunning jobs: " + "; ".join(
+                                           f"{j['kind']} {j['name']} {j['phase']}" for j in t.get("jobs", [])) + "\n")
+        st["alerts"] = (st.get("alerts", []) + [{"at": now(), "what": what, "item": item.name}])[-20:]
+        st["stale"] = {"since": now(), "what": what, "item": item.name}
+        log(f"gpu rule: ALERT {why} -> inbox/{item.name}")
+    gpu_save(st)
+    return out
+
+
 def gpu_save(st):
     """gpu-health.json written whole or not at all (a temporary file, then a rename; review F2)."""
     tmp = D / "gpu-health.json.tmp"
@@ -1885,10 +2308,13 @@ def ticket_status(text):
 
 
 def why_not(entry, t, inbox_w2s, started_logs):
-    """None when the entry may start; else the reason it waits."""
-    if len(entry) != 4:
+    """None when the entry may start; else the reason it waits. An entry is `<W2> <ticket> <brief> <log>`, optionally
+    followed by `first=<phase>` (DEC-1039 (1b): the phase the lead starts in, e.g. `first=test` for a lead resuming
+    with its tests ready; its forecast and its pairing use it)."""
+    first = entry_first(entry)
+    if len(entry) not in (4, 5) or first is False:
         return f"malformed line {' '.join(entry)}"
-    w2, tid, brief, logf = entry
+    w2, tid, brief, logf = entry[:4]
     if not LOGNAME.match(logf):
         return f"log name {logf!r} is not a lead log (<W2>-A5-<run>.json)"
     if w2 in t["leads"]:
@@ -1920,12 +2346,26 @@ def why_not(entry, t, inbox_w2s, started_logs):
         return f"no brief {brief}"
     if "@@" in bp.read_text():
         return "the brief holds an @@ placeholder"
-    ok, why = admit_safely(t, tid)
+    ok, why = admit_safely(t, tid, (first,) if first else None)
     if not ok:
         return "not admitted: " + why[:200]
     if not t["disk_open"]:
         return "disk gate shut"
     return None
+
+
+def entry_first(entry):
+    """A ready entry's `first=<phase>`: the phase (a lead's), None when not given, False when malformed."""
+    if len(entry) != 5:
+        return None
+    m = re.fullmatch(r"first=([\w.]+)", entry[4])
+    return m.group(1) if m and m.group(1) in balancer.KINDS["lead"] else False
+
+
+def entry_heavy(entry):
+    """The resource a ready entry's first phase loads most (DEC-1039 (1b)): a lead starts with its retrieval (the
+    GPU) unless its entry names another first phase."""
+    return balancer.PHASES[entry_first(entry) or "start"]["heavy"]
 
 
 def default_launch_argv():
@@ -1964,7 +2404,7 @@ def start_one(t, dry):
         m = re.search(r"^W2: (\S+)", item.read_text(), re.M)
         if m:
             inbox_w2s.add(m.group(1))
-    waits = {}
+    waits, possible = {}, []
     for entry in read_list(D / "ready.txt"):
         try:
             reason = why_not(entry, t, inbox_w2s, started_logs)
@@ -1973,7 +2413,19 @@ def start_one(t, dry):
         if reason:
             waits[" ".join(entry[:2])] = reason
             continue
-        w2, tid, brief, logf = entry
+        possible.append(entry)
+    # DEC-1039 (1b), pairing: of the starts possible, the one whose heavy resource is the idler goes first
+    load = t.get("pair_load")
+    if len(possible) > 1 and load:
+        order = balancer.pair([(e, entry_heavy(e)) for e in possible], load)
+        for e in order[1:]:
+            waits[" ".join(e[:2])] = (f"paired: {order[0][0]} goes first (its heavy resource "
+                                      f"{entry_heavy(order[0]) or 'none'} is the idler: CPU {load['cpu']}, "
+                                      f"GPU {load['gpu']})" if order[0] is not possible[0] or entry_heavy(e) !=
+                                      entry_heavy(order[0]) else "one start a pass")
+        possible = order
+    for entry in possible[:1]:
+        w2, tid, brief, logf = entry[:4]
         if dry:
             log(f"would start {w2} ({tid}) {brief} -> {logf}")
             return w2, waits
@@ -2170,6 +2622,297 @@ def balance(t, emb, c):
     return rec, line
 
 
+# ---- DEC-1038 (4): the standing targets, their history and their incidents; DEC-1037 (4): the machine --------------
+
+TARGET_NAMES = {"T1": "busy cores within the band", "T2": "memory available above the floor",
+                "T3": "GPU used at most total minus headroom", "T4": "no timed-out embedding",
+                "T5": "no cold rebuild", "outside-slot": "no heavy step outside a slot"}
+EVENT_TARGETS = ("T4", "T5")
+GIVE_UP = re.compile(r"gave up|give up|giving up|gave_up|give_up", re.I)
+
+
+def read_new_lines(path, off):
+    """The complete lines a log gained since `off` ({off, ino}); the first read starts at its end (no old events);
+    a shorter file or a new inode: from 0. ([], off) when missing."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return [], off
+    if not off:
+        return [], {"off": st.st_size, "ino": st.st_ino}
+    start = 0 if off.get("off", 0) > st.st_size or off.get("ino") != st.st_ino else off["off"]
+    with open(path, "rb") as fh:
+        fh.seek(start)
+        data = fh.read(min(st.st_size - start, 16 * 2 ** 20))
+    end = data.rfind(b"\n") + 1
+    return data[:end].decode("utf-8", "replace").splitlines(), {"off": start + end, "ino": st.st_ino}
+
+
+def cold_rebuilds(lines, cold_s):
+    """T5: tools/rebuild_counts.py's rule on log/seed.jsonl's rebuild rows: cold when its seed was not used (status
+    not seeded, deferred or none) or its semantic stage took at least `cold_s` (1500) seconds."""
+    out = []
+    for line in lines:
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(r, dict) or r.get("kind") != "rebuild":
+            continue
+        seed = (r.get("seed") or {}).get("status")
+        sem = (r.get("timing") or {}).get("semantic_s")
+        if seed not in ("seeded", "deferred", "none") or (sem and sem >= cold_s):
+            out.append(f"cold rebuild in {r.get('tree')} ({r.get('who')}): seed {seed}, semantic {sem} s")
+    return out
+
+
+def judge_targets(t, c, waits, land_pending, gpu_rule, emb, tst):
+    """Each target this pass: {target: (breached True/False/None (not measured), detail, events)}."""
+    out = {}
+    busy, (lo, hi) = t.get("busy_cores"), (c.get("cpu_band") or [14, 18])[:2]
+    work = any(str(v).startswith("not admitted") for v in (waits or {}).values()) or bool(land_pending)
+    if busy is None:
+        out["T1"] = (None, "CPU measuring", [])
+    elif busy > hi:
+        out["T1"] = (True, f"{busy} busy cores above the band {lo}-{hi}", [])
+    elif busy < lo and work:
+        out["T1"] = (True, f"{busy} busy cores below the band {lo}-{hi} while work waits", [])
+    else:
+        out["T1"] = (False, f"{busy} busy cores (band {lo}-{hi})", [])
+    try:
+        floor = json.loads(GATE_CONFIG.read_text())["floor_kb"]
+    except (OSError, ValueError, KeyError):
+        floor = None
+    avail = t.get("mem_available_mb")
+    out["T2"] = ((None, "memory or floor unknown", []) if avail is None or floor is None else
+                 (avail * 1024 < floor, f"{avail / 1024:.1f} GB available (floor {floor / 1048576:.1f} GB)", []))
+    g = (load_json("gpu-health.json", {}).get("gpu") or {})
+    head = int(c.get("gpu_headroom_mib", 2048))
+    fresh = g.get("ok") and g.get("used_mib") is not None and g.get("total_mib") and \
+        now() - float(g.get("at") or 0) <= float(c.get("gpu_state_max_age_s", 300))
+    out["T3"] = ((g["used_mib"] > g["total_mib"] - head,
+                  f"GPU {g['used_mib']} MiB used of {g['total_mib']} (at most {g['total_mib'] - head})", [])
+                 if fresh else (None, "GPU not read", []))
+    ev = [f"{n}: {l}" for n, sv in sorted(((emb or {}).get("servers") or {}).items()) for l in sv.get("t4_new") or []]
+    offs = tst.setdefault("offsets", {})
+    rlog = c.get("embed_retry_log")
+    if rlog:
+        lines, offs["retry"] = read_new_lines(rlog, offs.get("retry"))
+        ev += [f"retry log: {l.strip()[:200]}" for l in lines if GIVE_UP.search(l)]
+    out["T4"] = (bool(ev), f"{len(ev)} timed-out embedding(s) since the last pass", ev)
+    lines, offs["seed"] = read_new_lines(SEED_LOG, offs.get("seed"))
+    cold = cold_rebuilds(lines, float(c.get("cold_rebuild_s", 1500)))
+    out["T5"] = (bool(cold), f"{len(cold)} cold rebuild(s) since the last pass", cold)
+    os_ = t.get("outside_slot") or []
+    out["outside-slot"] = (bool(os_), "; ".join(os_[:3]) or "none", [])
+    return out
+
+
+def proc_groups(t, by="cpu", n=8):
+    """The top processes by CPU or memory, grouped by tree (the worktree of their folder) and session (the nearest
+    Claude session above them, by its ticket or role), as the 16:20 trace did: ["tree / session: N processes, X"]."""
+    facts = t.get("_facts") or []
+    cores = t.get("_proc_cores") or {}
+    by_pid = {f["pid"]: f for f in facts}
+
+    def tree_of(cwd):
+        if cwd.startswith(str(WT) + "/"):
+            return cwd[len(str(WT)) + 1:].split("/")[0]
+        if cwd == str(REPO) or cwd.startswith(str(REPO) + "/"):
+            return "main tree"
+        return "/".join(cwd.split("/")[:4]) or "?"
+
+    def session_of(f):
+        cur, seen = f, set()
+        while cur and cur["pid"] not in seen:
+            seen.add(cur["pid"])
+            a = cur["argv"]
+            if a and (os.path.basename(a[0]) == "claude" or any(MARKER in x for x in a)):
+                tid = lead_ticket(a)
+                role = next((m.group(1) for x in a for m in [re.search(r'GOV_ROLE":"([\w-]+)', x)] if m), None)
+                return f"{tid or role or 'claude'} (pid {cur['pid']})"
+            cur = by_pid.get(cur["ppid"])
+        return "no session"
+    groups = {}
+    for f in facts:
+        k = f"{tree_of(f['cwd'])} / {session_of(f)}"
+        g = groups.setdefault(k, {"n": 0, "cpu": 0.0, "rss_kb": 0, "top": (0, "")})
+        v = cores.get(f["pid"]) or 0.0
+        g["n"] += 1
+        g["cpu"] += v
+        g["rss_kb"] += f["rss_kb"]
+        w = v if by == "cpu" else f["rss_kb"]
+        if w >= g["top"][0]:
+            g["top"] = (w, " ".join(f["argv"][:3])[:60])
+    key = (lambda g: g["cpu"]) if by == "cpu" else (lambda g: g["rss_kb"])
+    return [f"{k}: {g['n']} processes, {g['cpu']:.1f} cores, {g['rss_kb'] / 1048576:.1f} GB (the largest: {g['top'][1]})"
+            for k, g in sorted(groups.items(), key=lambda kv: -key(kv[1]))[:n]]
+
+
+def incident_open(target, detail, events, since, t, row):
+    """One incident: the record log/incidents/<date>-<HHMM>-<target>.md (readings, the running jobs, the top
+    processes by CPU and memory grouped by tree and session, the events; empty Cause and Fix for the CTO) and one
+    inbox item `incident-<target>-<HHMM>` (label Incident:, so it holds no lead)."""
+    INCIDENTS.mkdir(parents=True, exist_ok=True)
+    when = datetime.fromtimestamp(now())
+    rec = INCIDENTS / f"{when.strftime('%Y-%m-%d-%H%M')}-{target}.md"
+    n = 1
+    while rec.exists():
+        n += 1
+        rec = INCIDENTS / f"{when.strftime('%Y-%m-%d-%H%M')}-{target}-{n}.md"
+    g = row.get("gpu") or {}
+    jobs = "; ".join(f"{j['kind']} {j['name']} {j['phase']} ({j['cpu'] if j['cpu'] is not None else '?'} cores, "
+                     f"{j['rss_kb'] / 1048576:.1f} GB)" for j in t.get("jobs") or []) or "none"
+    body = (f"# Incident {when.strftime('%Y-%m-%d %H:%M')} — {target}: {TARGET_NAMES[target]} (DEC-1038 (4))\n\n"
+            f"- **Opened:** {stamp()} by the dispatcher: {detail}; breached since {stamp(since)}\n"
+            f"- **Readings:** busy cores {row.get('busy_cores')} of {row.get('nproc')} (band "
+            f"{'-'.join(map(str, row.get('cpu_band') or []))}); load {row.get('load')}; memory available "
+            f"{row.get('mem_available_mb')} MB (floor {(row.get('floor_kb') or 0) // 1024} MB); GPU "
+            f"{g.get('used_mib')} of {g.get('total_mib')} MiB (headroom {g.get('headroom_mib')}), use {g.get('util')} %, "
+            f"shared {g.get('shared_mib')} MiB; embedders {row.get('embedders')}\n"
+            f"- **Running jobs (phases):** {jobs}\n"
+            "- **Top processes by CPU, grouped by tree and session:**\n"
+            + "".join(f"  - {x}\n" for x in proc_groups(t, "cpu"))
+            + "- **Top processes by memory, grouped by tree and session:**\n"
+            + "".join(f"  - {x}\n" for x in proc_groups(t, "rss"))
+            + ("- **Events:**\n" + "".join(f"  - {e}\n" for e in events[:20]) if events else "")
+            + "- **Cause:** \n- **Fix:** \n")
+    rec.write_text(body)
+    item = inbox_item(f"incident-{target}-{when.strftime('%H%M')}",
+                      f"log: incidents/{rec.name}\nIncident: {target}\nstatus: {TARGET_NAMES[target]}: {detail} "
+                      f"(since {stamp(since)}); fill Cause and Fix in the record\n")
+    log(f"incident {target} opened: {detail} -> {rec.name}, inbox/{item.name}")
+    return str(rec), item.name
+
+
+def incident_note(rec, text):
+    try:
+        with open(rec, "a") as f:
+            f.write(text + "\n")
+    except OSError:
+        pass
+
+
+def record_balance(t, bal, waits, land_pending, gpu_rule, c, dry):
+    """Each pass (not a dry one): the balance row to log/capacity/balance.jsonl (rotated over `balance_max_mb` to
+    balance-<stamp>.jsonl; nightly/rotate.sh keeps the newest), the targets judged, the breach timers (targets.json)
+    and the incidents; the machine (machine.json, an item when it changes), limits.json (the derived limits: the
+    reranker GPU slot count gov_reranker_gpu_slot.py may read) and forecast.json (the verdicts for a slot grant and
+    a rebuild). Returns {targets, open} for the status."""
+    tst = load_json("targets.json", {})
+    emb = load_json("embed-health.json", {})
+    judged = judge_targets(t, c, waits, land_pending, gpu_rule, emb, tst) if not dry else {}
+    g = (bal or {}).get("gpu") or {}
+    gh = load_json("gpu-health.json", {}).get("gpu") or {}
+    rr = t.get("rerankers") or {}
+    sh = (gpu_rule or {}).get("shared") or {}
+    row = {"t": datetime.fromtimestamp(now()).strftime("%Y-%m-%dT%H:%M:%S"), "busy_cores": t.get("busy_cores"),
+           "nproc": t.get("nproc"), "load": t.get("load"), "cpu_band": (c.get("cpu_band") or [14, 18])[:2],
+           "mem_available_mb": t.get("mem_available_mb"), "floor_kb": (bal or {}).get("floor_kb"),
+           "gpu": {"used_mib": gh.get("used_mib") if gh.get("ok") else None, "total_mib": gh.get("total_mib"),
+                   "headroom_mib": int(c.get("gpu_headroom_mib", 2048)), "util": gh.get("util"),
+                   "shared_mib": sh.get("shared_mib") if sh.get("ok") else None},
+           "gpu_used_mib": gh.get("used_mib") if gh.get("ok") else None, "gpu_util": gh.get("util"),
+           "rr_n": rr.get("n"), "rr_held": rr.get("gpu_held"), "embedders": (bal or {}).get("embedders"),
+           "jobs": [{"k": j["kind"], "p": j["phase"], "cpu": j["cpu"], "rss_kb": j["rss_kb"], "rr": j["rr"]}
+                    for j in t.get("jobs") or []],
+           "targets": {k: v[0] for k, v in judged.items()},
+           "forecast": {k: {"ok": f["ok"], "binding": f["binding"]} for k, f in (t.get("forecast") or {}).items()}}
+    if dry:
+        return {"targets": {}, "open": [k for k, v in (tst.get("timers") or {}).items() if v.get("open")], "row": row}
+    BALANCE_LOG.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if BALANCE_LOG.stat().st_size > float(c.get("balance_max_mb", 20)) * 2 ** 20:
+            os.replace(BALANCE_LOG, BALANCE_LOG.with_name(f"balance-{fstamp()}.jsonl"))
+    except OSError:
+        pass
+    with open(BALANCE_LOG, "a") as f:
+        f.write(json.dumps(row) + "\n")
+    timers = tst.setdefault("timers", {})
+    for target, (breached, detail, events) in judged.items():
+        tm = timers.setdefault(target, {})
+        act = balancer.breach_step(tm, breached, now(), event=target in EVENT_TARGETS,
+                                   open_after=float(c.get("breach_open_s", balancer.OPEN_AFTER_S)),
+                                   close_after=float(c.get("breach_close_s", balancer.CLOSE_AFTER_S)))
+        tm["detail"] = detail
+        if act == "open":
+            tm["record"], tm["item"] = incident_open(target, detail, events, tm["breach_since"], t, row)
+        elif act == "again" and events and tm.get("record"):
+            incident_note(tm["record"], f"- **More, {stamp()}:**\n" + "".join(f"  - {e}\n" for e in events[:20]))
+        elif act == "close":
+            incident_note(tm.get("record", ""), f"- **Closed:** {stamp()}: the target held again for "
+                                                f"{int(float(c.get('breach_close_s', 900)) // 60)} minutes")
+            log(f"incident {target} closed ({tm.get('record')})")
+    tmp = D / "targets.json.tmp"
+    tmp.write_text(json.dumps(tst))
+    os.replace(tmp, D / "targets.json")
+    # the machine and the limits derived from it (DEC-1037 (4))
+    mach = c.get("_machine") or {}
+    old = load_json("machine.json", {})
+    changed = balancer.machine_changed(old, mach)
+    if changed:
+        inbox_item("machine-changed", f"log: dispatch.log\nMachine: changed\nstatus: the machine changed ("
+                                      + ", ".join(f"{k} {old.get(k)} -> {mach.get(k)}" for k in changed)
+                                      + "); the limits are derived again: " + limits_line(c) + "\n")
+        log(f"machine changed: {changed}")
+    if mach and (changed or old != mach) and (mach.get("gpu_known") or not old.get("gpu_known")):
+        (D / "machine.json").write_text(json.dumps(mach))
+    lim = {k: c.get(k) for k in balancer.DERIVED_KEYS}
+    if load_json("limits.json", {}).get("limits") != lim:
+        (D / "limits.json").write_text(json.dumps({"at": stamp(), "limits": lim, "rerank_gpu_slots":
+                                                   c.get("rerank_gpu_slots"), "machine": mach}))
+    if t.get("forecast"):
+        (D / "forecast.json").write_text(json.dumps({"at": stamp(), **{k: {"ok": f["ok"], "binding": f["binding"],
+                                                                            "reason": f["reason"]}
+                                                                        for k, f in t["forecast"].items()}}))
+    return {"targets": judged, "open": [k for k, v in timers.items() if v.get("open")], "row": row}
+
+
+def limits_line(c):
+    """`Limits: from 20 CPUs (10 cores), 23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, ...; config.json overrides: ...`"""
+    m, d = c.get("_machine") or {}, c.get("_derived") or {}
+    gpu = (f"{re.sub(r'^(NVIDIA )?(GeForce )?', '', m.get('gpu_name') or '?')} {m.get('gpu_total_mib')} MiB"
+           if m.get("gpu_total_mib") else ("no GPU" if m.get("gpu_known") else "GPU not read yet (today's figures)"))
+    band = c.get("cpu_band") or [None, None]
+    conf = (f"heavy_slots.conf {c.get('slots')} x {c.get('_conf_workers')}"
+            + ("" if (c.get("slots"), c.get("_conf_workers")) == (d.get("heavy_slots"), d.get("heavy_workers"))
+               else " (differs)"))
+    over = c.get("_overrides") or {}
+    return (f"from {m.get('cpus')} CPUs ({m.get('cores') or '?'} cores), "
+            f"{'?' if m.get('mem_total_gb') is None else m['mem_total_gb']} GB, {gpu}: band {band[0]}-{band[1]}, "
+            f"margin {c.get('cpu_margin')}, heavy slots {d.get('heavy_slots')} x {d.get('heavy_workers')} workers "
+            f"({conf}), slots gpu/cpu {c.get('slots_gpu')}/{c.get('slots_cpu')}, GPU headroom "
+            f"{c.get('gpu_headroom_mib')} MiB, reranker GPU slots {c.get('rerank_gpu_slots')}, spill floor "
+            f"{c.get('gpu_shared_floor_mib')} MiB; config.json overrides: "
+            + (", ".join(f"{k} {v[0]} (derived {v[1]})" for k, v in over.items()) or "none"))
+
+
+def lb_status_lines(t, c, rec):
+    """The balancer's status lines: the forecast for each kind of start with its binding resource, the jobs by phase,
+    the GPU rule, the targets and their incidents, the limits and the machine they come from."""
+    f = t.get("forecast") or {}
+    load = t.get("pair_load") or {}
+    fl = ("Forecast: " + "; ".join(f"{k}: {'admits' if v['ok'] else 'REFUSES'}, binding {v['binding']}: "
+                                   f"{v['resources'][v['binding'].lower()]['text'] if v['binding'] else 'nothing measured'}"
+                                   for k, v in f.items()) + f"; pairing loads CPU {load.get('cpu')}, GPU {load.get('gpu')}"
+          if f else f"Forecast: unknown ({t.get('forecast_error')})")
+    jobs = "; ".join(f"{j['kind']} {j['name']} {j['phase']} ({'?' if j['cpu'] is None else j['cpu']} cores, "
+                     f"{j['rss_kb'] / 1048576:.1f} GB" + (f", {j['rr']} GPU reranker" if j['rr'] else "") + ")"
+                     for j in t.get("jobs") or [])
+    gr = t.get("gpu_rule") or {}
+    b, shd = gr.get("budget"), gr.get("shared")
+    gl = ("GPU rule: " + (f"{b['text']}: {'within' if b['ok'] else 'ABOVE'} total minus headroom" if b else
+                          "budget not judged (GPU not read)")
+          + "; shared GPU memory " + (f"{shd['shared_mib']} MiB (floor {c.get('gpu_shared_floor_mib')} MiB): "
+                                      + ("SPILL" if gr.get("spill") else "no spill") if shd and shd.get("ok") else
+                                      f"unread ({(shd or {}).get('why', 'not read this pass')})"))
+    tg = rec.get("targets") or {}
+    tl = ("Targets: " + ", ".join(f"{k} {'breached' if v[0] else 'met' if v[0] is False else 'not measured'}"
+                                  for k, v in tg.items()) if tg else "Targets: not judged (a dry pass)") \
+        + "; incidents open: " + (", ".join(rec.get("open") or []) or "none")
+    return [fl, "Jobs by phase: " + (jobs or "none"), gl, tl, "Limits: " + limits_line(c)]
+
+
 def write_status(t, started_w2, waits, land_state, new_returns, failures):
     items = unread()
     oldest_item = min(items, key=lambda i: i.stat().st_mtime) if items else None
@@ -2185,14 +2928,25 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
     except Exception as exc:  # noqa: BLE001 - the status line says so; the rest of the status is written
         bal, bal_line = None, f"Balance: unreadable ({exc!r})"[:200]
     s["balance"] = bal
+    lb_lines = []
+    try:  # DEC-1039 (1b), DEC-1038 (4), DEC-1037 (4): the balancer's lines and the targets' record
+        c = t.get("_c") or {}
+        rec = record_balance(t, bal, waits, s["land_pending"], t.get("gpu_rule"), c, bool(E("DISPATCH_DRY_FLAG")))
+        s["targets"] = {k: {"breached": v[0], "detail": v[1]} for k, v in rec["targets"].items()}
+        s["incidents_open"] = rec["open"]
+        lb_lines = lb_status_lines(t, c, rec)
+    except Exception as exc:  # noqa: BLE001 - said in the status; never the pass's end
+        lb_lines = [f"Forecast: unreadable ({exc!r})"[:200]]
+        failures.append(f"balancer: {exc!r}"[:200])
+        log(f"balancer status failed: {exc!r}")
     txt = ([f"TICK FAILED in part: {'; '.join(failures)} at {s['time']}"] if failures else []) + [
         f"dispatcher {s['time']}",
         f"leads running ({t['lead_count']}, from the processes): {', '.join(t['leads']) or 'none'}",
         f"load {load}; real busy cores {t.get('busy_cores')} of {t.get('nproc')} (the embedding server "
         f"{t.get('embedding_cores')}); memory available {t.get('mem_available_mb')} MB; gate_check (for comparison) {'open' if t['gate_open'] else 'SHUT'}"
         f" ({t['gate'][:120]}); disk {'open' if t['disk_open'] else 'SHUT'}",
-        bal_line,
-        f"admission (by peaks, DEC-1008 item 5): {t['admit_reason'][:200]}",
+        bal_line] + lb_lines + [
+        f"admission (by peaks, DEC-1008 item 5): {t['admit_reason'][:400]}",
         (f"peaks {t['peaks']['computed']}: a lead p95 {t['peaks']['lead_p95_mb']} MB, max {t['peaks']['lead_max_mb']} MB"
          if t.get("peaks") else "peaks: none (gate_check decides)"),
         ("FINDING: heavy step(s) outside a slot: " + "; ".join(t["outside_slot"][:3])) if t["outside_slot"] else
@@ -2333,6 +3087,11 @@ def tick(dry):
     except Exception as exc:
         failures.append(f"gpu watch: {exc!r}"[:200])
         log(f"gpu watch failed: {exc!r}")
+    try:  # DEC-1039 (1b): the GPU rule (its budget with the forecast, and no spill into shared memory), each pass
+        t["gpu_rule"] = watch_gpu_rules(dry, t.get("_c") or {}, t)
+    except Exception as exc:
+        failures.append(f"gpu rule: {exc!r}"[:200])
+        log(f"gpu rule failed: {exc!r}")
     try:
         watch_slots(dry, t.get("_c") or {}, embed)
     except Exception as exc:
