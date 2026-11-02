@@ -1,17 +1,27 @@
 """The one rerank over the merged candidate set (W1-19; DEC-379, DEC-374; ADR-0002 §2).
 
 A reranker is given as its loader: a function without arguments that returns ``score(query, texts)``, one number
-per text, higher is better. The loader is called at the first rerank and not before, so nothing of a model is
-loaded by importing this module or by a retrieval that has nothing to rerank. A loader that returns None says the
-reranker cannot be loaded: the order given is kept and no candidate carries a score.
+per text, higher is better (or None for "not scored"). The loader is called at the first rerank and not before, so
+nothing of a model is loaded by importing this module or by a retrieval that has nothing to rerank. A loader that
+returns None says the reranker cannot be loaded: the order given is kept and no candidate carries a score.
+
+The default reranker (W2-112; DEC-979 item 4, DEC-1032, DEC-1033) asks the user's one shared reranker service
+(``rerank_service.py``, on ``~/.cache/gov-os/rerank.sock``), starting it under ``rerank.lock`` when none listens.
+When the service cannot be reached, started, or does not answer, the search falls back to a private reranker
+(``rerank_worker.py``, which holds a GPU slot or ends named), and where that cannot load either, the order given is
+kept. Each fallback is a FALLBACK line in ``~/.cache/gov-os/rerank.log``; ``last_outcome`` names who answered.
 """
 
 from __future__ import annotations
 
+import fcntl
 import functools
 import json
 import os
+import socket
 import subprocess
+import threading
+import time
 from pathlib import Path
 
 # The pins of ADR-0002 §2; the index manifest records them.
@@ -20,41 +30,163 @@ REVISION = "e61197ed45024b0ed8a2d74b80b4d909f1255473"
 # The interpreter of the reranker environment, under the home folder (DEC-397).
 PYTHON_REL = ".local/share/gov-os/reranker-venv/bin/python"
 _WORKER = Path(__file__).with_name("rerank_worker.py")
+_SERVICE = Path(__file__).with_name("rerank_service.py")
+CACHE_REL = ".cache/gov-os"  # the socket, its start lock and the logs, in the user's own folder (0700)
+SOCKET, LOCK, LOG, SERVICE_LOG = "rerank.sock", "rerank.lock", "rerank.log", "rerank-service.log"
+CONNECT_S = 2.0  # to connect and be accepted (DEC-1034 T3); the answer is bounded by GOV_RERANK_TIMEOUT_S
+START_S = 60.0  # the bound on a search's wait while the service starts and loads its model
+_ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed"}
+_last = threading.local()
+
+
+def _cache() -> Path:
+    return Path(os.environ.get("HOME") or Path.home()) / CACHE_REL
+
+
+def _note(by: str, device, reason) -> None:
+    _last.outcome = {"by": by, "device": device, "reason": reason}
+
+
+def last_outcome() -> dict:
+    """This thread's last rerank: ``by`` is ``service``, ``private``, ``given`` or ``unavailable`` (the order kept),
+    with the device that scored and the reason for a fallback."""
+    return dict(getattr(_last, "outcome", {"by": "unavailable", "device": None, "reason": "no rerank was asked"}))
+
+
+def _log(kind: str, detail: str) -> None:
+    try:
+        with open(_cache() / LOG, "a", encoding="utf-8") as out:
+            out.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S%z')}\t{kind}\t{detail}\n")
+    except OSError:
+        pass  # a session that cannot write there still searches
+
+
+def status() -> dict:
+    """What ``gov status`` shows: the searches that fell back and the service's CPU alerts, read from the log."""
+    path = _cache() / LOG
+    try:
+        kinds = [line.split("\t")[1] for line in path.read_text(encoding="utf-8").splitlines() if "\t" in line]
+    except FileNotFoundError:
+        kinds = []
+    return {"fallbacks": kinds.count("FALLBACK"), "cpu_alerts": kinds.count("ALERT"), "log": str(path)}
+
+
+def fallback_count() -> int:
+    return status()["fallbacks"]
 
 
 @functools.lru_cache(maxsize=None)
 def _started(interpreter: str):
-    """``score`` of a reranker process started with ``interpreter``, or None when it ends without the model.
+    """``(score, device, None)`` of a private reranker process started with ``interpreter``, or ``(None, None,
+    reason)`` when it ends without the model.
 
     The process is a child of this one, isolated from this one's Python paths and offline whatever the caller's
     environment says. It is started once and stays loaded until this process ends, which closes its input.
     """
+    env = {key: value for key, value in os.environ.items() if key != "GOV_RERANK_GPU_SLOT"}
     try:
         process = subprocess.Popen([interpreter, "-I", str(_WORKER), MODEL, REVISION], text=True,
-                                   env={**os.environ, "HF_HUB_OFFLINE": "1"},
-                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    except OSError:
-        return None
-    if not process.stdout.readline():  # it ended before it had the model: the snapshot or a library is absent
-        process.wait()
-        return None
+                                   env={**env, "HF_HUB_OFFLINE": "1"}, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    except OSError as error:
+        return None, None, f"the private reranker could not start ({error})"
+    first = process.stdout.readline()
+    if not first:  # it ended before it had the model: no slot, no snapshot, or a library absent
+        code = process.wait()
+        return None, None, f"the private reranker ended without the model ({_ENDED.get(code, f'exit {code}')})"
+    loaded = json.loads(first)
 
     def score(query: str, texts: list[str]) -> list[float]:
         process.stdin.write(json.dumps([query, texts]) + "\n")
         process.stdin.flush()
         return json.loads(process.stdout.readline())
 
-    return score
+    return score, loaded.get("device") if isinstance(loaded, dict) else None, None
+
+
+def _start(folder: Path, interpreter: str, path: str):
+    """The service just started, or None when the start lock is held (another search starting it, or it runs)."""
+    fd = os.open(folder / LOCK, os.O_CREAT | os.O_RDWR, 0o600)
+    try:
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return None
+        if os.path.lexists(path):
+            os.unlink(path)  # a dead service's socket: a live service holds the lock
+        with open(folder / SERVICE_LOG, "ab") as log:  # the lock passes to the service, which holds it for its life
+            return subprocess.Popen([interpreter, "-I", str(_SERVICE), MODEL, REVISION, path, str(fd)],
+                                    env={**os.environ, "HF_HUB_OFFLINE": "1"}, stdin=subprocess.DEVNULL, stdout=log,
+                                    stderr=log, pass_fds=(fd,), start_new_session=True)
+    finally:
+        os.close(fd)
+
+
+def _connect(interpreter: str) -> socket.socket:
+    """A connection to the service, starting it when none listens; raises when it cannot be had within the bounds."""
+    folder = _cache()
+    folder.mkdir(parents=True, exist_ok=True)
+    folder.chmod(0o700)
+    path, deadline, started = str(folder / SOCKET), time.monotonic() + START_S, None
+    while True:
+        connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # a sandbox refuses this at once (EPERM)
+        connection.settimeout(CONNECT_S)
+        try:
+            connection.connect(path)
+            return connection
+        except (FileNotFoundError, ConnectionRefusedError):
+            connection.close()
+        except BaseException:
+            connection.close()
+            raise
+        if started is not None and started.poll() is not None:
+            raise ConnectionError(f"the service ended before it listened (exit {started.returncode}, {SERVICE_LOG})")
+        if time.monotonic() >= deadline:
+            raise TimeoutError(f"the service did not listen within {START_S:g} s")
+        started = started or _start(folder, interpreter, path)
+        time.sleep(0.05)
+
+
+def _ask(interpreter: str, query: str, texts: list[str]):
+    """The service's scores for ``texts`` and its device; raises naming why there are none."""
+    with _connect(interpreter) as connection:
+        connection.settimeout(float(os.environ.get("GOV_RERANK_TIMEOUT_S", "30")))
+        connection.sendall((json.dumps([query, texts]) + "\n").encode())
+        line = connection.makefile("rb").readline()
+    if not line:
+        raise ConnectionError("the service closed the connection without an answer")
+    answer = json.loads(line)
+    if "error" in answer:
+        raise RuntimeError(f"the service refused the request: {answer['error']}")
+    if len(answer["scores"]) != len(texts):
+        raise ValueError("the service's answer does not match the request")
+    return answer["scores"], answer["device"]
 
 
 def default_reranker():
-    """The loader of the pinned reranker, which runs as a separate, pinned process (ADR-0002 §2).
-
-    That process starts from ``~/.local/share/gov-os/reranker-venv`` (DEC-397), ``~`` being the folder ``HOME``
-    names. None when the environment or the snapshot is absent (DEC-374).
-    """
+    """The loader of the pinned reranker, which runs in its own pinned process (ADR-0002 §2): the shared service,
+    else a private one. Both start from ``~/.local/share/gov-os/reranker-venv`` (DEC-397), ``~`` being the folder
+    ``HOME`` names. None when the environment is absent (DEC-374)."""
     interpreter = Path(os.environ.get("HOME") or Path.home()) / PYTHON_REL
-    return _started(str(interpreter)) if interpreter.is_file() else None
+    if not interpreter.is_file():
+        _note("unavailable", None, f"no reranker environment at {interpreter}")
+        return None
+
+    def score(query: str, texts: list[str]):
+        try:
+            values, device = _ask(str(interpreter), query, texts)
+            _note("service", device, None)
+            return values
+        except Exception as error:  # the service down, in any way: this search falls back, never fails
+            why = f"the shared reranker did not answer ({type(error).__name__}: {error})"
+        private, device, failed = _started(str(interpreter))
+        _log("FALLBACK", f"{why}\t{'private' if private else 'unavailable: ' + failed}")
+        if private is None:
+            _note("unavailable", None, f"{why}; {failed}")
+            return None
+        _note("private", device, why)
+        return private(query, texts)
+
+    return score
 
 
 def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
@@ -62,9 +194,15 @@ def rerank(query: str, candidates: list[dict], reranker=None) -> list[dict]:
     given. One call of ``score``, with the ``text`` of every candidate. Without a reranker the candidates are returned
     as given."""
     candidates = [dict(candidate) for candidate in candidates]
+    _note("unavailable", None, "nothing to rerank" if not candidates else "the reranker given could not be loaded")
     score = (reranker or default_reranker)() if candidates else None
     if score is None:
         return candidates
-    scores = [float(value) for value in score(query, [candidate["text"] for candidate in candidates])]
+    if reranker is not None:
+        _note("given", None, None)
+    values = score(query, [candidate["text"] for candidate in candidates])
+    if values is None:
+        return candidates
+    scores = [float(value) for value in values]
     ranked = sorted(zip(scores, candidates, strict=True), key=lambda pair: -pair[0])
     return [{**candidate, "rerank_score": value} for value, candidate in ranked]

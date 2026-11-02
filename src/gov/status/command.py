@@ -3,7 +3,8 @@
 Six parts, each read from the module that owns its rule: ``tickets`` (``gov.tasks``: the READY rule and the claim
 lock), ``decision_packages`` (the record store), ``readiness`` (``gov.readiness``), ``governance_share``
 (``gov.telemetry.counter``), ``pause`` (the guard's reading of the freeze flag and its mirror) and ``doctor``
-(``gov doctor``). It only reads: no store is loaded and nothing is cached.
+(``gov doctor``); and ``reranker`` (``gov.retrieval.rerank``: the searches that fell back from the shared reranker,
+W2-112). It only reads: no store is loaded and nothing is cached.
 
 A result is measured or it is refused (DEC-449, DEC-454). A part, a list or an entry that was not read is
 ``{"read": false, "reason": ...}`` in its place, never an empty list, a zero or "not paused", and ``not_read``
@@ -168,6 +169,13 @@ def _doctor(root: Path, args, config: dict) -> dict:
             "parts": {name: section["status"] for name, section in report.items() if name != "healthy"}}
 
 
+def _reranker() -> dict:
+    """W2-112: the searches that fell back from the shared reranker, and its CPU alerts, from its log."""
+    from gov.retrieval.rerank import status
+
+    return status()
+
+
 def _unread_in(value, where: str = "") -> list[str]:
     """``<where>: <reason>`` of everything in the answer that says it was not read."""
     if isinstance(value, dict) and value.get("read") is False:
@@ -186,6 +194,7 @@ def run(root: Path, args, config: dict) -> dict:
         "governance_share": _part(_share, root, tickets),
         "pause": _part(_pause, root),
         "doctor": _part(_doctor, root, args, config),
+        "reranker": _part(_reranker),
     }
     # ``root`` and ``config_files`` are W1-07's answer, kept: a builder test of the command line reads them.
     return {"root": str(root), "config_files": sorted(config), **answer, "not_read": _unread_in(answer)}
