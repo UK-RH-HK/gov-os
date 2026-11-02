@@ -1,0 +1,22 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+=========================== short test summary info ============================
+FAILED tests/unit/orchestration/test_dispatcher.py::test_the_record_commit_is_retried_while_another_holds_the_index_lock[land.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_the_record_commit_is_retried_while_another_holds_the_index_lock[close_build.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f6_retry_exhaustion_fails_cleanly[land.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f6_retry_exhaustion_fails_cleanly[close_build.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f1_both_tools_commit_their_records_through_the_retry[land.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f1_both_tools_commit_their_records_through_the_retry[close_build.py]
+6 failed in 0.51s

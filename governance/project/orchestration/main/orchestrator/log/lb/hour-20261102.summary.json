@@ -1,0 +1,57 @@
+{
+ "from": "2026-11-02 10:57:12",
+ "to": "2026-11-02 11:57:23",
+ "samples": 215,
+ "interval_s": 15,
+ "shared": {
+  "cores_mean": 3.85,
+  "cores_p95": 9.51,
+  "rss_mb_max": 3120,
+  "log": {
+   "embed_requests": 690,
+   "errors": 21,
+   "p50_s": 1.39,
+   "p95_s": 4.85,
+   "max_s": 59.16,
+   "over_120_s": 0,
+   "runner_tasks_in_whole_log": 561527
+  }
+ },
+ "query": {
+  "cores_mean": 3.14,
+  "cores_p95": 7.28,
+  "rss_mb_max": 1185,
+  "log": {
+   "embed_requests": 133,
+   "errors": 4,
+   "p50_s": 19.26,
+   "p95_s": 40.36,
+   "max_s": 56.38,
+   "over_120_s": 0,
+   "runner_tasks_in_whole_log": 4691
+  }
+ },
+ "reranker": {
+  "cores_mean": 0.07,
+  "cores_p95": 0.3,
+  "rss_mb_max": 8373
+ },
+ "gpu_util_mean": 14.2,
+ "client_connection_samples": {
+  "query|worktree W2-61h": 141,
+  "shared|worktree W2-61h": 100,
+  "shared|worktree W2-04": 78,
+  "shared|worktree W2-123": 76,
+  "shared|worktree W2-122": 74,
+  "query|worktree W2-123": 50,
+  "shared|dispatcher": 35,
+  "shared|merge queue": 20,
+  "query|test temp /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/": 17,
+  "query|worktree W2-04": 12,
+  "shared|other /home/usain/Dynamic-Agentic-Engineering-OS": 7,
+  "query|test temp /tmp/gov-os-lead-W2-122/pytest-of-usain/pytest-58/popen-gw2/": 6,
+  "shared|unknown": 4,
+  "query|test temp /tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-55/popen-gw1/t": 4,
+  "shared|other /tmp": 2
+ }
+}

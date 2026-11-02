@@ -63,4 +63,409 @@ bringing up nodes...
 ........................................................................ [ 93%]
 ........................................................................ [ 95%]
 ........................................................................ [ 96%]
-..............
+........................................................................ [ 98%]
+..F....s.FF......F..............................................         [100%]
+=================================== FAILURES ===================================
+_ test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree] _
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0')
+box = <w2_05_support.Box object at 0x7a6ce4ecfec0>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0/dev/tie...os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+linked = True
+
+    @pytest.mark.parametrize("linked", (True, False), ids=("a linked worktree", "the main tree"))
+    def test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it(
+            tmp_path, box, retrieval_env, linked):
+        main, tree, trees = _setup(tmp_path, linked)
+        support.plain_hook(main, box.marks, support.retrieval_check_command())
+        before = support.repo_state(main, trees)
+        staged = _stage_a_change(tree)
+    
+>       done = _commit(box, tree, retrieval_env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:45: in _commit
+    return box.run([support.GIT, "commit", "-q", "-m", MESSAGE, *extra], cwd=tree, env=env,
+tests/acceptance/W2-05/w2_05_support.py:269: in run
+    return run_bounded([str(a) for a in args], cwd, env or self.env(**extra), timeout, self.base.parent)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ['/usr/bin/git', 'commit', '-q', '-m', 'the hooked change']
+cwd = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0/wt')
+env = {'GOV_DEV_TIERS': '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0/dev/tie...os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+timeout = 90.0
+folder = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0')
+
+    def run_bounded(args, cwd, env, timeout, folder):
+        process = subprocess.Popen(args, cwd=str(cwd), env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, text=True, start_new_session=True)
+        try:
+            out, err = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            stop_group(process.pid)
+            reap(folder)
+            try:
+                out, err = process.communicate(timeout=10)
+            except subprocess.TimeoutExpired:
+                out, err = "", ""
+>           raise AssertionError(
+                f"`{' '.join(args)}` in {cwd} did not end within {timeout:.0f} s and was stopped with every process "
+                f"it started.\n--- stdout\n{(out or '')[-2000:]}\n--- stderr\n{(err or '')[-2000:]}") from None
+E           AssertionError: `/usr/bin/git commit -q -m the hooked change` in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw5/test_a_hooked_commit_that_runs0/wt did not end within 90 s and was stopped with every process it started.
+E           --- stdout
+E           
+E           --- stderr
+
+tests/acceptance/W2-05/w2_05_support.py:284: AssertionError
+_ test_the_record_commit_is_retried_while_another_holds_the_index_lock[land.py] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw2/test_the_record_commit_is_retr0')
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+        import threading
+        repo, lock = locked_repo(tmp_path)
+        threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7cc0beddac60>
+path = '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+_ test_the_record_commit_is_retried_while_another_holds_the_index_lock[close_build.py] _
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw2/test_the_record_commit_is_retr1')
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+        import threading
+        repo, lock = locked_repo(tmp_path)
+        threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7cc0beb51e80>
+path = '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+_______________ test_f6_retry_exhaustion_fails_cleanly[land.py] ________________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw2/test_f6_retry_exhaustion_fails0')
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+        repo, lock = locked_repo(tmp_path)  # held throughout
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7cc0bede4bc0>
+path = '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+____________ test_f6_retry_exhaustion_fails_cleanly[close_build.py] ____________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw2/test_f6_retry_exhaustion_fails1')
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+        repo, lock = locked_repo(tmp_path)  # held throughout
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7cc0bedd9670>
+path = '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+______ test_f1_both_tools_commit_their_records_through_the_retry[land.py] ______
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+>       src = (TOOLS / tool).read_text()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+__ test_f1_both_tools_commit_their_records_through_the_retry[close_build.py] ___
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+>       src = (TOOLS / tool).read_text()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-123/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s program did not import the pin's installed package (/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_line_s_program_import0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:109: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'worker-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_guard_line_refuses_wh0')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_guard_line_refuses_wh0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'no-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers'))
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-44/popen-gw3/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...4dxwl2/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-5f4dxwl2/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+SKIPPED [1] tests/acceptance/W2-59/test_w2_59_hook_lines.py:140: got empty parameter set for (event, index, entry)
+11 failed, 4515 passed, 2 skipped in 1915.76s (0:31:55)

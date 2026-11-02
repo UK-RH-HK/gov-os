@@ -53,5 +53,18 @@ leads' memory sampler (`log/lead-mem.jsonl`, 5,025 samples since 2026-10-29); th
 - **The GPU:** NVIDIA GeForce RTX 5070 Ti, 16,303 MiB; about 2.6 GB in use (the shared server's partial load);
   utilisation about 1 % in the samples taken (13 % mean over a 30 s test at 10:56). Nearly all of it is idle.
 
-### The live hour (10:57 to 11:57) confirms this
-[to be filled from `log/lb/hour-20261102.summary.json`]
+### The live hour (10:57 to 11:57, 215 samples every 15 s) confirms this
+`tools/lb_measure.py`, `log/lb/hour-20261102.summary.json`. The shared server was reloaded onto the GPU at 11:15
+(DEC-1029), in the middle of the hour.
+| | shared (11434) | query (11435) | rerankers |
+|---|---|---|---|
+| CPU, mean / p95 | 3.9 / 9.5 cores | 3.1 / 7.3 cores | 0.07 / 0.3 cores |
+| Memory, max | 3.1 GB | 1.2 GB | **8.4 GB** |
+| /api/embed in the hour | 690; p50 1.4 s, p95 4.9 s, max 59 s; 21 failed | 133; **p50 19 s, p95 40 s**; 4 failed | — |
+- GPU utilisation: mean 14 % (the shared runner on the GPU from 11:15, and the GPU experiments).
+- Who holds the connections (samples x connections): to the shared server: W2-61h's lead 100, W2-04 78, W2-123 76,
+  W2-122 74, the dispatcher's probe 35, the merge queue 20; to the query server: W2-61h 141, W2-123 50, tests' temp
+  folders 27, W2-04 12. A lead's `gov check` (its retrieval checks) and its rebuild are the bulk of both.
+- **Confirmed:** with the shared runner back on the GPU its latency fell to seconds; the query server, still on the
+  CPU and sharing CPUs 12-19, stays at 19 s median for a single question; the rerankers hold more memory than every
+  other kind of work while using almost no CPU.
