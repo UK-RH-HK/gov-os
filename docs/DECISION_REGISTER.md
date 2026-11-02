@@ -12965,3 +12965,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.428 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1045. Next free id: DEC-1046. |
+
+### DEC-1046 — W2-112's slots (no private reranker beside the service), W2-126's query-cache case, and the W1-19 helper's lost gitleaks (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1033/DEC-1039: P2/P3, reversible, the leads' and engineers' recommendations; confidence medium-high; for the owner to overturn) · **Under:** DEC-1043, DEC-1042, DEC-1039 item 3, DEC-1036
+- **Decision:** (1) P-W2-112-SLOTS (i): W2-112's KPI DEC-1036 (2) becomes "no private reranker on the GPU while the shared service runs" (the private worker waits or goes unranked, named, never the CPU), and the service's GPU share threshold comes from its measured peak; done in W2-112's resume after the owner's answer to P-W2-112-F9 (a test designer first, then its engineer); (ii) the slot count from measured peaks as a later line in W2-20 or W2-121 (P-LB-PRODUCT-1). The CTO's `tools/rerank_service_slot_hold.py` is the interim. (2) P-W2-126-QC (a): a test designer revises the premise of W2-54's `test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` so each cache state holds for the machine-wide cache too (`Rewrite-Reason: DEC-1033`); the shared cache stays as built. (3) A red the CTO caused at 18:13: W1-19's acceptance helper (`scratch_env`) drops every PATH folder that holds an `ollama`, and the CTO's interim wrapper `~/.local/bin/ollama` sits beside `~/.local/bin/gitleaks`, so W1-19's secret-filter cases lose gitleaks on every tree (the nightly included). Fixed as an emergency red (DEC-1039 item 3): a test designer revises the helper to drop the `ollama` executable only, not its whole folder; no machine change.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.429 | 2026-11-02 | Orchestrator (delegated): DEC-1046. Next free id: DEC-1047. |
