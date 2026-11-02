@@ -4981,3 +4981,4 @@
 {"t": "2026-11-02T10:15:59", "nproc": 20, "load": [20.47, 18.4, 15.97], "mem_total_kb": 24607384, "mem_available_kb": 19217504, "leads_kb": {"DAEO-drhj": 406776, "DAEO-h2k3": 298280}}
 {"t": "2026-11-02T10:17:06", "nproc": 20, "load": [16.48, 17.8, 15.93], "mem_total_kb": 24607384, "mem_available_kb": 19397180, "leads_kb": {"DAEO-drhj": 292908, "DAEO-h2k3": 291072}}
 {"t": "2026-11-02T10:18:09", "nproc": 20, "load": [9.34, 15.43, 15.22], "mem_total_kb": 24607384, "mem_available_kb": 19322176, "leads_kb": {"DAEO-h2k3": 409760, "DAEO-u4oz": 251656}}
+{"t": "2026-11-02T10:19:16", "nproc": 20, "load": [7.95, 13.88, 14.7], "mem_total_kb": 24607384, "mem_available_kb": 19115008, "leads_kb": {"DAEO-h2k3": 408840, "DAEO-u4oz": 271096}}

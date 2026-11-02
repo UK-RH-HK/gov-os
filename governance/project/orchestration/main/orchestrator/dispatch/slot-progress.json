@@ -1,1 +1,1 @@
-{"3652904:139476223": {"slot": "1", "pid": 3652904, "cpu": 662, "since": 1793614694.9793482, "reported": false, "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m gov.cli.main rebuild --json", "cwd": "/home/usain/gov-os-worktrees/W2-61h"}}
+{"3652904:139476223": {"slot": "1", "pid": 3652904, "cpu": 667, "since": 1793614750.802688, "reported": false, "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m gov.cli.main rebuild --json", "cwd": "/home/usain/gov-os-worktrees/W2-61h"}}

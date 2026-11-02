@@ -93,6 +93,9 @@ environmental: 0 % at the pre-ticket base too, the shared embedder). Seven pendi
 round (F1; F2, F3 ride along), review 2 the last (a different model); brief `briefs/W2-04-A5-r5-repair.md` first on
 the ready list. P-W2-04-7 -> package item H `60a9b4a1`, pinged.
 **10:19:** W2-104 run 2 DONE `909d7ff0a926` (STANDARD; the one skilleval line checked). Eight pending to land.
+**10:25:** DEC-1026 `5f3d143b` (delegated, package A (d)): W2-123 run 2 builds the bounded embed retry in semantic.py
+(ticket `4c3f3ecd`); brief `briefs/W2-123-A5-r2-retry.md` first on the ready list; W2-123's old approval moved to
+`merge-queue/held/W2-123-at-9bb92097c811.json`. Seven pending in `dispatch/land.pending.txt`; land them WITH W2-123's new head.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

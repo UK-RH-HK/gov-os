@@ -1,13 +1,13 @@
-dispatcher 2026-11-02 10:18:05
-leads running (1, from the processes): W2-61h
-load 9.5/15.6/15.3; real busy cores 3.98 of 20 (the embedding server 3.76); memory available 19064 MB; gate_check (for comparison) open (OPEN leads=1 load=9.5/15.3 nproc=20 have=19930048kB need=7426200kB); disk open
-admission (by peaks, DEC-1008 item 5): admits: 1 of 6 leads; memory 19464 MB >= 13298 MB (slots rule: floor + 1 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1648 MB + serv
+dispatcher 2026-11-02 10:19:05
+leads running (2, from the processes): W2-04, W2-61h
+load 7.9/14.1/14.8; real busy cores 7.36 of 20 (the embedding server 5.18); memory available 18832 MB; gate_check (for comparison) open (OPEN leads=2 load=7.9/14.8 nproc=20 have=19952712kB need=9566436kB); disk open
+admission (by peaks, DEC-1008 item 5): admits: 2 of 6 leads; memory 19491 MB >= 15593 MB (slots rule: floor + 2 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1648 MB + serv
 peaks 2026-11-02 09:26:05: a lead p95 4090 MB, max 9580 MB
 heavy steps outside a slot: none
 heavy slots held: gov-os-heavy-slot-1.lock; queue free; land: nothing to land; main tree clean on w2/integrate
-inbox unread: 1 (oldest 0 min)
-ready list: nothing waiting; started W2-04
+inbox unread: 0
+ready list: stagger: last start 60 s ago (< 120 s)
 sentinel: watched
 guard harvest: last 2026-11-02 10:09:20, rc 0, 15.3 s of 300 s
-embedding server: healthy (9.29 s)
+embedding server: healthy (4.87 s)
 heavy slot holders: slot 1 pid 3652904 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min
