@@ -9,7 +9,8 @@ reason is on standard error.
 The GPU slot rule (DEC-1033, W2-112): before torch or the model loads, the worker holds one of
 ``GOV_RERANK_GPU_SLOTS`` (default 2) lock files ``gov-os-rerank-gpu-<n>.lock`` in ``GOV_RERANK_GPU_LOCK_DIR`` (default
 /tmp) for its life, waiting for one up to ``GOV_RERANK_GPU_WAIT_S`` (default 20) seconds; without one it ends named
-(exit 75). It never hides the GPU to run on the CPU: a GPU already hidden ends it named (exit 76), unless
+(exit 75). It never hides the GPU to run on the CPU: a GPU already hidden ends it named (exit 76), and so does a
+machine where torch sees no GPU at all (exit 78, after the slot, before the model loads), unless
 ``GOV_RERANK_ALLOW_CPU=1`` (tests and measurements only). While the interim module ``gov_reranker_gpu_slot`` is
 installed it has already taken a slot in this process (``GOV_RERANK_GPU_SLOT``), and the worker takes nothing more.
 """
@@ -19,8 +20,18 @@ import os
 import sys
 import time
 
-NO_SLOT, GPU_HIDDEN = 75, 76
+NO_SLOT, GPU_HIDDEN, NO_GPU = 75, 76, 78
 _HELD = []  # the slot's lock file, open for the process's life
+
+
+def gpu_present() -> bool:
+    """True when torch sees a CUDA GPU; any failure to ask is no GPU."""
+    try:
+        import torch
+
+        return bool(torch.cuda.is_available())
+    except Exception:
+        return False
 
 
 def take_slot(allow_cpu: bool):
@@ -74,7 +85,10 @@ def device_of(encoder) -> str | None:
 
 def main(model: str, revision: str) -> None:
     answers, sys.stdout = sys.stdout, sys.stderr  # whatever the libraries print stays out of the answers
-    refused = take_slot(os.environ.get("GOV_RERANK_ALLOW_CPU") == "1")
+    allow_cpu = os.environ.get("GOV_RERANK_ALLOW_CPU") == "1"
+    refused = take_slot(allow_cpu)
+    if not refused and not allow_cpu and not gpu_present():  # no GPU at all: never the CPU (DEC-1033, DEC-1036)
+        refused = NO_GPU, "no GPU is available to it, and no reranker runs on the CPU"
     if refused:
         print(f"gov reranker: {refused[1]}; this search goes without reranking", file=sys.stderr, flush=True)
         sys.exit(refused[0])

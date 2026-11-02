@@ -17,12 +17,13 @@ while it lives. The same pinned model and the same model call as ``rerank_worker
   across callers, so every answer is a private reranker's): ``[query, [text, …]]`` in, one JSON line out,
   ``{"scores": […], "device": …}`` or ``{"error": …, "device": …}``. More than ``MAX_TEXTS`` texts is refused.
 - **Idle end:** with no request for ``GOV_RERANK_IDLE_S`` seconds (default 900) it removes its socket, answers what
-  was already queued, and ends.
+  was already queued, and ends. Stopped with SIGTERM, it removes its socket and ends at once.
 """
 
 import importlib.util
 import json
 import os
+import signal
 import socket
 import sys
 import time
@@ -103,6 +104,14 @@ def main(model: str, revision: str, path: str, lock_fd: str) -> None:
         listener.bind(path)  # created 0600: the user's alone
     finally:
         os.umask(mask)
+
+    def stop(signum, _frame):  # stopped (SIGTERM): no stale socket left; the slot and the lock go with the process
+        if os.path.lexists(path):
+            os.unlink(path)
+        note(log, "END", f"pid {os.getpid()} signal {signum}")
+        os._exit(0)
+
+    signal.signal(signal.SIGTERM, stop)
     listener.listen(128)
     note(log, "READY", f"pid {os.getpid()} device {device}")
     listener.settimeout(idle)

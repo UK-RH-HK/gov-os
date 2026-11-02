@@ -36,7 +36,7 @@ SOCKET, LOCK, LOG, SERVICE_LOG = "rerank.sock", "rerank.lock", "rerank.log", "re
 CONNECT_S = 2.0  # to connect and be accepted (DEC-1034 T3); the answer is bounded by GOV_RERANK_TIMEOUT_S
 START_S = 60.0  # the bound on a search's wait while the service starts and loads its model
 _ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed",
-          77: "the GPU has too little free memory for its share"}
+          77: "the GPU has too little free memory for its share", 78: "no GPU is available to it"}
 _last = threading.local()
 
 

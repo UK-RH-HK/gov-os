@@ -79,7 +79,8 @@ the bound; with a slot, the reading is immediate and the load has the rest.
   holds one of the `GOV_RERANK_GPU_SLOTS` (default 2) locks `gov-os-rerank-gpu-<n>.lock` in
   `GOV_RERANK_GPU_LOCK_DIR` (default `/tmp`) for its life, or waits up to `GOV_RERANK_GPU_WAIT_S` (default 20 s)
   and ends named (exit 75, `gov reranker: no GPU slot free within 20 s; this search goes without reranking`, no
-  model line). A GPU already hidden (`CUDA_VISIBLE_DEVICES` -1 or empty) ends it named (exit 76). Only
+  model line). A GPU already hidden (`CUDA_VISIBLE_DEVICES` -1 or empty) ends it named (exit 76); so does a
+  machine where torch sees no GPU at all (exit 78, checked after the slot and before the model loads). Only
   `GOV_RERANK_ALLOW_CPU=1` (tests and measurements) allows the CPU. While the interim module is installed it has
   already taken a slot in that process (`GOV_RERANK_GPU_SLOT`), and the worker takes nothing more; `rerank.py`
   never passes its own `GOV_RERANK_GPU_SLOT` on to a worker.
@@ -109,7 +110,7 @@ DEC-374 case).
 
 ## 2. Builder evidence
 
-`tests/unit/retrieval/test_w2_112_shared_reranker.py` (25 tests, hermetic: a throwaway venv with a stand-in `torch`
+`tests/unit/retrieval/test_w2_112_shared_reranker.py` (26 tests, hermetic: a throwaway venv with a stand-in `torch`
 and `sentence_transformers` at the environment's path in a temporary HOME; the slot locks in a temporary folder;
 every process it starts is marked, ended and checked gone): eight searches starting together start one service;
 20 concurrent callers each get their own scores from that one process; the socket 0600 and its folder 0700; ties
@@ -119,35 +120,57 @@ waiting for it start no other and go on unranked, and no model loads on any devi
 GPU to read, or with the GPU hidden (also with `GOV_RERANK_ALLOW_CPU=1`), it does not start (REFUSED, named) and
 the search falls back; a killed service replaced by the next search; a service killed mid-request, one that does
 not answer in time, a request over the cap, a service that cannot load (each → private, logged); neither
-(→ unranked, named); a sandbox that refuses the socket (→ private at once); the private worker's slot rule;
-`gov status`'s counts; the bundle's `rerank` entry through `retrieve`.
+(→ unranked, named); with no GPU at all, neither the service nor the private worker loads a model (→ unranked,
+named); SIGTERM removes the service's socket; a sandbox that refuses the socket (→ private at once); the private
+worker's slot rule and its named end without a GPU (exit 78); `gov status`'s counts; the bundle's `rerank` entry
+through `retrieve`.
 
-## 3. The measurement the lead runs (on the real GPU, after this commit)
+## 3. The measurement, as the lead ran it
 
-All with the real environment, the embedder pinned in the shared Ollama server, and `GOV_RERANK_ALLOW_CPU` unset.
-1. **Memory with 10 concurrent searches, before and after.** Before: the commit before this one (each search's
-   process starts a private reranker). After: this commit. For each, 10 `gov retrieve "<question>" --json`
-   processes started together (questions from `fixtures/evaluation/memory-retrieval/visible/`), sampling every
-   0.5 s the RSS of every `rerank_worker.py` and `rerank_service.py` process (`ps -o rss,args`) and the machine's
-   used memory (`free -b`); report the peak and the mean, and the count of reranker processes (today: up to 9,
-   9.4 GiB at peak, CAPACITY-1).
-2. **The GPU's memory under 20 concurrent searches.** `nvidia-smi --query-gpu=memory.used,memory.total
-   --format=csv -l 1` and `nvidia-smi --query-compute-apps=pid,used_memory --format=csv` during 20 searches started
-   together; expected: the embedder (about 3.5 GB), one service (about 2.5 to 3.5 GB) holding one GPU slot, no
-   private reranker, at least 2 GB free; the service's `READY` line says `device cuda:0`.
-3. **The searches' times.** The wall time of each of those searches (first, cold: including the service's load; then
-   warm), p50 and p95, before and after.
-4. **The same answers.** For each of the 20 visible questions, the bundle's evidence order and every
-   `rerank_score` from the service against a private reranker on the same device (the service stopped, or
-   `rerank._started(...)` called directly): equal within float rounding (the service makes the same `predict` call;
-   both are rounded through JSON as `float`). After W2-61h, the 48.
-5. **The fallback count.** `gov status`'s `reranker.fallbacks` before and after the run (expected unchanged on a
-   healthy run), and `rerank.log` read for `REFUSED` lines (expected none).
+On the real machine (one RTX 5070 Ti, 16,303 MiB), with the real reranker environment, on commit `775c58eda031`,
+2026-11-02 14:11 UTC, `GOV_RERANK_ALLOW_CPU` unset. **The shared Ollama servers were never asked:** no `gov retrieve`
+search was sent. Each measured "search" is a process that reranks one visible question's candidates through
+`gov.retrieval.rerank.rerank()`. The candidates are the lexical route's first 30 chunks for that question's text, in
+the form a search gives the reranker (`[path: …]` and the first 500 characters). The questions are the 20 of
+`fixtures/evaluation/memory-retrieval/visible/` (`q01` to `q20`); Q12 has 7 candidates, the others 30. A sampler read
+`nvidia-smi`'s `memory.used`, the RSS of every reranker process and `free -b` every 0.25 s.
+1. **Cold:** one search, which starts the service and waits for its model to load.
+2. **20 concurrent searches, warm:** the 20 questions started together against the loaded service.
+3. **10 concurrent searches, warm:** 10 of the questions started together.
+4. **Before (a private reranker per search):** one private reranker (`rerank_worker.py`) started directly, its load
+   time, its time per question, its RSS and its GPU memory.
+5. **The same answers:** for each of the 20 questions, the service's scores against one private reranker's on the
+   same device.
+6. **The stop:** the service stopped with SIGTERM; the GPU's memory, the processes left, and `gov status`'s reranker
+   part read afterwards.
 
 ## 4. Measured
 
-The figures come from the lead's run on the real GPU after this commit; the lead gives them to the next batch. None
-are recorded here by the engineer, who ran no real model and touched no GPU.
+The lead's run, by the method above (the engineer ran no real model and touched no GPU).
+
+- **Before the run:** the GPU held 3,171 MiB of 16,303 MiB (the embedder, pinned in the shared Ollama server); RAM
+  used 6.32 GiB; no GPU slot held.
+- **Cold (one search, which started the service and loaded the model):** 7.56 s wall; the service answered on
+  `cuda:0`.
+- **20 concurrent searches, warm:** all 20 answered by the one service process on `cuda:0`, none fell back. Wall
+  p50 2.32 s, p95 3.82 s, max 4.01 s (the whole phase 4.12 s). GPU memory used at peak 6,429 MiB: the embedder and
+  the service, the service's one copy about 3.26 GB, 9.9 GB free. The service's RSS 1.68 GiB; one reranker process
+  of this tree.
+- **10 concurrent searches, warm:** all 10 answered by the service on `cuda:0`. Wall p50 1.09 s, p95 2.13 s. GPU
+  peak 6,428 MiB. The service's RSS 1.69 GiB (its peak over the cold and warm phases: 1.79 GiB).
+- **Before (a private reranker per search):** one private reranker started directly took 4.18 s to load on
+  `cuda:0`, 0.20 s per question (p50), about 1.7 GiB RSS and about 3.3 GB of GPU memory (GPU peak 9,694 MiB with the
+  service and one private reranker). With 10 searches at once that was up to 10 such processes; CAPACITY-1
+  measured 9 at once, 9.4 GiB at peak. Under the emergency interim (DEC-1033) at most two run on the GPU and the
+  others go unranked after 20 s. **After: one process, 1.7 to 1.8 GiB, whatever the number of searches.**
+- **The same answers:** for each of the 20 questions, the service's scores against one private reranker's on the
+  same device (`cuda:0`): the order identical in 20 of 20, the largest score difference 0.
+- **The stop:** the service ended on SIGTERM; the GPU's memory came back to 3,163 MiB (released); no reranker
+  process of this tree was left. `gov status`'s reranker part afterwards: 0 fallbacks, 0 service refusals.
+- **A note:** on `775c58eda031`, SIGTERM left the service's socket file (it was removed only on the idle end); a later
+  search then started a new service over the stale socket. Since the next commit, the service removes its socket
+  on SIGTERM too (a signal handler; builder test `test_a_service_stopped_with_sigterm_removes_its_socket`).
+- **After W2-61h:** the 48 questions, not yet measured.
 
 ## 5. ACT: retiring the stopgap (ACT-RERANK-GPU-SLOTS-1)
 

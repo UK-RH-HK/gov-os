@@ -221,6 +221,17 @@ def test_the_service_ends_after_its_idle_time_and_removes_its_socket(home, monke
     assert not (home / rerank.CACHE_REL / rerank.SOCKET).exists() and kinds(home)[-1] == "END"
 
 
+def test_a_service_stopped_with_sigterm_removes_its_socket(home):
+    ask("q", ["a"])
+    [pid] = _pids(home, SERVICE)
+    sock = home / rerank.CACHE_REL / rerank.SOCKET
+    assert sock.exists()
+    os.kill(pid, signal.SIGTERM)
+    assert _wait_until(lambda: not _alive(pid), 5)
+    assert not sock.exists() and kinds(home)[-1] == "END" and _held_slots(home) == []
+    assert ask("q2", ["a"])[1]["by"] == "service"
+
+
 # --- the GPU only, within its share and a slot (DEC-1032, DEC-1036 T5 and T6) ---
 
 def test_the_gpu_share_is_read_from_the_free_gpu_memory():
@@ -236,17 +247,24 @@ def _service_never_loaded(home: Path) -> bool:
     return not list((home / "marks").glob(f"model-{SERVICE}-*")) and "READY" not in kinds(home)
 
 
-@pytest.mark.parametrize("free", [str(4 * GIB), None])
-def test_below_its_gpu_share_the_service_does_not_start_and_the_search_falls_back(home, monkeypatch, free):
-    if free is None:
-        monkeypatch.delenv("STANDIN_GPU_FREE")  # no GPU to read
-    else:
-        monkeypatch.setenv("STANDIN_GPU_FREE", free)
+def test_below_its_gpu_share_the_service_does_not_start_and_the_search_falls_back(home, monkeypatch):
+    monkeypatch.setenv("STANDIN_GPU_FREE", str(4 * GIB))
     ranked, outcome = ask("q", ["a", "bb"])
     assert outcome["by"] == "private" and "too little free memory" in outcome["reason"]
     assert pairs(ranked) == expected("q", ["a", "bb"]) and _service_never_loaded(home)
     log = (home / rerank.CACHE_REL / rerank.LOG).read_text()
     assert "\tREFUSED\tthe shared reranker does not start: the GPU" in log and rerank.status()["service_refusals"] == 1
+
+
+def test_without_a_gpu_no_reranker_loads_and_the_search_goes_on_unranked_named(home, monkeypatch):
+    monkeypatch.delenv("STANDIN_GPU_FREE")  # torch sees no GPU at all; nothing hides it
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
+    assert rerank.rerank("q", candidates) == candidates
+    outcome = rerank.last_outcome()
+    assert outcome["by"] == "unavailable" and outcome["device"] is None
+    assert "could not be read" in (home / rerank.CACHE_REL / rerank.LOG).read_text()  # the service's refusal
+    assert outcome["reason"].endswith("the private reranker ended without the model (no GPU is available to it)")
+    assert not list((home / "marks").glob("model-*"))  # no model loaded, on any device
 
 
 @pytest.mark.parametrize("allow_cpu", [False, True])
@@ -433,6 +451,18 @@ def test_the_private_worker_holds_a_slot_or_waits_then_ends_named(home):
         hidden = _worker(home, CUDA_VISIBLE_DEVICES="-1")
         out, err = hidden.communicate(timeout=10)
         assert hidden.returncode == 76 and out == "" and "the GPU is hidden" in err
+        holders[1].stdin.close()  # a slot frees: the next worker takes it, then finds no GPU
+        holders[1].wait(timeout=10)
+        no_gpu = {key: value for key, value in os.environ.items() if key != "STANDIN_GPU_FREE"}
+        without = subprocess.run([str(home / rerank.PYTHON_REL), "-I", str(rerank._WORKER), rerank.MODEL,
+                                  rerank.REVISION], env=no_gpu, input="", text=True, capture_output=True, timeout=10)
+        assert without.returncode == 78 and without.stdout == ""
+        assert without.stderr.strip() == ("gov reranker: no GPU is available to it, and no reranker runs on the CPU; "
+                                          "this search goes without reranking")
+        on_cpu = subprocess.run([str(home / rerank.PYTHON_REL), "-I", str(rerank._WORKER), rerank.MODEL,
+                                 rerank.REVISION], env={**no_gpu, "GOV_RERANK_ALLOW_CPU": "1"}, input="", text=True,
+                                capture_output=True, timeout=10)
+        assert on_cpu.returncode == 0 and json.loads(on_cpu.stdout.splitlines()[0]) == {"device": "cuda:0"}
         for extra in ({"GOV_RERANK_GPU_SLOT": "0"}, {"GOV_RERANK_ALLOW_CPU": "1"}):  # the interim module's slot; tests
             allowed = _worker(home, **extra)
             assert json.loads(allowed.stdout.readline()) == {"device": "cuda:0"}
