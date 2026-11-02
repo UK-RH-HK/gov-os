@@ -1,3 +1,15 @@
+---
+type: probe
+task: DAEO-jpr0
+reviewer_session: agent-a84fd077e9f150872 (subagent of CTO session debdb3f7-879f-4f53-8ef5-ba7d562eaef2)
+implementer_session: agent-ae4c0d11fdfeee5c5 (subagent of CTO session debdb3f7-879f-4f53-8ef5-ba7d562eaef2)
+reviewer_wrote_nothing: true
+commissioned_by: orchestrator
+judged_by: orchestrator
+judgement: pass
+probed_commit: 4b3721a8f055c76c84cf3b44a244067843058ab9
+---
+
 # PR-DAEO-jpr0: independent review of W2-126, the machine-wide vector cache
 
 - **Ticket:** DAEO-jpr0 (W2-126, STANDARD). **Branch:** `w2/W2-126` at `4b3721a8f055`, in `/home/usain/gov-os-worktrees/W2-126`.
