@@ -13007,3 +13007,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.433 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1050. Next free id: DEC-1051. |
+
+### DEC-1051 — Everything stopped until the refactoring and the re-pins; nothing scheduled but the dispatcher
+- **Status:** ACCEPTED (owner, 2026-11-02 ~23:07 and ~23:18, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing until the owner lifts it) · **Under:** DEC-1047, DEC-1049, DEC-1050 · **Changes:** DEC-1047 item 1 (the memory infrastructure's finishing runs stop too) and DEC-1048 item 1 (W2-112's landing waits)
+- **Decision:** (1) Stop everything now, without waiting for it to finish: the W2-123 + W2-122 landing and its tests, W2-112's lead and its run, the shared reranker service and any private reranker the tests started, and every CTO agent and test run. (2) Everything resumes after the refactoring and the re-pins, from where it stopped; with the refactored tools, finishing each should take minutes, not hours. Where each stopped is recorded (`.gov-runtime/scratch/orchestrator/log/emergency-stops-20261102.md`, the 23:08 section). (3) The dispatcher stays on with nothing to start or land, so its GPU alerts still work. (4) ACT-SCHEDULE-STOP-2 applied by the owner's operator (the 09:30 runs sweep commented out; backup `~/crontab.pre-schedule-stop-20261102-2308.txt`): nothing scheduled but the dispatcher.
+- **Recorded with it (the orchestrator):** done at 23:08: four CTO agents stopped; 27 processes in five trees ended (TERM, none needed KILL); the landing's approvals (W2-122, W2-123) parked; the ready list emptied; no `land.txt`; the slot watcher (`tools/rerank_service_slot_hold.py --watch`) kept, holding nothing once no service runs.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.434 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1051. Next free id: DEC-1052. |
