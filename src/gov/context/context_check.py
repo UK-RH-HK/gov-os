@@ -15,7 +15,6 @@ the tree's (W2-M294).
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
@@ -39,13 +38,19 @@ def project_tickets(root: Path) -> tuple[list, list]:
 
 
 def stale_store(root: Path) -> str | None:
-    """Why the store is not the one of ``HEAD``, or None where it was built from ``HEAD``."""
+    """Why the store is not the one of ``HEAD``, or None where it was built from ``HEAD``.
+
+    ``HEAD`` is read through the store loader's own git call (W2-05's sweep, row 41: ``git_env(root, pinned=True)``),
+    the call that wrote the commit the store states; this file starts no git of its own (AR-2). A ``HEAD`` that
+    cannot be read is a reason, never a pass."""
+    from gov.cli.errors import GovError
     from gov.store import connect
-    from gov.store.loader import fingerprints
+    from gov.store.loader import _git, fingerprints
     try:
-        head = subprocess.run(["git", "rev-parse", "--verify", "HEAD^{commit}"], cwd=root, capture_output=True,
-                              text=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError):
+        head = _git(root, "rev-parse", "--verify", "HEAD^{commit}").decode("utf-8", "replace").strip()
+    except GovError:
+        return "the commit HEAD cannot be read"
+    if not head:
         return "the commit HEAD cannot be read"
     conn = connect(root)
     try:
