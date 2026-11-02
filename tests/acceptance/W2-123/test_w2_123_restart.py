@@ -19,8 +19,8 @@ def _configure(stage, query=False):
     return (upper, support.a_nice(3), 2, gate) if query else (lower, support.a_nice(5), 3, gate)
 
 
-def _restart(stage, server):
-    call = stage.call("safe_restart", server)
+def _restart(stage, server, env_extra=None):
+    call = stage.call("safe_restart", server, env_extra=env_extra)
     support.assert_keys(call.result, support.RESTART_KEYS, "safe_restart's result")
     return call.result
 
@@ -103,17 +103,23 @@ def test_a_down_server_is_started_under_its_cap_and_recorded(stage):
     assert len(lines) == 1 and lines[0]["probe_state"] == "down" and lines[0]["old_pid"] is None, lines
 
 
-def test_the_query_server_restarts_under_its_own_cap_cpu_only(stage):
-    """KPI 6: the safe restart of the query server keeps its cap and its hidden GPU."""
+@pytest.mark.parametrize("caller_gpu", [None, "0"], ids=["caller-names-no-gpu", "caller-names-gpu-0"])
+def test_the_query_server_restarts_under_its_own_cap_with_the_gpu_as_the_caller_set_it(stage, caller_gpu):
+    """KPI lines S7 and S8: the safe restart of the query server keeps its cap and adds no
+    ``CUDA_VISIBLE_DEVICES=-1``: the restarted server sees the caller's own value (none, or ``0``), so it comes back
+    on the GPU like the one the owner restarts (DEC-1033, replacing DEC-798's CPU-only start)."""
     cpus, nice, parallel, gate = _configure(stage, query=True)
+    caller_env = {} if caller_gpu is None else {"CUDA_VISIBLE_DEVICES": caller_gpu}
 
-    result = _restart(stage, "query")
+    result = _restart(stage, "query", env_extra=caller_env)
 
     assert result["restarted"] is True and result["server"] == "query", result
     assert_settings(result["settings"], parallel=parallel, cpus=cpus, nice=nice, source=gate)
     daemon = stage.serve_of(result["new_pid"])
     assert daemon["host"] == stage.query_host, daemon
-    assert daemon["env"]["CUDA_VISIBLE_DEVICES"] == "-1", f"the restarted query server sees a GPU: {daemon['env']}"
+    assert daemon["env"]["CUDA_VISIBLE_DEVICES"] == caller_gpu, \
+        f"the restarted query server's CUDA_VISIBLE_DEVICES is not the caller's {caller_gpu!r} (DEC-1033): " \
+        f"{daemon['env']}"
     assert_capped(daemon, cpus=cpus, nice=nice, parallel=parallel, what="the restarted query server")
     lines = stage.restarts()
     assert len(lines) == 1 and lines[0]["server"] == "query", lines
