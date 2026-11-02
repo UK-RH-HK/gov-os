@@ -33,7 +33,10 @@
   run_scoped_5.sh: parallel-5, serial-5). rc in log/chain-5.rc.
 - Review 2 brief ready: briefs/rev-2.md + fill_rev2.py (needs briefs/rev-2.results.part written after the run).
   Launch: gov launch independent-auditor, --model claude-sonnet-5-5 --effort max, read-only tools.
-- Next: wait chain-5; gov check --json; trailer_gate again; results part; review 2; verdict.py; record; DONE. (--no-ff, message file); TESTS-READY; red check of new
+- rebuild-8 (10:39-11:15Z, slot 2 at once): rc 75, "semantic not_recreated: Ollama did not embed with
+  qwen3-embedding:0.6b" (embedder overloaded); lexical + codeintel recreated. Scoped run not started.
+  Probe 11:16: /api/embed 200 in 0.3 s. Retry chain_6.sh (rebuild-9, then run_scoped_5.sh) started 11:16.
+- Next: wait chain-6; gov check --json; trailer_gate again; results part; review 2; verdict.py; record; DONE. (--no-ff, message file); TESTS-READY; red check of new
   cases on b37b5c8f1741's code (scratch clone in /tmp/gov-os-lead-W2-04); gov accept once; rebuild_slot (with
   PYTHONPATH); select_tests; run_scoped (parallel+serial); gov check; collect-only; trailer_gate; keyword_warn; review 2
   (sonnet 5.5, effort max, independent-auditor); verdict.py; record committed if READY; DONE.

@@ -117,6 +117,12 @@ crashes 02:36, 04:31; 8-10 rerankers on the GPU; 0/29 layers). Reloaded 11:15 (r
 29/29 on the GPU, about 26 chunks/s at batch 32; dispatcher health 1.96 s. **Standing until the plan: alert the
 owner on any `offloaded 0/N layers` or `CUDA error` in serve-11434.log** (background watch task b7ulw6ru4; re-arm after
 it fires). The seven ready relisted to `land.txt` at 11:18 (they no longer wait for W2-123's retry).
+**11:30 (owner) DEC-1030 `01f5d8be` (standing): the whole machine watched.** Dispatcher GPU pass being built by an
+engineer subagent (test_dispatcher.py; then a short review, then commit; until then the background watch b7ulw6ru4).
+Morning package: run `tools/server_log_scan.py` (found 3 CUDA crashes 23:54, 02:36, 04:30 and the 0/29 load at 04:34).
+SMART-WORK-6 `1e5d3395` (4 GPU KPI lines for W2-20 and W2-121) for the owner. Landing 11:16 refused before queueing:
+W2-104's gitleaks (two test fixtures: REPLY_TOKEN, SECRET; redacted); W2-104 run 3 `W2-104-A5-r3-gitleaks.md` queued
+(build the literals from parts); six relisted in `land.txt`.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

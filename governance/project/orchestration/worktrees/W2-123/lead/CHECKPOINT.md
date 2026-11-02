@@ -24,6 +24,17 @@
 
 ## Next (now): verification under log/verify-r2/ (rebuild, select_tests, scoped run, serial, gov check, collect-only)
 
+## Verification so far (log/verify-r2/)
+- gov.__file__ -> /home/usain/gov-os-worktrees/W2-123/src/gov/__init__.py; select_tests: scoped, core_changed
+  [src/gov/retrieval/ollama.py, src/gov/retrieval/semantic.py], unplaced []; collect-only 19266/19268 (2 deselected),
+  exit 0; trailer_gate: 19 commits judged, 0 lacking; keyword_warn 0.
+- rebuild 1 (10:39-11:12, exit 75): semantic not_recreated with the BARE NO_EMBEDDING after 1896.5 s (three rebuilds
+  at once on the shared server): a non-time-out failure, so not retried by design. The failing batch (first missing)
+  embedded fine at 11:20 in 2.6 s (probe_batch.log): transient. 2280 chunks missing then. Shared server pid 414672
+  never restarted. => PACKAGE: extend the retry to transient non-time-out failures (HTTP 5xx / connection reset)?
+- rebuild 2 (incremental) started ~11:21: log/verify-r2/rebuild-2.{log,exit}. Then verify_r2.sh (scoped run once),
+  then gov check in heavy_slot.
+
 ## Next (as first planned)
 1. On td-2's return: tripwire compare, check twelve fields and commit trailers; merge w2/W2-123-tests when eng-4 is
    not running (message file, Task/Role trailers); write TESTS-READY ("run 2").

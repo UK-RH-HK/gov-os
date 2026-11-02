@@ -1,0 +1,12 @@
+log: /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/land-dispatch-20261102-111608.out
+W2: (land batch)
+status: W2-11=c9f99b28b88b no outcome in the output (refused or stopped); W2-105=fa653609cc93 no outcome in the output (refused or stopped); W2-90b=73c18fea1e1f no outcome in the output (refused or stopped); W2-81=e78e6af7530d no outcome in the output (refused or stopped); W2-91=55b47e075b3b no outcome in the output (refused or stopped); W2-92=448a835a9dca no outcome in the output (refused or stopped); W2-104=909d7ff0a926 no outcome in the output (refused or stopped)
+
+last output:
+O-nqa2, LITE) at 73c18fea1e1f: pre-check passed
+W2-81 (DAEO-l78m, FULL) at e78e6af7530d: pre-check passed
+W2-91 (DAEO-a3u2, STANDARD) at 55b47e075b3b: pre-check passed
+W2-92 (DAEO-n0wb, STANDARD) at 448a835a9dca: pre-check passed
+W2-104 (DAEO-drhj, STANDARD) at 909d7ff0a926: W2-104: gitleaks found a leak in its change
+REFUSED before anything was queued: W2-104: gitleaks found a leak in its change
+

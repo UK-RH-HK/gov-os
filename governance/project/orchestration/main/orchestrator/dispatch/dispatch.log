@@ -172,3 +172,6 @@
 2026-11-02 11:11:37 guard harvest: rc 0 in 32.1 s
 2026-11-02 11:15:07 embedding server: answering again after HUNG since 2026-11-02 11:04:35
 2026-11-02 11:16:08 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-81=e78e6af7530d', 'W2-91=55b47e075b3b', 'W2-92=448a835a9dca', 'W2-104=909d7ff0a926'] -> land-dispatch-20261102-111608.out (launcher exit 0)
+2026-11-02 11:17:04 land finished: {'W2-11=c9f99b28b88b': 'no outcome in the output (refused or stopped)', 'W2-105=fa653609cc93': 'no outcome in the output (refused or stopped)', 'W2-90b=73c18fea1e1f': 'no outcome in the output (refused or stopped)', 'W2-81=e78e6af7530d': 'no outcome in the output (refused or stopped)', 'W2-91=55b47e075b3b': 'no outcome in the output (refused or stopped)', 'W2-92=448a835a9dca': 'no outcome in the output (refused or stopped)', 'W2-104=909d7ff0a926': 'no outcome in the output (refused or stopped)'}
+2026-11-02 11:19:08 return: W2-61h-A5-verify.json -> inbox/20261102-111908-W2-61h-A5-verify.txt
+2026-11-02 11:19:09 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-81=e78e6af7530d', 'W2-91=55b47e075b3b', 'W2-92=448a835a9dca'] -> land-dispatch-20261102-111909.out (launcher exit 0)
