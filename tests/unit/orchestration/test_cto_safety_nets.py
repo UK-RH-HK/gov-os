@@ -131,3 +131,21 @@ def test_a_standby_file_keeps_the_switch_quiet(tmp_path):
     sb.write_text("handover: the fresh session starts at 01:30\n")
     r = watch(p, tmp_path, "--session-file", str(tmp_path / "none"), "--standby", str(sb))
     assert r.returncode == 0 and r.stdout.startswith("HEARTBEAT standby: handover")
+
+
+def test_a_stale_dispatcher_inbox_alerts_once_per_stall(tmp_path):
+    p = tmp_path / "proj"
+    p.mkdir()
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": now, "message": {"content": [{"type": "text"}]}}])
+    stale = tmp_path / "inbox-stale.txt"
+    stale.write_text("1 unread; oldest W2-92-A5-run2.json\n")
+    extra = ["--session-file", str(tmp_path / "none"), "--inbox-stale", str(stale)]
+    r = watch(p, tmp_path, *extra)
+    assert r.returncode == 10 and r.stdout.startswith("ALERT P1 INBOX")
+    assert watch(p, tmp_path, *extra).returncode == 0  # the same stall: no second alert
+    stale.unlink()
+    assert watch(p, tmp_path, *extra).returncode == 0
+    stale.write_text("1 unread; oldest W2-13-A5-run3.json\n")
+    assert watch(p, tmp_path, *extra).returncode == 10  # a new stall alerts again

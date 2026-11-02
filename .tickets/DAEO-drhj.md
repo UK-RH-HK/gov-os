@@ -19,6 +19,7 @@ allowed_paths:
 - src/gov/skilleval/**
 - tests/unit/skilleval/test_w2_104*
 - governance/project/skill-imports.yaml
+- src/gov/check/commands.py
 kpis:
   success:
   - 'gov skilleval <skill> runs each of the skill''s three committed scenarios on a fresh session with only that skill loaded (the model and effort from the role defaults), judges each against its stated pass line, and writes a scenario record (skill version, scenario, verdict, cost, time) beside the skill; it is the evidence CIT-E reads [DEC-959 item 5, ROLES-RESEARCH-1 §5.3 item 13]'

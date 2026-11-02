@@ -20,6 +20,7 @@ decision is appended to log/deadman.log. It never reads or prints a transcript's
 """
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -32,6 +33,9 @@ TOOLS_DIR = Path(__file__).resolve().parent
 STATE = ORCH / "log/deadman-state.json"
 SESSION_FILE = ORCH / "log/cto-session.txt"
 STANDBY = ORCH / "log/cto-standby.txt"  # while it exists, the CTO stands by on purpose: no alert (DEC-998)
+# The dispatcher writes this file while an inbox item has been unread 30 minutes (the owner, 2026-11-01); its
+# content is stable for one stall, so the watch alerts once per stall. It also alerts during a CTO stand-by (intended).
+INBOX_STALE = ORCH / "dispatch/inbox-stale.txt"
 LOG = ORCH / "log/deadman.log"
 PINGS = Path.home() / ".config/gov-os-notify/pings.log"
 TOAST = TOOLS_DIR / "win_toast.ps1"
@@ -170,11 +174,24 @@ def main():
     ap.add_argument("--max", type=int, default=6600)
     ap.add_argument("--standby", default=str(STANDBY))
     ap.add_argument("--daily", default="09:05", help="the watch exits with a DAILY line once a day at this time")
+    ap.add_argument("--inbox-stale", default=str(INBOX_STALE))
     a = ap.parse_args()
     if a.watch:
         start, day0 = time.time(), datetime.now()
         dh, dm = (int(x) for x in a.daily.split(":"))
         while True:
+            stale, seen_f = Path(a.inbox_stale), Path(a.state).with_name("deadman-inbox-stale-seen.txt")
+            try:  # the dispatcher may remove it between the check and the read (review of 2026-11-01, L3)
+                line = stale.read_text().strip()[:150] if stale.is_file() else None
+            except OSError:
+                line = None
+            if line:
+                if not seen_f.is_file() or seen_f.read_text() != line:
+                    seen_f.write_text(line)  # one alert per stall: the file's stable content is the key
+                    print(f"ALERT P1 INBOX | the dispatcher's inbox: {line} | read it or restart the CTO", flush=True)
+                    sys.exit(10)
+            elif seen_f.is_file():
+                seen_f.unlink(missing_ok=True)  # the stall is over: the next one alerts again
             note = check(a, None, [])
             if note.get("verdict") == "ALERT":
                 print("ALERT " + note["line"], flush=True)

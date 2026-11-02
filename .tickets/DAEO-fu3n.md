@@ -23,6 +23,8 @@ allowed_paths:
 - tests/acceptance/W1-05/conftest.py
 - tests/acceptance/W1-46/test_w1_46_research_installs.py
 - tests/acceptance/W1-46/conftest.py
+- tests/acceptance/W1-46/test_w1_46_live_sessions.py
+- tests/acceptance/W1-50/test_w1_50_freeze_launcher.py
 - tests/acceptance/W2-59/test_w2_59_hook_lines.py
 - tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py
 - tests/acceptance/W2-90c/**
@@ -31,6 +33,7 @@ kpis:
   - 'W2-90''s seven named reds (W1-05''s two orchestrator-asks cases, W1-46''s research npm-install case, four W2-59 cases) judge the kernel''s wiring and pass on the head with W2-105 and W2-106 merged [DEC-965 item 1, DEC-966]'
   - 'Every case W2-90b named in its return as needing W2-105 or W2-110 judges the kernel''s wiring and passes on the head with them merged [DEC-999]'
   - 'Nothing is lowered: no case deleted, skipped, xfailed or weakened; every revised file''s commit carries Rewrite-Reason: DEC-953 item 2; a README under the ticket''s folder maps every case [DEC-906, MR-3]'
+  - 'From W2-90b''s KPI S4, re-baselined (P-W2-90b-1 (b), DEC-1022, under DEC-822 item 3): W1-46''s live sessions and W1-50''s freeze launcher start a real CLI session with the caller''s HOME and so judge the pinned guard by design, and their README says so; the kernel''s non-live cases judge the worktree''s code; nothing is lowered: no case deleted, skipped, xfailed or weakened [DEC-970, DEC-1016, DEC-1022, DEC-822]'
   failure:
   - 'A revised case still reads this repository''s live settings, or is red with W2-105, W2-106 and W2-110 merged.'
   - 'A case deleted, skipped, xfailed or its verdict weakened.'

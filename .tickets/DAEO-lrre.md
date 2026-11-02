@@ -32,6 +32,7 @@ kpis:
   - 'Every role file states the work order in one line: product-spec writes the spec and KPIs; the test designer and the engineer work in parallel from it, never reading each other''s work; the engineer runs the acceptance tests once ready (through gov accept); the QA engineer alone reads both [DEC-959 item 7, DEC-957]'
   - 'Every role file states one writer per worktree: two sessions that write never share a worktree; a ticket''s test designer works in its own tests worktree, merged by the lead [DEC-847, DEC-963, DEC-983, DEC-982]'
   - 'The CTO''s role file states the approval classes (a call that may need the owner''s approval: the host''s ask rules and safety checks) and the quiet hours and morning package time as role defaults read from the project''s configuration, so an adopted product sets its own hours [DEC-991, DEC-994 item 3]'
+  - 'The QA engineer''s role file makes it the moderator: it triages every finding against the ticket''s own scope and KPIs; a finding out of scope, or needing an unusual construction, is a Wave 3 row, never a round; it returns the structured verdict per KPI; at most two review rounds per ticket [DEC-1010 item 1, SMART-WORK-3]'
   failure:
   - 'A role built other than as the approved roles spec states it; a role file placed by hand rather than generated; a role without its machine-readable defaults.'
 profile: STANDARD
