@@ -5,5 +5,6 @@ W2-122 DAEO-blwa W2-122-A5-run1.md W2-122-A5-run1.json
 W2-123 DAEO-qzrq W2-123-A5-run1.md W2-123-A5-run1.json
 W2-04 DAEO-u4oz W2-04-A5-verify.md W2-04-A5-verify.json
 W2-92 DAEO-n0wb W2-92-A5-run3-dec1019.md W2-92-A5-run3-dec1019.json
+W2-104 DAEO-drhj W2-104-A5-run2-dec1020.md W2-104-A5-run2-dec1020.json
 W2-61h DAEO-h2k3 W2-61h-A5-verify.md W2-61h-A5-verify.json
 W2-91 DAEO-a3u2 W2-91-A5-td.md W2-91-A5-td.json

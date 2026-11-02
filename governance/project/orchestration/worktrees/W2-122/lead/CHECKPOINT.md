@@ -29,6 +29,11 @@
 - eng-4 (fresh, session e14ad1c4, repair iteration 1): commit 800cca6fba83, seed.py +4-3, unit +13-1; gov accept success-4 8/8; only success-3 red. Converged.
 - Head now 800cca6fba83. Still to do: K3 measurement (cold-base queued since ~23:12 behind priority waiters), eng batch for the evidence file, full rebuild here, scoped verification, gov check, collect-only, keyword_warn, trailer_gate, checkpoint record, remove tests worktree + measurement worktrees.
 
+## Update 00:08 (2026-11-02)
+- K3 cold-base (dda239e8) FAILED after 3013 s: REBUILD_FAILED semantic "Ollama did not embed" after 1023 of ~1560 requests; the shared runner was reloaded mid-run (outside our code; K5 behaved as designed). Files kept in /tmp/gov-os-lead-W2-122/m/old/. Old measurement worktrees removed.
+- New plan: base2 = /home/usain/gov-os-runs/W2-122/base2 at 800cca6fba83 (current head code), cold, proxy :11511 (bfycti8yx), measure.sh cold-base2 (b9pjbh6ji) waiting for a slot since 23:57. Sampler bupq41xru -> m/concurrency.log.
+- Then: this worktree's verification rebuild = `rebuild_slot.sh W2-122 --seed /home/usain/gov-os-runs/W2-122/base2` (seeded alone, proxy); then one seeded + one cold side by side (new worktrees at head) for "with two others"; eng-5 writes evidence; incremental seeded rebuild of W2-122 after eng-5's commit; scoped run via /tmp/gov-os-lead-W2-122/verify.py parallel|serial (select.json: scoped, core_changed [], unplaced []).
+
 ## Lead readings (P3, logged for the CTO)
 - Interface fixed for both workers: `--seed [folder]` (folder = base tree root, link followed); `--json` result `seed: {status: seeded|refused|none, base, reason}`; every full rebuild writes `.gov-runtime/rebuild/stores.json` {code, embedder{model,revision}, schema}; configured base = `integration_store` (absolute path) in `governance/project/rebuild.yaml`; K5 = GovError REBUILD_FAILED with store "semantic".
 - "Code fingerprint" in KPI 2 read as the Gov OS builder code's fingerprint, not the repository content's (W2-68's of_commit would refuse every seed whose tree differs, contradicting KPI 1).

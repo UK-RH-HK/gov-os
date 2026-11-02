@@ -1,13 +1,13 @@
-dispatcher 2026-11-01 23:53:03
+dispatcher 2026-11-02 00:08:04
 leads running (2, from the processes): W2-122, W2-123
-load 22.6/24.6/29.6; real busy cores 12.4 of 20 (the embedding server 8.09); memory available 6597 MB; gate_check (for comparison) SHUT (SHUT leads=2 load=22.6/29.6 nproc=20 have=7396052kB need=9566436kB: load 22.6/29.6 >= nproc 20; memory: available 675748); disk open
-admission (by peaks, DEC-1008 item 5): a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 25 min, /home/usain/gov-os-worktrees/W2-104)
+load 27.5/32.5/33.6; real busy cores 11.78 of 20 (the embedding server 7.9); memory available 7938 MB; gate_check (for comparison) SHUT (SHUT leads=2 load=27.5/33.6 nproc=20 have=11006628kB need=10024728kB: load 27.5/33.6 >= nproc 20); disk open
+admission (by peaks, DEC-1008 item 5): a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 40 min, /home/usain/gov-os-worktrees/W2-104)
 peaks 2026-11-01 23:22:04: a lead p95 4090 MB, max 9580 MB
-FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 25 min, /home/usain/gov-os-worktrees/W2-104); /usr/bin/python3 -P -m gov.context.context_check (pid 1614670, 21 min, /close/W2-05+W2-55+W2-96-20261101-215620); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 1741342, 14 min, /home/usain/gov-os-worktrees/W2-104)
+FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 40 min, /home/usain/gov-os-worktrees/W2-104); /usr/bin/python3 -P -m gov.context.context_check (pid 1614670, 35 min, /close/W2-05+W2-55+W2-96-20261101-215620); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 1741342, 28 min, /home/usain/gov-os-worktrees/W2-104)
 heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue busy; land: queue busy; main tree clean on w2/integrate
-inbox unread: 1 (oldest 0 min)
-ready list: W2-122 DAEO-blwa: running; W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 25 min, /home/usain/gov-os-worktrees/W2-104); W2-92 DAEO-n0wb: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 25 min, /home/usain/gov-os-worktrees/W2-104); W2-61h DAEO-h2k3: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 25 min, /home/usain/gov-os-worktrees/W2-104); W2-91 DAEO-a3u2: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 25 min, /home/usain/gov-os-worktrees/W2-104)
+inbox unread: 2 (oldest 16 min)
+ready list: W2-122 DAEO-blwa: running; W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 40 min, /home/usain/gov-os-worktrees/W2-104); W2-92 DAEO-n0wb: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 40 min, /home/usain/gov-os-worktrees/W2-104); W2-61h DAEO-h2k3: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 40 min, /home/usain/gov-os-worktrees/W2-104); W2-91 DAEO-a3u2: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.context.context_check (pid 1513690, 40 min, /home/usain/gov-os-worktrees/W2-104)
 sentinel: watched
-guard harvest: last 2026-11-01 23:47:29, rc 0, 24.6 s of 300 s
-embedding server: healthy (0.25 s)
-heavy slot holders: slot 1 pid 1460889 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm ) idle 0 min; slot 2 pid 1508011 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 911864 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock bash -c rm ) idle 0 min
+guard harvest: last 2026-11-01 23:58:27, rc 0, 24.5 s of 300 s
+embedding server: healthy (0.32 s)
+heavy slot holders: slot 1 pid 2071665 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash /tmp/c) idle 0 min; slot 2 pid 1945663 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 911864 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock bash -c rm ) idle 0 min

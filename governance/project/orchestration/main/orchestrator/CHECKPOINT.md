@@ -14,6 +14,15 @@ quiet-hours hook test at 03:00 PASSED and the push-on-prompt test ran 23:50:50 (
 confirm the phone push): `log/safety-net-tests-20261101.txt`. Test push: first "not sent" (owner at the PC), the two
 APPROVE pings "Mobile push requested". ACT-GUARD-FIX-3 copied to `drafts/act-guard-fix-3/`; its independent review
 (Sonnet subagent) writes `reviews/act-guard-fix-3.md`; then `packages/` and the ping (before midnight, else 09:00).
+**00:08:** review round 1 FAILED (F2 regression fails open; F3, F4 as today; F1 flaky test). Moderator's triage at the
+record's end: F1-F3 fixed, F4 only if false refusals stay under 10 %, F5-F7 rows. Round 2 (Opus subagent) works in
+`drafts/act-guard-fix-3/` (round 1 kept in `drafts/act-guard-fix-3-round1/`); then the second and last review
+(Sonnet, same probes); then the package to `packages/` for the 09:00 morning package (no ping after midnight).
+**00:15:** W2-104 returned DONE at `ac2d92af8c0e` with P-W2-104-CMDLIST: decided (a) + CLAUDEPATH (c), DEC-1020
+`235c4d5d`, ticket paths `d942524f`; run 2 brief `briefs/W2-104-A5-run2-dec1020.md` on the ready list after W2-92.
+Guard 64 (the reviewer's heredoc probe) false; 61 of 65 false. Leftover scratch for removal (rm: by day only, pinged):
+`/tmp/gov-os-lead-W2-92`, `/tmp/gov-os-lead-W2-104` once its run 2 ends. Morning package: W2-104 run 1's inherited
+reds (W2-54 AR-5 input, W1-46/W2-59 hook-file reds, W2-66 win_toast.ps1) to trace.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

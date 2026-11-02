@@ -1,0 +1,246 @@
+: {"content": [{"type": "tool_use", "name": "Bash"}]}}])
+        state = tmp_path / "state.json"
+        r = subprocess.run([sys.executable, str(DEADMAN), "--projects", str(p), "--now", "2026-11-01 04:00",
+                            "--channel", "nothing", "--state", str(state)], capture_output=True, text=True)
+>       assert json.loads(r.stdout.strip().splitlines()[-1])["verdict"] == "ALERT" and state.is_file()
+E       AssertionError: assert ('standby: 202...e for the fre' == 'ALERT'
+E         
+E         - ALERT
+E         + standby: 2026-11-01 22:43:58 CTO stand-by: handover written (RESUME HERE in CHECKPOINT.md); the owner reloads VS Code for the fre)
+
+tests/unit/orchestration/test_cto_safety_nets.py:86: AssertionError
+_ test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7159/popen-gw1/test_the_watch_exits_10_with_t0')
+
+    def test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise(tmp_path):
+        from datetime import datetime, timezone
+        p = tmp_path / "proj"
+        p.mkdir()
+        transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": "2026-11-01T01:46:20Z",
+                                    "message": {"content": [{"type": "tool_use", "name": "Bash"}]}}])
+        r = watch(p, tmp_path, "--session-file", str(tmp_path / "none"))
+>       assert r.returncode == 10 and r.stdout.startswith("ALERT P1 DEADMAN | the CTO session is waiting on a tool")
+E       assert (10 == 10 and False)
+E        +  where 10 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/governance/project/o...ox: 5 item(s) unread; the oldest 20261101-224503-W2-92-interim-ac960862.txt | read it or restart the CTO\n", stderr='').returncode
+E        +  and   False = <built-in method startswith of str object at 0x70833d3367f0>('ALERT P1 DEADMAN | the CTO session is waiting on a tool')
+E        +    where <built-in method startswith of str object at 0x70833d3367f0> = "ALERT P1 INBOX | the dispatcher's inbox: inbox: 5 item(s) unread; the oldest 20261101-224503-W2-92-interim-ac960862.txt | read it or restart the CTO\n".startswith
+E        +      where "ALERT P1 INBOX | the dispatcher's inbox: inbox: 5 item(s) unread; the oldest 20261101-224503-W2-92-interim-ac960862.txt | read it or restart the CTO\n" = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/governance/project/o...ox: 5 item(s) unread; the oldest 20261101-224503-W2-92-interim-ac960862.txt | read it or restart the CTO\n", stderr='').stdout
+
+tests/unit/orchestration/test_cto_safety_nets.py:102: AssertionError
+__________________ test_a_standby_file_keeps_the_switch_quiet __________________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7159/popen-gw1/test_a_standby_file_keeps_the_0')
+
+    def test_a_standby_file_keeps_the_switch_quiet(tmp_path):
+        p = tmp_path / "proj"
+        p.mkdir()
+        transcript(p / "s.jsonl", [{"type": "assistant", "timestamp": "2026-11-01T01:46:20Z",
+                                    "message": {"content": [{"type": "tool_use", "name": "Bash"}]}}])
+        sb = tmp_path / "standby.txt"
+        sb.write_text("handover: the fresh session starts at 01:30\n")
+        r = watch(p, tmp_path, "--session-file", str(tmp_path / "none"), "--standby", str(sb))
+>       assert r.returncode == 0 and r.stdout.startswith("HEARTBEAT standby: handover")
+E       assert (10 == 0)
+E        +  where 10 = CompletedProcess(args=['/usr/bin/python3', '/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged/governance/project/o...ox: 5 item(s) unread; the oldest 20261101-224503-W2-92-interim-ac960862.txt | read it or restart the CTO\n", stderr='').returncode
+
+tests/unit/orchestration/test_cto_safety_nets.py:133: AssertionError
+________ test_the_probe_schema_accepts_this_repository_s_probe_records _________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+check = <w1_08_support.Checker object at 0x7353096ca480>
+
+    @pytest.mark.local_only
+    def test_the_probe_schema_accepts_this_repository_s_probe_records(check):
+        schema = _schema()
+>       documents = {f"{path.parent.name}-{path.stem}": support.load_record(path) for path in _own_records()}
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-08/test_w1_08_probe.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-08/w1_08_support.py:167: in load_record
+    document = load_yaml(frontmatter_text(path), Path(path).name)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+text = 'record: probe\nticket: DAEO-l78m\nprobed_commit: 165d3057146a\ncommissioned_by: orchestrator\njudged_by: orchestrator\njudgement: computed (DEC-1010: READY from the verdict block below)\n'
+what = 'PR-DAEO-l78m-moderated.md'
+
+    def load_yaml(text, what):
+        try:
+            return yaml.load(text, Loader=_PlainLoader)  # noqa: S506 - a SafeLoader subclass
+        except yaml.YAMLError as exc:
+>           raise AssertionError(f"{what} is not valid YAML: {exc}") from None
+E           AssertionError: PR-DAEO-l78m-moderated.md is not valid YAML: mapping values are not allowed here
+E             in "<unicode string>", line 6, column 30:
+E               judgement: computed (DEC-1010: READY from the verdict block b ... 
+E                                            ^
+
+tests/acceptance/W1-08/w1_08_support.py:146: AssertionError
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7126c4f02660>
+project = PosixPath('/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...59/popen-gw3/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7126c59668e0>
+project = PosixPath('/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...59/popen-gw3/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7126c5966e80>
+project = PosixPath('/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...59/popen-gw3/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7126c5966fc0>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7159/popen-gw3/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+_________________ test_gov_check_gives_core_schema_green_here __________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+gov_check_here = (<w2_54_support.Run object at 0x71c7e4bf62a0>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': 'def27532f88aa497debf44c99018644bb2d7f283', 'inputs_hash': '3622be5cddbf837b'}, ...}, ...})
+
+    def test_gov_check_gives_core_schema_green_here(gov_check_here):
+        """*Red.* Core-schema, in ``gov check --json`` on this repository, is GREEN. In a close, that ``gov check`` is
+        gate (b)'s, whose output the close hands this run (README, "W2-75")."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CORE_SCHEMA_ID)
+        assert entry is not None, f"gov check lists no {S.CORE_SCHEMA_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CORE_SCHEMA_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: core-schema is RED here: [{"code": "SCHEMA_UNREADABLE_RECORD", "message": "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured", "path": "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md"}, {"at": "$.judgement", "code": "SCHEMA_INVALID_FIELD", "field": "judgement", "message": "docs/probes/DAEO-l78m/PR-DAEO-l78m.md: field 'judgement' is refused by probe.schema.json at $.judgement: 'superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']", "path": "docs/probes/DAEO-l78m/PR-DAEO-l78m.md", "schema": "probe.schema.json"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:53: AssertionError
+_____________ test_this_repository_s_probe_records_are_well_formed _____________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+raw_project = <w1_26_support.Project object at 0x71c7e3929850>
+
+    def test_this_repository_s_probe_records_are_well_formed(raw_project):
+        """Each record's frontmatter, as it is written here, in a temporary project: no finding."""
+        rels = []
+        for path in _own_records():
+            rel = f"docs/probes/{path.parent.name}/{path.name}"
+            raw_project.write(rel, _frontmatter(path) + "\n# The record\n")
+            rels.append(rel)
+        findings = run_schema_check(raw_project.root)
+        named = {rel: about(findings, rel) for rel in rels if about(findings, rel)}
+>       assert not named, f"probe records of this repository give findings of {CHECK}: {named}"
+E       AssertionError: probe records of this repository give findings of core-schema: {'docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md': [{'code': 'SCHEMA_UNREADABLE_RECORD', 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"}], 'docs/probes/DAEO-l78m/PR-DAEO-l78m.md': [{'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m.md', 'field': 'judgement', 'schema': 'probe.schema.json', 'at': '$.judgement', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m.md: field 'judgement' is refused by probe.schema.json at $.judgement: 'superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']"}]}
+E       assert not {'docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md': [{'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/probes/DAEO...uperseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']", ...}]}
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:289: AssertionError
+_____ test_no_finding_of_the_check_on_this_repository_names_a_probe_record _____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+    def test_no_finding_of_the_check_on_this_repository_names_a_probe_record():
+        """This repository's own figure, held so that a later record of any type does not break the case: the
+        check may have findings here (the recorded baseline), none of them under docs/probes/."""
+        findings = run_schema_check(REPO_ROOT)
+        named = [finding for finding in findings
+                 if str(finding.get("path", "")).startswith("docs/probes/") or "docs/probes/" in str(finding.get("message", ""))]
+>       assert not named, (f"{len(named)} findings of {CHECK} on this repository name a file under docs/probes/ "
+                           f"(the first: {named[:4]})")
+E       AssertionError: 2 findings of core-schema on this repository name a file under docs/probes/ (the first: [{'code': 'SCHEMA_UNREADABLE_RECORD', 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"}, {'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m.md', 'field': 'judgement', 'schema': 'probe.schema.json', 'at': '$.judgement', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m.md: field 'judgement' is refused by probe.schema.json at $.judgement: 'superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']"}])
+E       assert not [{'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---' bu...superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']", ...}]
+
+tests/acceptance/W1-26/test_w1_26_probe_records.py:298: AssertionError
+_________________ test_core_schema_is_green_on_this_repository _________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+here = (1, [{'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---...uperseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']", ...}])
+
+    def test_core_schema_is_green_on_this_repository(here):
+        """Exit code 0 and no finding at all. Red today: exit 1 with one finding (the W1-43 report)."""
+        code, findings = here
+>       assert findings == [], f"core-schema has {len(findings)} findings on this repository: {findings}"
+E       AssertionError: core-schema has 2 findings on this repository: [{'code': 'SCHEMA_UNREADABLE_RECORD', 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---' but its frontmatter is not YAML (mapping values are not allowed here): unmeasured"}, {'code': 'SCHEMA_INVALID_FIELD', 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m.md', 'field': 'judgement', 'schema': 'probe.schema.json', 'at': '$.judgement', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m.md: field 'judgement' is refused by probe.schema.json at $.judgement: 'superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)' is not one of ['pass', 'passed', 'fail', 'failed']"}]
+E       assert [{'code': 'SC...iled']", ...}] == []
+E         
+E         Left contains 2 more items, first extra item: {'code': 'SCHEMA_UNREADABLE_RECORD', 'message': "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md: opens with '---' but...not YAML (mapping values are not allowed here): unmeasured", 'path': 'docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-02/test_w2_02_green_here.py:65: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W2-11/test_w2_11_brief_gaps.py:63: GOV_BRIEF_BUILDER names no builder
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+14 failed, 5659 passed, 2 skipped, 4 errors in 2303.13s (0:38:23)
+heavy_slot: all 3 slots taken; waiting (2026-11-01 23:01:26)

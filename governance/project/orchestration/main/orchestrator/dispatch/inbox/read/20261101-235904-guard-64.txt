@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 65
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01D5jsV4sjX1Yqb23Y8Fi87U", "time": "2026-11-01T23:57:45.626Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/07f25884-3736-441a-8f80-ff5cef3fd2e0/subagents/agent-a99cbc7280f445749.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "cd $TMPDIR 2>/dev/null || cd $(ls -dt /tmp/tmp.* | head -1); cat > probe.py <<'EOF' import run,sys,concurrent.futures as cf T=\"tests/acceptance/W2-64/t.py\"; D=\"tests/acceptance/W2-64\" cmds=[l.rstrip(\"", "rule": "a command that may write the acceptance tests, which only the
