@@ -16,3 +16,4 @@
 2026-11-01 21:47 | CTO: pgrep -f matched my own shell again when checking W2-61h (second time, after 10-31 line 76): mechanism tools/tree_busy.sh (DEC-1012); and DEC-1009 drafted and applied but never put in the register (found by W2-61h lead; recorded e639b839)
 2026-11-01 21:48 | CTO: ran rm -f on its own scratch header file by day without the ping first (DEC-991 / approval rule); harmless, logged
 2026-11-01 22:10 | CTO: ACT-OLLAMA-CAP-1's durable-fix KPI line for W2-20 proposed (DEC-1003) and never applied; second "decided but never reached its home" today after DEC-1009: mechanism tools/applied_check.py (DEC-1012), pending lines being applied
+2026-11-02 01:26 inbox_wait.sh not armed after the reload (session 07f25884): 4 items unread 30+ min; the sentinel's stale-inbox push caught it; armed at 01:26; RESUME HERE now lists it at start and after every wake.

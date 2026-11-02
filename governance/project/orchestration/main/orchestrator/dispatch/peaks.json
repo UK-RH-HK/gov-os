@@ -1,82 +1,82 @@
 {
- "computed": "2026-11-02 00:22:04",
+ "computed": "2026-11-02 01:22:04",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 12.69,
+   "cpu_p95": 12.56,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 3948316,
+   "rss_kb_p95": 4102688,
    "rss_kb_max": 6682080,
-   "samples": 1919
+   "samples": 1976
   },
   "embedding": {
-   "cpu_p95": 8.08,
+   "cpu_p95": 8.14,
    "cpu_max": 16.2,
-   "rss_kb_p95": 3137672,
+   "rss_kb_p95": 3123012,
    "rss_kb_max": 5520432,
-   "samples": 1919
+   "samples": 1976
   },
   "rebuild": {
    "cpu_p95": 13.24,
    "cpu_max": 126.32,
-   "rss_kb_p95": 557764,
+   "rss_kb_p95": 557712,
    "rss_kb_max": 637492,
-   "samples": 1382
+   "samples": 1439
   },
   "test_run": {
-   "cpu_p95": 17.1,
+   "cpu_p95": 17.05,
    "cpu_max": 60.25,
-   "rss_kb_p95": 4211928,
+   "rss_kb_p95": 4211768,
    "rss_kb_max": 6778004,
-   "samples": 1519
+   "samples": 1543
   },
   "claude": {
-   "cpu_p95": 8.99,
+   "cpu_p95": 8.67,
    "cpu_max": 444.15,
-   "rss_kb_p95": 2918572,
+   "rss_kb_p95": 2869748,
    "rss_kb_max": 4055288,
-   "samples": 1496
+   "samples": 1553
   },
   "reranker": {
-   "cpu_p95": 1.98,
+   "cpu_p95": 1.87,
    "cpu_max": 12.23,
-   "rss_kb_p95": 7820288,
+   "rss_kb_p95": 7735156,
    "rss_kb_max": 10911392,
-   "samples": 1214
+   "samples": 1271
   },
   "gitleaks": {
    "cpu_p95": 0.36,
    "cpu_max": 4.08,
-   "rss_kb_p95": 2172852,
+   "rss_kb_p95": 2161396,
    "rss_kb_max": 3528312,
-   "samples": 865
+   "samples": 872
   },
   "git": {
    "cpu_p95": 0.01,
    "cpu_max": 0.03,
    "rss_kb_p95": 124468,
    "rss_kb_max": 164968,
-   "samples": 85
+   "samples": 87
   },
   "codegraph": {
    "cpu_p95": 0.27,
    "cpu_max": 1.21,
-   "rss_kb_p95": 153648,
+   "rss_kb_p95": 136064,
    "rss_kb_max": 844648,
-   "samples": 683
+   "samples": 692
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 15.860000000000001,
+   "cpu_p95": 15.77,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3643208,
+   "rss_kb_p95": 3641428,
    "rss_kb_max": 5663368,
-   "samples": 1382
+   "samples": 1439
   }
  },
  "lead": {
-  "rss_kb_p95": 4176896,
+  "rss_kb_p95": 4173152,
   "rss_kb_max": 9810916,
-  "samples": 17850
+  "samples": 17964
  },
  "lead_own_max_kb": {
   "DAEO-e8f0": 7404492,
@@ -120,12 +120,12 @@
   "DAEO-h2k3": 5249052,
   "DAEO-drhj": 4261900,
   "DAEO-blwa": 1599380,
-  "DAEO-qzrq": 3602684
+  "DAEO-qzrq": 4193768
  },
  "lead_outside": {
-  "rss_kb_p95": 2521636,
+  "rss_kb_p95": 2494052,
   "rss_kb_max": 5042316,
-  "samples": 259
+  "samples": 321
  },
  "lead_own_outside_max_kb": {
   "DAEO-3r1j": 2188012,
@@ -144,17 +144,19 @@
   "DAEO-a3u2": 1793484,
   "DAEO-u4oz": 347032,
   "DAEO-h2k3": 310468,
-  "DAEO-drhj": 310636
+  "DAEO-drhj": 310636,
+  "DAEO-blwa": 412504,
+  "DAEO-qzrq": 4193768
  },
  "lead_inside": {
-  "rss_kb_p95": 3961104,
+  "rss_kb_p95": 3952700,
   "rss_kb_max": 7859056,
-  "samples": 6152
+  "samples": 6198
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 732182.0,
+  "rss_kb_p95": 727486.0,
   "rss_kb_max": 1277816.0,
-  "samples": 1519
+  "samples": 1543
  },
- "slot_run_kb": 1439468
+ "slot_run_kb": 1458648
 }

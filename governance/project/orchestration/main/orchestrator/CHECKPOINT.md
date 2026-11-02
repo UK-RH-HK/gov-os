@@ -42,6 +42,11 @@ Guard 64 (the reviewer's heredoc probe) false; 61 of 65 false. Leftover scratch 
 `/tmp/gov-os-lead-W2-92`, `/tmp/gov-os-lead-W2-104` once its run 2 ends. Morning package: W2-104 run 1's inherited
 reds (W2-54 AR-5 input, W1-46/W2-59 hook-file reds, W2-66 win_toast.ps1) to trace.
 
+**01:26 slip (drift log):** the inbox sat 30+ min unread (guard 67-69, W2-123 interim) because this session never armed
+`tools/inbox_wait.sh` after the reload; the sentinel's stale-inbox push caught it. **Every session start and after every
+wake: arm `bash tools/inbox_wait.sh` with the Bash tool's background run (it exits on an item; re-arm after handling).**
+Mechanism proposed to the owner (DEC-1012): a Stop hook that names an unarmed waiter (a `.claude/` change: the owner's).
+
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
 2. Write your session id to `log/cto-session.txt` (the sentinel watches it), then end the stand-by with
