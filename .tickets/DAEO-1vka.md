@@ -25,6 +25,7 @@ kpis:
   - 'A session started by `gov launch` (sandboxed) can connect to the shared reranker service''s socket (W2-112: one path in the user''s own folder, mode 0600) and gets its answers: the sandbox block allows that one Unix socket path and no other; the path comes from the same setting the service uses, never a pattern wider than it [DEC-1035, P-W2-112-T2 (a)]'
   - 'Nothing else in the sandbox widens: no other Unix socket, no network port, `allowUnsandboxedCommands` false and `strictAllowlist` as today; `sandbox_faults` still refuses any other change; a planted sandboxed session that opens another Unix socket is refused [DEC-1035]'
   - 'Measured, in docs/changes/W2-127-evidence.md: a sandboxed worker''s search reranked by the shared service (not the fallback), and its time against the fallback''s [DEC-1035]'
+  - 'A sandboxed session''s reranker fallback is logged and counted where the service''s own answers are, so `gov status` shows it (today it shows 0) [W2-112 review round 1, F3; the CTO as moderator, DEC-1010]'
   failure:
   - 'A sandboxed session that can open any Unix socket or port beyond the reranker''s one path (containment widened).'
   - 'A sandboxed search that still falls back while the service runs.'
