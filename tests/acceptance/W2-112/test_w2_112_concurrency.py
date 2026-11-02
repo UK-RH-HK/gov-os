@@ -7,7 +7,8 @@ returns another session's scores because of the service.
 Each session's texts are its own (its tag is in every text), and the stand-in model's score is a function of the
 query and the text alone, so a score that belongs to another session or another text cannot pass for this one.
 Arrival order and the cap are read on the service's own socket, with P-RERANKER-1's one-line request
-``[query, [text, ...]]``.
+``[query, [text, ...]]``. The answer's form is not fixed (DEC-1036, the moderator's (a)): a JSON object whose
+``scores`` holds one number per text in the request's order, or a bare list of them, is taken.
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ import time
 
 import w2_112_support as support
 from w2_112_support import (ask, candidates, check_scored, check_scored_or_unranked, is_scores, query_of, raised,
-                            score)
+                            score, scores_in)
 
 GPU_ROOM = {"present": True, "total": 16 * support.GIB, "free": 14 * support.GIB, "name": "Stand-in GPU"}
 
@@ -66,10 +67,12 @@ def test_requests_are_answered_in_arrival_order(box):
     assert not errors, f"requests on the service's socket failed: {errors}"
     for tag in tags:
         texts, answer = answers[tag]
-        assert is_scores(answer, len(texts)), f"request {tag} was answered {answer!r}, not one score per text"[:400]
+        got = scores_in(answer, len(texts))
+        assert got is not None, \
+            f"request {tag} was answered {answer!r}, which carries no score per text, in order"[:400]
         wanted = [score(query_of(tag), text) for text in texts]
-        assert all(abs(got - want) <= support.TOLERANCE for got, want in zip(answer, wanted)), \
-            f"request {tag} got {answer}, its own texts score {wanted}: another request's scores"
+        assert all(abs(mine - want) <= support.TOLERANCE for mine, want in zip(got, wanted)), \
+            f"request {tag} got {got}, its own texts score {wanted}: another request's scores"
     calls = [record for record in box.events("predict-begin")]
     first_call = {}
     for index, record in enumerate(calls):
@@ -93,8 +96,9 @@ def test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering(box):
         f"a request of {support.OVER_CAP} texts was scored in full: there is no cap on a request's texts"
     small = [item["text"] for item in candidates("after-cap", 4)]
     again = ask(box.socket, query_of("after-cap"), small, timeout=30)
-    assert is_scores(again, len(small)) and all(
-        abs(got - score(query_of("after-cap"), text)) <= support.TOLERANCE for got, text in zip(again, small)), \
+    got = scores_in(again, len(small))
+    assert got is not None and all(
+        abs(mine - score(query_of("after-cap"), text)) <= support.TOLERANCE for mine, text in zip(got, small)), \
         f"after refusing a request over the cap, the service answered {again!r} to a normal one"[:400]
 
 

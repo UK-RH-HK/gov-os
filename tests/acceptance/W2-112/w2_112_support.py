@@ -798,9 +798,21 @@ def ask(path: Path, query: str, texts: list[str], timeout: float = 30.0):
         return line
 
 
+def scores_in(value, count: int) -> list[float] | None:
+    """The scores an answer carries, one number per text in the request's order, or None when it carries none.
+
+    The answer's form is not fixed by P-RERANKER-1 or the KPIs (DEC-1036, the moderator's (a)): a JSON object whose
+    ``scores`` holds them (other keys, such as ``device``, beside it) or a bare list of them are both taken."""
+    found = value.get("scores") if isinstance(value, dict) else value
+    if isinstance(found, list) and len(found) == count and all(
+            isinstance(item, (int, float)) and not isinstance(item, bool) for item in found):
+        return [float(item) for item in found]
+    return None
+
+
 def is_scores(value, count: int) -> bool:
-    return isinstance(value, list) and len(value) == count and all(
-        isinstance(item, (int, float)) and not isinstance(item, bool) for item in value)
+    """Whether an answer carries one score per text (see ``scores_in``)."""
+    return scores_in(value, count) is not None
 
 
 # ---------------------------------------------------------------- stand-ins of a broken service
