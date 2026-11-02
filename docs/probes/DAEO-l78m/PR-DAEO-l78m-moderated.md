@@ -1,10 +1,13 @@
 ---
-record: probe
-ticket: DAEO-l78m
-probed_commit: 165d3057146a
+type: probe
+task: DAEO-l78m
+reviewer_session: f00a8125-adc8-4e2a-ab48-a3997cc10436
+implementer_session: 9c2f47ad-6ef7-4454-ac3e-6408fad47084
+reviewer_wrote_nothing: true
 commissioned_by: orchestrator
 judged_by: orchestrator
-judgement: computed (DEC-1010: READY from the verdict block below)
+judgement: pass
+probed_commit: 165d3057146ae11ee6bdf58a8e5cd98893b8ebd6
 ---
 # W2-81 — the moderator's triage of review 5 (DEC-1010 item 1 and item 4)
 
@@ -31,3 +34,15 @@ this one.
   {"id": "F2", "scope": "out", "ordinary_work": "yes", "consequence": "fails open"},
   {"id": "F3", "scope": "in", "ordinary_work": "no", "consequence": "other"}]}]}
 ```
+
+## The judgement, as computed (DEC-1010)
+
+The `judgement` above is computed from the verdict block, not declared. READY holds unless a finding is in scope, can
+be hit in ordinary work, and fails open or loses work (`JUDGEMENT.md`'s two questions). F1 and F2 are out of scope;
+F3 is in scope but not ordinary work, and its consequence is other. No finding meets all three, so READY is true and
+the judgement is `pass`. The block's `"verdict": "fail"` is review 5's own verdict, kept as it returned it.
+
+The record's fields: the reviewer is review 5's session (`f00a8125-adc8-4e2a-ab48-a3997cc10436`, a fresh
+independent-auditor, launched sandboxed and read-only; the tripwire showed no change in this worktree); the
+implementer is the ticket's independent test designer (`9c2f47ad-6ef7-4454-ac3e-6408fad47084`), whose test code is
+the deliverable; the probed commit is `165d3057146a` in full.

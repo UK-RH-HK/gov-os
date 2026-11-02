@@ -6,9 +6,15 @@ implementer_session: 9c2f47ad-6ef7-4454-ac3e-6408fad47084
 reviewer_wrote_nothing: true
 commissioned_by: orchestrator
 judged_by: orchestrator
-judgement: superseded by PR-DAEO-l78m-moderated.md (DEC-997, DEC-1010)
+judgement: pass
 probed_commit: 5af07405778255e865d5c38cff1f8244a5ca7d9e
 ---
+
+> **Superseded (DEC-997, DEC-1010).** This record is superseded by the moderator's triage of review 5,
+> `PR-DAEO-l78m-moderated.md`. Its `judgement` above is the word it was committed with (the lead's pass, in
+> `e095e9ae97f3`); the CTO did not accept that pass (DEC-997). The reviewer's own judgement, below, was fail. Its
+> probed commit is an ancestor of the moderated record's, so the probe gate reads it as an earlier round's record
+> (W2-M209): it neither passes nor refuses.
 
 # Probe record: W2-81 (DAEO-l78m), round 2 (DEC-993), review 1 of up to 2 (DEC-916)
 
