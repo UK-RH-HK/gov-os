@@ -5,6 +5,9 @@
 - rebuild-5: my call without PYTHONPATH -> ModuleNotFoundError gov (rc 1; script uses caller's env). rebuild-6 with
   PYTHONPATH started 06:0x. Then: select_tests (select-3), run_scoped (parallel-3/serial-3), gov check, DONE.
 - Brief gap: the resume's rebuild_slot.sh command omits PYTHONPATH (~2 min).
+- rebuild-6 rc 0 (waited for a slot 06:03-06:17; semantic_s 0.8, all three stores recreated; completeness check
+  passed). gov.__file__ in this tree. select-3: scoped, core_changed [], unplaced [], 192 opts = select-2; serial-3 =
+  serial-2 (4 W2-54). keyword_warn 0. run_scoped_3.sh started ~06:20 (parallel-3, serial-3 .rc/.xml/.txt).
 
 ## Round 2 (resume after DEC-1005, 2026-11-01)
 - CTO decided P-W2-04-2 (A), P-W2-04-3 (b); P3 calls stand; needed tickets go as P1s from the CTO (do nothing).

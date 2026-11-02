@@ -66,6 +66,8 @@ ejected by hand (`merge-queue/ejected/W2-81.json`); its records-only repair `bri
 list. The four others stay approved; the dispatcher retries.
 **06:07:** W2-122 PACKAGES (26/26 at `bd50a9581893`); P-W2-122-K5 (K5 reds 100 earlier cases; adoption would need an
 embedder) is the owner's P1: morning draft §7, rec (b) then (a). W2-122 waits. W2-81's records repair running.
+**06:20:** W2-81 repair DONE `e78e6af7530d` (records only, checked). All five relisted in `dispatch/land.txt` (the
+dispatcher does not retry kept entries by itself: a gap, morning draft).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -1,0 +1,10 @@
+log: W2-81-A5-r4-records.json
+W2: W2-81
+status: DONE. Both records now pass the probe schema. The three record checks and the scoped run are green at `e78e6af7530d`.
+
+task: W2-81 (DAEO-l78m), records only: make both probe records valid against the probe schema without changing what they say, then run the three record checks and the scoped selection once, and return DONE with the head.
+status: DONE. Both records now pass the probe schema. The three record checks and the scoped run are green at `e78e6af7530d`.
+work_completed: The start state was as required: head `166f459f4b5c`, clean tree. I made one records-only commit and changed no schema, test or code.
+- **`PR-DAEO-l78m-moderated.md`:**
+  - `record`/`ticket` became `type: probe` and `task: DAEO-l78m`.
+  

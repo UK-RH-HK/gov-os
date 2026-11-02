@@ -77,3 +77,7 @@
 2026-11-02 06:02:07 started W2-04 (DAEO-u4oz) W2-04-A5-verify.md -> W2-04-A5-verify.json (launcher exit 0)
 2026-11-02 06:04:04 interim result: W2-122 3c8a6f44 W2-122 lead checkpoint: verified at bd50a9581893, packages returned
 2026-11-02 06:06:07 return: W2-122-A5-run1.json -> inbox/20261102-060607-W2-122-A5-run1.txt
+2026-11-02 06:09:17 guard harvest: rc 0 in 12.5 s
+2026-11-02 06:10:35 embedding server: HUNG since 2026-11-02 06:08:37 (no answer in 30 s)
+2026-11-02 06:16:18 embedding server: answering again after HUNG since 2026-11-02 06:08:37
+2026-11-02 06:19:04 return: W2-81-A5-r4-records.json -> inbox/20261102-061904-W2-81-A5-r4-records.txt
