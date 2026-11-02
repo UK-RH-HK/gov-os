@@ -12916,3 +12916,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 |---|---|---|
 | 0.421 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1039. Next free id: DEC-1040. |
 | 0.422 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1039 gains step (1b), the Gov Load Balancer. Next free id: DEC-1040. |
+
+### DEC-1040 — P1-INVENTORY-1 (a); the guard's parser misreadings fixed now as an emergency patch (W2-42a), live with re-pin window 2
+- **Status:** ACCEPTED (owner, 2026-11-02 ~20:15, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`) · **Under:** DEC-1039, DEC-1033, DEC-958, DEC-953 item 2, DEC-1028 item 4, DEC-866 · **Changes:** W2-42a (`DAEO-03ub`) from "claim when a K3 slot opens" to an emergency patch now; its KPIs gain the replay line
+- **Decision:** (1) **P1-INVENTORY-1 (a), as recommended:** D1 to D3, M1, M2 and R1 to R5 now, by test designers with one independent reviewer, once step 1's fixes are live; M1b at the designer's judgement; M4 to M7 later; M3 optional; M9 after the W2-54 revision (merged `88b33a38`). The code list (the report's §6b) to the senior engineer after the infrastructure is stable. Under DEC-866 only DEC-798 is marked superseded (`87510863`); DEC-466, DEC-947 and DEC-929 are left as they are (lifted as gates by DEC-953, not retired; DEC-466 stays in force for the product). (2) **The guard, in the emergency** (72 of 78 refusals since ACT 1 false): P1-GUARD-PARSER-W2 (W2-42a) is brought into the emergency now, as an emergency patch: the parser's misreadings fixed (heredocs, loops and substitutions, and the read-listing rule's misreads of literal paths), replayed against every logged refusal (each false one must now pass, each true one must still be refused) and the planted cases, with one review; live with re-pin window 2. The five rules stay as they are; only the misreadings go. (3) **Standing for the emergency:** everyone in the emergency works round a false refusal at once (a script file or the Edit tool) and keeps going; never a form chosen to pass a true refusal (DEC-849, DEC-958).
+- **Places (DEC-851):** this entry; the emergency plan's RESUME state; the common emergency brief `briefs/EMG-common.md`; W2-42a's ticket file (its KPI line, its own commit); `packages/P1-INVENTORY-1.md` (decided).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.423 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1040. Next free id: DEC-1041. |

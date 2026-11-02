@@ -1,5 +1,9 @@
 # P1-INVENTORY-1 — The tests and the code inventoried (DEC-1039 item 2): the list of deletions, merges and revisions, for the owner first
 
+**DECIDED (owner, 2026-11-02 ~20:15, DEC-1040 item 1): (a), as recommended.** D1-D3, M1, M2, R1-R5 once step 1's fixes
+are live; M1b at the designer's judgement; M4-M7 later; M3 optional; M9 after the W2-54 revision; §6b to the senior
+engineer after the infrastructure is stable. Only DEC-798 marked (DEC-466, DEC-947, DEC-929 left as they are).
+
 Written 2026-11-02 19:50 by the CTO (session debdb3f7). The full report: `INVENTORY-TESTS-CODE-1.md` beside this file
 (a read-only analyst's, every figure with its command; estimates marked).
 
