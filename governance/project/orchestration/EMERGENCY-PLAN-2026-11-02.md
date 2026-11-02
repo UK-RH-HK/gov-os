@@ -15,6 +15,18 @@
    dry install, `packages/ACT-REPIN-EMERGENCY-1.md` as the model for the ACT (the old pin's folder kept for the
    rollback; the registry script `pin/repin3_registry.py` needs its OLD_COMMIT/OLD_SHA moved to a7182f6c's entry
    first), the hold, a ping.
+1b. **The Gov Load Balancer (the owner, ~18:40; DEC-1039 (1b)), with the infrastructure fixes:** for this repository
+   now and for the Gov OS. Plan leads, closes, landings and rebuilds together by their **phases** and each phase's
+   **measured peak on every resource** (CPU, RAM, the GPU and its memory); **pair GPU-heavy work** (leads searching,
+   rebuilds embedding) **with CPU-heavy work** (test runs) so neither peaks twice at once; keep the embedders and
+   rerankers on the GPU within its budget, **even if that limits leads to two or three**. **Document the rule: the
+   GPU's dedicated memory never spills into shared memory, and never runs out into a CUDA crash**; test the load
+   balancer and the dispatcher on it and on the phase balancing. In the CTO's tools first (the dispatcher already has:
+   admission on CPU, RAM and GPU memory, the lead cap from memory, slots by device, `gpu_headroom_mib`, the rerankers'
+   GPU slots, `log/capacity/kinds.jsonl` samples by kind, `lead-mem.jsonl`; missing: per-phase peaks, phase pairing,
+   a forecast before admission, the spill rule's check: nvidia-smi's dedicated memory against the budget and WSL's
+   shared-memory use); fold it with `drafts/BRIEF-MACHINE-TARGETS.md` into one engineer's brief, one review. For the
+   Gov OS: propose to the owner whether it is its own ticket or KPI lines in W2-20 and W2-121 (DEC-1003).
 2. **The tests and the code, before the full suite:** a report of the code's size (files and lines: product code,
    tests, tools), the number of tests (unit, acceptance), which are no longer needed, which repeat each other or can be
    merged, even across tickets. Then test designers refactor the tests (an independent reviewer checks them) and a
