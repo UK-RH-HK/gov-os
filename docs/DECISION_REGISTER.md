@@ -12750,3 +12750,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.404 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1022. Next free id: DEC-1023. |
+
+### DEC-1023 — ACT-GUARD-FIX-3 (a), applied by the owner's operator in the morning
+- **Status:** ACCEPTED (owner, 2026-11-02, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`) · **Under:** DEC-958, DEC-1018 item 3, DEC-1010
+- **Decision:** ACT-GUARD-FIX-3 option (a), the whole fix (`governance/project/orchestration/packages/ACT-GUARD-FIX-3.md`, committed `49158e13`; independent review PASS in round 2, READY computed). The owner's operator applies it in the morning of 2026-11-02, not overnight, so the owner is present if anything goes wrong; the package's commands and checks as written (`guard4_check.py` PASS, the test file 269 passed and 1 skipped), undo by `git revert`. Until then today's hook stays in force. Round 2's low findings and round 1's F5 to F7 become Wave 3 rows.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.405 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1023. Next free id: DEC-1024. |
