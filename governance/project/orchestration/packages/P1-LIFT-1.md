@@ -1,6 +1,6 @@
 # P1-LIFT-1 — What to lift: the investigation's one list (DEC-1047), for the owner first
 
-Written 2026-11-02 22:15 by the CTO (session debdb3f7). The list: `INVESTIGATION-1-COMBINED.md` beside this file
+Written 2026-11-02 22:09 by the CTO (session debdb3f7). The list: `INVESTIGATION-1-COMBINED.md` beside this file
 (75 distinct rows in 8 themes, every row citing its sources); the seven part reports in `INVESTIGATION-1-parts/`.
 Nothing is lifted before the owner decides (DEC-1047). DEC-1010 stays, whatever is decided.
 
