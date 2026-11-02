@@ -56,10 +56,9 @@ record_only:
   - "governance/project/orchestration/**.md"
   - "governance/project/orchestration/packages/*.patch"
 
-# DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree. The first
-# list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window, widened by lens I's four
-# reports (I1 §4.1, I2 F6, I3 F5, I4 F6), filtered by that rule. DEC-1050 (T-4): this list and every_close join a
-# selection only when a record-only path is in the change (the full suite runs them always).
+# DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
+# every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
+# widened by lens I's four reports (I1 §4.1, I2 F6, I3 F5, I4 F6), filtered by that rule.
 record_reading:
   # gate (f) and DEC-889 item 2's start
   - "tests/acceptance/W1-06/test_w1_06_approvals.py"

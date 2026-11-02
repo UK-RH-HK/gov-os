@@ -217,18 +217,33 @@ def _code_only(repo: Repo, monkeypatch, test_map: dict = MAP) -> None:
     monkeypatch.setattr(select, "base", lambda root: after_record)
 
 
-def test_a_code_only_change_leaves_the_record_reading_and_every_close_lists_out(repo, monkeypatch):
-    """DEC-1050 (T-4): with no record-only path in the change, neither list joins the selection."""
+def test_a_code_only_change_leaves_every_close_out_and_keeps_the_record_reading_set(repo, monkeypatch):
+    """DEC-1050 (T-4): with no record-only path in the change, every_close does not join the selection; the
+    record-reading set (this repository's quick checks of its own records) still does."""
     _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
     repo.commit("work", files={"src/a/x.py": "x = 2\n"})
     plan = select.plan(repo.root, "W1-own")
     assert plan["scope"] == "scoped" and plan["changed"] == ["src/a/x.py"]
     assert _targets(plan) == {"tests/acceptance/W1-own/": ["OWN"], "tests/unit": ["UNIT"],
-                              "tests/acceptance/W1-aa/": ["OVERLAP"]}
-    assert {"tests/acceptance/W1-rr/", "tests/acceptance/W1-zz/"} <= set(plan["ignore"])
+                              "tests/acceptance/W1-aa/": ["OVERLAP"],
+                              "tests/acceptance/W1-rr/test_rr.py::test_reads": ["RECORD_READING"]}
+    assert "tests/acceptance/W1-zz/" in plan["ignore"]
 
 
-def test_a_record_only_path_in_the_change_brings_both_lists_back(repo, monkeypatch):
+def test_a_change_whose_record_paths_a_caller_strips_keeps_the_record_reading_set(repo, monkeypatch):
+    """A caller that strips record-only paths from the change before the selection runs (the orchestration's one
+    selection tool, DEC-953 item 4a) still gets the record-reading set; every_close then does not join."""
+    _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
+    repo.commit("work", files={"src/a/x.py": "x = 2\n", ".tickets/P-W1-aa.md": _ticket("W1-aa", "src/a/**", "x/**")})
+    changed = select.changed
+    monkeypatch.setattr(select, "changed", lambda root, since: [
+        p for p in changed(root, since) if not any(select.match(p, r) for r in MAP["record_only"])])
+    targets = _targets(select.plan(repo.root, "W1-own"))
+    assert targets["tests/acceptance/W1-rr/test_rr.py::test_reads"] == ["RECORD_READING"]
+    assert not [t for t in targets if t.startswith("tests/acceptance/W1-zz")], targets
+
+
+def test_a_record_only_path_in_the_change_brings_every_close_back(repo, monkeypatch):
     _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
     repo.commit("work", files={"src/a/x.py": "x = 2\n", ".tickets/P-W1-aa.md": _ticket("W1-aa", "src/a/**", "x/**")})
     targets = _targets(select.plan(repo.root, "W1-own"))
@@ -236,14 +251,14 @@ def test_a_record_only_path_in_the_change_brings_both_lists_back(repo, monkeypat
     assert targets["tests/acceptance/W1-zz/test_zz.py"] == ["EVERY_CLOSE"]
 
 
-def test_a_list_target_the_head_does_not_hold_still_widens_when_the_lists_are_not_selected(repo, monkeypatch):
-    """The map's own defect is still seen: a renamed list target widens the run whatever the change."""
-    _code_only(repo, monkeypatch)
-    repo.commit("rename", files={"tests/acceptance/W1-rr/test_rr.py": "def test_reads_renamed():\n    pass\n"})
+def test_an_every_close_target_the_head_does_not_hold_still_widens_when_it_is_not_selected(repo, monkeypatch):
+    """The map's own defect is still seen: a gone every-close target widens the run whatever the change."""
+    _code_only(repo, monkeypatch, {**MAP, "every_close": ["tests/acceptance/W1-zz/test_zz.py"]})
+    repo.git("rm", "-q", "tests/acceptance/W1-zz/test_zz.py")
+    repo.commit("gone", files={"src/a/x.py": "x = 2\n"})
     plan = select.plan(repo.root, "W1-own")
     assert plan["scope"] == "full" and plan["why_full"] == [
-        {"reason": "UNRESOLVED_TARGET", "target": "tests/acceptance/W1-rr/test_rr.py::test_reads",
-         "detail": "CASE_GONE"}]
+        {"reason": "UNRESOLVED_TARGET", "target": "tests/acceptance/W1-zz/test_zz.py", "detail": "FILE_GONE"}]
 
 
 def test_the_live_map_s_lists_name_no_w2_54_case_that_starts_a_whole_gov_check():

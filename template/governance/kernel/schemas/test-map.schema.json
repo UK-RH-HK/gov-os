@@ -16,7 +16,7 @@
       "$ref": "#/$defs/patterns"
     },
     "record_reading": {
-      "description": "The tests that read a record-only path, directly or by scanning the tree: run on a close whose change holds a record-only path (DEC-889 item 2, P-IS-2 (a), DEC-1050).",
+      "description": "The tests that read a record-only path, directly or by scanning the tree: run on every close (DEC-889 item 2, P-IS-2 (a)).",
       "$ref": "#/$defs/targets"
     },
     "every_close": {

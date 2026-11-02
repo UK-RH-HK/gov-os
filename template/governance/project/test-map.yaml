@@ -21,8 +21,7 @@ record_only:
   - "docs/DECISION_REGISTER.md"
   - "governance/project/orchestration/**.md"
 
-# The tests that read a record-only path, directly or by scanning the tree: run on a close whose change holds a
-# record-only path.
+# The tests that read a record-only path, directly or by scanning the tree: run on every close.
 record_reading: []
 
 # Targets run on a close whose change holds a record-only path (and in the full run).
