@@ -9,8 +9,13 @@ Everything runs on any machine, in a sandbox, with no model, no GPU and no netwo
   a real reranker environment where DEC-397 puts it (``HOME/.local/share/gov-os/reranker-venv``, a
   ``python -m venv`` of this interpreter), whose site folder holds the stand-in model (``standin/``): a
   ``sentence_transformers`` whose ``CrossEncoder`` scores a pair by a hash of its texts, and a ``torch`` whose
-  ``cuda`` reports the stand-in GPU. A stand-in ``nvidia-smi`` comes first on the sessions' ``PATH``. The stand-in
-  logs every load and every scoring call with its process id, so the tests count models and see who scored what.
+  ``cuda`` reports the stand-in GPU (by default one with room: 14 GiB of 16 free). A stand-in ``nvidia-smi``
+  comes first on the sessions' ``PATH``. The stand-in logs every load (with its device and how many GPU slots
+  were held) and every scoring call with its process id, so the tests count models and see who scored what.
+- **The GPU slot rule (KPI 7, DEC-1033)** runs on a private lock folder in the box (``GOV_RERANK_GPU_LOCK_DIR``),
+  never ``/tmp``: the real lock files are never touched. Every session gets that folder, two slots and a short wait
+  (``GOV_RERANK_GPU_WAIT_S``), and never ``GOV_RERANK_ALLOW_CPU``. A test holds slots itself with ``hold_slots``.
+  The box's reranker environment holds no ``gov_reranker_gpu_slot`` module: the rule is the product's.
 - **Sessions** run ``w2_112_session.py``: ``gov.retrieval.rerank.rerank(query, candidates)`` with no reranker
   given, as a search calls it. With a barrier, many call at the same moment.
 - **The service** is found from outside: the Unix socket P-RERANKER-1 names (``~/.cache/gov-os/rerank.sock``), the
@@ -21,8 +26,9 @@ Everything runs on any machine, in a sandbox, with no model, no GPU and no netwo
 
 The interface the tests rely on, beyond the base's public ``gov.retrieval.rerank`` (each one constant below):
 the socket's place and the one-line request ``[query, [text, ...]]`` answered by one line of scores, both from
-P-RERANKER-1, and two settings in the environment for the idle end and the time limit (named in the README; a
-package asks the lead to confirm them with the engineer).
+P-RERANKER-1; the idle and time-limit settings (DEC-1034 item 3); the GPU slot rule's settings and lock files
+(ACT-RERANK-WAIT-1, KPI 7); the fallback log and the CPU alert in a file under ``~/.cache/gov-os/`` (DEC-1034
+item 3); the bundle's ``rerank`` entry (DEC-1034 item 2).
 """
 
 from __future__ import annotations
@@ -53,9 +59,17 @@ REVISION = "e61197ed45024b0ed8a2d74b80b4d909f1255473"
 VENV_REL = ".local/share/gov-os/reranker-venv"
 PYTHON_REL = f"{VENV_REL}/bin/python"
 SOCKET_REL = ".cache/gov-os/rerank.sock"            # P-RERANKER-1: "~/.cache/gov-os/rerank.sock, mode 0600"
-# ---- the two settings a test needs to see an idle end and a time limit within a minute (package P-W2-112-T1)
+CACHE_REL = ".cache/gov-os"                         # DEC-1034 item 3: the fallback log and the CPU alert live here
+# ---- the two settings a test needs to see an idle end and a time limit within a minute (DEC-1034 item 3, T1)
 IDLE_SETTING = "GOV_RERANK_IDLE_S"                   # seconds without a request before the service ends itself
 TIMEOUT_SETTING = "GOV_RERANK_TIMEOUT_S"             # a request's time limit, in seconds
+# ---- the GPU slot rule (KPI 7, DEC-1033; ACT-RERANK-WAIT-1)
+SLOTS_SETTING = "GOV_RERANK_GPU_SLOTS"
+LOCK_DIR_SETTING = "GOV_RERANK_GPU_LOCK_DIR"
+WAIT_SETTING = "GOV_RERANK_GPU_WAIT_S"
+SLOTS = 2
+SLOT_WAIT_S = 5.0        # the boxes' default wait for a slot: short, so a case never waits the real 20 s
+LOCK_NAME = "gov-os-rerank-gpu-{}.lock"
 # ---- the bounds
 CONNECT_S = 2.0          # "does not answer within about 2 s" (the KPI, P-RERANKER-1)
 FALLBACK_S = 20.0        # a search whose service is down answers within this: 2 s, a private reranker's start, slack
@@ -64,12 +78,33 @@ OVER_CAP = 20_000        # texts in one request: above any cap the bundle's cand
 GIB = 1024 ** 3
 TOLERANCE = 1e-6         # "within float rounding"; the stand-in's scores lie in [-10, 10)
 SETTLE_S = 1.0           # a private reranker ends within this once its session has ended
+ROOM = {"present": True, "total": 16 * GIB, "free": 14 * GIB, "name": "Stand-in GPU"}
+SHORT = {"present": True, "total": 16 * GIB, "free": 1 * GIB, "name": "Stand-in GPU"}
+NO_GPU = {"present": False}
 
 _SKIP_IN_HOME = (".w2112", VENV_REL)
 
 
 class Missing(AssertionError):
     """What the test needs from this machine is not here (not a failure of the ticket)."""
+
+
+REFUSE_UNIX_SOCKETS = '''"""The W2-112 tests: this Python may not create a Unix socket, as in the launch sandbox (EPERM)."""
+import errno
+import socket as _socket
+
+_Socket = _socket.socket
+
+
+class _Refused(_Socket):
+    def __init__(self, family=-1, type=-1, proto=-1, fileno=None):
+        if fileno is None and family == _socket.AF_UNIX:
+            raise PermissionError(errno.EPERM, "Operation not permitted")
+        super().__init__(family, type, proto, fileno)
+
+
+_socket.socket = _Refused
+'''
 
 
 def unix_sockets_refused() -> str | None:
@@ -397,9 +432,12 @@ class Box:
             folder.mkdir(parents=True, exist_ok=True, mode=0o700)
         self.socket = self.home / SOCKET_REL
         self.venv = self.home / VENV_REL
+        self.locks = self.base / "locks"  # the GPU slot rule's private lock folder (never /tmp)
+        self.locks.mkdir(mode=0o700)
         self.settings = dict(settings or {})
         self._names = 0
-        self.config(gpu=gpu or {"present": False})
+        self._held: list[int] = []
+        self.config(gpu=gpu or ROOM, lock_dir=str(self.locks), slots=SLOTS)
         shutil.copy2(STANDIN, self.state / "lib" / STANDIN.name)
         if environment:
             self._environment()
@@ -445,6 +483,8 @@ class Box:
         smi.write_text(f"#!{sys.executable} -I\nimport sys\nsys.path.insert(0, {str(site)!r})\n"
                        "import w2112_standin\nsys.exit(w2112_standin.nvidia_smi(sys.argv[1:]))\n", encoding="utf-8")
         smi.chmod(0o755)
+        assert not list(site.glob("gov_reranker_gpu_slot*")) and not list(site.glob("gov-reranker-gpu-slot*")), \
+            "the box's reranker environment holds a start-up module: the GPU slot rule must be the product's own"
 
     def config(self, **changes) -> dict:
         """Change the stand-in's configuration (read again at every load and every scoring call)."""
@@ -462,6 +502,54 @@ class Box:
         pids = dict(current.get("pids") or {})
         pids[str(pid)] = {**pids.get(str(pid), {}), **settings}
         self.config(pids=pids)
+
+    # ---- the conditions a case plants
+
+    def hold_slots(self, *numbers: int) -> None:
+        """Hold the GPU slots ``numbers`` (all of them when none is named) from this test's own process, as other
+        rerankers would: an exclusive ``flock`` on each slot's lock file in the box's private lock folder."""
+        import fcntl
+
+        for number in numbers or range(SLOTS):
+            descriptor = os.open(self.locks / LOCK_NAME.format(number), os.O_CREAT | os.O_RDWR, 0o600)
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self._held.append(descriptor)
+
+    def release_slots(self) -> float:
+        """Release every slot this test holds; the moment it did, as ``time.time()``."""
+        while self._held:
+            os.close(self._held.pop())
+        return time.time()
+
+    def block_service(self) -> None:
+        """The service cannot start: a folder, not empty, stands where its socket goes. ``~/.cache/gov-os/`` stays
+        writable for the fallback log (DEC-1034 item 3)."""
+        self.socket.mkdir(parents=True, mode=0o700)
+        (self.socket / "keep").write_text("the W2-112 tests keep the service from starting\n", encoding="utf-8")
+
+    def refuse_unix_sockets(self) -> None:
+        """The sessions' own Python (the system interpreter with this ``HOME``) may not create a Unix socket, as in
+        the launch sandbox (``socket(AF_UNIX)`` gives EPERM): a ``usercustomize`` in the user site folder of this
+        ``HOME``. The reranker environment's Python (``-I``, a venv) does not read it."""
+        version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+        site = self.home / ".local" / "lib" / version / "site-packages"
+        site.mkdir(parents=True, exist_ok=True)
+        (site / "usercustomize.py").write_text(REFUSE_UNIX_SOCKETS, encoding="utf-8")
+
+    def cache_texts(self, since: float) -> list[str]:
+        """Every file under ``~/.cache/gov-os/`` written since ``since`` (the planted blocker left out), as
+        ``path: text``: where the fallback log and the CPU alert go (DEC-1034 item 3)."""
+        found, folder = [], self.home / CACHE_REL
+        for path in sorted(folder.rglob("*")) if folder.is_dir() else []:
+            if path == self.socket or self.socket in path.parents:
+                continue
+            try:
+                if path.is_file() and path.stat().st_mtime >= since - 1:
+                    found.append(f"{path.relative_to(self.home)}: " +
+                                 path.read_text(encoding="utf-8", errors="replace")[-4000:])
+            except OSError:
+                continue
+        return found
 
     # ---- what the stand-in saw
 
@@ -575,6 +663,10 @@ class Box:
             "OLLAMA_HOST": self.dead_host,
             "GOV_QUERY_OLLAMA_HOST": self.dead_host,
             "LC_ALL": "C.UTF-8",
+            # the GPU slot rule on the box's own lock folder, never the real one in /tmp; no GOV_RERANK_ALLOW_CPU
+            LOCK_DIR_SETTING: str(self.locks),
+            SLOTS_SETTING: str(SLOTS),
+            WAIT_SETTING: f"{SLOT_WAIT_S:g}",
         })
         env.update({key: str(value) for key, value in self.settings.items()})
         env.update({key: str(value) for key, value in extra.items()})
@@ -621,6 +713,7 @@ class Box:
         return holders[0]
 
     def close(self) -> None:
+        self.release_slots()
         end_processes_of(self.home)
         for pid in self._session_pids:
             try:
@@ -739,29 +832,31 @@ class FakeService:
         self.server.close()
 
 
-# ---------------------------------------------------------------- traces of a fallback
+# ---------------------------------------------------------------- the bundle's rerank entry (DEC-1034 item 2)
 
 
-def traces(box: Box, report: dict, since: float) -> list[str]:
-    """What a search left that a reader can find: its ``logging`` records, its standard error, and every file
-    under ``HOME`` written since ``since`` (the stand-in's own folders left out), as text."""
-    found = [f"log {record['logger']} {record['level']}: {record['message']}" for record in report.get("records", [])]
-    if report.get("stderr", "").strip():
-        found.append("stderr: " + report["stderr"])
-    for folder, names, files in os.walk(box.home):
-        rel = Path(folder).relative_to(box.home).as_posix()
-        if any(rel == skip or rel.startswith(skip + "/") for skip in _SKIP_IN_HOME):
-            names[:] = []
-            continue
-        for name in files:
-            path = Path(folder) / name
-            if path == box.socket.parent:  # the tests' own file that keeps the service from starting
-                continue
-            try:
-                if not path.is_file() or path.stat().st_mtime < since - 1:
-                    continue
-                found.append(f"file {path.relative_to(box.home)}: " +
-                             path.read_text(encoding="utf-8", errors="replace")[-4000:])
-            except OSError:
-                continue
-    return found
+def _strings(value) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [text for item in value.values() for text in _strings(item)]
+    if isinstance(value, (list, tuple)):
+        return [text for item in value for text in _strings(item)]
+    return []
+
+
+def rerank_entry(bundle: dict):
+    """``(where, value, reasons)``: the bundle's ``rerank`` entry, at its top level or in its ``merge``; and every
+    text that could be its reason (in the entry, or in a key beside it whose name holds "reason")."""
+    for where, scope in (("bundle", bundle), ("merge", bundle.get("merge") or {})):
+        if isinstance(scope, dict) and "rerank" in scope:
+            value = scope["rerank"]
+            reasons = [text for text in _strings(value) if text.strip().lower() != "unavailable"]
+            reasons += [text for key, item in scope.items() if "reason" in str(key).lower() for text in _strings(item)]
+            return where, value, [text for text in reasons if len(text.strip()) >= 3]
+    return None, None, []
+
+
+def unavailable(value) -> bool:
+    """The entry says ``unavailable``: as its value, or as a value inside it."""
+    return any(text.strip().lower() == "unavailable" for text in _strings(value))

@@ -15,7 +15,8 @@ What it does is read from outside, through files in its state folder (named in `
 - ``config.json``, read again at every load and every scoring call: delays, failures, and the stand-in GPU, for
   every process or for one process id;
 - ``log/``: one file per event (``load``, ``load-failed``, ``predict-begin``, ``predict-end``, ``move``), each with
-  its process id, its time and what it was asked.
+  its process id, its time and what it was asked; a ``load`` also records how many of the test's private GPU slots
+  (the lock files of the GPU slot rule, DEC-1033) were held when the model loaded.
 
 A score is a function of the query and the text alone (``score``), so the same pair always gets the same score in
 any process, in any batch, on any device.
@@ -69,6 +70,32 @@ def log(event: str, **fields) -> None:
     partial = folder / f".{name}.part"
     partial.write_text(json.dumps(record), encoding="utf-8")
     os.replace(partial, folder / name)
+
+
+def slots_held():
+    """How many of the GPU slots (``gov-os-rerank-gpu-<i>.lock`` in the test's private lock folder, named in
+    ``config.json``) are held at this moment, by this process or another; None when the test named no folder."""
+    found = config()
+    folder = found.get("lock_dir")
+    if not folder:
+        return None
+    import fcntl
+
+    held = 0
+    for number in range(int(found.get("slots", 2))):
+        path = os.path.join(folder, f"gov-os-rerank-gpu-{number}.lock")
+        try:
+            descriptor = os.open(path, os.O_RDWR)  # never creates a slot's file
+        except OSError:
+            continue
+        try:
+            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(descriptor, fcntl.LOCK_UN)
+        except OSError:
+            held += 1
+        finally:
+            os.close(descriptor)
+    return held
 
 
 def _attempt() -> int:
@@ -373,7 +400,7 @@ class CrossEncoder:
         if self._device == "cuda" and not cuda_is_available():
             log("load-failed", **fields)
             raise RuntimeError("Found no NVIDIA driver on your system")
-        log("load", device=self._device, **fields)
+        log("load", device=self._device, slots_held=slots_held(), **fields)
         self.model = _Inner(self)
         self.tokenizer = ANYTHING
         self.max_length = kwargs.get("max_length", 512)

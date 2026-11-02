@@ -17,12 +17,6 @@ def pytest_report_header(config):
     return [f"W2-112: {refused}"] if refused else []
 
 
-def pytest_configure(config):
-    config.addinivalue_line(
-        "markers", "w2_112_surfaces: needs the bundle (`gov.retrieval.retrieve`) or `gov status`, outside W2-112's "
-                   "allowed paths: the lead's scope package decides who builds them")
-
-
 @pytest.fixture()
 def boxes():
     """Make boxes with ``boxes(environment=..., gpu=..., settings=...)``; every process that carries a box's
