@@ -24,6 +24,17 @@ def git(d, *a):
                           capture_output=True, text=True, check=True).stdout.strip()
 
 
+OLD_HOOK = 'import os\n    slots = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2"))\n'  # the installed copy today
+NEW_HOOK = 'def _slots():\n    pass  # reads limits.json\n'
+
+
+def plant_hook(tmp, text):
+    p = tmp / "hook" / "gov_reranker_gpu_slot.py"
+    p.parent.mkdir(exist_ok=True)
+    p.write_text(text)
+    return p
+
+
 def ticket(tid, status):
     return f"---\nid: {tid}\nstatus: {status}\nwbs_id: W2-X\n---\n# {tid}\n"
 
@@ -86,6 +97,8 @@ def w(tmp_path, healthy_embed):
                DISPATCH_SS=str(tmp_path / "ss"), DISPATCH_RERANK_GLOB=str(tmp_path / "rerank" / "gov-os-rerank-gpu-*.lock"),
                # DEC-1039 (1b), planted: no shared-GPU-memory reader (unless a test plants one)
                DISPATCH_GPU_SHARED_CMD=str(tmp_path / "shared-counter"),
+               # review F2, planted: the installed reranker hook, today's copy (2 locks); a test may plant another
+               DISPATCH_RERANK_HOOK=str(plant_hook(tmp_path, OLD_HOOK)),
                DISPATCH_WORKTREES=str(wt), DISPATCH_FAKE_PROCS=str(procs), DISPATCH_FAKE_HELD=str(held),
                DISPATCH_GATE_CMD="echo OPEN", DISPATCH_DISK_CMD="true",
                DISPATCH_LAUNCH_CMD=f"{sys.executable} {launcher}", DISPATCH_LAND_CMD=f"{sys.executable} {lander}",
@@ -2278,8 +2291,9 @@ def test_lb_todays_numbers_are_unchanged_on_this_machines_figures(wp):
     tick(wp, DISPATCH_NOW=NOW + 60)
     line = status_line(wp, "Limits: ")
     assert ("from 20 CPUs" in line and "23.5 GB, RTX 5070 Ti 16303 MiB: band 14-18, margin 2, heavy slots 3 x 6 "
-            "workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2, "
-            "spill floor 1019 MiB; config.json overrides: none") in line, line
+            "workers (heavy_slots.conf 3 x 6), slots gpu/cpu 3/2, GPU headroom 2048 MiB, reranker GPU slots 2 priced "
+            "(the installed hook's own default: 2; proposed 2), spill floor 1019 MiB; config.json overrides: none") \
+        in line, line
     lim = json.loads((wp.d / "limits.json").read_text())
     assert lim["rerank_gpu_slots"] == 2 and lim["limits"]["cpu_band"] == [14, 18]
     assert "(band 14-18: " in status_line(wp, "Balance: ")
@@ -2499,3 +2513,112 @@ def test_lb_a_heavy_step_outside_a_slot_becomes_an_incident_after_15_minutes(wp)
     tick(wp, DISPATCH_NOW=NOW + 60 * 16)
     items = items_with(wp, "Incident: outside-slot")
     assert len(items) == 1 and "pid 700" in items[0] and "W2-A" in items[0]
+
+
+# ---- review round 1 of emg/lb: F1 (CPU of reaped children), F2 (reranker slots priced as enforced), F4 (T4) --------
+
+def slot_run(hz, pytest_ticks):
+    return [{"cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests", "cwd": "/", "pid": 10,
+             "ppid": 1}, {"cmd": "python3 -m pytest tests -n 6", "cwd": "/", "pid": 11, "ppid": 10,
+                          "cpu_ticks_all": pytest_ticks}]
+
+
+def test_lbr_f1_a_reaped_childs_lifetime_is_not_counted_again(w):
+    """The reviewer's case: a slot run's 6 workers ran 1 core each for 6 minutes and were reaped this interval (one of
+    them had reaped its own child, 100 s seen, 160 s in all): the job counts their last minute, 7 cores, not their
+    lifetimes again (37 cores before the fix)."""
+    (w.d / "ready.txt").write_text("")
+    hz = os.sysconf("SC_CLK_TCK")
+    w.procs.write_text(json.dumps(slot_run(hz, (6 * 360 + 160) * hz)))  # the workers' lifetimes now in its cutime
+    old = {"10": 0, "11": 0, "20": 100 * hz, **{str(p): 300 * hz for p in range(12, 18)}}
+    pp = {"10": 1, "11": 10, "20": 12, **{str(p): 11 for p in range(12, 18)}}
+    (w.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": old, "ppid": pp}))
+    tick(w)
+    assert jobs_by_name(w)["pid 10"]["cpu"] == 7.0
+
+
+def test_lbr_f1_a_job_is_capped_at_the_machines_cpus(w):
+    (w.d / "ready.txt").write_text("")
+    hz = os.sysconf("SC_CLK_TCK")
+    w.procs.write_text(json.dumps(slot_run(hz, 50 * 60 * hz)))  # 50 cores' worth in a minute (an earlier record's
+    (w.d / "jobs-prev.json").write_text(json.dumps({"t": NOW - 60, "ticks": {"10": 0, "11": 0}}))  # form: no ppid)
+    tick(w)
+    assert jobs_by_name(w)["pid 10"]["cpu"] == 20.0
+
+
+def phase_shares(w, emb, rr):
+    """A phase-peaks.json not due for refresh, with these measured GPU shares."""
+    (w.d / "phase-peaks.json").write_text(json.dumps({"_at": NOW + 86400, "_shares": {"embedders_gpu_mib": emb,
+                                                                                       "reranker_gpu_mib": rr}}))
+
+
+def test_lbr_f2_the_reranker_slots_are_priced_with_the_installed_hooks_count(wp):
+    """The reviewer's case: the shares measured at 5,800 and 4,655 MiB derive 1 reranker GPU slot, while today's
+    installed hook hands out 2. Priced with 1 (1 held, none free) the newcomer's reranker cost nothing and the forecast
+    admitted (10.2 of 13.9 GB); priced with the hook's 2 it is refused: 14.8 of 13.9 GB."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 10455)
+    hold_rerank_gpu(wp, 0)  # pid 4000, a private reranker
+    rr = "/v/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Q"
+    wp.procs.write_text(json.dumps([{"cmd": rr, "cwd": "/", "pid": 4000, "ppid": 1}]))
+    phase_shares(wp, 5800, 4655)
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")  # the first pass reads the GPU
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert not s["admit"] and s["admit_reason"].startswith("forecast refuses (GPU binding): GPU memory 14.8 of 13.9 GB")
+    assert "1 GPU reranker slot(s) free" in s["admit_reason"] and calls(wp) == []
+    assert "reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 1)" in status_line(wp, "Limits: ")
+    assert json.loads((wp.d / "limits.json").read_text())["rerank_gpu_slots"] == 1  # the proposal, for the new copy
+    # once the owner installs the copy that reads limits.json, it enforces the 1 written there: priced with 1
+    tick(wp, DISPATCH_NOW=NOW + 120, DISPATCH_RERANK_HOOK=str(plant_hook(wp.tmp, NEW_HOOK)))
+    assert "reranker GPU slots 1 priced (the installed hook reads limits.json: 1; proposed 1)" in \
+        status_line(wp, "Limits: ")
+    # no hook at all: nothing bounds the rerankers, every newcomer's reranker is priced
+    tick(wp, DISPATCH_NOW=NOW + 180, DISPATCH_RERANK_HOOK=str(wp.tmp / "none" / "gov_reranker_gpu_slot.py"))
+    assert "reranker GPU slots 64 priced (no hook installed; proposed 1)" in status_line(wp, "Limits: ")
+
+
+def test_lbr_f2_a_derived_count_is_never_0_with_a_gpu(wp):
+    smi(wp)
+    phase_shares(wp, 15000, 3584)  # a spurious embedders' share: (16303 - 15000 - 2048) // 3584 < 0
+    tick(wp)
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    assert json.loads((wp.d / "limits.json").read_text())["rerank_gpu_slots"] == 1
+
+
+def test_lbr_f2_slots_held_beside_the_shared_service_count_as_used(wp):
+    """DEC-1043 item 2: while the shared reranker service runs, the CTO's tool holds every other slot. Held is used:
+    no slot is free, the newcomer's reranker cannot take the GPU and is priced at nothing; and the tool's slot holds no
+    GPU memory, so it is not a reranker on the GPU in the balance row (the shares' measure)."""
+    (wp.tmp / "meminfo").write_text(f"MemAvailable: {16 * GB} kB\n")
+    gpu_used(wp, 5800 + 3584)
+    hold_rerank_gpu(wp, 0, 1)  # pids 4000 and 4001
+    wp.procs.write_text(json.dumps([
+        {"cmd": "/v/reranker-venv/bin/python /x/tools/rerank_service.py", "cwd": "/", "pid": 4000, "ppid": 1},
+        {"cmd": "python3 /x/tools/rerank_service_slot_hold.py", "cwd": "/", "pid": 4001, "ppid": 1}]))
+    tick(wp, DISPATCH_GATE_CMD="sh -c 'echo SHUT; exit 1'")
+    (wp.d / "started.txt").write_text("")
+    wp.calls.write_text("")
+    tick(wp, DISPATCH_NOW=NOW + 60)
+    s = status(wp)
+    assert s["admit"] and "the newcomer's 0.0; 0 GPU reranker slot(s) free" in s["admit_reason"], s["admit_reason"]
+    row = json.loads((wp.orch / "log" / "capacity" / "balance.jsonl").read_text().splitlines()[-1])
+    assert row["rr_held"] == 2 and row["rr_gpu"] == 1
+
+
+def test_lbr_f4_t4_events_are_not_repeated_when_the_log_becomes_unreadable(w):
+    (w.d / "ready.txt").write_text("")
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", gin(499))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    recs = sorted((w.orch / "log" / "incidents").glob("*-T4.md"))
+    assert len(recs) == 1
+    (w.tmp / "serve-11434.log").unlink()  # moved away: the last read's events must not count again
+    for m in range(2, 17):
+        tick(w, DISPATCH_NOW=NOW + 60 * m)
+    assert "- **More, " not in recs[0].read_text() and "Closed:" not in recs[0].read_text()
+    tick(w, DISPATCH_NOW=NOW + 60 * 17)  # 15 minutes with no event: closed
+    assert "- **Closed:** " in recs[0].read_text()

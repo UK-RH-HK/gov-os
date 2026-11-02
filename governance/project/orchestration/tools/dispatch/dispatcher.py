@@ -202,7 +202,7 @@ def tree_clean(path, tracked_only=False):
 
 def truth():
     procs = processes()
-    t = {"time": stamp(), "leads": running_leads(procs)}
+    t = {"time": stamp(), "leads": running_leads(procs), "_t0": now()}
     t["lead_count"] = len(t["leads"])
     try:
         t["load"] = [float(x) for x in Path(E("DISPATCH_LOADAVG", "/proc/loadavg")).read_text().split()[:3]]
@@ -296,6 +296,11 @@ def truth():
         except OSError:
             held = {}
         rr_pids = {p for pids in held.values() for p in pids}
+        argv_of = {f["pid"]: f["argv"] for f in facts}
+        # the GPU slots held by reranker processes (the shared service, a private worker); a slot-holding tool
+        # (rerank_service_slot_hold.py, DEC-1043 item 2) holds a slot as used but no GPU memory (review F2)
+        t["rr_gpu"] = sum(1 for p in rr_pids if is_reranker(argv_of.get(p, [])) or any(
+            os.path.basename(x) == "rerank_service.py" for x in argv_of.get(p, [])[:3]))
         shared = (load_json("embed-health.json", {}).get("servers") or {}).get("shared") or {}
         cores = job_cores(facts, dry)
         t["_proc_cores"] = cores
@@ -392,7 +397,42 @@ def config():
     derived = balancer.derive_limits(known, sh)
     c["_machine"], c["_derived"] = mach, derived
     c["_overrides"] = balancer.apply_limits(c, explicit, derived)
+    # review F2: the reranker GPU slots are priced with the count the installed hook enforces, never fewer: the
+    # derived (or explicit) number is the proposal written to limits.json, which only the new hook copy reads
+    c["rerank_gpu_slots_proposed"] = c["rerank_gpu_slots"]
+    c["_hook"] = hook = hook_slots(c)
+    if hook["slots"] is not None:
+        c["rerank_gpu_slots"] = max(hook["slots"], int(c["rerank_gpu_slots"]))
+    else:  # no hook installed: nothing bounds the rerankers on the GPU; every newcomer's reranker is priced
+        c["rerank_gpu_slots"] = 64
     return c
+
+
+RERANK_HOOK_GLOB = str(Path.home() / ".local/share/gov-os/reranker-venv/lib/python3*/site-packages/"
+                       "gov_reranker_gpu_slot.py")
+HOOK_LIMIT_MIN, HOOK_LIMIT_MAX = 1, 64
+
+
+def hook_slots(c):
+    """Review F2: the number of reranker GPU locks the installed hook (gov_reranker_gpu_slot.py in the reranker
+    environment) hands out: the copy that reads limits.json (`def _slots`) enforces its `rerank_gpu_slots` when an int
+    from 1 to 64, else 2; the earlier copy its `GOV_RERANK_GPU_SLOTS` default (2). None: no hook installed.
+    {slots, how}. (A caller's own GOV_RERANK_GPU_SLOTS is not seen here.)"""
+    paths = sorted(glob.glob(E("DISPATCH_RERANK_HOOK") or c.get("rerank_hook_glob") or RERANK_HOOK_GLOB))
+    if not paths:
+        return {"slots": None, "how": "no hook installed"}
+    try:
+        text = Path(paths[0]).read_text()
+    except OSError as exc:
+        return {"slots": 2, "how": f"the hook unreadable ({exc.strerror}): 2"}
+    if "def _slots" in text:
+        n = load_json("limits.json", {}).get("rerank_gpu_slots")
+        if isinstance(n, int) and not isinstance(n, bool) and HOOK_LIMIT_MIN <= n <= HOOK_LIMIT_MAX:
+            return {"slots": n, "how": f"the installed hook reads limits.json: {n}"}
+        return {"slots": 2, "how": "the installed hook reads limits.json, none valid there: 2"}
+    m = re.search(r'GOV_RERANK_GPU_SLOTS",\s*"(\d+)"', text)
+    n = int(m.group(1)) if m else 2
+    return {"slots": n, "how": f"the installed hook's own default: {n}"}
 
 
 def machine_now():
@@ -839,7 +879,8 @@ def find_jobs(facts, c, rr_pids, embed_busy, cores):
         cs = [cores.get(p["pid"]) for p in procs]
         jobs.append({"kind": kind, "name": name, "pid": root["pid"],
                      "phase": tree_phase(kind, procs, root, embed_busy, c),
-                     "cpu": None if not cores or all(x is None for x in cs) else round(sum(x or 0 for x in cs), 2),
+                     "cpu": None if not cores or all(x is None for x in cs) else  # at most the machine (F1)
+                     round(min(float(nproc()), sum(x or 0 for x in cs)), 2),
                      "rss_kb": sum(p["rss_kb"] for p in procs), "rr": sum(1 for p in procs if p["pid"] in rr_pids)})
     for f, (kind, name) in roots:
         add(kind, name, f)
@@ -854,26 +895,40 @@ def find_jobs(facts, c, rr_pids, embed_busy, cores):
 def job_cores(facts, dry):
     """{pid: cores} of every process: its utime + stime with its reaped children's (cutime + cstime: a test's
     short-lived programs, as kind_sampler.py counts them) since the last pass (jobs-prev.json, an interval of at most
-    3 minutes); a process not in the last sample (a first pass, a dry pass, a new process) at its lifetime's average
-    when it is at least 10 s old, else 0. A dry pass records nothing."""
+    3 minutes). Review F1: a process seen in the last pass and gone now was reaped, and its whole CPU moved into its
+    parent's cutime this interval; its last-seen CPU is taken off the delta of its nearest ancestor still running (it
+    was counted while it ran), so only its last interval counts. A process new since the last pass counts from 0; with
+    no usable last sample (a first pass, a dry pass) at its lifetime's average when at least 10 s old, else 0. Each
+    process at most the machine's CPUs (find_jobs caps each job too). A dry pass records nothing."""
     prev = load_json("jobs-prev.json", {})
-    t_now, hz = now(), os.sysconf("SC_CLK_TCK")
+    t_now, hz, cap = now(), os.sysconf("SC_CLK_TCK"), float(nproc())
     cur = {str(f["pid"]): f.get("cpu_ticks_all", f.get("cpu_ticks", 0)) for f in facts}
     if not dry:
         D.mkdir(parents=True, exist_ok=True)
         tmp = D / "jobs-prev.json.tmp"
-        tmp.write_text(json.dumps({"t": t_now, "ticks": cur}))
+        tmp.write_text(json.dumps({"t": t_now, "ticks": cur, "ppid": {str(f["pid"]): f["ppid"] for f in facts}}))
         os.replace(tmp, D / "jobs-prev.json")
     wall = t_now - float(prev.get("t") or 0)
-    old = (prev.get("ticks") or {}) if prev and 0 < wall <= 180 else {}
+    usable = bool(prev) and 0 < wall <= 180
+    old = (prev.get("ticks") or {}) if usable else {}
+    old_pp = {str(k): str(v) for k, v in ((prev.get("ppid") or {}) if usable else {}).items()}
+    reaped = {}  # {the nearest running ancestor: the last-seen CPU of the processes gone below it}
+    for p, ticks in old.items():
+        if p in cur:
+            continue
+        anc, hops = old_pp.get(p), 0
+        while anc is not None and anc not in cur and hops < 64:  # its parent gone too: the grandparent reaped both
+            anc, hops = old_pp.get(anc), hops + 1
+        if anc in cur:
+            reaped[anc] = reaped.get(anc, 0) + ticks
     out = {}
     for f in facts:
         p, ticks = str(f["pid"]), cur[str(f["pid"])]
-        if p in old:
-            out[f["pid"]] = max(0, ticks - old[p]) / hz / wall
+        if usable:
+            out[f["pid"]] = min(cap, max(0, ticks - old.get(p, 0) - reaped.get(p, 0)) / hz / wall)
         else:
             age = float(f.get("age_s") or 0)
-            out[f["pid"]] = ticks / hz / age if age >= 10 else 0.0
+            out[f["pid"]] = min(cap, ticks / hz / age) if age >= 10 else 0.0
     return out
 
 
@@ -1561,6 +1616,7 @@ def judge_progress(name, path, port, sv, conns, c):
     log, or unreadable connections with no progress for `embed_stall_s`, leaves it not judged (sv["judged"] False:
     the shared server then falls back to the test request). Returns the state."""
     t = now()
+    sv.update(t4_new=[], t4_n=0, t4_at=t)  # review F4: never the last read's T4 events again
     lines, off, first = gpu_log_new(name, path, sv.get("off"), c, False, baseline_mb=0)
     if off is None:
         sv.update(judged=False, why="its log is unreadable")
@@ -2693,7 +2749,9 @@ def judge_targets(t, c, waits, land_pending, gpu_rule, emb, tst):
     out["T3"] = ((g["used_mib"] > g["total_mib"] - head,
                   f"GPU {g['used_mib']} MiB used of {g['total_mib']} (at most {g['total_mib'] - head})", [])
                  if fresh else (None, "GPU not read", []))
-    ev = [f"{n}: {l}" for n, sv in sorted(((emb or {}).get("servers") or {}).items()) for l in sv.get("t4_new") or []]
+    t0 = float(t.get("_t0") or 0)  # review F4: only the events this pass read (a failed watch leaves older ones)
+    ev = [f"{n}: {l}" for n, sv in sorted(((emb or {}).get("servers") or {}).items())
+          if float(sv.get("t4_at") or 0) >= t0 for l in sv.get("t4_new") or []]
     offs = tst.setdefault("offsets", {})
     rlog = c.get("embed_retry_log")
     if rlog:
@@ -2813,7 +2871,8 @@ def record_balance(t, bal, waits, land_pending, gpu_rule, c, dry):
                    "headroom_mib": int(c.get("gpu_headroom_mib", 2048)), "util": gh.get("util"),
                    "shared_mib": sh.get("shared_mib") if sh.get("ok") else None},
            "gpu_used_mib": gh.get("used_mib") if gh.get("ok") else None, "gpu_util": gh.get("util"),
-           "rr_n": rr.get("n"), "rr_held": rr.get("gpu_held"), "embedders": (bal or {}).get("embedders"),
+           "rr_n": rr.get("n"), "rr_held": rr.get("gpu_held"), "rr_gpu": t.get("rr_gpu"),
+           "embedders": (bal or {}).get("embedders"),
            "jobs": [{"k": j["kind"], "p": j["phase"], "cpu": j["cpu"], "rss_kb": j["rss_kb"], "rr": j["rr"]}
                     for j in t.get("jobs") or []],
            "targets": {k: v[0] for k, v in judged.items()},
@@ -2857,10 +2916,10 @@ def record_balance(t, bal, waits, land_pending, gpu_rule, c, dry):
         log(f"machine changed: {changed}")
     if mach and (changed or old != mach) and (mach.get("gpu_known") or not old.get("gpu_known")):
         (D / "machine.json").write_text(json.dumps(mach))
-    lim = {k: c.get(k) for k in balancer.DERIVED_KEYS}
-    if load_json("limits.json", {}).get("limits") != lim:
+    lim = dict({k: c.get(k) for k in balancer.DERIVED_KEYS}, rerank_gpu_slots=c.get("rerank_gpu_slots_proposed"))
+    if load_json("limits.json", {}).get("limits") != lim:  # the proposal: what the new hook copy would enforce
         (D / "limits.json").write_text(json.dumps({"at": stamp(), "limits": lim, "rerank_gpu_slots":
-                                                   c.get("rerank_gpu_slots"), "machine": mach}))
+                                                   c.get("rerank_gpu_slots_proposed"), "machine": mach}))
     if t.get("forecast"):
         (D / "forecast.json").write_text(json.dumps({"at": stamp(), **{k: {"ok": f["ok"], "binding": f["binding"],
                                                                             "reason": f["reason"]}
@@ -2882,7 +2941,8 @@ def limits_line(c):
             f"{'?' if m.get('mem_total_gb') is None else m['mem_total_gb']} GB, {gpu}: band {band[0]}-{band[1]}, "
             f"margin {c.get('cpu_margin')}, heavy slots {d.get('heavy_slots')} x {d.get('heavy_workers')} workers "
             f"({conf}), slots gpu/cpu {c.get('slots_gpu')}/{c.get('slots_cpu')}, GPU headroom "
-            f"{c.get('gpu_headroom_mib')} MiB, reranker GPU slots {c.get('rerank_gpu_slots')}, spill floor "
+            f"{c.get('gpu_headroom_mib')} MiB, reranker GPU slots {c.get('rerank_gpu_slots')} priced ("
+            f"{(c.get('_hook') or {}).get('how', '?')}; proposed {c.get('rerank_gpu_slots_proposed')}), spill floor "
             f"{c.get('gpu_shared_floor_mib')} MiB; config.json overrides: "
             + (", ".join(f"{k} {v[0]} (derived {v[1]})" for k, v in over.items()) or "none"))
 

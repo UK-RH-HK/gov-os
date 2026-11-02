@@ -58,7 +58,7 @@ def derive_limits(machine, measured=None):
         rr = int(measured.get("reranker_gpu_mib") or FLOOR_RERANKER_GPU_MIB)
         head = half_up(total * RATIOS["gpu_headroom"])
         out.update(gpu_headroom_mib=head, gpu_shared_floor_mib=half_up(total * RATIOS["gpu_shared_floor"]),
-                   rerank_gpu_slots=max(0, int((total - emb - head) // rr)))
+                   rerank_gpu_slots=max(1, int((total - emb - head) // rr)))  # never 0 with a GPU (review F2)
         how.update(gpu_headroom_mib=f"{RATIOS['gpu_headroom']:.4f} of {total} MiB",
                    gpu_shared_floor_mib=f"1/16 of {total} MiB",
                    rerank_gpu_slots=f"({total} - the embedders' {emb} - headroom {head}) MiB / a reranker's {rr} MiB")
@@ -129,6 +129,15 @@ def pct(values, q):
     return v[min(len(v) - 1, int(q * (len(v) - 1) + 0.5))] if v else None
 
 
+def pick(vals, floor, min_samples):
+    """A phase's peak: the p95 from `min_samples` on; before that the larger of the floor (today's figure) and the
+    second-largest sample, so one sample alone never sets it (review F1: one spike would hold the peak for the whole
+    window and refuse every newcomer)."""
+    if len(vals) >= min_samples:
+        return pct(vals, 0.95)
+    return max([floor] + sorted(vals)[:-1])
+
+
 def floor_of(kind, phase):
     f = dict(PHASES.get(phase) or PHASES["other"])
     f.update(KIND_FLOORS.get((kind, phase), {}))
@@ -138,12 +147,16 @@ def floor_of(kind, phase):
 def shares(rows, min_samples=30):
     """The GPU's measured shares from the balance rows: the embedders' (GPU used while no reranker holds a GPU slot
     and none runs) and one reranker's ((used - the embedders' share) / the GPU slots held). Each a p95 once there are
-    `min_samples`, else at least today's figure."""
-    base = [r["gpu_used_mib"] for r in rows if r.get("gpu_used_mib") is not None and r.get("rr_held") == 0
+    `min_samples`, else at least today's figure (the largest sample: a larger share prices the GPU higher, the safe
+    side). Only the GPU slots held by reranker processes count (`rr_gpu`): a tool holding slots so that no private
+    reranker joins the shared service (DEC-1043 item 2) holds no GPU memory."""
+    def on_gpu(r):
+        return r.get("rr_gpu", r.get("rr_held"))
+    base = [r["gpu_used_mib"] for r in rows if r.get("gpu_used_mib") is not None and on_gpu(r) == 0
             and r.get("rr_n") == 0]
     emb = pct(base, 0.95) if len(base) >= min_samples else max([FLOOR_EMBEDDERS_GPU_MIB] + base)
-    each = [(r["gpu_used_mib"] - emb) / r["rr_held"] for r in rows
-            if r.get("gpu_used_mib") is not None and (r.get("rr_held") or 0) > 0]
+    each = [(r["gpu_used_mib"] - emb) / on_gpu(r) for r in rows
+            if r.get("gpu_used_mib") is not None and (on_gpu(r) or 0) > 0]
     each = [x for x in each if x > 0]
     rr = pct(each, 0.95) if len(each) >= min_samples else max([FLOOR_RERANKER_GPU_MIB] + each)
     return {"embedders_gpu_mib": int(emb), "reranker_gpu_mib": int(rr), "embedders_samples": len(base),
@@ -153,7 +166,8 @@ def shares(rows, min_samples=30):
 def phase_peaks(rows, min_samples=30):
     """{"kind.phase": {cpu, ram_kb, gpu, util, heavy, samples, how}} from the balance rows (each with its jobs: kind
     "k", phase "p", cores "cpu", tree RSS "rss_kb", GPU reranker slots held in its tree "rr"). A p95 over the rows
-    given (the rolling window) once a phase has `min_samples`; before that the larger of the floor and the p95."""
+    given (the rolling window) once a phase has `min_samples`; before that the larger of the floor and the
+    second-largest sample (`pick`: one spike never sets it)."""
     sh = shares(rows, min_samples)
     samples = {}
     for r in rows:
@@ -174,15 +188,11 @@ def phase_peaks(rows, min_samples=30):
             s = samples.get(key, {"cpu": [], "ram_kb": [], "rr": [], "util": []})
             n = len(s["ram_kb"])
             gpu_floor = sh["reranker_gpu_mib"] if f["gpu"] == R else f["gpu"]
-
-            def pick(vals, floor):
-                if len(vals) >= min_samples:
-                    return pct(vals, 0.95)
-                return max([floor] + vals)
-            rr_n = pick(s["rr"], 1 if f["gpu"] == R else 0)
-            out[key] = {"cpu": round(pick(s["cpu"], f["cpu"]), 2), "ram_kb": int(pick(s["ram_kb"], f["ram_kb"])),
+            rr_n = pick(s["rr"], 1 if f["gpu"] == R else 0, min_samples)
+            out[key] = {"cpu": round(pick(s["cpu"], f["cpu"], min_samples), 2),
+                        "ram_kb": int(pick(s["ram_kb"], f["ram_kb"], min_samples)),
                         "gpu": int(rr_n * sh["reranker_gpu_mib"]) if f["gpu"] == R or rr_n else int(gpu_floor),
-                        "util": pick(s["util"], f["util"]) if f["heavy"] == "gpu" else f["util"],
+                        "util": pick(s["util"], f["util"], min_samples) if f["heavy"] == "gpu" else f["util"],
                         "heavy": f["heavy"], "samples": n,
                         "how": "p95" if n >= min_samples else f"floor ({n} of {min_samples} samples)"}
     out["_shares"] = sh
@@ -263,9 +273,10 @@ def forecast(state, peaks, newcomer_kind, newcomer_phases=None):
         slots, held = state.get("rr_slots"), state.get("rr_held")
         free = None if held is None or slots is None else max(0, slots - held)
         new_gpu = new["gpu"] if (free is None or free > 0 or new["gpu"] == 0) else 0
+        if free is not None:  # the rerankers' part at most the free slots' share: the running jobs' first
+            gpu_up = min(gpu_up, free * rr_share)
+            new_gpu = min(new_gpu, max(0, free * rr_share - gpu_up))
         up = gpu_up + new_gpu
-        if free is not None:
-            up = min(up, free * rr_share) if new["gpu"] or gpu_up else up
         cap = g["total_mib"] - state.get("headroom_mib", 0)
         need = g["used_mib"] + up
         res["gpu"] = {"need": int(need), "cap": int(cap), "ok": need <= cap, "frac": need / cap if cap > 0 else 9,

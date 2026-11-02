@@ -70,6 +70,28 @@ def test_few_samples_keep_todays_floors_and_many_give_the_p95():
     assert pk["lead.retrieval"]["gpu"] == 3584 and pk["lead.build"]["gpu"] == 0  # no samples: the floors
 
 
+def test_review_f1_one_spike_never_sets_a_phases_peak():
+    """Below phase_min_samples one sample alone (a reaped run's CPU landing in one pass) does not set the peak for
+    the window; two at that level do."""
+    rows = [{"jobs": [{"k": "lead", "p": "build", "cpu": c, "rss_kb": GB, "rr": 0}]} for c in (0.5, 0.4, 0.6, 36.0)]
+    assert lb.phase_peaks(rows, 30)["lead.build"]["cpu"] == 1.0  # today's floor
+    rows.append({"jobs": [{"k": "lead", "p": "build", "cpu": 30.0, "rss_kb": GB, "rr": 0}]})
+    assert lb.phase_peaks(rows, 30)["lead.build"]["cpu"] == 30.0
+    assert lb.pick([], 2.0, 30) == 2.0 and lb.pick([9.0], 2.0, 30) == 2.0
+
+
+def test_review_f2_a_derived_reranker_count_is_never_0_with_a_gpu():
+    assert lb.derive_limits(TODAY, {"embedders_gpu_mib": 15000, "reranker_gpu_mib": 3584})["rerank_gpu_slots"] == 1
+
+
+def test_review_f2_slots_held_by_a_tool_are_no_rerankers_gpu_memory():
+    """A slot-holding tool (DEC-1043 item 2) holds no GPU memory: the reranker's share divides by the slots held by
+    rerankers (rr_gpu), not all held."""
+    rows = [{"gpu_used_mib": 5000, "rr_held": 0, "rr_gpu": 0, "rr_n": 0} for _ in range(40)]
+    rows += [{"gpu_used_mib": 8000, "rr_held": 2, "rr_gpu": 1, "rr_n": 1} for _ in range(40)]
+    assert lb.shares(rows, 30)["reranker_gpu_mib"] == 3000
+
+
 def test_the_gpu_shares_are_measured_from_the_rows():
     rows = [{"gpu_used_mib": 5000, "rr_held": 0, "rr_n": 0} for _ in range(40)]
     rows += [{"gpu_used_mib": 5000 + 3000 * h, "rr_held": h, "rr_n": h} for h in (1, 2) for _ in range(20)]
@@ -121,6 +143,8 @@ def test_the_free_gpu_reranker_slots_bound_the_rerankers_share():
     jobs = [{"kind": "lead", "name": f"W2-{i}", "phase": "retrieval", "cpu": 0, "rss_kb": 0, "rr": 0} for i in range(4)]
     f = lb.forecast(state(jobs=jobs), pk, "lead")
     assert f["resources"]["gpu"]["need"] == 5734 + 2 * 3584  # 2 slots: at most 2 rerankers on the GPU
+    # the text shows what is counted: the running jobs' part capped first, the newcomer's what is left (none)
+    assert "running jobs' peaks 7.0 + the newcomer's 0.0; 2 GPU reranker slot(s) free" in f["resources"]["gpu"]["text"]
 
 
 def test_cpu_and_ram_are_each_named_when_short():

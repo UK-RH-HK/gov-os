@@ -199,23 +199,30 @@ lead (the launch form's marker in a lead worktree), a landing (`land.py`), a clo
 (`nightly.sh`, `nightly_cron.sh`), each with its whole process tree; then each rebuild (`gov rebuild`, `-m
 gov.cli.main rebuild`) and each heavy-slot run (its `flock ... gov-os-heavy-slot-N.lock`, or a heavy pytest outside a
 slot) under none of them. A `heavy_slot.sh` or `rebuild_slot.sh` still waiting for its slot runs nothing and is no job
-(its flock, once it has the slot, is). A process's cores: its utime + stime since the last pass; one not in the last
-sample at its lifetime's average. Its phase is read from what its tree runs, in this order: **a rebuild**
+(its flock, once it has the slot, is). Its phase is read from what its tree runs, in this order: **a rebuild**
 (`rebuild.embedding` while the shared embedder makes progress or has requests waiting, by the last pass's 4d state;
 else `rebuild.lexical`); **a test run** (a heavy pytest or a heavy-slot lock in the tree: `test`); then, for a lead, **a
 review** (a reviewer's session, `GOV_ROLE` independent-auditor / reviewer / independent-test-designer, in its tree:
 `review`), **a retrieval** (`gov retrieve`, `gov check`, a retrieval module, a reranker: `retrieval`), **its start**
 (its first `lead_start_s`, 600 s: `start`), else **building** (`build`); for the others `other`. A landing or a close
 is `rebuild.*`, then `test`; a rebuild `rebuild.*`; a slot run `test`; the nightly `rebuild.*`, `test`. Each job's
-measures this pass: its tree's cores (each process's utime + stime since the last pass, `jobs-prev.json`), its RSS and
-the GPU reranker slots its tree holds (the `rerank_gpu_glob` lock holders). `Jobs by phase:` in the status.
+measures this pass: its tree's cores, its RSS and the GPU reranker slots its tree holds (the `rerank_gpu_glob` lock
+holders). **A process's cores** (review F1, F7): its utime + stime **with its reaped children's** (cutime + cstime, as
+`kind_sampler.py` counts them: a test's short-lived programs) since the last pass (`jobs-prev.json`, which keeps each
+process's CPU and parent); a process seen in the last pass and gone now was reaped, its whole CPU moved into its
+parent's cutime this interval, so its last-seen CPU is taken off the delta of its nearest ancestor still running (only
+its last interval counts, not its lifetime again); a process new since the last pass counts from 0; with no usable last
+sample (a first or dry pass), its lifetime's average. A process, and a job, at most the machine's CPUs. `Jobs by phase:`
+in the status.
 
 **Each phase's measured peak on every resource** (`phase_peaks`, `phase-peaks.json`, refreshed every
 `phase_refresh_s` 600 from the balance rows of the last `phase_window_h` 72): CPU cores busy, RAM, GPU memory and GPU
 use, per kind and phase (`lead.retrieval`, `slot.test`, `landing.rebuild.embedding`, ...): a p95 once the phase has
-`phase_min_samples` (30), before that the larger of today's figure (the floor) and the samples. GPU memory: a
-retrieval or review holds one reranker's share, measured as (GPU used - the embedders' share) / the GPU slots held,
-the embedders' share as the GPU used while no reranker runs (each a p95, floors 3,584 and 5,734 MiB). GPU use: the
+`phase_min_samples` (30), before that the larger of today's figure (the floor) and the second-largest sample (one
+sample alone never sets a peak for the window: review F1). GPU memory: a retrieval or review holds one reranker's
+share, measured as (GPU used - the embedders' share) / the GPU slots held by reranker processes (a tool holding slots
+beside the shared service, DEC-1043 item 2, holds no GPU memory), the embedders' share as the GPU used while no
+reranker runs (each a p95; below 30 samples the largest, the safe side for pricing; floors 3,584 and 5,734 MiB). GPU use: the
 pass's utilisation while the job is the only GPU-heavy one. RAM, while a phase's own samples are few, comes from the
 7-day history the memory rule uses (`peaks.json`: a lead's p95 outside verification, 2.1 GB today; inside it 4.1 GB; a
 slot run 1.9 GB; a rebuild 0.5 GB). Today's floors (2026-11-02):
@@ -258,14 +265,21 @@ Every limit is a ratio of it, each giving today's number on this machine (20 CPU
 | heavy slots x workers | slots 0.15 of the CPUs; workers 0.90 of the CPUs / slots | 3 x 6 (heavy_slots.conf: shown beside, the owner's file) |
 | `slots_gpu` / `slots_cpu` | the heavy slots / 2/3 of them | 3 / 2 |
 | `gpu_headroom_mib` | 0.1256 of the GPU's memory | 2,048 |
-| `rerank_gpu_slots` | (GPU memory - the embedders' measured share - headroom) / one reranker's measured peak | 2 |
+| `rerank_gpu_slots` (proposed) | (GPU memory - the embedders' measured share - headroom) / one reranker's measured peak, at least 1 with a GPU | 2 |
 | `gpu_shared_floor_mib` | 1/16 of the GPU's memory | 1,019 |
 (32 CPUs, 64 GB, 24 GB GPU: 22-29, 3, 5 x 5, 5/3, 3,085, 4; 8 CPUs, 16 GB, no GPU: 6-7, 1, 1 x 7, 1/1, 0, 0.) An
 explicit number in `config.json` still wins (the owner's override) and the `Limits:` line says so (`config.json
 overrides: cpu_band [12, 16] (derived [14, 18])`). A GPU not read yet uses today's GPU figures. A machine change (CPUs,
 cores, RAM by the half GB, the GPU) is one `Machine:` inbox item with the new limits. `limits.json` (state) holds them;
 `gov_reranker_gpu_slot.py` reads its lock count from it when `GOV_RERANK_GPU_SLOTS` is unset (installing that copy is
-the owner's ACT). The servers' CPU sets stay owner ACTs.
+the owner's ACT). **The reranker GPU slots are priced with the count the installed hook enforces, never fewer**
+(review F2): the derived (or explicit) number is only the proposal written to `limits.json`; the forecast, the GPU
+check and the rerankers' RAM reserve use the larger of it and the hook's count (`hook_slots`: the installed copy that
+reads `limits.json` enforces the number there, 1 to 64, else 2; today's copy its `GOV_RERANK_GPU_SLOTS` default, 2; no
+hook installed: 64, every newcomer's reranker priced). Every held slot counts as used, a slot held by the CTO's tool
+beside the shared service (DEC-1043 item 2) too: a newcomer is priced a reranker only while a slot is free. The
+`Limits:` line: `reranker GPU slots 2 priced (the installed hook's own default: 2; proposed 1)`. The servers' CPU sets
+stay owner ACTs.
 
 **The standing targets and their incidents** (DEC-1038 (4)). Each pass appends one row to `log/capacity/balance.jsonl`
 (the readings, the jobs and phases, the targets, the forecast; renamed to `balance-<stamp>.jsonl` past
