@@ -7,7 +7,9 @@ Drives the hook as Claude Code runs it (event JSON on stdin, the pinned judge's 
   parser does not read), and the patterns of the logged false refusals it must pass;
 - one synthetic case for each pattern of the 61 logged refusals (guard-refusals.jsonl), and, when the rebuilt corpus
   is given (GUARD_FIX3_CORPUS), the 61 themselves;
-- the module bash_writes.py directly.
+- the module bash_writes.py directly;
+- round 2: a case for each repro of the review's F1-F4 (planted with the others), the module's checks for them, and
+  the F5 gaps the package names, which stay as today.
 
 The hook under test: GUARD_FIX3_HOOK, else pretooluse.py beside this file, else the repository's own.
 Run: python3 -m pytest -q test_guard_fix_3.py
@@ -249,6 +251,151 @@ CASES = [
     ("fix3 auditor data heredoc substitution writes code", A, "Bash",
      b("cat > /tmp/gov-fix3-x <<EOF\n$(touch src/gov/y.py)\nEOF"), "deny"),
     ("fix3 auditor sh -c writes code", A, "Bash", b("sh -c 'echo x > src/gov/y.py'"), "deny"),
+    # --- round 2 (the review of round 1, F1-F4; the moderator's triage) -------------------------------------------
+    # F1: a variable whose value uses one set before it is expanded in source order, whatever the hash seed.
+    ("r2 F1 auditor chained variables in /tmp (T=..; H=$T/p)", A, "Bash",
+     b("T=/tmp/gov-fix3-a; H=$T/p; mkdir -p $H && touch $H/x"), "allow"),
+    ("r2 F1 auditor three chained variables in /tmp", A, "Bash",
+     b("Z=/tmp/gov-fix3-z; Q=$Z/a; M=$Q/m; mkdir -p $M && touch $M/f $Q/g"), "allow"),
+    ("r2 F1 auditor chained variables into code", A, "Bash",
+     b(f"R={ROOT}; S=$R/src; touch $S/gov-fix3-x"), "deny"),
+    # F2: a heredoc body written to a file and run by the usual idioms (the review's four repros first).
+    ("r2 F2 repro 1: chmod +x, then the path", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nchmod +x /tmp/gov-fix3-s.sh && /tmp/gov-fix3-s.sh"),
+     "deny"),
+    ("r2 F2 repro 2: cd, then bash name", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\ncd /tmp && bash gov-fix3-s.sh"), "deny"),
+    ("r2 F2 repro 3: a loop variable runs it", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nfor f in /tmp/gov-fix3-s.sh; do bash $f; done"),
+     "deny"),
+    ("r2 F2 repro 4: chmod +x, cd, then ./name", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nchmod +x /tmp/gov-fix3-s.sh && cd /tmp && "
+       "./gov-fix3-s.sh"), "deny"),
+    ("r2 F2 written after a cd, run by bash name", E, "Bash",
+     b("cd /tmp && cat > gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nbash ./gov-fix3-s.sh"), "deny"),
+    ("r2 F2 an unresolvable $S runs it", E, "Bash",
+     b("S=$(mktemp); cat > $S <<'EOF'\ntouch tests/acceptance/f\nEOF\nbash $S"), "deny"),
+    ("r2 F2 run by $S whose value is known", E, "Bash",
+     b("S=/tmp/gov-fix3-s.sh; cat > $S <<'EOF'\ntouch tests/acceptance/f\nEOF\nchmod +x $S; $S"), "deny"),
+    ("r2 F2 a script naming the folder with no slash", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\nrm -rf tests/acceptance\nEOF\nchmod +x /tmp/gov-fix3-s.sh; /tmp/gov-fix3-s.sh"),
+     "deny"),
+    ("r2 F2 xargs runs it", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\necho /tmp/gov-fix3-s.sh | xargs -n1 bash"), "deny"),
+    ("r2 F2 bash reads it on its input", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\nbash < /tmp/gov-fix3-s.sh"), "deny"),
+    ("r2 F2 a python file run by runpy", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\n"
+       "python3 -c \"import runpy; runpy.run_path('/tmp/gov-fix3-s.py')\""), "deny"),
+    ("r2 F2 a python file run by exec(open())", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\n"
+       "python3 -c \"exec(open('/tmp/gov-fix3-s.py').read())\""), "deny"),
+    ("r2 F2 a python file run by python -m runpy", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\npython3 -m runpy /tmp/gov-fix3-s.py"), "deny"),
+    ("r2 F2 a python file run by uv run", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\nuv run /tmp/gov-fix3-s.py"), "deny"),
+    ("r2 F2 a file with no #! line run by its name", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.py <<'EOF'\nopen('tests/acceptance/f','w')\nEOF\nchmod +x /tmp/gov-fix3-s.py; "
+       "/tmp/gov-fix3-s.py"), "deny"),
+    ("r2 F2 a python file that changes folder into the tests", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.py <<'EOF'\nimport os\nos.chdir('tests/acceptance')\nopen('f','w')\nEOF\n"
+       "python3 /tmp/gov-fix3-s.py"), "deny"),
+    ("r2 F2 a copy of the script is run", E, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch tests/acceptance/f\nEOF\ncp /tmp/gov-fix3-s.sh /tmp/gov-fix3-t.sh && "
+       "bash /tmp/gov-fix3-t.sh"), "deny"),
+    ("r2 F2 auditor: a script run by a loop variable writes code (rule 5)", A, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch src/gov-fix3-x\nEOF\nfor f in /tmp/gov-fix3-s.sh; do bash $f; done"), "deny"),
+    ("r2 F2 auditor: chmod +x, then the path, writes code (rule 5)", A, "Bash",
+     b("cat > /tmp/gov-fix3-s.sh <<'EOF'\ntouch src/gov-fix3-x\nEOF\nchmod +x /tmp/gov-fix3-s.sh && /tmp/gov-fix3-s.sh"),
+     "deny"),
+    ("r2 F2 a brief naming the tests, then read by wc and cat", O, "Bash",
+     b("cat > /tmp/gov-fix3-brief.md <<'EOF'\nRun tests/acceptance/W2-64/ and don't edit them.\nEOF\n"
+       "wc -l /tmp/gov-fix3-brief.md && cat /tmp/gov-fix3-brief.md"), "allow"),
+    ("r2 F2 a script naming the tests that only runs them", O, "Bash",
+     b("cat > /tmp/gov-fix3-run.sh <<'EOF'\npython3 -m pytest -q tests/acceptance/W2-64 > /tmp/gov-fix3-out.txt\nEOF\n"
+       "bash /tmp/gov-fix3-run.sh"), "allow"),
+    ("r2 F2 auditor: a probe in /tmp, run by its path after chmod", A, "Bash",
+     b("cat > /tmp/gov-fix3-p.sh <<'EOF'\n#!/bin/bash\necho x > /tmp/gov-fix3-p.out\nEOF\nchmod +x /tmp/gov-fix3-p.sh && "
+       "/tmp/gov-fix3-p.sh"), "allow"),
+    ("r2 F2 the tests' output written, then read by a script", O, "Bash",
+     b("python3 -m pytest -q tests/acceptance/W2-64 > /tmp/gov-fix3-o.txt 2>&1; tail -5 /tmp/gov-fix3-o.txt; "
+       "python3 /tmp/gov-fix3-sum.py /tmp/gov-fix3-o.txt"), "allow"),
+    # F3: a write whose words are split over lines by backslash-newline (the review's repros).
+    ("r2 F3 cp continued onto the tests", E, "Bash", b("cp /tmp/x \\\n  tests/acceptance/f"), "deny"),
+    ("r2 F3 cp continued onto the tests' folder", E, "Bash", b("cp /tmp/x \\\n  tests/acceptance/"), "deny"),
+    ("r2 F3 touch continued", E, "Bash", b("touch \\\ntests/acceptance/f"), "deny"),
+    ("r2 F3 sed -i continued twice", E, "Bash", b("sed -i \\\n  's/a/b/' \\\n  tests/acceptance/f"), "deny"),
+    ("r2 F3 mv continued twice", E, "Bash", b("mv \\\n /tmp/x \\\n tests/acceptance/f"), "deny"),
+    ("r2 F3 git checkout -- continued", E, "Bash", b("git checkout \\\n  -- \\\n  tests/acceptance"), "deny"),
+    ("r2 F3 git rm continued", E, "Bash", b("git rm \\\n  tests/acceptance/f"), "deny"),
+    ("r2 F3 a path split inside a word", E, "Bash", b("echo a > tests/accep\\\ntance/f"), "deny"),
+    ("r2 F3 a continued write in a command the scan cannot read (as before, on both spellings)", E, "Bash",
+     b("cp /tmp/x \\\n  tests/acceptance/f; echo \"unclosed"), "deny"),
+    ("r2 F3 auditor cp continued into code", A, "Bash", b("cp /tmp/x \\\n  src/x"), "deny"),
+    ("r2 F3 auditor touch continued into code", A, "Bash", b("touch \\\nsrc/x"), "deny"),
+    ("r2 F3 auditor sed -i continued into code", A, "Bash", b("sed -i \\\ns/a/b/ \\\nsrc/x"), "deny"),
+    ("r2 F3 auditor cp continued into /tmp", A, "Bash", b("cp /tmp/gov-fix3-x \\\n  /tmp/gov-fix3-y"), "allow"),
+    ("r2 F3 a continued listing of the tests", E, "Bash", b("ls -la \\\n  tests/acceptance/W2-64/"), "allow"),
+    ("r2 F3 a backslash-newline inside single quotes is kept", E, "Bash",
+     b("printf 'a\\\nb' > /tmp/gov-fix3-c.txt"), "allow"),
+    # F4: inline Python naming the tests that writes through a path the guard cannot work out.
+    ("r2 F4 Path.glob then write_text", E, "Bash",
+     b("python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance').glob('*.py'):\n"
+       "    p.write_text('')\nEOF"), "deny"),
+    ("r2 F4 Path.glob then unlink", E, "Bash",
+     b("python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance').glob('*.pyc'):\n    p.unlink()\nEOF"),
+     "deny"),
+    ("r2 F4 rglob then write_text", E, "Bash",
+     b("python3 - <<'EOF'\nimport re, pathlib\nfor p in pathlib.Path('tests/acceptance').rglob('*.py'):\n"
+       "    s = p.read_text()\n    p.write_text(re.sub('a', 'b', s))\nEOF"), "deny"),
+    ("r2 F4 listdir then os.remove(os.path.join)", E, "Bash",
+     b("python3 - <<'EOF'\nimport os\nroot = 'tests/acceptance'\nfor f in os.listdir(root):\n"
+       "    os.remove(os.path.join(root, f))\nEOF"), "deny"),
+    ("r2 F4 listdir then os.remove(f-string)", E, "Bash",
+     b("python3 - <<'EOF'\nimport os\nroot = 'tests/acceptance'\nfor f in os.listdir(root):\n"
+       "    os.remove(f'{root}/{f}')\nEOF"), "deny"),
+    ("r2 F4 os.walk then os.remove", E, "Bash",
+     b("python3 - <<'EOF'\nimport os\nfor r, d, fs in os.walk('tests/acceptance'):\n    for f in fs:\n"
+       "        os.remove(os.path.join(r, f))\nEOF"), "deny"),
+    ("r2 F4 os.chdir into the tests then open w (heredoc)", E, "Bash",
+     b("python3 - <<'EOF'\nimport os\nos.chdir('tests/acceptance')\nopen('x', 'w')\nEOF"), "deny"),
+    ("r2 F4 os.chdir into the tests then open w (-c)", E, "Bash",
+     b("python3 -c \"import os; os.chdir('tests/acceptance'); open('x', 'w')\""), "deny"),
+    ("r2 F4 os.chdir into tests then open acceptance/f", E, "Bash",
+     b("python3 -c \"import os; os.chdir('tests'); open('acceptance/f', 'w')\""), "deny"),
+    ("r2 F4 tempfile.mkdtemp in the tests", E, "Bash",
+     b("python3 - <<'EOF'\nimport tempfile\ntempfile.mkdtemp(dir='tests/acceptance')\nEOF"), "deny"),
+    ("r2 F4 -c: a path built by %", E, "Bash",
+     b("python3 -c \"p = 'tests/%s/f' % 'acceptance'; open(p, 'w')\""), "deny"),
+    ("r2 F4 -c: a path built by '/'.join", E, "Bash",
+     b("python3 -c \"open('/'.join(['tests', 'acceptance', 'f']), 'w')\""), "deny"),
+    ("r2 F4 -c: a path built by ''.join", E, "Bash",
+     b("python3 -c \"open(''.join(['tests/', 'acceptance/', 'f']), 'w')\""), "deny"),
+    ("r2 F4 -c: a path built with chr", E, "Bash",
+     b("python3 -c \"open(chr(116) + 'ests/acceptance/f', 'w')\""), "deny"),
+    ("r2 F4 -c: glob.glob of the tests then open w", E, "Bash",
+     b("python3 -c \"import glob; [open(p, 'w') for p in glob.glob('tests/accept*/*')]\""), "deny"),
+    ("r2 F4 -c: a path from os.environ.get's default", E, "Bash",
+     b("python3 -c \"import os; open(os.environ.get('D', 'tests/acceptance') + '/f', 'w')\""), "deny"),
+    ("r2 F4 perl -e naming the folder with no slash", E, "Bash",
+     b("perl -pi -e 's/a/b/' tests/acceptance"), "deny"),
+    ("r2 F4 Python reading the tests by glob passes", O, "Bash",
+     b("python3 - <<'EOF'\nfrom pathlib import Path\nfor p in Path('tests/acceptance/W2-64').glob('*.py'):\n"
+       "    print(p.read_text()[:10])\nEOF"), "allow"),
+    ("r2 F4 Python writing computed paths elsewhere, not naming the tests, passes", O, "Bash",
+     b("python3 - <<'EOF'\nimport glob\nfor p in glob.glob('/tmp/gov-fix3-*.md'):\n    open(p, 'a').write('x')\nEOF"),
+     "allow"),
+    ("r2 F4 Python naming the tests writes its argv's /tmp file", O, "Bash",
+     b("python3 - /tmp/gov-fix3-o.txt <<'EOF'\nimport sys\nsys.path.insert(0, 'tests/acceptance/W2-64')\n"
+       "open(sys.argv[1], 'w').write('x')\nEOF"), "allow"),
+    ("r2 F4 Python naming the tests writes under the session's HOME (os.environ)", O, "Bash",
+     b("python3 - <<'EOF'\nimport os\nprint('tests/acceptance/W2-64')\n"
+       "open(os.environ['HOME'] + '/gov-fix3-o.txt', 'w')\nEOF"), "allow"),
+    ("r2 F4 a variable the command sets for Python is not the session's", E, "Bash",
+     b("HOME=tests/acceptance python3 -c \"import os; open(os.environ['HOME'] + '/f', 'w')\""), "deny"),
+    ("r2 F4 code that changes os.environ is not read from the session", E, "Bash",
+     b("python3 - <<'EOF'\nimport os\nos.environ['HOME'] = 'tests/acceptance'\n"
+       "open(os.environ['HOME'] + '/f', 'w')\nEOF"), "deny"),
     # --- rules 2 and 3 kept --------------------------------------------------------------------------------------
     # known gap, as today: rule 3 does not read Python code (see the package)
     ("fix3 python heredoc reading .env (gap as today)", E, "Bash",
@@ -471,3 +618,113 @@ def test_no_case_is_judged_by_a_crash():
                        capture_output=True, text=True, timeout=300)
     assert p.returncode == 0, p.stderr[-2000:]
     assert json.loads(p.stdout) == []
+
+
+# --- round 2: the module's own checks for F1-F4 ----------------------------------------------------------------------
+
+_SEEDS = """
+import json, re, sys
+sys.path.insert(0, sys.argv[1])
+import bash_writes as bw
+
+
+def expand(value, env):
+    if any(n not in env for n in re.findall(r"\\$(\\w+)", value)):
+        return None
+    return re.sub(r"\\$(\\w+)", lambda m: env[m.group(1)], value)
+
+
+out = []
+for c in ["T=/tmp/a; H=$T/p; mkdir -p $H && touch $H/x", "Z=/tmp/z; Q=$Z/a; M=$Q/m; touch $M/f $Q/g",
+          "B=/tmp/b; for s in x y; do touch $B/$s; done; D=$B/d; mkdir $D"]:
+    env, loops, drop = bw.variants(c, expand)
+    out.append([sorted(env.items()), sorted(loops.items()), sorted(drop)])
+print(json.dumps(out))
+"""
+
+
+def test_variables_expand_in_source_order_whatever_the_hash_seed():
+    """F1: a value that uses a variable set before it (T=/tmp/a; H=$T/p) is expanded, the same under every hash seed
+    (the hook runs with -E, so each run has its own seed; here the seed is set, without -E)."""
+    seen = set()
+    for seed in range(12):
+        env = dict(os.environ, PYTHONHASHSEED=str(seed))
+        p = subprocess.run([PY, "-c", _SEEDS, os.path.dirname(HOOK)], capture_output=True, text=True, env=env,
+                           timeout=60)
+        assert p.returncode == 0, p.stderr[-2000:]
+        seen.add(p.stdout)
+    assert len(seen) == 1, seen
+    first = json.loads(seen.pop())
+    assert first[0][0] == [["H", "/tmp/a/p"], ["T", "/tmp/a"]] and not first[0][2]
+    assert first[1][0] == [["M", "/tmp/z/a/m"], ["Q", "/tmp/z/a"], ["Z", "/tmp/z"]] and not first[1][2]
+
+
+def test_line_continuations_are_joined():
+    """F3: backslash-newline is removed before the text is read, outside single quotes."""
+    bw = _module()
+    text, _ = bw.heredocs("cp /tmp/x \\\n  tests/acceptance/f")
+    assert bw.simples(bw.tokens(text))[0][0] == ["cp", "/tmp/x", "tests/acceptance/f"]
+    text, _ = bw.heredocs("echo a > tests/accep\\\ntance/f")
+    assert "tests/acceptance/f" in text
+    text, _ = bw.heredocs("printf 'a\\\nb'")
+    assert "'a\\\nb'" in text
+    assert bw.joined("touch \\\ntests/acceptance/f") == "touch tests/acceptance/f"
+
+
+def test_code_names_the_tests_in_any_spelling():
+    """F4: code names the tests' folder with or without its slash, in pieces, or by a glob; a shell command by the
+    folder with its slash, as before."""
+    bw = _module()
+    for code in ["Path('tests/acceptance')", "os.path.join('tests', 'acceptance')", "Path('tests') / 'acceptance'",
+                 "'tests/%s/f' % 'acceptance'", "chr(116) + 'ests/acceptance/f'", "glob.glob('tests/accept*/*')"]:
+        assert bw.names_tests(code, code=True), code
+    assert not bw.names_tests("open('/tmp/x', 'w')", code=True)
+    assert not bw.names_tests("ls tests/acceptance", code=False)
+    assert bw.names_tests("ls tests/acceptance/", code=False)
+
+
+def test_python_reads_sys_argv_from_the_command():
+    """sys.argv[k] is the command's word, unless the code changes sys.argv."""
+    bw = _module()
+    judge = lambda text, cwd, depth: []  # noqa: E731
+    got = bw.python_writes("import sys\nopen(sys.argv[1], 'w')", "/r", judge, 0, ["-", "/tmp/o"])
+    assert got == [("/tmp/o", "/tmp/o")]
+    got = bw.python_writes("import sys\nsys.argv.append('x')\nopen(sys.argv[1], 'w')", "/r", judge, 0, ["-", "/tmp/o"])
+    assert got == [(bw.SENT, None)]
+    got = bw.python_writes("import sys\nopen(sys.argv[1], 'w')", "/r", judge, 0, None)
+    assert got == [(bw.SENT, None)]
+
+
+def test_the_words_that_may_run_a_script():
+    """F2: the words of a command that may run a file, with how; a reader (cat, wc, chmod, cp) runs none."""
+    bw = _module()
+    assert ("s.sh", "shell") in bw._script_words(["bash", "-e", "s.sh", "x"], [])[0]
+    assert ("./s.sh", "exec") in bw._script_words(["./s.sh"], [])[0]
+    assert ("/tmp/s.sh", "shell") in bw._script_words(["bash"], [("<", "/tmp/s.sh")])[0]
+    assert ("/tmp/s.py", "python") in bw._script_words(["python3", "-u", "/tmp/s.py"], [])[0]
+    assert ("/tmp/s.py", "python") in bw._script_words(["python3", "-m", "runpy", "/tmp/s.py"], [])[0]
+    assert ("/tmp/s.py", "code") in bw._script_words(["uv", "run", "/tmp/s.py"], [])[0]
+    assert bw._script_words(["python3", "-c", "exec(open('/tmp/s.py').read())"], [])[1] == \
+        ["exec(open('/tmp/s.py').read())"]
+    for reader in (["cat", "/tmp/s.sh"], ["wc", "-l", "/tmp/s.sh"], ["chmod", "+x", "/tmp/s.sh"]):
+        assert bw._script_words(reader, [])[0] == [(reader[0], "exec")], reader
+
+
+# Repros of the review's F4 that are F5's class (a program the guard does not read as a writer, run through
+# subprocess with a literal command): still allowed, as by today's hook; Wave 3 rows (F5), named in the package.
+KNOWN_GAPS = [
+    ("r2 gap F5: subprocess black on the tests", E, "Bash",
+     b("python3 - <<'EOF'\nimport subprocess\nsubprocess.run(['black', 'tests/acceptance'])\nEOF"), "allow"),
+    ("r2 gap F5: subprocess tar -C the tests", E, "Bash",
+     b("python3 - <<'EOF'\nimport subprocess\nsubprocess.run(['tar', 'xf', 'a', '-C', 'tests/acceptance'])\nEOF"),
+     "allow"),
+    ("r2 gap F5: subprocess git stash", E, "Bash",
+     b("python3 - <<'EOF'\nimport subprocess\nsubprocess.run(['git', 'stash'])\nEOF"), "allow"),
+]
+
+
+@pytest.mark.parametrize("name,role,tool,tin,want", KNOWN_GAPS, ids=[c[0] for c in KNOWN_GAPS])
+def test_known_gaps_stay_as_today(name, role, tool, tin, want):
+    """The gaps the package names (F5, Wave 3): the hook's answer is today's. A change here is a change of scope."""
+    got, why = _hook(role, tool, tin)
+    assert got == want, f"{name}: want {want} (as today), got {got} ({why})"

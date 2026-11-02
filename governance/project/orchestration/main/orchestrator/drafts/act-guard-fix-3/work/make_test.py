@@ -12,7 +12,9 @@ Drives the hook as Claude Code runs it (event JSON on stdin, the pinned judge's 
   parser does not read), and the patterns of the logged false refusals it must pass;
 - one synthetic case for each pattern of the 61 logged refusals (guard-refusals.jsonl), and, when the rebuilt corpus
   is given (GUARD_FIX3_CORPUS), the 61 themselves;
-- the module bash_writes.py directly.
+- the module bash_writes.py directly;
+- round 2: a case for each repro of the review's F1-F4 (planted with the others), the module's checks for them, and
+  the F5 gaps the package names, which stay as today.
 
 The hook under test: GUARD_FIX3_HOOK, else pretooluse.py beside this file, else the repository's own.
 Run: python3 -m pytest -q test_guard_fix_3.py

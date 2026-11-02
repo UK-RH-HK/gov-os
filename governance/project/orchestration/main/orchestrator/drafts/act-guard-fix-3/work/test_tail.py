@@ -212,3 +212,113 @@ def test_no_case_is_judged_by_a_crash():
                        capture_output=True, text=True, timeout=300)
     assert p.returncode == 0, p.stderr[-2000:]
     assert json.loads(p.stdout) == []
+
+
+# --- round 2: the module's own checks for F1-F4 ----------------------------------------------------------------------
+
+_SEEDS = """
+import json, re, sys
+sys.path.insert(0, sys.argv[1])
+import bash_writes as bw
+
+
+def expand(value, env):
+    if any(n not in env for n in re.findall(r"\\$(\\w+)", value)):
+        return None
+    return re.sub(r"\\$(\\w+)", lambda m: env[m.group(1)], value)
+
+
+out = []
+for c in ["T=/tmp/a; H=$T/p; mkdir -p $H && touch $H/x", "Z=/tmp/z; Q=$Z/a; M=$Q/m; touch $M/f $Q/g",
+          "B=/tmp/b; for s in x y; do touch $B/$s; done; D=$B/d; mkdir $D"]:
+    env, loops, drop = bw.variants(c, expand)
+    out.append([sorted(env.items()), sorted(loops.items()), sorted(drop)])
+print(json.dumps(out))
+"""
+
+
+def test_variables_expand_in_source_order_whatever_the_hash_seed():
+    """F1: a value that uses a variable set before it (T=/tmp/a; H=$T/p) is expanded, the same under every hash seed
+    (the hook runs with -E, so each run has its own seed; here the seed is set, without -E)."""
+    seen = set()
+    for seed in range(12):
+        env = dict(os.environ, PYTHONHASHSEED=str(seed))
+        p = subprocess.run([PY, "-c", _SEEDS, os.path.dirname(HOOK)], capture_output=True, text=True, env=env,
+                           timeout=60)
+        assert p.returncode == 0, p.stderr[-2000:]
+        seen.add(p.stdout)
+    assert len(seen) == 1, seen
+    first = json.loads(seen.pop())
+    assert first[0][0] == [["H", "/tmp/a/p"], ["T", "/tmp/a"]] and not first[0][2]
+    assert first[1][0] == [["M", "/tmp/z/a/m"], ["Q", "/tmp/z/a"], ["Z", "/tmp/z"]] and not first[1][2]
+
+
+def test_line_continuations_are_joined():
+    """F3: backslash-newline is removed before the text is read, outside single quotes."""
+    bw = _module()
+    text, _ = bw.heredocs("cp /tmp/x \\\n  tests/acceptance/f")
+    assert bw.simples(bw.tokens(text))[0][0] == ["cp", "/tmp/x", "tests/acceptance/f"]
+    text, _ = bw.heredocs("echo a > tests/accep\\\ntance/f")
+    assert "tests/acceptance/f" in text
+    text, _ = bw.heredocs("printf 'a\\\nb'")
+    assert "'a\\\nb'" in text
+    assert bw.joined("touch \\\ntests/acceptance/f") == "touch tests/acceptance/f"
+
+
+def test_code_names_the_tests_in_any_spelling():
+    """F4: code names the tests' folder with or without its slash, in pieces, or by a glob; a shell command by the
+    folder with its slash, as before."""
+    bw = _module()
+    for code in ["Path('tests/acceptance')", "os.path.join('tests', 'acceptance')", "Path('tests') / 'acceptance'",
+                 "'tests/%s/f' % 'acceptance'", "chr(116) + 'ests/acceptance/f'", "glob.glob('tests/accept*/*')"]:
+        assert bw.names_tests(code, code=True), code
+    assert not bw.names_tests("open('/tmp/x', 'w')", code=True)
+    assert not bw.names_tests("ls tests/acceptance", code=False)
+    assert bw.names_tests("ls tests/acceptance/", code=False)
+
+
+def test_python_reads_sys_argv_from_the_command():
+    """sys.argv[k] is the command's word, unless the code changes sys.argv."""
+    bw = _module()
+    judge = lambda text, cwd, depth: []  # noqa: E731
+    got = bw.python_writes("import sys\nopen(sys.argv[1], 'w')", "/r", judge, 0, ["-", "/tmp/o"])
+    assert got == [("/tmp/o", "/tmp/o")]
+    got = bw.python_writes("import sys\nsys.argv.append('x')\nopen(sys.argv[1], 'w')", "/r", judge, 0, ["-", "/tmp/o"])
+    assert got == [(bw.SENT, None)]
+    got = bw.python_writes("import sys\nopen(sys.argv[1], 'w')", "/r", judge, 0, None)
+    assert got == [(bw.SENT, None)]
+
+
+def test_the_words_that_may_run_a_script():
+    """F2: the words of a command that may run a file, with how; a reader (cat, wc, chmod, cp) runs none."""
+    bw = _module()
+    assert ("s.sh", "shell") in bw._script_words(["bash", "-e", "s.sh", "x"], [])[0]
+    assert ("./s.sh", "exec") in bw._script_words(["./s.sh"], [])[0]
+    assert ("/tmp/s.sh", "shell") in bw._script_words(["bash"], [("<", "/tmp/s.sh")])[0]
+    assert ("/tmp/s.py", "python") in bw._script_words(["python3", "-u", "/tmp/s.py"], [])[0]
+    assert ("/tmp/s.py", "python") in bw._script_words(["python3", "-m", "runpy", "/tmp/s.py"], [])[0]
+    assert ("/tmp/s.py", "code") in bw._script_words(["uv", "run", "/tmp/s.py"], [])[0]
+    assert bw._script_words(["python3", "-c", "exec(open('/tmp/s.py').read())"], [])[1] == \
+        ["exec(open('/tmp/s.py').read())"]
+    for reader in (["cat", "/tmp/s.sh"], ["wc", "-l", "/tmp/s.sh"], ["chmod", "+x", "/tmp/s.sh"]):
+        assert bw._script_words(reader, [])[0] == [(reader[0], "exec")], reader
+
+
+# Repros of the review's F4 that are F5's class (a program the guard does not read as a writer, run through
+# subprocess with a literal command): still allowed, as by today's hook; Wave 3 rows (F5), named in the package.
+KNOWN_GAPS = [
+    ("r2 gap F5: subprocess black on the tests", E, "Bash",
+     b("python3 - <<'EOF'\nimport subprocess\nsubprocess.run(['black', 'tests/acceptance'])\nEOF"), "allow"),
+    ("r2 gap F5: subprocess tar -C the tests", E, "Bash",
+     b("python3 - <<'EOF'\nimport subprocess\nsubprocess.run(['tar', 'xf', 'a', '-C', 'tests/acceptance'])\nEOF"),
+     "allow"),
+    ("r2 gap F5: subprocess git stash", E, "Bash",
+     b("python3 - <<'EOF'\nimport subprocess\nsubprocess.run(['git', 'stash'])\nEOF"), "allow"),
+]
+
+
+@pytest.mark.parametrize("name,role,tool,tin,want", KNOWN_GAPS, ids=[c[0] for c in KNOWN_GAPS])
+def test_known_gaps_stay_as_today(name, role, tool, tin, want):
+    """The gaps the package names (F5, Wave 3): the hook's answer is today's. A change here is a change of scope."""
+    got, why = _hook(role, tool, tin)
+    assert got == want, f"{name}: want {want} (as today), got {got} ({why})"

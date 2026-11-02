@@ -25,6 +25,14 @@ open items in short form (P-W2-90b-1, W2-11's seven lines, SW4 line 3) to decide
 `c361b095` (product-spec, STANDARD; starts once W2-11 closes; withdrawn if W2-11 takes the lines in another round);
 SW4 line 3 -> W3-P21. applied_check 0 gaps. **TODO by day (after 07:30, 2026-11-02):** the push-on-prompt test again:
 ping first, the owner steps away, the prompt waits a few minutes (DEC-1022 item 1).
+**00:45:** guard-fix round 2 done (F1-F4 fixed; corpus 2/61; 0 of 167 planted writes missed; 270 tests stable; one
+residual regression -> Wave 3 row). Review round 2 (Sonnet, the last) writes `reviews/act-guard-fix-3-round2.md`.
+PASS -> copy to `packages/ACT-GUARD-FIX-3.md` (+ diff, files), commit, ping (before 02:00) or 09:00 package. FAIL ->
+the owner once, with options (DEC-1010). Refusals 63 of 67 false (a classify can race the harvester: re-check
+unclassified after classifying).
+**00:58:** review round 2 PASS, READY true (`tools/verdict.py`); package in `packages/` (`49158e13`: .md with the review
+summary, .diff, test file); ACT pinged (sent). Waiting on the owner's operator to apply it. Round 2's low findings and
+F5-F7 are Wave 3 rows to add to WAVE_3_PARKING.md with the morning records.
 **00:15:** W2-104 returned DONE at `ac2d92af8c0e` with P-W2-104-CMDLIST: decided (a) + CLAUDEPATH (c), DEC-1020
 `235c4d5d`, ticket paths `d942524f`; run 2 brief `briefs/W2-104-A5-run2-dec1020.md` on the ready list after W2-92.
 Guard 64 (the reviewer's heredoc probe) false; 61 of 65 false. Leftover scratch for removal (rm: by day only, pinged):

@@ -16,6 +16,12 @@ only, and judges the rest by what it is:
   ``os`` and ``shutil`` calls that write, and the commands it runs. A write whose target cannot be worked out, code
   that runs code (exec, eval, getattr, ...), and code the shell rewrites (``$VAR``) are "unresolvable".
 
+Round 2 (the independent review's F1-F4): variables are expanded in source order; backslash-newline is removed before
+the text is read; a data heredoc's body written to a file is judged as code whenever a later word may run that file
+(bash name after a cd, ./name, chmod +x and the path, a loop variable, xargs, runpy, ...), and refused under rule 1
+when the run cannot be read and the body names the tests; code that names the tests in any spelling and writes
+through a path the guard cannot work out (a glob, listdir, walk, chdir or computed path) is refused.
+
 Whatever the scan cannot read for certain (unbalanced quotes, an unterminated heredoc, ``<<`` in arithmetic, an
 unknown reader) falls back to the judgement before this fix (fail closed). Nothing here runs the command.
 """
@@ -26,6 +32,9 @@ import shlex
 import warnings
 from contextlib import contextmanager
 from itertools import product
+
+# The session's environment as the hook received it, before any judgement sets the command's own variables in it.
+_SESSION_ENV = dict(os.environ)
 
 ACCEPTANCE = "tests/acceptance/"
 SENT = "/<guard-unresolvable>"  # gov.guard.decide._UNRESOLVABLE; checked equal by the hook
@@ -436,7 +445,7 @@ def variants(text, expand):
                 break
     env, drop, loopvals = {}, set(), {}
     if opaque:
-        return env, loopvals, set(names)
+        return env, loopvals, set(names) | {"*"}  # "*": any variable may be set
     for name in names:
         mine = [s for s in sets if s[0] == name]
         loop = loops.get(name, [])
@@ -513,10 +522,11 @@ _PATHS = frozenset(("Path", "pathlib.Path", "PurePath", "pathlib.PurePath", "Pos
                     "pathlib.PurePosixPath", "PurePosixPath"))
 
 
-def python_writes(code, ecwd, judge, depth, argv=None):
+def python_writes(code, ecwd, judge, depth, argv=None, getenv=None):
     """The targets ``code`` writes, as (raw text, absolute path or None); SENT for one it cannot work out. ``judge``
     judges a command the code runs (a literal subprocess or os.system command). ``argv``: the words the command
-    gives the code (sys.argv, each None when it does not expand), when known. Raises SyntaxError."""
+    gives the code (sys.argv, each None when it does not expand), when known. ``getenv``: name -> (known, value or
+    None) for os.environ, when known. Raises SyntaxError."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")  # an invalid escape in the code is the code's business, not the hook's
         tree = ast.parse(code)
@@ -547,6 +557,18 @@ def python_writes(code, ecwd, judge, depth, argv=None):
         if any(isinstance(n, (ast.Attribute, ast.Name)) and qual(n, alias) == "sys.argv" and (
                 isinstance(n.ctx, (ast.Store, ast.Del)) or id(n) in changed) for n in ast.walk(tree)):
             argv = None
+    # os.environ is the session's, unless the code changes it (a store, update, setdefault, putenv) or names it
+    # other than to read one variable.
+    if getenv is not None:
+        changed = {id(n) for n in _receivers(tree)}
+        for n in ast.walk(tree):
+            if isinstance(n, (ast.Attribute, ast.Name)) and qual(n, alias) == "os.environ":
+                if id(n) in changed or not isinstance(n.ctx, ast.Load):
+                    getenv = None
+            elif isinstance(n, ast.Assign) and qual(n.value, alias) == "os.environ":
+                getenv = None
+            elif isinstance(n, ast.Call) and qual(n.func, alias) in ("os.putenv", "os.unsetenv"):
+                getenv = None
     # A name bound once in the whole code, by a plain assignment, is that value everywhere (in functions too).
     for node in ast.walk(tree):
         if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
@@ -594,6 +616,11 @@ def python_writes(code, ecwd, judge, depth, argv=None):
                     return ev(value)
                 finally:
                     scope.pop()
+            if isinstance(node, ast.Subscript) and getenv is not None and qual(node.value, alias) == "os.environ":
+                k = node.slice
+                known, value = getenv(k.value) if isinstance(k, ast.Constant) and isinstance(k.value, str) else \
+                    (False, None)
+                return value if known else None
             if isinstance(node, ast.Subscript) and argv is not None and qual(node.value, alias) == "sys.argv":
                 k = node.slice
                 if isinstance(k, ast.Constant) and type(k.value) is int and 0 <= k.value < len(argv):
@@ -632,6 +659,10 @@ def python_writes(code, ecwd, judge, depth, argv=None):
                     return args[0]
                 if q == "os.path.expanduser" and len(args) == 1:
                     return os.path.expanduser(args[0])
+                if q in ("os.environ.get", "os.getenv") and getenv is not None and 1 <= len(args) <= 2:
+                    known, value = getenv(args[0])
+                    return None if not known else value if value is not None else \
+                        (args[1] if len(args) == 2 else None)
                 if q in ("os.getcwd", "Path.cwd", "pathlib.Path.cwd") and not args:
                     return ecwd
                 if q in ("Path.home", "pathlib.Path.home") and not args:
@@ -823,7 +854,8 @@ def _receivers(tree):
     out = []
     for n in ast.walk(tree):
         if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in (
-                "append", "extend", "insert", "pop", "remove", "clear", "reverse", "sort", "__setitem__"):
+                "append", "extend", "insert", "pop", "remove", "clear", "reverse", "sort", "__setitem__", "update",
+                "setdefault", "popitem", "__delitem__"):
             out.append(n.func.value)
         elif isinstance(n, ast.Subscript) and isinstance(n.ctx, (ast.Store, ast.Del)):
             out.append(n.value)
@@ -939,7 +971,7 @@ _NOT_RUNNERS = frozenset(
     "xxd od hexdump strings realpath readlink dirname basename true false : mkdir rmdir tee shellcheck shfmt bat "
     "dos2unix unix2dos fold fmt iconv expand unexpand du df wait sleep cd pushd popd pwd export unset read set "
     "declare local typeset readonly shift exit return break continue git ruff black flake8 pyflakes pylint mypy "
-    "isort yamllint".split())
+    "isort yamllint for select case in esac done fi".split())  # a loop's words: a run inside it is judged there
 # Programs that run the file they are given as Python.
 _PY_RUNNERS = frozenset("pytest py.test coverage ipython".split())
 
@@ -997,6 +1029,19 @@ def _applies_patch(name, args):
     return sub == "stash" and rest[:1] in (["apply"], ["pop"])
 
 
+def _prefix(words, head):
+    """The names a simple command sets in its own environment before what it runs (X=1 cmd, env X=1 cmd); "*" when
+    it may change any (env -i, env -u, env -S)."""
+    out = set()
+    for w in words[:len(words) - len(head)]:
+        m = _ASSIGN.match(w)
+        if m:
+            out.add(m.group(1))
+        elif w.startswith("-") and not w.startswith("--") or w in ("--ignore-environment", "--unset", "--split-string"):
+            out.add("*")
+    return out
+
+
 def _shebang(text):
     """How a file run by its own name is run, by its #! line. With none, bash runs it as shell whatever it holds:
     the guard cannot tell what the file was meant to be (unknown)."""
@@ -1040,6 +1085,7 @@ class Judgement:
         self.shell, self.findings = [], []
         self.bodies = [] if bodies is None else bodies  # every heredoc body met, nested commands' too
         self.ctx = ({}, {}, set())  # the variables of the command being walked
+        self.prefix = set()  # the variables the simple command being judged sets for itself (X=1 cmd, env X=1 cmd)
 
     def run(self, command, cwd, whole, depth=0):
         outer = self.ctx
@@ -1079,11 +1125,12 @@ class Judgement:
                         self.sub(subs[k], ecwd, whole, depth)
                 self.ctx = (env, loopvals, drop)
                 head = lead(words)
+                self.prefix = _prefix(words, head)
                 name = os.path.basename(head[0]) if head else ""
                 args = head[1:]
                 part = " ".join(words)
                 for names, body in scripts:
-                    self.script(names, body, head, reds, subs, part, ecwd, whole, depth)
+                    self.script(names, body, words, reds, subs, part, ecwd, whole, depth, staged)
                 if name in ("cd", "pushd", "popd"):
                     ecwd = self.cd(name, args, ecwd)
                 elif name in _SHELLS and any(_short(a, "c") for a in args):
@@ -1117,7 +1164,9 @@ class Judgement:
                         # if more than one could.
                         runs = [kind for kind in stage[at:] if kind != "data"]
                         kind = "data" if not runs else runs[0] if len(runs) == 1 else "code"
-                        reader = next((lead(w) for (w, _), kd in zip(staged[at:], stage[at:]) if kd == kind), [])
+                        full = next((w for (w, _), kd in zip(staged[at:], stage[at:]) if kd == kind), [])
+                        reader = lead(full)
+                        self.prefix = _prefix(full, reader)
                         self.body(self.bodies[k], kind, part_, where, whole, depth, argv=self.py_argv(reader))
                         if kind == "data":
                             targets = _written(staged[at:], raw=True)
@@ -1130,14 +1179,14 @@ class Judgement:
         exp = self.expand(word)
         return None if exp is None or "`" in exp else os.path.basename(exp.rstrip("/"))
 
-    def script(self, names, body, head, reds, subs, part, ecwd, whole, depth):
+    def script(self, names, body, all_words, reds, subs, part, ecwd, whole, depth, piped=()):
         """A command after one that wrote a data heredoc's body to a file (ACT-GUARD-FIX-3 round 2, F2): when it may
         run that file, the body is judged as the code it then is. A run the guard reads (bash or sh, source, python,
-        the file's own name, after a cd too) is judged as shell or Python; any other command given the file's name,
-        and a run whose script word does not expand (a loop's variable, $S), is code the guard cannot read: refused
-        under rule 1 when the body names the tests, and judged as shell under rule 5, as before this fix."""
-        if not head:
-            return
+        the file's own name, after a cd too) is judged as shell or Python; any other command given the file's name
+        (a word, a pipe into xargs or a shell, a -c string or a substitution naming it), and a run whose script word
+        does not expand (a loop's variable, $S), is code the guard cannot read: refused under rule 1 when the body
+        names the tests, and judged as shell under rule 5, as before this fix."""
+        head = lead(all_words)
         words, code = _script_words(head, reds)
         unsure = None in names
         how = None
@@ -1149,12 +1198,17 @@ class Judgement:
             if (base is None or unsure) and kind in ("exec", "shell", "python") and \
                     (kind != "exec" or base is None or "/" in w):
                 how = how or ("unknown-python" if kind == "python" else "unknown")
+        if how is None and head and piped and (os.path.basename(head[0]) in ("xargs", "parallel") or
+                                               (len(words) == 1 and _kind(head) in ("shell", "python"))):
+            # A pipe hands the file's name to xargs, or its text to a shell or python reading its input.
+            if any(self.basename(w) in names for ws, rs in piped for w in ws + [r[1] for r in rs]):
+                how = "unknown"
         if how is None:
-            texts = code + [subs[int(k)] for w in head + [r[1] for r in reds]
+            texts = code + [subs[int(k)] for w in all_words + [r[1] for r in reds]
                             for k in re.findall(r"__gov_sub_(\d+)__", w)]
             if any(n and n in t for n in names for t in texts):
-                how = "unknown-python" if _PY.match(os.path.basename(head[0])) else "unknown"
-        name = os.path.basename(head[0])
+                how = "unknown-python" if head and _PY.match(os.path.basename(head[0])) else "unknown"
+        name = os.path.basename(head[0]) if head else ""
         if how is None:
             if name in ("cp", "mv", "ln", "install") and len(head) > 2 and \
                     any(self.basename(w) in names for w in head[1:-1] if not w.startswith("-")):
@@ -1199,6 +1253,14 @@ class Judgement:
                 self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
             except Unreadable:
                 self.shell.append(SENT)
+
+    def getenv(self, name):
+        """os.environ[name] as the code the command runs sees it: (known, value or None). The session's value when the
+        command does not set the variable itself; unknown when it does (or may: source, eval)."""
+        env, loops, drop = self.ctx
+        if name in env or name in loops or name in drop or "*" in drop or name in self.prefix or "*" in self.prefix:
+            return False, None
+        return True, _SESSION_ENV.get(name)
 
     def py_argv(self, head):
         """sys.argv of the Python a command runs (its words after the program: -c's code, -, or the script), each
@@ -1286,7 +1348,7 @@ class Judgement:
                 self.findings.append(([(SENT, None)], whole, False))
         for text in dict.fromkeys(texts):
             try:
-                targets = python_writes(text, ecwd, self.nested(whole), depth, argv)
+                targets = python_writes(text, ecwd, self.nested(whole), depth, argv, self.getenv)
             except (SyntaxError, ValueError, RecursionError):
                 targets = [(SENT, None)]
             self.findings.append((targets, scope + "\n" + text, True))

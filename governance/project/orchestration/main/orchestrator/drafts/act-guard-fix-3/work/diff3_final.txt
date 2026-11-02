@@ -1,0 +1,89 @@
+commands: 4893 Counter({'orchestrator': 2852, 'independent-auditor': 2041})
+outcomes (live, candidate): Counter({('allow', 'allow'): 4759, ('deny', 'allow'): 67, ('deny', 'deny'): 54, ('allow', 'deny'): 13})
+outcomes (round 1, round 2): Counter({('allow', 'allow'): 4826, ('deny', 'deny'): 61, ('allow', 'deny'): 6})
+  r1->r2 #1025 indep r1=allow r2=deny  | live=allow | r2: a command that may write the acceptance tests, which only th
+  r1->r2 #1778 indep r1=allow r2=deny  | live=allow | r2: a command that may write the acceptance tests, which only th
+  r1->r2 #1795 indep r1=allow r2=deny  | live=allow | r2: a command that may write the acceptance tests, which only th
+  r1->r2 #1796 indep r1=allow r2=deny  | live=deny  | r2: a command that may write the acceptance tests, which only th
+  r1->r2 #1979 indep r1=allow r2=deny  | live=deny  | r2: a command that may write the acceptance tests, which only th
+  r1->r2 #3489 orche r1=allow r2=deny  | live=allow | r2: a command that may write the acceptance tests, which only th
+  #109 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #111 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #112 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #470 indep live=deny  cand=allow | live: a reviewer or auditor writes only its own review or audit re | cand: 
+  #613 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #620 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #660 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #668 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #926 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #939 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #953 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #1025 indep live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #1044 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1049 indep live=deny  cand=allow | live: the call reads a secret or a key (.env, *.env, .env.*, *.pem | cand: 
+  #1183 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #1319 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #1483 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1517 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1614 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #1628 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1648 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1653 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1728 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1734 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1759 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #1778 indep live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #1795 indep live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #1899 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1929 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1935 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #1939 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #1943 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #1948 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #2034 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #2077 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #2087 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #2312 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #2388 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #2418 indep live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #2676 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #2855 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #3216 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #3217 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #3384 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3385 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3440 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3441 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3453 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3454 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3456 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3461 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #3465 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3466 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3477 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3481 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3482 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3486 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3487 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3489 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #3612 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3615 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3616 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3621 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3622 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #3769 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #3925 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #4059 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4115 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #4117 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4285 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #4302 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4350 indep live=deny  cand=allow | live: a reviewer or auditor runs only commands whose writes can be | cand: 
+  #4676 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #4730 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4783 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4784 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4785 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 
+  #4795 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #4796 orche live=allow cand=deny  | live:  | cand: a command that may write the acceptance tests, which only th
+  #4844 orche live=deny  cand=allow | live: a command that may write the acceptance tests, which only th | cand: 

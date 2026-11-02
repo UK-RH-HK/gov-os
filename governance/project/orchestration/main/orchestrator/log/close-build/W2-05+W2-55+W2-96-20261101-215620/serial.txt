@@ -1,0 +1,112 @@
+...........F............................................................ [ 72%]
+.............F.............                                              [100%]
+=================================== FAILURES ===================================
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer] ________
+
+kernel_live = PosixPath('/tmp/gov-os-close-20261101-215620/pytest-of-usain/pytest-23/w2-90-w1-05-live0/repo')
+kernel_switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...}]}], ...}, 'permissions': {'deny': ['Bash(npm install*)', 'Bash(pip install*)', 'Bash(sudo *)', 'Edit(.tickets/**)']}}
+kernel_sandbox = Sandbox(home=PosixPath('/tmp/gov-os-close-20261101-215620/pytest-of-usain/pytest-23/w2-90-w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/gov-os-close-20261101-215620/pytest-of-usain/pytest-23/w2-90-w1-05-sandbox0/systmp'))
+name = 'Read-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(kernel_live, kernel_switched_over, kernel_sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        live, switched_over, sandbox = kernel_live, kernel_switched_over, kernel_sandbox
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Read call for its PreToolUse hooks, per round (ms): 461.3, 239.8, 105.4; the bound is 100 ms
+E       assert 0.10538473585620522 < 0.1
+E        +  where 0.10538473585620522 = min([0.4613450721371919, 0.2398259569890797, 0.10538473585620522])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:228: AssertionError
+__________ test_a_secret_added_after_the_first_index_leaves_the_graph __________
+
+module = PosixPath('/home/usain/gov-os-runs/W2-00/close/W2-05+W2-55+W2-96-20261101-215620/src/gov/codeintel')
+cbm = '/home/usain/.local/bin/codebase-memory-mcp'
+sandbox = Sandbox(base=PosixPath('/tmp/w16-83wbiie1'), home=PosixPath('/tmp/w16-83wbiie1/h'), tmpdir=PosixPath('/tmp/w16-83wbiie1/t'), runtime=PosixPath('/tmp/w16-83wbiie1/r'), elsewhere=PosixPath('/tmp/w16-83wbiie1/e'))
+tmp_path = PosixPath('/tmp/gov-os-close-20261101-215620/pytest-of-usain/pytest-23/test_a_secret_added_after_the_0')
+
+    def test_a_secret_added_after_the_first_index_leaves_the_graph(module, cbm, sandbox, tmp_path):
+        """A clean file is indexed, then gains a secret: after the next index nothing of it is known or stored."""
+        planted = _plant(tmp_path / "later")
+        planted.write("app/later.py", "def later_helper(value):\n    return value - 1\n")
+        planted.commit("later")
+        first = support.codeintel(planted.root, [("index", []), ("definitions", ["later_helper"])], sandbox)
+        assert ("app/later.py", "later_helper") in support.entries(first.results[1], "definitions(later_helper)"), \
+            first.describe()
+        planted.write("app/later.py", f'TOKEN = "{support.STRING_SECRET}"\n\n\n'
+                                      "def later_helper(value):\n    return value - 1\n")
+        planted.commit("leak")
+>       second = support.codeintel(planted.root, [("index", []), ("definitions", ["later_helper"])], sandbox)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/tmp/gov-os-close-20261101-215620/pytest-of-usain/pytest-23/test_a_secret_added_after_the_0/later')
+calls = [('index', []), ('definitions', ['later_helper'])]
+sandbox = Sandbox(base=PosixPath('/tmp/w16-83wbiie1'), home=PosixPath('/tmp/w16-83wbiie1/h'), tmpdir=PosixPath('/tmp/w16-83wbiie1/t'), runtime=PosixPath('/tmp/w16-83wbiie1/r'), elsewhere=PosixPath('/tmp/w16-83wbiie1/e'))
+
+    def codeintel(root, calls, sandbox):
+        """The results of ``gov.codeintel`` calls, in order. Every call must succeed."""
+        run = run_calls("gov.codeintel", root, calls, sandbox)
+>       assert run.results is not None, f"gov.codeintel did not answer\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov.codeintel did not answer
+E       gov.codeintel.index(root); gov.codeintel.definitions(root, 'later_helper')
+E       exit code: 1
+E       stdout:
+E       
+E       stderr:
+E       Traceback (most recent call last):
+E         File "<string>", line 8, in <module>
+E         File "/home/usain/gov-os-runs/W2-00/close/W2-05+W2-55+W2-96-20261101-215620/src/gov/codeintel/__init__.py", line 243, in definitions
+E           nodes, _, named = _named(root, name)
+E                             ^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-runs/W2-00/close/W2-05+W2-55+W2-96-20261101-215620/src/gov/codeintel/__init__.py", line 233, in _named
+E           nodes, users = _graph(Path(root).resolve())
+E                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-runs/W2-00/close/W2-05+W2-55+W2-96-20261101-215620/src/gov/codeintel/__init__.py", line 221, in _graph
+E           found = _rows(session, "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path")
+E                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-runs/W2-00/close/W2-05+W2-55+W2-96-20261101-215620/src/gov/codeintel/__init__.py", line 207, in _rows
+E           page = session.tool("query_graph", project=PROJECT, format="json", query=query, max_rows=_PAGE,
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         File "/home/usain/gov-os-runs/W2-00/close/W2-05+W2-55+W2-96-20261101-215620/src/gov/codeintel/__init__.py", line 176, in tool
+E           raise RuntimeError(f"{TOOL} {tool} failed (exit code {self._end()})")
+E       RuntimeError: codebase-memory-mcp query_graph failed (exit code 0)
+
+tests/acceptance/W1-16/w1_16_support.py:494: AssertionError
+2 failed, 97 passed in 1061.02s (0:17:41)

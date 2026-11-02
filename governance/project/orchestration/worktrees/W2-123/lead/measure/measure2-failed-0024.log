@@ -1,0 +1,12 @@
+heavy_slot: all 3 slots taken; waiting (2026-11-01 23:25:45)
+{"kind": "sample", "corpus_chunks": 50740, "det_chunks": 256, "store": "/home/usain/gov-os-worktrees/W2-00-store/.gov-runtime/store.db", "at": "2026-11-02T00:05:18"}
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-123/00ea7924-7196-40be-b03c-12ea54569340/scratchpad/measure.py", line 286, in <module>
+    main()
+  File "/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-123/00ea7924-7196-40be-b03c-12ea54569340/scratchpad/measure.py", line 265, in main
+    seen = start(parallel, cpus, nice)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-123/00ea7924-7196-40be-b03c-12ea54569340/scratchpad/measure.py", line 150, in start
+    assert semantic._embed(["warm up"], HOST) is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

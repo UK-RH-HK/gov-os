@@ -1,1 +1,2 @@
 heavy_slot: all 3 slots taken; waiting (2026-11-01 23:39:54)
+rebuild: slow: past 1800 s and still running; it goes on to the end; its record: .gov-runtime/rebuild/record.json

@@ -6,3 +6,25 @@
 2026-11-01 22:49:54 W2-55 selection: scoped []; 41 targets; governance left out 1
 2026-11-01 22:49:58 W2-96 selection: scoped []; 65 targets; governance left out 9
 2026-11-01 22:49:58 run scope scoped: 84 targets; core changed 17, unplaced 0
+2026-11-02 00:32:34 parallel exit 1 in 5008 s {'exit': 1, 's': 5008, 'tests': 16358, 'failures': 16, 'errors': 2, 'skipped': 5}; serial exit 1 in 1146 s {'exit': 1, 's': 1146, 'entries': 44, 'tests': 99, 'failures': 2, 'errors': 0, 'skipped': 0}
+2026-11-02 00:32:34 passes alone (flaky candidate): tests/unit/orchestration/test_cto_safety_nets.py::test_the_switch_names_a_tool_call_waiting_since_its_time
+2026-11-02 00:32:35 passes alone (flaky candidate): tests/unit/orchestration/test_cto_safety_nets.py::test_the_switch_counts_a_tool_result_as_an_answered_call_and_alerts_by_day_after_an_hour
+2026-11-02 00:32:37 passes alone (flaky candidate): tests/unit/orchestration/test_cto_safety_nets.py::test_a_forced_test_alert_goes_through_the_channel_and_a_replay_keeps_its_own_state
+2026-11-02 00:32:40 passes alone (flaky candidate): tests/unit/orchestration/test_cto_safety_nets.py::test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise
+2026-11-02 00:32:41 passes alone (flaky candidate): tests/unit/orchestration/test_cto_safety_nets.py::test_the_named_session_is_watched_not_the_newest_transcript
+2026-11-02 00:32:41 red alone: tests/acceptance/W2-55/test_w2_55_backfill.py::test_one_row_per_register_entry_at_the_base_in_its_order
+2026-11-02 00:32:42 red alone: tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]
+2026-11-02 00:32:43 red alone: tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+2026-11-02 00:32:49 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+2026-11-02 00:32:55 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+2026-11-02 00:33:01 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+2026-11-02 00:33:06 red alone: tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+2026-11-02 00:33:07 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+2026-11-02 00:33:07 red alone: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+2026-11-02 00:33:08 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+2026-11-02 00:33:09 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+2026-11-02 00:33:10 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+2026-11-02 00:33:10 red alone: tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+2026-11-02 00:33:21 passes alone (flaky candidate): tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer]
+2026-11-02 00:34:15 passes alone (flaky candidate): tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_a_secret_added_after_the_first_index_leaves_the_graph
+2026-11-02 00:34:27 trace: against the known state 1f0bb5b3c516 (the nightly of 2026-10-31 (red))
