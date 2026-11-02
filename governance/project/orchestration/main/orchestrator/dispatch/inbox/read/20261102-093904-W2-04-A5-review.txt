@@ -1,0 +1,7 @@
+log: W2-04-A5-review.json
+W2: W2-04
+status: PACKAGES — the review failed: F1 is in scope, can be hit in ordinary work, and fails open (an emptied mandatory file is shown as read with the empty-content hash and 0 tokens); `verdict.py` gives READY = False.
+
+task: W2-04 (DAEO-u4oz): run the FULL independent review on the verified head b37b5c8f1741, triage it under the moderator rule, and land it (DONE) or return the blocking finding (PACKAGES).
+status: PACKAGES — the review failed: F1 is in scope, can be hit in ordinary work, and fails open (an emptied mandatory file is shown as read with the empty-content hash and 0 tokens); `verdict.py` gives READY = False.
+work_completed: Checked the head (b37b5c8f1741, tree clean, hooks folder has only samples). Updated `briefs/rev-1.md`: it now carries JUDGEMENT.md word for word as it stands on `w2/integrate`
