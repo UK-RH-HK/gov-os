@@ -25,8 +25,10 @@ and run there with that worktree's `PYTHONPATH`, the tests exercise the ticket's
   base read, or none) and `reason` (why, where it is not `seeded`).
 - Every full rebuild writes `.gov-runtime/rebuild/stores.json`: at least `code`, `embedder` (`model`, `revision`, as
   the semantic stage records them) and `schema`.
-- A rebuild whose semantic store was asked for and not recreated fails: exit non-zero, `REBUILD_FAILED`, naming the
-  semantic store and the reason. `--no-embeddings` still answers ok.
+
+**DEC-1027 C (owner, 2026-11-02):** the ticket's former KPI 5 (a rebuild whose semantic store was asked for and not
+recreated fails, named) moved to W2-124 (`DAEO-mb2t`); its four cases (`test_w2_122_semantic_required.py`) are
+retired from this suite. The ticket's other lines keep their numbers (K1 to K4, F1): K5 was the last success line.
 
 ## How the tests run
 
@@ -37,9 +39,8 @@ and run there with that worktree's `PYTHONPATH`, the tests exercise the ticket's
   twice (`kept.md`, `kept-too.md`), one changed (`changed.md`), one removed (`removed.md`), one added (`added.md`).
 - **The stand-in endpoint** speaks Ollama's HTTP interface on a loopback port that the case starts and stops. It
   reports `qwen3-embedding:0.6b` with a digest that begins with the pin (or with another revision), gives vectors
-  made of the words of each text (and a salt per endpoint, so two embedders give other vectors), records every text
-  it is asked to embed, and can fail every embed request after the first N. "Down" is a loopback port nothing
-  listens on. The shared embedding server is never asked.
+  made of the words of each text (and a salt per endpoint, so two embedders give other vectors), and records every
+  text it is asked to embed. The shared embedding server is never asked.
 - **Entry for entry** means: the result's `digest`; the stores' outcomes (`stores`, not `seed`); and every
   `lexical_*` and `semantic_*` table of `.gov-runtime/store.db`, row for row (a blob compared by its sha256, so every
   chunk's vector is compared; an `INTEGER PRIMARY KEY` row number is left out, as no entry of the store). The cold
@@ -60,7 +61,6 @@ and run there with that worktree's `PYTHONPATH`, the tests exercise the ticket's
 | K2: a base whose code fingerprint, embedder model or schema differs is refused, named, and the rebuild runs cold (never two embedders mixed) | `test_w2_122_fail_closed.py`: `test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold` (four cases: code, schema, embedder-model, embedder-revision), `test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold`, `test_a_base_whose_record_cannot_be_read_is_refused_and_the_rebuild_runs_cold`, `test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed` |
 | K3: measured on this repository, in `docs/changes/W2-122-evidence.md` | `test_w2_122_evidence.py::test_the_evidence_file_names_the_measurement` (the file exists and names the semantic stage's seconds and the embedding requests, seeded against cold, alone and with two others; no test runs the measurement) |
 | K4: the warm base is the project's configured integration store; none configured rebuilds cold, named; nothing of this repository in the code | `test_w2_122_configured_base.py`: `test_seed_without_a_folder_reads_the_configured_base`, `test_a_project_with_no_configured_base_rebuilds_cold_named` (a base planted at ~/gov-os-worktrees/W2-00-store under the rebuild's HOME is not read), `test_a_configured_path_that_holds_no_base_rebuilds_cold_named`, `test_a_configured_base_that_does_not_match_is_refused_and_the_rebuild_runs_cold` |
-| K5: `gov rebuild` exits non-zero, named, when the semantic store was asked for and not recreated; only `--no-embeddings` skips it | `test_w2_122_semantic_required.py`: `test_a_rebuild_with_the_endpoint_down_fails_named`, `test_a_rebuild_whose_endpoint_fails_part_way_fails_named`, `test_a_seeded_rebuild_with_the_endpoint_down_fails_named`, `test_without_embeddings_the_semantic_store_is_skipped_and_the_answer_is_ok` |
 | F1 (the ticket's first failure line): a seeded store that differs from a cold rebuild's; a seed from another embedder or schema used | Every K1 equality: `test_a_seeded_rebuild_is_the_cold_rebuild_entry_for_entry`, `test_a_link_to_the_base_is_followed`, `test_seed_without_a_folder_reads_the_configured_base`; every K2 case (refused, run cold, equal to cold): `test_a_base_whose_record_differs_is_refused_named_and_the_rebuild_runs_cold`, `test_a_base_with_no_record_is_refused_and_the_rebuild_runs_cold`, `test_a_base_whose_record_cannot_be_read_is_refused_and_the_rebuild_runs_cold`, `test_a_base_built_by_another_embedder_revision_is_refused_and_never_mixed` (the other embedder's vectors differ, so a mixed store fails the equality) |
 
 ## Expected red reasons (on the base code, `w2/integrate` at the designer's branch point)
@@ -69,10 +69,8 @@ and run there with that worktree's `PYTHONPATH`, the tests exercise the ticket's
 |---|---|
 | Every K1 case, `test_a_seeded_answer_has_its_form`, the K4 cases with `--seed` | `gov rebuild` takes no `--seed`: a usage error, exit 2 ("unrecognized arguments: --seed") |
 | `test_a_full_rebuild_writes_the_record_of_its_stores`, `test_the_same_code_and_embedder_write_the_same_record_in_two_trees`, every K2 case, `test_a_configured_base_that_does_not_match_...` | No `.gov-runtime/rebuild/stores.json` is written ("the full rebuild wrote no record"); the other-revision K2 case fails on `--seed` (usage error) |
-| `test_a_rebuild_with_the_endpoint_down_fails_named`, `test_a_rebuild_whose_endpoint_fails_part_way_fails_named` | The rebuild answers ok, exit 0, with `stores.semantic` `not_recreated` |
-| `test_a_seeded_rebuild_with_the_endpoint_down_fails_named` | Usage error on `--seed` (no JSON envelope, so not `ok: false`) |
 | `test_the_evidence_file_names_the_measurement` | No `docs/changes/W2-122-evidence.md` |
-| `test_without_seed_a_rebuild_does_not_seed`, `test_without_embeddings_the_semantic_store_is_skipped_and_the_answer_is_ok` | Green: today's behaviour, held |
+| `test_without_seed_a_rebuild_does_not_seed` | Green: today's behaviour, held |
 
 ## Not tested here, and why
 
@@ -82,5 +80,5 @@ and run there with that worktree's `PYTHONPATH`, the tests exercise the ticket's
 - **The secrets record's entries.** W2-107's cache is machine-wide (`GOV_SECRETS_CACHE`, else one file under the
   home), not under a base's `.gov-runtime/`, so what "copied from the base" means for it is not observable from a
   base folder. Returned to the lead as a package; no case guesses it.
-- **A hung endpoint.** Its outcome is the same named failure as an endpoint down or failing part way, and a hang
-  would make the suite wait on the rebuild's own timeouts.
+- **A rebuild whose semantic store was not recreated** (the former KPI 5): moved to W2-124 (DEC-1027 C); its
+  tests are W2-124's.
