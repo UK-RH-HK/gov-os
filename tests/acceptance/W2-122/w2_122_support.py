@@ -1,8 +1,8 @@
-"""Support code for the W2-122 acceptance tests: seeded rebuilds (DAEO-blwa, DEC-1014, DEC-1015 item 4).
+"""Support code for the W2-122 acceptance tests: seeded rebuilds (DAEO-blwa, DEC-1014; KPI 5 moved to W2-124, DEC-1027 C).
 
 The interface under test is public only (README, "The interface"):
 
-- ``gov rebuild --json [--seed [<folder>]] [--no-embeddings]``, run as ``sys.executable -m gov.cli.main rebuild ...``
+- ``gov rebuild --json [--seed [<folder>]]``, run as ``sys.executable -m gov.cli.main rebuild ...``
   in a temporary repository built from scratch: its standard output (the API envelope), its exit code, its ``seed``
   object;
 - the files it leaves under ``.gov-runtime/``: the shared store ``store.db`` (its lexical and semantic tables, read
@@ -33,7 +33,6 @@ import os
 import re
 import shutil
 import site
-import socket
 import sqlite3
 import subprocess
 import sys
@@ -111,17 +110,12 @@ def stand_in_vector(text, salt=""):
 
 class OllamaStandIn:
     """A healthy Ollama endpoint on a free loopback port. It reports ``model`` with a digest that begins with
-    ``revision``, embeds with vectors made of words and ``salt``, and records every text it is asked to embed.
+    ``revision``, embeds with vectors made of words and ``salt``, and records every text it is asked to embed."""
 
-    ``fail_after``: once that many embed requests have been answered, every later embed request is answered 500
-    (an endpoint that fails part way through a rebuild)."""
-
-    def __init__(self, revision=EMBED_REVISION, model=EMBED_MODEL, salt="", fail_after=None):
+    def __init__(self, revision=EMBED_REVISION, model=EMBED_MODEL, salt=""):
         self.revision, self.model, self.salt = revision, model, salt
         self.digest = revision + hashlib.sha256(f"w2-122 stand-in {revision}".encode()).hexdigest()[:52]
-        self.fail_after = fail_after
         self.embedded = []        # every text asked to be embedded, in order
-        self.embed_requests = 0   # every embed request, answered or failed
         self.lock = threading.Lock()
         stand_in = self
         entry = {"name": model, "model": model, "digest": self.digest, "size": 639150000,
@@ -151,13 +145,8 @@ class OllamaStandIn:
                     given = asked.get("input", asked.get("prompt", ""))
                     texts = [given] if isinstance(given, str) else list(given)
                     with stand_in.lock:
-                        stand_in.embed_requests += 1
-                        failing = stand_in.fail_after is not None and stand_in.embed_requests > stand_in.fail_after
-                        if not failing:
-                            stand_in.embedded.extend(str(text) for text in texts)
-                    if failing:
-                        reply, status = {"error": "the stand-in fails part way (W2-122)"}, 500
-                    elif route == "/api/embed":
+                        stand_in.embedded.extend(str(text) for text in texts)
+                    if route == "/api/embed":
                         reply = {"model": model, "embeddings": [stand_in_vector(t, stand_in.salt) for t in texts],
                                  "total_duration": 1, "load_duration": 1, "prompt_eval_count": len(texts)}
                     else:
@@ -185,7 +174,6 @@ class OllamaStandIn:
         """Start a new count: the texts and requests recorded so far are dropped."""
         with self.lock:
             self.embedded.clear()
-            self.embed_requests = 0
 
     def sent(self):
         """Every text sent to be embedded since the last ``forget``, as one text."""
@@ -195,13 +183,6 @@ class OllamaStandIn:
     def close(self):
         self.server.shutdown()
         self.server.server_close()
-
-
-def closed_loopback_host():
-    """A loopback address nothing listens on (bound, then closed): an endpoint that is down."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind(("127.0.0.1", 0))
-        return f"127.0.0.1:{sock.getsockname()[1]}"
 
 
 # --------------------------------------------------------------------------
@@ -388,10 +369,6 @@ class Run:
     @property
     def result(self):
         return self.envelope().get("result") or {}
-
-    @property
-    def error(self):
-        return self.envelope().get("error") or {}
 
     def describe(self, tail=3000):
         return (f"{' '.join(self.args)}\nexit code: {self.returncode} after {self.seconds:.1f} s\n"
