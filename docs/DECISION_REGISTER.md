@@ -12851,3 +12851,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.416 | 2026-11-02 | Orchestrator (delegated): DEC-1034. Next free id: DEC-1035. |
+
+### DEC-1035 — Dispatcher v4.6's G1 fix live without a third review; P-W2-112-T2: (c) now, (a) as W2-127
+- **Status:** ACCEPTED (owner, 2026-11-02, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`) · **Under:** DEC-1010, DEC-1033, DEC-1034
+- **Decision:** (1) G1 (a): the G1/G2 fix of dispatcher v4.6 (FAILING on 5xx and runner errors only, self-clearing; the reranker peak only after a day of samples) installed when its tests passed, without a third review (DEC-1010's owner-once); done (164 tests, one clean live pass, committed `b06ee350`). (2) P-W2-112-T2 (c) now: sandboxed sessions fall back (a GPU slot or unranked, named) while the shared reranker cannot be reached from the sandbox; and (a) as a follow-up ticket filed now, W2-127 (`DAEO-1vka`): the shared reranker's one socket path allowed in the launch sandbox, nothing else; it runs right after W2-112 lands, before EXAMIN's copy, since many of the agents that search memory are sandboxed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.417 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1035. Next free id: DEC-1036. |
