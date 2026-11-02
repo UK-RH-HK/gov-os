@@ -1,0 +1,7 @@
+log: W2-61h-A5-verify.json
+W2: W2-61h
+status: DONE at `ac7dfa1790c7`. The scoped set is green (4,172 passed, 0 failed). `gov check` has three hard-block reds, all from `w2/integrate` or the machine's load and none from this ticket's files.
+
+task: W2-61h (DAEO-h2k3) resume, scoped run only (P-W2-61h-A5 option (a)): rebuild, `select_tests.py` once, `run_scoped.py` parallel then serial, `gov check`, then DONE at the verified head.
+status: DONE at `ac7dfa1790c7`. The scoped set is green (4,172 passed, 0 failed). `gov check` has three hard-block reds, all from `w2/integrate` or the machine's load and none from this ticket's files.
+work_completed: Checked the start state (head `ac7dfa1790c7`, tree clean, `GOV_ROLE=orchestrator`, `GOV_TICKET=DAEO-h2k3`). Rebuild 5 failed on embeddings, so I retried once; rebuild 6 passed. Ran `select_te

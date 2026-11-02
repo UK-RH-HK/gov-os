@@ -123,6 +123,12 @@ Morning package: run `tools/server_log_scan.py` (found 3 CUDA crashes 23:54, 02:
 SMART-WORK-6 `1e5d3395` (4 GPU KPI lines for W2-20 and W2-121) for the owner. Landing 11:16 refused before queueing:
 W2-104's gitleaks (two test fixtures: REPLY_TOKEN, SECRET; redacted); W2-104 run 3 `W2-104-A5-r3-gitleaks.md` queued
 (build the literals from parts); six relisted in `land.txt`.
+**11:27:** six landing (claimed 11:21). The nightly of 11-02 ENDED 09:24, verdict red 32 (status line corrected 11:25).
+Its reds: 6 test_dispatcher (they read the untracked scratch tools: skip guard asked of the GPU-pass engineer); W1-19 x4 +
+W1-21 x4 (real-model errors: the embedder was on the CPU; re-run alone after the landing); W1-33 x4, W1-05 x2, W1-46,
+W2-59 x4 (known install/hook-line, W2-90c/W2-105); W2-54 x3 (AR-5: DEC-1024 after the head; sandboxed worker; time
+limit); W2-55, W2-66 (their runs); W1-01 x2 (history: DEC-906's known red; integration merges: to check). B: W2-05 + W2-96
+re-close started 11:26 against it (`log/close-two-20261102-1127.out`). W2-61h DONE `ac7dfa1790c7` in land.pending.txt.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

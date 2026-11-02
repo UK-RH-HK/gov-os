@@ -5036,3 +5036,10 @@
 {"t": "2026-11-02T11:17:02", "nproc": 20, "load": [29.29, 21.21, 16.21], "mem_total_kb": 24607384, "mem_available_kb": 15385644, "leads_kb": {"DAEO-h2k3": 2097448, "DAEO-u4oz": 413120, "DAEO-qzrq": 274368, "DAEO-blwa": 397068}}
 {"t": "2026-11-02T11:18:09", "nproc": 20, "load": [30.74, 23.0, 17.14], "mem_total_kb": 24607384, "mem_available_kb": 13462044, "leads_kb": {"DAEO-h2k3": 264856, "DAEO-u4oz": 411252, "DAEO-qzrq": 395872, "DAEO-blwa": 395140}}
 {"t": "2026-11-02T11:19:16", "nproc": 20, "load": [30.0, 24.14, 17.89], "mem_total_kb": 24607384, "mem_available_kb": 13862516, "leads_kb": {"DAEO-u4oz": 411112, "DAEO-qzrq": 396112, "DAEO-blwa": 419340}}
+{"t": "2026-11-02T11:20:23", "nproc": 20, "load": [37.39, 27.49, 19.45], "mem_total_kb": 24607384, "mem_available_kb": 13167884, "leads_kb": {"DAEO-u4oz": 1615156, "DAEO-qzrq": 422108, "DAEO-blwa": 301168}}
+{"t": "2026-11-02T11:21:29", "nproc": 20, "load": [36.77, 28.99, 20.46], "mem_total_kb": 24607384, "mem_available_kb": 12190616, "leads_kb": {"DAEO-u4oz": 1562168, "DAEO-qzrq": 302104, "DAEO-blwa": 1512640}}
+{"t": "2026-11-02T11:22:33", "nproc": 20, "load": [36.43, 30.42, 21.5], "mem_total_kb": 24607384, "mem_available_kb": 10800692, "leads_kb": {"DAEO-u4oz": 1696040, "DAEO-qzrq": 272412, "DAEO-blwa": 1540228}}
+{"t": "2026-11-02T11:23:40", "nproc": 20, "load": [34.69, 30.94, 22.23], "mem_total_kb": 24607384, "mem_available_kb": 10695292, "leads_kb": {"DAEO-u4oz": 1441724, "DAEO-qzrq": 262160, "DAEO-blwa": 1496488}}
+{"t": "2026-11-02T11:24:47", "nproc": 20, "load": [33.26, 31.15, 22.85], "mem_total_kb": 24607384, "mem_available_kb": 10656284, "leads_kb": {"DAEO-u4oz": 1509396, "DAEO-qzrq": 261420, "DAEO-blwa": 1635148}}
+{"t": "2026-11-02T11:25:54", "nproc": 20, "load": [34.34, 31.81, 23.6], "mem_total_kb": 24607384, "mem_available_kb": 12813860, "leads_kb": {"DAEO-u4oz": 1474672, "DAEO-qzrq": 261096, "DAEO-blwa": 1406744}}
+{"t": "2026-11-02T11:27:01", "nproc": 20, "load": [34.02, 32.06, 24.19], "mem_total_kb": 24607384, "mem_available_kb": 12663960, "leads_kb": {"DAEO-u4oz": 1341212, "DAEO-qzrq": 1355056, "DAEO-blwa": 1499684}}

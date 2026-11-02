@@ -1,0 +1,3 @@
+log: nightly/status.txt
+Nightly: 2026-11-02
+status: 2026-11-02 ran | verdict: red 32 duration: estimate 11176 s, actual 19448 s (setup 2381 s, lock wait 898 s) head 9d605eba20a2 (corrected 2026-11-02 11:35 by the orchestrator from log/nightly/20261102-0400/run.txt, ended 09:24:14: the 09:00 check wrote FAILED while the re-runs alone were still going)

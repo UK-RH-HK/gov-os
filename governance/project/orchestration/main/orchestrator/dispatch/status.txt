@@ -1,13 +1,14 @@
-dispatcher 2026-11-02 11:19:08
+dispatcher 2026-11-02 11:26:05
 leads running (3, from the processes): W2-04, W2-122, W2-123
-load 29.7/23.9/17.8; real busy cores 15.9 of 20 (the embedding server 13.63); memory available 13540 MB; gate_check (for comparison) open (OPEN leads=3 load=29.9/17.8 nproc=20 have=15093304kB need=11706672kB); disk open
-admission (by peaks, DEC-1008 item 5): a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h)
-peaks 2026-11-02 10:26:05: a lead p95 4084 MB, max 9580 MB
-FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3930069, 11 min, /home/usain/gov-os-worktrees/W2-61h)
-heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: started; main tree clean on w2/integrate
+load 33.1/31.6/23.6; real busy cores 19.63 of 20 (the embedding server 6.08); memory available 13052 MB; gate_check (for comparison) SHUT (SHUT leads=3 load=33.1/23.6 nproc=20 have=16557572kB need=11706672kB: load 33.1/23.6 >= nproc 20); disk open
+admission (by peaks, DEC-1008 item 5): real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2
+peaks 2026-11-02 11:26:05: a lead p95 4075 MB, max 9580 MB
+FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 45 min, /home/usain/gov-os-worktrees/W2-61h); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3930069, 18 min, /home/usain/gov-os-worktrees/W2-61h); python3 -m gov.retrieval.measure memory-retrieval (pid 3968810, 8 min, /tmp/tmp.chzdEiVAhl)
+heavy slots held: gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue busy; land: in flight; main tree NOT clean on w2/integrate
 inbox unread: 1 (oldest 0 min)
-ready list: W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: running; W2-122 DAEO-blwa: running; W2-66b DAEO-zuiy: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h); W2-104 DAEO-drhj: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h); W2-55 DAEO-arrl: not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h); W2-81 DAEO-l78m: already started for W2-81-A5-r4-records.json; W2-92 DAEO-n0wb: already started for W2-92-A5-run3-dec1019.json
+ready list: W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: running; W2-122 DAEO-blwa: running; W2-66b DAEO-zuiy: not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2; W2-104 DAEO-drhj: not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2; W2-55 DAEO-arrl: not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2; W2-81 DAEO-l78m: already started for W2-81-A5-r4-records.json; W2-92 DAEO-n0wb: already started for W2-92-A5-run3-dec1019.json
 sentinel: watched
-guard harvest: last 2026-11-02 11:11:37, rc 0, 32.1 s of 300 s
-embedding server: healthy (1.43 s)
-heavy slot holders: slot 1 pid 3966726 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min; slot 2 pid 3967353 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 3968586 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min
+guard harvest: last 2026-11-02 11:21:54, rc 0, 44.9 s of 300 s
+embedding server: healthy (0.07 s)
+GPU: RTX 5070 Ti 10.4/15.9 GB, 5 %; holders: embedder shared (0), reranker (1); layers: shared 29/29, query cpu-only by design
+heavy slot holders: slot 2 pid 3976885 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 3982619 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min

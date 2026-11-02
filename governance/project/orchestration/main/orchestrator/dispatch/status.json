@@ -1,5 +1,5 @@
 {
- "time": "2026-11-02 11:19:08",
+ "time": "2026-11-02 11:26:05",
  "leads": [
   "W2-04",
   "W2-122",
@@ -7,26 +7,29 @@
  ],
  "lead_count": 3,
  "load": [
-  29.73,
-  23.89,
-  17.75
+  33.06,
+  31.62,
+  23.62
  ],
- "mem_available_mb": 13540,
- "gate_open": true,
- "gate": "OPEN leads=3 load=29.9/17.8 nproc=20 have=15093304kB need=11706672kB",
+ "mem_available_mb": 13052,
+ "gate_open": false,
+ "gate": "SHUT leads=3 load=33.1/23.6 nproc=20 have=16557572kB need=11706672kB: load 33.1/23.6 >= nproc 20",
  "disk_open": true,
- "disk": "disk gate open: 844 GiB free, 64336094 inodes free",
+ "disk": "disk gate open: 842 GiB free, 64170837 inodes free",
  "slots_held": [
-  "gov-os-heavy-slot-1.lock",
   "gov-os-heavy-slot-2.lock",
   "gov-os-heavy-slot-3.lock"
  ],
- "land_running": false,
+ "land_running": true,
  "close_running": false,
  "closing_w2s": [],
- "queue_busy": false,
- "main_clean": true,
- "main_dirty": [],
+ "queue_busy": true,
+ "main_clean": false,
+ "main_dirty": [
+  "governance/project/orchestration/tools/dispatch/README.md",
+  "governance/project/orchestration/tools/dispatch/dispatcher.py",
+  "tests/unit/orchestration/test_dispatcher.py"
+ ],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
   "DAEO-u4oz",
@@ -34,101 +37,118 @@
   "DAEO-blwa"
  ],
  "lead_rss_kb": {
-  "W2-04": 411400,
-  "W2-123": 396144,
-  "W2-122": 418780
+  "W2-04": 1474576,
+  "W2-123": 260608,
+  "W2-122": 1402152
  },
  "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h)",
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3930069, 11 min, /home/usain/gov-os-worktrees/W2-61h)"
+  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 45 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3930069, 18 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "python3 -m gov.retrieval.measure memory-retrieval (pid 3968810, 8 min, /tmp/tmp.chzdEiVAhl)"
  ],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 4274056,
-  "codegraph": 11324
+  "embedding": 2424296,
+  "codegraph": 0
  },
- "busy_cores": 15.9,
- "embedding_cores": 13.63,
+ "busy_cores": 19.63,
+ "embedding_cores": 6.08,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 3472816,
+ "rerankers_outside_kb": 2610280,
  "outside_reranker_possible": true,
  "peaks": {
-  "computed": "2026-11-02 10:26:05",
-  "lead_p95_mb": 4084,
+  "computed": "2026-11-02 11:26:05",
+  "lead_p95_mb": 4075,
   "lead_max_mb": 9580
  },
  "admit": false,
- "admit_reason": "a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h)",
+ "admit_reason": "real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
  "inbox_unread": 1,
- "inbox_oldest_age_s": 1,
+ "inbox_oldest_age_s": 0,
  "started_this_tick": null,
  "ready_waits": {
   "W2-123 DAEO-qzrq": "running",
   "W2-04 DAEO-u4oz": "running",
   "W2-122 DAEO-blwa": "running",
-  "W2-66b DAEO-zuiy": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h)",
-  "W2-104 DAEO-drhj": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h)",
-  "W2-55 DAEO-arrl": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 38 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "W2-66b DAEO-zuiy": "not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
+  "W2-104 DAEO-drhj": "not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
+  "W2-55 DAEO-arrl": "not admitted: real CPU: 19.63 busy cores + 2.06 for the embedding server's p95 >= 20 - margin 2",
   "W2-81 DAEO-l78m": "already started for W2-81-A5-r4-records.json",
   "W2-92 DAEO-n0wb": "already started for W2-92-A5-run3-dec1019.json",
   "W2-61h DAEO-h2k3": "already started for W2-61h-A5-verify.json",
   "W2-91 DAEO-a3u2": "already started for W2-91-A5-td.json"
  },
- "land": "started",
+ "land": "in flight",
  "land_pending": [],
- "new_returns": [
-  "W2-61h-A5-verify.json"
- ],
+ "new_returns": [],
  "last_start": "2026-11-02 10:39:08 W2-122",
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 11:11:37",
+  "at": "2026-11-02 11:21:54",
   "rc": 0,
-  "secs": 32.1,
+  "secs": 44.9,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 72 total, 68 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 788,
-  "last_check_at": 1793618350.5863366,
+  "passes": 795,
+  "last_check_at": 1793618766.3947248,
   "last_result": "ok",
-  "last_secs": 1.43,
+  "last_secs": 0.07,
   "last_why": "",
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1793618350.5863407,
+  "last_ok_at": 1793618766.3947291,
   "state": "healthy"
  },
  "slot_holders": [
   {
-   "slot": "1",
-   "pid": 3966726,
-   "cpu": 1861,
-   "since": 1793618350.6216924,
-   "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m gov.cli.main rebuild --json",
-   "cwd": "/home/usain/gov-os-worktrees/W2-122"
-  },
-  {
    "slot": "2",
-   "pid": 3967353,
-   "cpu": 807,
-   "since": 1793618350.621753,
+   "pid": 3976885,
+   "cpu": 21042,
+   "since": 1793618766.6877198,
    "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m gov.cli.main rebuild --json",
+   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/home/usain/gov-os-w",
    "cwd": "/home/usain/gov-os-worktrees/W2-04"
   },
   {
    "slot": "3",
-   "pid": 3968586,
-   "cpu": 841,
-   "since": 1793618350.621798,
+   "pid": 3982619,
+   "cpu": 19202,
+   "since": 1793618766.6879742,
    "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m gov.cli.main rebuild --json",
-   "cwd": "/home/usain/gov-os-worktrees/W2-123"
+   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/tmp/gov-os-lead-W2-",
+   "cwd": "/home/usain/gov-os-worktrees/W2-122"
   }
- ]
+ ],
+ "gpu": {
+  "line": "GPU: RTX 5070 Ti 10.4/15.9 GB, 5 %; holders: embedder shared (0), reranker (1); layers: shared 29/29, query cpu-only by design",
+  "state": {
+   "ok": true,
+   "at": 1793618766.4966385,
+   "name": "NVIDIA GeForce RTX 5070 Ti",
+   "used_mib": 10615,
+   "total_mib": 16303,
+   "util": 5,
+   "holders": [
+    {
+     "pid": 3966518,
+     "name": "[Not Found]",
+     "mib": null,
+     "kind": "reranker"
+    }
+   ]
+  },
+  "layers": {
+   "shared": {
+    "x": 29,
+    "y": 29,
+    "at": 1793618530.9369028
+   }
+  },
+  "alerts_24h": []
+ }
 }
