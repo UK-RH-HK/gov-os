@@ -3,7 +3,7 @@
 Ticket DAEO-clon (W2-112), profile FULL. Sources: DEC-979 item 4 and P-RERANKER-1 (the design), DEC-374 (an absent
 reranker keeps the fused order), DEC-397 and ADR-0002 §2 (the pinned model and environment), DEC-1031 item 2 and
 DEC-1032 (the GPU budget), DEC-1033 (no reranker on the CPU; the slot rule), DEC-1034 (the settings, the paths, the
-sandbox question).
+sandbox question), DEC-1036 (T5 (b): no service below its GPU share; T6 (b): the service holds a GPU slot).
 
 ## 1. Design
 
@@ -43,21 +43,38 @@ sandbox question).
   search that started it): it removes its socket, answers what was already queued, writes `END` to its log and
   ends; its lock is released with it.
 
-### The device and the GPU budget (DEC-1032)
-- Before the model loads, the service reads the GPU's free memory with the library that will hold it
-  (`torch.cuda.mem_get_info()`, injectable as `choose_device(free=…)`).
-- **Threshold:** the service's share, 3.5 GiB (the top of DEC-1032's 2.5 to 3.5 GB, as measured for one reranker in
-  ACT-RERANK-GPU-SLOTS-1 §1), plus the 2 GiB headroom: **5.5 GiB free or more → the GPU (`cuda`)**; less, or no GPU
-  to read (no CUDA, no torch, an error) → **the CPU**, named: the `READY` line in `rerank.log` says
-  `device cpu`, every answer carries `"device": "cpu"`, the bundle's `rerank.device` is `cpu`, and an `ALERT` line
-  (`the shared reranker runs on the CPU: …`) is written to `~/.cache/gov-os/rerank.log`.
-- The embedder is already resident when the reading is taken (it is pinned in the shared Ollama server), so its
-  memory is counted as used. Never more than one copy: the single-service lock.
+### The GPU slot, then the GPU share (DEC-1032, DEC-1036 T5 and T6)
+The service starts in this order, before torch's free-memory reading and before the model loads:
+1. **A GPU slot (T6 (b)).** It takes one of the two slots the private rerankers use (the same locks
+   `gov-os-rerank-gpu-<n>.lock` in `GOV_RERANK_GPU_LOCK_DIR`, the same `GOV_RERANK_GPU_SLOTS`, the same wait
+   `GOV_RERANK_GPU_WAIT_S`, default 20 s, through the worker's own `take_slot`) and holds it for its life. So at most
+   one private reranker runs beside it: the embedder (about 3.5 GB), the service and one private reranker (about
+   3.5 GiB each), about 10.5 GB of the card's 16, with DEC-1032's 2 GB headroom kept. Without a slot within the
+   wait it ends named (exit 75; exit 76 when the GPU is hidden, whatever `GOV_RERANK_ALLOW_CPU` says).
+2. **Its share of the GPU's memory (T5 (b)).** Holding the slot, it reads the GPU's free memory with the library
+   that will hold it (`torch.cuda.mem_get_info()`, injectable as `gpu_short(free=…)`). **Threshold:** the share,
+   3.5 GiB (the top of DEC-1032's 2.5 to 3.5 GB, as measured for one reranker in ACT-RERANK-GPU-SLOTS-1 §1), plus
+   the 2 GiB headroom: **5.5 GiB free or more → it loads on the GPU**; less, or no GPU to read (no CUDA, no torch,
+   an error) → **it does not start** (exit 77). The embedder is already resident when the reading is taken, so its
+   memory is counted as used.
 
-### The stopgap's slots (DEC-1033)
+**No reranker on the CPU anywhere (DEC-1033):** the service has no CPU path. Each refusal is a `REFUSED` line in
+`~/.cache/gov-os/rerank.log` (`the shared reranker does not start: <reason>`), counted by `gov status`
+(`reranker.service_refusals`); the search that started it names the reason in its bundle (`rerank.reason`: `the
+service ended before it listened (no GPU slot freed within its wait | the GPU is hidden from it | the GPU has too
+little free memory for its share)`) and falls back: to a private reranker, which waits for a slot in turn, else the
+order is kept, unranked and named. Searches that were waiting for that service do not start another one (it would
+meet the same refusal): they fall back at once. Never more than one copy on the GPU: the single-service lock.
+
+**The cold start's bound still holds:** the starting search waits at most `START_S` = 60 s in all; the slot wait
+(20 s by default) comes first, so a service without a slot ends within it and the search falls back well inside
+the bound; with a slot, the reading is immediate and the load has the rest.
+
+### The stopgap's slots (DEC-1033, DEC-1036 T6)
 - **The service** is its own script, never `rerank_worker.py` and never run through it, so the interim module
-  `gov_reranker_gpu_slot` (loaded by the `.pth` in every Python of the reranker environment) leaves it untouched:
-  it takes no slot. Its GPU use is bounded by its own free-memory check and the single-service lock.
+  `gov_reranker_gpu_slot` (loaded by the `.pth` in every Python of the reranker environment) leaves it untouched;
+  **it takes a slot itself** with the same rule (above). This reverses the first design's "the service takes no
+  slot" (DEC-1036 T6 (b)). `rerank.py` never passes its own `GOV_RERANK_GPU_SLOT` on to it.
 - **The private worker** (`rerank_worker.py`) now carries the slot rule itself: before torch or the model loads it
   holds one of the `GOV_RERANK_GPU_SLOTS` (default 2) locks `gov-os-rerank-gpu-<n>.lock` in
   `GOV_RERANK_GPU_LOCK_DIR` (default `/tmp`) for its life, or waits up to `GOV_RERANK_GPU_WAIT_S` (default 20 s)
@@ -83,24 +100,27 @@ DEC-374 case).
 
 ### What the bundle and `gov status` show
 - `gov retrieve --json` carries `rerank`: `{"by": "service" | "private" | "unavailable" | "given", "device": …,
-  "reason": …}` (`by` `unavailable` with its reason when the order is unranked; `device` `cuda`/`cpu` from the
-  service, the worker's torch device for a private reranker). `merge.reranked` is unchanged.
-- `gov status` carries `reranker`: `{"fallbacks": n, "cpu_alerts": m, "log": path}`, read from the log by
+  "reason": …}` (`by` `unavailable` with its reason when the order is unranked; `device` the torch device the model
+  sits on, `cuda:0` for the service; `reason` why the service did not answer, when it fell back).
+  `merge.reranked` is unchanged.
+- `gov status` carries `reranker`: `{"fallbacks": n, "service_refusals": m, "log": path}`, read from the log by
   `rerank.status()` (`rerank.fallback_count()` gives the count alone; `rerank.last_outcome()` the last rerank of the
   calling thread).
 
 ## 2. Builder evidence
 
-`tests/unit/retrieval/test_w2_112_shared_reranker.py` (21 tests, hermetic: a throwaway venv with a stand-in `torch`
+`tests/unit/retrieval/test_w2_112_shared_reranker.py` (25 tests, hermetic: a throwaway venv with a stand-in `torch`
 and `sentence_transformers` at the environment's path in a temporary HOME; the slot locks in a temporary folder;
 every process it starts is marked, ended and checked gone): eight searches starting together start one service;
 20 concurrent callers each get their own scores from that one process; the socket 0600 and its folder 0700; ties
-keep the given order and the scores equal a private reranker's; the idle end removes the socket; the CPU choice
-with too little free GPU memory and with none to read (named, alerted); a killed service replaced by the next
-search; a service killed mid-request, one that does not answer in time, a request over the cap, a service that
-cannot start (each → private, logged); neither (→ unranked, named); no GPU slot (→ unranked, no model on any
-device); a sandbox that refuses the socket (→ private at once); the private worker's slot rule; `gov status`'s
-count; the bundle's `rerank` entry through `retrieve`.
+keep the given order and the scores equal a private reranker's; the idle end removes the socket; the service holds
+one GPU slot for its life and frees it when it dies; it waits for a slot; without one it ends named, the searches
+waiting for it start no other and go on unranked, and no model loads on any device; below its GPU share, with no
+GPU to read, or with the GPU hidden (also with `GOV_RERANK_ALLOW_CPU=1`), it does not start (REFUSED, named) and
+the search falls back; a killed service replaced by the next search; a service killed mid-request, one that does
+not answer in time, a request over the cap, a service that cannot load (each → private, logged); neither
+(→ unranked, named); a sandbox that refuses the socket (→ private at once); the private worker's slot rule;
+`gov status`'s counts; the bundle's `rerank` entry through `retrieve`.
 
 ## 3. The measurement the lead runs (on the real GPU, after this commit)
 
@@ -113,8 +133,8 @@ All with the real environment, the embedder pinned in the shared Ollama server, 
    9.4 GiB at peak, CAPACITY-1).
 2. **The GPU's memory under 20 concurrent searches.** `nvidia-smi --query-gpu=memory.used,memory.total
    --format=csv -l 1` and `nvidia-smi --query-compute-apps=pid,used_memory --format=csv` during 20 searches started
-   together; expected: the embedder (about 3.5 GB), one service (about 2.5 to 3.5 GB), no private reranker, at
-   least 2 GB free; the service's `READY` line says `device cuda`.
+   together; expected: the embedder (about 3.5 GB), one service (about 2.5 to 3.5 GB) holding one GPU slot, no
+   private reranker, at least 2 GB free; the service's `READY` line says `device cuda:0`.
 3. **The searches' times.** The wall time of each of those searches (first, cold: including the service's load; then
    warm), p50 and p95, before and after.
 4. **The same answers.** For each of the 20 visible questions, the bundle's evidence order and every
@@ -122,7 +142,7 @@ All with the real environment, the embedder pinned in the shared Ollama server, 
    `rerank._started(...)` called directly): equal within float rounding (the service makes the same `predict` call;
    both are rounded through JSON as `float`). After W2-61h, the 48.
 5. **The fallback count.** `gov status`'s `reranker.fallbacks` before and after the run (expected unchanged on a
-   healthy run), and `rerank.log` read for `ALERT` lines (expected none).
+   healthy run), and `rerank.log` read for `REFUSED` lines (expected none).
 
 ## 4. Measured
 
@@ -146,13 +166,14 @@ slot rule itself). It removes two files from your reranker environment under `~/
    ```
    prints `None None None`.
 3. The lock files `/tmp/gov-os-rerank-gpu-0.lock` and `/tmp/gov-os-rerank-gpu-1.lock` may be removed once
-   `fuser /tmp/gov-os-rerank-gpu-0.lock /tmp/gov-os-rerank-gpu-1.lock` shows no process holds them (they are
-   recreated by the next private worker that needs one).
+   `fuser /tmp/gov-os-rerank-gpu-0.lock /tmp/gov-os-rerank-gpu-1.lock` shows no process holds them (the shared
+   service holds one for its life, up to its idle end; they are recreated by the next service or private worker).
 4. **Undo:** the commands of ACT-RERANK-GPU-SLOTS-1 §3, with the module of ACT-RERANK-WAIT-1
    (`governance/project/orchestration/tools/gov_reranker_gpu_slot.py`).
 
-**Why it is safe after this ticket:** the shared service never took a slot (it is not `rerank_worker.py`); the
-private worker, the only process the module acted on, now holds the same slot locks (same names, same folder, same
+**Why it is safe after this ticket:** the module never acted on the shared service (it is not `rerank_worker.py`),
+which takes its slot with its own code (DEC-1036 T6); the private worker, the only process the module acted on,
+now holds the same slot locks (same names, same folder, same
 settings `GOV_RERANK_GPU_SLOTS`, `GOV_RERANK_GPU_LOCK_DIR`, `GOV_RERANK_GPU_WAIT_S`, the same 20 s wait, the same
 named end with exit 75 and 76, the same `GOV_RERANK_ALLOW_CPU=1` opt-out) before torch or the model loads. With the
 module gone the worker takes the slot itself instead of finding `GOV_RERANK_GPU_SLOT` set, so removing it changes

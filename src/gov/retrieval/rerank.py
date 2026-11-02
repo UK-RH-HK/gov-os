@@ -35,7 +35,8 @@ CACHE_REL = ".cache/gov-os"  # the socket, its start lock and the logs, in the u
 SOCKET, LOCK, LOG, SERVICE_LOG = "rerank.sock", "rerank.lock", "rerank.log", "rerank-service.log"
 CONNECT_S = 2.0  # to connect and be accepted (DEC-1034 T3); the answer is bounded by GOV_RERANK_TIMEOUT_S
 START_S = 60.0  # the bound on a search's wait while the service starts and loads its model
-_ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed"}
+_ENDED = {75: "no GPU slot freed within its wait", 76: "the GPU is hidden from it", 70: "its GPU slot check failed",
+          77: "the GPU has too little free memory for its share"}
 _last = threading.local()
 
 
@@ -62,13 +63,13 @@ def _log(kind: str, detail: str) -> None:
 
 
 def status() -> dict:
-    """What ``gov status`` shows: the searches that fell back and the service's CPU alerts, read from the log."""
+    """What ``gov status`` shows: the searches that fell back and the service's refusals to start, from the log."""
     path = _cache() / LOG
     try:
         kinds = [line.split("\t")[1] for line in path.read_text(encoding="utf-8").splitlines() if "\t" in line]
     except FileNotFoundError:
         kinds = []
-    return {"fallbacks": kinds.count("FALLBACK"), "cpu_alerts": kinds.count("ALERT"), "log": str(path)}
+    return {"fallbacks": kinds.count("FALLBACK"), "service_refusals": kinds.count("REFUSED"), "log": str(path)}
 
 
 def fallback_count() -> int:
@@ -103,19 +104,24 @@ def _started(interpreter: str):
     return score, loaded.get("device") if isinstance(loaded, dict) else None, None
 
 
-def _start(folder: Path, interpreter: str, path: str):
-    """The service just started, or None when the start lock is held (another search starting it, or it runs)."""
+def _start(folder: Path, interpreter: str, path: str, waited: bool):
+    """The service just started, or None when the start lock is held (another search starting it, or it runs).
+    A search that ``waited`` for a service which then ended without listening does not start another: it falls back
+    (that service's refusal, a missing slot or GPU memory, holds for this search too)."""
     fd = os.open(folder / LOCK, os.O_CREAT | os.O_RDWR, 0o600)
     try:
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             return None
+        if waited:
+            raise ConnectionError(f"the service this search waited for ended before it listened ({LOG})")
         if os.path.lexists(path):
             os.unlink(path)  # a dead service's socket: a live service holds the lock
+        env = {key: value for key, value in os.environ.items() if key != "GOV_RERANK_GPU_SLOT"}
         with open(folder / SERVICE_LOG, "ab") as log:  # the lock passes to the service, which holds it for its life
             return subprocess.Popen([interpreter, "-I", str(_SERVICE), MODEL, REVISION, path, str(fd)],
-                                    env={**os.environ, "HF_HUB_OFFLINE": "1"}, stdin=subprocess.DEVNULL, stdout=log,
+                                    env={**env, "HF_HUB_OFFLINE": "1"}, stdin=subprocess.DEVNULL, stdout=log,
                                     stderr=log, pass_fds=(fd,), start_new_session=True)
     finally:
         os.close(fd)
@@ -126,7 +132,7 @@ def _connect(interpreter: str) -> socket.socket:
     folder = _cache()
     folder.mkdir(parents=True, exist_ok=True)
     folder.chmod(0o700)
-    path, deadline, started = str(folder / SOCKET), time.monotonic() + START_S, None
+    path, deadline, started, waited = str(folder / SOCKET), time.monotonic() + START_S, None, False
     while True:
         connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)  # a sandbox refuses this at once (EPERM)
         connection.settimeout(CONNECT_S)
@@ -139,10 +145,13 @@ def _connect(interpreter: str) -> socket.socket:
             connection.close()
             raise
         if started is not None and started.poll() is not None:
-            raise ConnectionError(f"the service ended before it listened (exit {started.returncode}, {SERVICE_LOG})")
+            code = started.returncode
+            raise ConnectionError(f"the service ended before it listened ({_ENDED.get(code, f'exit {code}')})")
         if time.monotonic() >= deadline:
             raise TimeoutError(f"the service did not listen within {START_S:g} s")
-        started = started or _start(folder, interpreter, path)
+        if started is None:
+            started = _start(folder, interpreter, path, waited)
+            waited = started is None
         time.sleep(0.05)
 
 

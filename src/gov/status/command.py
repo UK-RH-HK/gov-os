@@ -170,7 +170,7 @@ def _doctor(root: Path, args, config: dict) -> dict:
 
 
 def _reranker() -> dict:
-    """W2-112: the searches that fell back from the shared reranker, and its CPU alerts, from its log."""
+    """W2-112: the searches that fell back from the shared reranker, and its refusals to start, from its log."""
     from gov.retrieval.rerank import status
 
     return status()

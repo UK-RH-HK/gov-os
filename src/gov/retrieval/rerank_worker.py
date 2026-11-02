@@ -1,5 +1,5 @@
 """The reranker's own process (W1-19; ADR-0002 §2, DEC-397). Started by ``gov.retrieval.rerank``, never imported
-except by ``rerank_service.py``, which shares ``load`` and ``scores``.
+except by ``rerank_service.py``, which shares ``take_slot``, ``load`` and ``scores``.
 
 It runs in the reranker environment, loads the pinned model once, and then answers one line with one line until
 its caller closes the pipe: ``[query, [text, …]]`` in, ``[score, …]`` out, as JSON. The first line it writes says
@@ -23,15 +23,16 @@ NO_SLOT, GPU_HIDDEN = 75, 76
 _HELD = []  # the slot's lock file, open for the process's life
 
 
-def _slot():
-    """None when the worker may load its model; otherwise ``(exit code, reason)``."""
+def take_slot(allow_cpu: bool):
+    """None when this process may load its model, holding a GPU slot for its life (or, with ``allow_cpu``, on the
+    CPU); otherwise ``(exit code, reason)``. The shared service calls it too, never allowing the CPU (DEC-1036)."""
     import fcntl
 
     if os.environ.get("GOV_RERANK_GPU_SLOT"):
         return None  # the interim module holds one for this process
-    allow_cpu = os.environ.get("GOV_RERANK_ALLOW_CPU") == "1"
     if os.environ.get("CUDA_VISIBLE_DEVICES") in ("-1", ""):
-        return None if allow_cpu else (GPU_HIDDEN, "the GPU is hidden from it and GOV_RERANK_ALLOW_CPU is not 1")
+        return None if allow_cpu else (GPU_HIDDEN, "the GPU is hidden from it (CUDA_VISIBLE_DEVICES), and no "
+                                                   "reranker runs on the CPU")
     slots, wait = int(os.environ.get("GOV_RERANK_GPU_SLOTS", "2")), float(os.environ.get("GOV_RERANK_GPU_WAIT_S", "20"))
     if not 0 <= wait < float("inf"):
         raise ValueError("GOV_RERANK_GPU_WAIT_S must be a finite number of seconds")
@@ -73,7 +74,7 @@ def device_of(encoder) -> str | None:
 
 def main(model: str, revision: str) -> None:
     answers, sys.stdout = sys.stdout, sys.stderr  # whatever the libraries print stays out of the answers
-    refused = _slot()
+    refused = take_slot(os.environ.get("GOV_RERANK_ALLOW_CPU") == "1")
     if refused:
         print(f"gov reranker: {refused[1]}; this search goes without reranking", file=sys.stderr, flush=True)
         sys.exit(refused[0])

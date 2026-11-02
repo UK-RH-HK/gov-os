@@ -5,11 +5,14 @@ Started by ``gov.retrieval.rerank`` with the reranker environment's interpreter,
 the socket), taken by the search that started it and held by this process for its life, so no second service starts
 while it lives. The same pinned model and the same model call as ``rerank_worker.py`` (``load`` and ``scores``).
 
-- **Device (DEC-1032):** before the model loads, the GPU's free memory is read with the library that will hold it
-  (``torch.cuda.mem_get_info``). Less than its share plus the headroom free, or no GPU to read: it loads on the CPU,
-  says so in its ready line and every answer, and writes an ALERT line to ``rerank.log``.
-- **The GPU slots:** this is not ``rerank_worker.py``, so the interim module ``gov_reranker_gpu_slot`` leaves it
-  untouched and it takes no slot; its own free-memory check and the single-service lock bound its GPU use.
+- **The GPU slots (DEC-1036 T6):** first it takes one of the private rerankers' GPU slots for its life, with their
+  rule (``rerank_worker.take_slot``: the same locks and settings, a wait of ``GOV_RERANK_GPU_WAIT_S``), never
+  allowing the CPU; so at most one private reranker runs beside it. Without a slot it ends named (exit 75; 76 when
+  the GPU is hidden). The interim module ``gov_reranker_gpu_slot`` acts only on ``rerank_worker.py``, never here.
+- **The GPU only (DEC-1036 T5, DEC-1032, DEC-1033):** holding a slot, it reads the GPU's free memory with the
+  library that will hold it (``torch.cuda.mem_get_info``). Less than its share plus the headroom free, or no GPU to
+  read: it does not start (exit 77). It never loads on the CPU. Every refusal is a REFUSED line in ``rerank.log``,
+  and the search falls back.
 - **Requests:** one connection per request, answered first come, first served, one request at a time (no batching
   across callers, so every answer is a private reranker's): ``[query, [text, …]]`` in, one JSON line out,
   ``{"scores": […], "device": …}`` or ``{"error": …, "device": …}``. More than ``MAX_TEXTS`` texts is refused.
@@ -29,8 +32,9 @@ _spec = importlib.util.spec_from_file_location("rerank_worker", os.path.join(os.
                                                                               "rerank_worker.py"))
 _worker = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_worker)
-load, scores = _worker.load, _worker.scores
+load, scores, device_of = _worker.load, _worker.scores, _worker.device_of
 
+NO_GPU_SHARE = 77  # holding a slot, the GPU has too little free memory, or none can be read
 GIB = 2 ** 30
 SHARE, HEADROOM = 3.5 * GIB, 2.0 * GIB  # DEC-1032: the reranker's share (2.5 to 3.5 GB, the top taken), 2 GB spare
 MAX_TEXTS = 512  # a search sends at most (rounds + 1) x batch size candidates: 90 at the defaults
@@ -43,15 +47,15 @@ def _free_gpu() -> int:
     return torch.cuda.mem_get_info()[0]
 
 
-def choose_device(free=_free_gpu):
-    """``("cuda", None)`` when the GPU has the share and the headroom free, else ``("cpu", why)``."""
+def gpu_short(free=_free_gpu):
+    """None when the GPU has the share and the headroom free; otherwise why the service does not start."""
     try:
         left = free()
     except Exception as error:  # no GPU, no CUDA, no torch: nothing to read
-        return "cpu", f"the GPU's free memory could not be read ({type(error).__name__}: {error})"
+        return f"the GPU's free memory could not be read ({type(error).__name__}: {error})"
     if left < SHARE + HEADROOM:
-        return "cpu", f"the GPU has {left / GIB:.1f} GiB free, under the {(SHARE + HEADROOM) / GIB:.1f} GiB needed"
-    return "cuda", None
+        return f"the GPU has {left / GIB:.1f} GiB free, under the {(SHARE + HEADROOM) / GIB:.1f} GiB needed"
+    return None
 
 
 def note(log: str, kind: str, detail: str) -> None:
@@ -84,10 +88,15 @@ def main(model: str, revision: str, path: str, lock_fd: str) -> None:
     os.set_inheritable(int(lock_fd), False)  # held until this process ends, and by no child of it
     sys.stdout = sys.stderr  # whatever the libraries print goes to the service's own log
     log, idle = os.path.join(os.path.dirname(path), "rerank.log"), float(os.environ.get("GOV_RERANK_IDLE_S", "900"))
-    device, why = choose_device()
-    if why:
-        note(log, "ALERT", f"the shared reranker runs on the CPU: {why}")
-    encoder = load(model, revision, device)
+    refused = _worker.take_slot(allow_cpu=False)  # before the free-memory reading and the load (DEC-1036 T6)
+    if refused is None:
+        short = gpu_short()
+        refused = (NO_GPU_SHARE, short) if short else None
+    if refused:
+        note(log, "REFUSED", f"the shared reranker does not start: {refused[1]}")
+        sys.exit(refused[0])
+    encoder = load(model, revision)  # the worker's call: the library's device, the GPU it has just read
+    device = device_of(encoder) or "cuda"
     listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     mask = os.umask(0o177)
     try:

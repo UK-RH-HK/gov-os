@@ -179,7 +179,7 @@ def test_searches_starting_together_start_one_service(home, monkeypatch):
     monkeypatch.setenv("STANDIN_LOAD_S", "1")  # a slow load widens the race
     results = in_threads(8, lambda number: ask(f"q{number}", ["a", "bbb", "cc"]))
     for number, (ranked, outcome) in enumerate(results):
-        assert outcome == {"by": "service", "device": "cuda", "reason": None}
+        assert outcome == {"by": "service", "device": "cuda:0", "reason": None}
         assert pairs(ranked) == expected(f"q{number}", ["a", "bbb", "cc"])
     assert len(_pids(home, SERVICE, alive=False)) == 1 and len(_pids(home, SERVICE)) == 1
     assert kinds(home).count("READY") == 1 and not _pids(home, WORKER, alive=False)
@@ -221,29 +221,109 @@ def test_the_service_ends_after_its_idle_time_and_removes_its_socket(home, monke
     assert not (home / rerank.CACHE_REL / rerank.SOCKET).exists() and kinds(home)[-1] == "END"
 
 
-# --- the device (DEC-1032) ---
+# --- the GPU only, within its share and a slot (DEC-1032, DEC-1036 T5 and T6) ---
 
-def test_the_device_is_chosen_from_the_free_gpu_memory():
-    assert rerank_service.choose_device(lambda: 6 * GIB) == ("cuda", None)
-    device, why = rerank_service.choose_device(lambda: 5 * GIB)
-    assert device == "cpu" and "5.0 GiB free" in why
+def test_the_gpu_share_is_read_from_the_free_gpu_memory():
+    assert rerank_service.gpu_short(lambda: 6 * GIB) is None
+    assert "5.0 GiB free" in rerank_service.gpu_short(lambda: 5 * GIB)
 
     def broken():
         raise RuntimeError("no CUDA")
-    assert rerank_service.choose_device(broken)[0] == "cpu"
+    assert "could not be read" in rerank_service.gpu_short(broken)
+
+
+def _service_never_loaded(home: Path) -> bool:
+    return not list((home / "marks").glob(f"model-{SERVICE}-*")) and "READY" not in kinds(home)
 
 
 @pytest.mark.parametrize("free", [str(4 * GIB), None])
-def test_short_of_gpu_memory_the_service_runs_on_the_cpu_named_and_alerted(home, monkeypatch, free):
+def test_below_its_gpu_share_the_service_does_not_start_and_the_search_falls_back(home, monkeypatch, free):
     if free is None:
-        monkeypatch.delenv("STANDIN_GPU_FREE")
+        monkeypatch.delenv("STANDIN_GPU_FREE")  # no GPU to read
     else:
         monkeypatch.setenv("STANDIN_GPU_FREE", free)
     ranked, outcome = ask("q", ["a", "bb"])
-    assert outcome == {"by": "service", "device": "cpu", "reason": None} and pairs(ranked) == expected("q", ["a", "bb"])
-    assert kinds(home)[:2] == ["ALERT", "READY"]
+    assert outcome["by"] == "private" and "too little free memory" in outcome["reason"]
+    assert pairs(ranked) == expected("q", ["a", "bb"]) and _service_never_loaded(home)
     log = (home / rerank.CACHE_REL / rerank.LOG).read_text()
-    assert "runs on the CPU" in log and "device cpu" in log
+    assert "\tREFUSED\tthe shared reranker does not start: the GPU" in log and rerank.status()["service_refusals"] == 1
+
+
+@pytest.mark.parametrize("allow_cpu", [False, True])
+def test_with_the_gpu_hidden_the_service_never_runs_on_the_cpu(home, monkeypatch, allow_cpu):
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "-1")
+    if allow_cpu:  # the tests' opt-out reaches the private worker only, never the service
+        monkeypatch.setenv("GOV_RERANK_ALLOW_CPU", "1")
+    candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
+    ranked = rerank.rerank("q", candidates)
+    outcome = rerank.last_outcome()
+    assert "the GPU is hidden from it" in outcome["reason"] and _service_never_loaded(home)
+    if allow_cpu:
+        assert outcome["by"] == "private" and pairs(ranked) == expected("q", ["a", "bbb"])
+    else:
+        assert outcome["by"] == "unavailable" and ranked == candidates
+
+
+def _held_slots(home: Path) -> list[int]:
+    """The slots some process holds, found by trying each lock without waiting."""
+    held = []
+    for i in (0, 1):
+        fd = os.open(home / "locks" / f"gov-os-rerank-gpu-{i}.lock", os.O_CREAT | os.O_RDWR, 0o600)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            held.append(i)
+        finally:
+            os.close(fd)
+    return held
+
+
+def _hold_slots(home: Path) -> list[int]:
+    fds = [os.open(home / "locks" / f"gov-os-rerank-gpu-{i}.lock", os.O_CREAT | os.O_RDWR, 0o600) for i in (0, 1)]
+    for fd in fds:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    return fds
+
+
+def test_the_service_holds_one_gpu_slot_for_its_life(home):
+    assert ask("q", ["a"])[1]["by"] == "service" and _held_slots(home) == [0]
+    ask("q2", ["a"])
+    assert _held_slots(home) == [0]  # one slot, held between requests, none for the requests
+    [pid] = _pids(home, SERVICE)
+    os.kill(pid, signal.SIGKILL)
+    assert _wait_until(lambda: not _alive(pid), 5) and _wait_until(lambda: _held_slots(home) == [], 5)
+
+
+def test_the_service_waits_for_a_slot(home, monkeypatch):
+    monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "10")
+    fds = _hold_slots(home)
+    threading.Timer(1.0, os.close, (fds[1],)).start()  # a private reranker's session ends
+    try:
+        ranked, outcome = ask("q", ["a", "bb"])
+    finally:
+        os.close(fds[0])
+    assert outcome["by"] == "service" and pairs(ranked) == expected("q", ["a", "bb"])
+
+
+def test_without_a_slot_the_service_ends_named_and_searches_go_on_unranked(home, monkeypatch):
+    monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "1")
+    fds = _hold_slots(home)
+    try:
+        began = time.monotonic()
+        results = in_threads(4, lambda number: (rerank.rerank(f"q{number}", [{"n": 0, "text": "a"}]),
+                                                rerank.last_outcome()))
+        took = time.monotonic() - began
+    finally:
+        for fd in fds:
+            os.close(fd)
+    for ranked, outcome in results:
+        assert ranked == [{"n": 0, "text": "a"}] and outcome["by"] == "unavailable"
+        assert "no GPU slot freed within its wait" in outcome["reason"]
+    assert took < 15, took
+    assert len(_pids(home, SERVICE, alive=False)) == 1  # the searches that waited for it did not start another
+    assert _service_never_loaded(home) and not list((home / "marks").glob(f"model-{WORKER}-*"))
+    assert "\tREFUSED\tthe shared reranker does not start: no GPU slot free within 1 s" in \
+        (home / rerank.CACHE_REL / rerank.LOG).read_text()
 
 
 # --- the fallbacks (DEC-374, DEC-1033) ---
@@ -292,7 +372,8 @@ def test_a_service_that_cannot_start_leaves_the_search_to_the_private_reranker(h
     monkeypatch.setenv("STANDIN_FAIL", SERVICE)
     ranked, outcome = ask("q", ["a", "bb"])
     assert outcome["by"] == "private" and outcome["device"] == "cuda:0"
-    assert "ended before it listened" in outcome["reason"] and pairs(ranked) == expected("q", ["a", "bb"])
+    assert "ended before it listened (exit 1)" in outcome["reason"] and pairs(ranked) == expected("q", ["a", "bb"])
+    assert _held_slots(home) == [0]  # the service's slot freed with it; the private reranker holds one
     [line] = fallbacks(home)
     assert line[2].startswith("the shared reranker did not answer") and line[3] == "private"
     assert rerank.fallback_count() == 1 and rerank.status()["fallbacks"] == 1
@@ -305,22 +386,6 @@ def test_without_service_or_private_reranker_the_order_is_kept_and_named(home, m
     outcome = rerank.last_outcome()
     assert outcome["by"] == "unavailable" and "ended without the model" in outcome["reason"]
     assert fallbacks(home)[-1][3].startswith("unavailable: the private reranker ended without the model")
-
-
-def test_a_private_reranker_without_a_gpu_slot_ends_and_never_runs_on_the_cpu(home, monkeypatch):
-    monkeypatch.setenv("STANDIN_FAIL", SERVICE)
-    monkeypatch.setenv("GOV_RERANK_GPU_WAIT_S", "1")
-    held = [os.open(home / "locks" / f"gov-os-rerank-gpu-{i}.lock", os.O_CREAT | os.O_RDWR, 0o600) for i in (0, 1)]
-    try:
-        for fd in held:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        candidates = [{"n": 0, "text": "a"}, {"n": 1, "text": "bbb"}]
-        assert rerank.rerank("q", candidates) == candidates
-    finally:
-        for fd in held:
-            os.close(fd)
-    assert "no GPU slot freed within its wait" in rerank.last_outcome()["reason"]
-    assert not list((home / "marks").glob(f"model-{WORKER}-*"))  # no model loaded, on no device
 
 
 def test_a_session_that_cannot_make_a_socket_falls_back_at_once(home, monkeypatch):
@@ -382,7 +447,7 @@ def test_the_private_worker_holds_a_slot_or_waits_then_ends_named(home):
 # --- what gov status and the bundle report ---
 
 def test_gov_status_counts_the_fallbacks(home, monkeypatch):
-    assert status_command._reranker() == {"fallbacks": 0, "cpu_alerts": 0,
+    assert status_command._reranker() == {"fallbacks": 0, "service_refusals": 0,
                                           "log": str(home / rerank.CACHE_REL / rerank.LOG)}
     monkeypatch.setenv("STANDIN_FAIL", SERVICE)
     ask("q", ["a"])
@@ -414,7 +479,7 @@ def test_the_bundle_names_who_reranked(home, tmp_path, monkeypatch):
     monkeypatch.setattr(semantic, "search", lambda *_args, **_kwargs: {"available": True, "reason": None, "hits": []})
 
     bundle = retrieve(tmp_path, "heron ledger")
-    assert bundle["merge"]["reranked"] and bundle["rerank"] == {"by": "service", "device": "cuda", "reason": None}
+    assert bundle["merge"]["reranked"] and bundle["rerank"] == {"by": "service", "device": "cuda:0", "reason": None}
     monkeypatch.setenv("STANDIN_FAIL", "all")
     for pid in _pids(home, SERVICE):
         os.kill(pid, signal.SIGKILL)
