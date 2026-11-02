@@ -14,7 +14,8 @@ P=$HOME/.local/share/gov-os
 readlink -f ~/.local/bin/gov | grep -q 'pin-5c401220' && echo "STOP: gov is still the old pin" || echo "ok: gov is $(readlink -f ~/.local/bin/gov)"
 S=$(dirname "$(readlink -f ~/.local/bin/gov)")/../lib/python3.12/site-packages/gov/retrieval/semantic.py
 grep -q -E 'NOT_ON_CPU|_on_cpu' "$S" && echo "STOP: the pin still has the CPU-only gate" || echo "ok: the pin accepts a vector from any device"
-timeout 300 sh -c 'while pgrep -f pin-5c401220 >/dev/null; do sleep 2; done' && echo "ok: no process of the old pin" || { echo "STOP: old-pin processes after 5 minutes:"; pgrep -af pin-5c401220; }
+T=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_busy.sh  # never pgrep -f: it matches its own command line (a false STOP on 2026-11-02)
+timeout 300 sh -c "while bash $T --cmd $P/pin-5c401220 >/dev/null; do sleep 2; done" && echo "ok: no process of the old pin" || { echo "STOP: old-pin processes after 5 minutes:"; bash $T --cmd $P/pin-5c401220; }
 install -m 0755 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/ollama_query_cpu_wrapper.sh ~/.local/bin/ollama  # the wrapper's update: a server never keeps a heavy slot's thread budget (DEC-1038, the gate review's F3; 14 tests)
 head -14 ~/.local/bin/ollama | grep -q 'query-server-device' && grep -q 'GOV_HEAVY_THREAD_BUDGET' ~/.local/bin/ollama && echo "ok: the wrapper is in place, updated" || echo "STOP: ~/.local/bin/ollama is not the updated wrapper"
 ```

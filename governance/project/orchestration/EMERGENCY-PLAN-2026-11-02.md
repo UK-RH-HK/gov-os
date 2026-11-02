@@ -1,66 +1,139 @@
 # EMERGENCY PLAN — DEC-1033 (in force since 2026-11-02 13:01), the one file a fresh or compacted session carries on from
 
-Rewritten 2026-11-02 15:55 by session `07f25884` (W2O V3); updated 16:15. **The owner's change of plan (16:00):
-session `07f25884` stays on until window 1's re-pin and ACT-QUERY-GPU-2 are done and checked; then it updates the
-handover, writes the stand-by file, says "fresh session ready" and does nothing further.** Read this before anything
-else in the checkpoint. The register holds the decisions; this file holds the state. Update it before the switch and
+## THE OWNER'S PLAN (DEC-1039, 2026-11-02 ~18:20) — the fresh session works from this, in order, all in emergency mode
+1. **No infrastructure fix waits for the ticket path.** Each one now, as an emergency patch, out of the ordinary,
+   with the reds' rules (an acceptance test that must change is revised by a test designer; a review where needed;
+   every heavy run through the gate): the shared reranker on the GPU (W2-112: resume from
+   `~/gov-os-worktrees/W2-112/.gov-runtime/scratch/lead/CHECKPOINT.md`, round 2's review); W2-122's seeding and
+   W2-123's bounded retry (branches `3fc448601e2d`, `3de9bcf44d91`, approved in the queue; the queue stops on W2-54's
+   six CPU-only cases until a test designer revises them under DEC-1033); the vector cache (W2-126: its tests are
+   ready at `75c4db0e` in its worktree); the real gitleaks fix (each gate slot confined to its CPU share with
+   `taskset` in `tools/heavy_slot.sh`; `src/gov/secrets/__init__.py:599`'s pool sized by `os.sched_getaffinity`;
+   `nightly.sh`'s runs included: it takes the slot locks itself, F2); the machine-derived limits and the standing
+   targets (`drafts/BRIEF-MACHINE-TARGETS.md`). **Re-pin as often as needed**, each like window 1:
+   `bash pin/make_repin3_commands.sh <commit>` (it builds twice, fills the sha256), `pin/repin3_checks.sh` on the
+   dry install, `packages/ACT-REPIN-EMERGENCY-1.md` as the model for the ACT (the old pin's folder kept for the
+   rollback; the registry script `pin/repin3_registry.py` needs its OLD_COMMIT/OLD_SHA moved to a7182f6c's entry
+   first), the hold, a ping.
+2. **The tests and the code, before the full suite:** a report of the code's size (files and lines: product code,
+   tests, tools), the number of tests (unit, acceptance), which are no longer needed, which repeat each other or can be
+   merged, even across tickets. Then test designers refactor the tests (an independent reviewer checks them) and a
+   senior engineer refactors the code. Every KPI line stays covered by at least one test; **the list of deletions and
+   merges goes to the owner first.** The inventory may start in parallel with 1; the refactor waits for stable
+   infrastructure.
+3. **The full suite on the re-pinned head**, every red fixed in emergency mode (even in the Gov OS), repeated until
+   green (see "Steps (5)" below for the known reds and nightly.sh's missing budget).
+3b. **Before the freeze lifts, the Wave 2 plan refactored** (WBS, tickets, the wave): done in substance by the
+   emergency (formal closing only), overlapping (merge), no longer needed, to re-scope; every KPI line of a merged or
+   retired ticket shown met with evidence or moved. **The list goes to the owner first, with the new estimate for
+   EXAMIN's copy.**
+4. Once green the owner lifts the emergency and the freeze; re-pin if needed; tickets resume; W2-112, W2-122,
+   W2-123, W2-126, W2-20 and the others closed formally afterwards with their records.
+- P-W2-20-THREAD-BUDGET (a): done (W2-20 `DAEO-r30l` has the four success lines and one failure line).
+- **The dispatcher starts nothing**: `dispatch/ready.txt` is empty (its lines in `ready.parked-by-stop-1821.txt`, the
+  freeze's in `ready.parked-by-freeze.txt`); `land.txt` absent. Restart work only under this plan.
+- **The push of w2/integrate** (30 commits incl. the registry `fe01f3cb`) was refused by the CTO session's
+  permissions: the owner's (`git push origin w2/integrate`).
+
+## State at ~18:30 (AFTER THE SWITCH): window 1 DONE
+- `pin-a7182f6c` live (registry `fe01f3cb`), confirmed from the CTO session: `readlink -f ~/.local/bin/gov`, no CPU
+  gate in its `semantic.py`, a search 1.3 s with both facets, no old-pin process (`tree_busy.sh --cmd`). Rollback: the
+  old pin `pin-5c401220` kept (ACT-REPIN-EMERGENCY-1's rollback lines; undo ACT-QUERY-GPU-2 first).
+- ACT-QUERY-GPU-2 done: the query server on the GPU (29/29, pid 3877550, CPUs 8-11, nice 0, pinned), a question
+  0.04-0.22 s (13.7 s before); the wrapper set to `gpu` and updated (drops a slot's thread budget);
+  `dispatch/config.json` `gpu_expected.query` = true (backup `.pre-gpu-query`); the dispatcher reads both 29/29.
+- The gate's thread budget live (`tools/heavy_slot.sh`, H1-H12); it does not bound the load (plan item 1's fix does).
+- **Stopped:** the W2-122/123 landing (17:00, both approved); W2-112's lead (17:08, safe point, round 2's review not
+  started); **W2-126**: the dispatcher had started its run 1 at 17:07 (the CTO's slip: the ready list was not emptied
+  at the 17:00 stop); its `retrieve_check`/`context_check` restarted the query server at 18:14 (through the wrapper: on
+  the GPU with its caps; `~/.ollama/query-autostart.log`); its verification run stopped at 18:25 (8 processes; its
+  tree clean at `75c4db0e`); its lead asked to checkpoint and exit (see the stops log for its reply).
+- `tools/tree_busy.sh --cmd <path>` is the ACTs' process check (ACT-QUERY-GPU-2, the re-pin template), never `pgrep -f`.
+
+Rewritten 2026-11-02 15:55 by session `07f25884` (W2O V3); updated 16:15 and ~17:15. Read this before anything
+else in the checkpoint. The register holds the decisions; this file holds the state. Updated before the switch and
 after it.
 
-## Window 1: what is READY (16:15)
+**The owner's order of ~17:00 (supersedes the earlier step list):** the re-pin no longer waits for the landing: fix
+(b) is on `a7182f6c`, so window 1 re-pins from there. In order: (1) stop everything at safe points (DONE, see
+`log/emergency-stops-20261102.md`); (2) the handover kept current; (3) BEFORE the re-pin, the gitleaks fix: the thread
+budget in `heavy_slot.sh` with its own quick test and one review, switched on; and a KPI proposal for W2-20's gate
+(DEC-1003); (4) window 1 from `a7182f6c` (fix (b) confirmed on it), commands generated, every check re-run on its dry
+install, the hold written, the owner pinged for the ACT; ACT-QUERY-GPU-2 right after; (5) straight after, the full
+suite on the re-pinned head, then **every red fixed as an emergency, not through the ticket path: the CTO launches
+senior engineers to fix the reds directly as emergency patches, no leads, no tickets; the only rule kept is that an
+acceptance test that must change is revised by a test designer, with a review where needed; every smart practice;
+actions out of the ordinary permitted to fix the machine and the infrastructure; the full run repeated until green**;
+(6) once green the owner lifts the freeze: then land W2-122, W2-123 and every in-flight ticket that can land, restart
+the closes, carry on with the tickets with the load within its band. **Session `07f25884` stays on until window 1's
+re-pin and ACT-QUERY-GPU-2 are done and checked; then it updates the handover, writes the stand-by file, says "fresh
+session ready" and does nothing further; the fresh session carries on from step (5).**
+
+## State at ~17:50 (BEFORE THE SWITCH)
+- **Step 3 done in part:** the thread budget is LIVE in `tools/heavy_slot.sh` (17:46; review PASS, verdict block last;
+  review F1 and F4 fixed with test H12; H1-H12 pass on the live gate; backup `heavy_slot.sh.pre-dec1038`). Measured on
+  W2-69's 352 tests: 968 s against 1,069 s, but peak runnable 179 against 165: **it does not bound the load**; the
+  cause is the scan's pool of `os.cpu_count()` gitleaks in `src/gov/secrets/__init__.py:599` (incident record
+  updated). Proposed to the owner with the window 1 ping: each slot confined to its CPU share (`taskset`) and the pool
+  sized by `os.sched_getaffinity` (an emergency patch + unit test + one review). The review's F3 (a server keeps a
+  slot's budget) is in ACT-QUERY-GPU-2's step 0 (the wrapper's update, 14 tests; `1d271a30`); F2 (nightly.sh has no
+  budget) is in step (5) below.
+- **Step 4:** all checks PASS on a7182f6c's dry install (17:2x); `REPIN-COMMANDS-a7182f6c.sh` and
+  `packages/ACT-REPIN-EMERGENCY-1.md` committed (`80ee632d`); the hold `log/act-in-progress.txt` written at the ping;
+  **waiting for the owner's operator**. After "done": end the hold (`mv` to `.ended-HHMM`), confirm the pin, set
+  `gpu_expected.query`, measure a question, update this file, RESUME HERE and the checkpoint, then the stand-by file
+  and "fresh session ready".
+
+## State at ~17:15
+- **Stopped (owner ~17:00):** the W2-122 + W2-123 landing (the queue stopped itself at 17:00 on W2-54's six CPU-only
+  cases, red on a7182f6c since fix (b); both still approved); W2-112's lead (safe point, round 2 of the review not
+  started, its checkpoint in its worktree); no CTO agent running. Details and resume points: the stops log.
+- **Records committed `8c817af2`** (DEC-1037, DEC-1038, the P1 approved, ACT-QUERY-GPU-2 revision 2, the plan, the
+  prompt's DEC-1038 line). Uncommitted: `.tickets/DAEO-1vka.md` (W2-127 gains F3's KPI line, the CTO as moderator),
+  `packages/P-W2-20-THREAD-BUDGET.md` (the KPI proposal): commit with the next records commit (not during the ACT hold).
+- **Step 3, the gate's thread budget:** `tools/heavy_slot.candidate.sh` (max(1, CPUs/slots/workers) threads exported
+  as GOMAXPROCS, OMP_NUM_THREADS, MKL, OPENBLAS, RAYON, NUMEXPR (both), VECLIB; inherited values overridden;
+  `GOV_HEAVY_THREADS` overrides); `tools/test_heavy_slot.sh` H1-H11 PASS on the candidate (H9-H11 fail on the live gate,
+  as they should; run with `HEAVY_SLOT_UNDER_TEST=<path>`); backups `heavy_slot.sh.pre-dec1038`,
+  `test_heavy_slot.sh.pre-dec1038`. Measurement (W2-69's tests through each gate, time and peak runnable) running; one
+  independent review (independent-auditor) running. **Switch on** = `cp heavy_slot.candidate.sh heavy_slot.sh` once the
+  review passes (verdict.py) and the measurement holds (no more than 20 % slower). Then incident
+  `log/incidents/2026-11-02-1620-T1-cpu.md` gets its fix line.
+- **Step 4, window 1 from a7182f6c:** fix (b) confirmed (6ed6a5ae is an ancestor; semantic.py has no CPU gate);
+  `pin/REPIN-COMMANDS-a7182f6c.sh` generated (sha256 9ed615a8…, two builds agree, reproducible across runs); checks on
+  its dry install (`~/.cache/gov-os-repin3-dry/a7182f6c/venv`) running (8c817af2, byte-identical code, passed ALL
+  CHECKS at 17:0x). Then: write `packages/ACT-REPIN-EMERGENCY-1.md` (the cover: `bash pin/REPIN-COMMANDS-a7182f6c.sh
+  2>&1 | tee ~/repin-a7182f6c.log` in a plain terminal, then ACT-QUERY-GPU-2), write `log/act-in-progress.txt`, ping.
+- **After the switch (the CTO):** confirm `readlink -f ~/.local/bin/gov` → `pin-a7182f6c`, a live tool call through the
+  hook, a search; after ACT-QUERY-GPU-2: `dispatch/config.json` `gpu_expected.query = true`, a question's time.
+
+## Window 1's tools (ready)
 - `pin/repin3_dry.sh` (the wheel twice + a scratch install), `pin/repin3_checks.sh <pin dir>` (every check before
   the switch: commands, no CPU gate, dependencies, a search with both facets, context, the three hooks by their exact
-  lines under a scratch HOME, and the guard: `guard4_check.py`, `test_guard_fix_3.py`, `hook_timing.py`, which now
-  take `GOV_PIN_PY`), `pin/REPIN-COMMANDS.template.sh` + `pin/make_repin3_commands.sh <commit>` (writes
-  `REPIN-COMMANDS-<C>.sh` with the dry run's sha256; parts 0, A install beside, B checks, C quiet point, D atomic
-  switch + smoke + a search, rolling back by itself on a failure, E registry by `pin/repin3_registry.py`, Role: owner).
-- **Dry run on the landing's merged commit 816db78d (in the warm clone): two builds agree (sha256 ff8827cc…); ALL
-  CHECKS PASS** (guard: 54 cases PASS, 269 passed 1 skipped, the same as the old pin; hook 0.14-0.94 s; a search 1.05 s
-  warm against 0.92 s on the old pin; the first search after the switch is a cache miss: the cache key now carries the
-  device). Note: a pin under a path over 127 characters gets a `/bin/sh` launcher line that the hooks cannot use: dry
-  installs live under `~/.cache/gov-os-repin3-dry/`.
-- `drafts/ACT-QUERY-GPU-2.md`, revision 2 (replaces the package at the commit): step 0 checks the new pin and waits
-  for the old to drain; **the wrapper is not removed but set to the GPU** (`echo gpu > ~/.ollama/query-server-device`;
-  the wrapper reads it, 11 tests), so a restart in the gap also comes back on the GPU with caps and log; undo = `cpu`.
-- To do once the landing ends: commit (step 2 below), then `bash pin/make_repin3_commands.sh w2/integrate`, run
-  `repin3_checks.sh` on its dry install, write `packages/ACT-REPIN-EMERGENCY-1.md` (the cover: the script, then
-  ACT-QUERY-GPU-2), write `log/act-in-progress.txt` (DEC-1028 item 6), ping the owner.
+  lines under a scratch HOME, and the guard: `guard4_check.py`, `test_guard_fix_3.py` (through the gate),
+  `hook_timing.py`, which take `GOV_PIN_PY`), `pin/REPIN-COMMANDS.template.sh` + `pin/make_repin3_commands.sh <commit>`
+  (parts 0 preconditions incl. the hold file, A install beside, B checks, C quiet point, D atomic switch + smoke + a
+  search, rolling back by itself on a failure, E registry by `pin/repin3_registry.py`, Role: owner).
+- Dry installs live under `~/.cache/gov-os-repin3-dry/` (a path over 127 characters gets a `/bin/sh` launcher line
+  the hooks cannot use). The first search after the switch is a cache miss (the cache key now carries the device).
+- `packages/ACT-QUERY-GPU-2.md` revision 2: step 0 checks the new pin and waits for the old to drain; the wrapper set
+  to the GPU (`echo gpu > ~/.ollama/query-server-device`), so a restart in the gap also comes back on the GPU.
 
-## NEXT STEP (in this order)
-1. **Watch the landing of W2-122 + W2-123** (started 15:48 by the dispatcher, `log/land-dispatch-20261102-1548*.out`;
-   merged 816db78d2d87 onto a7182f6c in the warm clone; testing). It ends with `CLOSED W2-122` / `CLOSED W2-123`
-   and a `land` inbox item. Do NOT commit to w2/integrate while it runs: a moved head makes the queue re-merge and
-   re-test (HEAD_TRIES 3, ~30-45 min each).
-2. **Then commit what is waiting** (all written in scratch, nothing half-written):
-   - `docs/DECISION_REGISTER.md`: append `drafts/register-DEC-1037.md` after DEC-1036's version table, then its own
-     version table `| 0.419 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1037. Next free id: DEC-1038. |`;
-     then `drafts/register-DEC-1038.md` and `| 0.420 | ... DEC-1038. Next free id: DEC-1039. |`.
-   - `governance/project/prompts/w2-orchestrator.md`: one standing line for DEC-1038 (ACT for machine changes; the
-     checkpoint tool; the targets; every heavy job through the gate).
-   - `governance/project/orchestration/packages/P1-REPIN-EMERGENCY.md` from `drafts/P1-REPIN-EMERGENCY.md`, its
-     header marked "APPROVED (a), DEC-1037, 2026-11-02 ~15:50".
-   - `packages/ACT-QUERY-GPU-2.md` replaced by `drafts/ACT-QUERY-GPU-2.md` (revision 2: the wrapper set to the GPU,
-     not removed).
-   - The scratch tools stay in scratch (land.py's strays, queue_park.py, the wrapper and the pin scripts).
-   - This file into `governance/project/orchestration/EMERGENCY-PLAN-2026-11-02.md` (the committed copy).
-   - One commit, trailers `Task: DAEO-sdxk`, `Implements: DEC-1037`, `Role: orchestrator`.
-3. **Refresh the integration store once by hand** (`tools/refresh_integration_store.sh`; it is at `6ebd7b56`).
-4. **Window 1's preparation** (DEC-1037 (1); the P1's section 4 (a), "window 1" steps, is the checklist): on the
-   landed head, the GOV_PIN_PY override in the guard-check tools; the wheel built twice, sha256 equal;
-   `REPIN-COMMANDS-<head12>.sh` and the registry script; every check before the switch, the guard's included (W2-84's
-   stricter reads, `smoke_repin2.sh`); then ping the owner for the plain-terminal ACT (re-pin by `mv -T`, old pin
-   kept), then ACT-QUERY-GPU-2 once `pgrep -f pin-5c401220` finds nothing (the new pin's own processes excepted).
-   **Any failed check, or a broken search after the switch: switch straight back to the old pin and tell the owner.**
-5. **The full suite on the re-pinned head** as soon as window 1 is done (DEC-1037 (2)): expected about 1.5-2 h on
-   the frozen machine (29-30 Oct quiet runs: 5,300-5,600 s with a 1,000-1,500 s cold setup; seeding cuts the setup;
-   today's contended nightly took 5.4 h). Started by hand like the nightly (`nightly.sh` against the head), detached.
-6. **The clean restart** (DEC-1037 (3)): every red of that run listed with the ticket that fixes it (W2-90b, W2-105
-   among the parked six; W2-90c, W2-66b, W2-55, W1-01b; any other: file it); those landed and run first, at top
-   priority (unpark their approvals with `tools/queue_park.py unpark` only for the ones landing, or name them); the
-   full run repeated until green, or every remaining red has its fix landing. Acceptance tests by test designers only.
-   Then the owner lifts the freeze.
-7. **Window 2** after W2-112 lands (its lead `w2-112-2b` is in its serial-only run; then the FULL review, reviewer
-   unsandboxed under DEC-1034's extension; then DONE; land through the queue); then W2-127.
-8. **The after figures** (DEC-1033 item 4), with ACT-QUERY-GPU-2's question time in them.
+## Steps (5) and (6) for the fresh session, in short
+- (5) The full suite on the re-pinned head, started by hand like the nightly (`nightly.sh` against the head),
+  detached, through the gate: expected about 1.5-2 h on the frozen machine. **The gate review's F2: `nightly.sh`
+  takes the slot locks itself, so it gets neither the worker cap nor the thread budget (20 workers, each gitleaks on
+  20 CPUs): export the budget for the run (`GOMAXPROCS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+  RAYON_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 NUMEXPR_MAX_THREADS=1`) or give `nightly.sh` the same budget as an
+  emergency patch (one review); and watch W2-54's context-check time limit (F7: gitleaks' fan-out is
+  `os.cpu_count()` at once, each with a 60 s + size limit).** Then the reds: known so far: W2-54's six
+  CPU-only cases (a test designer revises them under DEC-1033, `Rewrite-Reason: DEC-1033`), W2-59 hook_lines (4, red
+  at the baseline), W1-19 default_reranker (revised under DEC-1033 item 3), W1-19 warm p95 (load-sensitive), the
+  baseline nightly's 32 reds (`log/nightly/20261102-0400/run.txt`); W2-90b and W2-105 among the parked six; W2-90c,
+  W2-66b, W2-55, W1-01b. Senior engineers fix them directly as emergency patches (owner ~17:00): each with its tests,
+  a review where needed, through the gate; repeat the full run until green.
+- (6) On the owner's lift: `tools/queue_park.py unpark`, land W2-122/123 and the rest, `dispatch/ready.parked-by-freeze.txt`
+  back, closes restarted, W2-112 resumed from its checkpoint, the machine-targets engineer (`drafts/BRIEF-MACHINE-TARGETS.md`).
 
 ## Work the owner ordered that waits for an engineer (DEC-1037 (4) and follow-ups)
 - **Limits derived from the machine** (DEC-1037 (4)): no number fixed for this machine; the CTO's tools detect
@@ -114,14 +187,14 @@ after it.
   the GPU (the shared server, 15:50): 0.07-0.5 s. The GPU move after the re-pin removes it.
 
 ## The fixes: state
-| Fix | State at 15:55 | Next |
+| Fix | State at ~17:15 | Next |
 |---|---|---|
-| (a) W2-112 shared reranker on the GPU (`DAEO-clon`, FULL; lead `w2-112-2b`, `~/gov-os-worktrees/W2-112`) | lead's serial-only run (4 F, maybe the incident) | FULL review, DONE, land; window 2 |
-| (b) a question's vector from any device (merged `6ed6a5ae`) + the query server on the GPU | code in the repository, NOT in the pin; query server CPU-only (ACT-QUERY-CPUS-1) | window 1 re-pin, then ACT-QUERY-GPU-2 |
+| (a) W2-112 shared reranker on the GPU (`DAEO-clon`, FULL; `~/gov-os-worktrees/W2-112`) | STOPPED ~17:08 at a safe point: review round 2 not started (repairs committed f59c9ba5560e + tests ed0891667f46) | after green: resume from its checkpoint; land; window 2 |
+| (b) a question's vector from any device (merged `6ed6a5ae`) + the query server on the GPU | on a7182f6c, NOT in the pin; query server CPU-only (ACT-QUERY-CPUS-1) | window 1 from a7182f6c, then ACT-QUERY-GPU-2 |
 | Reranker interim rule (GPU slots; wait 20 s or unranked) | LIVE (`81b7a739`) | retired by W2-112's ACT |
 | (c) dispatcher v4.6 | LIVE (`b06ee350`) | machine-derived limits (above) |
 | (d) no cold rebuild (seeding) | LIVE (`648e5067`) | integration store refresh after the landing |
-| W2-122 seeded rebuilds, W2-123 bounded retry | LANDING since 15:48 (the two alone) | close records come from land.py |
+| W2-122 seeded rebuilds, W2-123 bounded retry | landing STOPPED 17:00 by the queue (W2-54's CPU-only reds on the head, not theirs); both approved | land after green (owner's step 6) |
 | W2-126 vector cache (`DAEO-jpr0`) | run 1 (tests only) on the ready list | engineer after W2-123 lands |
 | W2-127 the reranker's socket in the sandbox | filed | after W2-112 lands |
 
