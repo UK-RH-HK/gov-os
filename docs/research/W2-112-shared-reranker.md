@@ -174,9 +174,32 @@ The lead's run, by the method above (the engineer ran no real model and touched 
 
 ## 5. ACT: retiring the stopgap (ACT-RERANK-GPU-SLOTS-1)
 
-For the owner's operator, in a plain terminal, **only after W2-112 has merged** (the private worker then carries the
-slot rule itself). It removes two files from your reranker environment under `~/.local/share`; no repository commit.
+For the owner's operator, in a plain terminal. It removes two files from your reranker environment under
+`~/.local/share`; no repository commit. **W2-112's merge is not enough.** Only a `rerank_worker.py` of W2-112 or later
+carries the slot rule itself; every older one (the installed, pinned `gov` until it is re-pinned, and any checkout,
+clone or worktree whose branch predates W2-112) relies on the module alone and, without it, loads its model on the GPU
+beside the two held slots: a third copy, the crash state DEC-1031 records. Until the precondition below holds, **the
+module stays**: beside W2-112's worker it is harmless (it has already taken the slot in that process, and the worker
+then takes nothing more).
 
+**Precondition (both checks must pass):**
+1. The installed `gov` carries the worker's own slot rule (in practice after ACT 2's re-pin of `~/.local/bin/gov` to
+   a release that holds W2-112). This prints the worker's path and a count of `1` or more; `0` means it is older:
+   ```
+   P=$(dirname "$(readlink -f "$HOME/.local/bin/gov")")
+   F=$("$P/python" -I -c "import importlib.util as u; print(u.find_spec('gov.retrieval.rerank_worker').origin)")
+   echo "$F"; grep -c 'def take_slot' "$F"
+   ```
+   (On 2026-11-02 the pin `pin-5c401220` printed `0`: it does not yet.)
+2. No tree on the machine runs an older worker: the main checkout, the merge queue's clone, every worktree, any
+   other copy or installed environment. This lists every `rerank_worker.py` under your home and `/tmp` that lacks
+   the rule; it must print nothing:
+   ```
+   find "$HOME" /tmp -path '*/gov/retrieval/rerank_worker.py' 2>/dev/null | while read -r f; do grep -q 'def take_slot' "$f" || echo "OLD $f"; done
+   ```
+   Each `OLD` line is a tree to bring up to date (its branch merged with a main that holds W2-112) or remove first.
+
+**Then, and only then:**
 1. Remove the module and its `.pth`:
    ```
    V=$HOME/.local/share/gov-os/reranker-venv
@@ -188,16 +211,21 @@ slot rule itself). It removes two files from your reranker environment under `~/
    $V/bin/python -I -c "import importlib.util, os; print(importlib.util.find_spec('gov_reranker_gpu_slot'), os.environ.get('GOV_RERANK_GPU_SLOT'), os.environ.get('CUDA_VISIBLE_DEVICES'))"
    ```
    prints `None None None`.
-3. The lock files `/tmp/gov-os-rerank-gpu-0.lock` and `/tmp/gov-os-rerank-gpu-1.lock` may be removed once
-   `fuser /tmp/gov-os-rerank-gpu-0.lock /tmp/gov-os-rerank-gpu-1.lock` shows no process holds them (the shared
-   service holds one for its life, up to its idle end; they are recreated by the next service or private worker).
-4. **Undo:** the commands of ACT-RERANK-GPU-SLOTS-1 §3, with the module of ACT-RERANK-WAIT-1
+3. **Undo:** the commands of ACT-RERANK-GPU-SLOTS-1 §3, with the module of ACT-RERANK-WAIT-1
    (`governance/project/orchestration/tools/gov_reranker_gpu_slot.py`).
 
-**Why it is safe after this ticket:** the module never acted on the shared service (it is not `rerank_worker.py`),
-which takes its slot with its own code (DEC-1036 T6); the private worker, the only process the module acted on,
-now holds the same slot locks (same names, same folder, same
-settings `GOV_RERANK_GPU_SLOTS`, `GOV_RERANK_GPU_LOCK_DIR`, `GOV_RERANK_GPU_WAIT_S`, the same 20 s wait, the same
-named end with exit 75 and 76, the same `GOV_RERANK_ALLOW_CPU=1` opt-out) before torch or the model loads. With the
-module gone the worker takes the slot itself instead of finding `GOV_RERANK_GPU_SLOT` set, so removing it changes
-nothing in behaviour.
+**Never remove the slot lock files** `/tmp/gov-os-rerank-gpu-0.lock` and `/tmp/gov-os-rerank-gpu-1.lock` (nor any
+`gov-os-rerank-gpu-<n>.lock` in `GOV_RERANK_GPU_LOCK_DIR`), whether or not a process holds them. They are empty and
+must stay. A slot is a lock on that file's inode: removing a file a reranker holds lets the next reranker create a new
+file at the same name and lock it, so it loads beside the holder (the review saw three rerankers on two slots); and
+`fuser` cannot rule that out, since a reranker may take the lock just after it looks.
+
+**Why it is safe once the precondition holds:** the module never acted on the shared service (it is not
+`rerank_worker.py`), which takes its slot with its own code (DEC-1036 T6). The private worker, the only process the
+module acted on, then carries in every tree that can start one the same slot rule (the same lock files in the same
+folder, the same settings `GOV_RERANK_GPU_SLOTS`, `GOV_RERANK_GPU_LOCK_DIR`, `GOV_RERANK_GPU_WAIT_S`, the same 20 s
+wait, the same named end with exit 75 and 76, the same `GOV_RERANK_ALLOW_CPU=1` opt-out) before torch or the model
+loads. With the module gone such a worker takes the slot itself instead of finding `GOV_RERANK_GPU_SLOT` set, so
+removing it changes nothing in behaviour. Before the precondition holds that is false: an older worker, without the
+module, takes no slot at all. Rerankers already running when the module is removed keep the slot they took (their lock
+stays open for their life).
