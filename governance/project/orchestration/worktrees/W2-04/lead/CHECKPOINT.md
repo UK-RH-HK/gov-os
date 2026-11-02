@@ -1,5 +1,18 @@
 # W2-04 (DAEO-u4oz) lead checkpoint
 
+## Resume 4 (the CTO, 2026-11-02): the FULL review on b37b5c8f1741, then DONE
+- Head b37b5c8f1741, tree clean, hooks dir: samples only. No test run, no rebuild (the code is the verified code).
+- rev-1.md updated: JUDGEMENT.md carried as on w2/integrate (DEC-1010 item 1's section added; diff checked word for
+  word), the ```verdict block asked for (ids success-1..7, failure-1), embedder note (timeout 120 on gov retrieve).
+  Filled by fill_rev.py -> briefs/rev-1.filled.md (head as 12 digits; full from git rev-parse).
+- Tripwire snapshot 7 (09:15). rev-1 launched 09:15 (independent-auditor, gov launch, sandboxed, max, read-only tools);
+  log log/rev-1.json, rc log/rev-1.rc.
+- Implementer sessions: eng-1 a9172d75, eng-2 9d8f6751, eng-3 9077ada5, eng-5 f5463fda.
+- Next: tripwire compare; twelve fields; triage (block only if in scope + ordinary yes + fails open/loses work);
+  pass -> docs/probes/DAEO-u4oz/PR-DAEO-u4oz.md (schema fields, verdict block), commit (Task, Implements, Role), DONE.
+  fail -> draft under probes/, PACKAGES (one repair round at most).
+- Brief gap: JUDGEMENT.md in this tree predates DEC-1010 (the brief had the old text) (~5 min).
+
 ## Resume 3 (DEC-1015, 2026-11-02 06:02): verification only
 - Head e0d06a04ae53, tree clean. CTO's rebuild (log rebuild-W2-04-20261101-2205.out) ended ok 22:43, semantic recreated.
 - rebuild-5: my call without PYTHONPATH -> ModuleNotFoundError gov (rc 1; script uses caller's env). rebuild-6 with

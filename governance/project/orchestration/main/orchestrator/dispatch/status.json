@@ -1,20 +1,21 @@
 {
- "time": "2026-11-02 09:11:04",
+ "time": "2026-11-02 09:17:08",
  "leads": [
+  "W2-04",
   "W2-104",
   "W2-92"
  ],
- "lead_count": 2,
+ "lead_count": 3,
  "load": [
-  21.77,
-  21.37,
-  18.59
+  24.1,
+  23.15,
+  20.13
  ],
- "mem_available_mb": 18736,
- "gate_open": true,
- "gate": "OPEN leads=2 load=21.8/18.6 nproc=20 have=21378964kB need=9566436kB",
+ "mem_available_mb": 16949,
+ "gate_open": false,
+ "gate": "SHUT leads=3 load=24.1/20.1 nproc=20 have=20062672kB need=11706672kB: load 24.1/20.1 >= nproc 20",
  "disk_open": true,
- "disk": "disk gate open: 844 GiB free, 64266615 inodes free",
+ "disk": "disk gate open: 844 GiB free, 64253450 inodes free",
  "slots_held": [
   "gov-os-heavy-slot-1.lock"
  ],
@@ -22,85 +23,82 @@
  "close_running": false,
  "closing_w2s": [],
  "queue_busy": false,
- "main_clean": false,
- "main_dirty": [
-  ".tickets/DAEO-cuao.md",
-  ".tickets/DAEO-i89t.md",
-  ".tickets/DAEO-k7hz.md",
-  "docs/DECISION_REGISTER.md"
- ],
+ "main_clean": true,
+ "main_dirty": [],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
   "DAEO-n0wb",
-  "DAEO-drhj"
+  "DAEO-drhj",
+  "DAEO-u4oz"
  ],
  "lead_rss_kb": {
-  "W2-92": 349564,
-  "W2-104": 1874928
+  "W2-92": 354436,
+  "W2-104": 1850260,
+  "W2-04": 566316
  },
  "outside_slot": [],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1260128,
-  "codegraph": 29792
+  "embedding": 1259556,
+  "codegraph": 0
  },
- "busy_cores": 14.88,
- "embedding_cores": 6.11,
+ "busy_cores": 16.43,
+ "embedding_cores": 7.19,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 0,
- "outside_reranker_possible": false,
+ "rerankers_outside_kb": 1783752,
+ "outside_reranker_possible": true,
  "peaks": {
   "computed": "2026-11-02 08:25:04",
   "lead_p95_mb": 4093,
   "lead_max_mb": 9580
  },
- "admit": true,
- "admit_reason": "admits: 2 of 6 leads; memory 20908 MB >= 16700 MB (slots rule: floor + 2 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + services' headroom 1783 MB)",
- "inbox_unread": 1,
- "inbox_oldest_age_s": 74,
+ "admit": false,
+ "admit_reason": "memory: available + leads' 19655 MB < 27073 MB (slots rule: floor + 3 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + services' headroom 9862 MB)",
+ "inbox_unread": 0,
+ "inbox_oldest_age_s": null,
  "started_this_tick": null,
  "ready_waits": {
-  "W2-122 DAEO-blwa": "embedding server hung: starts held (DEC-1015)",
-  "W2-123 DAEO-qzrq": "embedding server hung: starts held (DEC-1015)",
-  "W2-81 DAEO-l78m": "embedding server hung: starts held (DEC-1015)",
-  "W2-04 DAEO-u4oz": "embedding server hung: starts held (DEC-1015)",
-  "W2-92 DAEO-n0wb": "embedding server hung: starts held (DEC-1015)",
-  "W2-104 DAEO-drhj": "embedding server hung: starts held (DEC-1015)",
-  "W2-61h DAEO-h2k3": "embedding server hung: starts held (DEC-1015)",
-  "W2-91 DAEO-a3u2": "embedding server hung: starts held (DEC-1015)"
+  "W2-04 DAEO-u4oz": "running",
+  "W2-122 DAEO-blwa": "already started for W2-122-A5-run1.json",
+  "W2-123 DAEO-qzrq": "already started for W2-123-A5-run1.json",
+  "W2-81 DAEO-l78m": "already started for W2-81-A5-r4-records.json",
+  "W2-92 DAEO-n0wb": "running",
+  "W2-104 DAEO-drhj": "running",
+  "W2-61h DAEO-h2k3": "not admitted: memory: available + leads' 19655 MB < 27073 MB (slots rule: floor + 3 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + service",
+  "W2-91 DAEO-a3u2": "not admitted: memory: available + leads' 19655 MB < 27073 MB (slots rule: floor + 3 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + service"
  },
- "land": "nothing to land",
+ "land": "finished",
  "land_pending": [],
  "new_returns": [],
- "last_start": "2026-11-02 08:14:08 W2-104",
+ "last_start": "2026-11-02 09:13:05 W2-04",
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 09:06:20",
+  "at": "2026-11-02 09:16:28",
   "rc": 0,
-  "secs": 19.0,
+  "secs": 22.5,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 71 total, 67 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 660,
-  "last_check_at": 1793610679.4942095,
+  "passes": 666,
+  "last_check_at": 1793611052.6217122,
   "last_result": "ok",
-  "last_secs": 14.49,
+  "last_secs": 23.94,
   "last_why": "",
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1793610679.4944427,
+  "last_ok_at": 1793611052.6217177,
   "state": "healthy"
  },
  "slot_holders": [
   {
    "slot": "1",
    "pid": 2939584,
-   "cpu": 43166,
-   "since": 1793610679.520601,
+   "cpu": 48507,
+   "since": 1793611052.6689873,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/tmp/gov-os-lead-W2-",
    "cwd": "/home/usain/gov-os-worktrees/W2-104"

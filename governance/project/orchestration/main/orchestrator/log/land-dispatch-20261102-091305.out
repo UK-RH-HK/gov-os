@@ -1,0 +1,17 @@
+W2-11 (DAEO-k7hz, STANDARD) at c9f99b28b88b: pre-check passed
+W2-105 (DAEO-zpdj, STANDARD) at fa653609cc93: pre-check passed
+W2-90b (DAEO-nqa2, LITE) at 73c18fea1e1f: pre-check passed
+W2-123 (DAEO-qzrq, STANDARD) at 9bb92097c811: pre-check passed
+W2-81 (DAEO-l78m, FULL) at e78e6af7530d: pre-check passed
+baseline 1f0bb5b3c516 (the nightly of 2026-10-31 (red))
+the baseline's own record: /tmp/gov-os-nightly-junit/20261031-0200, /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/nightly/20261031-0200/run.txt
+2026-11-02 09:13:08 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-02 09:13:08 merged W2-11, W2-105, W2-90b, W2-123, W2-81 onto a4c92d4e7beb: 369d8530bd38
+2026-11-02 09:16:07 STOPPED: the prepare command failed on the merged result; nothing advanced by this step, entries kept
+merge queue: stopped: the prepare command failed on the merged result; entries kept
+queue run exit 4
+W2-11: not landed (still approved)
+W2-105: not landed (still approved)
+W2-90b: not landed (still approved)
+W2-123: not landed (still approved)
+W2-81: not landed (still approved)

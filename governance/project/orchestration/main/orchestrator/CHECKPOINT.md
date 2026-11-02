@@ -82,6 +82,8 @@ session after the package (DEC-952 item 6).
 **09:15:** W2-04 verify DONE `b37b5c8f1741` (FULL: review not yet run); its review run `briefs/W2-04-A5-review.md`
 first on the ready list. P-W2-04-5 decided: DEC-1024 `446897f7`, W2-120's sources DEC-718 `a4c92d4e` (W2-10 and W2-11 keep
 AR-5/6 under closes:). Nightly marked FAILED at 09:00 (no verdict yet, still re-running): package item G `24375c96`.
+**09:20:** sixth landing attempt failed (09:16). Mechanism: `semantic.py` TIMEOUT_S 120, no retry. Package A updated with
+option (d), a bounded retry (`be9e2812`), pinged. `land.txt` left empty: relist only when the embedder is free.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

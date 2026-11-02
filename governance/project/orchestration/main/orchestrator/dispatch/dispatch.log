@@ -125,3 +125,9 @@
 2026-11-02 09:06:20 guard harvest: rc 0 in 19.0 s
 2026-11-02 09:10:04 return: W2-04-A5-verify.json -> inbox/20261102-091004-W2-04-A5-verify.txt
 2026-11-02 09:11:19 embedding server: answering again after HUNG since 2026-11-02 08:40:34
+2026-11-02 09:13:05 started W2-04 (DAEO-u4oz) W2-04-A5-review.md -> W2-04-A5-review.json (launcher exit 0)
+2026-11-02 09:13:05 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-123=9bb92097c811', 'W2-81=e78e6af7530d'] -> land-dispatch-20261102-091305.out (launcher exit 0)
+2026-11-02 09:15:34 embedding server: HUNG since 2026-11-02 09:13:38 (no answer in 30 s)
+2026-11-02 09:16:10 embedding server: answering again after HUNG since 2026-11-02 09:13:38
+2026-11-02 09:16:28 guard harvest: rc 0 in 22.5 s
+2026-11-02 09:17:08 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (still approved)'}

@@ -1,0 +1,10 @@
+All at b37b5c8f1741 (this worktree's `src/`; `gov.__file__` = `/home/usain/gov-os-worktrees/W2-04/src/gov/__init__.py`):
+- The store: rebuilt by the lead at this head (`rebuild_slot.sh`, rc 0, all three stores recreated, the semantic store's completeness check passed).
+- The selection (`select_tests.py`): scope `scoped`, `core_changed` [], `unplaced` [].
+- The scoped parallel run: 1 failed / 5,638 passed / 3 skipped. The one red is W2-55's backfill case (`test_w2_55_backfill::test_one_row_per_register_entry_at_the_base_in_its_order`): its proposal file stops at DEC-983 while the register at the base holds later entries; this branch touches neither file. Not this ticket's.
+- W2-04's acceptance tests (in that run): 61 cases, 60 passed, 1 skipped (a case that runs only on the lead's machine). The engineer's `gov accept DAEO-u4oz`: all seven KPI lines pass.
+- The W2-05 git-sweep case: green (the last fix, b37b5c8f1741, reads HEAD through the store loader's pinned git call; `context_check.py` starts no git of its own).
+- The serial-only cases (4, all W2-54): 1 passed (query_vector), 3 failed, none this ticket's: `sandboxed_worker` (its planted repository lacks the hook file; red on the base too); `green_here` and `time_limit` (the context-reproducibility check ends with one error: ticket DAEO-i89t, filed on the base, names sources AR-5 and AR-6, which neither the store nor the external-references file holds, so its context is BLOCKED; the same code path on the base gives the same; the CTO has since fixed W2-120's sources on `w2/integrate`, DEC-1024). The check's 57 `REFUSED:` tickets count as passes by design (the lead's P3 call above).
+- `gov check --json`: red context reproducibility (DAEO-i89t, above); red retrieval regression (the shared embedding server hung; time limit); yellow authority (DEC-1005, not in this tree's register) and product traceability (nothing to validate). The rest green.
+- Collection: 19,154 of 19,156 collected (2 deselected), no error. Trailers: 16 commits, none lacking.
+- Builder tests: `tests/unit/context/` 75 passed (the last engineer's run).

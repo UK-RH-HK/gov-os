@@ -68,6 +68,19 @@ Every reviewer, probe and auditor brief you write carries this section and the t
 From brief A3 (reviewer), word for word:
 - Judge against ADR-0001's threat model (section 14): honest agent mistakes and plausible accidents in ordinary work, not deliberate adversaries. Ask of every finding, word for word: "Can an honest agent hit this in ordinary work?" and "Does it fail open or lose work?"
 - Every finding carries two lines: `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other`. A finding marked "no" is a row for the Wave 3 hardening pass, never a round; only "yes" with "fails open" or "loses work" fails the probe.
+- **How reviews converge (owner, standing, DEC-1010 item 1; in force for the CTO, every lead, reviewer and QA engineer):**
+  - **A moderator, not a circle of reviewers:** the QA engineer (or the Senior Engineer; until the three layers start, the CTO) triages every finding against the ticket's own scope and KPIs. A finding outside the scope, or one that needs an unusual construction, becomes a Wave 3 row, never a round.
+  - **A finding blocks only if it is in scope, reachable in ordinary work, and fails open or loses work.** Everything else lands as a recorded row.
+  - **At most two review rounds.** If something still blocks after that, it goes to the owner once, with options; no more routine exceptions.
+  - **READY is computed by code, not declared by an agent:** each reviewer returns a structured verdict per KPI line, a fenced `verdict` block in the probe record: `{"kpis": [{"kpi": "<line id>", "verdict": "pass|fail", "findings": [{"id": "F1", "scope": "in|out", "ordinary_work": "yes|no", "consequence": "fails open|loses work|other"}]}]}`; the close (and the merge queue's pre-check) computes READY from it: no finding that is in scope, ordinary work yes and fails open or loses work. A lead never writes a verdict over a reviewer's.
+
+## The structured verdict (DEC-1010 item 1)
+
+Your return ends with one fenced block opened by three backticks and the word `verdict`, holding JSON only, one entry per KPI line of the ticket, with these line ids: `success-1` to `success-7` (the seven success lines in their order in the ticket's front matter) and `failure-1` (the failure line). Each entry: `{"kpi": "<line id>", "verdict": "pass|fail", "findings": [...]}`; each finding listed under the KPI line it bears on, with `id` (F1, F2, …, the same ids as in your text), `scope` (`in`: inside this ticket's KPIs and allowed paths; `out`: anything else), `ordinary_work` (`yes|no`) and `consequence` (`fails open|loses work|other`), exactly these words. A finding that bears on no KPI line goes under the line nearest to it, with `scope: "out"`. Example form: `{"kpis": [{"kpi": "success-1", "verdict": "pass", "findings": []}, ...]}`. Before the block, one line `judgement: pass` or `judgement: fail`.
+
+## The embedding server (today)
+
+The shared embedding server (127.0.0.1:11434) is overloaded today. Nothing in this review needs it: the supplementary block is semantic-free by design. Wrap every `gov retrieve` call in `timeout 120`; if it does not answer, read the named files instead and say so. Do not probe live semantic retrieval.
 
 ## Return
 
@@ -90,4 +103,4 @@ unresolved: <what is still open, or "none">
 recommended_next_action: <one line>
 ```
 
-After the twelve fields: your verdict and the findings as above; then a section `guard_refusals:` (one line per refusal: time | command form | the hook's reason | true or false-positive | minutes it cost), or `guard_refusals: none`; and a section `brief_gaps:` (one line per thing you had to discover that this brief did not tell you: what | where it belonged | minutes), or `brief_gaps: none`. Refused twice for the same call: stop and say so.
+After the twelve fields: your verdict and the findings as above, ending with the `verdict` block; then a section `guard_refusals:` (one line per refusal: time | command form | the hook's reason | true or false-positive | minutes it cost), or `guard_refusals: none`; and a section `brief_gaps:` (one line per thing you had to discover that this brief did not tell you: what | where it belonged | minutes), or `brief_gaps: none`. Refused twice for the same call: stop and say so.
