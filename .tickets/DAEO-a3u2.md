@@ -16,7 +16,6 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: [DAEO-jsg1]
 allowed_paths:
-- tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py
 - governance/project/path-map.yaml
 - tests/unit/retrieval/test_w2_91*
 - docs/changes/W2-91-evidence.md
