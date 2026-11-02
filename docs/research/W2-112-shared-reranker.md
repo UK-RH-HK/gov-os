@@ -183,14 +183,14 @@ module stays**: beside W2-112's worker it is harmless (it has already taken the 
 then takes nothing more).
 
 **Precondition (both checks must pass):**
-1. The installed `gov` carries the worker's own slot rule (in practice after ACT 2's re-pin of `~/.local/bin/gov` to
-   a release that holds W2-112). This prints the worker's path and a count of `1` or more; `0` means it is older:
+1. The installed `gov` carries the worker's own slot rule (in practice after a re-pin of `~/.local/bin/gov` to a
+   release that carries W2-112's worker). This prints the worker's path and a count of `1` or more; `0` means it is older:
    ```
    P=$(dirname "$(readlink -f "$HOME/.local/bin/gov")")
    F=$("$P/python" -I -c "import importlib.util as u; print(u.find_spec('gov.retrieval.rerank_worker').origin)")
    echo "$F"; grep -c 'def take_slot' "$F"
    ```
-   (On 2026-11-02 the pin `pin-5c401220` printed `0`: it does not yet.)
+   (On 2026-11-02 at 19:3x the live pin `pin-a7182f6c`, the emergency re-pin, printed `0`: it does not yet.)
 2. No tree on the machine runs an older worker: the main checkout, the merge queue's clone, every worktree, any
    other copy or installed environment. This lists every `rerank_worker.py` under your home and `/tmp` that lacks
    the rule; it must print nothing:
