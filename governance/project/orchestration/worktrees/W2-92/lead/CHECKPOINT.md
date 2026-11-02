@@ -1,35 +1,20 @@
-# W2-92 (DAEO-n0wb) lead checkpoint — end of run 2 (status PACKAGES: P-W2-92-5)
+# W2-92 (DAEO-n0wb) lead checkpoint — run 3 (DEC-1019 = P-W2-92-5 (a)), in progress
 
-## State (2026-11-01 22:50 UTC)
-- Branch w2/W2-92, head ac960862cfe7 (checkpoint record CP-DAEO-n0wb-0011). Code head 2a13eec6e586 (product code unchanged since d72c96fc029c; 2a13eec6e586 is a two-line builder-test fixture fix).
-- Run 2 commits (trailer_gate: 18 judged, 0 lacking, 0 bad Implements):
-  - bc7ece7e7db8 independent-test-designer (td-2): f1's expected set (Rewrite-Reason: DEC-1006 (P-W2-92-2))
-  - 39e8c5995ee3 engineer (eng-5): cue gate, one tool session per process, frontmatter cache, record graph fails soft
-  - ffd06cd8dc88 orchestrator: merge w2/W2-92-tests
-  - d72c96fc029c engineer (eng-6, resumed): an absent store still STORE_MISSING
-  - 43336d76bd9f independent-test-designer (td-3): README map names in gov accept's form (Rewrite-Reason: DEC-959 ...)
-  - 027ee4e852cf orchestrator: merge w2/W2-92-tests
-  - fd03541c042d engineer (eng-7): docs/research/W2-92-memory-measure.md updated
-  - 2a13eec6e586 engineer (eng-8): builder-test fixture resets the session cache (tmp_path reuse under retention=failed)
-  - ac960862cfe7 orchestrator: CP-DAEO-n0wb-0011
-- Tests worktree and branch removed.
+## State (2026-11-02)
+- Branch w2/W2-92. Run 3 started at ac960862cfe7 (clean, as the brief required).
+- eng-9 (old launch form, effort high; brief briefs/eng-9.md, log log/eng-9.json, session f6795420): DONE, commit e95eb4ad12ca "no record file is cited without a record graph" (retrieve.py +32 -1; tests/unit/retrieval/test_w2_92_record_files.py new, 126 lines). Trailers: Task, Role engineer, Implements DEC-423, DEC-957, DEC-424, CAP-12, CAP-13, CAP-18 (DEC-1019/DEC-1006 not in this tree's register: named in the body). Twelve fields: yes.
+  - its checks: unit retrieve/retrieval/closure/context 162 passed 1 skipped; gov accept DAEO-n0wb 30/30, 7/7 lines; gov accept DAEO-5x4l refused ACCEPT_NO_MAP (W1-21 README has no map) -> lead runs W1-21 itself.
+  - tripwire-before-11: this tree head only (expected); /home/usain/gov-os-worktrees/W2-00-record head b7d121c83943 -> 34fc936b96d8 (the orchestrator's record tree, not this worker).
+  - gov retrieve: used once, indexes stale -> FACET_UNAVAILABLE, no evidence. Guard refusals 0.
 
-## Results
-- Acceptance W2-92: 30/30 (lead pytest; gov accept pass on 7/7 lines in td-3's tree at 027ee4e852cf's content).
-- Scoped run at fd03541c042d (select_tests: scoped, core_changed [src/gov/retrieval/retrieve.py], unplaced [], 269 options; slot wait 21:24:55-21:52): parallel 4417 passed, 10 failed, 2 skipped (13 min 57 s); serial 1 passed. Outputs /tmp/gov-os-lead-W2-92/log/verify2/.
-  - W1-21 authority case: P-W2-92-5 (fails open). W2-92 builder tests x5: fixed at 2a13eec6e586 (40 passed with retention=failed). W2-59 hook-line x4: red at the base in run 1 too, not this ticket's.
-- W1-21 folder alone at 2a13eec6e586: 126 passed, 1 failed (the same case).
-- gov check (check-3, after rebuild-5, at fd03541c042d): ok, exit 0; context reproducibility GREEN, secrets indexing GREEN; YELLOW authority (DEC-1006 unrecorded in this tree's register), product traceability (openspec nothing to validate).
-- Context check alone: green 293 s. Measure (visible) d72c96fc029c: hit@5 11/20, full 13/20, bundle 16/20 (control 11/11/15).
-- collect-only 19103/19105 (2 deselected), no error. keyword_warn 0.
+## Next
+1. W1-21 authority file in a slot (bin/w1-21-r3.sh -> /tmp/gov-os-lead-W2-92/log/run3/w1-21.*).
+2. bin/final-r3.sh: rebuild, gov.__file__, gov check, select_tests, make_runs3, scoped parallel + serial in slots, gov accept in a slot; all outputs /tmp/gov-os-lead-W2-92/log/run3/.
+3. collect-only, trailer_gate, keyword_warn, gov checkpoint record, commit, return DONE with head. No re-measure (DEC-1019 acts only without a record graph; say so).
 
-## Package: P-W2-92-5 (packages-run2.md). Recommendation (a): cite no record file when the record graph cannot be read.
-
-## Run 3 (when decided)
-1. Engineer batch: (a) or (b). If (b), a test designer retires f3 under the decision (tests worktree).
-2. Rebuild (rebuild-wt2.sh, bump the log name), gov check (check2.sh, bump), select_tests, scoped run (verify2.sh writes outside the worktree), gov accept; DONE with head.
-3. Measure unchanged unless the change touches plain questions with a record graph (it should not): say so in the return; no re-measure needed for (a)/(b) as both act only without a record graph.
+## Brief gaps (run 3)
+- gov accept cannot run W1-21 (DAEO-5x4l): its README maps no KPI line (ACCEPT_NO_MAP) | this ticket's part | ~5 min (eng-9).
 
 ## Scratch
-- /home/usain/gov-os-runs/W2-92/{base, head, measure, records}: 1.5G, 33,058 inodes (kept as control).
-- /tmp/gov-os-lead-W2-92: 198M, 21,012 inodes (verify2 logs, pytest-of-usain, td2/probe-u7q35x0q, eng5/ left: rm needs a prompt).
+- /home/usain/gov-os-runs/W2-92/{base, head, measure, records}: control kept (1.5G, 33,058 inodes at run 2).
+- /tmp/gov-os-lead-W2-92: see the return.

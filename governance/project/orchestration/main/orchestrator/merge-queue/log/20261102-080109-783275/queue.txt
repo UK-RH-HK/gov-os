@@ -1,0 +1,3 @@
+2026-11-02 08:01:10 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
+2026-11-02 08:01:10 merged W2-11, W2-105, W2-90b, W2-81 onto 9d605eba20a2: 68ec9865b49f
+2026-11-02 08:04:11 STOPPED: the prepare command failed on the merged result; nothing advanced by this step, entries kept

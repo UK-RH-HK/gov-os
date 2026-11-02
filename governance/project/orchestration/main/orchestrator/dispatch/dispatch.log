@@ -107,3 +107,7 @@
 2026-11-02 07:56:04 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-123=9bb92097c811', 'W2-81=e78e6af7530d'] -> land-dispatch-20261102-075604.out (launcher exit 0)
 2026-11-02 08:00:05 nightly: 1 new status line(s) for 2026-11-02
 2026-11-02 08:00:05 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (still approved)'}
+2026-11-02 08:01:05 land started: ['W2-11=c9f99b28b88b', 'W2-105=fa653609cc93', 'W2-90b=73c18fea1e1f', 'W2-81=e78e6af7530d'] -> land-dispatch-20261102-080105.out (launcher exit 0)
+2026-11-02 08:02:38 embedding server: HUNG since 2026-11-02 08:00:39 (no answer in 30 s)
+2026-11-02 08:04:28 guard harvest: rc 0 in 21.4 s
+2026-11-02 08:05:01 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (still approved)'}
