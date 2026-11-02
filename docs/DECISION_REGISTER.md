@@ -12817,3 +12817,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.412 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1030. Next free id: DEC-1031. |
+
+### DEC-1031 — The load-balancing plan now, with its target architecture; no reranker pushes the embedder off the GPU; W1-01's merge rule; SMART-WORK-6 approved
+- **Status:** ACCEPTED (owner, 2026-11-02, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; item 3's last sentence standing) · **Under:** DEC-1028 item 5, DEC-1029, DEC-1030, DEC-906, DEC-253, DEC-1003
+- **Decision:** (1) The load-balancing plan comes now with what is at hand (the history, the live hour, last night's GPU crashes), the GPU agent's figures added when they come. Its target architecture: one shared embedding service on the GPU for indexing and queries (batched and parallel); one shared reranker on the GPU (W2-112); a GPU memory budget (the embedder first, the shared reranker second, nothing may push the embedder off); the CPU only as an alerted fallback. Whether query embedding on the GPU changes the final search answers (the determinism test) is measured now, so the query server can move too. (2) Until then, no reranker can push the embedder off the GPU: its memory reserved first (the CTO pinned the shared embedder with `keep_alive: -1` at 12:05; ACT-RERANK-CPU-1 keeps the rerankers on the CPU until W2-112). (3) P1-NIGHTLY-2026-11-02 (a): W1-01's test designer exempts a listed merge's own changes (the owner's named decision under DEC-906), and the owner commits the exemption for `0568d91baf56` when the CTO brings the ACT. Standing: a merge whose acceptance-file resolution a test designer made carries the test designer's role. (4) SMART-WORK-6 approved, all four lines (W2-20: the GPU measured and scheduled; W2-121: the GPU watched, the servers' crashes in the morning report).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.413 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1031. Next free id: DEC-1032. |
