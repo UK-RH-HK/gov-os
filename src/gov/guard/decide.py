@@ -431,14 +431,55 @@ def _copy_args(name: str, args: list[str]) -> tuple[
 def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     """Return absolute write-target paths, or None when the command is read-only.
 
+    W2-42a (DEC-1028 item 4, ACT-GUARD-FIX-3 §7): the command is read through ``gov.guard.bash_writes``, which
+    hands ``_line_write_targets`` shell text only: a heredoc's body is judged by what reads it (a data body is no
+    write, a shell's body is commands), the command's own variables and a literal ``for`` loop's words are
+    expanded, substitutions inside double quotes, ``sh -c`` strings and ``eval`` words are commands of their own,
+    shell keywords and prefixes are not the command's name, a backslash-newline is removed, and git checkout,
+    restore, rm and mv on paths, dd, truncate, sort -o and rsync are writes (git apply, git am and patch to unknown
+    targets). What the scan cannot read for certain is read as before, on both spellings of a continued line.
+    """
+    from gov.guard import bash_writes
+    if bash_writes.SENT != _UNRESOLVABLE:
+        return [_UNRESOLVABLE]
+    literal = not _GLOB_OPTIONS_RE.search(command)
+
+    def parse(text: str, where: str) -> list[str] | None:
+        # The whole command's glob options hold in its substitutions and sh -c strings too.
+        return _line_write_targets(text, where, literal)
+    try:
+        judged = bash_writes.judge(command, cwd, parse, _expand_token)
+    except bash_writes.Unreadable:
+        found = parse(command, cwd)
+        if "\\\n" in command:
+            more = parse(command.replace("\\\n", ""), cwd)
+            if found is not None or more is not None:
+                found = list(found or []) + list(more or [])
+        return found
+    except RecursionError:
+        return [_UNRESOLVABLE]
+    return judged.targets() or None
+
+
+# Commands that change how bash expands a glob (W2-42a): with one of them in the command, an unmatched glob is not
+# known to be the literal word.
+_GLOB_OPTIONS_RE = re.compile(r"\bshopt\b|\bGLOBIGNORE\b|\bset\b[^\n;|&]*\s[-+]\w*f|\bset\s+[-+]o\b")
+
+
+def _line_write_targets(command: str, cwd: str, literal_globs: bool = True) -> list[str] | None:
+    """Return absolute write-target paths of one shell line, or None when it is read-only (the parser before
+    W2-42a, which ``_extract_bash_write_targets`` hands shell text only).
+
     Tokenises with shlex (newline as punctuation, ``#`` not a comment),
     splits on non-redirect punctuation, then inspects each simple command
     for redirects and the plain write commands (DEC-111).  Each write target
     is resolved first (DEC-115): ``~``, ``~user`` and environment variables
     are expanded from the hook's own environment; globs are matched against
     the file system; anything still unresolvable maps to a sentinel that
-    fails every allow-list check.
+    fails every allow-list check. An unmatched glob is the literal word bash passes (no nullglob, W2-42a), unless
+    the command may change how bash expands one (shopt, GLOBIGNORE, set -f) or it holds ``**``.
     """
+    literal_globs = literal_globs and not _GLOB_OPTIONS_RE.search(command)
     try:
         lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n")
         lex.whitespace_split = True
@@ -473,7 +514,7 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
             return None
         p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
         if _has_glob(exp):
-            return glob.glob(p) or None
+            return glob.glob(p) or ([p] if literal_globs and "**" not in exp else None)
         return [p]
 
     def _resolve(raw: str, targets: list[str] = targets) -> None:

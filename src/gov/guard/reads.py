@@ -23,9 +23,9 @@ import shlex
 import stat
 import subprocess
 
-from gov.guard import runs
+from gov.guard import bash_writes, runs
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
-                              _copy_args, _expand_token, _extract_bash_write_targets,
+                              _copy_args, _expand_token, _line_write_targets,
                               _get_allowed_paths, _has_glob, _is_punct,
                               _parse_frontmatter, _path_allowed)
 from gov.guard.heldout import CONFIG_REL, SETTINGS_REL, _words, load_yaml_unique
@@ -80,6 +80,9 @@ _COVERAGE_VALUED = frozenset("--concurrency --context --data-file --debug --incl
                              "--omit --source --save-signal".split())
 # A substitution's place in a command once it is set aside (item 1).
 _SUB_RE = re.compile(r"__gov_sub(\d+)__")
+_NUMERIC_RE = re.compile(r"[-+]?[0-9]+(\.[0-9]+)?")
+# The words of a program's code in a heredoc, judged as paths (W2-42a): split where no path goes on.
+_CODE_PIECE_RE = re.compile(r"""[\s'"()\[\]{},;=<>|&`]+""")
 # The writes the write rules do not read as writes (DEC-821, no write rule
 # widens): the files they write, for the two files the read rule once covered.
 _SORT_VALUED = frozenset("-o -k -t -S -T --output --key --field-separator "
@@ -691,11 +694,49 @@ def _pipelines(cmds: list[tuple[list[str], str]]) -> list[list[list[str]]]:
     return [p for p in out if any(p)]
 
 
+def _arithmetic(command: str, s: int, e: int) -> bool:
+    """Whether the ``$(`` whose command runs from *s* to *e* (its closing
+    parenthesis) is an arithmetic expansion ``$((...))``, as bash reads it:
+    the parenthesis after ``$(`` closes just before the one that ends it
+    (W2-42a, KPI 6)."""
+    if command[s:s + 1] != "(" or e - 1 <= s:
+        return False
+    depth = 0
+    for i in range(s, e):
+        if command[i] == "(":
+            depth += 1
+        elif command[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return i == e - 1
+    return False
+
+
+def _names_used(loop: list[str], command: str, subs: list[str]) -> bool:
+    """Whether the names a ``for`` loop's list gives can reach a command
+    (W2-42a, KPI 10): its variable is named anywhere in the command but at
+    the loop's own head (after the loop too: it keeps its last value), or the
+    command may read a variable by another name (``${!``, ``eval``, a name
+    reference, ``declare``/``typeset``/``local``/``export``).  A wait loop
+    over ``$(seq ...)`` that greps one literal file uses none."""
+    if len(loop) < 2 or not re.fullmatch(r"[A-Za-z_]\w*", loop[1]):
+        return True
+    text = command + "\n" + "\n".join(subs)
+    if re.search(r"\$\{!|\beval\b|\bdeclare\b|\btypeset\b|\blocal\b|\bexport\b|\bsource\b|(?<![\w/.-])\.\s", text):
+        return True
+    uses = re.findall(rf"(?<![\w]){re.escape(loop[1])}(?!\w)", text)
+    return len(uses) > 1
+
+
 def _set_aside(command: str) -> tuple[str, list[str]]:
     """*command* with each outermost ``$(...)`` and backtick substitution
-    replaced by a word of its own, and the commands they hold."""
+    replaced by a word of its own, and the commands they hold.  An
+    arithmetic expansion is none (W2-42a): what it holds is set aside on its
+    own."""
     outer: list[tuple[int, int, int, int]] = []  # its text's ends, its command's
     for s, e in sorted(_spans(command)):
+        if command[s - 2:s] == "$(" and _arithmetic(command, s, e):
+            continue
         if command[s - 2:s] == "$(":
             a, b = s - 2, min(e + 1, len(command))
         elif command[s - 1:s] == "`":
@@ -875,7 +916,15 @@ class _Judge:
                         return part.reason
             return ""
         if tool_name == "Bash":
-            command = text("command")
+            # W2-42a (KPI 6, 10): a data heredoc's body is no command, nor $((...)) a substitution; a program's
+            # code in a heredoc is judged by the paths it names, as a python3 -c string is.
+            command, codes = bash_writes.read_view(text("command"))
+            for code in codes:
+                for piece in _CODE_PIECE_RE.split(code):
+                    if piece and not piece.startswith("-"):
+                        why = self.word(piece, cwd)
+                        if why:
+                            return why
             for whole in [command, *(command[s:e] for s, e in _spans(command))]:
                 for c in dict.fromkeys((whole, _uncommented(whole))):
                     why = self.command(c, cwd)
@@ -1040,7 +1089,7 @@ class _Judge:
                     return why
         # A write target of its own command is the allow-list's (as the read
         # rule of the two files left it): it judges it and names it.
-        written = set(_extract_bash_write_targets(
+        written = set(_line_write_targets(
             " ".join(shlex.quote(w) for w in [name, *args]), cwd) or ())
 
         # The destination of a copy, a move or an install (its -t value, or
@@ -1334,8 +1383,8 @@ class _Judge:
                         listings.append(feed)
             held = [int(n) for w in words for n in _SUB_RE.findall(w)]
             if held and not _SUB_RE.search(plain[0]) and (
-                    self._body_reads(cmds, i) if bare[:1] == ["for"]
-                    else _reads_files(words)):
+                    (self._body_reads(cmds, i) and _names_used(bare, command, subs))
+                    if bare[:1] == ["for"] else _reads_files(words)):
                 for n in held:
                     if n < len(subs):
                         listings += _pipelines(_simples(_words(subs[n])))
@@ -1456,9 +1505,26 @@ class _Judge:
         if name in ("echo", "printf"):
             return True, next((why for a in args for why in [self.at(a, cwd, False)]
                                if why), "")
+        if (name == "seq" and args and all(_NUMERIC_RE.fullmatch(a) or a == "-w" for a in args)) or (
+                name == "nproc" and all(a in ("--all",) for a in args)):
+            # W2-42a (KPI 10): numbers, read as names in the folder it runs in; placed there.
+            return True, self.at(".", cwd, False) or self.numbered(cwd)
         if name in _FILTERS:
             return False, ""
         return None, ""
+
+    def numbered(self, cwd: str) -> str:
+        """Why a name made of digits, read in *cwd*, may take a part's file
+        in: a part's file below *cwd* whose first name there starts with a
+        digit or a sign (W2-42a)."""
+        real = (self.spellings(".", cwd) or [None])[-1]
+        if real is None:
+            return RUNTIME_REFUSAL
+        for part in self.parts:
+            for f in part.below(real):
+                if f[len(real.rstrip("/")) + 1:].split("/")[0][:1] in "0123456789-.":
+                    return part.reason
+        return ""
 
 
 def acting_role(role: str | None, subagent_type: str | None) -> str:
