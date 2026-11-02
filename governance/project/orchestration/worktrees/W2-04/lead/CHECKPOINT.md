@@ -26,6 +26,13 @@
 - rebuild-7 rc 0 (slot wait 07:16-07:36; semantic_s 107). trailer_gate: 16 commits, 0 lacking. collect-3:
   19154/19156 collected (2 deselected), no error. select-4 at b37b5c8f1741: scoped, core_changed [], unplaced [],
   opts = select-3; serial-4 = 4 W2-54. keyword_warn 0. run_scoped_4.sh started ~07:41 (parallel-4, serial-4).
+- parallel-4 (07:39-08:07, 27m35s) at b37b5c8f1741: 1F/5638P/3S; only W2-55 backfill (not ours). W2-05 sweep green.
+- serial-4 (08:09-08:26, 16m26s): 3F/1P. query_vector P. sandboxed_worker F (planted repo lacks
+  .claude/hooks/pretooluse.py; red on base in run 1). green_here F + time_limit F: context_check rc 1 with
+  "0 failed, 1 error": DAEO-i89t (W2-120, filed 7224a564 in base) sources AR-5, AR-6, neither in the store nor in
+  governance/project/external-references.yaml -> BLOCKED (same path in base code, line 229 there): red on
+  w2/integrate too (inferred; neither file changed base..integrate). 57 REFUSED count as pass. None on red lists.
+- gov check --json started ~08:35 (check-4).
 - rm of briefs/eng-4.md and briefs/eng-4.spec.part refused (quiet hours, DEC-991, queued for morning): files left.
 
 ## Round 2 (resume after DEC-1005, 2026-11-01)

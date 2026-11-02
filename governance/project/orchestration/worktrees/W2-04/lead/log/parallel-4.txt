@@ -75,4 +75,34 @@ bringing up nodes...
 ........................................................................ [ 91%]
 ........................................................................ [ 93%]
 ........................................................................ [ 94%]
-......................................................................
+........................................................................ [ 95%]
+............................F........................................... [ 96%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+..........................                                               [100%]
+=================================== FAILURES ===================================
+___________ test_one_row_per_register_entry_at_the_base_in_its_order ___________
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+proposal = <function proposal.<locals>.read at 0x712e91c5da80>
+base = ('904bb3a0e7c6ae7084a8fdc4314b6bb1f569e7f3', '# Governance OS — Tool & Architecture Decision Register\n\n**Register ID...-11-01 | Owner (recorded by the orchestrator, DEC-861): DEC-1004 (SMART-WORK-2 approved). Next free id: DEC-1005. |\n')
+
+    def test_one_row_per_register_entry_at_the_base_in_its_order(proposal, base):
+        _, register_text = base
+        expected = s.heading_ids(register_text)
+        got = [row["id"] for row in table(proposal())]
+        missing = [i for i in expected if i not in got]
+        extra = [i for i in got if i not in expected]
+        twice = sorted({i for i in got if got.count(i) > 1})
+>       assert not missing and not extra and not twice, (
+            f"the table's rows are not the register's {len(expected)} entries: {len(missing)} missing "
+            f"({missing[:10]}), {len(extra)} not in the register ({extra[:10]}), twice: {twice[:10]}")
+E       AssertionError: the table's rows are not the register's 1000 entries: 21 missing (['DEC-984', 'DEC-985', 'DEC-986', 'DEC-987', 'DEC-988', 'DEC-989', 'DEC-990', 'DEC-991', 'DEC-992', 'DEC-993']), 0 not in the register ([]), twice: []
+E       assert (not ['DEC-984', 'DEC-985', 'DEC-986', 'DEC-987', 'DEC-988', 'DEC-989', ...])
+
+tests/acceptance/W2-55/test_w2_55_backfill.py:138: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-04/test_w2_04_reproducible.py:187: W204_LIVE_HOME names no HOME with the pinned embedder (README, local_only)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+1 failed, 5638 passed, 3 skipped in 1654.96s (0:27:34)

@@ -14,7 +14,7 @@
  ],
  "closes_next": "running: the landing batch W2-11, W2-105, W2-81 (land.py, tests in a heavy slot since 23:27) and the close W2-05, W2-55, W2-96 (close_build.py, tests since 22:52); next: W2-90b from land.txt, then W2-92 after run 3",
  "examin": "2026-11-14 (12-17); target 11-18; gated by K9's criteria (DEC-954 Q1); memory: hit@5 11/20, full evidence 11/20 (W2-86's measure), target 95 %, floor 85 %",
- "owner_action": "ACT ACT-GUARD-FIX-3: approved (a), DEC-1023; the operator applies it this morning; the push-on-prompt re-test after 07:30",
+ "owner_action": "P1-MORNING-2026-11-02: A the embedder's capacity; B the close refusal (W2-05/W2-55/W2-96); C W2-122's K5; D W2-123 x3; E the Stop hook; F ACT-GUARD-FIX-3 (operator) then the push test",
  "last_report": "2026-10-30 21:36:47",
  "chain_spec": "chain-2026-10-31f.txt",
  "chain_log": "chain-2026-10-31f.log",

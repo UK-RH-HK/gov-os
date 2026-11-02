@@ -1,0 +1,6 @@
+W2-104: merge w2/integrate into the ticket branch for run 2 (the ticket file's allowed paths take src/gov/check/commands.py, d942524f; DEC-1020)
+
+Task: DAEO-drhj
+Implements: DEC-959,DEC-820
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,16 +1,29 @@
-# Lead checkpoint, DAEO-drhj (W2-104), run 1 — FINAL (returned DONE)
+# Lead checkpoint, DAEO-drhj (W2-104), run 2 (P-W2-104-CMDLIST (a), DEC-1020)
 
-## State
-- Branch w2/W2-104 head ac2d92af8c0e (checkpoint record only, on top of verified code head 738cec98cf63; selection identical at both).
-- Commits since f46b96537d74: fa5426bc1171 (merge integrate, lead); a0fa726f54cd + 405c3cafa148 (tests, designer); ed341e5a3e68 (merge tests, lead); f3d8f608097b (engineer); 09d9f89bd183 (README map, designer); 738cec98cf63 (merge, lead); ac2d92af8c0e (CP-DAEO-drhj-0003, lead).
-- gov accept DAEO-drhj: 43 passed, 7/7 KPI lines pass. Red check on base: 43 failed (no skilleval).
-- Scoped parallel: 13 failed, 9653 passed, 4 skipped, 2 errors. Serial (13 of 65 entries): 8 failed, 58 passed; 5 latency cases pass alone (flaky candidates).
-- Ticket-caused reds: W1-26 [skilleval] x2 -> P-W2-104-CMDLIST. DEC-919 known: W2-66 lead_verification (conftest). Others inherited/environmental (see return).
-- gov check (after rebuild 5, semantic recreated): RED context-reproducibility, retrieval-regression (600 s limits); YELLOW core-decision-citations (5c1a6ef08d44 cites DEC-999), openspec-validate.
-- Tests worktree + branch removed. Loop: converged, no repair round.
-- A resume has nothing to do but re-send the return; or, if the orchestrator adds skilleval to RECORDED_GOV_COMMANDS here, re-run W1-26's two [skilleval] cases.
+## Run 1 (returned DONE at ac2d92af8c0e)
+- Verified code head 738cec98cf63; gov accept 43 passed, 7/7 KPI lines. One P2 open: skilleval not in
+  RECORDED_GOV_COMMANDS (W1-26 [skilleval] x2 red). Decided: DEC-1020 (a) path addition; CLAUDEPATH (c) residual.
+
+## Run 2 state
+- Start head ac2d92af8c0e, clean. Merged w2/integrate (9d605eba..., ticket file d942524f) --no-ff: 4ee33fec (lead),
+  clean merge; allowed_paths now include src/gov/check/commands.py.
+- Engineer eng-3 launched (gov launch, sandboxed, effort high), brief briefs/eng-3.md, log log/eng-3.json,
+  tripwire-before-5.json. Task: append "skilleval" to RECORDED_GOV_COMMANDS, commit.
+- eng-3 returned DONE (twelve fields): commit 9fc5bcc3f90d (Role: engineer, Implements: DEC-747,DEC-1020), one
+  line; tripwire-5: only this tree's head moved (allowed). Unit tests 97 passed. Session 2690bd5e (sandboxed).
+- select-3.json: scoped, core_changed [src/gov/check/commands.py], unplaced []; 66 targets (W1-26 in it; adds W2-96).
+- W1-26 folder alone: 419 passed, 1 skipped (/tmp/gov-os-lead-W2-104/run2-w1_26.txt). The two [skilleval] reds gone.
+- collect-only: 19263/19265 tests collected (2 deselected), exit 0.
+- rebuild-6: exit 75, semantic not_recreated (Ollama did not embed, 704 s; other leads' suites on the embedder).
+  rebuild-7 retry running (log/rebuild-7.json).
+- Then: scoped parallel + serial (run_verify2.py, output /tmp/gov-os-lead-W2-104/run2/).
+- Older next list: tripwire compare, check commit trailers; disk gate; select_tests.py; run W1-26 folder + scoped parallel +
+  serial through verify_lock.sh (output under /tmp/gov-os-lead-W2-104/run2/); gov check if needed; collect-only;
+  trailer_gate; keyword_warn; gov checkpoint record; DONE.
+- Loop: converged (no repair round).
+
+## Brief gaps (running)
+- none yet
 
 ## Leftovers for the orchestrator
-- /tmp/gov-os-lead-W2-104/ (331 MB, 41,557 inodes)
-- engineer session TMPDIRs /tmp/gov-launch-engineer-yd_3bxa1/, /tmp/gov-launch-engineer-ar7g4req/ (tiny)
-- src/gov/skilleval/__pycache__, tests/unit/skilleval/__pycache__ (ignored)
+- /tmp/gov-os-lead-W2-104/ ; engineer session TMPDIRs under /tmp/gov-launch-engineer-*

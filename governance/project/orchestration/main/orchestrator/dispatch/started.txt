@@ -5,3 +5,4 @@
 2026-11-02 05:59:07 W2-81 W2-81-A5-r4-records.md W2-81-A5-r4-records.json
 2026-11-02 06:02:07 W2-04 W2-04-A5-verify.md W2-04-A5-verify.json
 2026-11-02 07:55:04 W2-92 W2-92-A5-run3-dec1019.md W2-92-A5-run3-dec1019.json
+2026-11-02 08:14:08 W2-104 W2-104-A5-run2-dec1020.md W2-104-A5-run2-dec1020.json

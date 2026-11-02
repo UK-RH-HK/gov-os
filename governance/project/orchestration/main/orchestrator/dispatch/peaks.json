@@ -1,55 +1,55 @@
 {
- "computed": "2026-11-02 07:24:04",
+ "computed": "2026-11-02 08:25:04",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 12.18,
+   "cpu_p95": 12.0,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 4061332,
+   "rss_kb_p95": 4059016,
    "rss_kb_max": 6682080,
-   "samples": 2313
+   "samples": 2368
   },
   "embedding": {
    "cpu_p95": 8.08,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2999328,
+   "rss_kb_p95": 2997948,
    "rss_kb_max": 5520432,
-   "samples": 2313
+   "samples": 2368
   },
   "rebuild": {
-   "cpu_p95": 12.97,
+   "cpu_p95": 12.83,
    "cpu_max": 126.32,
-   "rss_kb_p95": 551892,
+   "rss_kb_p95": 551644,
    "rss_kb_max": 637492,
-   "samples": 1651
+   "samples": 1701
   },
   "test_run": {
-   "cpu_p95": 17.05,
+   "cpu_p95": 16.93,
    "cpu_max": 69.35,
-   "rss_kb_p95": 4139768,
+   "rss_kb_p95": 4079916,
    "rss_kb_max": 6778004,
-   "samples": 1866
+   "samples": 1921
   },
   "claude": {
-   "cpu_p95": 7.16,
+   "cpu_p95": 6.44,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2732772,
+   "rss_kb_p95": 2730928,
    "rss_kb_max": 4055288,
-   "samples": 1890
+   "samples": 1945
   },
   "reranker": {
-   "cpu_p95": 1.52,
+   "cpu_p95": 1.49,
    "cpu_max": 12.23,
-   "rss_kb_p95": 10048624,
+   "rss_kb_p95": 10025388,
    "rss_kb_max": 14331404,
-   "samples": 1559
+   "samples": 1588
   },
   "gitleaks": {
-   "cpu_p95": 0.36,
+   "cpu_p95": 0.35,
    "cpu_max": 4.08,
-   "rss_kb_p95": 2077392,
+   "rss_kb_p95": 2068660,
    "rss_kb_max": 3528312,
-   "samples": 1050
+   "samples": 1057
   },
   "git": {
    "cpu_p95": 0.01,
@@ -61,22 +61,22 @@
   "codegraph": {
    "cpu_p95": 0.26,
    "cpu_max": 1.21,
-   "rss_kb_p95": 125188,
+   "rss_kb_p95": 118736,
    "rss_kb_max": 844648,
-   "samples": 789
+   "samples": 807
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 15.72,
+   "cpu_p95": 15.47,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3528556,
+   "rss_kb_p95": 3441468,
    "rss_kb_max": 5663368,
-   "samples": 1651
+   "samples": 1701
   }
  },
  "lead": {
-  "rss_kb_p95": 4193936,
+  "rss_kb_p95": 4191808,
   "rss_kb_max": 9810916,
-  "samples": 18429
+  "samples": 18521
  },
  "lead_own_max_kb": {
   "DAEO-e8f0": 7404492,
@@ -151,12 +151,12 @@
  "lead_inside": {
   "rss_kb_p95": 4042872,
   "rss_kb_max": 7859056,
-  "samples": 6603
+  "samples": 6685
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 816904.0,
+  "rss_kb_p95": 781641.3333333334,
   "rss_kb_max": 1416492.0,
-  "samples": 1866
+  "samples": 1921
  },
  "slot_run_kb": 1692952
 }

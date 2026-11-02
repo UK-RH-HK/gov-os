@@ -76,6 +76,9 @@ the suspect; its approval moved to `merge-queue/held/` (not ejected); W2-11, W2-
 **08:06:** the four failed the same way: W2-123 NOT the cause, restored to approved/. Cause: the one-at-a-time shared
 embedder busy with W2-04's retrieve_check and the nightly's W1-19 re-run. `land.txt` left empty: relist all five once
 those end.
+**09:00:** morning package `packages/P1-MORNING-2026-11-02.md` (`0d0e8e41`) pinged (sent). Waiting on the owner's A-F. The
+nightly still re-running its reds alone; investigate when it ends. Leads W2-04, W2-92, W2-104. Handover to a fresh
+session after the package (DEC-952 item 6).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
