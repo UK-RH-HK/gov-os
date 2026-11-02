@@ -34,6 +34,14 @@
 - New plan: base2 = /home/usain/gov-os-runs/W2-122/base2 at 800cca6fba83 (current head code), cold, proxy :11511 (bfycti8yx), measure.sh cold-base2 (b9pjbh6ji) waiting for a slot since 23:57. Sampler bupq41xru -> m/concurrency.log.
 - Then: this worktree's verification rebuild = `rebuild_slot.sh W2-122 --seed /home/usain/gov-os-runs/W2-122/base2` (seeded alone, proxy); then one seeded + one cold side by side (new worktrees at head) for "with two others"; eng-5 writes evidence; incremental seeded rebuild of W2-122 after eng-5's commit; scoped run via /tmp/gov-os-lead-W2-122/verify.py parallel|serial (select.json: scoped, core_changed [], unplaced []).
 
+## Update 01:57 (2026-11-02)
+- K3 measured (m/ files under /tmp/gov-os-lead-W2-122/m): cold base2 at 800cca6fba83 semantic 4709.2 s / total 4761.6, 1701 req / 54,425 chunks, two others 74 % / one 25 %; seeded W2-122 (same commit) semantic 0.7 / total 30.8, 0 req, two others; seeded s1 (WBS edited) semantic 20.3 / total 57.7, 10 req / 320 chunks (exactly that file), one other. KPI 1 here: digest b5408db1250c7b8a equal, 54,425 vectors equal. Cold strictly alone not measured.
+- eng-5 (resume e14ad1c4): commit 98d46fbc180f, docs/changes/W2-122-evidence.md (84 lines), trailers ok; gov accept 26/26 pass, all six lines.
+- Final rebuild of W2-122 at 98d46fbc: exit 0, all recreated, semantic 1.3 s, digest 76bdaeac8117.
+- select_tests at 98d46fbc: scoped, core_changed [], unplaced [], 39 targets, 181 options. keyword_warn 0. collect-only 19168/19170 (2 deselected).
+- Removed: tests worktree + branch w2/W2-122-tests (merged), all measurement worktrees and /home/usain/gov-os-runs/W2-122.
+- Running: scoped parallel run (log/parallel.log, .exit, parallel.xml) via /tmp/gov-os-lead-W2-122/verify.py; then serial (3 cases), gov check --json via heavy_slot, trailer_gate, gov checkpoint record, commit it, return DONE.
+
 ## Lead readings (P3, logged for the CTO)
 - Interface fixed for both workers: `--seed [folder]` (folder = base tree root, link followed); `--json` result `seed: {status: seeded|refused|none, base, reason}`; every full rebuild writes `.gov-runtime/rebuild/stores.json` {code, embedder{model,revision}, schema}; configured base = `integration_store` (absolute path) in `governance/project/rebuild.yaml`; K5 = GovError REBUILD_FAILED with store "semantic".
 - "Code fingerprint" in KPI 2 read as the Gov OS builder code's fingerprint, not the repository content's (W2-68's of_commit would refuse every seed whose tree differs, contradicting KPI 1).

@@ -1,0 +1,64 @@
+serial entries kept: 7
+...F.FF                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+the launched worker did not run the probe to its end (no complete .gov-runtime/scratch/w2-54/results.txt)
+gov launch engineer DAEO-zz90 -- -p Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not work around it. Run this Bash command as written: bash .gov-runtime/scratch/w2-54/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 6 --allowedTools Bash
+exit code: 0
+stdout:
+The probe did not run. The `PreToolUse` hook failed before the script started, because `.claude/hooks/pretooluse.py` does not exist in the repo. Per your instructions I did not retry or work around it, so I can't answer DONE.
+
+stderr:
+
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-123/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+>       done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+argv = ['sh', '-c', 'python3 -m gov.context.context_check']
+
+    def run(argv, *, cwd, env, timeout):
+        started = time.monotonic()
+        try:
+            done = subprocess.run([str(part) for part in argv], cwd=str(cwd), env=env, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+>           raise AssertionError(f"{' '.join(map(str, argv))} did not end within {timeout:.0f} s") from None
+E           AssertionError: sh -c python3 -m gov.context.context_check did not end within 630 s
+
+tests/acceptance/W2-54/w2_54_support.py:249: AssertionError
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.Run object at 0x73ec27c23380>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '17d88232b2879bff2de27c9ca130abc9249e0f4d', 'inputs_hash': '666fa3a0ce1b3d12'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "context-reproducibility did not end within its time limit of 600 seconds"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError
+3 failed, 4 passed in 2077.68s (0:34:37)

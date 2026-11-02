@@ -47,6 +47,13 @@ reds (W2-54 AR-5 input, W1-46/W2-59 hook-file reds, W2-66 win_toast.ps1) to trac
 wake: arm `bash tools/inbox_wait.sh` with the Bash tool's background run (it exits on an item; re-arm after handling).**
 Mechanism proposed to the owner (DEC-1012): a Stop hook that names an unarmed waiter (a `.claude/` change: the owner's).
 
+**02:52:** the close W2-05+W2-55+W2-96 REFUSED at 01:48 (W2-55's backfill 31 rows behind the register: W2-55's;
+W2-66's record-only red on `win_toast.ps1` from `42104b11`: the CTO's, misattributed because the baseline predates it).
+The landing batch found an owned W1-08 probe-schema red at 02:01 (W2-11's or W2-81's probe record) and is still
+re-running cases alone; no hold of its own; left running. All in `drafts/P1-MORNING-2026-11-02.md` (scratch until the
+nightly starts; then copy to `packages/`). **After the nightly's verdict:** re-close W2-05 + W2-96 against it (rec (a));
+W2-55 back for its table + P-W2-55-HOOK. Inbox waiter re-armed 02:52.
+
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
 2. Write your session id to `log/cto-session.txt` (the sentinel watches it), then end the stand-by with

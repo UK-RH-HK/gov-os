@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+      $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-35/test_a_command_that_sets_pytho0/project)
+      exit: 2
+      stdout:
+      
+      stderr:
+      /tmp/gov-os-lead-W2-123/w259-pin-q7i_d_2u/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-35/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+      
+    assert []
+     +  where [] = marks('pin-gov-')
+     +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-q7i_d_2u'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...i_d_2u/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-q7i_d_2u/pin-markers')).marks
+/home/usain/gov-os-worktrees/W2-123/tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+1 failed in 12.97s

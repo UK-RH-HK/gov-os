@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-123/w259-pin-_b0bwzau/venv/lib/python3.12/site-packages/gov)
+      $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-33/test_the_guard_line_refuses_wh0/project)
+      exit: 2
+      stdout:
+      
+      stderr:
+      /tmp/gov-os-lead-W2-123/w259-pin-_b0bwzau/venv/bin/python: can't open file '/tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-33/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+      
+    assert []
+     +  where [] = marks('pin-gov-')
+     +    where marks = StandIn(root=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-_b0bwzau'), wheel=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin...0bwzau/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/gov-os-lead-W2-123/w259-pin-_b0bwzau/pin-markers')).marks
+/home/usain/gov-os-worktrees/W2-123/tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/gov-os-lead-W2-123/w259-pin-_b0bwzau/venv/lib/python3.12/site-packages/gov)
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+1 failed in 21.67s
