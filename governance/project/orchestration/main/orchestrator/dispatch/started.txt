@@ -2,3 +2,5 @@
 2026-11-01 20:08:01 W2-61h W2-61h-A5-revise.md W2-61h-A5-revise.json
 2026-11-01 22:24:43 W2-122 W2-122-A5-run1.md W2-122-A5-run1.json
 2026-11-01 22:26:46 W2-123 W2-123-A5-run1.md W2-123-A5-run1.json
+2026-11-02 05:59:07 W2-81 W2-81-A5-r4-records.md W2-81-A5-r4-records.json
+2026-11-02 06:02:07 W2-04 W2-04-A5-verify.md W2-04-A5-verify.json

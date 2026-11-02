@@ -4,13 +4,14 @@
  "core_changed": [],
  "unplaced": [],
  "base": "c38a5b49bc86e4c30f012acb01f7db50b8e41665",
- "head": "165d3057146ae11ee6bdf58a8e5cd98893b8ebd6",
+ "head": "e78e6af7530d776371e102fd0f04271fed76c523",
  "governance_left_out": [
   "docs/checkpoints/DAEO-l78m/CP-DAEO-l78m-0004.md",
   "docs/checkpoints/DAEO-l78m/CP-DAEO-l78m-0007.md",
   "docs/checkpoints/DAEO-l78m/CP-DAEO-l78m-0012.md",
   "docs/checkpoints/DAEO-l78m/CP-DAEO-l78m-0016.md",
   "docs/checkpoints/DAEO-l78m/CP-DAEO-l78m-0020.md",
+  "docs/probes/DAEO-l78m/PR-DAEO-l78m-moderated.md",
   "docs/probes/DAEO-l78m/PR-DAEO-l78m.md"
  ],
  "changed": [

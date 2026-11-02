@@ -1,0 +1,2 @@
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights:   8%|▊         | 26/310 [00:00<00:01, 259.47it/s]Loading weights:  21%|██▏       | 66/310 [00:00<00:00, 329.78it/s]Loading weights:  32%|███▏      | 99/310 [00:00<00:00, 261.47it/s]Loading weights:  61%|██████▏   | 190/310 [00:00<00:00, 468.36it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 571.87it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.

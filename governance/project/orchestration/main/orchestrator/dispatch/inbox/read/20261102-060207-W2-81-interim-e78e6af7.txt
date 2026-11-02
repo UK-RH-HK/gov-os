@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-81
+status: interim result e78e6af7: W2-81: the two probe records fit the probe schema (records only): the moderated record's required fields and computed pass, the review-3 record's own word with its supersession in its body

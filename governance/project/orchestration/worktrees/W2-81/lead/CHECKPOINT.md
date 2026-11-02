@@ -58,6 +58,12 @@
 - Floors reading recommendation: floors on the measurement half (hidden) alone, visible half reported beside; W2-93 entry criterion that the hidden half also uses controls as gold (item 7 backstop). Medium confidence; P2 (KPI reading within spec) unless CTO says P1.
 - Other stray folders to name for the CTO: tests/acceptance/W2-81/.claude/ and tests/acceptance/W2-81/questions/.claude/ (empty harness .cc-writes markers).
 
+## Run 5 — records-only repair (DEC-968 brief, CTO, 2026-11-02)
+- Merge queue ejected 166f459f4b5c: probe records break W1-08 probe-schema case, W1-26 probe-record check, W2-02 core schema. Start head 166f459f4b5c, clean.
+- Plan: PR-DAEO-l78m.md judgement back to its own word (pass, as committed in e095e9ae9 by the lead; gate skips it as an earlier round) + body note of supersession; moderated record: type/task/reviewer_session f00a8125.../implementer_session 9c2f47ad.../reviewer_wrote_nothing true, probed_commit full id of 165d3057146a, judgement pass (READY computed), computation in body. Then W1-08, W1-26, W2-02 cases + scoped run (heavy slot). Return DONE.
+- Done: commit e78e6af7530d (orchestrator, Task DAEO-l78m, Implements DEC-1010, DEC-490). W1-08 probe + W1-26 probe records + W2-02 green here: 55 passed 29.0 s. gov.__file__ in this worktree. select-5: scoped, core_changed [], unplaced [], base c38a5b49bc86. collect-only 19309/19311 (2 deselected), exit 0. keyword_warn 0. trailer_gate 22/22, 0 lacking, 3 unresolved items (DEC-1010 x2, DEC-997): they are on w2/integrate's register, not this branch's.
+- Running: scoped5.sh (bg), started 06:01:34; exit in log/scoped-5.exit, parallel.exit, serial.exit.
+
 ## Loop count
 - 3 (round 1: two; round 2: batch 5). Converged.
 

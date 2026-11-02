@@ -1,0 +1,10 @@
+log: W2-122-A5-run1.json
+W2: W2-122
+status: (no status line)
+
+**task:** W2-122 (DAEO-blwa), run 1: run the ticket loop for `gov rebuild --seed`. The test designer and the engineer worked in parallel, I checked the tests red, verified the code, measured KPI 3, and return here.
+
+**status:** PACKAGES. The ticket's own work is done: `gov accept` passes 26 of 26, all six KPI lines, at `bd50a9581893`. The merge is blocked by P-W2-122-K5: KPI 5 (DEC-1015 item 4) turns 100 cases of earlier suites red. That blocks only the merge; nothing else is open in this ticket.
+
+**work_completed:**
+- **Tests:** an independent test designer wrote 26 acceptance tests in its ow

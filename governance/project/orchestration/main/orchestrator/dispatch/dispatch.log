@@ -66,3 +66,14 @@
 2026-11-02 05:16:34 embedding server: HUNG since 2026-11-02 05:14:36 (no answer in 30 s)
 2026-11-02 05:16:37 guard harvest: rc 0 in 33.1 s
 2026-11-02 05:17:19 embedding server: answering again after HUNG since 2026-11-02 05:14:36
+2026-11-02 05:27:21 guard harvest: rc 0 in 73.9 s
+2026-11-02 05:37:50 guard harvest: rc 0 in 44.8 s
+2026-11-02 05:48:38 guard harvest: rc 0 in 33.1 s
+2026-11-02 05:50:38 embedding server: HUNG since 2026-11-02 05:48:37 (no answer in 30 s)
+2026-11-02 05:55:15 embedding server: answering again after HUNG since 2026-11-02 05:48:37
+2026-11-02 05:58:21 guard harvest: rc 0 in 12.7 s
+2026-11-02 05:59:07 started W2-81 (DAEO-l78m) W2-81-A5-r4-records.md -> W2-81-A5-r4-records.json (launcher exit 0)
+2026-11-02 06:02:07 interim result: W2-81 e78e6af7 W2-81: the two probe records fit the probe schema (records only): the moderated 
+2026-11-02 06:02:07 started W2-04 (DAEO-u4oz) W2-04-A5-verify.md -> W2-04-A5-verify.json (launcher exit 0)
+2026-11-02 06:04:04 interim result: W2-122 3c8a6f44 W2-122 lead checkpoint: verified at bd50a9581893, packages returned
+2026-11-02 06:06:07 return: W2-122-A5-run1.json -> inbox/20261102-060607-W2-122-A5-run1.txt

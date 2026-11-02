@@ -1,55 +1,55 @@
 {
- "computed": "2026-11-02 04:23:06",
+ "computed": "2026-11-02 05:23:08",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 12.48,
+   "cpu_p95": 12.36,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 4088612,
+   "rss_kb_p95": 4073568,
    "rss_kb_max": 6682080,
-   "samples": 2146
+   "samples": 2202
   },
   "embedding": {
-   "cpu_p95": 8.14,
+   "cpu_p95": 8.08,
    "cpu_max": 16.2,
-   "rss_kb_p95": 3051836,
+   "rss_kb_p95": 3006916,
    "rss_kb_max": 5520432,
-   "samples": 2146
+   "samples": 2202
   },
   "rebuild": {
-   "cpu_p95": 13.41,
+   "cpu_p95": 13.39,
    "cpu_max": 126.32,
-   "rss_kb_p95": 552020,
+   "rss_kb_p95": 551992,
    "rss_kb_max": 637492,
-   "samples": 1563
+   "samples": 1578
   },
   "test_run": {
-   "cpu_p95": 17.19,
+   "cpu_p95": 17.16,
    "cpu_max": 69.35,
-   "rss_kb_p95": 4175632,
+   "rss_kb_p95": 4162556,
    "rss_kb_max": 6778004,
-   "samples": 1699
+   "samples": 1755
   },
   "claude": {
-   "cpu_p95": 7.84,
+   "cpu_p95": 7.57,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2752984,
+   "rss_kb_p95": 2741556,
    "rss_kb_max": 4055288,
-   "samples": 1723
+   "samples": 1779
   },
   "reranker": {
-   "cpu_p95": 1.71,
+   "cpu_p95": 1.64,
    "cpu_max": 12.23,
-   "rss_kb_p95": 10053904,
+   "rss_kb_p95": 10063596,
    "rss_kb_max": 14331404,
-   "samples": 1438
+   "samples": 1494
   },
   "gitleaks": {
-   "cpu_p95": 0.37,
+   "cpu_p95": 0.36,
    "cpu_max": 4.08,
-   "rss_kb_p95": 2079288,
+   "rss_kb_p95": 2068660,
    "rss_kb_max": 3528312,
-   "samples": 964
+   "samples": 1004
   },
   "git": {
    "cpu_p95": 0.01,
@@ -63,20 +63,20 @@
    "cpu_max": 1.21,
    "rss_kb_p95": 128896,
    "rss_kb_max": 844648,
-   "samples": 714
+   "samples": 741
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 15.76,
+   "cpu_p95": 15.860000000000001,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3558076,
+   "rss_kb_p95": 3556236,
    "rss_kb_max": 5663368,
-   "samples": 1563
+   "samples": 1578
   }
  },
  "lead": {
-  "rss_kb_p95": 4193768,
+  "rss_kb_p95": 4194504,
   "rss_kb_max": 9810916,
-  "samples": 18242
+  "samples": 18298
  },
  "lead_own_max_kb": {
   "DAEO-e8f0": 7404492,
@@ -149,14 +149,14 @@
   "DAEO-qzrq": 4193768
  },
  "lead_inside": {
-  "rss_kb_p95": 4039108,
+  "rss_kb_p95": 4044924,
   "rss_kb_max": 7859056,
-  "samples": 6432
+  "samples": 6483
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 718548.6666666666,
+  "rss_kb_p95": 715678.6666666666,
   "rss_kb_max": 1277816.0,
-  "samples": 1699
+  "samples": 1755
  },
- "slot_run_kb": 1689188
+ "slot_run_kb": 1695004
 }

@@ -1,19 +1,20 @@
 {
- "time": "2026-11-02 05:18:04",
+ "time": "2026-11-02 06:06:07",
  "leads": [
-  "W2-122"
+  "W2-04",
+  "W2-81"
  ],
- "lead_count": 1,
+ "lead_count": 2,
  "load": [
-  44.14,
-  42.26,
-  38.61
+  21.86,
+  20.85,
+  30.33
  ],
- "mem_available_mb": 10124,
+ "mem_available_mb": 15569,
  "gate_open": false,
- "gate": "SHUT leads=1 load=44.1/38.6 nproc=20 have=10860480kB need=7426200kB: load 44.1/38.6 >= nproc 20",
+ "gate": "SHUT leads=2 load=21.9/30.3 nproc=20 have=19447152kB need=10650072kB: load 21.9/30.3 >= nproc 20",
  "disk_open": true,
- "disk": "disk gate open: 842 GiB free, 64044797 inodes free",
+ "disk": "disk gate open: 842 GiB free, 64070622 inodes free",
  "slots_held": [
   "gov-os-heavy-slot-1.lock"
  ],
@@ -25,72 +26,83 @@
  "main_dirty": [],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
-  "DAEO-blwa"
+  "DAEO-l78m",
+  "DAEO-u4oz"
  ],
  "lead_rss_kb": {
-  "W2-122": 325124
+  "W2-81": 3208160,
+  "W2-04": 280568
  },
  "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 117910, 48 min, /home/usain/gov-os-worktrees/W2-122)",
-  "python3 -m pytest tests (pid 530208, 21 min, /gov-os-runs/W2-00/nightly/20261102-0400)",
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 752377, 10 min, /home/usain/gov-os-worktrees/W2-122)",
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 4028094, 68 min, /home/usain/gov-os-worktrees/W2-122)",
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 4133555, 61 min, n/gov-os-runs/W2-00/merge-queue/warm/alt)"
+  "python3 -m pytest tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision (pid 1615334, 6 min, /gov-os-runs/W2-00/nightly/20261102-0400)"
  ],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 2432000,
+  "embedding": 2935620,
   "codegraph": 0
  },
- "busy_cores": 18.86,
- "embedding_cores": 7.56,
+ "busy_cores": 13.92,
+ "embedding_cores": 3.59,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 5845092,
- "outside_reranker_possible": true,
+ "rerankers_outside_kb": 0,
+ "outside_reranker_possible": false,
  "peaks": {
-  "computed": "2026-11-02 04:23:06",
-  "lead_p95_mb": 4095,
+  "computed": "2026-11-02 05:23:08",
+  "lead_p95_mb": 4096,
   "lead_max_mb": 9580
  },
  "admit": false,
- "admit_reason": "real CPU: 18.86 busy cores + 0.58 for the embedding server's p95 >= 20 - margin 2",
- "inbox_unread": 0,
- "inbox_oldest_age_s": null,
+ "admit_reason": "real CPU: 13.92 busy cores + 4.49 for the embedding server's p95 >= 20 - margin 2",
+ "inbox_unread": 1,
+ "inbox_oldest_age_s": 14,
  "started_this_tick": null,
  "ready_waits": {
-  "W2-122 DAEO-blwa": "running",
+  "W2-122 DAEO-blwa": "already started for W2-122-A5-run1.json",
   "W2-123 DAEO-qzrq": "already started for W2-123-A5-run1.json",
-  "W2-04 DAEO-u4oz": "not admitted: real CPU: 18.86 busy cores + 0.58 for the embedding server's p95 >= 20 - margin 2",
-  "W2-92 DAEO-n0wb": "not admitted: real CPU: 18.86 busy cores + 0.58 for the embedding server's p95 >= 20 - margin 2",
-  "W2-104 DAEO-drhj": "not admitted: real CPU: 18.86 busy cores + 0.58 for the embedding server's p95 >= 20 - margin 2",
-  "W2-61h DAEO-h2k3": "not admitted: real CPU: 18.86 busy cores + 0.58 for the embedding server's p95 >= 20 - margin 2",
-  "W2-91 DAEO-a3u2": "not admitted: real CPU: 18.86 busy cores + 0.58 for the embedding server's p95 >= 20 - margin 2"
+  "W2-81 DAEO-l78m": "running",
+  "W2-04 DAEO-u4oz": "running",
+  "W2-92 DAEO-n0wb": "not admitted: real CPU: 13.92 busy cores + 4.49 for the embedding server's p95 >= 20 - margin 2",
+  "W2-104 DAEO-drhj": "not admitted: real CPU: 13.92 busy cores + 4.49 for the embedding server's p95 >= 20 - margin 2",
+  "W2-61h DAEO-h2k3": "not admitted: real CPU: 13.92 busy cores + 4.49 for the embedding server's p95 >= 20 - margin 2",
+  "W2-91 DAEO-a3u2": "not admitted: real CPU: 13.92 busy cores + 4.49 for the embedding server's p95 >= 20 - margin 2"
  },
  "land": "nothing to land",
  "land_pending": [],
- "new_returns": [],
- "last_start": "2026-11-01 22:26:46 W2-123",
+ "new_returns": [
+  "W2-122-A5-run1.json"
+ ],
+ "last_start": "2026-11-02 06:02:07 W2-04",
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 05:16:37",
+  "at": "2026-11-02 05:58:21",
   "rc": 0,
-  "secs": 33.1,
+  "secs": 12.7,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 71 total, 67 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 427,
-  "last_check_at": 1793596717.4904275,
-  "last_result": "timeout",
-  "last_secs": 32.48,
-  "last_why": "no answer in 30 s",
-  "fails": 1,
-  "first_fail_at": 1793596717.4904332,
+  "passes": 475,
+  "last_check_at": 1793599581.9407902,
+  "last_result": "ok",
+  "last_secs": 14.66,
+  "last_why": "",
+  "fails": 0,
+  "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1793596639.176219,
-  "state": "failing"
+  "last_ok_at": 1793599581.940795,
+  "state": "healthy"
  },
- "slot_holders": []
+ "slot_holders": [
+  {
+   "slot": "1",
+   "pid": 1634915,
+   "cpu": 18524,
+   "since": 1793599581.9853835,
+   "reported": false,
+   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/home/usain/gov-os-w",
+   "cwd": "/home/usain/gov-os-worktrees/W2-81"
+  }
+ ]
 }

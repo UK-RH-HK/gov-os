@@ -1,0 +1,12 @@
+hit@5: 48.3 (baseline: 80.0)
+forbidden: 2 (baseline: 2)
+  callers-impact: 60.0%
+  current-vs-superseded: 50.0%
+  decisions: 33.3%
+  deletable: 20.0%
+  failed-approaches: 50.0%
+  history: 50.0%
+  stale-evidence: 50.0%
+  tests: 60.0%
+  where-defined: 50.0%
+  why: 60.0%

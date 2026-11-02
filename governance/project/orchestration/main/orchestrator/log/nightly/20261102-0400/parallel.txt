@@ -170,4 +170,811 @@ sss................sssss.s.sssssssssssssss.............................. [ 15%]
 ........................................................................ [ 63%]
 ........................................................................ [ 63%]
 ........................................................................ [ 64%]
-....................................................................
+........................................................................ [ 64%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+........................................................................ [ 69%]
+........................................................................ [ 70%]
+........................................................................ [ 70%]
+............................................F........................... [ 70%]
+...................................s.................................... [ 71%]
+........................................................................ [ 71%]
+........................................................................ [ 71%]
+...........................................F............................ [ 72%]
+........................................................................ [ 72%]
+........................................................................ [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 73%]
+........................................................................ [ 74%]
+........................................................................ [ 74%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 75%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 76%]
+........................................................................ [ 77%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 78%]
+........................................................................ [ 78%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 79%]
+........................................................................ [ 80%]
+........................................................................ [ 80%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 81%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 83%]
+........................................................................ [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 84%]
+........................................................................ [ 85%]
+........................................................................ [ 85%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 86%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 87%]
+........................................................................ [ 88%]
+........................................................................ [ 88%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 90%]
+........................................................................ [ 91%]
+......................................................................FF [ 91%]
+F.FFF................................................................... [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 92%]
+........................................................................ [ 93%]
+......................................................................s. [ 93%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+........................................................................ [ 94%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 95%]
+........................................................................ [ 96%]
+........................................................................ [ 96%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 97%]
+........................................................................ [ 98%]
+...............................F....s.FF......F......................... [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+.................................................................        [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[pip install requests] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+_ ERROR at setup of test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+the switch-over has not happened: .claude/settings.json does not register a PreToolUse hook for Edit, Write, NotebookEdit and Bash and a PostToolUse hook for Bash
+=================================== FAILURES ===================================
+___________ test_only_the_test_designer_commits_to_acceptance_tests ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+repo_root = PosixPath('/home/usain/gov-os-runs/W2-00/nightly/20261102-0400')
+deny_rules = ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(config/secrets*)', 'Read(//home/usain/gov-os-workbench/qualification-oracle/**)']
+w1_05_landed = True
+
+    def test_only_the_test_designer_commits_to_acceptance_tests(repo_root, deny_rules, w1_05_landed):
+        """KPI failure 1: no implementer commit touches tests/acceptance/** before W1-05 lands.
+    
+        DEC-253 (rewrite after implementation, "owner decision: integration merges"):
+        a merge commit passes when every change it brings under tests/acceptance/
+        comes from commits on the merged side carrying the test designer's role.
+    
+        DEC-906 item 2 (rewrite, W2-70): a non-merge commit without the test
+        designer's role passes only when its full id is listed in the path map's
+        ``acceptance_exemptions`` ({commit: <full sha>, decision: <DEC id>}, beside
+        ``accepted_history``). Any other commit stays red, an owner's included: a
+        ``Role: owner`` trailer alone exempts nothing until W2-44 binds trailers to
+        the launch. The list's only entry is the owner's own commit
+        ``c9a08678644485a7528bc875164e110881b63d93``, citing DEC-900.
+    
+        Expected red until that entry is committed: this case fails naming
+        ``c9a086786444``. It is the owner's entry, not this ticket's; once it is in,
+        the case is green. (A note for W1-01's README, which is not in W2-70's
+        paths.)
+        """
+        if not w1_05_landed:
+            tool, target = ACCEPTANCE_PROBE
+            assert support.denying_rules(deny_rules, tool, target, repo_root), (
+                f"the interim guardrail is not in force: {tool} on {target} is not denied"
+            )
+        offenders = support.acceptance_test_offenders(repo_root)
+>       assert not offenders, (
+            "commits touch tests/acceptance/** without the trailer "
+            f"`Role: {support.TEST_DESIGNER_ROLE}`, and are not listed by their full id in "
+            f"{support.PATH_MAP_REL} `{support.EXEMPTIONS_KEY}`:\n" + "\n".join(offenders)
+        )
+E       AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
+E         0568d91baf56 (merge: the merge commit itself changes tests/acceptance/W1-30/test_w1_30_close.py)
+E       assert not ['0568d91baf56 (merge: the merge commit itself changes tests/acceptance/W1-30/test_w1_30_close.py)']
+
+tests/acceptance/W1-01/test_w1_01_history.py:65: AssertionError
+_____________ test_the_integration_merges_of_this_repository_pass ______________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+repo_root = PosixPath('/home/usain/gov-os-runs/W2-00/nightly/20261102-0400')
+
+    def test_the_integration_merges_of_this_repository_pass(repo_root):
+        """Every merge commit on HEAD's history that touches tests/acceptance/** passes the DEC-253 rule.
+    
+        Rewrite (W2-70, DEC-908 item 3): ``merge_offences`` reads the path map's
+        ``acceptance_exemptions`` (DEC-906), so a branch made before the listed
+        ``c9a08678`` may merge the line that holds it back.
+        """
+        merges = [sha for sha in support.commits_touching(ACCEPTANCE, repo_root)
+                  if len(support.commit_parents(sha, repo_root)) > 1
+                  and DESIGNER not in support.commit_roles(sha, repo_root)]
+        assert merges, "no merge commit on HEAD's history touches tests/acceptance/**: 00e3d539 is expected there"
+        failing = {sha[:12]: support.merge_offences(sha, ACCEPTANCE, repo_root) for sha in merges}
+        failing = {sha: why for sha, why in failing.items() if why}
+>       assert not failing, f"integration merges on HEAD's history do not pass the DEC-253 rule: {failing}"
+E       AssertionError: integration merges on HEAD's history do not pass the DEC-253 rule: {'0568d91baf56': ['the merge commit itself changes tests/acceptance/W1-30/test_w1_30_close.py']}
+E       assert not {'0568d91baf56': ['the merge commit itself changes tests/acceptance/W1-30/test_w1_30_close.py']}
+
+tests/acceptance/W1-01/test_w1_01_integration_merges.py:421: AssertionError
+_ test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x717625552ac0>
+project = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_only_the_test_designer_ma0/repo')
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_only_the_test_designer_may_write_the_acceptance_tests(guard, project, role):
+        result = guard("Write", w47.write_input("Write", project / ACCEPTANCE_FILE), role)
+        if role == support.TEST_DESIGNER:
+>           w47.assert_allowed(result, f"a Write to {ACCEPTANCE_FILE} by the test designer")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...18/popen-gw4/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to tests/acceptance/W1-90/test_new.py by the test designer'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to tests/acceptance/W1-90/test_new.py by the test designer was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_only_the_test_designer_ma0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_______ test_the_orchestrator_may_write_anywhere_else_in_the_repository ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x717625596340>
+project = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_the_orchestrator_may_writ0/repo')
+
+    def test_the_orchestrator_may_write_anywhere_else_in_the_repository(guard, project):
+        for rel in ("README.md", "src/gov/guard/decide.py", "docs/notes.md", support.ROSTER_REL):
+>           w47.assert_allowed(guard("Write", w47.write_input("Write", project / rel), support.ORCHESTRATOR),
+                               f"a Write to {rel} by the orchestrator")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...18/popen-gw4/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to README.md by the orchestrator'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to README.md by the orchestrator was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_the_orchestrator_may_writ0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+________ test_the_auditor_writes_only_the_report_path_of_its_own_ticket ________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x7176255968e0>
+project = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_the_auditor_writes_only_t0/repo')
+
+    def test_the_auditor_writes_only_the_report_path_of_its_own_ticket(guard, project):
+        """DEC-112. The fixture ticket of the auditor allows ``docs/audit/**``."""
+        report = launch_support.OWN_PATH[support.AUDITOR]
+>       w47.assert_allowed(guard("Write", w47.write_input("Write", project / report), support.AUDITOR),
+                           f"a Write to {report} by the auditor on its own ticket")
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...18/popen-gw4/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = 'a Write to docs/audit/report.md by the auditor on its own ticket'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a Write to docs/audit/report.md by the auditor on its own ticket was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_the_auditor_writes_only_t0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x717625596b60>
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role(guard, role):
+        result = guard("Bash", w47.bash_input(INSTALL), role)
+        if role == support.ORCHESTRATOR:
+>           assert result.decision == "ask", f"`{INSTALL}` by the orchestrator did not ask: {result.describe()}"
+E           AssertionError: `pip install requests` by the orchestrator did not ask: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw4/test_an_install_asks_for_the_o0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+E           assert 'deny' == 'ask'
+E             
+E             - ask
+E             + deny
+
+tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py:69: AssertionError
+_ test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+guard = <function guard.<locals>._guard at 0x727bb4786fc0>
+folder = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_research_install_inside0/repo/experiments/spikes/exp-901')
+name = 'npm-install'
+
+    @pytest.mark.parametrize("name", sorted(NOT_MOVED_TO_THE_KERNEL))
+    def test_a_research_install_inside_the_experiment_folder_is_let_through(guard, folder, name):
+        """Not denied by the install rule, and not asked: neither by the hook nor by a settings rule."""
+        result = guard("Bash", w47.bash_input(INSTALLS[name]), RESEARCH, cwd=folder)
+>       w47.assert_allowed(result, f"`{INSTALLS[name]}` by research in its experiment folder")
+
+tests/acceptance/W1-46/test_w1_46_research_installs.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = GuardResult(decision='deny', returncode=2, stdout='', stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python:...18/popen-gw6/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory\n")
+what = '`npm install left-pad` by research in its experiment folder'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `npm install left-pad` by research in its experiment folder was not allowed: decision=deny exit=2 stdout='' stderr="/home/usain/.local/share/gov-os/pin-5c401220/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_research_install_inside0/repo/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory"
+
+tests/acceptance/W1-47/w1_47_support.py:455: AssertionError
+_ test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0')
+box = <w2_05_support.Box object at 0x727bb47f29c0>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0/dev/tiers', 'HF_HUB_OFFL...HOME': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+linked = True
+
+    @pytest.mark.parametrize("linked", (True, False), ids=("a linked worktree", "the main tree"))
+    def test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it(
+            tmp_path, box, retrieval_env, linked):
+        main, tree, trees = _setup(tmp_path, linked)
+        support.plain_hook(main, box.marks, support.retrieval_check_command())
+        before = support.repo_state(main, trees)
+        staged = _stage_a_change(tree)
+    
+>       done = _commit(box, tree, retrieval_env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:45: in _commit
+    return box.run([support.GIT, "commit", "-q", "-m", MESSAGE, *extra], cwd=tree, env=env,
+tests/acceptance/W2-05/w2_05_support.py:269: in run
+    return run_bounded([str(a) for a in args], cwd, env or self.env(**extra), timeout, self.base.parent)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ['/usr/bin/git', 'commit', '-q', '-m', 'the hooked change']
+cwd = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0/wt')
+env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0/dev/tiers', 'HF_HUB_OFFL...HOME': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+timeout = 90.0
+folder = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0')
+
+    def run_bounded(args, cwd, env, timeout, folder):
+        process = subprocess.Popen(args, cwd=str(cwd), env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, text=True, start_new_session=True)
+        try:
+            out, err = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            stop_group(process.pid)
+            reap(folder)
+            try:
+                out, err = process.communicate(timeout=10)
+            except subprocess.TimeoutExpired:
+                out, err = "", ""
+>           raise AssertionError(
+                f"`{' '.join(args)}` in {cwd} did not end within {timeout:.0f} s and was stopped with every process "
+                f"it started.\n--- stdout\n{(out or '')[-2000:]}\n--- stderr\n{(err or '')[-2000:]}") from None
+E           AssertionError: `/usr/bin/git commit -q -m the hooked change` in /tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_hooked_commit_that_runs0/wt did not end within 90 s and was stopped with every process it started.
+E           --- stdout
+E           
+E           --- stderr
+
+tests/acceptance/W2-05/w2_05_support.py:284: AssertionError
+_ test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0')
+box = <w2_05_support.Box object at 0x727bb576e060>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0/dev/tiers', 'HF_HUB_OFFL...HOME': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+
+    def test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file(tmp_path, box, retrieval_env):
+        """The project's own ``lefthook.yml`` (pre-commit: ``gov ci checks G1 G2`` and ``gov ci staged-secrets``),
+        installed in a temporary repository whose G1 check is the retrieval-regression declaration."""
+        skip_without("lefthook", "gitleaks")
+        assert support.LEFTHOOK_YML.is_file(), "lefthook.yml is absent from the repository root"
+        main, tree, trees = _setup(tmp_path, hooks_file=support.LEFTHOOK_YML)
+        installed = box.run(["lefthook", "install"], cwd=main, env=box.env())
+        assert installed.returncode == 0, f"lefthook install refused the project's lefthook.yml:\n{support.said(installed)}"
+        assert (support.common_dir_of(main) / "hooks" / "pre-commit").is_file(), "lefthook installed no pre-commit hook"
+        before = support.repo_state(main, trees)
+        staged = _stage_a_change(tree)
+    
+>       done = _commit(box, tree, retrieval_env)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:163: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:45: in _commit
+    return box.run([support.GIT, "commit", "-q", "-m", MESSAGE, *extra], cwd=tree, env=env,
+tests/acceptance/W2-05/w2_05_support.py:269: in run
+    return run_bounded([str(a) for a in args], cwd, env or self.env(**extra), timeout, self.base.parent)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ['/usr/bin/git', 'commit', '-q', '-m', 'the hooked change']
+cwd = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0/wt')
+env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0/dev/tiers', 'HF_HUB_OFFL...HOME': '/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+timeout = 90.0
+folder = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0')
+
+    def run_bounded(args, cwd, env, timeout, folder):
+        process = subprocess.Popen(args, cwd=str(cwd), env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE, text=True, start_new_session=True)
+        try:
+            out, err = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            stop_group(process.pid)
+            reap(folder)
+            try:
+                out, err = process.communicate(timeout=10)
+            except subprocess.TimeoutExpired:
+                out, err = "", ""
+>           raise AssertionError(
+                f"`{' '.join(args)}` in {cwd} did not end within {timeout:.0f} s and was stopped with every process "
+                f"it started.\n--- stdout\n{(out or '')[-2000:]}\n--- stderr\n{(err or '')[-2000:]}") from None
+E           AssertionError: `/usr/bin/git commit -q -m the hooked change` in /tmp/pytest-of-usain/pytest-7218/popen-gw6/test_a_commit_in_a_linked_work0/wt did not end within 90 s and was stopped with every process it started.
+E           --- stdout
+E           
+E           --- stderr
+E           [38;2;56;56;56m╭──────────────────────────────────────────╮[m
+E           [38;2;56;56;56m│[m 🥊 lefthook  v2.1.15   hook:  [1mpre-commit[m [38;2;56;56;56m│[m
+E           [38;2;56;56;56m╰──────────────────────────────────────────╯[m
+
+tests/acceptance/W2-05/w2_05_support.py:284: AssertionError
+_ test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+test_map = {'couplings': [{'paths': ['src/gov/cli/main.py', 'template/governance/kernel/templates/**', 'template/governance/kerne...ceptance/W1-07/test_w1_07_read_act.py', 'tests/acceptance/W1-07/test_w1_07_registry.py'], 'per_test_timeout': 900, ...}
+tracked = ['.claude/agents/engineer.md', '.claude/agents/independent-auditor.md', '.claude/agents/independent-test-designer.md', '.claude/agents/orchestrator.md', '.claude/agents/product-spec.md', '.claude/agents/research.md', ...]
+place = 'governance/project/orchestration/'
+
+    @pytest.mark.parametrize("place", RECORD_PLACES)
+    def test_every_record_of_each_of_dec_891_s_places_is_record_only(test_map, tracked, place):
+        records = _patterns(test_map, "record_only")
+        files = [p for p in tracked if p.startswith(place) and not p.endswith(CODE_SUFFIXES)
+                 and (place != "docs/plan/" or re.fullmatch(r"docs/plan/[^/]+\.md", p))]
+        assert files, f"the fixture is wrong: no tracked record under {place}"
+        unplaced = [p for p in files if not _placed(records, p)]
+>       assert not unplaced, f"records of {place} the record-only list leaves out: {unplaced[:20]}"
+E       AssertionError: records of governance/project/orchestration/ the record-only list leaves out: ['governance/project/orchestration/packages/ACT-GUARD-FIX-3.diff', 'governance/project/orchestration/tools/win_toast.ps1']
+E       assert not ['governance/project/orchestration/packages/ACT-GUARD-FIX-3.diff', 'governance/project/orchestration/tools/win_toast.ps1']
+
+tests/acceptance/W2-66/test_w2_66_live_test_map.py:257: AssertionError
+___________ test_one_row_per_register_entry_at_the_base_in_its_order ___________
+[gw2] linux -- Python 3.12.3 /usr/bin/python3
+
+proposal = <function proposal.<locals>.read at 0x715dcf080900>
+base = ('9d605eba20a2dba7ef8d7a5b2764515cca7f8c7f', '# Governance OS — Tool & Architecture Decision Register\n\n**Register ID...---|---|\n| 0.405 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1023. Next free id: DEC-1024. |\n')
+
+    def test_one_row_per_register_entry_at_the_base_in_its_order(proposal, base):
+        _, register_text = base
+        expected = s.heading_ids(register_text)
+        got = [row["id"] for row in table(proposal())]
+        missing = [i for i in expected if i not in got]
+        extra = [i for i in got if i not in expected]
+        twice = sorted({i for i in got if got.count(i) > 1})
+>       assert not missing and not extra and not twice, (
+            f"the table's rows are not the register's {len(expected)} entries: {len(missing)} missing "
+            f"({missing[:10]}), {len(extra)} not in the register ({extra[:10]}), twice: {twice[:10]}")
+E       AssertionError: the table's rows are not the register's 1019 entries: 40 missing (['DEC-984', 'DEC-985', 'DEC-986', 'DEC-987', 'DEC-988', 'DEC-989', 'DEC-990', 'DEC-991', 'DEC-992', 'DEC-993']), 0 not in the register ([]), twice: []
+E       assert (not ['DEC-984', 'DEC-985', 'DEC-986', 'DEC-987', 'DEC-988', 'DEC-989', ...])
+
+tests/acceptance/W2-55/test_w2_55_backfill.py:138: AssertionError
+_ test_the_record_commit_is_retried_while_another_holds_the_index_lock[land.py] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_the_record_commit_is_retr0')
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+        import threading
+        repo, lock = locked_repo(tmp_path)
+        threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x727bb2444fe0>
+path = '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+_ test_the_record_commit_is_retried_while_another_holds_the_index_lock[close_build.py] _
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_the_record_commit_is_retr1')
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+        import threading
+        repo, lock = locked_repo(tmp_path)
+        threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x727bc1bfe2d0>
+path = '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+_______________ test_f6_retry_exhaustion_fails_cleanly[land.py] ________________
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_f6_retry_exhaustion_fails0')
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+        repo, lock = locked_repo(tmp_path)  # held throughout
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x727bb23ab7a0>
+path = '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+____________ test_f6_retry_exhaustion_fails_cleanly[close_build.py] ____________
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw6/test_f6_retry_exhaustion_fails1')
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+        repo, lock = locked_repo(tmp_path)  # held throughout
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x727bb2445bb0>
+path = '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+______ test_f1_both_tools_commit_their_records_through_the_retry[land.py] ______
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+>       src = (TOOLS / tool).read_text()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/land.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+__ test_f1_both_tools_commit_their_records_through_the_retry[close_build.py] ___
+[gw6] linux -- Python 3.12.3 /usr/bin/python3
+
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+>       src = (TOOLS / tool).read_text()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/close_build.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-runs/W2-00/nightly/20261102-0400/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s program did not import the pin's installed package (/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-2fr42bc4/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_line_s_program_import0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:109: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'worker-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_guard_line_refuses_wh0')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_guard_line_refuses_wh0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-2fr42bc4/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_guard_line_refuses_wh0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+inherits = 'no-pythonpath'
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_guard_line_refuses_wh1')
+
+    @pytest.mark.parametrize("inherits", ["worker-pythonpath", "no-pythonpath"])
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path(
+            event, index, entry, inherits, pin_markers, tmp_path):
+        """An engineer's write outside the ticket's paths, which the pin's guard refuses, is refused (exit 2 or a deny
+        decision), and the pin's package decided it, not the project's edited guard (which allows everything)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        inherited = _worker(src) if inherits == "worker-pythonpath" else {}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=inherited,
+                                     payload=support.refused_write(project))
+        assert not box.marks("tree-gov-"), (
+            f"with the session's environment {inherited}, {event}[{index}] imported the project's own {src}/gov: "
+            f"the code under test, not the pin, decided the call\n{done.describe()}")
+        assert support.denies(done), (
+            f"with the session's environment {inherited}, {event}[{index}] let through a write the pin's guard refuses "
+            f"(exit {done.returncode}; only exit 2 or a deny decision blocks)\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package (/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_guard_line_refuses_wh1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-2fr42bc4/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_the_guard_line_refuses_wh1/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:71: AssertionError
+_ test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+[gw1] linux -- Python 3.12.3 /usr/bin/python3
+
+event = 'preToolUse', index = 0
+entry = {'command': 'h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(comman...gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_a_command_that_sets_pytho0')
+
+    @pytest.mark.parametrize("event,index,entry", GUARD, ids=GUARD_IDS)
+    def test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code(
+            event, index, entry, pin_markers, tmp_path):
+        """DEC-732's form, an engineer's ``PYTHONPATH=<worktree>/src python3 ...``, in a worker's session: the pin's
+        guard decides it and lets it through, and the command, run with the session's environment, imports the tree's
+        package. Whatever the line does with the session's environment, the variable is not taken from the session
+        nor refused to the command."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project, src = support.worker_project(tmp_path, box.markers, src_in_project=True)
+        command = f"PYTHONPATH={src} python3 -c 'import gov; print(gov.__file__)'"
+        payload = {**support.hook_input("preToolUse", project),
+                   "tool_input": {"command": command, "description": "w259: the code under test"}}
+        done = support.run_hook_line(entry["command"], event, project, box, inherited=_worker(src), payload=payload)
+        assert not box.marks("tree-gov-"), (
+            f"with PYTHONPATH={src}, {event}[{index}] imported the project's own gov to decide the call\n"
+            f"{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s decision did not come from the pin's installed package\n{done.describe()}")
+E       AssertionError: preToolUse[0]'s decision did not come from the pin's installed package
+E         $ sh -c h="$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py"; g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH, so $h cannot run; refused" >&2; exit 2; }; read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "gov hook: $g names no interpreter that runs: $p, so $h cannot run; refused" >&2; exit 2; }; "$p" -E "$h"; r=$?; case $r in 0|2) exit $r;; esac; echo "gov hook: $h ended with exit $r (it could not run or crashed); refused" >&2; exit 2  (in /tmp/pytest-of-usain/pytest-7218/popen-gw1/test_a_command_that_sets_pytho0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         /tmp/w259-pin-2fr42bc4/venv/bin/python: can't open file '/tmp/pytest-of-usain/pytest-7218/popen-gw1/test_a_command_that_sets_pytho0/project/.claude/hooks/pretooluse.py': [Errno 2] No such file or directory
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-2fr42bc4'), wheel=PosixPath('/tmp/w259-pin-2fr42bc4/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-2fr42bc4/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-2fr42bc4/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py:169: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests
+FAILED tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket
+FAILED tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]
+FAILED tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]
+FAILED tests/acceptance/W2-05/test_w2_05_linked_worktree.py::test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree]
+FAILED tests/acceptance/W2-05/test_w2_05_linked_worktree.py::test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file
+FAILED tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]
+FAILED tests/acceptance/W2-55/test_w2_55_backfill.py::test_one_row_per_register_entry_at_the_base_in_its_order
+FAILED tests/unit/orchestration/test_dispatcher.py::test_the_record_commit_is_retried_while_another_holds_the_index_lock[land.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_the_record_commit_is_retried_while_another_holds_the_index_lock[close_build.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f6_retry_exhaustion_fails_cleanly[land.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f6_retry_exhaustion_fails_cleanly[close_build.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f1_both_tools_commit_their_records_through_the_retry[land.py]
+FAILED tests/unit/orchestration/test_dispatcher.py::test_f1_both_tools_commit_their_records_through_the_retry[close_build.py]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]
+FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]
+ERROR tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]
+21 failed, 18943 passed, 35 skipped, 2 errors in 3567.44s (0:59:27)

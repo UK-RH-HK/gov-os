@@ -64,6 +64,8 @@ probe (task bydgl3oz2) watches; no restart (caps would be lost; the owner's). Wa
 **05:20:** batch of five STOPPED 04:37 (prepare failed: the server). Shared server flapping (HUNG 05:14). W2-81
 ejected by hand (`merge-queue/ejected/W2-81.json`); its records-only repair `briefs/W2-81-A5-r4-records.md` on the ready
 list. The four others stay approved; the dispatcher retries.
+**06:07:** W2-122 PACKAGES (26/26 at `bd50a9581893`); P-W2-122-K5 (K5 reds 100 earlier cases; adoption would need an
+embedder) is the owner's P1: morning draft §7, rec (b) then (a). W2-122 waits. W2-81's records repair running.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -1,5 +1,11 @@
 # W2-04 (DAEO-u4oz) lead checkpoint
 
+## Resume 3 (DEC-1015, 2026-11-02 06:02): verification only
+- Head e0d06a04ae53, tree clean. CTO's rebuild (log rebuild-W2-04-20261101-2205.out) ended ok 22:43, semantic recreated.
+- rebuild-5: my call without PYTHONPATH -> ModuleNotFoundError gov (rc 1; script uses caller's env). rebuild-6 with
+  PYTHONPATH started 06:0x. Then: select_tests (select-3), run_scoped (parallel-3/serial-3), gov check, DONE.
+- Brief gap: the resume's rebuild_slot.sh command omits PYTHONPATH (~2 min).
+
 ## Round 2 (resume after DEC-1005, 2026-11-01)
 - CTO decided P-W2-04-2 (A), P-W2-04-3 (b); P3 calls stand; needed tickets go as P1s from the CTO (do nothing).
 - DEC-1005 is not in this worktree's register: the brief's text holds.
