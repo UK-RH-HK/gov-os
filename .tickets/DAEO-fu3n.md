@@ -33,7 +33,7 @@ kpis:
   - 'W2-90''s seven named reds (W1-05''s two orchestrator-asks cases, W1-46''s research npm-install case, four W2-59 cases) judge the kernel''s wiring and pass on the head with W2-105 and W2-106 merged [DEC-965 item 1, DEC-966]'
   - 'Every case W2-90b named in its return as needing W2-105 or W2-110 judges the kernel''s wiring and passes on the head with them merged [DEC-999]'
   - 'Nothing is lowered: no case deleted, skipped, xfailed or weakened; every revised file''s commit carries Rewrite-Reason: DEC-953 item 2; a README under the ticket''s folder maps every case [DEC-906, MR-3]'
-  - 'From W2-90b''s KPI S4, unchanged: the stand-in homes of W1-46''s live sessions and W1-50''s freeze launcher use the editable install''s gov, so with the hook lines pinned they judge the worktree''s code; how (a stand-in HOME with CLAUDE_CONFIG_DIR, a P1 exception to DEC-784, or S4 re-baselined under DEC-822 item 3) is the owner''s P-W2-90b-1; nothing is lowered before that decision [DEC-970, DEC-1016]'
+  - 'From W2-90b''s KPI S4, re-baselined (P-W2-90b-1 (b), DEC-1022, under DEC-822 item 3): W1-46''s live sessions and W1-50''s freeze launcher start a real CLI session with the caller''s HOME and so judge the pinned guard by design, and their README says so; the kernel''s non-live cases judge the worktree''s code; nothing is lowered: no case deleted, skipped, xfailed or weakened [DEC-970, DEC-1016, DEC-1022, DEC-822]'
   failure:
   - 'A revised case still reads this repository''s live settings, or is red with W2-105, W2-106 and W2-110 merged.'
   - 'A case deleted, skipped, xfailed or its verdict weakened.'

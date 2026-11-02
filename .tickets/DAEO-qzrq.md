@@ -17,10 +17,12 @@ role: engineer
 depends_on: []
 allowed_paths:
 - src/gov/retrieval/ollama.py
+- src/gov/retrieval/semantic.py
 - tests/unit/retrieval/test_w2_123*
 - docs/changes/W2-123-evidence.md
 kpis:
   success:
+  - 'A rebuild''s embedding request that times out behind other clients on the shared server is retried, bounded (at most three tries with a growing wait, each try under the existing per-request timeout), and the semantic stage still ends not_recreated, named, after the last failed try: never a partial store reported as built; the tries and waits are stated in the rebuild''s result [DEC-1026, DEC-1015 item 4]'
   - 'When the Gov OS starts its shared embedding server (`ensure_available`), it sets the number of parallel requests and the CPU cap from one configuration value each (defaults from the measure below), and states them in its result; an unreadable value refuses to start the server (named), never an uncapped one [DEC-1014, DEC-1010 item 7]'
   - 'Determinism: with parallel requests the embedder returns the same vector for the same text as with one request at a time (checked on a fixed set of chunks, to the stored precision); a difference refuses the setting [DEC-1014]'
   - 'Measured, in docs/changes/W2-123-evidence.md: throughput (chunks per second) and a cold rebuild''s semantic stage at 1, 2, 4 and 8 parallel requests, under the 8-core cap and without it, alone and with three rebuilds at once; the setting chosen is the one where the 8-core cap is not the limit (or the cap is raised with the figures), and the figures are stated [DEC-1014, DEC-996 item 3 A]'
