@@ -21,6 +21,9 @@ DEC-381).
   it and the sha256 of the exact text, at most ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` bytes. Round 3's entries, keyed
   without the device, are never read and are dropped at the next write. The cache only saves a request: a cache that
   cannot be read, written or created is skipped, and deleting it changes no answer.
+- Before a chunk or a question is embedded, the machine-wide cache (``vector_cache``, W2-126, DEC-1032) is looked up
+  under the model, the revision and the sha256 of the exact text sent; a hit is used and nothing is sent, a miss is
+  embedded and stored. ``refresh`` and ``search`` name the run's ``vector_cache`` counts (hits, misses, skipped).
 """
 
 from __future__ import annotations
@@ -36,7 +39,7 @@ import urllib.request
 from pathlib import Path
 
 from gov.config.loader import KNOWN_FILES, PROJECT_DIR, load_config
-from gov.retrieval import lexical, ollama, rerank
+from gov.retrieval import lexical, ollama, rerank, vector_cache
 from gov.secrets import _matches
 from gov.store import STORE_REL
 
@@ -183,20 +186,25 @@ def _cache(path: Path, key: tuple, vector: bytes) -> None:
         return
 
 
-def query_vector(root: Path, query: str) -> tuple[bytes | None, str | None]:
+def query_vector(root: Path, query: str, counts: dict | None = None) -> tuple[bytes | None, str | None]:
     """The vector a search compares with for ``query``, and why there is none: the one cached under its key for
     either device, else the one the query embedder gives the question, sent right after the bare instruction in one
     request, if the vectors are well-formed and that embedder then reports the model loaded, on any device (DEC-1033;
     cached then, under that device). When the embedder gives no vector, malformed vectors or does not report the model
     loaded, there is no vector and nothing is cached. Without a revision in the model list there is no key and nothing
-    is cached."""
+    is cached. The machine-wide cache is looked up first, and given the vector whenever the tree's cache is."""
     host = ollama.query_host()
     text, revision, path = INSTRUCTION + query, _revision(host), Path(root) / QUERY_VECTORS_REL
     digest = hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest()
     keys = {device: (MODEL, revision, device, digest) for device in DEVICES} if revision else {}
+    machine = vector_cache.Cache(MODEL, revision, counts)
+    cached = machine.get([text])[0]
+    if cached:
+        return cached, None
     for key in keys.values():
         cached = _cached(path, key)
         if cached:
+            machine.put([text], [cached])
             return cached, None
     try:
         vectors = _embed([INSTRUCTION, text], host)
@@ -211,6 +219,7 @@ def query_vector(root: Path, query: str) -> tuple[bytes | None, str | None]:
         return None, NOT_LOADED
     if device in keys:
         _cache(path, keys[device], vectors[1])
+        machine.put([text], [vectors[1]])
     return vectors[1], None
 
 
@@ -256,9 +265,10 @@ def _open(root: Path) -> sqlite3.Connection | None:
     return connection
 
 
-def _build(root: Path) -> str | None:
+def _build(root: Path, counts: dict) -> str | None:
     """Bring the lexical index up to date, then embed the chunks that have no vector, each as its first
-    ``EMBED_CHARS`` characters; why it cannot be done, or None."""
+    ``EMBED_CHARS`` characters, those the machine-wide cache holds taken from it (counted in ``counts``); why it
+    cannot be done, or None."""
     lexical.refresh(root)
     connection = sqlite3.connect(root / STORE_REL)
     try:
@@ -279,12 +289,19 @@ def _build(root: Path) -> str | None:
             connection.executemany("DELETE FROM semantic_vector WHERE chunk_id = ?",
                                    [(chunk_id,) for chunk_id in have - set(wanted)])
             missing = [chunk_id for chunk_id in wanted if chunk_id not in have]
+            machine = vector_cache.Cache(MODEL, revision, counts)
             for start in range(0, len(missing), BATCH):
                 batch = missing[start:start + BATCH]
-                vectors = _embed([connection.execute(_TEXT, (chunk_id,)).fetchone()[0][:EMBED_CHARS]
-                                  for chunk_id in batch])
-                if vectors is None:
-                    return NO_EMBEDDING
+                texts = [connection.execute(_TEXT, (chunk_id,)).fetchone()[0][:EMBED_CHARS] for chunk_id in batch]
+                vectors = machine.get(texts)  # no cache connection stays open while the misses are embedded
+                todo = [i for i, vector in enumerate(vectors) if vector is None]
+                if todo:
+                    embedded = _embed([texts[i] for i in todo])
+                    if embedded is None:
+                        return NO_EMBEDDING
+                    machine.put([texts[i] for i in todo], embedded)
+                    for i, vector in zip(todo, embedded):
+                        vectors[i] = vector
                 connection.executemany("INSERT INTO semantic_vector VALUES (?, ?)", zip(batch, vectors))
         return None
     finally:
@@ -321,7 +338,8 @@ def _vectors(root: Path) -> str | None:
 
 def refresh(root: Path) -> dict:
     """Bring the lexical index up to date, then embed the chunks that have no vector."""
-    return _report(_build(Path(root)))
+    counts = vector_cache.zero()
+    return _report(_build(Path(root), counts), vector_cache=counts)
 
 
 def search(root: Path, query: str, refresh: bool = True) -> dict:
@@ -332,18 +350,19 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
     question is embedded by the query embedder alone (started if needed, on any device) and its vector is cached
     beside the store once the vectors can be answered from (DEC-782, DEC-1033).
     """
-    root = Path(root)
-    reason = (_build(root) if refresh else None) or _status(root)
+    root, counts = Path(root), vector_cache.zero()
+    reason = (_build(root, counts) if refresh else None) or _status(root)
     if reason:
-        return _report(reason, hits=[])
+        return _report(reason, hits=[], vector_cache=counts)
     connection = _open(root)
     try:
         reason = _ready(connection, ollama.ensure_query_available)
-        vector, reason = (None, reason) if reason else query_vector(root, query)
+        vector, reason = (None, reason) if reason else query_vector(root, query, counts)
         if vector is None:
-            return _report(reason, hits=[])
+            return _report(reason, hits=[], vector_cache=counts)
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
-        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, TOP_K))])
+        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, TOP_K))],
+                       vector_cache=counts)
     finally:
         connection.close()
 
