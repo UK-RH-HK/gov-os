@@ -12726,3 +12726,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.401 | 2026-11-01 | Orchestrator (delegated): DEC-1019. Next free id: DEC-1020. |
+
+### DEC-1020 — W2-104's P-W2-104-CMDLIST (a) and P-W2-104-CLAUDEPATH (c) (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: P2, reversible, the lead's recommendation, confidence high; for the owner to overturn) · **Under:** DEC-747, DEC-970, DEC-959 item 5, DEC-205
+- **Decision:** (1) P-W2-104-CMDLIST (a): W2-104's allowed paths take `src/gov/check/commands.py` for one line, `skilleval` in `RECORDED_GOV_COMMANDS` (as DEC-970 did for `accept`), so W1-26's two `[skilleval]` cases go green; the overlap with W2-96 (closing) and W2-20 (held) is that list alone, settled at the merge. Run 2: merge `w2/integrate` into the branch, the line, W1-26's folder and the scoped selection once, DONE with the head. (2) P-W2-104-CLAUDEPATH (c): the harness keeps finding `claude` on PATH; recorded as a residual (a wrong binary gives not-run or a real run, never a false pass).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.402 | 2026-11-02 | Orchestrator (delegated): DEC-1020. Next free id: DEC-1021. |
