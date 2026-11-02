@@ -9,7 +9,8 @@ re-embeds only the files whose content differs from the base's.
   stores' schema version. A base is used only where all three equal the tree's own build: the running code, the
   embedder the endpoint reports now (not asked under ``--no-embeddings``, whose seed keeps no vector) and the running
   code's schema. A base without a readable record, or one that differs, is refused, named, and nothing of it is
-  copied: the rebuild runs cold (fail closed: never a store of two embedders).
+  copied: the rebuild runs cold (fail closed: never a store of two embedders). A record the rebuild cannot remove
+  or write is said and the rebuild goes on (W2-76); one it cannot remove is emptied, so it is no readable record.
 - **The code fingerprint** is the program that turns files into store entries, never the repository's content: every
   file of the running ``gov`` package, the gitleaks the pre-index filter runs (which decides which files enter), and
   the versions of the interpreter and SQLite that read and store them.
@@ -75,20 +76,45 @@ def _read(path: Path) -> dict | None:
     return record if isinstance(record, dict) else None
 
 
-def forget(root: Path) -> None:
-    """The tree's record removed: its stores are no base until a full rebuild completes them again."""
-    (Path(root) / RECORD_REL).unlink(missing_ok=True)
+def forget(root: Path) -> str | None:
+    """The tree's record removed: its stores are no base until a full rebuild completes them again. A record that
+    cannot be removed is emptied, so none is left to read (fail closed); what could not be done is said (W2-76: a
+    fault of the rebuild's own records never changes its success), never raised."""
+    path = Path(root) / RECORD_REL
+    try:
+        path.unlink(missing_ok=True)
+        return None
+    except OSError as exc:
+        said = f"{RECORD_REL} could not be removed: {exc}"
+    try:
+        left = path.is_file()
+    except OSError:
+        left = True
+    if not left:
+        return f"{said}; no record is left"
+    try:
+        path.write_bytes(b"")
+    except OSError as exc:
+        return f"{said}; nor emptied ({exc}): this tree may still be read as a warm base"
+    return f"{said}; emptied, so this tree is no warm base"
 
 
 def remember(root: Path, embedder: dict) -> None:
-    """The tree's record, written whole once its stores are complete."""
+    """The tree's record, written whole once its stores are complete; a write that fails leaves no part of it."""
     path = Path(root) / RECORD_REL
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    temporary.write_text(json.dumps({"code": code_fingerprint(), "embedder": embedder, "schema": schema_version(),
-                                     "written_at": datetime.now(timezone.utc).isoformat()}, indent=2) + "\n",
-                         encoding="utf-8")
-    os.replace(temporary, path)
+    try:
+        temporary.write_text(json.dumps({"code": code_fingerprint(), "embedder": embedder, "schema": schema_version(),
+                                         "written_at": datetime.now(timezone.utc).isoformat()}, indent=2) + "\n",
+                             encoding="utf-8")
+        os.replace(temporary, path)
+    except OSError:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:
+            pass
+        raise
 
 
 def _answer(status: str, base: Path | None, reason: str | None, **more) -> dict:

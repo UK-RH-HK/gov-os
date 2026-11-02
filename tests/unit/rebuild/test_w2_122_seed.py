@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import sqlite3
 import subprocess
@@ -216,4 +217,38 @@ def test_a_semantic_store_asked_for_and_not_recreated_fails_the_rebuild(base, tr
     assert raised.value.details["reason"] == semantic.NO_EMBEDDING
     assert not (tree / seed.RECORD_REL).exists()
     assert run(tree, _args("--no-embeddings"), CONFIG)["stores"]["semantic"]["requested"] is False
+
+
+@pytest.mark.parametrize("given", [(), ("--no-embeddings",), ("--seed", "BASE")])
+def test_a_rebuild_folder_that_is_a_file_is_said_and_the_rebuild_still_succeeds(base, tree, endpoint, capsys, given):
+    """W2-76's rule: the rebuild's own folder not usable is said, never raised; the stores are built all the same."""
+    blocker = (tree / seed.RECORD_REL).parent
+    blocker.parent.mkdir(parents=True)
+    blocker.write_text("not a folder\n")
+    result = run(tree, _args(*(str(base) if part == "BASE" else part for part in given)), CONFIG)
+    said = capsys.readouterr().err
+    assert f"{seed.RECORD_REL} could not be removed" in said and "no record is left" in said
+    assert result["stores"]["lexical"]["status"] == "recreated"
+    if "--no-embeddings" not in given:
+        assert f"{seed.RECORD_REL} not written" in said and len(endpoint["sent"]) == CHUNKS  # cold, all embedded
+    if "--seed" in given:
+        assert result["seed"]["status"] == "refused" and "could not be copied" in result["seed"]["reason"]
+    assert blocker.read_text() == "not a folder\n"
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root writes through a read-only folder")
+def test_a_record_that_cannot_be_removed_is_emptied_said_and_refused_as_a_base(base, tree, capsys):
+    """Fail closed: a record the rebuild could not remove is left unreadable, so the tree is no warm base."""
+    folder = (base / seed.RECORD_REL).parent
+    folder.chmod(0o555)
+    try:
+        run(base, _args(), CONFIG)
+    finally:
+        folder.chmod(0o755)
+    said = capsys.readouterr().err
+    assert f"{seed.RECORD_REL} could not be removed" in said and "emptied" in said
+    assert f"{seed.RECORD_REL} not written" in said
+    assert (base / seed.RECORD_REL).read_text() == ""
+    answer = run(tree, _args("--seed", str(base)), CONFIG)["seed"]
+    assert answer["status"] == "refused" and "no readable record" in answer["reason"]
 

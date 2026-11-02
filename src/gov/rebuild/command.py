@@ -107,6 +107,8 @@ def run(root: Path, args, config: dict) -> dict:
 
 
 def _build(root: Path, args, config: dict, watch) -> dict:
+    import sys
+
     from gov.cli.errors import GovError
     from gov.rebuild import seed
     from gov.retrieval import lexical
@@ -118,7 +120,10 @@ def _build(root: Path, args, config: dict, watch) -> dict:
     embeddings = not getattr(args, "no_embeddings", False)
 
     # The tree is no warm base while it is rebuilt: its record is written again only once its stores are complete.
-    seed.forget(root)
+    # A record that cannot be removed is said and the rebuild goes on (W2-76: its own records never fail it).
+    forgotten = seed.forget(root)
+    if forgotten:
+        print(f"rebuild: {forgotten}", file=sys.stderr, flush=True)
     seeded = None
     if getattr(args, "seed", None) is not None:
         with watch.stage("seed"):
@@ -227,7 +232,6 @@ def _build(root: Path, args, config: dict, watch) -> dict:
 
     if embeddings:  # complete: the tree is a warm base for the embedder its semantic store records
         import sqlite3
-        import sys
 
         from gov.retrieval.semantic import manifest
 
