@@ -44,7 +44,7 @@ reds (W2-54 AR-5 input, W1-46/W2-59 hook-file reds, W2-66 win_toast.ps1) to trac
 
 **01:26 slip (drift log):** the inbox sat 30+ min unread (guard 67-69, W2-123 interim) because this session never armed
 `tools/inbox_wait.sh` after the reload; the sentinel's stale-inbox push caught it. **Every session start and after every
-wake: arm `bash tools/inbox_wait.sh` with the Bash tool's background run (it exits on an item; re-arm after handling).**
+wake: arm `bash tools/inbox_wait_quiet.sh` (09:28: repeat server-hung items wake at most hourly; else as inbox_wait.sh) with the Bash tool's background run (it exits on an item; re-arm after handling).**
 Mechanism proposed to the owner (DEC-1012): a Stop hook that names an unarmed waiter (a `.claude/` change: the owner's).
 
 **02:52:** the close W2-05+W2-55+W2-96 REFUSED at 01:48 (W2-55's backfill 31 rows behind the register: W2-55's;

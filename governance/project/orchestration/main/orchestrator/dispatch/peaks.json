@@ -1,82 +1,82 @@
 {
- "computed": "2026-11-02 08:25:04",
+ "computed": "2026-11-02 09:26:05",
  "days": 7,
  "kinds": {
   "other": {
-   "cpu_p95": 12.0,
+   "cpu_p95": 11.99,
    "cpu_max": 7206.96,
-   "rss_kb_p95": 4059016,
+   "rss_kb_p95": 4057508,
    "rss_kb_max": 6682080,
-   "samples": 2368
+   "samples": 2423
   },
   "embedding": {
-   "cpu_p95": 8.08,
+   "cpu_p95": 8.06,
    "cpu_max": 16.2,
-   "rss_kb_p95": 2997948,
+   "rss_kb_p95": 2991972,
    "rss_kb_max": 5520432,
-   "samples": 2368
+   "samples": 2423
   },
   "rebuild": {
-   "cpu_p95": 12.83,
+   "cpu_p95": 12.78,
    "cpu_max": 126.32,
-   "rss_kb_p95": 551644,
+   "rss_kb_p95": 548592,
    "rss_kb_max": 637492,
-   "samples": 1701
+   "samples": 1733
   },
   "test_run": {
-   "cpu_p95": 16.93,
+   "cpu_p95": 16.8,
    "cpu_max": 69.35,
-   "rss_kb_p95": 4079916,
+   "rss_kb_p95": 4001152,
    "rss_kb_max": 6778004,
-   "samples": 1921
+   "samples": 1976
   },
   "claude": {
    "cpu_p95": 6.44,
    "cpu_max": 543.86,
-   "rss_kb_p95": 2730928,
+   "rss_kb_p95": 2729036,
    "rss_kb_max": 4055288,
-   "samples": 1945
+   "samples": 2000
   },
   "reranker": {
-   "cpu_p95": 1.49,
+   "cpu_p95": 1.44,
    "cpu_max": 12.23,
-   "rss_kb_p95": 10025388,
+   "rss_kb_p95": 9939500,
    "rss_kb_max": 14331404,
-   "samples": 1588
+   "samples": 1613
   },
   "gitleaks": {
    "cpu_p95": 0.35,
    "cpu_max": 4.08,
    "rss_kb_p95": 2068660,
    "rss_kb_max": 3528312,
-   "samples": 1057
+   "samples": 1071
   },
   "git": {
    "cpu_p95": 0.01,
    "cpu_max": 0.03,
    "rss_kb_p95": 124468,
    "rss_kb_max": 164968,
-   "samples": 95
+   "samples": 96
   },
   "codegraph": {
    "cpu_p95": 0.26,
    "cpu_max": 1.21,
-   "rss_kb_p95": 118736,
+   "rss_kb_p95": 118272,
    "rss_kb_max": 844648,
-   "samples": 807
+   "samples": 825
   },
   "rebuild_with_embedding": {
-   "cpu_p95": 15.47,
+   "cpu_p95": 15.33,
    "cpu_max": 126.32,
-   "rss_kb_p95": 3441468,
+   "rss_kb_p95": 3420172,
    "rss_kb_max": 5663368,
-   "samples": 1701
+   "samples": 1733
   }
  },
  "lead": {
-  "rss_kb_p95": 4191808,
+  "rss_kb_p95": 4188180,
   "rss_kb_max": 9810916,
-  "samples": 18521
+  "samples": 18684
  },
  "lead_own_max_kb": {
   "DAEO-e8f0": 7404492,
@@ -149,14 +149,14 @@
   "DAEO-qzrq": 4193768
  },
  "lead_inside": {
-  "rss_kb_p95": 4042872,
+  "rss_kb_p95": 4037808,
   "rss_kb_max": 7859056,
-  "samples": 6685
+  "samples": 6829
  },
  "test_run_per_slot": {
-  "rss_kb_p95": 781641.3333333334,
+  "rss_kb_p95": 747342.6666666666,
   "rss_kb_max": 1416492.0,
-  "samples": 1921
+  "samples": 1976
  },
- "slot_run_kb": 1692952
+ "slot_run_kb": 1687888
 }

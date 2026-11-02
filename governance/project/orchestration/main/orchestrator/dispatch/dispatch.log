@@ -131,3 +131,9 @@
 2026-11-02 09:16:10 embedding server: answering again after HUNG since 2026-11-02 09:13:38
 2026-11-02 09:16:28 guard harvest: rc 0 in 22.5 s
 2026-11-02 09:17:08 land finished: {'W2-11=c9f99b28b88b': 'not landed (still approved)', 'W2-105=fa653609cc93': 'not landed (still approved)', 'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)', 'W2-81=e78e6af7530d': 'not landed (still approved)'}
+2026-11-02 09:21:35 embedding server: HUNG since 2026-11-02 09:19:38 (no answer in 30 s)
+2026-11-02 09:23:11 embedding server: answering again after HUNG since 2026-11-02 09:19:38
+2026-11-02 09:24:08 started W2-61h (DAEO-h2k3) W2-61h-A5-verify.md -> W2-61h-A5-verify.json (launcher exit 0)
+2026-11-02 09:26:38 embedding server: HUNG since 2026-11-02 09:24:41 (no answer in 30 s)
+2026-11-02 09:27:21 guard harvest: rc 0 in 16.0 s
+2026-11-02 09:27:29 embedding server: answering again after HUNG since 2026-11-02 09:24:41

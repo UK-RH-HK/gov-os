@@ -7,3 +7,41 @@ heavy-job slots held: 2 of 3 (waited 1 s)
 heavy-job slots released after the suites
 parallel exit 1 in 3854 s: 21 failed, 18943 passed, 35 skipped, 2 errors in 3567.44s (0:59:27)
 serial exit 1 in 5858 s: 3 failed, 171 passed, 8 errors in 5349.37s (1:29:09)
+red-alone tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests: 1 failed in 8.81s
+red-alone tests/acceptance/W1-01/test_w1_01_integration_merges.py::test_the_integration_merges_of_this_repository_pass: 1 failed in 16.86s
+red-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[pip install requests]: 1 error in 0.02s
+red-alone tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner[npm install -g ccusage]: 1 error in 0.03s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_only_the_test_designer_may_write_the_acceptance_tests[independent-test-designer]: 1 failed in 0.17s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_orchestrator_may_write_anywhere_else_in_the_repository: 1 failed in 0.17s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_the_auditor_writes_only_the_report_path_of_its_own_ticket: 1 failed in 0.17s
+red-alone tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py::test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[orchestrator]: 1 failed in 0.17s
+red-alone tests/acceptance/W1-46/test_w1_46_research_installs.py::test_a_research_install_inside_the_experiment_folder_is_let_through[npm-install]: 1 failed in 0.18s
+passes-alone tests/acceptance/W2-05/test_w2_05_linked_worktree.py::test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree]
+passes-alone tests/acceptance/W2-05/test_w2_05_linked_worktree.py::test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file
+red-alone tests/acceptance/W2-66/test_w2_66_live_test_map.py::test_every_record_of_each_of_dec_891_s_places_is_record_only[governance/project/orchestration/]: 1 failed in 0.05s
+red-alone tests/acceptance/W2-55/test_w2_55_backfill.py::test_one_row_per_register_entry_at_the_base_in_its_order: 1 failed in 0.07s
+red-alone tests/unit/orchestration/test_dispatcher.py::test_the_record_commit_is_retried_while_another_holds_the_index_lock[land.py]: 1 failed in 0.15s
+red-alone tests/unit/orchestration/test_dispatcher.py::test_the_record_commit_is_retried_while_another_holds_the_index_lock[close_build.py]: 1 failed in 0.07s
+red-alone tests/unit/orchestration/test_dispatcher.py::test_f6_retry_exhaustion_fails_cleanly[land.py]: 1 failed in 0.06s
+red-alone tests/unit/orchestration/test_dispatcher.py::test_f6_retry_exhaustion_fails_cleanly[close_build.py]: 1 failed in 0.07s
+red-alone tests/unit/orchestration/test_dispatcher.py::test_f1_both_tools_commit_their_records_through_the_retry[land.py]: 1 failed in 0.06s
+red-alone tests/unit/orchestration/test_dispatcher.py::test_f1_both_tools_commit_their_records_through_the_retry[close_build.py]: 1 failed in 0.06s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines.py::test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]: 1 failed in 3.13s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]: 1 failed in 3.00s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]: 1 failed in 3.01s
+red-alone tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]: 1 failed in 3.00s
+red-alone tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written: 1 failed in 6.22s
+red-alone tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80: 1 error in 842.92s (0:14:02)
+red-alone tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95: 1 error in 464.63s (0:07:44)
+red-alone tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes: 1 error in 495.36s (0:08:15)
+red-alone tests/acceptance/W1-19/test_w1_19_real_models.py::test_every_answer_is_one_fused_list_from_both_routes_reranked: 1 error in 1044.68s (0:17:24)
+red-alone tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_retr_a_04_finds_and_cites_both_implementations: 1 error in 1041.14s (0:17:21)
+red-alone tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_hit_at_5_pass_line: 1 error in 130.25s (0:02:10)
+red-alone tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_forbidden_citation_baseline: 1 error in 860.15s (0:14:20)
+red-alone tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_every_measured_bundle_was_reranked_from_both_routes: 1 error in 367.76s (0:06:07)
+red-alone tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit: 1 failed in 215.97s (0:03:35)
+red-alone tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here: 1 failed in 296.10s (0:04:56)
+verdict: red 32
+duration: estimate 11176 s, actual 19448 s (setup 2381 s, lock wait 898 s)
+clone kept for the diagnosis: /home/usain/gov-os-runs/W2-00/nightly/20261102-0400
+2026-11-02 09:24:14 done

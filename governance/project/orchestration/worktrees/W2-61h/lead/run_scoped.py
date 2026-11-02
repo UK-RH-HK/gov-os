@@ -13,12 +13,12 @@ sys.path.insert(0, str(TREE / "src"))
 from gov.close import serial, select as _select  # noqa: E402
 from gov.close.pytest_plugin import gov_close_serial_only as serial_only  # noqa: E402
 
-sel = json.loads((LOG / "select-2.json").read_text())
+sel = json.loads((LOG / "select-3.json").read_text())
 options = sel["pytest_options"]
 listed = serial_only.entries(TREE)
 declared = [e for e in listed if e.startswith("tests/") and _select.runs(e, sel["ignore"], sel["deselect"])]
 declared = serial.phase(TREE, declared)
-(LOG / "serial-entries-2.txt").write_text("\n".join(declared) + "\n")
+(LOG / "serial-entries-3.txt").write_text("\n".join(declared) + "\n")
 
 env = dict(os.environ)
 env["PATH"] = "/home/usain/.nvm/versions/node/v22.23.3/bin:" + env["PATH"]
