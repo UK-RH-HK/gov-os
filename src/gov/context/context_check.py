@@ -10,7 +10,8 @@ check is not green: no ticket leaves the measurement unseen. A file whose name
 does not end in ``.md`` and two files that carry one id are named too (W2-M228,
 W2-L219). A store built from another commit than ``HEAD`` is not measured: the
 check says so and is not green, so it never gives a stale store's result for
-the tree's (W2-M294).
+the tree's (W2-M294). Where every ticket whose context was computed refused over
+the ceiling, no packet was built: the check says so and is not green (DEC-1025).
 """
 
 from __future__ import annotations
@@ -129,6 +130,12 @@ def main() -> int:
         return 1
     if not measured:
         print("unmeasured: every ticket's context computation failed")
+        return 1
+    if refused == measured:  # no packet was built twice, so none was compared: never green (S8a, DEC-1025 item 2)
+        print(f"unmeasured: no packet was built: every ticket whose context was computed ({measured}) refused over "
+              f"the ceiling, so no packet's hash was compared")
+        if errors:
+            print(f"context-reproducibility: {failures} ticket(s) failed, {errors} error(s)")
         return 1
 
     if failures or errors:

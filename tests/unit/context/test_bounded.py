@@ -202,18 +202,65 @@ def test_what_is_left_names_only_items_a_batch_read(monkeypatch, tmp_path):
     assert block["further_batch"] == sequence[sequence.index(block["further_batch"][0]):]
 
 
-def test_room_that_ends_on_a_batch_s_last_item_leaves_nothing_named(monkeypatch, tmp_path):
+def _left(block):
+    return [item["id"] for item in block["further_batch"]]
+
+
+def test_room_that_ends_on_a_batch_s_last_item_names_the_next_items_one_batch_long(monkeypatch, tmp_path):
+    # DEC-1025 item 2: the room ends exactly on a stacked item and ranked items remain
     block = _stacked(monkeypatch, tmp_path, [1] * 30, room=3)
     assert [item["id"] for item in block["supplementary"]] == ["R-0", "R-1", "R-2"]
     assert block["supplementary_batches"] == [{"items": [{"id": f"R-{n}", "path": f"f{n}.md"} for n in range(3)],
-                                               "limit": 3}]
-    assert block["further_batch"] == [] and block["dropped"] == []  # no item failed to fit, none unread is named
+                                               "limit": 3}]  # no further batch is taken for them
+    assert block["further_batch"] == [{"id": f"R-{n}", "path": f"f{n}.md"} for n in range(3, 6)]
+    assert block["dropped"] == [{"id": f"R-{n}", "reason": "budget exceeded"} for n in range(3, 6)]
 
 
-def test_no_room_takes_no_batch_and_names_nothing_unread(monkeypatch, tmp_path):
-    block = _stacked(monkeypatch, tmp_path, [1] * 5, room=0)
+def test_room_that_ends_on_a_later_batch_names_at_most_the_largest_limit(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 40, room=12)  # a batch of 10, then one of 2: the room is 0
+    assert [(len(batch["items"]), batch["limit"]) for batch in block["supplementary_batches"]] == [(10, 10), (2, 2)]
+    assert len(block["supplementary"]) == 12
+    assert _left(block) == [f"R-{n}" for n in range(12, 22)]
+    assert [entry["id"] for entry in block["dropped"]] == _left(block)
+
+
+def test_room_that_ends_inside_a_batch_names_the_rest_of_it(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [2, 3, 1, 1, 1], room=5)
+    assert [item["id"] for item in block["supplementary"]] == ["R-0", "R-1"]
+    assert _left(block) == ["R-2", "R-3", "R-4"] and [entry["id"] for entry in block["dropped"]] == _left(block)
+
+
+def test_room_that_ends_with_the_evidence_names_nothing(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 3, room=3)
+    assert len(block["supplementary"]) == 3 and block["further_batch"] == [] and block["dropped"] == []
+
+
+def test_no_room_takes_no_batch_and_names_the_first_batch_size_of_items(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 15, room=0)
     assert block["supplementary_batches"] == [] and block["supplementary"] == []
-    assert block["further_batch"] == [] and block["dropped"] == []
+    assert _left(block) == [f"R-{n}" for n in range(supplementary.BATCH_SIZE)]
+    assert block["dropped"] == [{"id": f"R-{n}", "reason": "budget exceeded"} for n in range(supplementary.BATCH_SIZE)]
+
+
+def test_no_room_and_fewer_items_than_a_batch_names_them_all(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [1] * 4, room=0)
+    assert block["supplementary_batches"] == [] and _left(block) == ["R-0", "R-1", "R-2", "R-3"]
+
+
+def test_no_room_and_no_evidence_names_nothing(monkeypatch, tmp_path):
+    block = _stacked(monkeypatch, tmp_path, [], room=0)
+    assert block["supplementary_batches"] == [] and block["further_batch"] == [] and block["dropped"] == []
+
+
+def test_a_packet_whose_mandatory_part_fills_the_ceiling_names_what_it_left(project):
+    full = ctx.context(project, "TK-1")
+    mandatory = full["tokens"] - sum(item["tokens"] for item in full["supplementary"])
+    packet = ctx.context(project, "TK-1", budget=mandatory)
+    assert packet["tokens"] == mandatory and packet["supplementary"] == []
+    assert packet["supplementary_batches"] == []
+    assert packet["further_batch"] == [{"id": item["id"], "path": item["path"]} for item in full["supplementary"]]
+    assert packet["dropped"] == sorted(({"id": item["id"], "reason": "budget exceeded"} for item in full["supplementary"]),
+                                       key=lambda entry: (entry["id"], entry["reason"]))
 
 
 def _sequence(block):
@@ -282,3 +329,54 @@ def test_a_dependency_body_never_moves_the_tokens_nor_passes_the_ceiling(project
     assert large["tokens"] == short["tokens"] <= large["budget"]["limit"]
     dep = [next(item for item in packet["mandatory"] if item["id"] == "TK-0") for packet in (short, large)]
     assert dep[0]["tokens"] == dep[1]["tokens"] and dep[0]["sha256"] != dep[1]["sha256"]
+
+
+# S5, an emptied mandatory file (DEC-1025 item 1): the store is built from HEAD, the working tree's file is emptied after
+
+
+def _blocked(project, rel, **kwargs):
+    with pytest.raises(GovError) as raised:
+        ctx.context(project, "TK-1", **kwargs)
+    error = raised.value
+    assert error.code == "BLOCKED", error.code
+    assert error.details["unreadable"] == rel[1] and error.details["file"] == rel[0]
+    assert rel[1] in error.message and rel[0] in error.message and "empty" in error.message
+    return error
+
+
+@pytest.mark.parametrize("content", ["", " ", "\n", " \t\n\n\t  \n"])
+def test_an_emptied_capability_file_blocks_and_is_never_read(project, content):
+    (project / "docs/CAP-1.md").write_text(content, encoding="utf-8")
+    _blocked(project, ("docs/CAP-1.md", "CAP-1"))
+
+
+@pytest.mark.parametrize("kwargs", [{"brief": True}, {"brief": True, "dry_run": True}, {"dry_run": True}])
+def test_an_emptied_file_blocks_the_brief_and_the_dry_run_and_writes_no_brief(project, kwargs):
+    (project / "docs/CAP-1.md").write_text("  \n", encoding="utf-8")
+    _blocked(project, ("docs/CAP-1.md", "CAP-1"), **kwargs)
+    assert not (project / ".gov-runtime" / "scratch" / "context").exists()
+
+
+@pytest.mark.parametrize("content", ["", "\n\t \n"])
+def test_an_emptied_dependency_ticket_blocks_and_is_never_read(project, content):
+    _with_dependency(project, "A short body.\n")
+    (project / ".tickets/TK-0.md").write_text(content, encoding="utf-8")
+    _blocked(project, (".tickets/TK-0.md", "TK-0"))
+
+
+def test_an_emptied_file_exits_non_zero_from_the_command(project, capsys, monkeypatch):
+    from gov.cli.main import main
+    from gov.config import loader
+    monkeypatch.setattr(loader, "load_config", lambda root: {})  # the fixture's path map is a store's, not a project's
+    (project / "docs/CAP-1.md").write_text("", encoding="utf-8")
+    for extra in ([], ["--brief"], ["--brief", "--dry-run"]):
+        assert main(["context", "TK-1", *extra, "--json", "--root", str(project)]) != 0
+        envelope = json.loads(capsys.readouterr().out)
+        assert envelope["ok"] is False and envelope["error"]["code"] == "BLOCKED", envelope["error"]
+        assert envelope["error"]["details"]["unreadable"] == "CAP-1"
+
+
+def test_a_file_with_text_after_whitespace_is_still_read(project):
+    (project / "docs/CAP-1.md").write_text("\n\n  A capability, its front matter gone.\n", encoding="utf-8")
+    item = next(item for item in ctx.context(project, "TK-1")["mandatory"] if item["id"] == "CAP-1")
+    assert item["tokens"] == _tokens("\n\n  A capability, its front matter gone.\n")

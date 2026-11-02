@@ -38,7 +38,8 @@ def _tokens(text: str) -> int:
 
 def _read_record(root: Path, record: dict, ticket: str) -> tuple[str, str]:
     """The sha256 and the text of a mandatory record: a register entry's own span and ``content_hash`` (W2-03, AR-1),
-    another record's file; BLOCKED where it cannot be read (never read as empty)."""
+    another record's file; BLOCKED where it cannot be read (never read as empty), and where its file is empty or
+    holds only whitespace, so no longer holds the record the store lists (S5, DEC-1025 item 1)."""
     if record.get("in_register"):
         if not record.get("span") or not record.get("content_hash"):
             raise GovError("BLOCKED", f"mandatory input {record['id']!r}: its span of the register {record['path']} "
@@ -47,12 +48,17 @@ def _read_record(root: Path, record: dict, ticket: str) -> tuple[str, str]:
         return record["content_hash"], record["span"]
     try:
         content = (root / record["path"]).read_bytes()
-        return hashlib.sha256(content).hexdigest(), content.decode("utf-8")
+        text = content.decode("utf-8")
     except (OSError, UnicodeDecodeError) as exc:
         reason = getattr(exc, "strerror", None) or "it is not UTF-8 text"
         raise GovError("BLOCKED", f"mandatory input {record['id']!r}: its file {record['path']} cannot be read "
                                   f"({reason})", {"ticket": ticket, "unreadable": record["id"],
                                                 "file": record["path"]}) from None
+    if not text.strip():  # an emptied file is never shown as read, with the hash or tokens of its emptiness (S5)
+        raise GovError("BLOCKED", f"mandatory input {record['id']!r}: its file {record['path']} is empty (it holds "
+                                  f"no text, or only whitespace), so it no longer holds the record the store lists",
+                       {"ticket": ticket, "unreadable": record["id"], "file": record["path"], "empty": True})
+    return hashlib.sha256(content).hexdigest(), text
 
 
 def _store_query(root: Path, sql: str, params: tuple = ()) -> list:

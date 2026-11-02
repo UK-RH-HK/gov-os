@@ -106,15 +106,55 @@ def test_two_ticket_files_with_one_id_are_a_duplicate_id(project, monkeypatch, c
     assert "duplicate id" in out and "PROJ-aaaa" in out and ".tickets/sub/PROJ-aaaa.md" in out
 
 
-def test_the_same_refusal_twice_is_reproduced_and_named(project, monkeypatch, capsys):
+def _refusing(refused):
+    """A context that refuses over the ceiling for the tickets in ``refused`` and builds a packet for the others."""
     from gov.cli.errors import GovError
-    project([(".tickets/PROJ-aaaa.md", "PROJ-aaaa", "task")])
 
-    def refuse(root, ticket):
-        raise GovError("CONTEXT_OVER_CEILING", "over", {"ticket": ticket, "limit": 6000, "mandatory_tokens": 7000})
-    monkeypatch.setattr(gov.context, "context", refuse)
+    def context(root, ticket):
+        if ticket in refused:
+            raise GovError("CONTEXT_OVER_CEILING", "over", {"ticket": ticket, "limit": 6000, "mandatory_tokens": 7000})
+        return {"hash": "h"}
+    return context
+
+
+def test_the_same_refusal_twice_beside_a_packet_is_reproduced_named_and_green(project, monkeypatch, capsys):
+    project([(".tickets/PROJ-aaaa.md", "PROJ-aaaa", "task"), (".tickets/PROJ-bbbb.md", "PROJ-bbbb", "task")])
+    monkeypatch.setattr(gov.context, "context", _refusing({"PROJ-aaaa"}))
     assert context_check.main() == 0
-    assert "REFUSED: PROJ-aaaa" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "REFUSED: PROJ-aaaa" in out and "green (1 packet(s) built twice alike, 1 refused" in out
+    assert "unmeasured" not in out
+
+
+@pytest.mark.parametrize("tickets", [["PROJ-aaaa"], ["PROJ-aaaa", "PROJ-bbbb"]])
+def test_every_ticket_refused_is_unmeasured_and_never_green(project, monkeypatch, capsys, tickets):
+    # DEC-1025 item 2: no packet was built twice, so none was compared
+    project([(f".tickets/{rid}.md", rid, "task") for rid in tickets])
+    monkeypatch.setattr(gov.context, "context", _refusing(set(tickets)))
+    assert context_check.main() == 1
+    lines = capsys.readouterr().out.splitlines()
+    assert [line for line in lines if line.startswith("REFUSED: ")] == [f"REFUSED: {rid}: 7000 tokens of its own "
+                                                                       f"text and mandatory inputs, over the ceiling "
+                                                                       f"of 6000" for rid in tickets]
+    unmeasured = [line for line in lines if line.startswith("unmeasured:")]
+    assert len(unmeasured) == 1 and "no packet was built" in unmeasured[0]
+    assert not any("green" in line for line in lines)
+
+
+def test_every_computed_ticket_refused_beside_an_error_is_unmeasured_and_red(project, monkeypatch, capsys):
+    from gov.cli.errors import GovError
+    project([(".tickets/PROJ-aaaa.md", "PROJ-aaaa", "task"), (".tickets/PROJ-bbbb.md", "PROJ-bbbb", "task")])
+    refuse = _refusing({"PROJ-aaaa"})
+
+    def context(root, ticket):
+        if ticket == "PROJ-bbbb":
+            raise GovError("BLOCKED", "a mandatory input is missing", {"ticket": ticket})
+        return refuse(root, ticket)
+    monkeypatch.setattr(gov.context, "context", context)
+    assert context_check.main() == 1
+    out = capsys.readouterr().out
+    assert "REFUSED: PROJ-aaaa" in out and "ERROR: PROJ-bbbb" in out and "unmeasured: no packet was built" in out
+    assert "green" not in out
 
 
 def test_another_error_keeps_the_check_red(project, monkeypatch):
