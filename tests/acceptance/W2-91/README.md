@@ -64,8 +64,8 @@ not vacuous.
 
 - **The export half of success 3** ("the export path still refuses the overlay, with a planted export case"). On
   `w2/integrate`, no public command or module reads a namespace's `export_policy`. The only code that reads it is
-  the schema check, `gov.config.path_map_schema`. No stand-in is invented here. The question goes back as a package
-  in the test designer's return.
+  the schema check, `gov.config.path_map_schema`. No stand-in is invented here. DEC-1013 (TD-1 (a)) dropped this
+  clause from success 3; an export command that refuses a `denied` namespace is Wave 3 row W3-P18.
 - **The vector counts per set in success 1**, which are read from the clone's store; **success 6** (W2-61's
   re-measure); and **failure 4** (a figure reported alone, or the hidden half read or run). These need the real
   embedder and built stores. They belong to the lead's measurement record, `docs/changes/W2-91-evidence.md`.

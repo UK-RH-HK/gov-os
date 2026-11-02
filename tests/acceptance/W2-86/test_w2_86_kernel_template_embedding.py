@@ -79,12 +79,20 @@ def test_every_namespace_states_one_of_the_two_values():
     assert {name: value for name, value in stated.items() if value not in VALUES} == {}
 
 
+def _newly_embedded_by_dec_957(rel: str) -> bool:
+    """DEC-957's three sets, embedded later on purpose (W2-91, DEC-1013 TD-2 (a)): the tracked root files, every
+    tracked file under ``governance/**`` and every tracked file under ``schemas/**``. The same definition as W2-91's
+    acceptance tests (``tests/acceptance/W2-91/w2_91_support.py``, ``newly_embedded_area``)."""
+    return "/" not in rel or rel.startswith(("governance/", "schemas/"))
+
+
 def test_guard_outside_template_every_verdict_as_at_the_base(tmp_path):
     base = tmp_path / "base"
     (base / PROJECT_DIR).mkdir(parents=True)
     text = subprocess.run(["git", "show", f"{BASE}:{PATH_MAP}"], cwd=ROOT, check=True, capture_output=True).stdout
     (base / PATH_MAP).write_bytes(text)
-    outside = _tracked(inside=False)
+    outside = [rel for rel in _tracked(inside=False) if not _newly_embedded_by_dec_957(rel)]
+    assert outside, "no tracked path outside template/ is left to compare: the case would pass vacuously"
     head_db, base_db = tmp_path / "head", tmp_path / "base-db"
     head_db.mkdir(), base_db.mkdir()
     head, before = _selected(ROOT, outside, head_db), _selected(base, outside, base_db)
