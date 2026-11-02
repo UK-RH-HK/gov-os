@@ -19,6 +19,8 @@ allowed_paths:
 - src/gov/retrieval/rerank.py
 - src/gov/retrieval/rerank_worker.py
 - src/gov/retrieval/rerank_service.py
+- src/gov/retrieval/retrieve.py
+- src/gov/status/command.py
 - tests/unit/retrieval/test_w2_112*
 - docs/research/W2-112-shared-reranker.md
 kpis:
