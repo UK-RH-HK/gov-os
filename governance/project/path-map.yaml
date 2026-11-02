@@ -420,6 +420,8 @@ accepted_history:
 acceptance_exemptions:
   - commit: "c9a08678644485a7528bc875164e110881b63d93"
     decision: DEC-900
+  - commit: "0568d91baf566b4d8f3ccb448e51af41cbb46d03"
+    decision: DEC-1031
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
