@@ -45,3 +45,6 @@
 2026-11-02 02:36:30 guard harvest: rc 0 in 25.3 s
 2026-11-02 02:47:54 guard harvest: rc 0 in 103.2 s
 2026-11-02 02:48:07 guard refusals: 1 new
+2026-11-02 02:58:01 guard harvest: rc 0 in 52.1 s
+2026-11-02 03:08:40 guard harvest: rc 0 in 35.4 s
+2026-11-02 03:17:06 return: W2-123-A5-run1.json -> inbox/20261102-031706-W2-123-A5-run1.txt

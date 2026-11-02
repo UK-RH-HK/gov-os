@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: `/usr/bin/git commit -q -m the hooked change` in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-38/test_a_refusing_hook_in_a_link0/wt did not end within 90 s and was stopped with every process it started.
+    --- stdout
+    
+    --- stderr
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-05/w2_05_support.py:284: AssertionError: `/usr/bin/git commit -q -m the hooked change` in /tmp/gov-os-lead-W2-123/pytest-of-usain/pytest-38/test_a_refusing_hook_in_a_link0/wt did not end within 90 s and was stopped with every process it started.
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-05/test_w2_05_linked_worktree.py::test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change
+1 failed in 90.66s (0:01:30)

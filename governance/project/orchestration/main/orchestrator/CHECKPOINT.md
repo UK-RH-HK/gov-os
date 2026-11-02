@@ -53,6 +53,9 @@ The landing batch found an owned W1-08 probe-schema red at 02:01 (W2-11's or W2-
 re-running cases alone; no hold of its own; left running. All in `drafts/P1-MORNING-2026-11-02.md` (scratch until the
 nightly starts; then copy to `packages/`). **After the nightly's verdict:** re-close W2-05 + W2-96 against it (rec (a));
 W2-55 back for its table + P-W2-55-HOOK. Inbox waiter re-armed 02:52.
+**03:17:** W2-123 DONE (verified `17d88232b287`, head `9bb92097c811`): added to `dispatch/land.txt` (held for the
+nightly); its three P1s (Ollama `-np 1`; embedder not bit-reproducible; the query server starved: an ACT for its own
+CPUs, first) in the morning draft §5. Leads now 1 (W2-122). Waiter re-armed 03:17.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

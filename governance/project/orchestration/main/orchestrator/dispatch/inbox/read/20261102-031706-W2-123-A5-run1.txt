@@ -1,0 +1,7 @@
+log: W2-123-A5-run1.json
+W2: W2-123
+status: DONE. The verified head is `17d88232b287`. The branch head `9bb92097c811` adds only the lead's checkpoint record. All 7 KPI lines pass (39 of 39 acceptance tests). Three packages go to the owner; none blocks the landing.
+
+I've returned DONE on W2-123 with three packages for the owner. The code works and passes all its own tests. But the ticket's main aim, faster embedding through parallel requests, can't be reached with the installed Ollama: it runs this model one request at a time, whatever it is told. My scoped run also has 10 red tests and `gov check` exits 3. I traced all of them to the base or the machine, not to this change, but the merge queue's run will likely hit the timeouts again.
+
+task: W2-123 (DAEO-qzrq), run 1, STANDARD. Let both embedding servers serve parallel requests within their CPU cap from 
