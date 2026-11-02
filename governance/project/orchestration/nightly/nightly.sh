@@ -107,6 +107,14 @@ PLUG=$CLONE/src/gov/close/pytest_plugin
 # One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 builds it into gov rebuild).
 # The nightly's rebuild scans every file in full (DEC-966 item 4, W2-107): GOV_SECRETS_FULL_SCAN=1 reads nothing from
 # the machine's secrets-scan cache and refreshes it. Only the rebuild: the suites keep their own cache settings.
+# DEC-1032 (iv): no cold rebuild. The clone is first seeded with the integration store's vectors only (the CTO's
+# seed_store.py --vectors-only: the record store, the lexical index and every secrets judgement are still built by
+# the clone's own code with the full scan; only chunks with no vector are embedded). A seed that cannot be applied is
+# named in run.txt and the rebuild runs cold, as before; no seeder, no seed.
+SEED=${NIGHTLY_SEED:-$ORCH/tools/seed_store.py}
+if [ -f "$SEED" ]; then
+  echo "$(python3 "$SEED" seed "$CLONE" --vectors-only --who nightly 2>&1 | tail -1)" >> "$OUT/run.txt"
+fi
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
   > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
 echo "clone rebuilt" >> "$OUT/run.txt"
