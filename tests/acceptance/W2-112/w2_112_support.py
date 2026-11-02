@@ -27,8 +27,9 @@ Everything runs on any machine, in a sandbox, with no model, no GPU and no netwo
 The interface the tests rely on, beyond the base's public ``gov.retrieval.rerank`` (each one constant below):
 the socket's place and the one-line request ``[query, [text, ...]]`` answered by one line of scores, both from
 P-RERANKER-1; the idle and time-limit settings (DEC-1034 item 3); the GPU slot rule's settings and lock files
-(ACT-RERANK-WAIT-1, KPI 7); the fallback log and the CPU alert in a file under ``~/.cache/gov-os/`` (DEC-1034
-item 3); the bundle's ``rerank`` entry (DEC-1034 item 2).
+(ACT-RERANK-WAIT-1, KPI 7), which the service obeys too (DEC-1036 T6 (b): it holds one of the two slots); the
+fallback log with its reason in a file under ``~/.cache/gov-os/`` (DEC-1034 item 3); the bundle's ``rerank`` entry
+(DEC-1034 item 2). No reranker loads on the CPU anywhere (DEC-1033, DEC-1036 T5 (b)).
 """
 
 from __future__ import annotations
@@ -59,7 +60,7 @@ REVISION = "e61197ed45024b0ed8a2d74b80b4d909f1255473"
 VENV_REL = ".local/share/gov-os/reranker-venv"
 PYTHON_REL = f"{VENV_REL}/bin/python"
 SOCKET_REL = ".cache/gov-os/rerank.sock"            # P-RERANKER-1: "~/.cache/gov-os/rerank.sock, mode 0600"
-CACHE_REL = ".cache/gov-os"                         # DEC-1034 item 3: the fallback log and the CPU alert live here
+CACHE_REL = ".cache/gov-os"                         # DEC-1034 item 3: the fallback log, with its reason, lives here
 # ---- the two settings a test needs to see an idle end and a time limit within a minute (DEC-1034 item 3, T1)
 IDLE_SETTING = "GOV_RERANK_IDLE_S"                   # seconds without a request before the service ends itself
 TIMEOUT_SETTING = "GOV_RERANK_TIMEOUT_S"             # a request's time limit, in seconds
@@ -512,8 +513,47 @@ class Box:
 
         for number in numbers or range(SLOTS):
             descriptor = os.open(self.locks / LOCK_NAME.format(number), os.O_CREAT | os.O_RDWR, 0o600)
-            fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                os.close(descriptor)
+                raise
             self._held.append(descriptor)
+
+    def hold_free_slots(self) -> list[int]:
+        """Hold every GPU slot that no one holds now; the numbers taken."""
+        import fcntl
+
+        taken = []
+        for number in range(SLOTS):
+            descriptor = os.open(self.locks / LOCK_NAME.format(number), os.O_CREAT | os.O_RDWR, 0o600)
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                os.close(descriptor)
+                continue
+            self._held.append(descriptor)
+            taken.append(number)
+        return taken
+
+    def slots_held(self) -> int:
+        """How many GPU slots in the box's lock folder are held now, by anyone (this test's own count too)."""
+        import fcntl
+
+        held = 0
+        for number in range(SLOTS):
+            try:
+                descriptor = os.open(self.locks / LOCK_NAME.format(number), os.O_RDWR)  # never creates a slot
+            except OSError:
+                continue
+            try:
+                fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+            except OSError:
+                held += 1
+            finally:
+                os.close(descriptor)
+        return held
 
     def release_slots(self) -> float:
         """Release every slot this test holds; the moment it did, as ``time.time()``."""
@@ -538,7 +578,7 @@ class Box:
 
     def cache_texts(self, since: float) -> list[str]:
         """Every file under ``~/.cache/gov-os/`` written since ``since`` (the planted blocker left out), as
-        ``path: text``: where the fallback log and the CPU alert go (DEC-1034 item 3)."""
+        ``path: text``: where the fallback log goes, with its reason (DEC-1034 item 3, DEC-1036)."""
         found, folder = [], self.home / CACHE_REL
         for path in sorted(folder.rglob("*")) if folder.is_dir() else []:
             if path == self.socket or self.socket in path.parents:
