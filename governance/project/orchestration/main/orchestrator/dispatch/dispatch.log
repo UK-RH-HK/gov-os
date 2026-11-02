@@ -59,3 +59,10 @@
 2026-11-02 04:33:38 embedding server: HUNG since 2026-11-02 04:31:41 (no answer in 30 s)
 2026-11-02 04:34:07 guard harvest: rc 0 in 62.2 s
 2026-11-02 04:38:04 land finished: {'W2-90b=73c18fea1e1f': 'not landed (still approved)', 'W2-123=9bb92097c811': 'not landed (still approved)'}
+2026-11-02 04:41:25 embedding server: answering again after HUNG since 2026-11-02 04:31:41
+2026-11-02 04:44:25 guard harvest: rc 0 in 20.9 s
+2026-11-02 04:54:21 guard harvest: rc 0 in 15.1 s
+2026-11-02 05:05:45 guard harvest: rc 0 in 38.0 s
+2026-11-02 05:16:34 embedding server: HUNG since 2026-11-02 05:14:36 (no answer in 30 s)
+2026-11-02 05:16:37 guard harvest: rc 0 in 33.1 s
+2026-11-02 05:17:19 embedding server: answering again after HUNG since 2026-11-02 05:14:36

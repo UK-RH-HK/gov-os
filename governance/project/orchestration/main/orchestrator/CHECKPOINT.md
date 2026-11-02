@@ -61,6 +61,9 @@ nothing landed. Culprit of its owned reds: **W2-81** (both probe records fail `p
 undone): back to its lead. Dispatcher batch of five started 04:33 (`land-dispatch-20261102-043305.out`). Embedding
 servers hung/overloaded since 04:31 (11434 reloading its model; 11435's runner 490 % CPU for ~5 h); a background
 probe (task bydgl3oz2) watches; no restart (caps would be lost; the owner's). Waiter re-armed 04:45. Draft §6.
+**05:20:** batch of five STOPPED 04:37 (prepare failed: the server). Shared server flapping (HUNG 05:14). W2-81
+ejected by hand (`merge-queue/ejected/W2-81.json`); its records-only repair `briefs/W2-81-A5-r4-records.md` on the ready
+list. The four others stay approved; the dispatcher retries.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="1368.019" timestamp="2026-11-02T04:53:32.305423+00:00" hostname="Usain"><testcase classname="tests.acceptance.W2-69.test_w2_69_deleted_text_after_rebuild" name="test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild" time="22.936" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[dot-from-the-project]" time="20.476" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[a-relative-path-from-its-parent]" time="20.884" /><testcase classname="tests.acceptance.W2-54.test_w2_54_green_here" name="test_gov_check_gives_context_reproducibility_green_here" time="1303.513"><failure message="AssertionError: context-reproducibility is RED here: [{&quot;code&quot;: &quot;CHECK_FAILED&quot;, &quot;message&quot;: &quot;context-reproducibility did not end within its time limit of 600 seconds&quot;}]&#10;assert 'RED' == 'GREEN'&#10;  &#10;  - GREEN&#10;  + RED">gov_check_here = (&lt;w2_54_support.Run object at 0x75bb762578c0&gt;, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': 'bd50a9581893b46b2b091de5d94c10afffb55a6a', 'inputs_hash': 'd88859ce29c6103d'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN. In a close,
+        that ``gov check`` is gate (b)'s, whose output the close hands this run (README, "W2-75").
+    
+        Since W2-85 the case runs in the nightly, not in a close: ``serial-only.txt`` lists it as ``nightly:
+        real-model`` (README, "W2-85 (DEC-951 item 3)"). Rewrite-Reason: DEC-951 item 3."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+&gt;       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "context-reproducibility did not end within its time limit of 600 seconds"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:42: AssertionError</failure></testcase></testsuite></testsuites>

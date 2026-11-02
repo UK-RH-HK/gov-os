@@ -2,3 +2,5 @@
 latest start 04:53
 head 9d605eba20a2
 clone rebuilt
+gate: OPEN full-run leads=1 load=19.0/39.0 nproc=20 have=14752324kB need=12690456kB
+heavy-job slots held: 2 of 3 (waited 1 s)

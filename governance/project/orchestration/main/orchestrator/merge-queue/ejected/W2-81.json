@@ -1,0 +1,19 @@
+{
+ "ticket": "W2-81",
+ "task": "DAEO-l78m",
+ "branch": "w2/W2-81",
+ "commit": "166f459f4b5c159796d87536fbf2f0b1f9f2c732",
+ "requested_at": "2026-11-01 21:56:22",
+ "approved_by": "CTO",
+ "approved_at": "2026-11-01T21:56:22.435128",
+ "reason": "red",
+ "ejected_by": "CTO (by hand, 2026-11-02 05:20)",
+ "failing": [
+  "tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records",
+  "tests/acceptance/W1-26/test_w1_26_probe_records.py (no finding names a probe record)",
+  "tests/acceptance/W2-02/test_w2_02_green_here.py::test_core_schema_is_green_on_this_repository"
+ ],
+ "evidence": "reproduced 04:40 on W2-81 head 166f459f4b5c alone: PR-DAEO-l78m-moderated.md not valid YAML; both probe records fail probe.schema.json; W2-11 records pass. First batch log 20261101-215622-556386: owned 3/3 with, 0/3 without.",
+ "log": "log/20261101-215622-556386",
+ "tested_on": "e639b83908c8"
+}
