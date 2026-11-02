@@ -47,3 +47,6 @@ Nothing is lifted before the owner decides (DEC-1047). DEC-1010 stays, whatever 
    procedure (`gov accept` and the two worktrees, G-14).
 6. **What it blocks, and what waiting costs.** It blocks DEC-1039's steps 2 (the refactor), 3b (the WBS refactor and the
    new estimate for EXAMIN's copy) and the restart of ticket work; waiting keeps every cost above while the freeze holds.
+
+## Addendum (2026-11-02 22:18, the CTO)
+- **O-A1, the dispatcher's older memory admission double-counts** (found by the Load Balancer's first T1 incident, `log/incidents/2026-11-02-2217-T1.md`): the "slots rule" reserves each heavy slot's peak on top of the memory the running slot jobs already hold, so at 22:17 it refused W2-112's lead with "-2580 MB of room" while 15.9 GB was free and the forecast admitted it. Recommendation: lift the slots rule; the Load Balancer's forecast (memory above the floor, per-phase peaks) is the admission. Cost to lift: a few lines and their tests in the dispatcher. W2-112 was started past it on the owner's DEC-1048 order (`tools/start_owner_order.sh`, 22:17:55).
