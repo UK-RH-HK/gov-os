@@ -1,0 +1,8 @@
+W2-11 (DAEO-k7hz, STANDARD) at c9f99b28b88b: pre-check passed
+W2-105 (DAEO-zpdj, STANDARD) at fa653609cc93: pre-check passed
+W2-90b (DAEO-nqa2, LITE) at 73c18fea1e1f: pre-check passed
+W2-81 (DAEO-l78m, FULL) at e78e6af7530d: pre-check passed
+W2-91 (DAEO-a3u2, STANDARD) at 55b47e075b3b: pre-check passed
+W2-92 (DAEO-n0wb, STANDARD) at 448a835a9dca: pre-check passed
+W2-104 (DAEO-drhj, STANDARD) at 909d7ff0a926: W2-104: gitleaks found a leak in its change
+REFUSED before anything was queued: W2-104: gitleaks found a leak in its change

@@ -2,18 +2,23 @@
 
 ## State
 - Run 2 under DEC-1027 C: K5 moved to W2-124. Run 1's verified code head bd50a9581893; run 1 record 3c8a6f448ce8.
-- Merged w2/integrate (42dad22ddb30) into w2/W2-122: 5e789d623 (clean, --no-ff, Task/Role trailers).
-- Tests worktree recreated: /home/usain/gov-os-worktrees/W2-122-tests, branch w2/W2-122-tests from 5e789d623.
-- Running (launched together, gov launch, sandboxed): td-3 (retire the 4 K5 cases + README map, Rewrite-Reason: DEC-1027 C)
-  in the tests worktree; eng-7 (take out REBUILD_FAILED store:semantic; no stores.json record when semantic not recreated)
-  here. Tripwire snapshot: tripwire-before-9.json (both).
-- Loop: converged in run 1; run 2 iteration 1.
+- Commits this run: 5e789d62395f merge w2/integrate (lead); 6bcb7dfaa4ee test designer (K5 retired, Rewrite-Reason:
+  DEC-1027 C); 60ec3379dd43 engineer (REBUILD_FAILED out; stores.json only where semantic recreated); b4b75bce02b5 merge
+  of tests (lead). Tests worktree + branch removed. TESTS-READY rewritten.
+- td-3 and eng-7 returned DONE, twelve fields, sandboxed (gov launch), sandbox check passed both.
+- Tripwire 9: main tree head 2536346b8711->f614ec78ff73 and W2-00-record head moved (orchestrator, not workers);
+  W2-122 head + untracked pytest-of-usain/ (engineer's tests, sandbox TMPDIR read-only -> fallback to worktree; 4.4M,
+  802 inodes; rm refused for engineer twice and for lead once: needs approval) ; W2-122-tests head + acceptance W2-122.
+- gov accept DAEO-blwa: pass, 22/22, success-1..4 + failure-1.
+- select_tests: scoped, core_changed [], unplaced [], 39 selected, 181 options. Output in /tmp/gov-os-lead-W2-122/run2/.
+- Rebuild (rebuild_slot) running -> run2/rebuild.exit. Then verify2.py parallel, then serial (3 cases).
 
 ## Next
-1. When both return: tripwire compare; check commits' trailers; merge w2/W2-122-tests (--no-ff, msg file); TESTS-READY.
-2. gov accept DAEO-blwa (lead, one process). 3. rebuild_slot, select_tests, scoped parallel + serial via verify_lock,
-   output outside the worktree (/tmp/gov-os-lead-W2-122/run2/). 4. collect-only, trailer_gate, keyword_warn, gov check.
-5. Remove tests worktree + branch. gov checkpoint record, commit. Return DONE with exact head.
+- parallel + serial via /tmp/gov-os-lead-W2-122/run2/verify2.py; compare reds to run 1 (100 K5 reds should be gone).
+- collect-only, trailer_gate, gov check (heavy_slot). gov checkpoint record + commit. Return DONE.
 
 ## Brief gaps (running list)
-- run 1's briefs td-1/eng-1 are untracked scratch here; the tests worktree has no copy (td-3 restates the rules).
+- run 1's briefs are untracked scratch; the tests worktree has no copy (td-3 restated the rules).
+- TMPDIR=/tmp/gov-os-lead-W2-122 is read-only inside gov launch's sandbox: tests fall back to the worktree (pytest-of-usain/).
+- The lead cannot rm a worker's stray temp folder (permission prompt).
+- Writes to .gov-runtime/scratch/td/ refused for the test designer in its sandbox.

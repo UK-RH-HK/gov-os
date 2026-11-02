@@ -1,5 +1,5 @@
 {
- "time": "2026-11-02 10:58:01",
+ "time": "2026-11-02 11:16:08",
  "leads": [
   "W2-04",
   "W2-122",
@@ -8,19 +8,17 @@
  ],
  "lead_count": 4,
  "load": [
-  10.13,
-  11.16,
-  12.57
+  27.91,
+  19.48,
+  15.4
  ],
- "mem_available_mb": 18089,
+ "mem_available_mb": 15066,
  "gate_open": true,
- "gate": "OPEN leads=4 load=10.1/12.6 nproc=20 have=20175064kB need=13846908kB",
+ "gate": "OPEN leads=4 load=27.9/15.4 nproc=20 have=18610072kB need=13846908kB",
  "disk_open": true,
- "disk": "disk gate open: 844 GiB free, 64348182 inodes free",
+ "disk": "disk gate open: 844 GiB free, 64346423 inodes free",
  "slots_held": [
-  "gov-os-heavy-slot-1.lock",
-  "gov-os-heavy-slot-2.lock",
-  "gov-os-heavy-slot-3.lock"
+  "gov-os-heavy-slot-1.lock"
  ],
  "land_running": false,
  "close_running": false,
@@ -36,22 +34,23 @@
   "DAEO-blwa"
  ],
  "lead_rss_kb": {
-  "W2-61h": 368008,
-  "W2-04": 448444,
-  "W2-123": 419512,
-  "W2-122": 415236
+  "W2-61h": 2097152,
+  "W2-04": 284268,
+  "W2-123": 281608,
+  "W2-122": 520820
  },
  "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 19 min, /home/usain/gov-os-worktrees/W2-61h)",
-  "python3 -m gov.cli.main check (pid 3871460, 8 min, /home/usain/gov-os-worktrees/W2-61h)"
+  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 36 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "python3 -m gov.cli.main check (pid 3914946, 13 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3930069, 9 min, /home/usain/gov-os-worktrees/W2-61h)"
  ],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1217396,
+  "embedding": 3601900,
   "codegraph": 0
  },
- "busy_cores": 8.43,
- "embedding_cores": 8.12,
+ "busy_cores": 16.76,
+ "embedding_cores": 12.66,
  "cpu_measuring": false,
  "nproc": 20,
  "rerankers_outside_kb": 0,
@@ -62,73 +61,56 @@
   "lead_max_mb": 9580
  },
  "admit": false,
- "admit_reason": "a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 19 min, /home/usain/gov-os-worktrees/W2-61h)",
+ "admit_reason": "a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 36 min, /home/usain/gov-os-worktrees/W2-61h)",
  "inbox_unread": 0,
  "inbox_oldest_age_s": null,
  "started_this_tick": null,
  "ready_waits": {
-  "W2-123 DAEO-qzrq": "embedding server hung: starts held (DEC-1015)",
-  "W2-04 DAEO-u4oz": "embedding server hung: starts held (DEC-1015)",
-  "W2-122 DAEO-blwa": "embedding server hung: starts held (DEC-1015)",
-  "W2-66b DAEO-zuiy": "embedding server hung: starts held (DEC-1015)",
-  "W2-81 DAEO-l78m": "embedding server hung: starts held (DEC-1015)",
-  "W2-92 DAEO-n0wb": "embedding server hung: starts held (DEC-1015)",
-  "W2-104 DAEO-drhj": "embedding server hung: starts held (DEC-1015)",
-  "W2-61h DAEO-h2k3": "embedding server hung: starts held (DEC-1015)",
-  "W2-91 DAEO-a3u2": "embedding server hung: starts held (DEC-1015)"
+  "W2-123 DAEO-qzrq": "running",
+  "W2-04 DAEO-u4oz": "running",
+  "W2-122 DAEO-blwa": "running",
+  "W2-66b DAEO-zuiy": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 36 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "W2-55 DAEO-arrl": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 3794318, 36 min, /home/usain/gov-os-worktrees/W2-61h)",
+  "W2-81 DAEO-l78m": "already started for W2-81-A5-r4-records.json",
+  "W2-92 DAEO-n0wb": "already started for W2-92-A5-run3-dec1019.json",
+  "W2-104 DAEO-drhj": "already started for W2-104-A5-run2-dec1020.json",
+  "W2-61h DAEO-h2k3": "running",
+  "W2-91 DAEO-a3u2": "already started for W2-91-A5-td.json"
  },
- "land": "nothing to land",
+ "land": "started",
  "land_pending": [],
  "new_returns": [],
  "last_start": "2026-11-02 10:39:08 W2-122",
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 10:50:18",
+  "at": "2026-11-02 11:11:37",
   "rc": 0,
-  "secs": 13.0,
+  "secs": 32.1,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 72 total, 68 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 767,
-  "last_check_at": 1793617114.742901,
-  "last_result": "timeout",
-  "last_secs": 33.4,
-  "last_why": "no answer in 30 s",
-  "fails": 5,
-  "first_fail_at": 1793616878.550163,
-  "hung_since": 1793616878.550163,
-  "last_ok_at": 1793616810.041147,
-  "state": "HUNG"
+  "passes": 785,
+  "last_check_at": 1793618169.0650063,
+  "last_result": "ok",
+  "last_secs": 0.25,
+  "last_why": "",
+  "fails": 0,
+  "first_fail_at": null,
+  "hung_since": null,
+  "last_ok_at": 1793618169.0650113,
+  "state": "healthy"
  },
  "slot_holders": [
   {
    "slot": "1",
-   "pid": 3902161,
-   "cpu": 765,
-   "since": 1793617059.0638564,
+   "pid": 3966726,
+   "cpu": 682,
+   "since": 1793618169.0921376,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m gov.cli.main rebuild --json",
    "cwd": "/home/usain/gov-os-worktrees/W2-122"
-  },
-  {
-   "slot": "2",
-   "pid": 3835744,
-   "cpu": 755,
-   "since": 1793617059.0639155,
-   "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m gov.cli.main rebuild --json",
-   "cwd": "/home/usain/gov-os-worktrees/W2-04"
-  },
-  {
-   "slot": "3",
-   "pid": 3837482,
-   "cpu": 693,
-   "since": 1793617059.0639517,
-   "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m gov.cli.main rebuild --json",
-   "cwd": "/home/usain/gov-os-worktrees/W2-123"
   }
  ]
 }

@@ -112,6 +112,11 @@ proposal's commit; append mode); **TODO when it returns: wire its append command
 use it for every register entry.** A: the load-balancing plan: `tools/lb_measure.py` runs 10:57-11:57
 (`log/lb/hour-20261102.*`); sections a-d drafted by a research subagent into `drafts/LB-PLAN-sections-a-d.md`; the CTO
 writes e and f, then the package `packages/P1-LOAD-BALANCE-1.md`.
+**11:18 (owner) DEC-1029 `39e3c16f`:** ROOT CAUSE of the night: the shared embedder fell off the GPU at 04:33 (CUDA
+crashes 02:36, 04:31; 8-10 rerankers on the GPU; 0/29 layers). Reloaded 11:15 (runner ended, serve kept, caps kept):
+29/29 on the GPU, about 26 chunks/s at batch 32; dispatcher health 1.96 s. **Standing until the plan: alert the
+owner on any `offloaded 0/N layers` or `CUDA error` in serve-11434.log** (background watch task b7ulw6ru4; re-arm after
+it fires). The seven ready relisted to `land.txt` at 11:18 (they no longer wait for W2-123's retry).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
