@@ -12766,3 +12766,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.406 | 2026-11-02 | Orchestrator (delegated): DEC-1024. Next free id: DEC-1025. |
+
+### DEC-1025 — W2-04's review 1: one repair round for F1, F2 and F3 riding along (delegated)
+- **Status:** ACCEPTED (orchestrator as moderator, delegated under DEC-1010 item 1 and DEC-936 item 2.5: P2 inside W2-04's KPIs, the lead's recommendations, confidence high; for the owner to overturn) · **Under:** DEC-1010, DEC-802, DEC-136, DEC-860, DEC-1014
+- **Decision:** Review 1 of W2-04 at `b37b5c8f1741` failed on F1 (in scope, ordinary work yes, fails open: a mandatory file or dependency ticket emptied in the working tree is shown as read with the empty-content hash and 0 tokens; KPI 5, row W2-H034). (1) P-W2-04-6 (a): one repair round, the last before the owner: a test-design batch gets F1 as a described behaviour (emptied or whitespace-only mandatory file or dependency ticket: BLOCKED naming the id and file, or `read: false`); a fresh engineer fixes it inside `src/gov/context/**`; `gov accept`; the scoped run once; review 2 with a different model or effort. (2) P-W2-04-8 (a): F2 rides along (`further_batch` names the first ranked item not stacked on an exact fit or zero room, S7a as written; the designer revises round 2's case with `Rewrite-Reason`). F3 rides along (the check says unmeasured, not green, when every ticket refuses). (3) F5 and F6 are Wave 3 rows. (4) P-W2-04-7 (31 tickets refuse at the default ceiling; a follow-up ticket moving the context gate before the close's runs) goes to the owner (a new ticket, DEC-974). DEC-960 is already marked superseded by DEC-961 on `w2/integrate` (the reviewer read W2-04's older base).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.407 | 2026-11-02 | Orchestrator (delegated): DEC-1025. Next free id: DEC-1026. |
