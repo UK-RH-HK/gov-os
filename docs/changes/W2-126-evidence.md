@@ -83,6 +83,30 @@ files (12 chunks). "Before" gives every rebuild a fresh empty cache folder (the 
 - **The retrieval check:** each later `gov check` sends none of the dev tiers' chunks and none of the 52 questions
   (acceptance `test_w2_126_dev_tiers.py`); before, every check embedded both tiers cold.
 
+## Test results (head `b32fdb80f5fc`, through the confined gate)
+
+- `gov accept DAEO-jpr0`: **pass, 17/17**; every mapped line passes (success-1 to success-6, failure-1 to failure-3).
+- Builder tests: `tests/unit/retrieval/test_w2_126_vector_cache.py` 14/14. Each test now has its own
+  `GOV_VECTOR_CACHE_DIR` (`tests/conftest.py`, DEC-1042), so no test is served another's stand-in vectors and none
+  writes the user's own cache; the five builder files that embed in-process pass (76 cases), two of them revised to the
+  behaviour in force (`test_semantic_query_vector.py`, `test_w2_108_freshness_once.py`).
+- The scoped set at `fa137d75b86f`: 4,647 passed, 42 failed, 26 errors, 9 skipped; none in `tests/unit`. The reds:
+  - **Not caused by this change:**
+    - W1-19 (22) and W2-108 (20 errors): their fixtures need gitleaks (`FileNotFoundError: 'gitleaks'` in the
+      lexical refresh). They run only in the nightly under DEC-1045.
+    - W2-59 (4): the test project's `.claude/hooks/pretooluse.py` is missing. These four are red on the 2026-11-02
+      nightly's baseline (known).
+  - **W2-54 (22):** rerun after the test designer's revision (DEC-1042), below.
+- `tests/acceptance/W2-54/` with `-m "not local_only and not shared_gpu"`, after the merge: 99 passed, 3 failed.
+  - `test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here` and
+    `test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit`:
+    `gov check` on this worktree reads its store, which predates the merge ("DAEO-1vka: … the store holds no record
+    of … the store was loaded before it"). The worktree's store is stale; this change does not cause it.
+  - `test_w2_54_query_cache.py::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state`: **caused by this
+    change.** Its premise ("the context left no cache file to make read-only") expects `gov context` to leave the
+    tree's query-vector file. With the machine-wide cache, a question it already holds is served from there, and
+    nothing is written in the tree.
+
 ## Limits
 
 - The WAL file can hold up to about 4 MiB (`journal_size_limit`) beyond the bound while connections are open.
