@@ -27,6 +27,7 @@ from gov.cli.errors import GovError
 from gov.retrieval import authority, code_route, graph_route, lexical, semantic
 from gov.retrieval.fusion import RERANK_CHARS, rrf
 from gov.retrieval.rerank import rerank
+from gov.store import loader
 
 CLOSURE = "closure"
 SATURATED, BUDGET_EXHAUSTED = "SATURATED", "BUDGET_EXHAUSTED_WITH_GAPS"
@@ -41,6 +42,25 @@ MUST_NOT_CITE_STATUSES = frozenset({"DEPRECATED", "REJECTED", "WITHDRAWN"})
 AHEAD_TYPES = frozenset({"failure", "lesson"})
 # What sqlite raises for a store that cannot be opened, holds no record graph or is no database; no fault of a query
 STORE_FAULTS = (sqlite3.OperationalError, sqlite3.DatabaseError)
+NO_RECORD_GRAPH = "the record graph is unreadable, so whether this record is current cannot be judged"  # DEC-1019
+
+
+def _declares_record(root: Path, rel: str) -> str | None:
+    """The id a file's front matter declares, read as the store's loader reads a record; None for no record."""
+    try:
+        front = loader._frontmatter((root / rel).read_text(encoding="utf-8", errors="replace"))
+    except (OSError, ValueError):
+        return None
+    return str(front["id"]) if isinstance(front, dict) and "id" in front else None
+
+
+def _named_register(root: Path) -> str | None:
+    """The register the path map names under the loader's key, read without the record graph; None for none."""
+    try:
+        named = yaml.safe_load((root / loader.PATH_MAP_REL).read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return None
+    return named.get(loader.REGISTER_KEY) if isinstance(named, dict) else None
 
 
 def _graph(root: Path) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
@@ -124,9 +144,12 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         if type(error) not in STORE_FAULTS:
             raise  # a fault that is not the store's is no unavailable route
         missing = str(error).startswith("no such table")
-        unread = f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure"
+        unread = (f"the record store is {'missing' if missing else 'unreadable'}: {error}; no record route or closure;"
+                  " record files are left out, as their currency cannot be judged without the record graph")
         record_of, not_current, record_types, known, edges = {}, {}, {}, [], []
     register, entry_of = authority.register_path(known), authority.register_entries_of(known, edges, root)
+    if unread is not None:
+        register = _named_register(root)  # DEC-1019: the register, known without the graph, is left out too
     order = (authority.order(root, known, edges, entry_of) if unread is None  # DEC-952 item 1: retrieval_authority
              else authority.Order(None, known, edges, entry_of))  # no record graph: no authority order (DEC-1006)
     answers = {lexical.FACET: lexical.search(root, query, refresh=False),
@@ -207,6 +230,14 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
         # W2-87: a register chunk is never dropped for another entry's status, and its own entry's drops nothing
         # new here: leaving entries out is W2-55's (DEC-791 item 1)
         in_register = chunk["path"] == register
+
+        # DEC-1019: without the record graph no record is judged current, so no record file is cited at all
+        if unread is not None:
+            declared = None if in_register else _declares_record(root, chunk["path"])
+            if in_register or declared is not None:
+                dropped.setdefault(chunk["path"], {"path": chunk["path"], "id": declared or chunk["path"],
+                                                   "reason": NO_RECORD_GRAPH})
+                continue
 
         # DEC-329, G-19: superseded records
         if not in_register and record_id is not None and record_id in not_current:
