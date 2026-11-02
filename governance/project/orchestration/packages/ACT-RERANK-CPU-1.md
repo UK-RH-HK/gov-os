@@ -1,3 +1,5 @@
+**SUPERSEDED by ACT-RERANK-GPU-SLOTS-1 (2026-11-02, DEC-1031 item 2): a reranker on the CPU takes over 100 s a query. Applied by mistake and undone by the owner's operator; do not apply.**
+
 # ACT-RERANK-CPU-1: no reranker can push the embedder off the GPU (DEC-1031 item 2)
 
 For the owner's operator (a plain command; it writes one file in your reranker environment under `~/.local/share`,
