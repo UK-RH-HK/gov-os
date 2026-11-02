@@ -1,0 +1,8 @@
+log: W2-04-A5-verify.json
+W2: W2-04
+status: DONE at `b37b5c8f1741`. This ticket's own tests pass. The one red this ticket caused (W2-05's git sweep) was fixed by a fresh engineer. The four other reds and the two red checks are not this ticket's, and each is named below; one of them is urgent: the shared embedding server has been hung again si
+
+task: W2-04 (DAEO-u4oz), resume after DEC-1015: rebuild, select the tests once, run the scoped set (parallel, then serial), run `gov check`, and return DONE at the head I verified.
+status: DONE at `b37b5c8f1741`. This ticket's own tests pass. The one red this ticket caused (W2-05's git sweep) was fixed by a fresh engineer. The four other reds and the two red checks are not this ticket's, and each is named below; one of them is urgent: the shared embedding server has been hung again since about 08:16–08:21.
+work_completed:
+- Start state checked: head `e0d06a04ae53`, tree clean. The CTO's rebuil

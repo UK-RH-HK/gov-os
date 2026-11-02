@@ -4910,3 +4910,13 @@
 {"t": "2026-11-02T08:57:21", "nproc": 20, "load": [14.93, 13.33, 14.27], "mem_total_kb": 24607384, "mem_available_kb": 19033792, "leads_kb": {"DAEO-u4oz": 295692, "DAEO-n0wb": 371428, "DAEO-drhj": 1742364}}
 {"t": "2026-11-02T08:58:24", "nproc": 20, "load": [17.12, 14.22, 14.52], "mem_total_kb": 24607384, "mem_available_kb": 17372604, "leads_kb": {"DAEO-u4oz": 302508, "DAEO-n0wb": 370852, "DAEO-drhj": 2936096}}
 {"t": "2026-11-02T08:59:31", "nproc": 20, "load": [30.94, 19.04, 16.18], "mem_total_kb": 24607384, "mem_available_kb": 18460348, "leads_kb": {"DAEO-u4oz": 303804, "DAEO-n0wb": 373464, "DAEO-drhj": 1778068}}
+{"t": "2026-11-02T09:00:38", "nproc": 20, "load": [24.2, 19.06, 16.35], "mem_total_kb": 24607384, "mem_available_kb": 18986768, "leads_kb": {"DAEO-u4oz": 303700, "DAEO-n0wb": 373856, "DAEO-drhj": 1626704}}
+{"t": "2026-11-02T09:01:45", "nproc": 20, "load": [19.5, 18.6, 16.36], "mem_total_kb": 24607384, "mem_available_kb": 19103628, "leads_kb": {"DAEO-u4oz": 304312, "DAEO-n0wb": 374136, "DAEO-drhj": 1771940}}
+{"t": "2026-11-02T09:02:52", "nproc": 20, "load": [17.37, 18.19, 16.36], "mem_total_kb": 24607384, "mem_available_kb": 19000656, "leads_kb": {"DAEO-u4oz": 304268, "DAEO-n0wb": 374264, "DAEO-drhj": 1907592}}
+{"t": "2026-11-02T09:03:58", "nproc": 20, "load": [15.13, 17.44, 16.22], "mem_total_kb": 24607384, "mem_available_kb": 19033072, "leads_kb": {"DAEO-u4oz": 304568, "DAEO-n0wb": 374600, "DAEO-drhj": 1664104}}
+{"t": "2026-11-02T09:05:05", "nproc": 20, "load": [21.8, 18.94, 16.81], "mem_total_kb": 24607384, "mem_available_kb": 18876844, "leads_kb": {"DAEO-u4oz": 304616, "DAEO-n0wb": 374796, "DAEO-drhj": 1798708}}
+{"t": "2026-11-02T09:06:12", "nproc": 20, "load": [23.64, 19.9, 17.27], "mem_total_kb": 24607384, "mem_available_kb": 18365384, "leads_kb": {"DAEO-u4oz": 304792, "DAEO-n0wb": 374788, "DAEO-drhj": 2001364}}
+{"t": "2026-11-02T09:07:16", "nproc": 20, "load": [20.8, 19.86, 17.43], "mem_total_kb": 24607384, "mem_available_kb": 18459072, "leads_kb": {"DAEO-u4oz": 304996, "DAEO-n0wb": 354204, "DAEO-drhj": 2474260}}
+{"t": "2026-11-02T09:08:22", "nproc": 20, "load": [26.5, 21.63, 18.19], "mem_total_kb": 24607384, "mem_available_kb": 18942976, "leads_kb": {"DAEO-u4oz": 326044, "DAEO-n0wb": 346840, "DAEO-drhj": 1682676}}
+{"t": "2026-11-02T09:09:28", "nproc": 20, "load": [23.29, 21.58, 18.38], "mem_total_kb": 24607384, "mem_available_kb": 18949172, "leads_kb": {"DAEO-u4oz": 258768, "DAEO-n0wb": 348056, "DAEO-drhj": 1694256}}
+{"t": "2026-11-02T09:10:35", "nproc": 20, "load": [20.39, 21.06, 18.4], "mem_total_kb": 24607384, "mem_available_kb": 18988572, "leads_kb": {"DAEO-n0wb": 348976, "DAEO-drhj": 1922280}}

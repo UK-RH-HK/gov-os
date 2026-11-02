@@ -1,21 +1,20 @@
 {
- "time": "2026-11-02 08:59:04",
+ "time": "2026-11-02 09:11:04",
  "leads": [
-  "W2-04",
   "W2-104",
   "W2-92"
  ],
- "lead_count": 3,
+ "lead_count": 2,
  "load": [
-  28.61,
-  17.57,
-  15.64
+  21.77,
+  21.37,
+  18.59
  ],
- "mem_available_mb": 15848,
+ "mem_available_mb": 18736,
  "gate_open": true,
- "gate": "OPEN leads=3 load=28.6/15.6 nproc=20 have=19317012kB need=11978520kB",
+ "gate": "OPEN leads=2 load=21.8/18.6 nproc=20 have=21378964kB need=9566436kB",
  "disk_open": true,
- "disk": "disk gate open: 844 GiB free, 64328496 inodes free",
+ "disk": "disk gate open: 844 GiB free, 64266615 inodes free",
  "slots_held": [
   "gov-os-heavy-slot-1.lock"
  ],
@@ -23,45 +22,43 @@
  "close_running": false,
  "closing_w2s": [],
  "queue_busy": false,
- "main_clean": true,
- "main_dirty": [],
+ "main_clean": false,
+ "main_dirty": [
+  ".tickets/DAEO-cuao.md",
+  ".tickets/DAEO-i89t.md",
+  ".tickets/DAEO-k7hz.md",
+  "docs/DECISION_REGISTER.md"
+ ],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
-  "DAEO-u4oz",
   "DAEO-n0wb",
   "DAEO-drhj"
  ],
  "lead_rss_kb": {
-  "W2-04": 302376,
-  "W2-92": 372324,
-  "W2-104": 2448368
+  "W2-92": 349564,
+  "W2-104": 1874928
  },
- "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 2871117, 21 min, /home/usain/gov-os-worktrees/W2-04)",
-  "/usr/bin/time -f %e s python3 (pid 2908073, 10 min, /home/usain/gov-os-worktrees/W2-04)",
-  "python3 -m gov.retrieval.retrieve_check (pid 2908074, 10 min, /home/usain/gov-os-worktrees/W2-04)",
-  "/usr/bin/python3 -m pytest -q (pid 2927611, 6 min, /gov-os-runs/W2-00/nightly/20261102-0400)"
- ],
+ "outside_slot": [],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1260084,
-  "codegraph": 0
+  "embedding": 1260128,
+  "codegraph": 29792
  },
- "busy_cores": 18.45,
- "embedding_cores": 4.56,
+ "busy_cores": 14.88,
+ "embedding_cores": 6.11,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 1670336,
- "outside_reranker_possible": true,
+ "rerankers_outside_kb": 0,
+ "outside_reranker_possible": false,
  "peaks": {
   "computed": "2026-11-02 08:25:04",
   "lead_p95_mb": 4093,
   "lead_max_mb": 9580
  },
- "admit": false,
- "admit_reason": "real CPU: 18.45 busy cores + 3.52 for the embedding server's p95 >= 20 - margin 2",
- "inbox_unread": 0,
- "inbox_oldest_age_s": null,
+ "admit": true,
+ "admit_reason": "admits: 2 of 6 leads; memory 20908 MB >= 16700 MB (slots rule: floor + 2 running + 0 launching at 2294 MB (outside verification) or their own max + the newcomer 2294 MB + 3 slot runs at 1653 MB + services' headroom 1783 MB)",
+ "inbox_unread": 1,
+ "inbox_oldest_age_s": 74,
  "started_this_tick": null,
  "ready_waits": {
   "W2-122 DAEO-blwa": "embedding server hung: starts held (DEC-1015)",
@@ -80,30 +77,30 @@
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 08:55:19",
+  "at": "2026-11-02 09:06:20",
   "rc": 0,
-  "secs": 13.5,
+  "secs": 19.0,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 71 total, 67 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 648,
-  "last_check_at": 1793609975.5055375,
-  "last_result": "timeout",
-  "last_secs": 30.03,
-  "last_why": "no answer in 30 s",
-  "fails": 20,
-  "first_fail_at": 1793608834.988558,
-  "hung_since": 1793608834.988558,
-  "last_ok_at": 1793608776.3113718,
-  "state": "HUNG"
+  "passes": 660,
+  "last_check_at": 1793610679.4942095,
+  "last_result": "ok",
+  "last_secs": 14.49,
+  "last_why": "",
+  "fails": 0,
+  "first_fail_at": null,
+  "hung_since": null,
+  "last_ok_at": 1793610679.4944427,
+  "state": "healthy"
  },
  "slot_holders": [
   {
    "slot": "1",
    "pid": 2939584,
-   "cpu": 20944,
-   "since": 1793609975.5455275,
+   "cpu": 43166,
+   "since": 1793610679.520601,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/tmp/gov-os-lead-W2-",
    "cwd": "/home/usain/gov-os-worktrees/W2-104"

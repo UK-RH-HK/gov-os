@@ -79,6 +79,9 @@ those end.
 **09:00:** morning package `packages/P1-MORNING-2026-11-02.md` (`0d0e8e41`) pinged (sent). Waiting on the owner's A-F. The
 nightly still re-running its reds alone; investigate when it ends. Leads W2-04, W2-92, W2-104. Handover to a fresh
 session after the package (DEC-952 item 6).
+**09:15:** W2-04 verify DONE `b37b5c8f1741` (FULL: review not yet run); its review run `briefs/W2-04-A5-review.md`
+first on the ready list. P-W2-04-5 decided: DEC-1024 `446897f7`, W2-120's sources DEC-718 `a4c92d4e` (W2-10 and W2-11 keep
+AR-5/6 under closes:). Nightly marked FAILED at 09:00 (no verdict yet, still re-running): package item G `24375c96`.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

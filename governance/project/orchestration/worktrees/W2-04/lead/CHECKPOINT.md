@@ -32,7 +32,18 @@
   "0 failed, 1 error": DAEO-i89t (W2-120, filed 7224a564 in base) sources AR-5, AR-6, neither in the store nor in
   governance/project/external-references.yaml -> BLOCKED (same path in base code, line 229 there): red on
   w2/integrate too (inferred; neither file changed base..integrate). 57 REFUSED count as pass. None on red lists.
-- gov check --json started ~08:35 (check-4).
+- gov check --json (check-4, rc 3, ~08:33-08:46): RED context reproducibility (DAEO-i89t AR-5, above), RED retrieval
+  regression ("did not end within its time limit of 600 seconds"); YELLOW authority (DECISION_UNRECORDED DEC-1005 on
+  td/merge commits: not in this tree's register), YELLOW product traceability (openspec nothing to validate). Rest GREEN.
+- retrieve_check alone (08:47): connected to 127.0.0.1:11434, no output after 20 min. Probe 09:08: /api/tags 200 in
+  6 ms; /api/embed of "probe" no answer in 30 s; model expires_at 08:21:49 => SHARED EMBEDDING SERVER HUNG AGAIN since
+  ~08:16-08:21. Stopped my retrieve_check (it does not run this ticket's code: only gov.context imports supplementary).
+- W2-04 acceptance in parallel-4: 61 cases, 60 passed, 1 skipped (local_only). keyword_warn 0. Tree clean.
+- No gov checkpoint commit (head stays the verified head, per the resume brief). Review (FULL) not run: the resume
+  brief says verification only; briefs/rev-1.md is ready for it.
+- STATE: returning DONE at b37b5c8f1741 with the reds named as not this ticket's, and packages: embedder hung (urgent),
+  DAEO-i89t AR-5/AR-6 unresolvable (context-reproducibility red on integrate), W2-55 backfill proposal stale.
+- Scratch at end: /tmp/gov-os-lead-W2-04 24M / 3,058 inodes; .gov-runtime/scratch 21M / 128 inodes.
 - rm of briefs/eng-4.md and briefs/eng-4.spec.part refused (quiet hours, DEC-991, queued for morning): files left.
 
 ## Round 2 (resume after DEC-1005, 2026-11-01)
