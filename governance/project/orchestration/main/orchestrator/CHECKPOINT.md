@@ -133,6 +133,13 @@ re-close started 11:26 against it (`log/close-two-20261102-1127.out`). W2-61h DO
 Dispatcher v4.4 `7f81f91a` LIVE (DEC-1030 item 1): GPU line in status, `gpu-alert` inbox items (the quiet waiter wakes
 on them: push the owner at once); the 6 scratch-tools tests skip by name; review by Sonnet running
 (`reviews/dispatch-v4.4.md`). The background log watch b7ulw6ru4 stays as a second net.
+**12:25 (owner) DEC-1031 `44f4df2d`.** Embedder PINNED in VRAM (keep_alive -1, 12:05). COMMIT HOLD ON
+(`log/act-in-progress.txt`): ACT-W1-01-EXEMPT-1 `983f1ece` with the operator; ACT-RERANK-CPU-1 `5aeed6ea` must NOT be
+applied (CPU rerank >100 s/query): replaced by `drafts/ACT-RERANK-GPU-SLOTS-1.md` + `drafts/gov_reranker_gpu_slot.py`
+(at most 2 rerankers on the GPU; tested) — commit both to packages/ and tools/ when the hold ends, and mark v1
+superseded. The plan: `drafts/P1-LOAD-BALANCE-1.md` (with the GPU agent's figures; query on GPU: no answer changes)
+— commit to packages/ when the hold ends. W1-01b `DAEO-vhad` queued. SMART-WORK-6 applied (`4036a296`, `42889c78`).
+GPU at 15.1/16.3 GB with 11 rerankers at 12:16 (pre-crash state).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

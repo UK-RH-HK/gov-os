@@ -1,5 +1,5 @@
 {
- "time": "2026-11-02 12:08:09",
+ "time": "2026-11-02 12:18:08",
  "leads": [
   "W2-04",
   "W2-122",
@@ -7,15 +7,15 @@
  ],
  "lead_count": 3,
  "load": [
-  48.41,
-  50.33,
-  48.54
+  32.1,
+  38.17,
+  43.35
  ],
- "mem_available_mb": 6285,
+ "mem_available_mb": 6642,
  "gate_open": false,
- "gate": "SHUT leads=3 load=48.4/48.5 nproc=20 have=14454180kB need=15101912kB: load 48.4/48.5 >= nproc 20; memory: available 6624644 kB + leads' 7829536 kB < need 15101912 kB (floor 3145728, 3 running lead(s) at 9815948, the new lead 2140236)",
+ "gate": "SHUT leads=3 load=32.1/43.4 nproc=20 have=11327932kB need=12242100kB: load 32.1/43.4 >= nproc 20; memory: available 6740948 kB + leads' 4586984 kB < need 12242100 kB (floor 3145728, 3 running lead(s) at 6956136, the new lead 2140236)",
  "disk_open": true,
- "disk": "disk gate open: 842 GiB free, 64181767 inodes free",
+ "disk": "disk gate open: 842 GiB free, 64152901 inodes free",
  "slots_held": [
   "gov-os-heavy-slot-1.lock",
   "gov-os-heavy-slot-2.lock",
@@ -37,24 +37,24 @@
   "DAEO-blwa"
  ],
  "lead_rss_kb": {
-  "W2-04": 2095156,
-  "W2-123": 207488,
-  "W2-122": 5216484
+  "W2-04": 1738544,
+  "W2-123": 207452,
+  "W2-122": 2688280
  },
  "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 186410, 22 min, /home/usain/gov-os-worktrees/W2-123)",
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 401326, 14 min, /home/usain/gov-os-worktrees/W2-04)"
+  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 401326, 23 min, /home/usain/gov-os-worktrees/W2-04)",
+  "/usr/bin/python3 -P -m gov.context.context_check (pid 653991, 11 min, /home/usain/gov-os-worktrees/W2-122)"
  ],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1171580,
-  "codegraph": 13552
+  "embedding": 1170240,
+  "codegraph": 0
  },
- "busy_cores": 19.91,
- "embedding_cores": 5.09,
+ "busy_cores": 18.48,
+ "embedding_cores": 3.2,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 5609272,
+ "rerankers_outside_kb": 8126932,
  "outside_reranker_possible": true,
  "peaks": {
   "computed": "2026-11-02 11:26:05",
@@ -62,7 +62,7 @@
   "lead_max_mb": 9580
  },
  "admit": false,
- "admit_reason": "real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2",
+ "admit_reason": "real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2",
  "inbox_unread": 0,
  "inbox_oldest_age_s": null,
  "started_this_tick": null,
@@ -70,10 +70,10 @@
   "W2-123 DAEO-qzrq": "running",
   "W2-04 DAEO-u4oz": "running",
   "W2-122 DAEO-blwa": "running",
-  "W2-66b DAEO-zuiy": "not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2",
-  "W1-01b DAEO-vhad": "not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2",
-  "W2-104 DAEO-drhj": "not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2",
-  "W2-55 DAEO-arrl": "not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2",
+  "W2-66b DAEO-zuiy": "not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2",
+  "W1-01b DAEO-vhad": "not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2",
+  "W2-104 DAEO-drhj": "not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2",
+  "W2-55 DAEO-arrl": "not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2",
   "W2-81 DAEO-l78m": "already started for W2-81-A5-r4-records.json",
   "W2-92 DAEO-n0wb": "already started for W2-92-A5-run3-dec1019.json",
   "W2-61h DAEO-h2k3": "already started for W2-61h-A5-verify.json",
@@ -86,30 +86,30 @@
  "failures": [],
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 12:05:01",
+  "at": "2026-11-02 12:15:52",
   "rc": 0,
-  "secs": 51.0,
+  "secs": 40.3,
   "limit_s": 300,
-  "tail": "guard refusals since ACT 1: 72 total, 68 false positives, 0 unclassified"
+  "tail": "guard refusals since ACT 1: 73 total, 68 false positives, 1 unclassified"
  },
  "embedding_server": {
-  "passes": 837,
-  "last_check_at": 1793621291.1509356,
+  "passes": 847,
+  "last_check_at": 1793621890.7406452,
   "last_result": "ok",
-  "last_secs": 0.1,
+  "last_secs": 1.13,
   "last_why": "",
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1793621291.15094,
+  "last_ok_at": 1793621890.7406516,
   "state": "healthy"
  },
  "slot_holders": [
   {
    "slot": "1",
    "pid": 571803,
-   "cpu": 29176,
-   "since": 1793621230.7024474,
+   "cpu": 61246,
+   "since": 1793621891.6899817,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm -f \"$0\"; exec \"$@\" /tmp/gov-os-heavy-prio-4073537 /usr/bin/python3 -m pytest tests/acceptance/W2-11/ tests/unit tests/acceptance/W1-35/ test",
    "cwd": "/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged"
@@ -117,8 +117,8 @@
   {
    "slot": "2",
    "pid": 3976885,
-   "cpu": 45367,
-   "since": 1793621230.7032626,
+   "cpu": 50147,
+   "since": 1793621891.690114,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/home/usain/gov-os-w",
    "cwd": "/home/usain/gov-os-worktrees/W2-04"
@@ -126,22 +126,22 @@
   {
    "slot": "3",
    "pid": 3982619,
-   "cpu": 59169,
-   "since": 1793621291.45935,
+   "cpu": 54288,
+   "since": 1793621891.6902392,
    "reported": false,
    "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m pytest tests -n auto -q -p no:cacheprovider -p gov_close_serial_only -o tmp_path_retention_policy=failed -rs --junitxml=/tmp/gov-os-lead-W2-",
    "cwd": "/home/usain/gov-os-worktrees/W2-122"
   }
  ],
  "gpu": {
-  "line": "GPU: RTX 5070 Ti 14.8/15.9 GB, 0 %; holders: embedder shared (0), reranker (3); layers: shared 29/29, query cpu-only by design",
+  "line": "GPU: RTX 5070 Ti 14.7/15.9 GB, 69 %; holders: embedder shared (0), reranker (5); layers: shared 29/29, query cpu-only by design",
   "state": {
    "ok": true,
-   "at": 1793621291.2641456,
+   "at": 1793621891.19227,
    "name": "NVIDIA GeForce RTX 5070 Ti",
-   "used_mib": 15203,
+   "used_mib": 15077,
    "total_mib": 16303,
-   "util": 0,
+   "util": 69,
    "holders": [
     {
      "pid": 478376,
@@ -156,7 +156,19 @@
      "kind": "reranker"
     },
     {
+     "pid": 771223,
+     "name": "[Not Found]",
+     "mib": null,
+     "kind": "reranker"
+    },
+    {
      "pid": 656312,
+     "name": "[Not Found]",
+     "mib": null,
+     "kind": "reranker"
+    },
+    {
+     "pid": 830388,
      "name": "[Not Found]",
      "mib": null,
      "kind": "reranker"

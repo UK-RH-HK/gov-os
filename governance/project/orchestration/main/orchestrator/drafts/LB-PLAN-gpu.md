@@ -7,7 +7,10 @@
 - **Rules kept:** the shared servers (:11434, :11435) were not stopped, restarted, reconfigured or loaded by me; I sent
   them read-only probes only (`/api/ps` on :11434, twice). Every experiment ran on private servers (:11446 Ollama
   on the GPU, :11447 Ollama on the CPU only, :11448 the bundled `llama-server` on the GPU), each stopped at the end.
-  Only the visible half of `memory-retrieval` was used.
+  Only the visible half of `memory-retrieval` was used. **At the end** (about 12:05) all three private servers were stopped:
+  ports 11446 to 11448 were closed, and none of my processes remained. My VRAM was released: :11446 was stopped at
+  11:36; :11448 at 11:12; :11447 never used the GPU. The card's 15.1 GiB in use at the end belongs to other
+  sessions (nine rerankers and the shared runner).
 - **Load:** the 1-minute load was 10.5 to 19 during the GPU throughput runs and **29 to 65** from about 11:16
   onwards (other sessions: up to 7 gitleaks at once, the busy query runner on :11435). Every figure after 11:16 was taken
   on a crowded machine; the CPU figures especially are worse than a quiet machine would give (marked).
@@ -135,15 +138,20 @@ shared runner (then on the GPU). CPU chunk vectors: see the end of this section.
 | stored vs Ollama-GPU, 1 per request | 0.999399 | 0.999883 | 0/200 |
 | stored vs Ollama-GPU, 32 per request | 0.999409 | 0.999883 | 0/200 |
 | stored vs Ollama-GPU, 128 per request | 0.999430 | 0.999896 | 0/200 |
-| Ollama-GPU 1 vs 32 per request | (in `agree` output) | | 0/200 |
+| Ollama-GPU 1 vs 32 per request (same server, a minute apart) | 0.999280 | 0.999909 | 124/200 |
+| Ollama-GPU 32 vs 128 per request | 0.999332 | 0.999924 | 137/200 |
 | stored vs llama-server-8-slots, 1 per request | 0.999427 | 0.999874 | 10/200 |
 | llama-server-8 vs Ollama-GPU (any pair) | 0.998869 | 0.999700 | 0/200 |
 
 Questions (the 20 visible): the GPU query vector against the CPU one (my :11447), cosine **min 0.999349, mean ≈ 0.99965**
-(`data/facet.json`). This is the same order of disagreement as W2-123's CPU floor (0.9994) and the stored-vs-fresh
-drift: the GPU is not measurably worse than the CPU's own non-reproducibility, but it is never bit-identical.
+(`data/facet.json`). This is the same size of disagreement as W2-123's CPU floor (0.999427 for the CPU's own repeat
+at 32 per request) and the stored-vs-fresh drift. The GPU disagrees with itself across request shapes (38 to 40 % of
+vectors differ, min cosine 0.99928) about as much as the CPU did in W2-123 (25 % differ on a repeat, min 0.999427):
+it is not measurably worse than the CPU's own non-reproducibility, but it is never bit-identical.
 
-CPU chunk vectors for the same chunks: CPU_CHUNK_PLACEHOLDER
+**Not measured: CPU chunk vectors for the same 200 chunks.** My CPU-only server's bench was stopped at 11:19 when the
+load reached 34 (rule: pause above 30) and the load did not fall below 30 again before the end (36 to 65). The
+CPU-vs-GPU agreement above is on the 20 question vectors only.
 
 ## 4. Query embedding on the GPU and the search answers (the owner's question)
 
@@ -159,10 +167,35 @@ GPU, in both runs. Command: `python3 -m gov.retrieval.measure memory-retrieval -
 --part visible --gov <scratch>/bin/gov --out <scratch>/measure-{gpu,cpu}`.
 
 **The semantic facet alone** (the same store, each question's top-30 with the GPU and the CPU vector, the facet's own
-SQL): top-5 the same set in 20 of 20 questions, the same order in 19 (q18 differs in order); top-30 the same set in 12 and 29 of 30 in 8;
-the top-30 order differs in all 20 (near-ties swap).
+SQL): top-5 the same set in 20 of 20 questions, the same order in 19 (q18 differs in order); top-30 the same set in 13
+and 29 of 30 in 7; the top-30 order differs in all 20 (near-ties swap).
 
-MEASURE_PLACEHOLDER
+**The measure, side by side** (records `measure-gpu/measure-memory-retrieval-visible-20261102T112831723626Z.json`,
+11:17 to 11:28, about 11 min, load 14 to 36; `measure-cpu/…`, 11:46 to about 12:03, about 17 min, load 38 to 59). The main tree's `src/` is
+identical at the two commits the runs reported (`git diff 01f5d8be36ae 578203ec65dd -- src/` is empty).
+
+| | GPU query vector | CPU query vector |
+|---|---|---|
+| hit@5 (floor 85) | **11 of 20 (55.0 %)** | **10 of 20 (50.0 %)** |
+| full evidence (target 99 %) | **11 of 20 (55.0 %)** | **11 of 20 (55.0 %)** |
+| in the bundle (first call) | 15 of 20 | 15 of 20 |
+| calls | the same per question | the same per question |
+| stacked digest | — | differs in 13 of 20 questions |
+
+- **The one figure that differs is Q13:** hit@5 yes (first gold rank 1) with the GPU vector, no (rank 7) with the CPU vector.
+  **It is not the device.** A control (three repeats of Q13's first call with the same cached CPU vector, after the CPU
+  run) gave the GPU run's top-5, gold at rank 1, in 3 of 3. So the CPU run's Q13 is run-to-run variation inside the
+  pipeline (the GPU reranker, or a timing effect on a loaded machine), not the query vector.
+- **First-call top-5 per question:** the same items in the same order in 18 of 20. Q13: as above (noise). Q17: items 4
+  and 5 differ (GPU: `DECISION_REGISTER.md:7327-7335`, `rebuild/command.py:23-36`; CPU: `rebuild/command.py:23-36`,
+  `DECISION_REGISTER.md:8861-8876`). The control gave the CPU result 3 of 3, so this one does follow the vector. Q17's
+  scores did not change (hit@5 yes, rank 2; full evidence no, 1 of 2 either way).
+- **Stacked digests differ in 13 of 20.** The deeper stacked context (calls 2 to 5) is reordered. None of the 13 changes a
+  pass or fail.
+- **Does any final answer change?** No pass or fail of hit@5 or full evidence changes because of the device. One
+  question's 4th and 5th items change places with a neighbour, and deeper context reorders. The pipeline's own
+  run-to-run variation (Q13) is as large as the device's effect. (Caveat: 20 questions, one run each plus a 2-question
+  control. The hidden half was not run.)
 
 ## 5. The reranker on the GPU
 
@@ -172,7 +205,11 @@ offline; 20 visible questions × 30 candidates (512-character chunks), one `pred
 | device | load s | per query p50 s | p95 s | memory |
 |---|---|---|---|---|
 | GPU (cuda), bf16 | 1.8 | **0.181** | **0.262** | torch peak allocated 2,829 MiB, reserved 3,198 MiB (+ CUDA context; ≈ 3.5 GiB per process) |
-| CPU | RERANK_CPU_PLACEHOLDER | | | |
+| CPU (4 cores 6-9, nice 10, `CUDA_VISIBLE_DEVICES=-1`, 3 queries), load 37 to 46 | did **not finish** load + 1 warm-up + 3 queries in 400 s (stopped by its timeout) | > 100 s per query (lower bound, crowded) | — | host RAM only |
+
+The CPU figure is a bound, not a measurement: on a quieter machine it would be faster. The run was kept tiny because of
+the load. At 11:58 nine `rerank_worker` processes were running (other sessions), and the card showed 15,091 to 15,102
+MiB used of 16,303 with none of my processes on it.
 
 - **The reranker already runs on the GPU in production** whenever the card has room: the worker leaves the device to
   the library, and the environment's torch has CUDA. So each search's private reranker costs about 3.5 GiB of VRAM for
@@ -197,7 +234,7 @@ offline; 20 visible questions × 30 candidates (512-character chunks), one `pred
   a busy query runner causes (its runner was at 450 % CPU during this run). The cost: the vector is not bit-identical
   to the CPU's (cosine ≥ 0.99935 on the 20 questions); the effect on the answers is in §4.
 - **Reranking.** It is already on the GPU when there is room; the risk is not speed but memory: 3.5 GiB per process.
-  On the CPU a rerank takes RERANK_CPU_SUMMARY.
+  On the CPU, under today's load, a rerank of 30 candidates did not finish in 100 s (bound, §5), against 0.18 s on the GPU.
 - **Total.** With the embedder (2.5 GiB) and one shared reranker (3.5 GiB) on the GPU, the GPU could take essentially
   all embedding and reranking work (estimate: well over 95 % of its compute time today is CPU-side overhead or
   CPU-only work that the GPU does faster). It frees the 8 capped cores of the shared server (about 5 used during a rebuild)
@@ -216,7 +253,12 @@ offline; 20 visible questions × 30 candidates (512-character chunks), one `pred
 3. **Leave `OLLAMA_NUM_PARALLEL` alone**: it is not honoured for this model in 0.35.0. A bigger gain (+25 to 40 %) would
    need serving the embedder with llama-server's own slots, a different server and a change to the request path
    (`/v1/embeddings`) and to DEC-773's determinism assumptions. Not worth it now; the GPU vs CPU gap (×200) is what matters.
-4. **The question embedder on the GPU:** see §4 for whether the answers change; DEC-798's CPU-only rule exists for
-   bit-reproducibility, which the GPU does not give (and the CPU only gives for single-text, one-in-flight requests).
+4. **The question embedder on the GPU:** on the 20 visible questions, no pass or fail changed because of the device
+   (§4). The cost is DEC-798's bit-reproducibility: the GPU never gives it, and the CPU gives it only for single-text,
+   one-in-flight requests. Moving it means amending DEC-798/DEC-975 (the CPU-only rule and `_on_cpu`'s refusal) and
+   re-keying the query-vector cache by device. The pipeline's own run-to-run variation (Q13) is already as large as
+   the device's effect.
+6. **Right now (11:58):** the card was at 15.1 of 16.3 GiB with nine rerankers resident. The shared runner (2.37 GB,
+   29/29 layers since 11:15) is in the same position it was in before the 02:36 and 04:30 crashes.
 5. **Crash risk stays** while many CUDA processes share the card on WSL: plan for the shared runner to crash and reload,
    and make the reload find room (point 2).

@@ -1,14 +1,14 @@
-dispatcher 2026-11-02 12:08:09
+dispatcher 2026-11-02 12:18:08
 leads running (3, from the processes): W2-04, W2-122, W2-123
-load 48.4/50.3/48.5; real busy cores 19.91 of 20 (the embedding server 5.09); memory available 6285 MB; gate_check (for comparison) SHUT (SHUT leads=3 load=48.4/48.5 nproc=20 have=14454180kB need=15101912kB: load 48.4/48.5 >= nproc 20; memory: available 6624); disk open
-admission (by peaks, DEC-1008 item 5): real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2
+load 32.1/38.2/43.4; real busy cores 18.48 of 20 (the embedding server 3.2); memory available 6642 MB; gate_check (for comparison) SHUT (SHUT leads=3 load=32.1/43.4 nproc=20 have=11327932kB need=12242100kB: load 32.1/43.4 >= nproc 20; memory: available 6740); disk open
+admission (by peaks, DEC-1008 item 5): real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2
 peaks 2026-11-02 11:26:05: a lead p95 4075 MB, max 9580 MB
-FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 186410, 22 min, /home/usain/gov-os-worktrees/W2-123); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 401326, 14 min, /home/usain/gov-os-worktrees/W2-04)
+FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 401326, 23 min, /home/usain/gov-os-worktrees/W2-04); /usr/bin/python3 -P -m gov.context.context_check (pid 653991, 11 min, /home/usain/gov-os-worktrees/W2-122)
 heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue busy; land: in flight; main tree clean on w2/integrate
 inbox unread: 0
-ready list: W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: running; W2-122 DAEO-blwa: running; W2-66b DAEO-zuiy: not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2; W1-01b DAEO-vhad: not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2; W2-104 DAEO-drhj: not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2; W2-55 DAEO-arrl: not admitted: real CPU: 19.91 busy cores + 3.05 for the embedding server's p95 >= 20 - margin 2; W2-81 DAEO-l78m: already started for W2-81-A5-r4-records.json
+ready list: W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: running; W2-122 DAEO-blwa: running; W2-66b DAEO-zuiy: not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2; W1-01b DAEO-vhad: not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2; W2-104 DAEO-drhj: not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2; W2-55 DAEO-arrl: not admitted: real CPU: 18.48 busy cores + 4.94 for the embedding server's p95 >= 20 - margin 2; W2-81 DAEO-l78m: already started for W2-81-A5-r4-records.json
 sentinel: watched
-guard harvest: last 2026-11-02 12:05:01, rc 0, 51.0 s of 300 s
-embedding server: healthy (0.1 s)
-GPU: RTX 5070 Ti 14.8/15.9 GB, 0 %; holders: embedder shared (0), reranker (3); layers: shared 29/29, query cpu-only by design
-heavy slot holders: slot 1 pid 571803 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm ) idle 1 min; slot 2 pid 3976885 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 1 min; slot 3 pid 3982619 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min
+guard harvest: last 2026-11-02 12:15:52, rc 0, 40.3 s of 300 s
+embedding server: healthy (1.13 s)
+GPU: RTX 5070 Ti 14.7/15.9 GB, 69 %; holders: embedder shared (0), reranker (5); layers: shared 29/29, query cpu-only by design
+heavy slot holders: slot 1 pid 571803 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm ) idle 0 min; slot 2 pid 3976885 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 3982619 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min

@@ -1,0 +1,5 @@
+log: guard-refusals.jsonl line 73
+Guard: refusal
+status: a guard refusal to judge (DEC-958)
+
+{"key": "toolu_01XYggTJoAir4pjmipJDLmHd", "time": "2026-11-02T12:08:08.943Z", "transcript": "/home/usain/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "cwd": "/home/usain/Dynamic-Agentic-Engineering-OS", "tool": "Bash", "form": "S=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/07f25884-3736-441a-8f80-ff5cef3fd2e0/scratchpad/exempt; cp -r governance/project/*.yaml $S/b/governance/project/ 2>/dev/null; cp $S/b/gove", "rule": "a command that may write the acceptance tests, which only the independent test designer writes (DEC-
