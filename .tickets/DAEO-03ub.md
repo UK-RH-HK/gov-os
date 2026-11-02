@@ -1,6 +1,6 @@
 ---
 id: DAEO-03ub
-status: open
+status: in_progress
 deps: []
 links: [DAEO-fau3]
 created: 2026-11-02T10:58:34Z
@@ -32,11 +32,14 @@ kpis:
   - 'A backslash-newline outside single quotes is removed before the command is read [ACT-GUARD-FIX-3 §7 line 7]'
   - 'A data heredoc''s body written to a file that a later word of the command may run is judged as that file''s code; a run the parser cannot read is unresolvable [ACT-GUARD-FIX-3 §7 line 8]'
   - 'Measured in docs/changes/W2-42a-evidence.md: on the 61 logged commands the product''s parser resolves the writes of all but at most 2 (today 22 unresolvable); no planted write into the acceptance folder or outside a reviewer''s record is missed; every unknown form still fails closed [DEC-1028 item 4, DEC-958]'
+  - 'The read judge does not misread a literal path as a run-time listing: a command that names its files literally (in a heredoc, a `for` loop over `$(seq …)`, a `$(…)` that yields no file name) is judged by those files [DEC-1040 item 2]'
+  - 'Replayed against every refusal in the CTO''s `log/guard-refusals.jsonl` (the full command from its transcript): each one judged false now passes and each one judged true is still refused, through the five-rule hook as it runs after re-pin window 2; and every planted case of ACT-GUARD-FIX-3 still refused [DEC-1040 item 2, DEC-958]'
   failure:
   - 'Any write the parser misses that today''s parser catches (a fail-open).'
   - 'An unknown or unparseable form that passes instead of refusing.'
 profile: FULL
 sources:
+- DEC-1040
 - DEC-1028
 - DEC-1027
 - DEC-958
