@@ -17,7 +17,14 @@ APPROVE pings "Mobile push requested". ACT-GUARD-FIX-3 copied to `drafts/act-gua
 **00:08:** review round 1 FAILED (F2 regression fails open; F3, F4 as today; F1 flaky test). Moderator's triage at the
 record's end: F1-F3 fixed, F4 only if false refusals stay under 10 %, F5-F7 rows. Round 2 (Opus subagent) works in
 `drafts/act-guard-fix-3/` (round 1 kept in `drafts/act-guard-fix-3-round1/`); then the second and last review
-(Sonnet, same probes); then the package to `packages/` for the 09:00 morning package (no ping after midnight).
+(Sonnet, same probes); then the package to `packages/`, pinged if before 02:00 (DEC-1021), else the 09:00 package.
+**00:25 (owner):** both 23:50 pushes arrived; DEC-1021 `a332b2aa`: pings until 02:00, quiet 02:00-07:30. Push-on-prompt
+re-run 00:12:48 (pinged first, approved in ~25 s; owner to confirm Claude Code's own push). Owner asked for the three
+open items in short form (P-W2-90b-1, W2-11's seven lines, SW4 line 3) to decide now.
+**00:35 (owner) DEC-1022** `94df6e93`: P-W2-90b-1 (b), W2-90c's S4 line re-worded `3a4203e5`; W2-11b `DAEO-9bc0` filed
+`c361b095` (product-spec, STANDARD; starts once W2-11 closes; withdrawn if W2-11 takes the lines in another round);
+SW4 line 3 -> W3-P21. applied_check 0 gaps. **TODO by day (after 07:30, 2026-11-02):** the push-on-prompt test again:
+ping first, the owner steps away, the prompt waits a few minutes (DEC-1022 item 1).
 **00:15:** W2-104 returned DONE at `ac2d92af8c0e` with P-W2-104-CMDLIST: decided (a) + CLAUDEPATH (c), DEC-1020
 `235c4d5d`, ticket paths `d942524f`; run 2 brief `briefs/W2-104-A5-run2-dec1020.md` on the ready list after W2-92.
 Guard 64 (the reviewer's heredoc probe) false; 61 of 65 false. Leftover scratch for removal (rm: by day only, pinged):

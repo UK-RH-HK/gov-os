@@ -55,6 +55,23 @@ class Unreadable(Exception):
     """The scan cannot read the command for certain: the caller judges it as before this fix."""
 
 
+# Code that names the acceptance tests' folder in any spelling an honest script uses: 'tests/acceptance' with or
+# without the slash, 'tests', 'acceptance' as separate pieces (os.path.join, Path / ..., '/'.join, %), or a glob.
+_CODE_NAMES = re.compile(r"tests\b.{0,40}?accept|ests/accept", re.S)
+
+
+def names_tests(scope, code=False):
+    """Whether ``scope`` names the acceptance tests: the folder with its slash for a shell command (as before), and
+    any spelling of it for code (ACT-GUARD-FIX-3 round 2, F4: Python, perl or node code, or a script body)."""
+    return ACCEPTANCE in scope or (code and bool(_CODE_NAMES.search(scope)))
+
+
+def joined(command):
+    """``command`` with each backslash-newline removed (round 2, F3), for the checks that read its text whole. Inside
+    single quotes the shell keeps them; removing them there too only makes the text name more, never less."""
+    return command.replace("\\\n", "")
+
+
 # -- the shell text: heredocs and substitutions out --------------------------------------------------------------
 
 def heredocs(command):
@@ -69,6 +86,11 @@ def heredocs(command):
     while i < n:
         c = command[i]
         ctx = stack[-1]
+        if command.startswith("\\\n", i):
+            # A line continuation (ACT-GUARD-FIX-3 round 2, F3): the shell removes backslash-newline outside single
+            # quotes, so "cp /tmp/x \<newline> tests/..." is one command with both words.
+            i += 2
+            continue
         if c == "\\" and i + 1 < n:
             out.append(command[i:i + 2])
             i += 2
@@ -399,7 +421,10 @@ def variants(text, expand):
             depth = max(0, depth - 1)
         if sep == "(":
             depth += 1
-    names = {s[0] for s in sets} | set(loops)
+    # In source order (ACT-GUARD-FIX-3 round 2, F1): a value may use a variable set before it (T=/tmp; H=$T/p), so
+    # each is expanded after the ones it can use, and the result never depends on the process's hash seed.
+    names = list(dict.fromkeys(name for _, name in sorted(
+        [(s[3], s[0]) for s in sets] + [(p, name) for name, l in loops.items() for _, p in l])))
     uses = {}
     for name in names:
         pat = re.compile(_NAME_USE.format(re.escape(name)))
@@ -411,7 +436,7 @@ def variants(text, expand):
                 break
     env, drop, loopvals = {}, set(), {}
     if opaque:
-        return env, loopvals, names
+        return env, loopvals, set(names)
     for name in names:
         mine = [s for s in sets if s[0] == name]
         loop = loops.get(name, [])
@@ -488,9 +513,10 @@ _PATHS = frozenset(("Path", "pathlib.Path", "PurePath", "pathlib.PurePath", "Pos
                     "pathlib.PurePosixPath", "PurePosixPath"))
 
 
-def python_writes(code, ecwd, judge, depth):
+def python_writes(code, ecwd, judge, depth, argv=None):
     """The targets ``code`` writes, as (raw text, absolute path or None); SENT for one it cannot work out. ``judge``
-    judges a command the code runs (a literal subprocess or os.system command). Raises SyntaxError."""
+    judges a command the code runs (a literal subprocess or os.system command). ``argv``: the words the command
+    gives the code (sys.argv, each None when it does not expand), when known. Raises SyntaxError."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")  # an invalid escape in the code is the code's business, not the hook's
         tree = ast.parse(code)
@@ -515,6 +541,12 @@ def python_writes(code, ecwd, judge, depth):
             stores[node.name] = stores.get(node.name, 0) + 1
         elif isinstance(node, (ast.Global, ast.Nonlocal)):
             shared.update(node.names)
+    # sys.argv[k] is the command's k-th word, unless the code changes or rebinds sys.argv.
+    if argv is not None:
+        changed = {id(n) for n in _receivers(tree)}
+        if any(isinstance(n, (ast.Attribute, ast.Name)) and qual(n, alias) == "sys.argv" and (
+                isinstance(n.ctx, (ast.Store, ast.Del)) or id(n) in changed) for n in ast.walk(tree)):
+            argv = None
     # A name bound once in the whole code, by a plain assignment, is that value everywhere (in functions too).
     for node in ast.walk(tree):
         if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
@@ -562,6 +594,11 @@ def python_writes(code, ecwd, judge, depth):
                     return ev(value)
                 finally:
                     scope.pop()
+            if isinstance(node, ast.Subscript) and argv is not None and qual(node.value, alias) == "sys.argv":
+                k = node.slice
+                if isinstance(k, ast.Constant) and type(k.value) is int and 0 <= k.value < len(argv):
+                    return argv[k.value]
+                return None
             if isinstance(node, ast.JoinedStr):
                 parts = []
                 for v in node.values:
@@ -780,6 +817,19 @@ def _safe_call(q, attr):
     return attr in _SAFE_METHODS
 
 
+def _receivers(tree):
+    """The objects whose methods a call changes in place (x.append(...), x[0] = ...): sys.argv among them is not
+    the command's words any more."""
+    out = []
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in (
+                "append", "extend", "insert", "pop", "remove", "clear", "reverse", "sort", "__setitem__"):
+            out.append(n.func.value)
+        elif isinstance(n, ast.Subscript) and isinstance(n.ctx, (ast.Store, ast.Del)):
+            out.append(n.value)
+    return out
+
+
 def _bound(stmt):
     """The names a statement binds or deletes, anywhere inside it."""
     out = set()
@@ -869,15 +919,65 @@ def _more_targets(name, args, ecwd):
     return out
 
 
-def _written(stages):
-    """The names of the files a pipeline's stages write by a redirect or tee (a heredoc's body lands there)."""
+def _written(stages, raw=False):
+    """The names of the files a pipeline's stages write by a redirect or tee (a heredoc's body lands there); with
+    ``raw``, the target words themselves."""
     out = []
     for words, reds in stages:
-        out += [os.path.basename(t) for op, t in reds if ">" in op and op not in (">&",) and not t.isdigit()]
+        out += [t for op, t in reds if ">" in op and op not in (">&",) and not t.isdigit()]
         head = lead(words)
         if head and os.path.basename(head[0]) == "tee":
-            out += [os.path.basename(a) for a in head[1:] if not a.startswith("-")]
-    return [w for w in out if w]
+            out += [a for a in head[1:] if not a.startswith("-")]
+    return [w for w in out if w] if raw else [w for w in map(os.path.basename, out) if w]
+
+
+# Commands that take a file's name and never run the file (round 2, F2): a script named by any other command may be
+# run by it.
+_NOT_RUNNERS = frozenset(
+    "cat head tail less more wc grep egrep fgrep rg ls stat file diff cmp chmod chown chgrp touch cp mv rm ln install "
+    "echo printf test [ [[ md5sum sha1sum sha256sum sha512sum b2sum cksum base64 sed jq sort uniq cut tr nl column "
+    "xxd od hexdump strings realpath readlink dirname basename true false : mkdir rmdir tee shellcheck shfmt bat "
+    "dos2unix unix2dos fold fmt iconv expand unexpand du df wait sleep cd pushd popd pwd export unset read set "
+    "declare local typeset readonly shift exit return break continue git ruff black flake8 pyflakes pylint mypy "
+    "isort yamllint".split())
+# Programs that run the file they are given as Python.
+_PY_RUNNERS = frozenset("pytest py.test coverage ipython".split())
+
+
+def _script_words(head, reds):
+    """The words of a simple command that name a file it may run, each with how it runs it: (word, "shell" |
+    "python" | "exec" | "code"), and the code strings it runs (-c, -e) that may name one."""
+    if not head:
+        return [], []
+    name, args = os.path.basename(head[0]), head[1:]
+    inputs = [t for op, t in reds if op in ("<", "<<<", "<>")]
+    out, code = [(head[0], "exec")], []
+    if name in _SHELLS or name in ("source", "."):
+        i = 0
+        while i < len(args) and args[i].startswith(("-", "+")) and args[i] not in ("-", "--"):
+            if _short(args[i], "c"):
+                code += args[i + 1:i + 2]
+                return out, code
+            i += 2 if args[i] in ("-o", "+o", "-O", "+O", "--rcfile", "--init-file") else 1
+        i += i < len(args) and args[i] in ("-", "--")
+        out += [(args[i], "shell")] if i < len(args) else [(t, "shell") for t in inputs]
+    elif _PY.match(name) or name in _PY_RUNNERS:
+        i = 0
+        while i < len(args) and args[i].startswith("-") and args[i] != "-" and _PY.match(name):
+            if not args[i].startswith("--") and "c" in args[i][1:]:
+                code += args[i + 1:i + 2]
+                return out, code
+            if not args[i].startswith("--") and args[i].endswith("m"):
+                return out + [(w, "python") for w in args[i + 1:] + inputs], code  # -m runpy, pytest, ...
+            i += 2 if args[i] in ("-W", "-X") else 1
+        if name in _PY_RUNNERS:
+            return out + [(w, "python") for w in args if not w.startswith("-")], code
+        out += [(args[i], "python")] if i < len(args) and args[i] != "-" else [(t, "python") for t in inputs]
+    elif name not in _NOT_RUNNERS:
+        # perl, node, make, xargs, find -exec, uv run, an unknown program: any file it is given may be run.
+        out += [(w, "code") for w in args + inputs]
+        code += args
+    return out, code
 
 
 def _applies_patch(name, args):
@@ -897,33 +997,12 @@ def _applies_patch(name, args):
     return sub == "stash" and rest[:1] in (["apply"], ["pop"])
 
 
-def _ran_script(head):
-    """(the name of the script file a command runs, how it runs it), or None."""
-    if not head:
-        return None
-    name, args = os.path.basename(head[0]), head[1:]
-    operands = [a for a in args if not a.startswith("-")]
-    if name in _SHELLS or name in ("source", "."):
-        return (os.path.basename(operands[0]), "shell") if operands and not any(_short(a, "c") for a in args) \
-            else None
-    if _PY.match(name):
-        i = 0
-        while i < len(args) and args[i].startswith("-") and args[i] != "-":
-            if not args[i].startswith("--") and args[i][-1:] in "cm":
-                return None
-            i += 2 if args[i] in ("-W", "-X") else 1
-        return (os.path.basename(args[i]), "python") if i < len(args) and args[i] != "-" else None
-    if name in ("perl", "node", "ruby", "php", "Rscript", "awk", "make"):
-        return (os.path.basename(operands[0]), "code") if operands else None
-    if "/" in head[0]:
-        return name, "exec"
-    return None
-
-
 def _shebang(text):
+    """How a file run by its own name is run, by its #! line. With none, bash runs it as shell whatever it holds:
+    the guard cannot tell what the file was meant to be (unknown)."""
     first = text.split("\n", 1)[0]
     if not first.startswith("#!"):
-        return "code"
+        return "unknown"
     return "python" if "python" in first else "shell" if re.search(r"\b(ba|da|z|k)?sh\b", first) else "code"
 
 
@@ -951,8 +1030,9 @@ def _kind(words):
 
 class Judgement:
     """What a Bash command writes: the shell's own targets (rule 5 reads these), and the findings in the code it
-    runs inline (rule 1 reads both). ``findings`` is a list of (targets, scope): ``scope`` is the text whose naming
-    of the acceptance tests refuses an unresolvable target."""
+    runs inline (rule 1 reads both). ``findings`` is a list of (targets, scope, code): ``scope`` is the text whose
+    naming of the acceptance tests refuses an unresolvable target; ``code``: it is code (Python, perl or node, a
+    script body), whose naming counts in any spelling (names_tests)."""
 
     def __init__(self, parse, expand, bodies=None):
         self.parse = parse    # the product's parser: (command, cwd) -> targets or None
@@ -991,7 +1071,7 @@ class Judgement:
                 self.shell += self.parse(ptext, cwd) or []
         # The walk below reads the folder the shell is in; a loop's word is not one value there: dropped.
         ecwd, stage, held, staged = cwd, [], [], []
-        scripts = {}  # the name of a file a data heredoc was written to: its body
+        scripts = []  # the files data heredocs were written to: (their names, the body)
         with environ(env, drop | set(loopvals)):
             for words, reds, sep in simples(tokens(text)):
                 for w in words + [r[1] for r in reds]:
@@ -1002,15 +1082,8 @@ class Judgement:
                 name = os.path.basename(head[0]) if head else ""
                 args = head[1:]
                 part = " ".join(words)
-                ran = _ran_script(head)
-                if ran and ran[0] in scripts:
-                    body = scripts[ran[0]]
-                    how = ran[1] if ran[1] != "exec" else _shebang(body["text"])
-                    if how == "shell":
-                        self.body(body, "shell", part, ecwd, whole, depth)
-                    elif how == "python":
-                        self.code(body["text"], part, ecwd, whole, depth, shell_text=not body["quoted"],
-                                  definite=True)
+                for names, body in scripts:
+                    self.script(names, body, head, reds, subs, part, ecwd, whole, depth)
                 if name in ("cd", "pushd", "popd"):
                     ecwd = self.cd(name, args, ecwd)
                 elif name in _SHELLS and any(_short(a, "c") for a in args):
@@ -1025,13 +1098,14 @@ class Judgement:
                     # Writes the product's parser does not read (rule 1 judges them; rule 5 as before). A patch
                     # applied writes the files it names: unknown targets, judged by the whole command.
                     if _applies_patch(name, args):
-                        self.findings.append(([(SENT, None)], whole))
+                        self.findings.append(([(SENT, None)], whole, False))
                     targets = [self.place(t, where) for t, where in _more_targets(name, args, ecwd)]
                     if targets:
-                        self.findings.append((targets, part))
+                        self.findings.append((targets, part, False))
                 elif _INLINE.search(part):
-                    # perl, node, ruby: code the guard does not read (ACT-GUARD-FIX-2's judgement of the part)
-                    self.findings.append(([(SENT, None)], part))
+                    # perl, node, ruby: code the guard does not read (ACT-GUARD-FIX-2's judgement of the part; any
+                    # spelling of the tests' folder counts, round 2, F4)
+                    self.findings.append(([(SENT, None)], part, True))
                 stage.append(_kind(words))
                 staged.append((words, reds))
                 held += [(int(m), len(stage) - 1, part, ecwd)
@@ -1043,11 +1117,103 @@ class Judgement:
                         # if more than one could.
                         runs = [kind for kind in stage[at:] if kind != "data"]
                         kind = "data" if not runs else runs[0] if len(runs) == 1 else "code"
-                        self.body(self.bodies[k], kind, part_, where, whole, depth)
+                        reader = next((lead(w) for (w, _), kd in zip(staged[at:], stage[at:]) if kd == kind), [])
+                        self.body(self.bodies[k], kind, part_, where, whole, depth, argv=self.py_argv(reader))
                         if kind == "data":
-                            for written in _written(staged[at:]):
-                                scripts[written] = self.bodies[k]
+                            targets = _written(staged[at:], raw=True)
+                            if targets:
+                                scripts.append(({self.basename(t) for t in targets}, self.bodies[k]))
                     stage, held, staged = [], [], []
+
+    def basename(self, word):
+        """The name of the file a word names, or None when it does not expand."""
+        exp = self.expand(word)
+        return None if exp is None or "`" in exp else os.path.basename(exp.rstrip("/"))
+
+    def script(self, names, body, head, reds, subs, part, ecwd, whole, depth):
+        """A command after one that wrote a data heredoc's body to a file (ACT-GUARD-FIX-3 round 2, F2): when it may
+        run that file, the body is judged as the code it then is. A run the guard reads (bash or sh, source, python,
+        the file's own name, after a cd too) is judged as shell or Python; any other command given the file's name,
+        and a run whose script word does not expand (a loop's variable, $S), is code the guard cannot read: refused
+        under rule 1 when the body names the tests, and judged as shell under rule 5, as before this fix."""
+        if not head:
+            return
+        words, code = _script_words(head, reds)
+        unsure = None in names
+        how = None
+        for w, kind in words:
+            base = self.basename(w)
+            if base is not None and base in names:
+                how = kind
+                break
+            if (base is None or unsure) and kind in ("exec", "shell", "python") and \
+                    (kind != "exec" or base is None or "/" in w):
+                how = how or ("unknown-python" if kind == "python" else "unknown")
+        if how is None:
+            texts = code + [subs[int(k)] for w in head + [r[1] for r in reds]
+                            for k in re.findall(r"__gov_sub_(\d+)__", w)]
+            if any(n and n in t for n in names for t in texts):
+                how = "unknown-python" if _PY.match(os.path.basename(head[0])) else "unknown"
+        name = os.path.basename(head[0])
+        if how is None:
+            if name in ("cp", "mv", "ln", "install") and len(head) > 2 and \
+                    any(self.basename(w) in names for w in head[1:-1] if not w.startswith("-")):
+                names.add(self.basename(head[-1]))  # a copy of the script, which a later command may run
+            return
+        if how == "exec":
+            how = _shebang(body["text"])
+        if how == "python":
+            i = next((i for i, w in enumerate(head) if self.basename(w) in names), None)
+            argv = [self.expand(w) for w in head[i:]] if i is not None else None
+            self.code(body["text"], part, ecwd, whole, depth, shell_text=not body["quoted"], argv=argv)
+        elif how == "shell" and (body["quoted"] or not _EXPANSION.search(body["text"])):
+            self.script_shell(body["text"], part, ecwd, whole, depth)
+        else:
+            self.unknown_script(body["text"], part, ecwd, whole, depth, shell=how != "unknown-python")
+
+    def script_shell(self, text, part, ecwd, whole, depth):
+        """A script file's shell body, run by this command: its writes are the command's (rule 5); under rule 1 a
+        target that names the tests refuses wherever the script runs, and one it cannot work out refuses when the
+        body names them."""
+        sub = Judgement(self.parse, self.expand, self.bodies)
+        try:
+            sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
+        except Unreadable:
+            self.unknown_script(text, part, ecwd, whole, depth, shell=True)
+            return
+        shell = [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
+        self.shell += shell
+        self.findings += sub.findings
+        self.findings.append(([(SENT, None) if t == SENT else (t, os.path.normpath(t) if os.path.isabs(t) else None)
+                               for t in shell], part + "\n" + text, True))
+
+    def unknown_script(self, text, part, ecwd, whole, depth, shell):
+        """A script file run by a form the guard cannot read: refused under rule 1 when the body names the tests;
+        under rule 5 its body is read as shell, as before this fix (``shell``; not a Python body run by Python,
+        which rule 5 never read)."""
+        self.findings.append(([(SENT, None)], part + "\n" + text, True))
+        if shell:
+            sub = Judgement(self.parse, self.expand, self.bodies)
+            try:
+                sub.run(text, UNKNOWN if ecwd is None or ecwd.startswith(UNKNOWN) else ecwd, whole, depth + 1)
+                self.shell += [SENT if t.startswith(UNKNOWN) else t for t in sub.shell]
+            except Unreadable:
+                self.shell.append(SENT)
+
+    def py_argv(self, head):
+        """sys.argv of the Python a command runs (its words after the program: -c's code, -, or the script), each
+        expanded (None when it does not); None when the guard cannot tell."""
+        if not head or not _PY.match(os.path.basename(head[0])):
+            return None
+        args, i = head[1:], 0
+        while i < len(args) and args[i].startswith("-") and args[i] != "-":
+            a = args[i]
+            if not a.startswith("--") and a.endswith("c"):
+                return ["-c"] + [self.expand(w) for w in args[i + 2:]]
+            if not a.startswith("--") and ("c" in a[1:] or a.endswith("m")):
+                return None
+            i += 2 if a in ("-W", "-X") else 1
+        return [self.expand(w) for w in args[i:]] or ["-"]
 
     def sub(self, command, ecwd, whole, depth):
         """A command inside this one (a substitution, an sh -c string, eval's words, a shell heredoc)."""
@@ -1091,21 +1257,22 @@ class Judgement:
             if not a.startswith("--") and a.endswith("c"):
                 if i + 1 >= len(args):
                     return
-                self.code(args[i + 1], part, ecwd, whole, depth, shell_text=True)
+                self.code(args[i + 1], part, ecwd, whole, depth, shell_text=True,
+                          argv=["-c"] + [self.expand(w) for w in args[i + 2:]])
                 return
             if not a.startswith("--") and "c" in a[1:]:
-                self.findings.append(([(SENT, None)], part))  # -cXYZ: the code glued to the option
+                self.findings.append(([(SENT, None)], part, True))  # -cXYZ: the code glued to the option
                 return
             if a in ("-m",) or (not a.startswith("--") and a.endswith("m")):
                 return
             i += 2 if a in ("-W", "-X") else 1
 
-    def code(self, code, scope, ecwd, whole, depth, shell_text, definite=False):
+    def code(self, code, scope, ecwd, whole, depth, shell_text, argv=None):
         """Python code: its writes. Code the shell rewrites first is read once for each value of the variables it
         uses when the guard resolves them all (the command's own, a literal loop's words); otherwise ($(...),
         backticks, a variable it cannot resolve) it is code the guard cannot read, with the whole command as its
-        scope. ``definite``: only a target that names or lands in the tests counts (a script file the command
-        wrote and runs, which is otherwise not read, as any script file)."""
+        scope. A target it cannot work out refuses when the code or its command names the tests in any spelling
+        (round 2, F4: a glob, listdir, walk, chdir or computed path). ``argv``: the words the command gives it."""
         texts = [code]
         if shell_text and _EXPANSION.search(code):
             texts = []
@@ -1116,14 +1283,13 @@ class Judgement:
                         texts.append(self.expand(code))
             if not texts or None in texts:
                 texts = [code]
-                if not definite:
-                    self.findings.append(([(SENT, None)], whole))
+                self.findings.append(([(SENT, None)], whole, False))
         for text in dict.fromkeys(texts):
             try:
-                targets = python_writes(text, ecwd, self.nested(whole), depth)
+                targets = python_writes(text, ecwd, self.nested(whole), depth, argv)
             except (SyntaxError, ValueError, RecursionError):
                 targets = [(SENT, None)]
-            self.findings.append((targets, "" if definite else scope + "\n" + text))
+            self.findings.append((targets, scope + "\n" + text, True))
 
     def nested(self, whole):
         def judge(text, cwd, depth):
@@ -1133,30 +1299,33 @@ class Judgement:
             else:
                 sub.run(text, cwd, whole, depth)
             out = [(t, t) if t != SENT else (SENT, None) for t in sub.shell]
-            for targets, _scope in sub.findings:
+            for targets, _scope, _code in sub.findings:
                 out += targets
             return out
         return judge
 
-    def body(self, body, kind, part, ecwd, whole, depth):
+    def body(self, body, kind, part, ecwd, whole, depth, argv=None):
         if kind == "data":
             if not body["quoted"]:
                 text = re.sub(r"\\[\\$`]", "  ", body["text"])
                 for _, _, s, e in spans(text):
                     self.sub(text[s:e], ecwd, whole, depth)
         elif kind == "python":
-            self.code(body["text"], part, ecwd, whole, depth, shell_text=not body["quoted"])
+            self.code(body["text"], part, ecwd, whole, depth, shell_text=not body["quoted"], argv=argv)
         elif kind == "shell" and body["quoted"]:
             self.sub(body["text"], ecwd, whole, depth)
         else:
             # code the guard does not read (an unknown reader, or a shell body the shell rewrites first)
-            self.findings.append(([(SENT, None)], part + "\n" + body["text"]))
+            self.findings.append(([(SENT, None)], part + "\n" + body["text"],
+                                  bool(re.search(r"\b(perl|node|ruby|php)\b", part))))
 
 
 def judge(command, cwd, parse, expand):
     """The Judgement of ``command`` run at ``cwd``; Unreadable when the scan cannot read it for certain."""
     j = Judgement(parse, expand)
-    j.run(command, cwd, command)
+    # A line continuation is removed before the text is read (round 2, F3); the whole command's naming of the tests
+    # is read on both spellings.
+    j.run(command, cwd, command if "\\\n" not in command else command + "\n" + joined(command))
     return j
 
 

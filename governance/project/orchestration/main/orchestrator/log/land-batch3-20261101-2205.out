@@ -5,3 +5,10 @@ baseline 1f0bb5b3c516 (the nightly of 2026-10-31 (red))
 the baseline's own record: /tmp/gov-os-nightly-junit/20261031-0200, /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/nightly/20261031-0200/run.txt
 2026-11-01 21:56:23 warm clone merged reused (/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged); its stores kept, the rest of .gov-runtime cleared
 2026-11-01 21:56:23 merged W2-11, W2-105, W2-81 onto e639b83908c8: def27532f88a
+2026-11-02 00:09:59 flaky candidate (passes alone, decides nothing): tests/acceptance/W1-35/test_w1_35.py
+2026-11-02 00:10:29 flaky candidate (passes alone, decides nothing): tests/acceptance/W1-35/test_w1_35_orchestration.py
+2026-11-02 00:10:30 flaky candidate (passes alone, decides nothing): tests/unit/orchestration/test_cto_safety_nets.py::test_the_switch_names_a_tool_call_waiting_since_its_time
+2026-11-02 00:10:30 flaky candidate (passes alone, decides nothing): tests/unit/orchestration/test_cto_safety_nets.py::test_the_switch_counts_a_tool_result_as_an_answered_call_and_alerts_by_day_after_an_hour
+2026-11-02 00:10:30 flaky candidate (passes alone, decides nothing): tests/unit/orchestration/test_cto_safety_nets.py::test_a_forced_test_alert_goes_through_the_channel_and_a_replay_keeps_its_own_state
+2026-11-02 00:10:33 flaky candidate (passes alone, decides nothing): tests/unit/orchestration/test_cto_safety_nets.py::test_the_watch_exits_10_with_the_alert_line_on_a_stall_and_0_with_a_heartbeat_otherwise
+2026-11-02 00:10:35 flaky candidate (passes alone, decides nothing): tests/unit/orchestration/test_cto_safety_nets.py::test_a_standby_file_keeps_the_switch_quiet
