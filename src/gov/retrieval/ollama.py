@@ -5,10 +5,11 @@ Ollama's own 5-minute idle unload frees the model's memory. There is no unit and
 no keep-alive override. When the daemon cannot be reached within the deadline,
 the result names the facet state and the warning is written once to standard error.
 
-Two daemons are started so (DEC-261 as DEC-798 amends it): the shared one at
-``OLLAMA_HOST``, which builds the index, and a CPU-only one at
-``GOV_QUERY_OLLAMA_HOST``, which embeds the questions and nothing else. The second
-is started with its own ``OLLAMA_HOST`` and the GPU hidden (``NO_GPU``).
+Two daemons are started so (DEC-261 as DEC-798 amends it and DEC-1033 replaces its
+CPU-only rule): the shared one at ``OLLAMA_HOST``, which builds the index, and the
+query one at ``GOV_QUERY_OLLAMA_HOST``, which embeds the questions and nothing else.
+The second is started with its own ``OLLAMA_HOST`` and the GPU left visible: a
+question's vector is used from any device (DEC-1033).
 
 Every start of either daemon is capped (DEC-1014, DEC-1017): its parallel requests, its logical CPUs and its
 niceness come from the ``embedding_servers`` section of the resource gate's configuration file (W2-20), else from
@@ -40,9 +41,8 @@ DEFAULT_HOST = "127.0.0.1:11434"
 HEALTH_PATH = "/api/version"
 FACET = "semantic"
 WARNING = "Ollama is unavailable: semantic retrieval is skipped and results are FTS-only."
-QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"  # the CPU-only embedder's address, in OLLAMA_HOST's form (DEC-798)
+QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"  # the query embedder's address, in OLLAMA_HOST's form (DEC-798)
 QUERY_DEFAULT_HOST = "127.0.0.1:11435"
-NO_GPU = {"CUDA_VISIBLE_DEVICES": "-1"}  # an id that names no device: Ollama's documented way to use no GPU
 
 GATE_REL = ".gov-os/machine/gate.json"  # the resource gate's one configuration file, under HOME (W2-20)
 RESTARTS_REL = ".gov-os/machine/embedding-restarts.jsonl"  # one line per stop or start by ``safe_restart``
@@ -204,7 +204,7 @@ def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
                 "settings": None}
     executable = None if available else _executable(env)
     if executable:
-        daemon_env = {**env, PARALLEL_SETTING: str(settings["parallel"]), **(NO_GPU if server == "query" else {})}
+        daemon_env = {**env, PARALLEL_SETTING: str(settings["parallel"])}  # the GPU is not hidden (DEC-1033)
         try:
             # Its own session and no inherited streams: the daemon outlives this call and is never stopped.
             subprocess.Popen([executable, "serve"], env=daemon_env, stdin=subprocess.DEVNULL,
@@ -229,16 +229,17 @@ def ensure_available(*, timeout_s: float = 20.0, env=None) -> dict:
 
 
 def query_host(env=None) -> str:
-    """The CPU-only embedder's address: ``GOV_QUERY_OLLAMA_HOST``, else ``QUERY_DEFAULT_HOST``."""
+    """The query embedder's address: ``GOV_QUERY_OLLAMA_HOST``, else ``QUERY_DEFAULT_HOST``."""
     env = os.environ if env is None else env
     return env.get(QUERY_HOST_SETTING) or QUERY_DEFAULT_HOST
 
 
 def ensure_query_available(*, timeout_s: float = 20.0, env=None) -> dict:
-    """Make the CPU-only embedder answer at ``query_host``, as ``ensure_available`` does, starting ``ollama serve``
-    with ``OLLAMA_HOST`` set to that address and ``NO_GPU`` in its environment; never stopped."""
+    """Make the query embedder answer at ``query_host``, as ``ensure_available`` does, starting ``ollama serve``
+    with ``OLLAMA_HOST`` set to that address and the rest of the caller's environment as it is: the GPU is not
+    hidden (DEC-1033 replaces DEC-798's ``CUDA_VISIBLE_DEVICES=-1``); never stopped."""
     env = os.environ if env is None else env
-    return ensure_available(timeout_s=timeout_s, env={**env, "OLLAMA_HOST": query_host(env), **NO_GPU})
+    return ensure_available(timeout_s=timeout_s, env={**env, "OLLAMA_HOST": query_host(env)})
 
 
 def _embed_one(host: str, text: str, timeout_s: float) -> bytes | None:

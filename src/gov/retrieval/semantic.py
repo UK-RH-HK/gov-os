@@ -9,13 +9,13 @@ DEC-381).
   model list reported when the vectors were built (DEC-374). Vectors of another embedder are dropped and built again.
 - ``search(..., refresh=False)`` and ``manifest`` open the store read-only and never write it (DEC-322). Missing, empty
   or stale vectors, an absent ``sqlite_vec`` and an absent Ollama make the facet unavailable; none raises.
-- On the GPU the embedder gives a text a vector that depends on the prompt the runner computed just before it, by
-  this or any other client (DEC-773; W2-54's change record §5.5). On the CPU it gives one vector whatever came
-  before, whatever the request's shape and whoever else asks at the same time. So a question is embedded by the
-  CPU-only embedder at ``ollama.query_host()`` (DEC-798), in one request after the bare instruction, and the second
-  vector is its vector. It is used only when that embedder reports the model wholly on the CPU after computing it;
-  otherwise the facet is unavailable and the question goes nowhere else. The chunks go to the shared runner at
-  ``OLLAMA_HOST``, with no runner option.
+- A question is embedded by the query embedder at ``ollama.query_host()``, in one request after the bare
+  instruction, and the second vector is its vector. It is used whatever device computed it (DEC-1033, replacing
+  DEC-798's CPU-only rule): on the GPU the vector can depend on the prompt computed just before it (DEC-773), and
+  the owner accepted that drift on the evidence that it changed no answer of the standing memory measure. The vector
+  is used only when that embedder reports the model loaded after computing it and the two vectors are well-formed
+  (one length above 0, every number finite); otherwise the facet is unavailable and the question goes nowhere else.
+  The chunks go to the shared runner at ``OLLAMA_HOST``, with no runner option.
 - That vector is cached in ``QUERY_VECTORS_REL``, the one file a read writes (DEC-782): beside the store and never in
   it, keyed by the model, the revision the model list reports at the time of the search, the device that computed
   it and the sha256 of the exact text, at most ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` bytes. Round 3's entries, keyed
@@ -28,6 +28,7 @@ from __future__ import annotations
 import hashlib
 import http.client
 import json
+import math
 import os
 import sqlite3
 import struct
@@ -45,7 +46,7 @@ MODEL = "qwen3-embedding:0.6b"
 EMBEDDED = "embedded"  # the one value of ``embedding_policy`` that embeds (DEC-381)
 # A question is embedded with the model's retrieval instruction; a chunk is embedded without one.
 INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
-DEVICE = "cpu"  # the one device a question's vector is used from: on the CPU its vector is one vector
+DEVICES = ("cpu", "gpu")  # the devices a question's vector is used from (DEC-1033); the cache key names which one
 EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
@@ -55,7 +56,8 @@ TIMED_OUT: dict = {}  # ``_ask``'s answer to a request accepted and not answered
 NO_VECTORS = "sqlite_vec cannot be loaded: no vector can be stored or compared"
 NO_MODEL = f"{MODEL} is not in Ollama's model list"
 NO_EMBEDDING = f"Ollama did not embed with {MODEL}"
-NOT_ON_CPU = f"the query embedder does not report {MODEL} wholly on the CPU: its vector is not used"
+NOT_LOADED = f"the query embedder does not report {MODEL} loaded: its vector is not used"
+MALFORMED = f"the query embedder's vectors from {MODEL} are malformed: the question's vector is not used"
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS semantic_vector (chunk_id TEXT PRIMARY KEY, embedding BLOB NOT NULL);
@@ -130,13 +132,25 @@ def _revision(host: str | None = None) -> str | None:
     return None
 
 
-def _on_cpu(host: str) -> bool:
-    """True when the embedder at ``host`` reports, at ``/api/ps``, the model loaded wholly on the CPU: ``size_vram`` 0
-    and ``size`` above 0. A listing without the model, or one that cannot be read, is not the CPU."""
-    for model in (_ask("/api/ps", host=host) or {}).get("models") or []:
-        if MODEL in (model.get("name"), model.get("model")):
-            return model.get("size_vram") == 0 and (model.get("size") or 0) > 0
-    return False
+def _device(host: str) -> str | None:
+    """Where the embedder at ``host`` reports, at ``/api/ps``, the model loaded: ``"cpu"`` with ``size_vram`` 0,
+    ``"gpu"`` with ``size_vram`` above 0 (wholly or partly in GPU memory), each with ``size`` above 0 (DEC-1033). None
+    when the listing cannot be read, lacks the model or reports it without those two whole numbers."""
+    listing = _ask("/api/ps", host=host)
+    for model in (listing.get("models") or [] if isinstance(listing, dict) else []):
+        if isinstance(model, dict) and MODEL in (model.get("name"), model.get("model")):
+            size, vram = model.get("size"), model.get("size_vram")
+            if not all(isinstance(n, int) and not isinstance(n, bool) for n in (size, vram)) or size <= 0 or vram < 0:
+                return None
+            return "gpu" if vram > 0 else "cpu"
+    return None
+
+
+def _well_formed(vectors: list[bytes]) -> bool:
+    """True when the vectors are of one length above 0 and every number of the question's is finite."""
+    if len({len(vector) for vector in vectors}) != 1 or not vectors[-1]:
+        return False
+    return all(math.isfinite(number) for number in struct.unpack(f"{len(vectors[-1]) // 4}f", vectors[-1]))
 
 
 def _bound() -> int:
@@ -186,24 +200,33 @@ def _cache(path: Path, key: tuple, vector: bytes) -> None:
 
 
 def query_vector(root: Path, query: str) -> tuple[bytes | None, str | None]:
-    """The vector a search compares with for ``query``, and why there is none: the one cached under its key, else the
-    one the CPU-only embedder gives the question, sent right after the bare instruction in one request, if that
-    embedder then reports the model wholly on the CPU (cached then). When the embedder gives no vector, or does not
-    report the CPU, there is no vector and nothing is cached. Without a revision in the model list there is no key and
-    nothing is cached."""
+    """The vector a search compares with for ``query``, and why there is none: the one cached under its key for
+    either device, else the one the query embedder gives the question, sent right after the bare instruction in one
+    request, if the vectors are well-formed and that embedder then reports the model loaded, on any device (DEC-1033;
+    cached then, under that device). When the embedder gives no vector, malformed vectors or does not report the model
+    loaded, there is no vector and nothing is cached. Without a revision in the model list there is no key and nothing
+    is cached."""
     host = ollama.query_host()
     text, revision, path = INSTRUCTION + query, _revision(host), Path(root) / QUERY_VECTORS_REL
-    key = revision and (MODEL, revision, DEVICE, hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest())
-    cached = key and _cached(path, key)
-    if cached:
-        return cached, None
-    vectors = _embed([INSTRUCTION, text], host)
+    digest = hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest()
+    keys = {device: (MODEL, revision, device, digest) for device in DEVICES} if revision else {}
+    for key in keys.values():
+        cached = _cached(path, key)
+        if cached:
+            return cached, None
+    try:
+        vectors = _embed([INSTRUCTION, text], host)
+    except (struct.error, TypeError):  # an answer whose vectors are not lists of numbers
+        return None, MALFORMED
     if vectors is None:
         return None, NO_EMBEDDING
-    if not _on_cpu(host):  # read after the computation: a fresh embedder lists nothing until a request loads it
-        return None, NOT_ON_CPU
-    if key:
-        _cache(path, key, vectors[1])
+    if not _well_formed(vectors):
+        return None, MALFORMED
+    device = _device(host)  # read after the computation: a fresh embedder lists nothing until a request loads it
+    if device is None:
+        return None, NOT_LOADED
+    if device in keys:
+        _cache(path, keys[device], vectors[1])
     return vectors[1], None
 
 
@@ -328,8 +351,8 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
 
     With ``refresh`` the vectors are brought up to date first. Without, the store is not written, and missing, empty
     or stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342). Either way, the
-    question is embedded by the CPU-only embedder alone (started if needed) and its vector is cached beside the store
-    once the vectors can be answered from (DEC-782, DEC-798).
+    question is embedded by the query embedder alone (started if needed, on any device) and its vector is cached
+    beside the store once the vectors can be answered from (DEC-782, DEC-1033).
     """
     root = Path(root)
     reason = (_build(root, []) if refresh else None) or _status(root)

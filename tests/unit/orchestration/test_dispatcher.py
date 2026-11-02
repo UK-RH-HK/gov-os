@@ -79,6 +79,9 @@ def w(tmp_path, healthy_embed):
                # DEC-1015 item 2, all planted: a fake server answering; no slot file; an empty lock table
                DISPATCH_EMBED_URL=healthy_embed,
                DISPATCH_SLOT_GLOB=str(tmp_path / "slots" / "gov-os-heavy-slot-*.lock"), DISPATCH_PROC=str(tmp_path / "proc"),
+               # DEC-1030, all planted: no nvidia-smi (unless a test plants one), the two servers' logs in the folder
+               DISPATCH_NVIDIA_SMI=str(tmp_path / "nvidia-smi"), DISPATCH_GPU_LOG_SHARED=str(tmp_path / "serve-11434.log"),
+               DISPATCH_GPU_LOG_QUERY=str(tmp_path / "serve-11435.log"),
                DISPATCH_WORKTREES=str(wt), DISPATCH_FAKE_PROCS=str(procs), DISPATCH_FAKE_HELD=str(held),
                DISPATCH_GATE_CMD="echo OPEN", DISPATCH_DISK_CMD="true",
                DISPATCH_LAUNCH_CMD=f"{sys.executable} {launcher}", DISPATCH_LAND_CMD=f"{sys.executable} {lander}",
@@ -894,6 +897,8 @@ def test_the_nightlys_line_for_today_becomes_one_inbox_item(w):
 # ---- DEC-1014 item 1: land.py's commit tolerates a concurrent close's commit ----------------------------------------
 
 TOOLS = Path(__file__).resolve().parents[3] / ".gov-runtime/scratch/orchestrator/tools"
+SCRATCH_TOOLS = pytest.mark.skipif(not (TOOLS / "land.py").exists(),
+                                   reason="the CTO's untracked scratch tools are not in this tree (a clean clone)")
 
 
 def load_tool(name):
@@ -915,6 +920,7 @@ def locked_repo(tmp_path):
     return repo, lock
 
 
+@SCRATCH_TOOLS
 @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
 def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
     import threading
@@ -927,6 +933,7 @@ def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_pat
     assert r.returncode == 0 and git(repo, "log", "-1", "--format=%s") == "close"
 
 
+@SCRATCH_TOOLS
 @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
 def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
     repo, lock = locked_repo(tmp_path)  # held throughout
@@ -938,6 +945,7 @@ def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
     assert "b.txt" not in git(repo, "diff", "--cached", "--name-only")
 
 
+@SCRATCH_TOOLS
 @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
 def test_f1_both_tools_commit_their_records_through_the_retry(tool):
     src = (TOOLS / tool).read_text()
@@ -1460,3 +1468,238 @@ def test_nightly_hold_times_are_configured(w):
     assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY
     tick(w, DISPATCH_NOW=at(3, 30))  # outside the configured window: the default window does not apply
     assert calls(w) == ["land W2-A=abcdef1"]
+
+
+# ---- DEC-1030: the GPU, its holders and each embedding model's layers ---------------------------------------------------
+
+GPU_OK = "NVIDIA GeForce RTX 5070 Ti, 3584, 16303, 5"
+LOADED = "load_tensors: offloaded 29/29 layers to GPU\n"
+ON_CPU = "load_tensors: offloaded 0/29 layers to GPU\n"
+CUDA = "CUDA error: unknown error\n"
+
+
+def smi(w, gpu=GPU_OK, apps="", rc=0):
+    """A stand-in nvidia-smi: answers each query from planted text, counts its calls."""
+    exe = w.tmp / "nvidia-smi"
+    (w.tmp / "smi-gpu.txt").write_text(gpu + "\n")
+    (w.tmp / "smi-apps.txt").write_text(apps)
+    exe.write_text(f"#!{sys.executable}\nimport sys\nopen({str(w.tmp / 'smi-calls.txt')!r}, 'a').write(sys.argv[1] + '\\n')\n"
+                   f"if {rc}:\n    print('NVIDIA-SMI has failed', file=sys.stderr); sys.exit({rc})\n"
+                   f"q = 'gpu' if sys.argv[1].startswith('--query-gpu') else 'apps'\n"
+                   f"sys.stdout.write(open({str(w.tmp)!r} + '/smi-' + q + '.txt').read())\n")
+    exe.chmod(0o755)
+
+
+def smi_calls(w):
+    p = w.tmp / "smi-calls.txt"
+    return p.read_text().splitlines() if p.exists() else []
+
+
+def glog(w, server, text, mode="a"):
+    with open(w.tmp / ("serve-11434.log" if server == "shared" else "serve-11435.log"), mode) as f:
+        f.write(text)
+
+
+def gpu_items(w):
+    return sorted((w.d / "inbox").glob("*-gpu-alert*.txt"))
+
+
+def gpu_status(w):
+    return next(l for l in (w.d / "status.txt").read_text().splitlines() if l.startswith("GPU: "))
+
+
+def test_gpu_the_state_line_from_a_normal_nvidia_smi(w):
+    smi(w)
+    glog(w, "shared", "time=x level=INFO msg=start\n" + LOADED)
+    r = tick(w)
+    assert r.returncode == 0 and status(w)["failures"] == []
+    assert gpu_status(w) == ("GPU: RTX 5070 Ti 3.5/15.9 GB, 5 %; holders: embedder shared (0), reranker (0); "
+                             "layers: shared 29/29, query cpu-only by design")
+    assert len(smi_calls(w)) == 2 and gpu_items(w) == []  # one read a pass (two queries); a first pass alerts nothing
+    assert status(w)["gpu"]["state"]["total_mib"] == 16303
+
+
+def test_gpu_wsl_na_memory_keeps_the_pid(w):
+    fake_proc(w, 4242, 1, 0, cmd="/home/u/reranker-venv/bin/python -I /x/src/gov/retrieval/rerank_worker.py Qwen/Qwen3-Reranker-0.6B")
+    smi(w, apps="4242, [Not Found], [N/A]\n")
+    tick(w)
+    h = status(w)["gpu"]["state"]["holders"]
+    assert h == [{"pid": 4242, "name": "[Not Found]", "mib": None, "kind": "reranker"}]
+    assert "reranker (1)" in gpu_status(w)
+
+
+@pytest.mark.parametrize("how", ["missing", "failing"])
+def test_gpu_an_unreadable_nvidia_smi_is_a_status_line_not_a_failure(w, how):
+    if how == "failing":
+        smi(w, rc=9)
+    glog(w, "shared", LOADED)
+    r = tick(w)
+    assert r.returncode == 0 and status(w)["failures"] == []
+    line = gpu_status(w)
+    assert line.startswith("GPU: unreadable (") and "layers: shared 29/29" in line
+    assert ("exit 9" in line) if how == "failing" else ("nvidia-smi" in line)
+    assert (w.d / "status.txt").read_text().startswith("dispatcher ") and gpu_items(w) == []
+
+
+def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
+    (w.d / "ready.txt").write_text("")  # no lead starts: the inbox holds only the GPU's items
+    smi(w, gpu="NVIDIA GeForce RTX 5070 Ti, 14400, 16303, 99")
+    glog(w, "shared", LOADED + "an old " + CUDA)  # history before the first pass: not alerted
+    tick(w)
+    assert gpu_items(w) == []
+    glog(w, "shared", "ggml_cuda_compute_forward: x\n" + CUDA + "/build/ggml-cuda.cu:108: CUDA error\n")
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = gpu_items(w)
+    assert len(items) == 1 and items[0].name.endswith("-gpu-alert.txt") and not items[0].name.endswith("-server-hung.txt")
+    body = items[0].read_text().splitlines()
+    assert body[0] == "log: serve-11434.log" and body[1] == "GPU: CUDA error (shared)" and body[2].startswith("status: ")
+    text = items[0].read_text()
+    assert "shared: CUDA error: unknown error" in text and "14.1/15.9 GB, 99 %" in text and "W2:" not in text
+    assert "holders:" in text and "layers: shared 29/29" in text
+    assert (w.d / "inbox-stale.txt").read_text().startswith("gpu: the GPU CUDA error (shared) since ")
+    tick(w, DISPATCH_NOW=NOW + 120)  # no new line: not again
+    assert len(gpu_items(w)) == 1 and "last alert " in gpu_status(w)
+    items[0].rename(w.d / "inbox" / (items[0].name + ".read"))  # read: the stale line clears
+    tick(w, DISPATCH_NOW=NOW + 180)
+    assert not (w.d / "inbox-stale.txt").exists()
+    glog(w, "shared", CUDA)  # a second crash minutes later: every crash alerts (DEC-1030; review F3)
+    tick(w, DISPATCH_NOW=NOW + 240)
+    assert len(gpu_items(w)) == 1 and len(list((w.d / "inbox").glob("*.txt"))) == 1
+
+
+def test_gpu_an_empty_nvidia_smi_answer_still_reads_the_logs(w):
+    """Review F1: nvidia-smi answering nothing (exit 0) must not stop the logs being read."""
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="")
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", CUDA)
+    r = tick(w, DISPATCH_NOW=NOW + 60)
+    assert r.returncode == 0 and status(w)["failures"] == []
+    assert len(gpu_items(w)) == 1 and gpu_status(w).startswith("GPU: unreadable (")
+
+
+def test_gpu_an_unreadable_state_file_still_counts_new_errors(w):
+    """Review F2: a damaged gpu-health.json re-reads the recent log with its errors counted (an extra alert at
+    worst, never a missed one); the state is written whole (a rename)."""
+    (w.d / "ready.txt").write_text("")
+    smi(w)
+    glog(w, "shared", LOADED)
+    tick(w)
+    assert json.loads((w.d / "gpu-health.json").read_text())["offsets"]
+    (w.d / "gpu-health.json").write_text("{not json")
+    glog(w, "shared", CUDA)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1
+    assert json.loads((w.d / "gpu-health.json").read_text())["offsets"] and not (w.d / "gpu-health.json.tmp").exists()
+
+
+def test_gpu_a_zero_layer_load_on_the_shared_server_is_one_item(w):
+    smi(w)
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", "load_tensors: offloading 0 repeating layers to GPU\n" + ON_CPU)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = gpu_items(w)
+    assert len(items) == 1 and "GPU: 0 layers (shared)" in items[0].read_text()
+    assert "offloaded 0/29 layers to GPU" in items[0].read_text() and "layers: shared 0/29" in gpu_status(w)
+    glog(w, "shared", ON_CPU)  # loaded on the CPU again: the same incident
+    items[0].rename(w.d / "inbox" / (items[0].name + ".read"))
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert gpu_items(w) == [] and (w.d / "inbox-stale.txt").read_text().startswith("gpu: ")  # held while on the CPU
+    glog(w, "shared", LOADED)  # back on the GPU: cleared
+    tick(w, DISPATCH_NOW=NOW + 180)
+    assert not (w.d / "inbox-stale.txt").exists() and "layers: shared 29/29" in gpu_status(w)
+    glog(w, "shared", ON_CPU)  # a new incident
+    tick(w, DISPATCH_NOW=NOW + 240)
+    assert len(gpu_items(w)) == 1
+
+
+def test_gpu_a_zero_layer_load_already_current_at_the_first_pass_alerts(w):
+    smi(w)
+    glog(w, "shared", LOADED + ON_CPU)
+    tick(w)
+    assert len(gpu_items(w)) == 1
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1
+
+
+def test_gpu_a_zero_layer_load_on_the_query_server_is_by_design(w):
+    smi(w)
+    glog(w, "query", "time=x msg=start\n")
+    tick(w)
+    glog(w, "query", ON_CPU)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert gpu_items(w) == [] and "query cpu-only by design" in gpu_status(w)
+    conf(w, gpu_expected={"query": True})  # configurable: then it is an alert (and the shared default is kept)
+    glog(w, "query", ON_CPU)
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(gpu_items(w)) == 1 and "0 layers (query)" in gpu_items(w)[0].read_text()
+
+
+def test_gpu_offsets_survive_a_truncated_log(w):
+    smi(w)
+    glog(w, "shared", LOADED + "x" * 200 + "\n" * 50)
+    tick(w)
+    off = json.loads((w.d / "gpu-health.json").read_text())["offsets"]["shared"]["off"]
+    assert off == (w.tmp / "serve-11434.log").stat().st_size
+    glog(w, "shared", CUDA, mode="w")  # truncated (a restart's `>`): shorter than the offset
+    r = tick(w, DISPATCH_NOW=NOW + 60)
+    assert r.returncode == 0 and status(w)["failures"] == [] and len(gpu_items(w)) == 1
+    assert json.loads((w.d / "gpu-health.json").read_text())["offsets"]["shared"]["off"] == len(CUDA)
+
+
+def test_gpu_a_partial_last_line_waits_for_the_next_pass(w):
+    smi(w)
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", "CUDA err")  # being written
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert gpu_items(w) == []
+    glog(w, "shared", "or: unknown error\n")
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert len(gpu_items(w)) == 1 and "CUDA error: unknown error" in gpu_items(w)[0].read_text()
+
+
+def environ(w, pid, **env):
+    (w.tmp / "proc" / str(pid) / "environ").write_bytes(b"".join(f"{k}={v}".encode() + b"\0" for k, v in env.items()))
+
+
+def test_gpu_holders_are_classified_by_command_line_and_parents(w):
+    serve, llama = "/home/u/.local/ollama/bin/ollama serve", "/home/u/.local/ollama/lib/ollama/llama-server --model m"
+    fake_proc(w, 300, 1, 0, cmd=serve)
+    environ(w, 300, HOME="/home/u", SECRET_TOKEN="x")  # no OLLAMA_HOST: the shared server
+    fake_proc(w, 301, 300, 0, cmd=llama)
+    fake_proc(w, 310, 1, 0, cmd=serve)
+    environ(w, 310, OLLAMA_HOST="127.0.0.1:11435", CUDA_VISIBLE_DEVICES="-1")
+    fake_proc(w, 311, 310, 0, cmd=llama)
+    fake_proc(w, 320, 1, 0, cmd=serve)
+    environ(w, 320, OLLAMA_HOST="127.0.0.1:11447")  # a private test server
+    fake_proc(w, 321, 320, 0, cmd=llama)
+    fake_proc(w, 330, 1, 0, cmd="/v/bin/python -m gov.retrieval.rerank_worker Qwen/Qwen3-Reranker-0.6B")
+    fake_proc(w, 340, 1, 0, cmd="/usr/bin/python3 train.py")
+    apps = "".join(f"{p}, x, {m}\n" for p, m in ((301, "1200 MiB"), (311, "[N/A]"), (321, "300 MiB"), (330, "[N/A]"),
+                                                 (340, "10 MiB"), (999, "[N/A]")))
+    smi(w, apps=apps)
+    tick(w)
+    kinds = {h["pid"]: h["kind"] for h in status(w)["gpu"]["state"]["holders"]}
+    assert kinds == {301: "embedder shared", 311: "embedder query", 321: "embedder other", 330: "reranker",
+                     340: "other", 999: "other"}
+    assert ("holders: embedder shared (1), embedder query (1), embedder other (1), reranker (1), other (2)"
+            in gpu_status(w))
+    assert "SECRET" not in (w.d / "gpu-health.json").read_text() + (w.d / "status.json").read_text()
+
+
+def test_gpu_checked_every_n_passes(w):
+    smi(w)
+    conf(w, gpu_check_every=2)
+    for t in (NOW, NOW + 60, NOW + 120):
+        tick(w, DISPATCH_NOW=t)
+    assert len(smi_calls(w)) == 4  # passes 1 and 3, two queries each
+
+
+def test_gpu_a_dry_pass_reads_nothing(w):
+    smi(w)
+    glog(w, "shared", LOADED)
+    tick(w, "--dry")
+    assert smi_calls(w) == [] and not (w.d / "gpu-health.json").exists()

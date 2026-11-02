@@ -124,15 +124,31 @@ def test_the_shared_server_starts_under_the_default_cap_and_its_child_inherits_i
         assert run["cpus"] == _highest(8) and run["nice"] >= 10 and run["parallel"] == "1", run
 
 
-def test_the_query_server_starts_under_its_configured_cap_with_the_gpu_hidden(stage):
+@pytest.mark.parametrize("gpu", [None, "0"])
+def test_the_query_server_starts_under_its_configured_cap_with_the_gpu_left_visible(stage, gpu):
+    """DEC-1033: no ``CUDA_VISIBLE_DEVICES=-1`` is added; the caller's own value, if any, reaches the daemon as it is."""
     stage.gate({"other": 1, "embedding_servers": {"query": {"parallel": 3, "cpus": "0-1", "nice": 15},
                                                   "shared": {"parallel": 2}}})
-    result = ollama.ensure_query_available(timeout_s=15, env={**stage.env, "OLLAMA_NUM_PARALLEL": "9"})
+    caller = {"CUDA_VISIBLE_DEVICES": gpu} if gpu is not None else {}
+    result = ollama.ensure_query_available(timeout_s=15, env={**stage.env, "OLLAMA_NUM_PARALLEL": "9", **caller})
     assert result["available"] and result["started"], result
     assert result["settings"] == {"parallel": 3, "cpus": "0-1", "nice": 15,
                                   "source": str(stage.home / ollama.GATE_REL)}
     for run in stage.wait_runs(2):
-        assert (run["cpus"], run["nice"] >= 15, run["parallel"], run["gpu"]) == ("0-1", True, "3", "-1"), run
+        assert (run["cpus"], run["nice"] >= 15, run["parallel"], run["gpu"]) == ("0-1", True, "3", gpu), run
+
+
+def test_an_automatic_start_of_the_query_server_runs_under_the_default_cap_like_the_shared_one(stage):
+    """Nothing listens at the query address and no gate file exists: the code's own start gives the started process
+    and its child the default CPU list and niceness, the same as the shared server's, and leaves the GPU visible."""
+    assert not (stage.home / ollama.GATE_REL).exists()
+    result = ollama.ensure_query_available(timeout_s=15, env=stage.env)
+    assert result["available"] and result["started"], result
+    assert result["settings"] == {"parallel": 1, "cpus": _highest(8), "nice": 10, "source": "default"}
+    runs = {run["who"]: run for run in stage.wait_runs(2)}
+    assert set(runs) == {"serve", "child"} and runs["serve"]["argv"] == ["serve"]
+    for run in runs.values():
+        assert (run["cpus"], run["nice"] >= 10, run["parallel"], run["gpu"]) == (_highest(8), True, "1", None), run
 
 
 @pytest.mark.parametrize("section, key", [
@@ -263,7 +279,7 @@ def test_a_safe_restart_starts_a_down_server_under_its_cap_and_records_it(stage)
     result = ollama.safe_restart("query", env=stage.env)
     assert (result["restarted"], result["old_pid"], result["probe"]["state"]) == (True, None, "down"), result
     assert "down" in result["reason"] and result["new_pid"] == stage.wait_runs(1)[0]["pid"]
-    assert all(run["cpus"] == "0" and run["nice"] >= 12 and run["gpu"] == "-1" for run in stage.wait_runs(2))
+    assert all(run["cpus"] == "0" and run["nice"] >= 12 and run["gpu"] is None for run in stage.wait_runs(2))
     record = [json.loads(line) for line in (stage.home / ollama.RESTARTS_REL).read_text().splitlines()]
     assert len(record) == 1 and record[0]["probe_state"] == "down" and record[0]["settings"]["cpus"] == "0"
 
