@@ -1,5 +1,5 @@
-"""Builder tests for ``gov rebuild --seed`` and the failed rebuild without its semantic store (W2-122; DEC-1014,
-DEC-1015 item 4).
+"""Builder tests for ``gov rebuild --seed`` and the rebuild without its semantic store, which answers as before and
+leaves no record, so its tree is no warm base (W2-122; DEC-1014, DEC-1027 C).
 
 Regression evidence only (MR-3). Each tree is a temporary git repository; the secrets filter lets every file through,
 the embedding endpoint is an in-process stand-in (``semantic._ask``, never the shared server: ``OLLAMA_HOST`` points
@@ -17,7 +17,6 @@ import subprocess
 import pytest
 
 from gov import codeintel
-from gov.cli.errors import GovError
 from gov.rebuild import seed
 from gov.rebuild.command import add_arguments, run
 from gov.retrieval import lexical, ollama, semantic
@@ -63,13 +62,14 @@ def _vectors(root):
 
 @pytest.fixture()
 def endpoint(monkeypatch):
-    """The embedding endpoint's stand-in: the texts it was asked to embed, its model's digest, and whether it fails."""
-    state = {"sent": [], "digest": "ac6da0dfba84" + "0" * 52, "fails": False}
+    """The embedding endpoint's stand-in: the texts it was asked to embed, its model's digest, whether it fails, and
+    after how many texts embedded it starts failing (None: never)."""
+    state = {"sent": [], "digest": "ac6da0dfba84" + "0" * 52, "fails": False, "fails_after": None}
 
     def ask(path, body=None, host=None):
         if path == "/api/tags":
             return {"models": [{"name": semantic.MODEL, "digest": state["digest"]}]}
-        if state["fails"]:
+        if state["fails"] or (state["fails_after"] is not None and len(state["sent"]) >= state["fails_after"]):
             return None
         state["sent"] += body["input"]
         return {"embeddings": [[float(len(text)), float(sum(map(ord, text)))] for text in body["input"]]}
@@ -209,14 +209,38 @@ def test_a_seed_without_embeddings_keeps_no_vector_and_asks_no_endpoint(base, tr
 
 
 @pytest.mark.parametrize("seeded", [False, True])
-def test_a_semantic_store_asked_for_and_not_recreated_fails_the_rebuild(base, tree, endpoint, seeded):
-    endpoint["fails"] = True
-    with pytest.raises(GovError) as raised:
-        run(tree, _args(*(("--seed", str(base)) if seeded else ())), CONFIG)
-    assert raised.value.code == "REBUILD_FAILED" and raised.value.details["store"] == "semantic"
-    assert raised.value.details["reason"] == semantic.NO_EMBEDDING
+@pytest.mark.parametrize("how", ["unavailable", "part way", "hung"])
+def test_a_semantic_store_not_recreated_answers_as_before_and_leaves_no_record(base, tree, endpoint, monkeypatch,
+                                                                                tmp_path, seeded, how):
+    """DEC-1027 C: the rebuild succeeds with ``stores.semantic`` ``not_recreated``, as at the ticket's base; its tree
+    keeps no record, so it is refused as a base and nothing of its partial semantic store is ever copied."""
+    if how == "unavailable":
+        endpoint["fails"], reason = True, semantic.NO_EMBEDDING
+    elif how == "part way":  # one text embedded and committed, then the endpoint fails: a partial store
+        monkeypatch.setattr(semantic, "BATCH", 1)
+        endpoint["fails_after"], reason = 1, semantic.NO_EMBEDDING
+    else:
+        def hung(root):
+            raise TimeoutError("the endpoint hung")
+        monkeypatch.setattr(semantic, "refresh", hung)
+        reason = "the endpoint hung"
+    result = run(tree, _args(*(("--seed", str(base)) if seeded else ())), CONFIG)
+    assert result["stores"]["semantic"] == {"status": "not_recreated", "reason": reason}
+    assert result["stores"]["lexical"]["status"] == "recreated"
+    assert ("seed" in result) is seeded and (not seeded or result["seed"]["status"] == "seeded")
+    if how == "part way":  # the store does hold a manifest over partial vectors: exactly what must never seed
+        assert semantic.manifest(tree) is not None and 0 < len(_vectors(tree)) < CHUNKS
     assert not (tree / seed.RECORD_REL).exists()
-    assert run(tree, _args("--no-embeddings"), CONFIG)["stores"]["semantic"]["requested"] is False
+    other = _repo(tmp_path / "other", FILES)
+    answer = seed.seed(other, str(tree), True)
+    assert answer["status"] == "refused" and "no readable record" in answer["reason"]
+    assert not (other / STORE).exists() and not (other / codeintel.BASE_REL).exists()
+
+
+def test_without_embeddings_the_answer_and_the_missing_record_are_unchanged(tree, endpoint):
+    result = run(tree, _args("--no-embeddings"), CONFIG)
+    assert result["stores"]["semantic"]["requested"] is False and not endpoint["sent"]
+    assert not (tree / seed.RECORD_REL).exists()
 
 
 @pytest.mark.parametrize("given", [(), ("--no-embeddings",), ("--seed", "BASE")])
