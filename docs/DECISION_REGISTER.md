@@ -12983,3 +12983,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.430 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1047. Next free id: DEC-1048. |
+
+### DEC-1048 — P-W2-112-F9 (c): the interim GPU-slot module stays as the machine-wide guard and W2-112's code lands; a cleanup approved; P-LB-PRODUCT-1 after the investigation; the DEC-1045 product switch continues
+- **Status:** ACCEPTED (owner, 2026-11-02 ~21:50, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; item 5 delegated, for the owner to overturn) · **Under:** DEC-1010, DEC-105, DEC-1047, DEC-1046, DEC-1043, DEC-1036
+- **Decision:** (1) **P-W2-112-F9 (c), as recommended:** keep the interim module (`gov-reranker-gpu-slot.pth`, ACT-RERANK-GPU-SLOTS-1) as the machine-wide guard (it caps every reranker, whatever its tree's commit); W2-112's KPI success-7 re-baselined: §5 of the research document records that the module is not to be retired by an ACT now, and is retired only when old code fails closed by construction ((b), a later ticket); a test designer revises `test_w2_112_retirement_act.py` to it (`Rewrite-Reason: DEC-1048`); its engineer rewrites §5; then W2-112's code lands through the queue. No third review round (DEC-1010): the change after round 2 is the re-baselined text and its test, checked by the lead's acceptance run. W2-112 is memory infrastructure and finishes under DEC-1047. (2) The owner approved removing `/tmp/gov-launch-engineer-y6het9bm` (done, 21:51). (3) P-LB-PRODUCT-1 waits for the investigation's list (DEC-1047). (4) The DEC-1045 product switch continues. (5) (delegated) DEC-1046 item 1 (P-W2-112-SLOTS (i), no private reranker beside the service in the product) moves after W2-112's landing, as a follow-up (the owner: "land W2-112's code"); `tools/rerank_service_slot_hold.py` stays the interim guard meanwhile.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.431 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861) and delegated item 5: DEC-1048. Next free id: DEC-1049. |
