@@ -79,4 +79,218 @@ bringing up nodes...
 .....................................................................F.. [ 94%]
 ........................................................................ [ 95%]
 ........................................................................ [ 96%]
-.........................
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+.......................................................                  [100%]
+=================================== FAILURES ===================================
+_ test_the_record_commit_is_retried_while_another_holds_the_index_lock[land.py] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-55/popen-gw0/test_the_record_commit_is_retr0')
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+        import threading
+        repo, lock = locked_repo(tmp_path)
+        threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x75688c451970>
+path = '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+_ test_the_record_commit_is_retried_while_another_holds_the_index_lock[close_build.py] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-55/popen-gw0/test_the_record_commit_is_retr1')
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+        import threading
+        repo, lock = locked_repo(tmp_path)
+        threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:923: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x75688c477aa0>
+path = '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+_______________ test_f6_retry_exhaustion_fails_cleanly[land.py] ________________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-55/popen-gw0/test_f6_retry_exhaustion_fails0')
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+        repo, lock = locked_repo(tmp_path)  # held throughout
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x75688c451f40>
+path = '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+____________ test_f6_retry_exhaustion_fails_cleanly[close_build.py] ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+tmp_path = PosixPath('/tmp/gov-os-lead-W2-04/pytest-of-usain/pytest-55/popen-gw0/test_f6_retry_exhaustion_fails1')
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+        repo, lock = locked_repo(tmp_path)  # held throughout
+>       mod = load_tool(tool)
+              ^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:933: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/unit/orchestration/test_dispatcher.py:903: in load_tool
+    spec.loader.exec_module(mod)
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1128: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x75688c4a4590>
+path = '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+<frozen importlib._bootstrap_external>:1186: FileNotFoundError
+______ test_f1_both_tools_commit_their_records_through_the_retry[land.py] ______
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+tool = 'land.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+>       src = (TOOLS / tool).read_text()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/land.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/land.py'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+__ test_f1_both_tools_commit_their_records_through_the_retry[close_build.py] ___
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+tool = 'close_build.py'
+
+    @pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+    def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+>       src = (TOOLS / tool).read_text()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/unit/orchestration/test_dispatcher.py:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/pathlib.py:1029: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/close_build.py')
+mode = 'r', buffering = -1, encoding = 'locale', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/usain/gov-os-worktrees/W2-04/.gov-runtime/scratch/orchestrator/tools/close_build.py'
+
+/usr/lib/python3.12/pathlib.py:1015: FileNotFoundError
+___________ test_one_row_per_register_entry_at_the_base_in_its_order ___________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+proposal = <function proposal.<locals>.read at 0x79f877804360>
+base = ('60a9b4a1093b9d743ed414c8a0acf92a7302d3c2', '# Governance OS — Tool & Architecture Decision Register\n\n**Register ID...ate | Change |\n|---|---|---|\n| 0.407 | 2026-11-02 | Orchestrator (delegated): DEC-1025. Next free id: DEC-1026. |\n')
+
+    def test_one_row_per_register_entry_at_the_base_in_its_order(proposal, base):
+        _, register_text = base
+        expected = s.heading_ids(register_text)
+        got = [row["id"] for row in table(proposal())]
+        missing = [i for i in expected if i not in got]
+        extra = [i for i in got if i not in expected]
+        twice = sorted({i for i in got if got.count(i) > 1})
+>       assert not missing and not extra and not twice, (
+            f"the table's rows are not the register's {len(expected)} entries: {len(missing)} missing "
+            f"({missing[:10]}), {len(extra)} not in the register ({extra[:10]}), twice: {twice[:10]}")
+E       AssertionError: the table's rows are not the register's 1021 entries: 42 missing (['DEC-984', 'DEC-985', 'DEC-986', 'DEC-987', 'DEC-988', 'DEC-989', 'DEC-990', 'DEC-991', 'DEC-992', 'DEC-993']), 0 not in the register ([]), twice: []
+E       assert (not ['DEC-984', 'DEC-985', 'DEC-986', 'DEC-987', 'DEC-988', 'DEC-989', ...])
+
+tests/acceptance/W2-55/test_w2_55_backfill.py:138: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/acceptance/W2-04/test_w2_04_reproducible.py:187: W204_LIVE_HOME names no HOME with the pinned embedder (README, local_only)
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+7 failed, 5805 passed, 3 skipped in 3482.39s (0:58:02)

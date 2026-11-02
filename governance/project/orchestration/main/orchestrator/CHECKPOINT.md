@@ -140,6 +140,13 @@ applied (CPU rerank >100 s/query): replaced by `drafts/ACT-RERANK-GPU-SLOTS-1.md
 superseded. The plan: `drafts/P1-LOAD-BALANCE-1.md` (with the GPU agent's figures; query on GPU: no answer changes)
 — commit to packages/ when the hold ends. W1-01b `DAEO-vhad` queued. SMART-WORK-6 applied (`4036a296`, `42889c78`).
 GPU at 15.1/16.3 GB with 11 rerankers at 12:16 (pre-crash state).
+**12:45 (owner) DEC-1032 `caa01da9`: FREEZE + the infrastructure sprint.** Ready list frozen (the rest parked in
+`dispatch/ready.parked-by-freeze.txt`; land.pending kept). Sprint: (i) W2-112 claimed `be02bb01`, first on the ready
+list (waits for CPU room); (ii) ACT-QUERY-GPU-1 `10f856c7` handed to the operator (HOLD on); W2-123 got the
+query-GPU line `b0156a41` (its lead messaged); (iii) dispatcher v4.6 being built by an engineer agent (review, then
+commit); (iv) seeding everywhere being built by an engineer agent (tools; review, then commit); W2-126 (the vector
+cache) filed+claimed `2a3c998f`, run 1 = tests only, queued; (v) the assessment after. After the query ACT: set
+dispatch/config.json `gpu_expected.query` true. Plan + v2 ACT committed `d03ce368`.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -1,14 +1,9 @@
 # The CTO's ready list (DEC-1007): the WBS order and dependencies, RESUME HERE's priorities. One line: <W2> <ticket id> <brief> <log>.
 # Memory chain first (W2-92 is the critical path: W2-13 waits for its landing).
 # DEC-1014: W2-122 and W2-123 at the front (they unblock every close)
+# FREEZE (DEC-1032): only the infrastructure sprint and the fix work in flight; the rest parked in ready.parked-by-freeze.txt
+W2-112 DAEO-clon W2-112-A5-run1.md W2-112-A5-run1.json
+W2-126 DAEO-jpr0 W2-126-A5-run1.md W2-126-A5-run1.json
 W2-123 DAEO-qzrq W2-123-A5-r2-retry.md W2-123-A5-r2-retry.json
 W2-04 DAEO-u4oz W2-04-A5-r5-repair.md W2-04-A5-r5-repair.json
 W2-122 DAEO-blwa W2-122-A5-r2-nok5.md W2-122-A5-r2-nok5.json
-W2-66b DAEO-zuiy W2-66b-A5-run1.md W2-66b-A5-run1.json
-W1-01b DAEO-vhad W1-01b-A5-run1.md W1-01b-A5-run1.json
-W2-104 DAEO-drhj W2-104-A5-r3-gitleaks.md W2-104-A5-r3-gitleaks.json
-W2-55 DAEO-arrl W2-55-A5-r2-append.md W2-55-A5-r2-append.json
-W2-81 DAEO-l78m W2-81-A5-r4-records.md W2-81-A5-r4-records.json
-W2-92 DAEO-n0wb W2-92-A5-run3-dec1019.md W2-92-A5-run3-dec1019.json
-W2-61h DAEO-h2k3 W2-61h-A5-verify.md W2-61h-A5-verify.json
-W2-91 DAEO-a3u2 W2-91-A5-td.md W2-91-A5-td.json
