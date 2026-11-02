@@ -15,7 +15,8 @@ readlink -f ~/.local/bin/gov | grep -q 'pin-5c401220' && echo "STOP: gov is stil
 S=$(dirname "$(readlink -f ~/.local/bin/gov)")/../lib/python3.12/site-packages/gov/retrieval/semantic.py
 grep -q -E 'NOT_ON_CPU|_on_cpu' "$S" && echo "STOP: the pin still has the CPU-only gate" || echo "ok: the pin accepts a vector from any device"
 timeout 300 sh -c 'while pgrep -f pin-5c401220 >/dev/null; do sleep 2; done' && echo "ok: no process of the old pin" || { echo "STOP: old-pin processes after 5 minutes:"; pgrep -af pin-5c401220; }
-head -12 ~/.local/bin/ollama | grep -q 'query-server-device' && echo "ok: the wrapper is in place" || echo "STOP: ~/.local/bin/ollama is not the wrapper"
+install -m 0755 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/ollama_query_cpu_wrapper.sh ~/.local/bin/ollama  # the wrapper's update: a server never keeps a heavy slot's thread budget (DEC-1038, the gate review's F3; 14 tests)
+head -14 ~/.local/bin/ollama | grep -q 'query-server-device' && grep -q 'GOV_HEAVY_THREAD_BUDGET' ~/.local/bin/ollama && echo "ok: the wrapper is in place, updated" || echo "STOP: ~/.local/bin/ollama is not the updated wrapper"
 ```
 Any `STOP`: do not go on; tell the CTO (the re-pin stays; the query server stays on the CPU).
 
