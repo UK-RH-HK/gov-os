@@ -25,9 +25,12 @@ allowed_paths:
 kpis:
   success:
   - '`gov queue` gives W2-97''s queue in the product: the commit tested is the commit landed; one run per batch on the merged result, in a heavy-job slot (W2-20); a run skipped when the merged code is identical to what the lead tested, with its reason; a red batch''s culprit ejected and the rest advanced (W2-115''s attribution) [DEC-959 item 1, DEC-983, DEC-982]'
-  - 'Each advance writes the record the close cites, and the close cites it instead of running its own tests on the same code [DEC-959 item 1, DEC-983, DEC-982]'
+  - 'Each green run lands and closes in one step: the ticket merges, its close record (the run, its counts, every red with its verdict, the baseline traced against) is written and the ticket closed on that run, the close citing the queue''s record instead of running its own tests on the same code; no ticket sits merged but not closed [DEC-989, DEC-959 item 1, DEC-983, DEC-982, DEC-1003, SMART-WORK-2]'
   - 'Nothing project-specific: no branch, path or ticket of this repository is named in the code; this repository''s queue moves onto it and W2-97''s tool is retired [DEC-983, DEC-982]'
   - 'After each landing, the queue starts the integration store''s refresh (W2-116) and seeds its own warm clones from it [DEC-1014 items 4 and 6, SMART-WORK-5 E, DEC-1015 item 3]'
+  - 'When the integration branch moved during a run only by record or governance files (the record places and the governance overlay), the queue merges onto the new head and re-runs only the record-reading suites (named in the test map), then advances; any other file in the move re-runs the whole selection; a record-reading set that cannot be read re-runs the whole selection [DEC-1001 (a), DEC-1003, SMART-WORK-2]'
+  - 'The queue keeps its work clones between runs (reset to the head, untracked files removed, the stores kept, so a rebuild is incremental); a clone that cannot be reset is replaced by a fresh one; measured: the rebuild''s seconds per run, warm against fresh [DEC-1001 (b), DEC-1003, SMART-WORK-2]'
+  - 'A ticket''s review rounds are counted from its probe records; a candidate with a blocking finding after two rounds is refused with "to the owner, once, with options", never queued for a third round [DEC-1010 item 1, SMART-WORK-3]'
   failure:
   - 'A branch advanced to a commit that was not the one tested, or after a red.'
   - 'A second run on identical code, or a skip without its reason.'

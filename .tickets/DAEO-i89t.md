@@ -31,8 +31,7 @@ sources:
 - DEC-996
 - DEC-992
 - CAP-24.b
-- AR-5
-- AR-6
+- DEC-718
 est_loc: 80
 acceptance_tests:
   path: tests/acceptance/W2-120/

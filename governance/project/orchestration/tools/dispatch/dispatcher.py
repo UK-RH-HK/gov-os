@@ -4,6 +4,7 @@ Its code is committed here (DEC-1010 item 6); its state stays in .gov-runtime/sc
 
     python3 dispatcher.py tick [--dry]     # one pass (cron every minute, or loop.sh); a second concurrent pass exits
     python3 dispatcher.py status           # prints status.txt
+    python3 dispatcher.py harvest          # the guard harvest alone (a pass starts it detached, after its decisions)
 
 Each pass, in order (a step's error is logged, shown in the status, and the pass goes on; a step never acts on an
 error in its own checks; every external command has a 60 s limit, a timeout counting as a failed check):
@@ -15,12 +16,25 @@ error in its own checks; every external command has a 60 s limit, a timeout coun
      the owner's launch form (tools/launch_when_gate_opens.sh, as lead_chain2.sh starts it), recorded before launch;
   4. land: land.txt claimed by an atomic rename, every line in one tools/land.py call, only when the queue is free,
      no close runs, the main tree is clean and on w2/integrate; its outcome becomes land-done.txt and an inbox item;
-  5. status.json and status.txt; 6. inbox-stale.txt (stable content) while an inbox item is unread 30 minutes.
+     from `nightly_hold_from` (03:15) until the nightly has started (or `nightly_hold_until`, 05:30) nothing is
+     claimed (DEC-1018 item 1); a landing already in flight is finalised as usual;
+  5. the guard harvest, when due: detached, with its own lock and time limit, after the start and land decisions;
+     its last result is shown in the status, and a failure or timeout is one of the pass's failures;
+  5b. the embedding server's health (DEC-1015 item 2): a test request every `embed_check_every` passes; failures in
+     a row make it HUNG, or NOT RUNNING when the last was refused (one Server: item, one line in inbox-stale.txt, once
+     per incident); while either holds, step 3 starts nothing (the last pass's state); a restart only when
+     `embed_restart_cmd` is configured, the incident has lasted `embed_restart_after_s`, at most one per 30 minutes;
+  5c. the heavy-slot holders' progress: a holder whose process tree's CPU time has not grown for `slot_idle_s` is
+     IDLE (one Slot: item and one line, once per holder); never killed;
+  6. status.json and status.txt; 7. inbox-stale.txt, one stable line per cause (the sentinel's watch silent, the
+     embedding server HUNG, a slot holder IDLE, an inbox item unread 30 minutes), each written once per stall.
 It never starts what is not in ready.txt and never lands what is not in land.txt (the CTO's lists).
 Every external command and path can be replaced through DISPATCH_* variables, for the tests only.
 """
 import fcntl
 import glob
+import hashlib
+import http.client
 import json
 import os
 import re
@@ -29,6 +43,8 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 E = os.environ.get
@@ -46,6 +62,9 @@ STALE_S = int(E("DISPATCH_STALE_S", "1800"))
 NEVER_RAN_S = int(E("DISPATCH_NEVER_RAN_S", "300"))
 TIMEOUT_S = int(E("DISPATCH_TIMEOUT_S", "60"))
 SLOTS = [Path(f"/tmp/gov-os-heavy-slot-{n}.lock") for n in (1, 2, 3)]
+SLOT_GLOB = E("DISPATCH_SLOT_GLOB", "/tmp/gov-os-heavy-slot-*.lock")  # the slot-progress pass (DEC-1015 item 2)
+PROC = Path(E("DISPATCH_PROC", "/proc"))  # the process table that pass reads; a planted one in the tests
+EMBED_URL = "http://127.0.0.1:11434/api/embed"
 RUN_LOCK = ORCH / "merge-queue" / "run.lock"
 MARKER = 'GOV_ROLE":"orchestrator","GOV_TICKET'  # the launch form's identity, as gate_check.py counts leads
 LOGNAME = re.compile(r"^[A-Za-z0-9][\w.-]*-A5-[\w.-]+\.json$")
@@ -74,13 +93,14 @@ class R:
         self.returncode, self.stdout, self.stderr = returncode, stdout, stderr
 
 
-def sh(cmd, **kw):
-    """Every external command with a time limit; a timeout is a failed command (124)."""
+def sh(cmd, limit=None, **kw):
+    """Every external command with a time limit (TIMEOUT_S unless `limit`); a timeout is a failed command (124)."""
+    limit = limit or TIMEOUT_S
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=TIMEOUT_S, **kw)
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=limit, **kw)
         return R(r.returncode, r.stdout, r.stderr)
     except subprocess.TimeoutExpired:
-        return R(124, "", f"timed out after {TIMEOUT_S} s: {' '.join(map(str, cmd))[:120]}")
+        return R(124, "", f"timed out after {limit} s: {' '.join(map(str, cmd))[:120]}")
 
 
 # ---- 1. the truth -------------------------------------------------------------------------------------------------
@@ -182,8 +202,12 @@ def truth():
     t["slots_held"] = [s.name for s in SLOTS if lock_held(s)]
     t["land_running"] = any(runs_script(a, "land.py") for a, _ in procs)
     t["close_running"] = any(runs_script(a, "close_build.py") for a, _ in procs)
+    t["closing_w2s"] = sorted({x for a, _ in procs if runs_script(a, "close_build.py")
+                               for x in a if re.fullmatch(r"W2-[0-9A-Za-z]+", x)})
     t["queue_busy"] = lock_held(RUN_LOCK) or t["land_running"]
     t["main_clean"] = tree_clean(REPO)
+    st = sh(["git", "-C", str(REPO), "status", "--porcelain"])
+    t["main_dirty"] = [l[3:] for l in st.stdout.splitlines() if l.strip()] if st.returncode == 0 else ["(git failed)"]
     br = sh(["git", "-C", str(REPO), "rev-parse", "--abbrev-ref", "HEAD"])
     t["main_branch"] = br.stdout.strip() if br.returncode == 0 else None
     t["_procs"] = procs
@@ -259,7 +283,13 @@ HEAVY = ("gov.context.context_check", "gov.retrieval.retrieve_check", "gov.check
 def config():
     c = {"K": 2, "outside_slot_limit_s": 300, "peaks_refresh_s": 3600, "peaks_max_age_s": 7 * 86400,
          "history_days": 7, "memory_rule": "slots", "min_outside_samples": 120,
-         "cpu_margin": 2}
+         "cpu_margin": 2,
+         # DEC-1015 item 2: the embedding server's health, and the slot holders' progress
+         "embed_check_every": 1, "embed_timeout_s": 30, "embed_hung_after": 3, "embed_restart_cmd": None,
+         "embed_restart_after_s": 900, "embed_restart_min_gap_s": 1800, "embed_model": "qwen3-embedding:0.6b",
+         "embed_url": EMBED_URL, "slot_idle_s": 900,
+         # DEC-1018 item 1: no landing claimed from this time until the nightly has started, or until the second
+         "nightly_hold_from": "03:15", "nightly_hold_until": "05:30"}
     try:
         c.update(json.loads(CONFIG.read_text()))
     except (OSError, ValueError):
@@ -644,9 +674,15 @@ def started():
 
 def inbox_item(name, body):
     (D / "inbox").mkdir(parents=True, exist_ok=True)
-    item = D / "inbox" / f"{fstamp()}-{name}.txt"
-    item.write_text(body)
-    return item
+    item, n = D / "inbox" / f"{fstamp()}-{name}.txt", 1
+    while True:  # F5 (v4 review): never overwrite an item (a name used twice in one second gets -2, -3, ...)
+        try:
+            with open(item, "x") as f:
+                f.write(body)
+            return item
+        except FileExistsError:
+            n += 1
+            item = D / "inbox" / f"{fstamp()}-{name}-{n}.txt"
 
 
 def collect_returns(t, dry=False):
@@ -701,6 +737,435 @@ def collect_returns(t, dry=False):
             f.write(logf + "\n")
         log(f"started but never ran: {w2} {logf}")
     return new
+
+
+KEY = re.compile(r"baseline|measure|figures|hit@5|findings report|probe record|research record|PACKAGE|returns? PACKAGES",
+                 re.I)
+
+
+def seen_set(name):
+    f = D / name
+    return set(f.read_text().splitlines()) if f.exists() else set()
+
+
+def mark_seen(name, items):
+    if items:
+        with open(D / name, "a") as f:
+            f.write("".join(i + "\n" for i in items))
+
+
+def change_key(wt, h, tree, subj):
+    """F5 (v4 review): what a commit changes, kept across a rebase: its stable patch-id; else (no patch-id, as for
+    an empty commit) its subject plus its tree."""
+    show = sh(["git", "-C", str(wt), "show", "--format=", h])
+    if show.returncode == 0 and show.stdout:
+        pid = sh(["git", "-C", str(wt), "patch-id", "--stable"], input=show.stdout)
+        if pid.returncode == 0 and pid.stdout.split():
+            return "patch " + pid.stdout.split()[0]
+    return "tree " + tree + " " + hashlib.sha1(subj.encode()).hexdigest()[:12]
+
+
+def watch_interim(dry):
+    """A lead's new commit (not on w2/integrate) whose subject marks a key result: one inbox item, once. A worktree
+    seen for the first time has its history marked seen silently. A key result is known by what it changes (its
+    patch-id), so the same commit rebased is not reported again."""
+    seen = seen_set("interim-seen.txt")
+    known = {x.split()[0] for x in seen if x}
+    new_seen, found = [], []
+    for wt in sorted(WT.glob("*")) if WT.is_dir() else []:
+        name = wt.name
+        if not wt.is_dir() or name.endswith("-tests") or name.startswith("W2-00-") or not (wt / ".git").exists():
+            continue
+        r = sh(["git", "-C", str(wt), "log", "--format=%h%x09%T%x09%s", "-20", "HEAD", "--not", "w2/integrate"])
+        if r.returncode:
+            continue
+        first = name not in known
+        if first:
+            new_seen.append(f"{name} (watched)")
+        for line in r.stdout.splitlines():
+            h, _, rest = line.partition("\t")
+            tree, _, subj = rest.partition("\t")
+            if f"{name} {h}" in seen:
+                continue
+            new_seen.append(f"{name} {h}")
+            if not KEY.search(subj):
+                continue
+            ck = f"{name} {change_key(wt, h, tree, subj)}"  # only for key results: two short commands each
+            if ck in seen or ck in new_seen:
+                continue
+            new_seen.append(ck)
+            if not first:
+                found.append((name, h, subj))
+    if dry:
+        for n, h, subj in found:
+            log(f"would report an interim result: {n} {h} {subj[:80]}")
+        return [f"{n} {h}" for n, h, _ in found]
+    mark_seen("interim-seen.txt", new_seen)
+    for n, h, subj in found:
+        inbox_item(f"{n}-interim-{h}", f"log: (interim)\nInterim: {n}\nstatus: interim result {h}: {subj[:200]}\n")
+        log(f"interim result: {n} {h} {subj[:80]}")
+    return [f"{n} {h}" for n, h, _ in found]
+
+
+def judged(line):
+    """F3 (v4 review): a refusal row that already carries a verdict (the harvest marks known patterns) or a judgement
+    (a row written by hand) needs no judging."""
+    try:
+        r = json.loads(line)
+    except ValueError:
+        return False
+    return isinstance(r, dict) and bool(r.get("verdict") or r.get("judgement"))
+
+
+def watch_guard(dry):
+    """The guard's refusals: every new, unjudged line of log/guard-refusals.jsonl becomes one inbox item. The first
+    pass only notes where the file ends; a file shorter than the offset (rewritten or reset) is re-baselined to its
+    end, with no items. The harvest that appends to the file runs apart (guard_harvest), after the pass's decisions."""
+    off_f, gl = D / "guard-offset.txt", LOG / "guard-refusals.jsonl"
+    if not gl.exists():
+        return []
+    lines = gl.read_text().splitlines()
+    try:
+        off = int(off_f.read_text())
+    except (OSError, ValueError):
+        if not dry:
+            off_f.write_text(str(len(lines)))
+        return []
+    if len(lines) < off:  # F3: shrunk: never replay old rows as a flood
+        if not dry:
+            off_f.write_text(str(len(lines)))
+            log(f"guard refusals: the file shrank from {off} to {len(lines)} lines; re-baselined, no items")
+        return []
+    new = [(off + i, line) for i, line in enumerate(lines[off:]) if line.strip() and not judged(line)]
+    if dry:
+        return [line for _, line in new]
+    for n, line in new:
+        inbox_item(f"guard-{n}", f"log: guard-refusals.jsonl line {n + 1}\nGuard: refusal\nstatus: a guard "
+                                 f"refusal to judge (DEC-958)\n\n{line[:600]}\n")
+    if len(lines) > off:  # F3: the offset is written only when the file grew
+        off_f.write_text(str(len(lines)))
+    if new:
+        log(f"guard refusals: {len(new)} new")
+    return [line for _, line in new]
+
+
+def harvest():
+    """The guard harvest itself (python3 dispatcher.py harvest): one at a time under dispatch/guard-harvest.lock, with
+    the `guard_harvest_timeout_s` limit (300); its result goes to dispatch/guard-harvest.json."""
+    D.mkdir(parents=True, exist_ok=True)
+    lock = open(D / "guard-harvest.lock", "a")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        log("guard harvest: another harvest is running; nothing done")
+        return 0
+    try:
+        limit = int(config().get("guard_harvest_timeout_s", 300))
+    except Exception:
+        limit = 300
+    cmd = shlex.split(E("DISPATCH_GUARD_CMD", f"python3 {ORCH}/tools/guard_refusals.py --quiet"))
+    t0 = time.time()
+    try:
+        r = sh(cmd, limit=limit)
+    except OSError as exc:
+        r = R(127, "", repr(exc))
+    rec = {"at": stamp(), "rc": r.returncode, "secs": round(time.time() - t0, 1), "limit_s": limit,
+           "tail": (r.stderr or r.stdout).strip()[-300:]}
+    (D / "guard-harvest.json").write_text(json.dumps(rec) + "\n")
+    log(f"guard harvest: rc {r.returncode} in {rec['secs']} s")
+    return r.returncode
+
+
+def guard_harvest(dry, c):
+    """F2 (v4 review): the harvest out of the pass's critical path. When due (every `guard_harvest_s`, 600) and no
+    harvest runs, it starts detached (its own session); DISPATCH_GUARD_SYNC=1 runs it in the pass (the tests)."""
+    if dry:
+        return "dry: no harvest"
+    last_f = D / "guard-harvested.txt"
+    try:
+        last = float(last_f.read_text())
+    except (OSError, ValueError):
+        last = 0.0
+    if now() - last < c.get("guard_harvest_s", 600):
+        return "not due"
+    if lock_held(D / "guard-harvest.lock"):
+        return "a harvest is still running"
+    last_f.write_text(str(now()))
+    if E("DISPATCH_GUARD_SYNC") == "1":
+        harvest()
+        return "ran in the pass"
+    subprocess.Popen([sys.executable, str(Path(__file__).resolve()), "harvest"], start_new_session=True,
+                     stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return "started detached"
+
+
+def harvest_result():
+    """The last harvest's record, and its failure line (a non-zero exit or a timeout) or None."""
+    try:
+        rec = json.loads((D / "guard-harvest.json").read_text())
+    except (OSError, ValueError):
+        return None, None
+    if not isinstance(rec, dict):
+        return None, "guard harvest: its record is unreadable"
+    rc = rec.get("rc")
+    if rc == 0:
+        return rec, None
+    why = "timed out" if rc == 124 else f"exit {rc}"
+    return rec, f"guard harvest: {why} at {rec.get('at')}: {str(rec.get('tail', ''))[-120:]}"
+
+
+def watch_nightly(dry):
+    """The nightly's end: log/nightly/status.txt gains a line for today: one inbox item, once."""
+    st = LOG / "nightly" / "status.txt"
+    if not st.exists():
+        return []
+    today = datetime.fromtimestamp(now()).strftime("%Y-%m-%d")
+    seen = seen_set("nightly-seen.txt")
+    new = [l for l in st.read_text().splitlines() if l.startswith(today) and l not in seen]
+    if dry or not new:
+        return new
+    for l in new:
+        inbox_item(f"nightly-{hashlib.sha1(l.encode()).hexdigest()[:8]}",
+                   f"log: nightly/status.txt\nNightly: {today}\nstatus: {l[:300]}\n")
+    mark_seen("nightly-seen.txt", new)
+    log(f"nightly: {len(new)} new status line(s) for {today}")
+    return new
+
+
+def sentinel_silent():
+    """(2) The watcher watched: while dispatch/sentinel-expected exists, the sentinel's watch writes log/deadman.log
+    each pass; its newest line older than 2 hours (or none) is a silence."""
+    if not (D / "sentinel-expected").exists():
+        return None
+    dl = LOG / "deadman.log"
+    try:
+        with open(dl, "rb") as f:  # the tail only: the log grows each pass
+            f.seek(max(0, os.path.getsize(dl) - 65536))
+            tail = [l for l in f.read().decode("utf-8", "replace").splitlines() if l.strip()]
+    except OSError:
+        tail = []
+    if not tail:
+        return "the sentinel's watch has written nothing to log/deadman.log"
+    last = age = None
+    for line in reversed(tail):  # F4 (v4 review): a malformed line falls back to the newest parseable one
+        try:
+            at = json.loads(line)["at"]
+            age = now() - datetime.strptime(at, "%Y-%m-%d %H:%M:%S").timestamp()
+            last = at
+            break
+        except (ValueError, KeyError, TypeError, IndexError):
+            continue
+    if last is None:
+        return "the sentinel's watch log is unreadable (no parseable line in log/deadman.log)"
+    if age > 7200:
+        return f"the sentinel's watch is silent since {last} ({int(age // 60)} min)"
+    return None
+
+
+# ---- 5b. the embedding server's health (DEC-1015 item 2) ----------------------------------------------------------------
+
+def load_json(name, default):
+    try:
+        v = json.loads((D / name).read_text())
+        return v if isinstance(v, type(default)) else default
+    except (OSError, ValueError):
+        return default
+
+
+def embed_probe(c):
+    """One test request: ("ok" | "timeout" | "fail" | "down", seconds, why). "down": nothing listens (refused)."""
+    url = E("DISPATCH_EMBED_URL") or c.get("embed_url") or EMBED_URL
+    body = json.dumps({"model": c.get("embed_model", "qwen3-embedding:0.6b"), "input": "dispatcher health check"}).encode()  # no keep_alive: the server's own setting stays
+    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # never through a proxy
+    t0 = time.time()
+    try:
+        with opener.open(req, timeout=float(c.get("embed_timeout_s", 30))) as r:
+            data = json.loads(r.read() or b"{}")
+        secs = round(time.time() - t0, 2)
+        if isinstance(data, dict) and data.get("embeddings"):
+            return "ok", secs, ""
+        return "fail", secs, "an answer with no embeddings"
+    except urllib.error.URLError as exc:
+        secs = round(time.time() - t0, 2)
+        if isinstance(exc.reason, ConnectionRefusedError):
+            return "down", secs, "connection refused"
+        if isinstance(exc.reason, TimeoutError):
+            return "timeout", secs, f"no answer in {c.get('embed_timeout_s', 30)} s"
+        return "fail", secs, str(exc)[:200]
+    except TimeoutError:
+        return "timeout", round(time.time() - t0, 2), f"no answer in {c.get('embed_timeout_s', 30)} s"
+    except (OSError, ValueError, http.client.HTTPException) as exc:
+        return "fail", round(time.time() - t0, 2), repr(exc)[:200]
+
+
+def watch_embedding(dry, c):
+    """Each `embed_check_every` passes, one test request (limit `embed_timeout_s`). `embed_hung_after` failures or
+    timeouts in a row make the server HUNG: one Server: item and a stable inbox-stale line, once per incident; both
+    clear when it answers. A restart only with `embed_restart_cmd` configured, HUNG for `embed_restart_after_s`, no
+    answer within that window, and no restart in the last `embed_restart_min_gap_s` (1800)."""
+    if dry:
+        return None
+    st = load_json("embed-health.json", {})
+    st["passes"] = st.get("passes", 0) + 1
+    every = max(1, int(c.get("embed_check_every", 1)))
+    if (st["passes"] - 1) % every:
+        (D / "embed-health.json").write_text(json.dumps(st))
+        return st
+    res, secs, why = embed_probe(c)
+    st.update(last_check_at=now(), last_result=res, last_secs=secs, last_why=why)
+    if res == "ok":
+        if st.get("hung_since"):
+            log(f"embedding server: answering again after {st.get('state')} since {stamp(st['hung_since'])}")
+        st.update(fails=0, first_fail_at=None, hung_since=None, last_ok_at=now(), state="healthy")
+    else:  # a failure, a timeout or a refusal: `embed_hung_after` in a row is an incident (hung_since: its start)
+        st["fails"] = st.get("fails", 0) + 1
+        st["first_fail_at"] = st.get("first_fail_at") or now()
+        bad = "NOT RUNNING" if res == "down" else "HUNG"
+        if st["fails"] >= int(c.get("embed_hung_after", 3)) and not st.get("hung_since"):
+            st["hung_since"] = st["first_fail_at"]
+            inbox_item("server-" + bad.lower().replace(" ", "-"),
+                       f"log: dispatch.log\nServer: the embedding server\nstatus: {bad} since "
+                       f"{stamp(st['hung_since'])}: {st['fails']} failed test requests in a row ({why}); "
+                       "starts are held; rebuilds and heavy steps that need it wait\n")
+            log(f"embedding server: {bad} since {stamp(st['hung_since'])} ({why})")
+        st["state"] = bad if st.get("hung_since") else "failing"
+        restart_if_due(st, c)
+    (D / "embed-health.json").write_text(json.dumps(st))
+    return st
+
+
+def restart_if_due(st, c):
+    cmd = c.get("embed_restart_cmd")
+    if not cmd or not st.get("hung_since"):
+        return
+    after = float(c.get("embed_restart_after_s", 900))
+    if now() - st["hung_since"] < after or (st.get("last_ok_at") or 0) >= now() - after:
+        return  # never while it answered within the window
+    if now() - (st.get("last_restart_at") or 0) < float(c.get("embed_restart_min_gap_s", 1800)):
+        return
+    argv = shlex.split(cmd) if isinstance(cmd, str) else [str(x) for x in cmd]
+    try:
+        r = sh(argv)
+    except OSError as exc:
+        r = R(127, "", repr(exc))
+    st["last_restart_at"] = now()
+    st["restarts"] = st.get("restarts", 0) + 1
+    tail = (r.stderr or r.stdout).strip()[-200:]
+    log(f"embedding server: restarted ({' '.join(argv)[:120]}): rc {r.returncode} {tail}")
+    inbox_item("server-restart", f"log: dispatch.log\nServer: the embedding server\nstatus: restarted after "
+                                 f"{st.get('state')} since {stamp(st['hung_since'])}: rc {r.returncode}\n\n{tail}\n")
+
+
+def embed_line(st):
+    if not st or "last_result" not in st:
+        return "not checked yet"
+    if st.get("state") == "healthy":
+        return f"healthy ({st.get('last_secs')} s)"
+    if st.get("state") in ("HUNG", "NOT RUNNING"):
+        return (f"{st['state']} since {stamp(st['hung_since'])} ({st.get('fails')} failed checks; "
+                f"{st.get('last_why')}); starts held")
+    return f"failing ({st.get('fails')} in a row; {st.get('last_why')})"
+
+
+SERVER_DOWN = ("HUNG", "NOT RUNNING")
+
+
+# ---- 5c. the heavy-slot holders' progress (DEC-1015 item 2) ---------------------------------------------------------
+
+def slot_name(path):
+    m = re.search(r"slot-([\w]+)\.lock$", str(path))
+    return m.group(1) if m else Path(path).name
+
+
+def slot_holders():
+    """{slot path: [holder pid]} from the lock table (a waiter, "->", is not a holder)."""
+    locks = (PROC / "locks").read_text().splitlines()
+    out = {}
+    for p in sorted(glob.glob(SLOT_GLOB)):
+        try:
+            ino = str(os.stat(p).st_ino)
+        except OSError:
+            continue
+        for line in locks:
+            f = line.split()
+            if "->" in f:
+                continue
+            dev = [i for i, x in enumerate(f) if x.count(":") == 2]
+            if dev and f[dev[0]].rsplit(":", 1)[1] == ino and f[dev[0] - 1].isdigit():
+                out.setdefault(p, []).append(int(f[dev[0] - 1]))
+    return out
+
+
+def proc_table():
+    """{pid: (ppid, utime + stime in clock ticks, start time)}."""
+    t = {}
+    for d in PROC.glob("[0-9]*"):
+        try:
+            text = (d / "stat").read_text()
+            rest = text[text.rindex(")") + 2:].split()
+            t[int(d.name)] = (int(rest[1]), int(rest[11]) + int(rest[12]), rest[19])
+        except (OSError, ValueError, IndexError):
+            continue
+    return t
+
+
+def tree_cpu(table, pid):
+    kids = {}
+    for p, (pp, _, _) in table.items():
+        kids.setdefault(pp, []).append(p)
+    total, todo, seen = 0, [pid], set()
+    while todo:
+        p = todo.pop()
+        if p in seen or p not in table:
+            continue
+        seen.add(p)
+        total += table[p][1]
+        todo.extend(kids.get(p, []))
+    return total
+
+
+def watch_slots(dry, c, embed):
+    """Each heavy-slot holder's process tree's CPU time, against the last sample (slot-progress.json). Not grown for
+    `slot_idle_s` (900): IDLE, one Slot: item naming the slot, the pid, the command, the tree and the idle time, once
+    per holder; it clears when the CPU grows or the holder ends. A holder is never killed."""
+    holders = slot_holders()
+    prev = load_json("slot-progress.json", {})
+    table = proc_table() if holders else {}
+    limit = float(c.get("slot_idle_s", 900))
+    cur = {}
+    for path, pids in holders.items():
+        for pid in pids:
+            if pid not in table:
+                continue
+            key = f"{pid}:{table[pid][2]}"  # the start time: a reused pid is a new holder
+            cpu, p = tree_cpu(table, pid), prev.get(key)
+            grew = p is None or cpu > p.get("cpu", -1)
+            try:
+                cmd = (PROC / str(pid) / "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", "replace")
+            except OSError:
+                cmd = "?"
+            try:
+                cwd = os.readlink(PROC / str(pid) / "cwd")
+            except OSError:
+                cwd = "?"
+            e = dict(slot=slot_name(path), pid=pid, cpu=cpu, since=now() if grew else p["since"],
+                     reported=False if grew else p.get("reported", False), cmd=cmd.strip()[:200], cwd=cwd)
+            idle = now() - e["since"]
+            if idle >= limit and not e["reported"] and not dry:
+                hung = embed and embed.get("state") == "HUNG"
+                inbox_item(f"slot-{e['slot']}-idle-{pid}",
+                           f"log: dispatch.log\nSlot: heavy slot {e['slot']}\nstatus: its holder is IDLE: no CPU "
+                           f"time for {int(idle // 60)} min (since {stamp(e['since'])}); pid {pid}; command "
+                           f"{e['cmd'][:160]}; tree {cwd}"
+                           + (f"; likely waiting on the embedding server, HUNG since {stamp(embed['hung_since'])}"
+                              if hung else "") + "; not killed: the CTO decides\n")
+                log(f"slot {e['slot']}: holder {pid} idle {int(idle // 60)} min")
+                e["reported"] = True
+            cur[key] = e
+    if not dry:
+        (D / "slot-progress.json").write_text(json.dumps(cur))
+    return cur
 
 
 def unread():
@@ -776,6 +1241,10 @@ def launch(w2, tid, brief, logf):
 
 
 def start_one(t, dry):
+    srv = load_json("embed-health.json", {}).get("state")
+    if srv in SERVER_DOWN:  # DEC-1015: the last known state (the check itself runs after the decisions)
+        why = "embedding server hung: starts held (DEC-1015)"
+        return None, {" ".join(e[:2]): why for e in read_list(D / "ready.txt")} or {"held": why}
     st = started()
     if st:
         try:
@@ -850,15 +1319,62 @@ def finalise_land(t, dry):
     return "finished"
 
 
+def clock_today(text, default):
+    """Today's local time HH:MM as a timestamp (a malformed value: the default)."""
+    for v in (text, default):
+        try:
+            h, m = (int(x) for x in str(v).split(":"))
+            return datetime.fromtimestamp(now()).replace(hour=h, minute=m, second=0, microsecond=0).timestamp()
+        except (ValueError, TypeError):
+            continue
+
+
+NIGHTLY_HELD = "held for the nightly (DEC-1018) until it starts"
+
+
+def nightly_hold(c):
+    """DEC-1018 item 1: the nightly (cron 04:00) starts only after 5 quiet minutes in a clean main tree, and a landing
+    run takes about 45 minutes; so from `nightly_hold_from` no new landing is claimed until the nightly has started
+    (ORCH/NIGHTLY-RUNNING newer than today's hold start, or a line for today in log/nightly/status.txt), and never
+    after `nightly_hold_until`. Returns the hold's reason, or None."""
+    start = clock_today(c.get("nightly_hold_from"), "03:15")
+    until = clock_today(c.get("nightly_hold_until"), "05:30")
+    if not start <= now() < until:
+        return None
+    try:
+        if (ORCH / "NIGHTLY-RUNNING").stat().st_mtime >= start:
+            return None
+    except OSError:
+        pass
+    today = datetime.fromtimestamp(now()).strftime("%Y-%m-%d")
+    try:
+        if any(l.startswith(today) for l in (LOG / "nightly" / "status.txt").read_text().splitlines()):
+            return None
+    except OSError:
+        pass
+    return NIGHTLY_HELD
+
+
 def land_step(t, dry):
     if (D / "land-inflight.txt").exists():
-        return finalise_land(t, dry)
+        return finalise_land(t, dry)  # a landing in flight is never stopped by the nightly hold
+    held = nightly_hold(t.get("_c") or {})
+    if held:
+        return held
     if not read_list(D / "land.txt"):
         return "nothing to land"
     if t["queue_busy"]:
         return "queue busy"
-    if t["close_running"]:
-        return "a close is running"
+    # DEC-1014 item 1: a running close holds a landing only if it closes one of the landing's tickets, or while it
+    # commits (its ticket or close-record files modified in the main tree: one pass); any other close does not
+    want = {" ".join(e).split("=")[0] for e in read_list(D / "land.txt")}
+    clash = sorted(want & set(t.get("closing_w2s", [])))
+    if clash:
+        return f"a close of {', '.join(clash)} is running (the same ticket): waits"
+    committing = t["close_running"] and t.get("main_dirty") and all(
+        p.startswith(".tickets/") or p.startswith("governance/project/orchestration/closes/") for p in t["main_dirty"])
+    if committing:
+        return "a close is committing its records: next pass"
     if not t["main_clean"]:
         return "main tree not clean"
     if t["main_branch"] != "w2/integrate":
@@ -929,11 +1445,55 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
         + (f"; started {started_w2}" if started_w2 else "")]
     (D / "status.txt").write_text("\n".join(txt) + "\n")
     stale = D / "inbox-stale.txt"
+    silent = sentinel_silent()
+    want = {}  # F4 (v4 review): one line per cause, keyed; the sentinel's first (deadman.py keys on 150 characters)
+    if silent:
+        want["sentinel"] = "sentinel: " + silent.split(" (")[0]  # stable for one silence: no minutes in it
+    emb, slots = load_json("embed-health.json", {}), load_json("slot-progress.json", {})
+    if emb.get("hung_since"):
+        want["server"] = f"server: the embedding server {emb.get('state')} since {stamp(emb['hung_since'])}"
+    for e in sorted(slots.values(), key=lambda e: (str(e.get("slot")), e.get("pid", 0))):
+        if e.get("reported"):
+            k = f"slot {e['slot']} pid {e['pid']}"
+            want[k] = f"{k}: IDLE since {stamp(e['since'])}"
     if age is not None and age >= STALE_S:
-        if not stale.exists():  # F1: stable content, written once per stall (the sentinel keys on it)
-            stale.write_text(f"{len(items)} inbox item(s) unread; the oldest {oldest_item.name}\n")
+        want["inbox"] = f"inbox: {len(items)} item(s) unread; the oldest {oldest_item.name}"
+    if silent:
+        if not (D / "sentinel-silence-reported.txt").exists():
+            inbox_item("sentinel-silent", f"log: deadman.log\nSentinel: silent\nstatus: {silent}; restart the sentinel "
+                                          "(ACT-SENTINEL-1) or remove dispatch/sentinel-expected\n")
+            (D / "sentinel-silence-reported.txt").write_text(silent + "\n")
+    elif (D / "sentinel-silence-reported.txt").exists():
+        os.unlink(D / "sentinel-silence-reported.txt")
+    s["sentinel"] = silent or ("watched" if (D / "sentinel-expected").exists() else "not expected")
+    have = {}
+    try:
+        for line in stale.read_text().splitlines():
+            if line.strip():  # a line without a known key (the v4 form) is the inbox's
+                k = line.split(":", 1)[0]
+                have.setdefault(k if k in ("sentinel", "server", "inbox") or k.startswith("slot ") else "inbox", line)
+    except OSError:
+        pass
+    order = ["sentinel", "server"] + sorted(k for k in want if k.startswith("slot ")) + ["inbox"]
+    keep = [have.get(k) or want[k] for k in order if k in want]  # a cause's line kept as first written
+    if keep:
+        text = "\n".join(keep) + "\n"
+        if not stale.exists() or stale.read_text() != text:
+            stale.write_text(text)
     elif stale.exists():
         os.unlink(stale)
+    rec, _ = harvest_result()
+    s["guard_harvest"] = rec
+    s["embedding_server"], s["slot_holders"] = emb or None, list(slots.values())
+    (D / "status.json").write_text(json.dumps(s, indent=1))  # again, with the sentinel's state
+    with open(D / "status.txt", "a") as f:
+        f.write(f"sentinel: {s['sentinel']}\n")
+        f.write("guard harvest: " + (f"last {rec.get('at')}, rc {rec.get('rc')}, {rec.get('secs')} s of "
+                                     f"{rec.get('limit_s')} s" if rec else "no record yet") + "\n")
+        f.write(f"embedding server: {embed_line(emb)}\n")
+        f.write("heavy slot holders: " + ("; ".join(
+            f"slot {e['slot']} pid {e['pid']} ({e['cmd'][:60]}) {'IDLE' if e.get('reported') else 'idle'} "
+            f"{int((now() - e['since']) // 60)} min" for e in slots.values()) or "none") + "\n")
 
 
 def fail_status(why):
@@ -964,6 +1524,13 @@ def tick(dry):
     except Exception as exc:
         failures.append(f"returns: {exc!r}"[:200])
         log(f"returns failed: {exc!r}")
+    for name, fn in (("interim", lambda: watch_interim(dry)), ("guard", lambda: watch_guard(dry)),
+                     ("nightly", lambda: watch_nightly(dry))):
+        try:
+            fn()
+        except Exception as exc:
+            failures.append(f"{name} watch: {exc!r}"[:200])
+            log(f"{name} watch failed: {exc!r}")
     try:
         started_w2, waits = start_one(t, dry)
     except Exception as exc:
@@ -975,6 +1542,25 @@ def tick(dry):
         land_state = f"error: {exc!r}"[:200]
         failures.append(f"land: {exc!r}"[:200])
         log(f"land failed: {exc!r}")
+    try:  # F2 (v4 review): after the start and land decisions, detached; its failure is the pass's, never silent
+        guard_harvest(dry, t.get("_c") or {})
+        _, hf = harvest_result()
+        if hf:
+            failures.append(hf[:200])
+    except Exception as exc:
+        failures.append(f"guard harvest: {exc!r}"[:200])
+        log(f"guard harvest failed: {exc!r}")
+    embed = None  # DEC-1015 item 2: after the decisions too (a hung server costs up to embed_timeout_s here)
+    try:
+        embed = watch_embedding(dry, t.get("_c") or {})
+    except Exception as exc:
+        failures.append(f"embedding check: {exc!r}"[:200])
+        log(f"embedding check failed: {exc!r}")
+    try:
+        watch_slots(dry, t.get("_c") or {}, embed)
+    except Exception as exc:
+        failures.append(f"slot progress: {exc!r}"[:200])
+        log(f"slot progress failed: {exc!r}")
     try:
         write_status(t, started_w2, waits, land_state, new, failures)
     except Exception as exc:
@@ -989,8 +1575,8 @@ def state_is_code():
 
 
 def main(argv):
-    if not argv or argv[0] not in ("tick", "status"):
-        sys.exit("usage: dispatcher.py tick [--dry] | status")
+    if not argv or argv[0] not in ("tick", "status", "harvest"):
+        sys.exit("usage: dispatcher.py tick [--dry] | status | harvest")
     if state_is_code() and E("DISPATCH_TEST") != "1":
         sys.exit(f"dispatcher: refused: the state folder {STATE} is the code folder or inside it (a stray "
                  "DISPATCH_STATE or DISPATCH_DIR?); nothing done")
@@ -998,6 +1584,8 @@ def main(argv):
         p = D / "status.txt"
         print(p.read_text() if p.exists() else "no status yet")
         return 0
+    if argv[0] == "harvest":
+        return harvest()
     if "--dry" in argv:
         os.environ["DISPATCH_DRY_FLAG"] = "1"
     return tick("--dry" in argv)

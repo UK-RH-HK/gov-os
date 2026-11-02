@@ -17,6 +17,8 @@ It keeps exactly five rules and nothing else (DEC-953 item 2, DEC-954):
 It reuses the product's own checks (gov.guard.reads, heldout, install, decide), imported from the pinned judge that
 runs this file. The product's full guard (template/governance/kernel/hooks/pretooluse.py, src/gov/guard/) stays built
 and tested; it is not wired here until the Gov OS is whole. Fail closed: an error or the 20-second deadline refuses.
+Rules 1 and 5 read a Bash command through bash_writes.py beside this file (ACT-GUARD-FIX-3): heredoc bodies, the
+command's own variables, substitutions and inline Python are judged by what they are, not by the words they hold.
 """
 import json
 import os
@@ -60,6 +62,49 @@ def inline_writes_acceptance(command):
     except ValueError:
         parts = [command]
     return any(INLINE_CODE.search(part) and ACCEPTANCE in part for part in parts)
+
+
+def parse_both(parse, command, cwd):
+    """The product's parser on a command it is to read as before this fix, and, when the command continues a line
+    with a backslash-newline, on the text with each one removed too (ACT-GUARD-FIX-3 round 2): the targets of both,
+    so a write split over lines is not missed."""
+    found = parse(command, cwd)
+    if "\\\n" not in command:
+        return found
+    more = parse(command.replace("\\\n", ""), cwd)
+    if found is None and more is None:
+        return None
+    return list(found or []) + list(more or [])
+
+
+def bash_judgement(command, cwd):
+    """ACT-GUARD-FIX-3: what ``command`` writes, read by bash_writes.py with the product's parser; None when the
+    command cannot be read for certain, which is then judged as before the fix."""
+    import bash_writes
+    from gov.guard.decide import _UNRESOLVABLE, _expand_token, _extract_bash_write_targets
+    if bash_writes.SENT != _UNRESOLVABLE:
+        raise RuntimeError("bash_writes.SENT differs from the parser's sentinel")
+    try:
+        return bash_writes.judge(command, cwd, _extract_bash_write_targets, _expand_token)
+    except bash_writes.Unreadable:
+        return None
+
+
+def code_writes_acceptance(findings, root, cwd):
+    """Rule 1 for the code a command runs inline (ACT-GUARD-FIX-3): a target that names or lands in the acceptance
+    tests refuses; one the guard cannot work out refuses when the code or its command names them (code: in any
+    spelling, round 2)."""
+    from bash_writes import SENT, UNKNOWN, names_tests
+    for targets, scope, code in findings:
+        for raw, full in targets:
+            if raw != SENT and "tests/acceptance" in raw:
+                return True
+            if raw == SENT or full is None or full.startswith(UNKNOWN):
+                if names_tests(scope, code):
+                    return True
+            elif under_acceptance(full, root, cwd) or "/tests/acceptance/" in full + "/":
+                return True
+    return False
 
 
 def tree_roots(root):
@@ -144,7 +189,12 @@ def main():
     for r in dict.fromkeys((role, acting)):
         hidden += reads._hidden(root, r, ticket)
     parts = [reads._Part(t, hidden, reads.HIDDEN_REFUSAL) for t in tree_roots(root)] if hidden else []
-    why = reads._Judge(root, parts).tool(tool, tin, cwd)
+    seen = tin
+    if tool == "Bash" and isinstance(tin.get("command"), str):
+        # ACT-GUARD-FIX-3: a heredoc that cat or tee takes as data is no read; $((n+6)) is no listing.
+        import bash_writes
+        seen = dict(tin, command=bash_writes.reads_view(tin["command"]))
+    why = reads._Judge(root, parts).tool(tool, seen, cwd)
     if why:
         answer("deny", why)
 
@@ -156,8 +206,11 @@ def main():
         elif tool == "Bash":
             from gov.guard.decide import _UNRESOLVABLE, _extract_bash_write_targets
             # The parser answers None for a read-only command, and a list of targets (the sentinel among them
-            # for a write it cannot resolve) otherwise (DEC-958 fix: None was read as "cannot read").
-            targets = _extract_bash_write_targets(tin.get("command") or "", cwd)
+            # for a write it cannot resolve) otherwise (DEC-958 fix: None was read as "cannot read"). The shell's
+            # own writes are judged; inline code is not, as before (ACT-GUARD-FIX-3).
+            judged = bash_judgement(tin.get("command") or "", cwd)
+            targets = (judged.shell or None) if judged is not None else \
+                parse_both(_extract_bash_write_targets, tin.get("command") or "", cwd)
             if targets and _UNRESOLVABLE in targets:
                 answer("deny", "a reviewer or auditor runs only commands whose writes can be read, and writes only "
                                "its own review or audit record")
@@ -173,11 +226,21 @@ def main():
         elif tool == "Bash":
             from gov.guard.decide import _UNRESOLVABLE, _extract_bash_write_targets
             command = tin.get("command") or ""
-            found = _extract_bash_write_targets(command, cwd)
-            # None is a read-only command (running or reading the tests is open, DEC-820); a write the parser
-            # cannot resolve, or inline interpreter code, is refused only when it names the acceptance tests.
-            unresolved = found is not None and _UNRESOLVABLE in found and ACCEPTANCE in command
-            if unresolved or inline_writes_acceptance(command):
+            judged = bash_judgement(command, cwd)
+            # A line continuation (backslash-newline) is read on both spellings (ACT-GUARD-FIX-3 round 2).
+            names = ACCEPTANCE in command or ACCEPTANCE in command.replace("\\\n", "")
+            if judged is None:
+                # Not read for certain (ACT-GUARD-FIX-3): judged as before.
+                found = parse_both(_extract_bash_write_targets, command, cwd)
+                # None is a read-only command (running or reading the tests is open, DEC-820); a write the parser
+                # cannot resolve, or inline interpreter code, is refused only when it names the acceptance tests.
+                unresolved = found is not None and _UNRESOLVABLE in found and names
+                inline = inline_writes_acceptance(command) or inline_writes_acceptance(command.replace("\\\n", ""))
+            else:
+                found = judged.shell
+                unresolved = _UNRESOLVABLE in found and names
+                inline = code_writes_acceptance(judged.findings, root, cwd)
+            if unresolved or inline:
                 answer("deny", "a command that may write the acceptance tests, which only the "
                                "independent test designer writes")
             targets = [t for t in (found or []) if t != _UNRESOLVABLE]

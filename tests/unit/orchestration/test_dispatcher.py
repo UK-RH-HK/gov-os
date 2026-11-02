@@ -28,8 +28,18 @@ def ticket(tid, status):
     return f"---\nid: {tid}\nstatus: {status}\nwbs_id: W2-X\n---\n# {tid}\n"
 
 
+@pytest.fixture(scope="session")
+def healthy_embed():
+    """One planted embedding server answering at once, for every test that does not plant its own (DEC-1015: a
+    server down holds starts)."""
+    srv, mode = fake_embed_server()
+    yield mode["url"]
+    srv.shutdown()
+    srv.server_close()
+
+
 @pytest.fixture
-def w(tmp_path):
+def w(tmp_path, healthy_embed):
     repo = tmp_path / "repo"
     repo.mkdir()
     git(repo, "init", "-q", "-b", "w2/integrate")
@@ -60,8 +70,15 @@ def w(tmp_path):
     (tmp_path / "loadavg").write_text("3.0 4.0 5.0 1/100 1\n")
     (tmp_path / "meminfo").write_text("MemAvailable:   16384000 kB\n")
     (tmp_path / "procstat").write_text(PROCSTAT.format(busy=1000, iowait=0, idle=9000))
+    (tmp_path / "proc").mkdir()
+    (tmp_path / "proc" / "locks").write_text("")
+    (tmp_path / "slots").mkdir()
     env = dict(os.environ, DISPATCH_ORCH=str(orch), DISPATCH_STATE=str(orch / "dispatch"), DISPATCH_REPO=str(repo),
-               DISPATCH_PROCSTAT=str(tmp_path / "procstat"), DISPATCH_NPROC="20",
+               DISPATCH_PROCSTAT=str(tmp_path / "procstat"), DISPATCH_NPROC="20", DISPATCH_GUARD_CMD="true",
+               DISPATCH_GUARD_SYNC="1",  # the harvest in the pass, for determinism; one test runs it detached
+               # DEC-1015 item 2, all planted: a fake server answering; no slot file; an empty lock table
+               DISPATCH_EMBED_URL=healthy_embed,
+               DISPATCH_SLOT_GLOB=str(tmp_path / "slots" / "gov-os-heavy-slot-*.lock"), DISPATCH_PROC=str(tmp_path / "proc"),
                DISPATCH_WORKTREES=str(wt), DISPATCH_FAKE_PROCS=str(procs), DISPATCH_FAKE_HELD=str(held),
                DISPATCH_GATE_CMD="echo OPEN", DISPATCH_DISK_CMD="true",
                DISPATCH_LAUNCH_CMD=f"{sys.executable} {launcher}", DISPATCH_LAND_CMD=f"{sys.executable} {lander}",
@@ -188,9 +205,9 @@ def test_land_waits_for_a_busy_queue_a_running_close_or_a_dirty_tree(w):
     tick(w)
     assert calls(w) == [] and status(w)["land"] == "queue busy"
     w.held.write_text("[]")
-    w.procs.write_text(json.dumps([{"cmd": "python3 tools/close_build.py W2-05", "cwd": "/"}]))
+    w.procs.write_text(json.dumps([{"cmd": "python3 tools/close_build.py W2-A", "cwd": "/"}]))  # the same ticket
     tick(w)
-    assert calls(w) == [] and status(w)["land"] == "a close is running"
+    assert calls(w) == [] and status(w)["land"].startswith("a close of W2-A is running")
     w.procs.write_text("[]")
     (w.repo / "dirty.txt").write_text("x")
     tick(w)
@@ -763,3 +780,683 @@ def test_v3_f3_the_scripts_clear_every_dispatch_variable():
         r = subprocess.run(["bash", "-c", line + "\nenv | grep '^DISPATCH_' || true"], capture_output=True, text=True,
                            env=dict(os.environ, DISPATCH_STATE="/tmp/stray", DISPATCH_DIR="/tmp/stray2"))
         assert r.stdout.strip() == "", script
+
+
+# ---- DEC-1014 item 1: a landing never waits for a close it does not conflict with ---------------------------------
+
+def land_one(w, line="W2-A=abcdef1"):
+    (w.d / "land.txt").write_text(line + "\n")
+    (w.d / "ready.txt").write_text("")
+
+
+def commit(d, files, msg, task=None):
+    for rel, text in files.items():
+        p = Path(d) / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text)
+    git(d, "add", "-A")
+    git(d, "commit", "-q", "-m", msg, *(["--trailer", f"Task: {task}"] if task else []))
+    return git(d, "rev-parse", "HEAD")
+
+
+def test_a_close_of_other_tickets_does_not_hold_a_landing(w):
+    land_one(w)
+    w.procs.write_text(json.dumps([{"cmd": "python3 /x/tools/close_build.py W2-B W2-C", "cwd": "/"}]))
+    tick(w)
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_a_close_of_the_same_ticket_holds_it(w):
+    land_one(w)
+    w.procs.write_text(json.dumps([{"cmd": "python3 /x/tools/close_build.py W2-A", "cwd": "/"}]))
+    tick(w)
+    assert calls(w) == [] and "a close of W2-A is running" in status(w)["land"]
+
+
+def test_a_close_committing_its_records_holds_one_pass(w):
+    land_one(w)
+    w.procs.write_text(json.dumps([{"cmd": "python3 /x/tools/close_build.py W2-B", "cwd": "/"}]))
+    (w.repo / ".tickets" / "T-A.md").write_text(ticket("T-A", "closed"))  # a close mid-commit
+    tick(w)
+    assert calls(w) == [] and "committing its records" in status(w)["land"]
+
+
+# ---- DEC-1014 item 2: the watcher watched ----------------------------------------------------------------------------
+
+def deadman_line(w, at):
+    (w.orch / "log" / "deadman.log").write_text(json.dumps({"at": at, "verdict": "alive"}) + "\n")
+
+
+def test_a_silent_sentinel_is_flagged_once_while_it_is_expected(w):
+    (w.d / "sentinel-expected").write_text("started 2026-11-01\n")
+    deadman_line(w, datetime.fromtimestamp(NOW - 3 * 3600).strftime("%Y-%m-%d %H:%M:%S"))
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert "sentinel" in (w.d / "inbox-stale.txt").read_text()
+    assert len([i for i in (w.d / "inbox").glob("*.txt") if "Sentinel: silent" in i.read_text()]) == 1
+    deadman_line(w, datetime.fromtimestamp(NOW + 100).strftime("%Y-%m-%d %H:%M:%S"))
+    for i in (w.d / "inbox").glob("*.txt"):
+        i.rename(w.d / "inbox" / (i.name + ".read"))
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert not (w.d / "inbox-stale.txt").exists() and status(w)["sentinel"] == "watched"
+
+
+def test_no_sentinel_expected_no_flag(w):
+    deadman_line(w, datetime.fromtimestamp(NOW - 3 * 3600).strftime("%Y-%m-%d %H:%M:%S"))
+    tick(w)
+    assert not (w.d / "inbox-stale.txt").exists() and status(w)["sentinel"] == "not expected"
+
+
+# ---- DEC-1014 item 3: the CTO's watchers as passes --------------------------------------------------------------------
+
+def test_an_interim_result_becomes_one_inbox_item_and_holds_no_start(w):
+    tick(w)  # the first pass marks each worktree's history seen
+    commit(w.wt / "W2-B", {"docs/m.md": "x"}, "W2-B: the measure after the fix (hit@5 12 of 20)", "T-B")
+    commit(w.wt / "W2-B", {"docs/n.md": "y"}, "W2-B: a plain step", "T-B")
+    tick(w, DISPATCH_NOW=NOW + 200)
+    tick(w, DISPATCH_NOW=NOW + 400)
+    items = [i.read_text() for i in (w.d / "inbox").glob("*.txt") if "Interim:" in i.read_text()]
+    assert len(items) == 1 and "the measure after the fix" in items[0]
+    assert all("W2: W2-B" not in i for i in items)  # an interim item never holds a lead's start
+
+
+def test_a_commit_already_on_integrate_is_not_an_interim_result(w):
+    tick(w)
+    commit(w.repo, {"docs/p.md": "z"}, "a probe record on integrate")  # the fixture's repository is on w2/integrate
+    git(w.wt / "W2-B", "merge", "-q", "--ff-only", "w2/integrate")
+    tick(w, DISPATCH_NOW=NOW + 200)
+    assert not [i for i in (w.d / "inbox").glob("*.txt") if "Interim:" in i.read_text()]
+
+
+def test_a_new_guard_refusal_becomes_one_inbox_item(w):
+    gl = w.orch / "log" / "guard-refusals.jsonl"
+    gl.write_text('{"at": "old 1"}\n{"at": "old 2"}\n')
+    tick(w)  # notes where the file ends
+    with open(gl, "a") as f:
+        f.write('{"at": "new 3", "form": "x"}\n')
+    tick(w, DISPATCH_NOW=NOW + 200)
+    tick(w, DISPATCH_NOW=NOW + 400)
+    items = [i.read_text() for i in (w.d / "inbox").glob("*.txt") if "Guard:" in i.read_text()]
+    assert len(items) == 1 and "new 3" in items[0]
+
+
+def test_the_nightlys_line_for_today_becomes_one_inbox_item(w):
+    nd = w.orch / "log" / "nightly"
+    nd.mkdir(parents=True)
+    today = datetime.fromtimestamp(NOW).strftime("%Y-%m-%d")
+    (nd / "status.txt").write_text(f"2000-01-01 ran | old\n{today} ran | verdict: green\n")
+    tick(w)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = [i.read_text() for i in (w.d / "inbox").glob("*.txt") if "Nightly:" in i.read_text()]
+    assert len(items) == 1 and "verdict: green" in items[0]
+
+
+# ---- DEC-1014 item 1: land.py's commit tolerates a concurrent close's commit ----------------------------------------
+
+TOOLS = Path(__file__).resolve().parents[3] / ".gov-runtime/scratch/orchestrator/tools"
+
+
+def load_tool(name):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(name.replace(".", "_") + "_under_test", TOOLS / name)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def locked_repo(tmp_path):
+    repo = tmp_path / "r"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "w2/integrate")
+    commit(repo, {"a.txt": "1"}, "base")
+    (repo / "b.txt").write_text("2")
+    lock = repo / ".git" / "index.lock"
+    lock.write_text("")
+    return repo, lock
+
+
+@pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+def test_the_record_commit_is_retried_while_another_holds_the_index_lock(tmp_path, tool):
+    import threading
+    repo, lock = locked_repo(tmp_path)
+    threading.Timer(0.6, lock.unlink).start()  # the other commit finishes 0.6 s later
+    mod = load_tool(tool)
+    assert mod.git_retry(["add", "--", "b.txt"], root=repo, wait=0.5).returncode == 0
+    r = mod.git_retry(["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "close", "--", "b.txt"],
+                      root=repo, wait=0.5)
+    assert r.returncode == 0 and git(repo, "log", "-1", "--format=%s") == "close"
+
+
+@pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+def test_f6_retry_exhaustion_fails_cleanly(tmp_path, tool):
+    repo, lock = locked_repo(tmp_path)  # held throughout
+    mod = load_tool(tool)
+    t0 = time.time()
+    r = mod.git_retry(["add", "--", "b.txt"], root=repo, tries=3, wait=0.2)
+    assert r.returncode != 0 and "index.lock" in r.stderr and lock.exists()
+    assert time.time() - t0 >= 0.4  # three tries, two waits; then it gives back, no exception
+    assert "b.txt" not in git(repo, "diff", "--cached", "--name-only")
+
+
+@pytest.mark.parametrize("tool", ["land.py", "close_build.py"])
+def test_f1_both_tools_commit_their_records_through_the_retry(tool):
+    src = (TOOLS / tool).read_text()
+    assert 'git_retry(["add", "--", *paths])' in src and 'cm = git_retry(["commit", "-q", "-m",' in src
+
+
+# ---- v4 review F6: the missing tests --------------------------------------------------------------------------------
+
+def test_f6_another_dirty_path_still_refuses_while_a_close_runs(w):
+    land_one(w)
+    w.procs.write_text(json.dumps([{"cmd": "python3 /x/tools/close_build.py W2-B", "cwd": "/"}]))
+    (w.repo / ".tickets" / "T-A.md").write_text(ticket("T-A", "closed"))  # the close's record
+    (w.repo / "notes.txt").write_text("someone else's edit\n")  # and something that is not
+    tick(w)
+    assert calls(w) == [] and status(w)["land"] == "main tree not clean"
+
+
+def test_f6_an_interim_item_leaves_a_leads_start_free(w):
+    (w.d / "ready.txt").write_text("")
+    tick(w)  # marks each worktree's history seen
+    commit(w.wt / "W2-B", {"docs/m.md": "x"}, "W2-B: the baseline figures", "T-B")
+    (w.d / "ready.txt").write_text("W2-B T-B B.md W2-B-A5-run1.json\n")
+    tick(w, DISPATCH_NOW=NOW + 200)
+    assert [i for i in (w.d / "inbox").glob("*.txt") if "Interim: W2-B" in i.read_text()]
+    assert any(c.startswith("launch") and "W2-B" in c for c in calls(w))
+
+
+def test_f6_the_sentinel_re_silences_after_clearing(w):
+    (w.d / "sentinel-expected").write_text("started\n")
+    old = lambda t: datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S")
+    deadman_line(w, old(NOW - 3 * 3600))
+    tick(w)
+    deadman_line(w, old(NOW + 100))
+    tick(w, DISPATCH_NOW=NOW + 120)  # cleared
+    assert status(w)["sentinel"] == "watched"
+    tick(w, DISPATCH_NOW=NOW + 100 + 7300)  # silent again
+    assert len([i for i in (w.d / "inbox").glob("*.txt") if "Sentinel: silent" in i.read_text()]) == 2
+
+
+# F2: the harvest out of the critical path
+
+def harvester(w, body):
+    h = w.tmp / "harvest.py"
+    h.write_text(f"import sys, time\nopen({str(w.calls)!r}, 'a').write('harvest\\n')\n{body}\n")
+    return f"{sys.executable} {h}"
+
+
+def test_f2_the_harvest_runs_detached_and_does_not_hold_the_pass(w):
+    t0 = time.time()
+    r = tick(w, DISPATCH_GUARD_SYNC="0", DISPATCH_GUARD_CMD=harvester(w, "time.sleep(4)"))
+    assert r.returncode == 0 and time.time() - t0 < 3.5
+    assert not (w.d / "guard-harvest.json").exists()  # still running when the pass has ended
+    for _ in range(100):
+        if (w.d / "guard-harvest.json").exists():
+            break
+        time.sleep(0.1)
+    assert json.loads((w.d / "guard-harvest.json").read_text())["rc"] == 0
+
+
+def test_f2_the_harvest_comes_after_the_start_and_land_decisions(w):
+    (w.d / "land.txt").write_text("W2-B=abcdef1\n")
+    tick(w, DISPATCH_GUARD_CMD=harvester(w, ""))
+    assert [c.split()[0] for c in calls(w)] == ["launch", "land", "harvest"]
+
+
+def test_f2_the_harvest_runs_at_most_every_guard_harvest_s(w):
+    cmd = harvester(w, "")
+    for t in (NOW, NOW + 60, NOW + 700):
+        tick(w, DISPATCH_GUARD_CMD=cmd, DISPATCH_NOW=t)
+    assert calls(w).count("harvest") == 2
+
+
+def test_f2_a_failed_harvest_is_one_of_the_pass_failures(w):
+    tick(w, DISPATCH_GUARD_CMD=harvester(w, "sys.exit(3)"))
+    assert any("guard harvest: exit 3" in f for f in status(w)["failures"])
+    assert (w.d / "status.txt").read_text().startswith("TICK FAILED in part: guard harvest")
+
+
+def test_f2_a_harvest_past_its_time_limit_is_a_failure(w):
+    (w.d / "config.json").write_text(json.dumps({"guard_harvest_timeout_s": 1}))
+    tick(w, DISPATCH_GUARD_CMD=harvester(w, "time.sleep(5)"))
+    assert any("guard harvest: timed out" in f for f in status(w)["failures"])
+    assert status(w)["guard_harvest"]["rc"] == 124
+
+
+def test_f2_a_second_harvest_waits_for_the_first(w):
+    with open(w.d / "guard-harvest.lock", "a") as lk:
+        fcntl.flock(lk, fcntl.LOCK_EX)
+        r = subprocess.run([sys.executable, str(TOOL), "harvest"], capture_output=True, text=True,
+                           env=dict(w.env, DISPATCH_GUARD_CMD=harvester(w, "")))
+    assert r.returncode == 0 and "harvest" not in calls(w)
+
+
+# F3: refusals already judged, the offset, a shrunk file
+
+def guard_rows(w, *rows, mode="a"):
+    with open(w.orch / "log" / "guard-refusals.jsonl", mode) as f:
+        f.write("".join(json.dumps(r) + "\n" for r in rows))
+
+
+def guard_items(w):
+    return [i.read_text() for i in (w.d / "inbox").glob("*.txt") if "Guard:" in i.read_text()]
+
+
+def test_f3_rows_already_judged_raise_no_item(w):
+    guard_rows(w, {"time": "old"}, mode="w")
+    tick(w)
+    guard_rows(w, {"time": "a", "verdict": "false-positive"}, {"at": "b", "judgement": "a known pattern"},
+               {"time": "c", "verdict": ""})
+    tick(w, DISPATCH_NOW=NOW + 60)
+    items = guard_items(w)
+    assert len(items) == 1 and '"c"' in items[0]
+
+
+def test_f3_the_offset_is_written_only_when_the_file_grows(w):
+    guard_rows(w, {"time": "old"}, mode="w")
+    tick(w)
+    off = w.d / "guard-offset.txt"
+    os.utime(off, (1, 1))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert off.stat().st_mtime == 1 and off.read_text() == "1"
+
+
+def test_f3_a_shrunk_file_is_re_baselined_without_a_flood(w):
+    guard_rows(w, {"time": "1"}, {"time": "2"}, {"time": "3"}, mode="w")
+    tick(w)
+    guard_rows(w, {"time": "reset"}, mode="w")  # rewritten shorter
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert guard_items(w) == [] and (w.d / "guard-offset.txt").read_text() == "1"
+    guard_rows(w, {"time": "fresh"})
+    tick(w, DISPATCH_NOW=NOW + 120)
+    items = guard_items(w)
+    assert len(items) == 1 and "fresh" in items[0]
+
+
+# F4: the sentinel's own line; a malformed deadman.log
+
+def test_f4_the_sentinels_silence_is_added_though_the_inbox_is_already_stale(w):
+    old_item(w)
+    tick(w)
+    first = (w.d / "inbox-stale.txt").read_text()
+    assert first.startswith("inbox: ")
+    (w.d / "sentinel-expected").write_text("started\n")
+    deadman_line(w, datetime.fromtimestamp(NOW - 3 * 3600).strftime("%Y-%m-%d %H:%M:%S"))
+    tick(w, DISPATCH_NOW=NOW + 60)
+    both = (w.d / "inbox-stale.txt").read_text()
+    lines = both.splitlines()
+    assert lines[0].startswith("sentinel: ") and lines[1] == first.strip() and len(lines) == 2
+    assert "sentinel" in both[:150]  # within what deadman.py keys on
+    tick(w, DISPATCH_NOW=NOW + 120)
+    assert (w.d / "inbox-stale.txt").read_text() == both  # no second line, no change
+
+
+def test_f4_a_malformed_deadman_line_falls_back_to_the_newest_parseable_one(w):
+    (w.d / "sentinel-expected").write_text("started\n")
+    recent = datetime.fromtimestamp(NOW - 60).strftime("%Y-%m-%d %H:%M:%S")
+    (w.orch / "log" / "deadman.log").write_text(json.dumps({"at": recent}) + "\n{broken\n[1, 2]\n")
+    tick(w)
+    assert status(w)["sentinel"] == "watched" and not status(w)["failures"]
+
+
+def test_f4_a_deadman_log_with_no_parseable_line_reads_unreadable(w):
+    (w.d / "sentinel-expected").write_text("started\n")
+    (w.orch / "log" / "deadman.log").write_text("{broken\nnot json\n")
+    tick(w)
+    assert "unreadable" in status(w)["sentinel"]
+    assert (w.d / "status.txt").read_text().startswith("dispatcher ")  # the status is whole, not a failed tick
+
+
+# F5: unique names; a rebased interim result
+
+def test_f5_two_nightly_lines_give_two_items(w):
+    nd = w.orch / "log" / "nightly"
+    nd.mkdir(parents=True)
+    today = datetime.fromtimestamp(NOW).strftime("%Y-%m-%d")
+    (nd / "status.txt").write_text(f"{today} ran | verdict: red\n{today} re-ran | verdict: green\n")
+    tick(w)
+    items = [i.read_text() for i in (w.d / "inbox").glob("*.txt") if "Nightly:" in i.read_text()]
+    assert len(items) == 2
+
+
+def test_f5_an_inbox_item_never_overwrites_another(w, monkeypatch):
+    import importlib.util
+    for k, v in w.env.items():
+        if k.startswith("DISPATCH_"):
+            monkeypatch.setenv(k, v)
+    spec = importlib.util.spec_from_file_location("dispatcher_under_test", TOOL)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    a, b = mod.inbox_item("same", "one\n"), mod.inbox_item("same", "two\n")
+    assert a != b and a.read_text() == "one\n" and b.read_text() == "two\n"
+
+
+def test_f5_a_rebased_interim_result_is_not_reported_again(w):
+    tick(w)
+    commit(w.wt / "W2-B", {"docs/m.md": "x"}, "W2-B: the baseline figures", "T-B")
+    tick(w, DISPATCH_NOW=NOW + 200)
+    commit(w.repo, {"docs/other.md": "y"}, "another landing on integrate")
+    git(w.wt / "W2-B", "rebase", "-q", "w2/integrate")  # a new commit id, the same change
+    tick(w, DISPATCH_NOW=NOW + 400)
+    items = [i for i in (w.d / "inbox").glob("*.txt") if "Interim:" in i.read_text()]
+    assert len(items) == 1
+
+
+# ---- DEC-1015 item 2: the embedding server's health -------------------------------------------------------------------
+
+@pytest.fixture
+def server():
+    """A planted embedding server on a free port: "ok" answers at once, "hang" answers after 3 s."""
+    srv, mode = fake_embed_server()
+    yield mode
+    srv.shutdown()
+    srv.server_close()
+
+
+def fake_embed_server():
+    import http.server
+    import threading
+    mode = {"m": "ok", "hits": 0}
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            mode["hits"] += 1
+            if mode["m"] == "hang":
+                time.sleep(3)
+            body = json.dumps({"embeddings": [[0.1, 0.2]]}).encode()
+            try:
+                self.send_response(200)
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            except OSError:
+                pass
+
+        def log_message(self, *a):
+            pass
+
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+    srv.daemon_threads = True
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    mode["url"] = f"http://127.0.0.1:{srv.server_address[1]}/api/embed"
+    return srv, mode
+
+
+def conf(w, **kv):
+    (w.d / "config.json").write_text(json.dumps(kv))
+
+
+def etick(w, server, t):
+    return tick(w, DISPATCH_EMBED_URL=server["url"], DISPATCH_NOW=t)
+
+
+def items_with(w, label):
+    return [i.read_text() for i in (w.d / "inbox").glob("*.txt") if label in i.read_text()]
+
+
+def test_embed_a_server_answering_is_healthy(w, server):
+    etick(w, server, NOW)
+    assert server["hits"] == 1 and status(w)["embedding_server"]["state"] == "healthy"
+    assert "embedding server: healthy (" in (w.d / "status.txt").read_text() and not items_with(w, "Server:")
+
+
+REFUSED = "http://127.0.0.1:9/api/embed"  # nothing listens: a refused connection
+
+
+def test_embed_refused_three_times_is_not_running_one_item_and_recovery_clears_it(w, server):
+    (w.d / "ready.txt").write_text("")
+    for t in (NOW, NOW + 60):
+        tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
+    assert not items_with(w, "Server:") and status(w)["embedding_server"]["state"] == "failing"
+    for t in (NOW + 120, NOW + 180):  # the third refusal in a row, then a fourth
+        tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
+    down = items_with(w, "Server:")
+    assert len(down) == 1 and "NOT RUNNING since" in down[0] and "W2:" not in down[0]
+    assert (w.d / "inbox-stale.txt").read_text().startswith("server: the embedding server NOT RUNNING since")
+    assert "embedding server: NOT RUNNING since" in (w.d / "status.txt").read_text()
+    for i in (w.d / "inbox").glob("*.txt"):
+        i.rename(w.d / "inbox" / (i.name + ".read"))
+    etick(w, server, NOW + 240)
+    assert not (w.d / "inbox-stale.txt").exists() and status(w)["embedding_server"]["state"] == "healthy"
+
+
+def test_embed_a_configured_restart_applies_to_not_running(w):
+    r = w.tmp / "restart.py"
+    r.write_text(f"open({str(w.calls)!r}, 'a').write('restart\\n')\n")
+    conf(w, embed_hung_after=1, embed_restart_after_s=60, embed_restart_cmd=f"{sys.executable} {r}")
+    (w.d / "ready.txt").write_text("")
+    for t in (NOW, NOW + 30, NOW + 90, NOW + 150):
+        tick(w, DISPATCH_EMBED_URL=REFUSED, DISPATCH_NOW=t)
+    assert calls(w).count("restart") == 1
+
+
+HELD = "embedding server hung: starts held (DEC-1015)"
+
+
+@pytest.mark.parametrize("why", ["hung", "refused"])
+def test_embed_starts_are_held_while_the_server_is_down_and_landings_are_not(w, server, why):
+    conf(w, embed_timeout_s=0.5, embed_hung_after=1)
+    server["m"] = "hang"
+    url = server["url"] if why == "hung" else REFUSED
+    tick(w, DISPATCH_EMBED_URL=url, DISPATCH_NOW=NOW)  # starts W2-A (no state yet), then finds the server down
+    assert [c for c in calls(w) if c.startswith("launch")] and status(w)["embedding_server"]["state"] in (
+        "HUNG", "NOT RUNNING")
+    (w.d / "land.txt").write_text("W2-A=abcdef1\n")
+    tick(w, DISPATCH_EMBED_URL=url, DISPATCH_NOW=NOW + 200)  # past the stagger: W2-B would start
+    assert len([c for c in calls(w) if c.startswith("launch")]) == 1
+    assert status(w)["ready_waits"]["W2-B T-B"] == HELD and "land W2-A=abcdef1" in calls(w)
+    server["m"] = "ok"
+    etick(w, server, NOW + 400)  # answers again: the next pass may start
+    etick(w, server, NOW + 600)
+    assert any(c.startswith("launch") and "W2-B" in c for c in calls(w))
+
+
+def test_embed_timeouts_count_to_hung_one_item_and_recovery_clears_it(w, server):
+    conf(w, embed_timeout_s=0.5)
+    server["m"] = "hang"
+    etick(w, server, NOW)
+    etick(w, server, NOW + 60)
+    assert not items_with(w, "Server:") and status(w)["embedding_server"]["state"] == "failing"
+    etick(w, server, NOW + 120)  # the third failure in a row
+    etick(w, server, NOW + 180)
+    hung = items_with(w, "Server:")
+    assert len(hung) == 1 and "HUNG since" in hung[0] and "W2:" not in hung[0]
+    assert (w.d / "inbox-stale.txt").read_text().startswith("server: the embedding server HUNG since")
+    assert "embedding server: HUNG since" in (w.d / "status.txt").read_text()
+    server["m"] = "ok"
+    for i in (w.d / "inbox").glob("*.txt"):
+        i.rename(w.d / "inbox" / (i.name + ".read"))
+    etick(w, server, NOW + 240)
+    assert not (w.d / "inbox-stale.txt").exists() and status(w)["embedding_server"]["state"] == "healthy"
+
+
+def test_embed_no_restart_unless_configured(w, server):
+    conf(w, embed_timeout_s=0.5, embed_hung_after=1, embed_restart_after_s=60)
+    server["m"] = "hang"
+    etick(w, server, NOW)
+    etick(w, server, NOW + 2000)
+    assert len(items_with(w, "Server:")) == 1 and "restart" not in calls(w)
+
+
+def test_embed_a_configured_restart_waits_for_its_time_and_is_rate_limited(w, server):
+    r = w.tmp / "restart.py"
+    r.write_text(f"open({str(w.calls)!r}, 'a').write('restart\\n')\n")
+    conf(w, embed_timeout_s=0.5, embed_hung_after=1, embed_restart_after_s=60,
+         embed_restart_cmd=f"{sys.executable} {r}")
+    server["m"] = "hang"
+    for t in (NOW, NOW + 30, NOW + 90, NOW + 150, NOW + 1900):  # HUNG at NOW; 30 s: too soon; 150 s: within 30 min
+        etick(w, server, t)
+    assert calls(w).count("restart") == 2
+    assert len([i for i in items_with(w, "Server:") if "restarted" in i]) == 2
+
+
+def test_embed_checked_every_n_passes(w, server):
+    conf(w, embed_check_every=2)
+    for t in (NOW, NOW + 60, NOW + 120):
+        etick(w, server, t)
+    assert server["hits"] == 2
+
+
+# ---- DEC-1015 item 2: the heavy-slot holders' progress ----------------------------------------------------------------
+
+def fake_proc(w, pid, ppid, ticks, start=100, cmd="python3 -m pytest tests", cwd=None):
+    d = w.tmp / "proc" / str(pid)
+    d.mkdir(exist_ok=True)
+    fields = ["S", str(ppid)] + ["0"] * 9 + [str(ticks), "0"] + ["0"] * 6 + [str(start)] + ["0"] * 5
+    (d / "stat").write_text(f"{pid} (a name) " + " ".join(fields) + "\n")  # a space inside the name, as /proc allows
+    (d / "cmdline").write_bytes(cmd.replace(" ", "\0").encode() + b"\0")
+    if not (d / "cwd").is_symlink():
+        (d / "cwd").symlink_to(cwd or (w.wt / "W2-A"))
+
+
+def hold(w, slot=1, pid=500):
+    p = w.tmp / "slots" / f"gov-os-heavy-slot-{slot}.lock"
+    p.write_text("")
+    ino = os.stat(p).st_ino
+    with open(w.tmp / "proc" / "locks", "a") as f:
+        f.write(f"1: FLOCK  ADVISORY  WRITE {pid} 08:30:{ino} 0 EOF\n")
+        f.write(f"1: -> FLOCK  ADVISORY  WRITE 999 08:30:{ino} 0 EOF\n")  # a waiter, not a holder
+
+
+def slot_tree(w, child_ticks):
+    fake_proc(w, 500, 1, 5, cmd="flock /tmp/gov-os-heavy-slot-1.lock gov rebuild")
+    fake_proc(w, 501, 500, child_ticks)
+
+
+def test_slot_a_holder_whose_cpu_grows_raises_nothing(w):
+    hold(w)
+    for n, t in enumerate((NOW, NOW + 1000, NOW + 2000)):
+        slot_tree(w, 10 + n * 10)
+        tick(w, DISPATCH_NOW=t)
+    assert not items_with(w, "Slot:")
+    assert "heavy slot holders: slot 1 pid 500" in (w.d / "status.txt").read_text()
+
+
+def test_slot_a_holder_idle_past_the_limit_is_one_item_not_repeated(w):
+    hold(w)
+    slot_tree(w, 10)
+    for t in (NOW, NOW + 600, NOW + 1000, NOW + 1100):
+        tick(w, DISPATCH_NOW=t)
+    found = items_with(w, "Slot:")
+    assert len(found) == 1
+    assert all(x in found[0] for x in ("heavy slot 1", "pid 500", "gov rebuild", str(w.wt / "W2-A"), "IDLE", "16 min"))
+    assert "slot 1 pid 500: IDLE since" in (w.d / "inbox-stale.txt").read_text()
+
+
+def test_slot_cpu_growing_again_clears_the_idle_line(w):
+    hold(w)
+    slot_tree(w, 10)
+    tick(w, DISPATCH_NOW=NOW)
+    tick(w, DISPATCH_NOW=NOW + 1000)
+    slot_tree(w, 11)
+    tick(w, DISPATCH_NOW=NOW + 1060)
+    assert "slot 1" not in ((w.d / "inbox-stale.txt").read_text() if (w.d / "inbox-stale.txt").exists() else "")
+
+
+def test_slot_a_holder_ending_clears_it(w):
+    hold(w)
+    slot_tree(w, 10)
+    tick(w, DISPATCH_NOW=NOW)
+    tick(w, DISPATCH_NOW=NOW + 1000)
+    (w.tmp / "proc" / "locks").write_text("")  # the holder ended
+    for i in (w.d / "inbox").glob("*.txt"):
+        i.rename(w.d / "inbox" / (i.name + ".read"))
+    tick(w, DISPATCH_NOW=NOW + 1060)
+    assert not (w.d / "inbox-stale.txt").exists() and status(w)["slot_holders"] == []
+    assert "heavy slot holders: none" in (w.d / "status.txt").read_text()
+
+
+def test_slot_an_idle_holder_while_the_server_is_hung_is_likely_waiting_on_it(w, server):
+    conf(w, embed_timeout_s=0.5, embed_hung_after=1, slot_idle_s=60)
+    server["m"] = "hang"
+    hold(w)
+    slot_tree(w, 10)
+    etick(w, server, NOW)
+    etick(w, server, NOW + 120)
+    found = items_with(w, "Slot:")
+    assert len(found) == 1 and "likely waiting on the embedding server" in found[0]
+
+
+# ---- DEC-1018 item 1: no landing claimed before the nightly has started ------------------------------------------------
+
+HELD_FOR_NIGHTLY = "held for the nightly (DEC-1018) until it starts"
+
+
+def at(hh, mm):
+    """NOW's day at a local time (the dispatcher runs in the same time zone as the test)."""
+    return datetime.fromtimestamp(NOW).replace(hour=hh, minute=mm, second=0, microsecond=0).timestamp()
+
+
+def nightly_running(w, mtime):
+    m = w.orch / "NIGHTLY-RUNNING"
+    m.write_text("nightly: running\n")
+    os.utime(m, (mtime, mtime))
+
+
+def test_nightly_hold_inside_the_window_claims_nothing(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(3, 30))
+    assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY and (w.d / "land.txt").exists()
+
+
+def test_nightly_hold_not_before_the_window(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(3, 14))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_does_not_hold_starts(w):
+    tick(w, DISPATCH_NOW=at(3, 30))
+    assert [c for c in calls(w) if c.startswith("launch")] and status(w)["land"] == HELD_FOR_NIGHTLY
+
+
+def test_nightly_hold_released_by_nightly_running(w):
+    land_one(w)
+    nightly_running(w, at(4, 1))
+    tick(w, DISPATCH_NOW=at(4, 10))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_released_by_a_status_line_for_today(w):
+    land_one(w)
+    nd = w.orch / "log" / "nightly"
+    nd.mkdir(parents=True)
+    today = datetime.fromtimestamp(NOW).strftime("%Y-%m-%d")
+    (nd / "status.txt").write_text(f"{today} FAILED | nightly NOT STARTED: by the latest start, ...\n")
+    tick(w, DISPATCH_NOW=at(4, 55))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_released_by_the_until_time(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(5, 30))
+    assert calls(w) == ["land W2-A=abcdef1"]
+
+
+def test_nightly_hold_a_stale_nightly_running_from_yesterday_does_not_release(w):
+    land_one(w)
+    nightly_running(w, at(4, 1) - 86400)
+    nd = w.orch / "log" / "nightly"
+    nd.mkdir(parents=True)
+    yesterday = datetime.fromtimestamp(NOW - 86400).strftime("%Y-%m-%d")
+    (nd / "status.txt").write_text(f"{yesterday} ran | verdict: green\n")  # yesterday's line does not release either
+    tick(w, DISPATCH_NOW=at(4, 10))
+    assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY
+
+
+def test_nightly_hold_a_landing_in_flight_is_finalised_not_stopped(w):
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(3, 10))  # claimed before the hold
+    assert calls(w) == ["land W2-A=abcdef1"] and (w.d / "land-inflight.txt").exists()
+    tick(w, DISPATCH_NOW=at(3, 20))
+    assert not (w.d / "land-inflight.txt").exists() and "CLOSED" in (w.d / "land-done.txt").read_text()
+
+
+def test_nightly_hold_times_are_configured(w):
+    conf(w, nightly_hold_from="02:00", nightly_hold_until="02:30")
+    land_one(w)
+    tick(w, DISPATCH_NOW=at(2, 10))
+    assert calls(w) == [] and status(w)["land"] == HELD_FOR_NIGHTLY
+    tick(w, DISPATCH_NOW=at(3, 30))  # outside the configured window: the default window does not apply
+    assert calls(w) == ["land W2-A=abcdef1"]
