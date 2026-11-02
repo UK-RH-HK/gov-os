@@ -295,7 +295,7 @@ def config():
          "embed_url": EMBED_URL, "slot_idle_s": 900,
          # DEC-1030: the GPU, its holders and each embedding model's layers (gpu_logs and gpu_expected merge per server)
          "gpu_smi": GPU_SMI, "gpu_smi_timeout_s": 10, "gpu_logs": dict(GPU_LOGS), "gpu_expected": dict(GPU_EXPECTED),
-         "gpu_check_every": 1, "gpu_alert_gap_s": 1800, "gpu_log_baseline_mb": 32, "gpu_log_read_max_mb": 64,
+         "gpu_check_every": 1, "gpu_alert_gap_s": 0, "gpu_log_baseline_mb": 32, "gpu_log_read_max_mb": 64,
          # DEC-1018 item 1: no landing claimed from this time until the nightly has started, or until the second
          "nightly_hold_from": "03:15", "nightly_hold_until": "05:30"}
     try:
@@ -1164,8 +1164,8 @@ def gpu_read(c):
     missing or failing nvidia-smi is {"ok": False, "why": ...}, never an exception. Two queries, the second only
     when the first answered (nvidia-smi takes one --query-* switch per call)."""
     lines, why = gpu_smi(c, "--query-gpu=name,memory.used,memory.total,utilization.gpu")
-    if lines is None:
-        return {"ok": False, "why": why, "at": now()}
+    if not lines:
+        return {"ok": False, "why": why or "nvidia-smi: an empty answer", "at": now()}
     f = [x.strip() for x in lines[0].split(",")]
     if len(f) < 4:
         return {"ok": False, "why": f"nvidia-smi: unreadable line {lines[0][:80]!r}", "at": now()}
@@ -1260,21 +1260,28 @@ def watch_gpu(dry, c):
     saved offset (gpu-health.json), the latest `load_tensors: offloaded X/Y` kept per server. A new `CUDA error`
     (`out of memory`, `cudaMalloc failed`) line, or a load with 0 layers on a server that expects the GPU
     (`gpu_expected`), writes one gpu-alert item at once, with the lines, the GPU's state and its holders; once per
-    incident: errors more than `gpu_alert_gap_s` (1800) after the last are a new incident; a 0-layer incident lasts
+    incident: errors more than `gpu_alert_gap_s` (0: every pass that finds new error lines alerts, DEC-1030) after the
+    last are a new incident; a 0-layer incident lasts
     until a load with layers on the GPU. A dry pass reads nothing."""
     if dry:
         return None
     st = load_json("gpu-health.json", {})
+    recovering = not st and (D / "gpu-health.json").exists()  # present but unreadable (review F2)
+    if recovering:
+        log("gpu watch: gpu-health.json unreadable: the recent logs are re-read with their errors counted")
     st["passes"] = st.get("passes", 0) + 1
     every = max(1, int(c.get("gpu_check_every", 1)))
     if (st["passes"] - 1) % every:
-        (D / "gpu-health.json").write_text(json.dumps(st))
+        gpu_save(st)
         return st
-    g = st["gpu"] = gpu_read(c)
+    try:
+        g = st["gpu"] = gpu_read(c)
+    except Exception as exc:  # noqa: BLE001 - the logs are read whatever the GPU read did (review F1)
+        g = st["gpu"] = {"ok": False, "why": f"the GPU read failed: {exc.__class__.__name__}", "at": now()}
     expected = dict(GPU_EXPECTED, **(c.get("gpu_expected") or {}))
     offs, layers = st.setdefault("offsets", {}), st.setdefault("layers", {})
     err_last, zero_since = st.setdefault("error_last_at", {}), st.setdefault("zero_since", {})
-    gap = float(c.get("gpu_alert_gap_s", 1800))
+    gap = float(c.get("gpu_alert_gap_s", 0))
     reasons, evidence, what = [], [], []
     for name, path in gpu_logs(c).items():
         lines, off, first = gpu_log_new(name, path, offs.get(name), c, dry)
@@ -1288,9 +1295,9 @@ def watch_gpu(dry, c):
                 if int(m.group(1)) == 0 and not first:
                     zero_load = True
                     evidence.append(f"{name}: {line.strip()[:300]}")
-        errors = [] if first else [l for l in lines if GPU_ERROR.search(l)]
+        errors = [] if first and not recovering else [l for l in lines if GPU_ERROR.search(l)]
         if errors:
-            if now() - err_last.get(name, float("-inf")) > gap:
+            if now() - err_last.get(name, float("-inf")) >= gap:
                 reasons.append(f"{len(errors)} new CUDA error line(s) in the {name} server's log")
                 what.append(f"CUDA error ({name})")
                 evidence.extend(f"{name}: {l.strip()[:300]}" for l in errors[:20])
@@ -1322,8 +1329,15 @@ def watch_gpu(dry, c):
         st["alerts"] = (st.get("alerts", []) + [{"at": now(), "what": "; ".join(what), "item": item.name}])[-20:]
         st["stale"] = {"since": now(), "what": "; ".join(what), "item": item.name}
         log(f"gpu watch: ALERT {'; '.join(what)} -> inbox/{item.name}")
-    (D / "gpu-health.json").write_text(json.dumps(st))
+    gpu_save(st)
     return st
+
+
+def gpu_save(st):
+    """gpu-health.json written whole or not at all (a temporary file, then a rename; review F2)."""
+    tmp = D / "gpu-health.json.tmp"
+    tmp.write_text(json.dumps(st))
+    os.replace(tmp, D / "gpu-health.json")
 
 
 def gpu_stale_line(st):

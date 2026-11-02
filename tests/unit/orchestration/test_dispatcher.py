@@ -1557,16 +1557,41 @@ def test_gpu_a_cuda_error_is_one_item_at_once_and_not_again(w):
     assert "shared: CUDA error: unknown error" in text and "14.1/15.9 GB, 99 %" in text and "W2:" not in text
     assert "holders:" in text and "layers: shared 29/29" in text
     assert (w.d / "inbox-stale.txt").read_text().startswith("gpu: the GPU CUDA error (shared) since ")
-    glog(w, "shared", CUDA)  # the same incident (within gpu_alert_gap_s): no second item
-    tick(w, DISPATCH_NOW=NOW + 120)
-    tick(w, DISPATCH_NOW=NOW + 180)
+    tick(w, DISPATCH_NOW=NOW + 120)  # no new line: not again
     assert len(gpu_items(w)) == 1 and "last alert " in gpu_status(w)
     items[0].rename(w.d / "inbox" / (items[0].name + ".read"))  # read: the stale line clears
-    tick(w, DISPATCH_NOW=NOW + 240)
+    tick(w, DISPATCH_NOW=NOW + 180)
     assert not (w.d / "inbox-stale.txt").exists()
-    glog(w, "shared", CUDA)  # two hours later (the night's 04:31 after 02:36): a new incident
-    tick(w, DISPATCH_NOW=NOW + 7200)
+    glog(w, "shared", CUDA)  # a second crash minutes later: every crash alerts (DEC-1030; review F3)
+    tick(w, DISPATCH_NOW=NOW + 240)
     assert len(gpu_items(w)) == 1 and len(list((w.d / "inbox").glob("*.txt"))) == 1
+
+
+def test_gpu_an_empty_nvidia_smi_answer_still_reads_the_logs(w):
+    """Review F1: nvidia-smi answering nothing (exit 0) must not stop the logs being read."""
+    (w.d / "ready.txt").write_text("")
+    smi(w, gpu="")
+    glog(w, "shared", LOADED)
+    tick(w)
+    glog(w, "shared", CUDA)
+    r = tick(w, DISPATCH_NOW=NOW + 60)
+    assert r.returncode == 0 and status(w)["failures"] == []
+    assert len(gpu_items(w)) == 1 and gpu_status(w).startswith("GPU: unreadable (")
+
+
+def test_gpu_an_unreadable_state_file_still_counts_new_errors(w):
+    """Review F2: a damaged gpu-health.json re-reads the recent log with its errors counted (an extra alert at
+    worst, never a missed one); the state is written whole (a rename)."""
+    (w.d / "ready.txt").write_text("")
+    smi(w)
+    glog(w, "shared", LOADED)
+    tick(w)
+    assert json.loads((w.d / "gpu-health.json").read_text())["offsets"]
+    (w.d / "gpu-health.json").write_text("{not json")
+    glog(w, "shared", CUDA)
+    tick(w, DISPATCH_NOW=NOW + 60)
+    assert len(gpu_items(w)) == 1
+    assert json.loads((w.d / "gpu-health.json").read_text())["offsets"] and not (w.d / "gpu-health.json.tmp").exists()
 
 
 def test_gpu_a_zero_layer_load_on_the_shared_server_is_one_item(w):
