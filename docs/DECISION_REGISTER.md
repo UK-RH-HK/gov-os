@@ -12758,3 +12758,11 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.405 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1023. Next free id: DEC-1024. |
+
+### DEC-1024 — P-W2-04-5: tickets cite DEC-718 for AR-5 and AR-6 (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5: P2, reversible, W2-04's lead's recommendation, confidence high; for the owner to overturn) · **Under:** DEC-718, DEC-519, DEC-521, DEC-866
+- **Decision:** AR-5 and AR-6 are items 5 and 6 of DEC-718, not records the store holds, so `gov context`'s check failed for every tree ("DAEO-i89t: mandatory input 'AR-5' not found in the store"; W2-04's run 4, W2-90b and W2-105 met the same red). W2-120 (`DAEO-i89t`), the one ticket that lists them as sources, cites DEC-718 instead; its KPI text keeps the AR names. W2-10 and W2-11 keep AR-5 and AR-6 under `closes:` (the exit-audit items they close), unchanged. Not listed in `external-references.yaml`: they live in the repository, inside a decision (DEC-519, DEC-521).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.406 | 2026-11-02 | Orchestrator (delegated): DEC-1024. Next free id: DEC-1025. |
