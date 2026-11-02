@@ -26,8 +26,13 @@ error in its own checks; every external command has a 60 s limit, a timeout coun
      `embed_restart_cmd` is configured, the incident has lasted `embed_restart_after_s`, at most one per 30 minutes;
   5c. the heavy-slot holders' progress: a holder whose process tree's CPU time has not grown for `slot_idle_s` is
      IDLE (one Slot: item and one line, once per holder); never killed;
+  5d. the GPU (DEC-1030), every `gpu_check_every` passes: its memory, utilisation and holders (nvidia-smi, classified
+     by command line and parents), each embedding server's layers on the GPU from its log (read on from a saved
+     offset); a new CUDA error, or a 0-layer load where the GPU is expected, is one gpu-alert item and one gpu: line
+     at once, once per incident; an unreadable nvidia-smi is a status line, never a failure;
   6. status.json and status.txt; 7. inbox-stale.txt, one stable line per cause (the sentinel's watch silent, the
-     embedding server HUNG, a slot holder IDLE, an inbox item unread 30 minutes), each written once per stall.
+     embedding server HUNG, a GPU alert unread or 0 layers, a slot holder IDLE, an inbox item unread 30 minutes),
+     each written once per stall.
 It never starts what is not in ready.txt and never lands what is not in land.txt (the CTO's lists).
 Every external command and path can be replaced through DISPATCH_* variables, for the tests only.
 """
@@ -288,6 +293,9 @@ def config():
          "embed_check_every": 1, "embed_timeout_s": 30, "embed_hung_after": 3, "embed_restart_cmd": None,
          "embed_restart_after_s": 900, "embed_restart_min_gap_s": 1800, "embed_model": "qwen3-embedding:0.6b",
          "embed_url": EMBED_URL, "slot_idle_s": 900,
+         # DEC-1030: the GPU, its holders and each embedding model's layers (gpu_logs and gpu_expected merge per server)
+         "gpu_smi": GPU_SMI, "gpu_smi_timeout_s": 10, "gpu_logs": dict(GPU_LOGS), "gpu_expected": dict(GPU_EXPECTED),
+         "gpu_check_every": 1, "gpu_alert_gap_s": 1800, "gpu_log_baseline_mb": 32, "gpu_log_read_max_mb": 64,
          # DEC-1018 item 1: no landing claimed from this time until the nightly has started, or until the second
          "nightly_hold_from": "03:15", "nightly_hold_until": "05:30"}
     try:
@@ -1071,6 +1079,261 @@ def embed_line(st):
 SERVER_DOWN = ("HUNG", "NOT RUNNING")
 
 
+# ---- 5d. the GPU, its holders and each embedding model's layers (DEC-1030) ---------------------------------------------
+
+GPU_SMI = "/usr/lib/wsl/lib/nvidia-smi"
+GPU_LOGS = {"shared": "/home/usain/.ollama/serve-11434.log", "query": "/home/usain/.ollama/serve-11435.log"}
+GPU_EXPECTED = {"shared": True, "query": False}  # the query server is CPU-only by design (DEC-798)
+GPU_ERROR = re.compile(r"CUDA error|out of memory|cudaMalloc failed", re.I)
+GPU_LOAD = re.compile(r"load_tensors: offloaded (\d+)/(\d+) layers to GPU")
+GPU_KINDS = ("embedder shared", "embedder query", "embedder other", "reranker", "other")
+SHARED_HOSTS = ("", "127.0.0.1:11434", "localhost:11434", "0.0.0.0:11434", ":11434")
+
+
+def gpu_logs(c):
+    """{server: log path}: the defaults, `gpu_logs` in config.json, then DISPATCH_GPU_LOG_<SERVER> (the tests)."""
+    logs = dict(GPU_LOGS, **(c.get("gpu_logs") or {}))
+    return {k: E(f"DISPATCH_GPU_LOG_{k.upper()}") or v for k, v in logs.items()}
+
+
+def gpu_smi(c, query):
+    """One nvidia-smi query (limit `gpu_smi_timeout_s`): (lines, None) or (None, why)."""
+    exe = E("DISPATCH_NVIDIA_SMI") or c.get("gpu_smi") or GPU_SMI
+    try:
+        r = sh([exe, query, "--format=csv,noheader" + (",nounits" if "query-gpu" in query else "")],
+               limit=float(c.get("gpu_smi_timeout_s", 10)))
+    except OSError as exc:
+        return None, f"{os.path.basename(exe)}: {exc.strerror or exc!r}"[:160]
+    if r.returncode:
+        return None, f"nvidia-smi exit {r.returncode}: {(r.stderr or r.stdout).strip()[:120]}"
+    return [l.strip() for l in r.stdout.splitlines() if l.strip()], None
+
+
+def mib(text):
+    """'1234 MiB', '1234' -> 1234; '[N/A]', 'N/A' (WSL) -> None."""
+    m = re.match(r"\s*(\d+(?:\.\d+)?)", text or "")
+    return int(float(m.group(1))) if m else None
+
+
+def proc_read(pid):
+    """{argv, ppid, env: OLLAMA_HOST only} of a pid from PROC (a planted one in the tests), or None."""
+    d = PROC / str(pid)
+    try:
+        argv = [a.decode("utf-8", "replace") for a in (d / "cmdline").read_bytes().split(b"\0") if a]
+        text = (d / "stat").read_text()
+        ppid = int(text[text.rindex(")") + 2:].split()[1])
+    except (OSError, ValueError, IndexError):
+        return None
+    env = {}
+    try:
+        for kv in (d / "environ").read_bytes().split(b"\0"):
+            if kv.startswith(b"OLLAMA_HOST="):  # only this variable is kept: the environment may hold secrets
+                env["OLLAMA_HOST"] = kv.split(b"=", 1)[1].decode("utf-8", "replace")
+    except OSError:
+        pass
+    return {"argv": argv, "ppid": ppid, "env": env}
+
+
+def gpu_holder_kind(pid):
+    """A GPU holder's kind by its command line and parents: an ollama server or llama-server is the shared embedder
+    when its `ollama serve` has no OLLAMA_HOST or 127.0.0.1:11434, the query embedder with 127.0.0.1:11435, another
+    embedder otherwise (a private test server); a process whose command line holds `rerank` is a reranker."""
+    info = proc_read(pid)
+    if not info or not info["argv"]:
+        return "other"  # not in this process table (on WSL nvidia-smi may list a pid of the host)
+    base = os.path.basename(info["argv"][0])
+    if base.startswith(("llama-server", "ollama")):
+        cur, seen = info, set()
+        while cur and len(seen) < 16:
+            a = cur["argv"]
+            if a and os.path.basename(a[0]).startswith("ollama") and "serve" in a[1:3]:
+                host = re.sub(r"^https?://", "", cur["env"].get("OLLAMA_HOST", "")).rstrip("/")
+                if host in SHARED_HOSTS:
+                    return "embedder shared"
+                return "embedder query" if host in ("127.0.0.1:11435", "localhost:11435") else "embedder other"
+            seen.add(cur["ppid"])
+            cur = proc_read(cur["ppid"]) if cur["ppid"] > 1 else None
+        return "embedder other"
+    if "rerank" in " ".join(info["argv"]).lower():  # gov.retrieval.rerank_worker, by -m or by its path
+        return "reranker"
+    return "other"
+
+
+def gpu_read(c):
+    """The GPU's state: name, memory used/total (MiB), utilisation, and its holders [{pid, name, mib, kind}]. A
+    missing or failing nvidia-smi is {"ok": False, "why": ...}, never an exception. Two queries, the second only
+    when the first answered (nvidia-smi takes one --query-* switch per call)."""
+    lines, why = gpu_smi(c, "--query-gpu=name,memory.used,memory.total,utilization.gpu")
+    if lines is None:
+        return {"ok": False, "why": why, "at": now()}
+    f = [x.strip() for x in lines[0].split(",")]
+    if len(f) < 4:
+        return {"ok": False, "why": f"nvidia-smi: unreadable line {lines[0][:80]!r}", "at": now()}
+    g = {"ok": True, "at": now(), "name": f[0], "used_mib": mib(f[1]), "total_mib": mib(f[2]), "util": mib(f[3]),
+         "holders": []}
+    apps, why = gpu_smi(c, "--query-compute-apps=pid,process_name,used_memory")
+    if apps is None:
+        g["holders_why"] = why
+        return g
+    for line in apps:
+        p = [x.strip() for x in line.split(",")]
+        if not p[0].isdigit():
+            continue
+        pid = int(p[0])  # kept though its memory reads [N/A] (WSL)
+        g["holders"].append({"pid": pid, "name": p[1] if len(p) > 1 else "?",
+                             "mib": mib(p[2]) if len(p) > 2 else None, "kind": gpu_holder_kind(pid)})
+    return g
+
+
+def gpu_log_new(name, path, off, c, dry):
+    """The complete lines a server's log gained since its saved offset {path, off, ino}: (lines, new offset, first).
+    The first read (or a new path) takes only the last `gpu_log_baseline_mb` (32) to learn the current layers; an
+    offset past the end, or a new inode, is a truncated or rotated log: from 0; at most `gpu_log_read_max_mb` (64) a
+    pass (the rest skipped). A partial last line waits for the next pass. A missing log: ([], None, False)."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return [], None, False
+    size, first = st.st_size, not off or off.get("path") != path
+    if first:
+        start = max(0, size - int(float(c.get("gpu_log_baseline_mb", 32)) * 2 ** 20))
+    elif off.get("off", 0) > size or off.get("ino") != st.st_ino:
+        if not dry:
+            log(f"gpu watch: the {name} log was truncated or rotated (offset {off.get('off')}, size {size}): from 0")
+        start = 0
+    else:
+        start = off["off"]
+    cap = int(float(c.get("gpu_log_read_max_mb", 64)) * 2 ** 20)
+    capped = size - start > cap
+    if capped:
+        start = size - cap
+    with open(path, "rb") as fh:
+        fh.seek(start)
+        data = fh.read(size - start)
+    end = data.rfind(b"\n") + 1
+    lines = data[:end].decode("utf-8", "replace").splitlines()
+    if start and (first or capped) and lines:  # began mid-line
+        lines = lines[1:]
+    return lines, {"path": path, "off": start + end, "ino": st.st_ino}, first
+
+
+def gpu_line(g):
+    """`RTX 5070 Ti 3.5/15.9 GB, 5 %; holders: embedder shared (1), reranker (0)` or `unreadable (why)`."""
+    if not g:
+        return "not checked yet"
+    if not g.get("ok"):
+        return f"unreadable ({g.get('why')})"
+    name = re.sub(r"^(NVIDIA )?(GeForce )?", "", g.get("name") or "?")
+    gb = lambda m: "?" if m is None else f"{m / 1024:.1f}"
+    counts = {k: 0 for k in GPU_KINDS}
+    for h in g.get("holders", []):
+        counts[h.get("kind", "other")] = counts.get(h.get("kind", "other"), 0) + 1
+    shown = ", ".join(f"{k} ({n})" for k, n in counts.items() if n or k in ("embedder shared", "reranker"))
+    hold = f"holders unreadable ({g['holders_why']})" if g.get("holders_why") else f"holders: {shown}"
+    return f"{name} {gb(g.get('used_mib'))}/{gb(g.get('total_mib'))} GB, {g.get('util')} %; {hold}"
+
+
+def layers_line(st, c):
+    expected = dict(GPU_EXPECTED, **(c.get("gpu_expected") or {}))
+    out = []
+    for name in gpu_logs(c):
+        lay = (st.get("layers") or {}).get(name)
+        if not expected.get(name, True) and (not lay or lay["x"] == 0):
+            out.append(f"{name} cpu-only by design")
+        elif lay:
+            out.append(f"{name} {lay['x']}/{lay['y']}" + ("" if expected.get(name, True) else " (expected cpu-only)"))
+        else:
+            out.append(f"{name} ?")
+    return "layers: " + ", ".join(out)
+
+
+def gpu_status_line(st, c):
+    line = f"GPU: {gpu_line(st.get('gpu'))}; {layers_line(st, c)}"
+    recent = [a for a in st.get("alerts", []) if now() - a.get("at", 0) < 86400]
+    if recent:
+        line += f"; last alert {stamp(recent[-1]['at'])}: {recent[-1]['what']}"
+    return line
+
+
+def watch_gpu(dry, c):
+    """Each `gpu_check_every` passes (1): the GPU's state (nvidia-smi) and holders; each server's log read on from its
+    saved offset (gpu-health.json), the latest `load_tensors: offloaded X/Y` kept per server. A new `CUDA error`
+    (`out of memory`, `cudaMalloc failed`) line, or a load with 0 layers on a server that expects the GPU
+    (`gpu_expected`), writes one gpu-alert item at once, with the lines, the GPU's state and its holders; once per
+    incident: errors more than `gpu_alert_gap_s` (1800) after the last are a new incident; a 0-layer incident lasts
+    until a load with layers on the GPU. A dry pass reads nothing."""
+    if dry:
+        return None
+    st = load_json("gpu-health.json", {})
+    st["passes"] = st.get("passes", 0) + 1
+    every = max(1, int(c.get("gpu_check_every", 1)))
+    if (st["passes"] - 1) % every:
+        (D / "gpu-health.json").write_text(json.dumps(st))
+        return st
+    g = st["gpu"] = gpu_read(c)
+    expected = dict(GPU_EXPECTED, **(c.get("gpu_expected") or {}))
+    offs, layers = st.setdefault("offsets", {}), st.setdefault("layers", {})
+    err_last, zero_since = st.setdefault("error_last_at", {}), st.setdefault("zero_since", {})
+    gap = float(c.get("gpu_alert_gap_s", 1800))
+    reasons, evidence, what = [], [], []
+    for name, path in gpu_logs(c).items():
+        lines, off, first = gpu_log_new(name, path, offs.get(name), c, dry)
+        if off:
+            offs[name] = off
+        zero_load = False
+        for line in lines:
+            m = GPU_LOAD.search(line)
+            if m:
+                layers[name] = {"x": int(m.group(1)), "y": int(m.group(2)), "at": now()}
+                if int(m.group(1)) == 0 and not first:
+                    zero_load = True
+                    evidence.append(f"{name}: {line.strip()[:300]}")
+        errors = [] if first else [l for l in lines if GPU_ERROR.search(l)]
+        if errors:
+            if now() - err_last.get(name, float("-inf")) > gap:
+                reasons.append(f"{len(errors)} new CUDA error line(s) in the {name} server's log")
+                what.append(f"CUDA error ({name})")
+                evidence.extend(f"{name}: {l.strip()[:300]}" for l in errors[:20])
+            else:
+                log(f"gpu watch: {len(errors)} more CUDA error line(s) in the {name} log (same incident)")
+            err_last[name] = now()
+        lay = layers.get(name)
+        if expected.get(name, True) and lay and lay["x"] == 0:
+            if (zero_load or first) and not zero_since.get(name):
+                reasons.append(f"the {name} server loaded its model with 0/{lay['y']} layers on the GPU (CPU only, "
+                               "30-100x slower)")
+                what.append(f"0 layers ({name})")
+                if first:
+                    evidence.append(f"{name}: load_tensors: offloaded 0/{lay['y']} layers to GPU (the latest load)")
+            zero_since[name] = zero_since.get(name) or now()
+        elif lay and lay["x"] > 0 and zero_since.pop(name, None):
+            log(f"gpu watch: the {name} server has {lay['x']}/{lay['y']} layers on the GPU again")
+    if reasons:
+        state = gpu_line(g)
+        holders = "\n".join(f"  pid {h['pid']} {h['kind']} ({h['name']}, "
+                            f"{'?' if h['mib'] is None else str(h['mib']) + ' MiB'})" for h in g.get("holders", []))
+        logs = ", ".join(os.path.basename(gpu_logs(c)[n]) for n in gpu_logs(c) if any(w.endswith(f"({n})")
+                                                                                         for w in what))
+        item = inbox_item("gpu-alert",
+                          f"log: {logs}\nGPU: {'; '.join(what)}\nstatus: {'; '.join(reasons)}; the GPU now: {state}\n"
+                          "\nlines:\n" + "\n".join(f"  {e}" for e in evidence[:40]) +
+                          f"\n\nthe GPU at that moment: {state}\n{layers_line(st, c)}\nholders:\n"
+                          + (holders or "  none listed") + "\n")
+        st["alerts"] = (st.get("alerts", []) + [{"at": now(), "what": "; ".join(what), "item": item.name}])[-20:]
+        st["stale"] = {"since": now(), "what": "; ".join(what), "item": item.name}
+        log(f"gpu watch: ALERT {'; '.join(what)} -> inbox/{item.name}")
+    (D / "gpu-health.json").write_text(json.dumps(st))
+    return st
+
+
+def gpu_stale_line(st):
+    """The `gpu:` line of inbox-stale.txt while the last alert's item is unread or a 0-layer incident holds."""
+    s = st.get("stale")
+    if s and ((D / "inbox" / s.get("item", "")).is_file() or st.get("zero_since")):
+        return f"gpu: the GPU {s['what']} since {stamp(s['since'])}"
+    return None
+
+
 # ---- 5c. the heavy-slot holders' progress (DEC-1015 item 2) ---------------------------------------------------------
 
 def slot_name(path):
@@ -1452,6 +1715,9 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
     emb, slots = load_json("embed-health.json", {}), load_json("slot-progress.json", {})
     if emb.get("hung_since"):
         want["server"] = f"server: the embedding server {emb.get('state')} since {stamp(emb['hung_since'])}"
+    gpu = load_json("gpu-health.json", {})
+    if gpu_stale_line(gpu):
+        want["gpu"] = gpu_stale_line(gpu)
     for e in sorted(slots.values(), key=lambda e: (str(e.get("slot")), e.get("pid", 0))):
         if e.get("reported"):
             k = f"slot {e['slot']} pid {e['pid']}"
@@ -1471,10 +1737,11 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
         for line in stale.read_text().splitlines():
             if line.strip():  # a line without a known key (the v4 form) is the inbox's
                 k = line.split(":", 1)[0]
-                have.setdefault(k if k in ("sentinel", "server", "inbox") or k.startswith("slot ") else "inbox", line)
+                have.setdefault(k if k in ("sentinel", "server", "gpu", "inbox") or k.startswith("slot ") else "inbox",
+                                line)
     except OSError:
         pass
-    order = ["sentinel", "server"] + sorted(k for k in want if k.startswith("slot ")) + ["inbox"]
+    order = ["sentinel", "server", "gpu"] + sorted(k for k in want if k.startswith("slot ")) + ["inbox"]
     keep = [have.get(k) or want[k] for k in order if k in want]  # a cause's line kept as first written
     if keep:
         text = "\n".join(keep) + "\n"
@@ -1485,12 +1752,16 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
     rec, _ = harvest_result()
     s["guard_harvest"] = rec
     s["embedding_server"], s["slot_holders"] = emb or None, list(slots.values())
+    c = t.get("_c") or {}
+    s["gpu"] = {"line": gpu_status_line(gpu, c), "state": gpu.get("gpu"), "layers": gpu.get("layers"),
+                "alerts_24h": [a for a in gpu.get("alerts", []) if now() - a.get("at", 0) < 86400]} if gpu else None
     (D / "status.json").write_text(json.dumps(s, indent=1))  # again, with the sentinel's state
     with open(D / "status.txt", "a") as f:
         f.write(f"sentinel: {s['sentinel']}\n")
         f.write("guard harvest: " + (f"last {rec.get('at')}, rc {rec.get('rc')}, {rec.get('secs')} s of "
                                      f"{rec.get('limit_s')} s" if rec else "no record yet") + "\n")
         f.write(f"embedding server: {embed_line(emb)}\n")
+        f.write((s["gpu"]["line"] if gpu else "GPU: not checked yet") + "\n")
         f.write("heavy slot holders: " + ("; ".join(
             f"slot {e['slot']} pid {e['pid']} ({e['cmd'][:60]}) {'IDLE' if e.get('reported') else 'idle'} "
             f"{int((now() - e['since']) // 60)} min" for e in slots.values()) or "none") + "\n")
@@ -1556,6 +1827,11 @@ def tick(dry):
     except Exception as exc:
         failures.append(f"embedding check: {exc!r}"[:200])
         log(f"embedding check failed: {exc!r}")
+    try:  # DEC-1030: the GPU, its holders and the embedding models' layers (an unreadable GPU is a status, not this)
+        watch_gpu(dry, t.get("_c") or {})
+    except Exception as exc:
+        failures.append(f"gpu watch: {exc!r}"[:200])
+        log(f"gpu watch failed: {exc!r}")
     try:
         watch_slots(dry, t.get("_c") or {}, embed)
     except Exception as exc:

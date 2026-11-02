@@ -81,11 +81,34 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
    item naming the slot, the pid, the command, the tree (cwd) and the idle time, and a `slot N pid P:` line, once per
    holder; it clears when the CPU grows or the holder ends. A holder is never killed; while the server is HUNG the item
    says the holder is likely waiting on it. Status: `heavy slot holders: slot N pid P (command) idle M min`.
+4f. **The GPU (DEC-1030):** every `gpu_check_every` passes (1), one read of the GPU by `gpu_smi`
+   (`/usr/lib/wsl/lib/nvidia-smi`, limit `gpu_smi_timeout_s` 10): its memory and utilisation
+   (`--query-gpu=name,memory.used,memory.total,utilization.gpu`), then its holders
+   (`--query-compute-apps=pid,process_name,used_memory`; a `[N/A]` memory, as on WSL, keeps the pid). nvidia-smi takes
+   one `--query-*` switch a call, so a read is two short calls, the second only when the first answered. Each holder
+   is classified from `/proc` by its command line and parents: `embedder shared` (an ollama or llama-server under the
+   `ollama serve` with no `OLLAMA_HOST` or `127.0.0.1:11434`), `embedder query` (`127.0.0.1:11435`), `embedder other`
+   (any other, e.g. a private test server), `reranker` (a command line holding `rerank`), `other`. A missing or failing
+   nvidia-smi is the status line `GPU: unreadable (why)`, never a failure of the pass.
+   Each server's log (`gpu_logs`: `shared` `/home/usain/.ollama/serve-11434.log`, `query` `.../serve-11435.log`) is
+   read on from its saved byte offset (`gpu-health.json`): the first read takes only the last `gpu_log_baseline_mb`
+   (32) and alerts on no old error; an offset past the end or a new inode (truncated, rotated) reads from 0; at most
+   `gpu_log_read_max_mb` (64) a pass; a partial last line waits. The latest `load_tensors: offloaded X/Y layers to
+   GPU` is kept per server. `gpu_expected` (`shared` true, `query` false: CPU-only by design, DEC-798) says where 0
+   layers is an alert. **At once, once per incident**, one `<stamp>-gpu-alert.txt` item (`log:`, `GPU: <kinds>`,
+   `status:`, the matching lines, the GPU's state, layers and holders at that moment) and a `gpu:` line in
+   `inbox-stale.txt`, for a new `CUDA error` / `out of memory` / `cudaMalloc failed` line (errors more than
+   `gpu_alert_gap_s`, 1800, after the last are a new incident) or a load with 0 layers where the GPU is expected (the
+   incident lasts until a load with layers on the GPU; a 0-layer load already current at the first read alerts too).
+   Status: `GPU: RTX 5070 Ti 9.7/15.9 GB, 24 %; holders: embedder shared (0), reranker (1); layers: shared 29/29,
+   query cpu-only by design` and the last alert of the last 24 hours. On WSL nvidia-smi lists the reranker but not the
+   llama-server (measured 2026-11-02): the embedder's GPU use shows in its layers.
 5. **Status:** `status.json`, `status.txt` (`TICK FAILED` first when part of a pass failed).
 6. **Escalation:** `inbox-stale.txt`, one line per cause, each written once per stall: `sentinel: ...` (first) while
    the sentinel is expected (`sentinel-expected` in the state folder) and its watch has written nothing parseable to
    `log/deadman.log` for 2 hours (DEC-1014 item 2: also one inbox item per silence; a malformed line falls back to
    the newest parseable one, none reads "unreadable"); `server: ...` while the embedding server is HUNG or NOT RUNNING (4d);
+   `gpu: ...` while the last GPU alert's item is unread or a 0-layer incident holds (4f);
    `slot N pid P: ...` while a slot holder is IDLE (4e); `inbox: ...` while an inbox item is unread 30 minutes. The
    sentinel pushes it, keyed on its first 150 characters, so the short lines come first.
 
@@ -94,7 +117,7 @@ runs one pass a minute: `run_tick.sh` (here) → `dispatcher.py tick` (here), re
 
 ## The state folder
 `ready.txt` and `land.txt` (the CTO's), `started.txt`, `land-done.txt`, `land-inflight.*`, `never-ran.txt`, `inbox/`
-(the CTO moves read items to `inbox/read/`), `status.*`, `peaks.json`, `config.json`, `cpu_prev.json`,
+(the CTO moves read items to `inbox/read/`), `status.*`, `peaks.json`, `config.json`, `cpu_prev.json`, `gpu-health.json`,
 `dispatch.log`, `tick.lock`, `loop.lock`, `loop.pid`, `OFF` (while present, every pass does nothing).
 
 ## Running it
