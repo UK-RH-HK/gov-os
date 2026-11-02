@@ -155,6 +155,12 @@ ollama.py start without NO_GPU, then the operator's restart ACT; reranker interi
 tools/gov_reranker_gpu_slot.py (wait for a slot or go without reranking, named; never the CPU), then the operator's
 install ACT; (c) dispatcher v4.6 agent; (d) seeding agent (it is editing merge_queue.py in the MAIN tree, uncommitted).
 Before snapshot: `log/emergency-before-20261102.txt`. After all four: the after figures, then the owner lifts it.
+**13:16:** fix (b) LIVE in code: emg/query reviewed PASS (`reviews/emg-query.md`, READY true) and merged `6ed6a5ae`
+(slip: merged without Task/Role trailers; not amended; drift log). ACT-QUERY-GPU-2 `2cd0e836` waits until W2-112,
+W2-122 and W2-123 have merged 6ed6a5ae (messaged; background watch), then to the owner. Reranker interim patch
+(tools/gov_reranker_gpu_slot.py + 14 tests, uncommitted) in review (`reviews/emg-rerank-slot.md`); then commit and the
+owner's install ACT (commands in the engineer's return). Follow-ups: W2-54 acceptance revision (5 groups), review F1
+(zero vector) and F2 (list answers), the automatic start's caps.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

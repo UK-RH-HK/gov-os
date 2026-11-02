@@ -150,7 +150,8 @@ def test_replace_seeds_over_the_trees_store(w):
 STUB = ("import json, os, sys\n"
         "open(os.environ['STUB_ARGS'], 'a').write(json.dumps(sys.argv[1:]) + '\\n')\n"
         "print(json.dumps({'ok': True, 'result': {'stores': {'semantic': {'status': 'recreated'}},"
-        " 'timing': {'semantic_s': 1.5, 'total_s': 3.0}}}))\n")
+        " 'timing': {'semantic_s': 1.5, 'total_s': 3.0}}}))\n"
+        "sys.exit(int(os.environ.get('STUB_RC', '0')))\n")
 
 
 def run_tool(w, *args, env=None):
@@ -197,6 +198,64 @@ def test_product_mode_passes_seed_to_the_rebuild_when_the_trees_gov_offers_it(w)
 def test_warm_in_copy_mode_seeds_without_a_rebuild(w):
     r = run_tool(w, "warm", w.tree, "--base", w.link, "--mode", "copy")
     assert r.returncode == 0 and "seed: seeded (copy)" in r.stdout and not (w.tmp / "args.jsonl").exists()
+
+
+def test_new_worktree_adds_the_worktree_and_seeds_it(w):
+    env = dict(os.environ, NEW_WORKTREE_REPO=str(w.repo), NEW_WORKTREE_ROOT=str(w.tmp / "wts"),
+               NEW_WORKTREE_BASE=str(w.link), SEED_LOG=str(w.tmp / "seed.jsonl"))
+    (w.tmp / "wts").mkdir()
+    r = subprocess.run(["bash", str(HERE / "new_worktree.sh"), "W2-9", "main"], capture_output=True, text=True, env=env)
+    assert r.returncode == 0, r.stdout + r.stderr
+    tree = w.tmp / "wts/W2-9"
+    assert git(tree, "rev-parse", "--abbrev-ref", "HEAD") == "w2/W2-9" and (tree / ss.STORE_REL).is_file()
+    assert "seed: seeded (copy): whole store" in r.stdout and log(w)[-1]["who"] == "lead W2-9"
+    again = subprocess.run(["bash", str(HERE / "new_worktree.sh"), "W2-9", "main"], capture_output=True, text=True,
+                           env=env)
+    assert again.returncode == 2 and "exists" in again.stderr
+    assert subprocess.run(["bash", str(HERE / "new_worktree.sh"), "../x"], capture_output=True, env=env).returncode == 2
+
+
+def refresh_env(w, **more):
+    for half in ("a", "b"):
+        git(w.repo, "worktree", "add", "-q", "--detach", str(w.tmp / f"st-{half}"), "main")
+    (w.tmp / "st").symlink_to(w.tmp / "st-a")
+    plant_store(w.tmp / "st-a")
+    stub = w.tmp / "stub.py"
+    stub.write_text(STUB)
+    return dict(os.environ, GOV_STORE_LINK=str(w.tmp / "st"), GOV_STORE_REPO=str(w.repo), GOV_STORE_REF="main",
+                GOV_STORE_LOG=str(w.tmp / "store.log"), SEED_LOG=str(w.tmp / "seed.jsonl"),
+                SEED_REBUILD_CMD=f"{sys.executable} {stub}", STUB_ARGS=str(w.tmp / "args.jsonl"), **more)
+
+
+def test_the_refresh_builds_the_standby_half_seeded_and_moves_the_link_under_the_stores_lock(w):
+    env = refresh_env(w)
+    fresh = subprocess.run(["bash", str(HERE / "refresh_integration_store.sh")], capture_output=True, text=True, env=env)
+    assert fresh.returncode == 0 and "fresh at" in fresh.stdout  # already at the ref: nothing built
+    write(w.repo / "docs/b.md", "b\n")
+    git(w.repo, "add", "-A")
+    git(w.repo, "commit", "-q", "-m", "two")
+    r = subprocess.run(["bash", str(HERE / "refresh_integration_store.sh")], capture_output=True, text=True, env=env)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert (w.tmp / "st").resolve() == (w.tmp / "st-b").resolve()
+    assert git(w.tmp / "st-b", "rev-parse", "HEAD") == git(w.repo, "rev-parse", "main")
+    assert json.loads((w.tmp / "args.jsonl").read_text().splitlines()[-1]) == [str((w.tmp / "st-b").resolve())]
+    seeds = [x for x in log(w) if x["kind"] == "seed"]
+    assert seeds[-1]["status"] == "seeded" and seeds[-1]["kept"] == "vectors only" and seeds[-1]["who"] == "refresh st-b"
+
+
+def test_a_failed_refresh_or_a_held_lock_leaves_the_link(w):
+    import fcntl
+    env = refresh_env(w, STUB_RC="75")
+    write(w.repo / "docs/b.md", "b\n")
+    git(w.repo, "add", "-A")
+    git(w.repo, "commit", "-q", "-m", "two")
+    r = subprocess.run(["bash", str(HERE / "refresh_integration_store.sh")], capture_output=True, text=True, env=env)
+    assert r.returncode == 75 and (w.tmp / "st").resolve() == (w.tmp / "st-a").resolve()
+    with open(str(w.tmp / "st") + ".lock", "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_SH)  # a queue's re-run in the ready half
+        r = subprocess.run(["bash", str(HERE / "refresh_integration_store.sh")], capture_output=True, text=True,
+                           env=dict(env, GOV_STORE_LOCK_WAIT="1", STUB_RC="0"))
+    assert r.returncode == 3 and "lock" in r.stdout and (w.tmp / "st").resolve() == (w.tmp / "st-a").resolve()
 
 
 # ---- the planted repository: the real rebuild, a stand-in embedder that counts what it is asked -------------------
