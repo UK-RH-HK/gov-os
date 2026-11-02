@@ -1,0 +1,7 @@
+log: W2-92-A5-run3-dec1019.json
+W2: W2-92
+status: DONE. DEC-1019 is built at e95eb4ad12ca and W1-21's case passes again. Acceptance is 30/30, and the scoped run is green apart from 4 W2-59 cases that were already red at the base. gov check has one red, retrieval-regression, which also fails on the pre-ticket base today (details below). Head 448a835
+
+task: W2-92 (DAEO-n0wb) run 3: build DEC-1019 (P-W2-92-5 (a)), then rebuild, gov check, the scoped run once, gov accept, and return DONE with the head.
+status: DONE. DEC-1019 is built at e95eb4ad12ca and W1-21's case passes again. Acceptance is 30/30, and the scoped run is green apart from 4 W2-59 cases that were already red at the base. gov check has one red, retrieval-regression, which also fails on the pre-ticket base today (details below). Head 448a835a9dca.
+work_completed: The engineer (eng-9) built DEC-1019 in `retrieve.py`. When a store's record graph cannot be read, no record file is c

@@ -87,6 +87,8 @@ option (d), a bounded retry (`be9e2812`), pinged. `land.txt` left empty: relist 
 **09:36:** W2-91 DONE `55b47e075b3b` (STANDARD, gov accept 8/8; VERIFY-1: the queue verifies). Six to land kept in
 `dispatch/land.pending.txt` (copy to `land.txt` when the embedder is free or (d) lands). Leftovers to remove by day
 (rm: ping first): W2-91-tests worktree + branch, gov-os-runs/W2-91/{base,head}, /tmp/gov-os-lead-W2-{91,92,104,122,123,04}.
+**09:38:** W2-92 run 3 DONE `448a835a9dca` (STANDARD; DEC-1019 built; 30/30; gov check's retrieval-regression red is
+environmental: 0 % at the pre-ticket base too, the shared embedder). Seven pending to land. W2-13 waits on W2-92's landing.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -12,6 +12,21 @@
   pass -> docs/probes/DAEO-u4oz/PR-DAEO-u4oz.md (schema fields, verdict block), commit (Task, Implements, Role), DONE.
   fail -> draft under probes/, PACKAGES (one repair round at most).
 - Brief gap: JUDGEMENT.md in this tree predates DEC-1010 (the brief had the old text) (~5 min).
+- rev-1 returned 09:34 (session 5042a938, 100 turns, 18.7 min; twelve fields ok): judgement FAIL. verdict.py:
+  (False, success-5: F1 blocks). Tripwire-7: this tree unchanged; other trees moved (main, W2-00-record, W2-91,
+  W2-91-tests appeared, W2-92: other sessions). Tree clean, head b37b5c8f1741. keyword_warn 0.
+- Lead triage (moderator): F1 BLOCKS (S5 forbids it in words; row W2-H034's own symptom): an emptied mandatory FILE
+  (not a register span) is shown read, sha256 of empty content, 0 tokens, ok true; context_check green;
+  src/gov/context/__init__.py _read_record hashes whatever the file holds. F2 (exact-fit further_batch []) is a
+  spec/test conflict: S7/S7a say it begins at the first unstacked item; eng-3's fix made exact fit -> [] (round 2's
+  test). F3 (check green when every ticket refuses), F6 (12 longest words): in scope, other -> rows, may ride along.
+  F4 (31 open/in-progress tickets refuse at 6,000; close builds context after its runs; sessionstart drops errors),
+  F5 (stale store older than HEAD satisfies a retired source in gov context): out of scope -> rows / CTO packages.
+- Draft record: probes/PR-DAEO-u4oz-rev-1-DRAFT.md (not committed). Nothing committed.
+- STATE: returning PACKAGES (F1; one repair round at most, then the owner). Resume does: td batch (F1 as a described
+  behaviour, DEC-136; and F2's exact-fit case if the CTO decides S7a holds), fresh engineer (F1, F2/F3 riding),
+  gov accept, select_tests + scoped run, then review 2 (the last, DEC-1010: different model or effort, DEC-1014).
+- Reviewer's temp probe folder (~27 MB, 1,936 entries) in its sandbox temp: its delete was refused; left.
 
 ## Resume 3 (DEC-1015, 2026-11-02 06:02): verification only
 - Head e0d06a04ae53, tree clean. CTO's rebuild (log rebuild-W2-04-20261101-2205.out) ended ok 22:43, semantic recreated.
