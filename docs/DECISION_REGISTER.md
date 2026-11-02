@@ -12799,3 +12799,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.410 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1028. Next free id: DEC-1029. |
+
+### DEC-1029 — The shared embedder reloaded onto the GPU; an alert if it ever loads with 0 layers on the GPU
+- **Status:** ACCEPTED (owner, 2026-11-02, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; item 2 standing until the load-balancing plan is decided) · **Under:** DEC-1028 item 5, DEC-1015
+- **Context:** the shared embedding server (127.0.0.1:11434) had its model on the GPU (29/29 layers, about 44.8 chunks/s) until CUDA crashed at 02:36 and 04:31; at the 04:33 reload only 1.9 GiB of GPU memory was free and it loaded 0/29 layers, running on the CPU at 0.4 to 1.4 chunks/s; every landing attempt since 04:37 failed on its first 120 s request. 8 to 10 rerankers were running at both crashes (the capacity sampler).
+- **Decision:** (1) Unload the shared server's model so it reloads fully on the GPU, keeping its CPU caps. Done at 11:13: an unload request did not take (the model stays loaded while requests keep coming), so the CPU-only runner process alone was ended; `ollama serve` (pid 414672) stayed up and started a new runner (affinity 12-19 kept) with `offloaded 29/29 layers to GPU` at 11:15 (14.7 GiB free); measured about 26 chunks/s in batches of 32 with other clients sharing it. (2) Until the load-balancing plan is in, the CTO alerts the owner if the model ever loads with 0 layers on the GPU again (or CUDA crashes), and reports what holds the GPU's memory.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.411 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1029. Next free id: DEC-1030. |
