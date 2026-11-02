@@ -39,15 +39,33 @@ S2 to S7 (`gov accept` names the lines by their order in the ticket file).
 | S4: Measured in `docs/changes/W2-123-evidence.md`, the setting chosen where the cap is not the limit | `test_w2_123_evidence.py::test_the_evidence_file_holds_the_sixteen_measured_cases_and_the_chosen_setting` (the only test of this line; no test measures) | the file does not exist |
 | S5: A product feature: read from the gate's file with the measured defaults; nothing of this machine in the code | `test_w2_123_start.py::test_shared_start_without_configuration_uses_the_default_resolved_from_the_callers_cpus` (the default cap is resolved from the calling process's own CPUs, narrowed by the test, so a machine's CPU numbers in the code fail it), `::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner`; `test_w2_123_config_invalid.py` | no `settings`; the configuration is not read |
 | S6: Health probe (healthy, slow, hung) and safe restart (hung server stopped, started again under its cap, recorded); never a restart while answering | `test_w2_123_probe.py` (all 7); `test_w2_123_restart.py::test_a_server_that_answers_is_never_restarted`, `::test_a_hung_server_of_the_gov_os_is_stopped_with_its_runner_and_started_again_under_its_cap`, `::test_a_port_held_by_another_program_is_never_stopped`, `::test_a_down_server_is_started_under_its_cap_and_recorded`, `::test_an_unreadable_value_stops_and_starts_nothing` | `probe` and `safe_restart` do not exist (`AttributeError`, in the pytest process or in the child) |
-| S7: Both servers start under their cap from the gate's file, the query server CPU-only; every restart keeps the cap; a planted start of each shows it | `test_w2_123_start.py::test_query_start_uses_its_own_entry_and_keeps_the_gpu_hidden`, `::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner`; `test_w2_123_config_invalid.py::test_an_unreadable_query_entry_refuses_the_query_start`; `test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_cpu_only`, `::test_a_hung_server_of_the_gov_os_is_stopped_with_its_runner_and_started_again_under_its_cap`, `::test_a_down_server_is_started_under_its_cap_and_recorded` | no `settings`; the started process runs on every CPU at the caller's niceness; no `safe_restart` |
+| S7: Both servers start under their cap from the gate's file, the query server with the GPU visible (DEC-1033, replacing DEC-798); every restart keeps the cap; a planted start of each shows it | `test_w2_123_start.py::test_query_start_uses_its_own_entry_and_leaves_the_gpu_as_the_caller_set_it` (2 cases), `::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner`; `test_w2_123_config_invalid.py::test_an_unreadable_query_entry_refuses_the_query_start`; `test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_with_the_gpu_as_the_caller_set_it` (2 cases), `::test_a_hung_server_of_the_gov_os_is_stopped_with_its_runner_and_started_again_under_its_cap`, `::test_a_down_server_is_started_under_its_cap_and_recorded` | no `settings`; the started process runs on every CPU at the caller's niceness; no `safe_restart`; once those exist, the two query-server tests fail as S8 says |
+| S8: The query embedder may use the GPU (DEC-1032, DEC-1033 replacing DEC-798): `ensure_query_available` starts the query server without hiding the GPU (no `CUDA_VISIBLE_DEVICES=-1`), so a server restarted by the code comes back on the GPU | `test_w2_123_start.py::test_query_start_uses_its_own_entry_and_leaves_the_gpu_as_the_caller_set_it` (2 cases: the caller names `CUDA_VISIBLE_DEVICES=0`, the server and its runner see `0`; the caller names none, they see none); `test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_with_the_gpu_as_the_caller_set_it` (2 cases: the same two for the restarted server) | the code before the DEC-1033 patch starts the query server with `CUDA_VISIBLE_DEVICES=-1` added: the server (and its runner) sees `-1`, not the caller's `0` or none (every other assertion of these cases, the cap, `OLLAMA_HOST` and `settings`, passes there) |
 | F1: parallel requests that change a vector; a server started uncapped; a setting chosen without its measure | `test_w2_123_determinism.py::test_vectors_changed_by_parallel_requests_refuse_the_setting`, `::test_one_differing_vector_is_named_and_refuses`, `::test_a_missing_vector_refuses`; the cap assertions of `test_w2_123_start.py` and `test_w2_123_restart.py` and every case of `test_w2_123_config_invalid.py` (no uncapped start); `test_w2_123_evidence.py` (no setting without its measure) | as the rows above |
 
 The key edge cases of STANDARD (DEC-221): an unreadable value of each kind S1 names (12 cases: the file not JSON,
 not an object, the section and the entry not objects, a key of the wrong type and out of range, a CPU list that
 cannot be parsed or names no CPU the caller may run on, a probe time not positive, `probe_slow_s` not below
-`probe_hung_s`; and one for the query entry); the query server's cap and hidden GPU (even with
-`CUDA_VISIBLE_DEVICES=0` in the environment); the cap inherited by a child (each daemon's runner); a restart refused
+`probe_hung_s`; and one for the query entry); the query server's cap with the caller's GPU setting left as it is
+(`CUDA_VISIBLE_DEVICES=0` in the caller's environment, and none; revised for DEC-1033, see below); the cap inherited by a child (each daemon's runner); a restart refused
 while the server answers (healthy and slow) and for a foreign process on the port.
+
+## Revision for DEC-1033: the query server on the GPU (`Rewrite-Reason: DEC-1033`)
+
+DEC-1033 (an emergency decision) replaces DEC-798: the query embedder may run on the GPU, and the Gov OS starts the
+query server with the GPU visible (the ticket's success lines S7, as amended, and S8). Run 1 asserted the query
+server's hidden GPU; a fresh independent test designer revised exactly those expectations (DEC-866: a test revised
+for a newer decision lowers no other expectation), without reading the implementation:
+
+| Old test (old expectation) | New test (new expectation) |
+|---|---|
+| `test_w2_123_start.py::test_query_start_uses_its_own_entry_and_keeps_the_gpu_hidden`: with `CUDA_VISIBLE_DEVICES=0` in the caller's environment, the started query server and its runner see `-1` | `::test_query_start_uses_its_own_entry_and_leaves_the_gpu_as_the_caller_set_it[caller-names-gpu-0]`: they see `0`; `[caller-names-no-gpu]`: with none in the caller's environment, they see none |
+| `test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_cpu_only`: the restarted query server sees `-1` | `::test_the_query_server_restarts_under_its_own_cap_with_the_gpu_as_the_caller_set_it[caller-names-no-gpu]`: it sees none; `[caller-names-gpu-0]`: with `0` in the caller's environment, it sees `0` |
+
+Every other assertion of those tests is unchanged (the configured entry, `OLLAMA_HOST`, the CPU list, the niceness,
+`OLLAMA_NUM_PARALLEL`, the result's `settings`, the restart record). The child's environment is built from scratch
+(`Stage.environment`), so "none" means the caller's environment has no `CUDA_VISIBLE_DEVICES` at all; the planted
+daemon and its runner record what they see from inside.
 
 ## How the suite runs the code under test (DEC-732)
 
