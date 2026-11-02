@@ -12933,3 +12933,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.424 | 2026-11-02 | Orchestrator (delegated): DEC-1041. Next free id: DEC-1042. |
+
+### DEC-1042 — W2-126's four questions (delegated): each test its own vector cache; the five builder tests revised by its engineer; W2-54's sharing case and W2-126's README map by a test designer; KPI 7 after W2-123 lands
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1033/DEC-1039: P2, reversible, inside W2-126's KPIs and DEC-1033 item 3; the engineer's recommendations; confidence high for (1), medium-high for the rest; for the owner to overturn) · **Under:** DEC-1039, DEC-1033, DEC-1032
+- **Decision:** (1) P1: W2-126's allowed paths gain `tests/conftest.py`, for one autouse fixture that gives every test its own `GOV_VECTOR_CACHE_DIR`, so no test reads another's stand-in vectors and no test run writes into the owner's real cache (`~/.cache/gov-os/vector-cache`). (2) P2: the five builder tests that assert the old behaviour (deleting or bounding the tree's cache forces a new embedding; whole `search` answers compared with their new `vector_cache` counts) are revised by W2-126's engineer, its paths widened by `tests/unit/retrieval/test_semantic_query_vector.py`, `test_emg_query_device.py`, `test_semantic_cpu_embedder.py`, `test_w2_108_freshness_once.py` and `tests/unit/semantic/test_semantic.py` (builder tests, not acceptance tests: MR-3 holds); W2-54's `test_two_projects_do_not_share_query_vectors` (and any other W2-54 case red for this reason) is revised by a test designer under DEC-1033 item 3 (`Rewrite-Reason: DEC-1033`). (3) P3: the same designer fixes W2-126's README map rows so `gov accept DAEO-jpr0` reads them. (4) P4: KPI 7 (the bounded retry's cache use) is done in W2-126 after W2-123 lands, by merging `w2/integrate` and a small follow-up commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.425 | 2026-11-02 | Orchestrator (delegated): DEC-1042. Next free id: DEC-1043. |
