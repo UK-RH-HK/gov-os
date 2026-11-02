@@ -20,19 +20,28 @@ error in its own checks; every external command has a 60 s limit, a timeout coun
      claimed (DEC-1018 item 1); a landing already in flight is finalised as usual;
   5. the guard harvest, when due: detached, with its own lock and time limit, after the start and land decisions;
      its last result is shown in the status, and a failure or timeout is one of the pass's failures;
-  5b. the embedding server's health (DEC-1015 item 2): a test request every `embed_check_every` passes; failures in
-     a row make it HUNG, or NOT RUNNING when the last was refused (one Server: item, one line in inbox-stale.txt, once
-     per incident); while either holds, step 3 starts nothing (the last pass's state); a restart only when
-     `embed_restart_cmd` is configured, the incident has lasted `embed_restart_after_s`, at most one per 30 minutes;
+  5b. the embedding servers' health (DEC-1015 item 2; by progress, DEC-1032): each server's runner judged by the tasks
+     it completes (its log) and the requests waiting on it (`ss`): BUSY while tasks complete, IDLE when nothing waits,
+     HUNG only when requests have waited `embed_stall_s` with no task or 2xx request during that wait, FAILING after
+     `embed_fail_after` failed requests in a row (4xx/5xx, no 2xx since), NOT RUNNING when nothing listens; the
+     test request only as the fallback when the shared server's log is unreadable, every `embed_check_every` passes
+     (one Server: item, one line in inbox-stale.txt, once per incident); while the shared server is HUNG, FAILING or
+     NOT RUNNING, step 3 starts nothing (the last pass's state); a restart only when `embed_restart_cmd` is configured, the
+     incident has lasted `embed_restart_after_s`, at most one per 30 minutes;
   5c. the heavy-slot holders' progress: a holder whose process tree's CPU time has not grown for `slot_idle_s` is
      IDLE (one Slot: item and one line, once per holder); never killed;
   5d. the GPU (DEC-1030), every `gpu_check_every` passes: its memory, utilisation and holders (nvidia-smi, classified
      by command line and parents), each embedding server's layers on the GPU from its log (read on from a saved
-     offset); a new CUDA error, or a 0-layer load where the GPU is expected, is one gpu-alert item and one gpu: line
-     at once, once per incident; an unreadable nvidia-smi is a status line, never a failure;
+     offset); a new CUDA error, or a load with 0 or only part of its layers where the GPU is expected, is one
+     gpu-alert item and one gpu: line at once, once per incident; an unreadable nvidia-smi is a status line, never a
+     failure;
   6. status.json and status.txt; 7. inbox-stale.txt, one stable line per cause (the sentinel's watch silent, the
      embedding server HUNG, a GPU alert unread or 0 layers, a slot holder IDLE, an inbox item unread 30 minutes),
      each written once per stall.
+Admission (step 3, DEC-1032) needs room on every resource, each from measured peaks: the real CPU, memory (with the
+lead cap derived from it), GPU memory (from the last pass's read), and counts the rerankers; the heavy slots it
+reckons with follow where the shared embedder runs (`slots_gpu` on the GPU, `slots_cpu` otherwise). The status's
+`Balance:` line shows them all.
 It never starts what is not in ready.txt and never lands what is not in land.txt (the CTO's lists).
 Every external command and path can be replaced through DISPATCH_* variables, for the tests only.
 """
@@ -270,7 +279,18 @@ def truth():
     except Exception as exc:  # F3: a bad peaks value refuses admission, it never stops the tick
         t["peaks"] = None
         t["config_error"] = f"peaks.json unreadable: {exc!r}"[:200]
+    try:  # DEC-1032: the rerankers, the GPU as the last pass read it, and the heavy slots by the embedder's device
+        t["rerankers"] = rerankers(facts, c or {})
+        t["reranker_reserve"] = reranker_reserve(t["rerankers"], c or {}, pk, bool(E("DISPATCH_DRY_FLAG")))
+        t["gpu_last"] = gpu_last(c or {})
+        t["slots_target"], t["slots_device"] = slots_by_device(c or {})
+    except Exception as exc:  # fail closed: admission refuses, naming why
+        t["config_error"] = f"balance: {exc!r}"[:200]
     t["admit"], t["admit_reason"] = admit_safely(t, None)  # the status shows the admission of a plain newcomer
+    try:
+        t["lead_cap"] = lead_cap(t, c, t["_pk"]) if c and t["_pk"] else None
+    except Exception:  # noqa: BLE001 - shown as unknown; admission already said why
+        t["lead_cap"] = None
     return t
 
 
@@ -286,16 +306,30 @@ HEAVY = ("gov.context.context_check", "gov.retrieval.retrieve_check", "gov.check
 
 
 def config():
-    c = {"K": 2, "outside_slot_limit_s": 300, "peaks_refresh_s": 3600, "peaks_max_age_s": 7 * 86400,
+    c = {"K": 2,  # no longer used: the lead cap comes from memory (DEC-1032), not slots x K
+         "outside_slot_limit_s": 300, "peaks_refresh_s": 3600, "peaks_max_age_s": 7 * 86400,
          "history_days": 7, "memory_rule": "slots", "min_outside_samples": 120,
          "cpu_margin": 2,
          # DEC-1015 item 2: the embedding server's health, and the slot holders' progress
-         "embed_check_every": 1, "embed_timeout_s": 30, "embed_hung_after": 3, "embed_restart_cmd": None,
+         "embed_check_every": 5, "embed_timeout_s": 30, "embed_hung_after": 3, "embed_restart_cmd": None,
          "embed_restart_after_s": 900, "embed_restart_min_gap_s": 1800, "embed_model": "qwen3-embedding:0.6b",
          "embed_url": EMBED_URL, "slot_idle_s": 900,
+         # DEC-1032: each embedding server judged by its runner's progress (its log, gpu_logs) and the requests
+         # waiting on its port (`ss`); the test request above only as the fallback, every embed_check_every passes
+         "embed_stall_s": 180, "embed_ports": dict(EMBED_PORTS), "embed_ss": "ss", "embed_fail_after": 3,
+         "embed_fail_clear_s": 300,
          # DEC-1030: the GPU, its holders and each embedding model's layers (gpu_logs and gpu_expected merge per server)
          "gpu_smi": GPU_SMI, "gpu_smi_timeout_s": 10, "gpu_logs": dict(GPU_LOGS), "gpu_expected": dict(GPU_EXPECTED),
          "gpu_check_every": 1, "gpu_alert_gap_s": 0, "gpu_log_baseline_mb": 32, "gpu_log_read_max_mb": 64,
+         # DEC-1032: the whole machine balanced by measured peaks: the CPU band shown, GPU memory in admission (the
+         # last pass's read, at most gpu_state_max_age_s old), the rerankers' GPU slots (their lock files), the heavy
+         # slots by the shared embedder's device
+         "cpu_band": [14, 18], "gpu_headroom_mib": 2048, "reranker_gpu_mib": 3584, "rerank_gpu_slots": 2,
+         "rerank_gpu_glob": RERANK_GPU_GLOB, "gpu_state_max_age_s": 300, "slots_gpu": 3, "slots_cpu": 2,
+         # review of v4.6, F4: the rerankers' memory reserved at most as the allowed number (rerank_gpu_slots: the rest
+         # end, DEC-1033) x one reranker's measured peak, from the dispatcher's own samples since this time; the
+         # rerankers' 7-day p95 only while fewer than reranker_min_samples
+         "reranker_era_from": "2026-11-02 13:00", "reranker_min_samples": 30, "reranker_min_span_s": 86400,
          # DEC-1018 item 1: no landing claimed from this time until the nightly has started, or until the second
          "nightly_hold_from": "03:15", "nightly_hold_until": "05:30"}
     try:
@@ -361,6 +395,86 @@ def under_lead(facts, f):
 def rerankers_outside_leads(facts):
     """The memory of rerankers whose process is not inside a lead's tree (a queue or close run's, the CTO's)."""
     return sum(f["rss_kb"] for f in facts if f["argv"] and "reranker-venv" in f["argv"][0] and not under_lead(facts, f))
+
+
+def is_reranker(argv):
+    """A reranker process: the reranker environment's interpreter, or `rerank_worker` among its first arguments."""
+    return bool(argv) and ("reranker-venv" in argv[0] or any("rerank_worker" in a for a in argv[1:4]))
+
+
+def rerankers(facts, c):
+    """DEC-1032: the rerankers counted: how many, their RSS (all, and outside every lead tree), and how many hold a GPU
+    slot (the holders of the `rerank_gpu_glob` lock files in the lock table; None when it is unreadable)."""
+    rr = [f for f in facts if is_reranker(f["argv"])]
+    try:
+        held = len(lock_holders(E("DISPATCH_RERANK_GLOB") or c.get("rerank_gpu_glob") or RERANK_GPU_GLOB))
+    except OSError:
+        held = None
+    return {"n": len(rr), "rss_kb": sum(f["rss_kb"] for f in rr), "each_kb": [f["rss_kb"] for f in rr],
+            "outside_kb": sum(f["rss_kb"] for f in rr if not under_lead(facts, f)),
+            "gpu_held": held, "gpu_slots": int(c.get("rerank_gpu_slots", 2))}
+
+
+def reranker_reserve(rr, c, pk, dry):
+    """Review of v4.6, F4 (DEC-1033: at most `rerank_gpu_slots` rerankers, on the GPU; the rest end): the memory kept
+    for rerankers outside the leads is at most the allowed number x one reranker's measured peak, the largest RSS of
+    any reranker process in the dispatcher's own samples (one a reranker a pass, reranker-peak.json) since
+    `reranker_era_from`; and never more than the rerankers' p95 when one is known. Until the samples number
+    `reranker_min_samples` (30) AND span `reranker_min_span_s` (86400: a day's load, round 2 G2) it is the rerankers'
+    p95 (peaks.json), as before. A dry pass records nothing. {kb, how, samples, span_s, peak_kb, allowed}."""
+    era = str(c.get("reranker_era_from", "2026-11-02 13:00"))
+    era_t = datetime.strptime(era, "%Y-%m-%d %H:%M").timestamp()
+    st = load_json("reranker-peak.json", {})
+    if st.get("era") != era or not all(isinstance(st.get(k), (int, float)) for k in ("samples", "max_kb")):
+        st = {"era": era, "samples": 0, "max_kb": 0}  # a new era, or a damaged record (G3): counted afresh
+    each = [kb for kb in rr.get("each_kb", []) if kb > 0]
+    if not dry and each and now() >= era_t:
+        st.setdefault("first_at", now())
+        st.update(samples=st["samples"] + len(each), max_kb=max([st["max_kb"]] + each), at=stamp())
+        D.mkdir(parents=True, exist_ok=True)
+        tmp = D / "reranker-peak.json.tmp"
+        tmp.write_text(json.dumps(st))
+        os.replace(tmp, D / "reranker-peak.json")
+    p95 = ((pk or {}).get("kinds", {}).get("reranker", {}).get("rss_kb_p95") or 0)
+    allowed, need = int(c.get("rerank_gpu_slots", 2)), int(c.get("reranker_min_samples", 30))
+    span, need_span = now() - float(st.get("first_at") or now()), float(c.get("reranker_min_span_s", 86400))
+    if st["samples"] >= need and span >= need_span:
+        kb = allowed * st["max_kb"]
+        how = f"{allowed} x the {st['max_kb'] // 1024} MB peak ({st['samples']} samples since {era})"
+        if p95 and p95 < kb:
+            kb, how = p95, f"the rerankers' p95, under {how}"
+    else:
+        kb, how = p95, (f"the rerankers' p95 ({st['samples']} of {need} samples, {span / 3600:.1f} of "
+                        f"{need_span / 3600:.0f} h, since {era})")
+    return {"kb": kb, "how": how, "samples": st["samples"], "span_s": round(span), "peak_kb": st["max_kb"],
+            "allowed": allowed}
+
+
+def gpu_last(c):
+    """The GPU as the last pass read it (gpu-health.json): {used_mib, total_mib, free_mib, age_s, holders}, or None when
+    unread, unreadable, or older than `gpu_state_max_age_s` (300)."""
+    g = load_json("gpu-health.json", {}).get("gpu") or {}
+    if not g.get("ok") or g.get("used_mib") is None or not g.get("total_mib"):
+        return None
+    age = now() - float(g.get("at") or 0)
+    if age > float(c.get("gpu_state_max_age_s", 300)):
+        return None
+    counts = {}
+    for h in g.get("holders") or []:
+        counts[h.get("kind", "other")] = counts.get(h.get("kind", "other"), 0) + 1
+    return {"used_mib": g["used_mib"], "total_mib": g["total_mib"], "free_mib": g["total_mib"] - g["used_mib"],
+            "age_s": round(age), "holders": counts}
+
+
+def slots_by_device(c):
+    """DEC-1032: the heavy slots follow where the shared embedder runs: all its layers on the GPU, `slots_gpu` (3);
+    none or only part, `slots_cpu` (2); not known yet (no load line seen), heavy_slots.conf's number. (target, device)"""
+    lay = (load_json("gpu-health.json", {}).get("layers") or {}).get("shared")
+    if not lay or not lay.get("y"):
+        return int(c.get("slots", 3)), "unknown"
+    if lay["x"] >= lay["y"]:
+        return int(c.get("slots_gpu", 3)), f"gpu {lay['x']}/{lay['y']}"
+    return int(c.get("slots_cpu", 2)), ("cpu" if lay["x"] == 0 else "partial") + f" {lay['x']}/{lay['y']}"
 
 
 def services_resident(facts):
@@ -611,25 +725,41 @@ def admission(t, c, pk, newcomer_tid=None):
     if t["busy_cores"] + emb_room >= limit:
         return False, (f"real CPU: {t['busy_cores']} busy cores + {round(emb_room, 2)} for the embedding server's p95 "
                        f">= {t['nproc']} - margin {c['cpu_margin']}")
-    return _admission_rules(t, c, pk, newcomer_tid)
+    gpu_ok, gpu_why = gpu_room(t, c)  # DEC-1032: GPU memory, for every admission too
+    if not gpu_ok:
+        return False, gpu_why
+    ok, why = _admission_rules(t, c, pk, newcomer_tid)
+    return ok, (f"{why}; {gpu_why}" if ok else why)
 
 
-def _admission_rules(t, c, pk, newcomer_tid=None):
-    """(admit, reason). Memory: available + the leads' current memory >= floor + each running lead's peak + the new
-    lead's peak; CPU: running leads < slots x K; never while a heavy step runs outside a slot. No peaks: gate_check."""
-    if pk is None:
-        return t["gate_open"], "fallback to gate_check (peaks.json missing or older than 7 days): " + t["gate"][:120]
-    if t["outside_slot"]:
-        return False, f"a heavy step runs outside a slot over {c['outside_slot_limit_s'] // 60} min: {t['outside_slot'][0]}"
-    cap = c["slots"] * c["K"]
-    running = t["lead_count"] + len(t.get("pending_launches", []))
-    if running >= cap:
-        return False, (f"{t['lead_count']} leads running and {len(t.get('pending_launches', []))} launching, the CPU rule "
-                       f"allows {cap} ({c['slots']} slots x K {c['K']})")
+def gpu_room(t, c):
+    """DEC-1032: (room, reason). The GPU's free memory (the last pass's read) must cover the newcomer's expected GPU
+    need: one reranker's share (`reranker_gpu_mib`) while a GPU reranker slot is free (a lead's reranker then takes
+    it), else none; plus `gpu_headroom_mib` (2048). A GPU not read in the last `gpu_state_max_age_s` is not judged
+    (said so): the GPU watch alerts on it apart, and its absence is not a shortage."""
+    g = t.get("gpu_last")
+    if not g:
+        return True, "GPU memory: not judged (no GPU read in the last pass)"
+    rr = t.get("rerankers") or {}
+    held, slots = rr.get("gpu_held"), rr.get("gpu_slots", int(c.get("rerank_gpu_slots", 2)))
+    free_slot = held is None or held < slots  # the lock table unreadable: priced as if a slot were free
+    share = int(c.get("reranker_gpu_mib", 3584)) if free_slot else 0
+    need = share + int(c.get("gpu_headroom_mib", 2048))
+    how = (f"a reranker's {share} MiB (a GPU reranker slot free: {'?' if held is None else held} of {slots} held)"
+           if share else f"no reranker share (all {slots} GPU reranker slots held)") \
+        + f" + headroom {int(c.get('gpu_headroom_mib', 2048))} MiB"
+    if g["free_mib"] < need:
+        return False, f"GPU memory: {g['free_mib']} MiB free < {need} MiB ({how})"
+    return True, f"GPU memory {g['free_mib']} MiB free >= {need} MiB"
+
+
+def memory_room(t, c, pk):
+    """The memory rule's parts: {floor, have, p95, own, slots_n, slots_kb, headroom, rule, how_lead}, or (None, why)
+    when the rule cannot price (no floor: refuse; too little history: gate_check decides)."""
     try:
         floor = json.loads(GATE_CONFIG.read_text())["floor_kb"]
     except (OSError, ValueError, KeyError):
-        return False, "no floor in gate-config.json (fail closed)"
+        return None, (False, "no floor in gate-config.json (fail closed)")
     have = (t["mem_available_mb"] or 0) * 1024 + sum(t["lead_rss_kb"].values())
     rule = c.get("memory_rule", "slots")
     lo = pk.get("lead_outside")
@@ -637,32 +767,75 @@ def _admission_rules(t, c, pk, newcomer_tid=None):
     headroom = sum(max(0, (pk.get("kinds", {}).get(k, {}).get("rss_kb_p95") or 0) - t.get("services_kb", {}).get(k, 0))
                    for k in SERVICES)
     # a reranker outside every lead tree (a queue or close run's, which no lead's peak covers): its kind's p95 above
-    # what such rerankers hold now, while a queue or close run, or such a reranker, exists (review of 2026-11-01)
-    if t.get("outside_reranker_possible"):
-        headroom += max(0, (pk.get("kinds", {}).get("reranker", {}).get("rss_kb_p95") or 0)
-                        - t.get("rerankers_outside_kb", 0))
-    pending = len(t.get("pending_launches", []))
+    # what such rerankers hold now, while a queue or close run, or such a reranker, exists (review of 2026-11-01);
+    # a reranker inside a lead's tree is in that lead's current memory and its peak (DEC-1032: all are counted)
+    if t.get("outside_reranker_possible"):  # F4: re-priced for DEC-1033 (reranker_reserve), the old p95 as fallback
+        reserve = (t.get("reranker_reserve") or {}).get("kb")
+        if reserve is None:
+            reserve = pk.get("kinds", {}).get("reranker", {}).get("rss_kb_p95") or 0
+        headroom += max(0, reserve - t.get("rerankers_outside_kb", 0))
     if rule == "slots":
         if not (lo and lo["samples"] >= c["min_outside_samples"] and pk.get("slot_run_kb")):  # F4: too little history
-            return t["gate_open"], ("fallback to gate_check (fewer than "
-                                    f"{c['min_outside_samples']} minutes outside verification): " + t["gate"][:120])
+            return None, (t["gate_open"], ("fallback to gate_check (fewer than "
+                                           f"{c['min_outside_samples']} minutes outside verification): "
+                                           + t["gate"][:120]))
         p95, own = lo["rss_kb_p95"], pk.get("lead_own_outside_max_kb", {})
-        slots_kb = c["slots"] * pk["slot_run_kb"]
+        # DEC-1032: the slots by the embedder's device, never fewer than the slots held now
+        slots_n = max(int(t.get("slots_target") or c["slots"]), len(t.get("slots_held") or []))
+        slots_kb = slots_n * pk["slot_run_kb"]
         how_lead = "outside verification"
     else:  # the literal rule (DEC-1008 item 5 as written)
         p95, own = pk["lead"]["rss_kb_p95"], pk.get("lead_own_max_kb", {})
-        slots_kb = 0
+        slots_n, slots_kb = 0, 0
         how_lead = "all samples"
+    return dict(floor=floor, have=have, p95=p95, own=own, slots_n=slots_n, slots_kb=slots_kb, headroom=headroom,
+                rule=rule, how_lead=how_lead), None
+
+
+def lead_cap(t, c, pk):
+    """DEC-1032: the lead cap from memory, replacing slots x K: floor(room / a lead's p95), where room is the memory
+    the leads may hold (available + the leads' current trees - the floor - the slot runs - the services' headroom).
+    {cap, room_kb, p95_kb} or None when the memory rule cannot price."""
+    m, _ = memory_room(t, c, pk)
+    if not m or not m["p95"]:
+        return None
+    room = m["have"] - m["floor"] - m["slots_kb"] - m["headroom"]
+    return {"cap": max(0, int(room // m["p95"])), "room_kb": room, "p95_kb": m["p95"]}
+
+
+def _admission_rules(t, c, pk, newcomer_tid=None):
+    """(admit, reason). Never while a heavy step runs outside a slot; the lead cap from memory (DEC-1032); memory:
+    available + the leads' current memory >= floor + each running lead's peak + the new lead's peak + the slot runs +
+    the services' headroom. No peaks: gate_check."""
+    if pk is None:
+        return t["gate_open"], "fallback to gate_check (peaks.json missing or older than 7 days): " + t["gate"][:120]
+    if t["outside_slot"]:
+        return False, f"a heavy step runs outside a slot over {c['outside_slot_limit_s'] // 60} min: {t['outside_slot'][0]}"
+    m, verdict = memory_room(t, c, pk)
+    if m is None:
+        return verdict
+    floor, have, p95, own, headroom = m["floor"], m["have"], m["p95"], m["own"], m["headroom"]
+    pending = len(t.get("pending_launches", []))
+    running = t["lead_count"] + pending
+    room = have - floor - m["slots_kb"] - headroom
+    cap = max(0, int(room // p95)) if p95 else 0
+    if running + 1 > cap:
+        return False, (f"memory: lead cap {cap} ({m['rule']} rule: {room // 1024} MB of room / {p95 // 1024} MB a lead, "
+                       f"{m['how_lead']}): {t['lead_count']} leads running and {pending} launching")
     newcomer = max(p95, own.get(newcomer_tid or "", 0))  # F4: the newcomer at the larger of p95 and its own max
     need = floor + newcomer + sum(max(p95, own.get(tid or "", 0)) for tid in t["lead_ticket_ids"]) \
-        + pending * p95 + slots_kb + headroom
-    how = (f"{rule} rule: floor + {len(t['lead_ticket_ids'])} running + {pending} launching at {p95 // 1024} MB "
-           f"({how_lead}) or their own max + the newcomer {newcomer // 1024} MB"
-           + (f" + {c['slots']} slot runs at {pk['slot_run_kb'] // 1024} MB" if slots_kb else "")
-           + f" + services' headroom {headroom // 1024} MB")
+        + pending * p95 + m["slots_kb"] + headroom
+    rr = t.get("rerankers") or {}
+    how = (f"{m['rule']} rule: floor + {len(t['lead_ticket_ids'])} running + {pending} launching at {p95 // 1024} MB "
+           f"({m['how_lead']}) or their own max + the newcomer {newcomer // 1024} MB"
+           + (f" + {m['slots_n']} slot runs at {pk['slot_run_kb'] // 1024} MB" if m["slots_kb"] else "")
+           + f" + services' headroom {headroom // 1024} MB"
+           + (f"; rerankers {rr.get('n', 0)} at {rr.get('rss_kb', 0) // 1024} MB now, "
+              f"{rr.get('outside_kb', 0) // 1024} MB outside the leads" if rr else ""))
     if have < need:
         return False, f"memory: available + leads' {have // 1024} MB < {need // 1024} MB ({how})"
-    return True, f"admits: {t['lead_count']} of {cap} leads; memory {have // 1024} MB >= {need // 1024} MB ({how})"
+    return True, (f"admits: {t['lead_count']} of {cap} leads (cap from memory); memory {have // 1024} MB >= "
+                  f"{need // 1024} MB ({how})")
 
 # ---- 2. returns ---------------------------------------------------------------------------------------------------
 
@@ -1007,19 +1180,211 @@ def embed_probe(c):
         return "fail", round(time.time() - t0, 2), repr(exc)[:200]
 
 
+def ss_connections(c, ports):
+    """DEC-1032: {port: {listening, waiting, oldest_s}} from one `ss -Htnia` call (limit 10 s), or None when it is
+    unreadable. A request waits on a client socket (ESTAB, its peer the server's port) that has sent and has had no
+    answer since: no byte received, or its last send newer than its last receive; an idle keep-alive connection (its
+    answer received after its last send) does not wait. oldest_s: the time since the oldest waiting request was sent."""
+    exe = E("DISPATCH_SS") or c.get("embed_ss") or "ss"
+    filt = "( " + " or ".join(f"sport = :{p} or dport = :{p}" for p in ports) + " )"
+    try:
+        r = sh([exe, "-Htnia", filt], limit=10)
+    except OSError:
+        return None
+    if r.returncode:
+        return None
+    out = {p: {"listening": False, "waiting": 0, "oldest_s": 0.0} for p in ports}
+    port_of = lambda addr: int(addr.rsplit(":", 1)[1]) if addr.rsplit(":", 1)[-1].isdigit() else None
+    client = None
+    for line in r.stdout.splitlines():
+        if not line.strip():
+            continue
+        if line[0] in " \t":  # the socket's details (-i), after its line
+            if client is None:
+                continue
+            info = dict(re.findall(r"\b(\w+):(\d+(?:\.\d+)?)", line))
+            sent = float(info.get("bytes_sent", 0)) > 0  # F3: -i always prints lastsnd; a request sends bytes
+            snd, rcv = float(info.get("lastsnd", 0)), float(info.get("lastrcv", float("inf")))
+            if sent and (float(info.get("bytes_received", 0)) == 0 or snd < rcv):
+                out[client]["waiting"] += 1
+                out[client]["oldest_s"] = max(out[client]["oldest_s"], round(snd / 1000, 1))
+            client = None
+            continue
+        f = line.split()
+        client = None
+        if len(f) < 5:
+            continue
+        local, peer = port_of(f[3]), port_of(f[4])
+        if f[0] == "LISTEN" and local in out:
+            out[local]["listening"] = True
+        elif f[0] == "ESTAB" and peer in out:
+            client = peer
+    return out
+
+
+def judge_progress(name, path, port, sv, conns, c):
+    """DEC-1032: one server judged by its runner's progress. The log read on from its saved offset (the first read
+    starts at its end): tasks done (`release: ... stop processing`) and requests done (`[GIN] ... POST /api/embed`)
+    since the last pass, a minute's rate of each; the requests waiting on its port (ss). Progress is a task done or a
+    2xx request (F2). BUSY while there is progress; IDLE when nothing waits; WAITING when requests wait and none has
+    waited `embed_stall_s` without progress; HUNG only when requests have waited `embed_stall_s` (180) with no
+    progress during that wait: the stall clock starts when the wait starts (the oldest waiting request's send, or the
+    first pass that saw a request waiting), or at the last progress if later, never earlier (F1: a first request after
+    an idle spell is not HUNG); FAILING when `embed_fail_after` (3) requests in a row have failed (4xx/5xx) with no 2xx
+    since (F2); NOT RUNNING when nothing has listened on its port for `embed_hung_after` (3) passes. An unreadable
+    log, or unreadable connections with no progress for `embed_stall_s`, leaves it not judged (sv["judged"] False:
+    the shared server then falls back to the test request). Returns the state."""
+    t = now()
+    lines, off, first = gpu_log_new(name, path, sv.get("off"), c, False, baseline_mb=0)
+    if off is None:
+        sv.update(judged=False, why="its log is unreadable")
+        return sv.get("state")
+    sv["off"] = off
+    tasks, ok, failed, client, last_code = 0, 0, 0, 0, None
+    run = int(sv.get("fails_in_a_row") or 0)
+    for l in lines:
+        if TASK_DONE.search(l):
+            tasks += 1
+            continue
+        if TASK_FAILED.search(l):  # G1: a runner task's failure is the server's
+            failed, run, last_code = failed + 1, run + 1, "a runner task error"
+            continue
+        m = REQ_DONE.search(l)
+        if m:
+            code = int(m.group(1))
+            if 200 <= code < 300:
+                ok, run = ok + 1, 0
+            elif code >= 500:
+                failed, run, last_code = failed + 1, run + 1, code
+            elif code >= 400:
+                client += 1  # G1: the client's (a bad input, a wrong model, gave up): not progress, not a failure
+    if failed:
+        sv["last_fail_at"] = t
+    if run and not failed and t - float(sv.get("last_fail_at") or t) >= float(c.get("embed_fail_clear_s", 300)):
+        log(f"embedding server {name}: {run} failed requests in a row, then none for "
+            f"{int(t - sv['last_fail_at'])} s: the run ends")
+        run = 0  # G1: a failure run decays after embed_fail_clear_s with no new failure
+    if run and not sv.get("fails_in_a_row"):
+        sv["fail_run_since"] = t
+    sv["fails_in_a_row"], sv["last_fail_code"] = run, last_code or (sv.get("last_fail_code") if run else None)
+    sv["client_errors"] = client
+    prev = sv.get("read_at")
+    if first or not prev or not 0 < t - prev <= 600:
+        sv["tasks_per_min"] = sv["requests_per_min"] = sv["failed_per_min"] = None
+    else:
+        k = 60 / (t - prev)
+        sv["tasks_per_min"], sv["requests_per_min"], sv["failed_per_min"] = round(tasks * k), round(ok * k), \
+            round(failed * k)
+    sv["read_at"] = t
+    progress = tasks or ok
+    if first or not sv.get("last_progress_at") or progress:
+        sv["last_progress_at"] = t  # the first read: a stall is measured from here at the earliest (a restart)
+    stall = float(c.get("embed_stall_s", 180))
+    conn = conns.get(port) if conns is not None else None
+    if conn and conn["waiting"]:  # F1: when this wait began: kept while requests go on waiting
+        sv["wait_since"] = sv.get("wait_since") or t - float(conn["oldest_s"] or 0)
+    elif conn:
+        sv["wait_since"] = None
+    stalled_from = max(sv["last_progress_at"], sv.get("wait_since") or t)
+    quiet = t - sv["last_progress_at"]
+    sv.update(judged=True, why="", quiet_s=round(quiet), waiting=conn["waiting"] if conn else None,
+              oldest_wait_s=conn["oldest_s"] if conn else None, listening=conn["listening"] if conn else None,
+              stalled_s=round(t - stalled_from) if conn and conn["waiting"] else 0)
+    sv["down_passes"] = sv.get("down_passes", 0) + 1 if conn and not conn["listening"] else 0
+    if conn and sv["down_passes"] >= int(c.get("embed_hung_after", 3)):
+        state = "NOT RUNNING"
+    elif conn and not conn["listening"]:
+        state = "NOT LISTENING"  # under embed_hung_after passes: a restart, most likely
+    elif run >= int(c.get("embed_fail_after", 3)):
+        state = "FAILING"
+    elif progress:
+        state = "BUSY"
+    elif conn is None:
+        if quiet >= stall:  # cannot tell waiting from idle: not judged
+            sv.update(judged=False, why=f"its connections are unreadable and no progress for {int(quiet)} s")
+        state = "IDLE"
+    elif conn["waiting"]:
+        state = "HUNG" if t - stalled_from >= stall else "WAITING"
+    else:
+        state = "IDLE"
+    label = "the embedding server" if name == "shared" else f"the {name} embedding server"
+    if state in SERVER_DOWN and not sv.get("hung_since"):
+        sv["hung_since"] = {"HUNG": stalled_from, "FAILING": sv.get("fail_run_since") or t}.get(state, t)
+        detail = {"HUNG": f"{conn['waiting'] if conn else '?'} request(s) waiting on port {port} (the oldest sent "
+                          f"{conn['oldest_s'] if conn else '?'} s ago) and no task completed for "
+                          f"{int(t - stalled_from)} s of that wait in its log (nor a successful request)",
+                  "FAILING": f"{run} requests in a row failed on /api/embed (the last with status "
+                             f"{sv.get('last_fail_code')}) and none succeeded since"}.get(
+            state, f"nothing listens on port {port} ({sv['down_passes']} passes)")
+        inbox_item("server-" + ("" if name == "shared" else name + "-") + state.lower().replace(" ", "-"),
+                   f"log: {os.path.basename(path)}\nServer: {label}\nstatus: {state} since {stamp(sv['hung_since'])}: "
+                   f"{detail}; " + ("starts are held; rebuilds and heavy steps that need it wait\n" if name == "shared"
+                                    else "starts are not held (the shared server decides)\n"))
+        log(f"embedding server {name}: {state} since {stamp(sv['hung_since'])} ({detail})")
+    elif sv.get("hung_since") and ((state in ("BUSY", "IDLE") and sv.get("judged"))
+                                   or (sv.get("state") == "FAILING" and state not in SERVER_DOWN)):
+        # a stall clears on progress or idleness; a failure run (G1) clears when it ends: a 2xx, or no new failure
+        # for embed_fail_clear_s
+        log(f"embedding server {name}: {state} again after {sv.get('state')} since {stamp(sv['hung_since'])}")
+        sv["hung_since"] = None
+    elif sv.get("hung_since"):
+        state = sv.get("state") or state  # the incident holds until it progresses or idles
+    sv["state"] = state
+    return state
+
+
 def watch_embedding(dry, c):
-    """Each `embed_check_every` passes, one test request (limit `embed_timeout_s`). `embed_hung_after` failures or
-    timeouts in a row make the server HUNG: one Server: item and a stable inbox-stale line, once per incident; both
-    clear when it answers. A restart only with `embed_restart_cmd` configured, HUNG for `embed_restart_after_s`, no
+    """DEC-1032: each embedding server (`gpu_logs`, on its `embed_ports` port) judged by its runner's progress
+    (judge_progress), every pass; the shared server's state is the one that holds starts. When the shared server
+    cannot be judged by progress (its log unreadable), the fallback is DEC-1015's test request, at most every
+    `embed_check_every` passes (5; limit `embed_timeout_s`): `embed_hung_after` failures or timeouts in a row make it
+    HUNG. Either way one Server: item and a stable inbox-stale line, once per incident; both clear when it progresses
+    (or answers). A restart only with `embed_restart_cmd` configured, HUNG for `embed_restart_after_s`, no progress or
     answer within that window, and no restart in the last `embed_restart_min_gap_s` (1800)."""
     if dry:
         return None
     st = load_json("embed-health.json", {})
     st["passes"] = st.get("passes", 0) + 1
-    every = max(1, int(c.get("embed_check_every", 1)))
-    if (st["passes"] - 1) % every:
+    servers = st.setdefault("servers", {})
+    ports = {k: int(v) for k, v in dict(EMBED_PORTS, **(c.get("embed_ports") or {})).items()}
+    logs = {k: v for k, v in gpu_logs(c).items() if k in ports}
+    conns = ss_connections(c, sorted({ports[k] for k in logs})) if logs else None
+    for name, path in logs.items():
+        try:
+            judge_progress(name, path, ports[name], servers.setdefault(name, {}), conns, c)
+        except Exception as exc:  # noqa: BLE001 - one server's error never stops the other's judgement
+            servers.setdefault(name, {}).update(judged=False, why=f"error: {exc!r}"[:160])
+            log(f"embedding server {name}: progress check failed: {exc!r}")
+    shared = servers.get("shared") or {}
+    if shared.get("judged"):
+        if st.get("how") == "probe" and st.get("hung_since") and shared["state"] not in SERVER_DOWN:
+            log(f"embedding server: {shared['state']} by its progress after {st.get('state')} by the test request")
+        every = max(1, int(c.get("embed_check_every", 5)))
+        last = st.get("last_probe_pass")
+        if shared["state"] == "FAILING" and (last is None or not 0 <= st["passes"] - last < every):
+            # G1: while FAILING, the test request (at most every embed_check_every passes) can clear it
+            st["last_probe_pass"] = st["passes"]
+            res, secs, why = embed_probe(c)
+            st.update(last_check_at=now(), last_result=res, last_secs=secs, last_why=why)
+            if res == "ok":
+                log(f"embedding server shared: the test request answered in {secs} s: FAILING since "
+                    f"{stamp(shared['hung_since'])} cleared")
+                shared.update(fails_in_a_row=0, hung_since=None, state="IDLE", last_fail_at=None)
+        st.update(how="progress", state=shared["state"], hung_since=shared.get("hung_since"),
+                  last_ok_at=shared.get("last_progress_at"))
+        if st["state"] in SERVER_DOWN:
+            restart_if_due(st, c)
         (D / "embed-health.json").write_text(json.dumps(st))
         return st
+    if st.get("how") == "progress":  # back to the test request: its own count starts afresh
+        st.update(fails=0, first_fail_at=None, hung_since=None)
+    st["how"] = "probe"
+    every = max(1, int(c.get("embed_check_every", 5)))
+    last = st.get("last_probe_pass")
+    if last is not None and 0 <= st["passes"] - last < every:
+        (D / "embed-health.json").write_text(json.dumps(st))
+        return st
+    st["last_probe_pass"] = st["passes"]
     res, secs, why = embed_probe(c)
     st.update(last_check_at=now(), last_result=res, last_secs=secs, last_why=why)
     if res == "ok":
@@ -1065,7 +1430,7 @@ def restart_if_due(st, c):
                                  f"{st.get('state')} since {stamp(st['hung_since'])}: rc {r.returncode}\n\n{tail}\n")
 
 
-def embed_line(st):
+def probe_line(st):
     if not st or "last_result" not in st:
         return "not checked yet"
     if st.get("state") == "healthy":
@@ -1076,7 +1441,39 @@ def embed_line(st):
     return f"failing ({st.get('fails')} in a row; {st.get('last_why')})"
 
 
-SERVER_DOWN = ("HUNG", "NOT RUNNING")
+def server_line(name, sv, short=False):
+    """`shared BUSY 3120 tasks/min (2 waiting, the oldest 1.2 s)`, `query HUNG since ...`, `query not judged (...)`."""
+    if not sv:
+        return f"{name} not checked yet"
+    if not sv.get("judged") and not sv.get("hung_since"):
+        return f"{name} not judged ({sv.get('why') or 'no reading yet'})"
+    st = sv.get("state") or "?"
+    if st in SERVER_DOWN and sv.get("hung_since"):
+        return (f"{name} {st} since {stamp(sv['hung_since'])}" + ("" if short else
+                (f" ({sv.get('fails_in_a_row')} failed requests in a row, the last {sv.get('last_fail_code')})"
+                 if st == "FAILING" else f" ({sv.get('waiting')} waiting, {sv.get('stalled_s')} s with no progress)")
+                + ("; starts held" if name == "shared" else "")))
+    rate = sv.get("tasks_per_min")
+    line = f"{name} {st} {'?' if rate is None else rate} tasks/min"
+    if sv.get("waiting") and not short:
+        line += f" ({sv['waiting']} waiting, the oldest {sv.get('oldest_wait_s')} s)"
+    return line
+
+
+def embed_line(st, short=False):
+    """The shared server first (by progress, or the test request's line), then the others by progress."""
+    servers = (st or {}).get("servers") or {}
+    if not st or ("last_result" not in st and not servers):
+        return "not checked yet"
+    if st.get("how") == "progress":
+        parts = [server_line("shared", servers.get("shared"), short)]
+    else:
+        parts = [("shared by the test request: " if short else "") + probe_line(st)]
+    parts += [server_line(n, sv, short) for n, sv in servers.items() if n != "shared"]
+    return "; ".join(parts)
+
+
+SERVER_DOWN = ("HUNG", "NOT RUNNING", "FAILING")  # FAILING: by progress only (F2); the test request's is "failing"
 
 
 # ---- 5d. the GPU, its holders and each embedding model's layers (DEC-1030) ---------------------------------------------
@@ -1088,6 +1485,16 @@ GPU_ERROR = re.compile(r"CUDA error|out of memory|cudaMalloc failed", re.I)
 GPU_LOAD = re.compile(r"load_tensors: offloaded (\d+)/(\d+) layers to GPU")
 GPU_KINDS = ("embedder shared", "embedder query", "embedder other", "reranker", "other")
 SHARED_HOSTS = ("", "127.0.0.1:11434", "localhost:11434", "0.0.0.0:11434", ":11434")
+RERANK_GPU_GLOB = "/tmp/gov-os-rerank-gpu-*.lock"  # gov_reranker_gpu_slot.py's lock files (ACT-RERANK-GPU-SLOTS-1)
+EMBED_PORTS = {"shared": 11434, "query": 11435}
+# DEC-1032: the runner's per-input task done (llama-server `slot release: ... stop processing`), and a request done
+# (Ollama's `[GIN] <time> | <status> | ... | POST "/api/embed"` line). Progress is a task done or a 2xx request (review
+# of v4.6, F2). A server failure is a 5xx request or a runner task's failure (llama.cpp's `send_error: task id = N,
+# error: ...`; none in the shared log since 2026-11-01 21:51); a 4xx (400 a bad input, 404 a wrong model, 499 the
+# client gave up) is the client's: neither progress nor a failure (round 2, G1)
+TASK_DONE = re.compile(r"\brelease: +id +\d+ \| task -?\d+ \| stop processing")
+TASK_FAILED = re.compile(r"\bsend_error: +task id = -?\d+, error:")
+REQ_DONE = re.compile(r"^\[GIN\] [^|]*\|\s*(\d{3})\s*\|.*\|\s*POST\s+\"/api/embed\"")
 
 
 def gpu_logs(c):
@@ -1185,18 +1592,20 @@ def gpu_read(c):
     return g
 
 
-def gpu_log_new(name, path, off, c, dry):
+def gpu_log_new(name, path, off, c, dry, baseline_mb=None):
     """The complete lines a server's log gained since its saved offset {path, off, ino}: (lines, new offset, first).
-    The first read (or a new path) takes only the last `gpu_log_baseline_mb` (32) to learn the current layers; an
-    offset past the end, or a new inode, is a truncated or rotated log: from 0; at most `gpu_log_read_max_mb` (64) a
-    pass (the rest skipped). A partial last line waits for the next pass. A missing log: ([], None, False)."""
+    The first read (or a new path) takes only the last `gpu_log_baseline_mb` (32; `baseline_mb` when given: 0 for the
+    progress watch) to learn the current layers; an offset past the end, or a new inode, is a truncated or rotated
+    log: from 0; at most `gpu_log_read_max_mb` (64) a pass (the rest skipped). A partial last line waits for the next
+    pass. A missing log: ([], None, False)."""
     try:
         st = os.stat(path)
     except OSError:
         return [], None, False
     size, first = st.st_size, not off or off.get("path") != path
     if first:
-        start = max(0, size - int(float(c.get("gpu_log_baseline_mb", 32)) * 2 ** 20))
+        base = c.get("gpu_log_baseline_mb", 32) if baseline_mb is None else baseline_mb
+        start = max(0, size - int(float(base) * 2 ** 20))
     elif off.get("off", 0) > size or off.get("ino") != st.st_ino:
         if not dry:
             log(f"gpu watch: the {name} log was truncated or rotated (offset {off.get('off')}, size {size}): from 0")
@@ -1280,6 +1689,7 @@ def watch_gpu(dry, c):
         g = st["gpu"] = {"ok": False, "why": f"the GPU read failed: {exc.__class__.__name__}", "at": now()}
     expected = dict(GPU_EXPECTED, **(c.get("gpu_expected") or {}))
     offs, layers = st.setdefault("offsets", {}), st.setdefault("layers", {})
+    # zero_since: since when a server that expects the GPU has had a short load (0 layers, or only part: DEC-1032)
     err_last, zero_since = st.setdefault("error_last_at", {}), st.setdefault("zero_since", {})
     gap = float(c.get("gpu_alert_gap_s", 0))
     reasons, evidence, what = [], [], []
@@ -1291,10 +1701,14 @@ def watch_gpu(dry, c):
         for line in lines:
             m = GPU_LOAD.search(line)
             if m:
-                layers[name] = {"x": int(m.group(1)), "y": int(m.group(2)), "at": now()}
-                if int(m.group(1)) == 0 and not first:
+                x, y = int(m.group(1)), int(m.group(2))
+                layers[name] = {"x": x, "y": y, "at": now()}
+                if x < y and not first:
                     zero_load = True
                     evidence.append(f"{name}: {line.strip()[:300]}")
+                elif x >= y and expected.get(name, True) and zero_since.get(name) and not first:
+                    zero_since.pop(name)  # a full load ends the incident, though a short one follows in this pass
+                    log(f"gpu watch: the {name} server has all {x}/{y} layers on the GPU again")
         errors = [] if first and not recovering else [l for l in lines if GPU_ERROR.search(l)]
         if errors:
             if now() - err_last.get(name, float("-inf")) >= gap:
@@ -1305,16 +1719,24 @@ def watch_gpu(dry, c):
                 log(f"gpu watch: {len(errors)} more CUDA error line(s) in the {name} log (same incident)")
             err_last[name] = now()
         lay = layers.get(name)
-        if expected.get(name, True) and lay and lay["x"] == 0:
+        if expected.get(name, True) and lay and lay["x"] < lay["y"]:
             if (zero_load or first) and not zero_since.get(name):
-                reasons.append(f"the {name} server loaded its model with 0/{lay['y']} layers on the GPU (CPU only, "
-                               "30-100x slower)")
-                what.append(f"0 layers ({name})")
+                if lay["x"] == 0:
+                    reasons.append(f"the {name} server loaded its model with 0/{lay['y']} layers on the GPU (CPU "
+                                   "only, 30-100x slower)")
+                    what.append(f"0 layers ({name})")
+                else:  # DEC-1032: a partial load runs the rest on the CPU, as slow as the slowest part
+                    reasons.append(f"the {name} server loaded its model with only {lay['x']}/{lay['y']} layers on "
+                                   "the GPU (the rest on the CPU: GPU memory short)")
+                    what.append(f"partial {lay['x']}/{lay['y']} layers ({name})")
                 if first:
-                    evidence.append(f"{name}: load_tensors: offloaded 0/{lay['y']} layers to GPU (the latest load)")
+                    evidence.append(f"{name}: load_tensors: offloaded {lay['x']}/{lay['y']} layers to GPU (the "
+                                    "latest load)")
             zero_since[name] = zero_since.get(name) or now()
-        elif lay and lay["x"] > 0 and zero_since.pop(name, None):
-            log(f"gpu watch: the {name} server has {lay['x']}/{lay['y']} layers on the GPU again")
+        elif lay and lay["x"] >= lay["y"] and zero_since.pop(name, None):
+            log(f"gpu watch: the {name} server has all {lay['x']}/{lay['y']} layers on the GPU again")
+        elif lay and not expected.get(name, True):
+            zero_since.pop(name, None)  # expected on the CPU (configured since): no incident holds
     if reasons:
         state = gpu_line(g)
         holders = "\n".join(f"  pid {h['pid']} {h['kind']} ({h['name']}, "
@@ -1357,9 +1779,15 @@ def slot_name(path):
 
 def slot_holders():
     """{slot path: [holder pid]} from the lock table (a waiter, "->", is not a holder)."""
+    return lock_holders(SLOT_GLOB)
+
+
+def lock_holders(pattern):
+    """{lock file: [holder pid]} for the files matching `pattern`, from the lock table (a waiter, "->", is not a
+    holder); the heavy slots' and the rerankers' GPU slots' (DEC-1032). An unreadable table raises OSError."""
     locks = (PROC / "locks").read_text().splitlines()
     out = {}
-    for p in sorted(glob.glob(SLOT_GLOB)):
+    for p in sorted(glob.glob(pattern)):
         try:
             ino = str(os.stat(p).st_ino)
         except OSError:
@@ -1694,6 +2122,54 @@ def land_step(t, dry):
 
 # ---- 5, 6. status and escalation ------------------------------------------------------------------------------------
 
+def balance(t, emb, c):
+    """DEC-1032: the machine's balance in one line and its record: the CPU against its band (`cpu_band`, 14-18 of 20),
+    memory available against the floor, the GPU used/total and the budget's holders (the embedders by their layers,
+    nvidia-smi's holders by kind; read this pass), the embedders' states, the heavy slots by the shared embedder's
+    device, the lead cap from memory, the rerankers."""
+    gb = lambda kb: f"{kb / 1048576:.1f}"
+    lo, hi = (c.get("cpu_band") or [14, 18])[:2]
+    busy = t.get("busy_cores")
+    band = None if busy is None else ("below" if busy < lo else "above" if busy > hi else "within")
+    cpu = (f"CPU {busy}/{t.get('nproc')} busy (band {lo}-{hi}: {band})" if busy is not None
+           else f"CPU ?/{t.get('nproc')} (measuring)")
+    try:
+        floor_kb = json.loads(GATE_CONFIG.read_text())["floor_kb"]
+    except (OSError, ValueError, KeyError):
+        floor_kb = None
+    avail = t.get("mem_available_mb")
+    ram = (f"RAM {'?' if avail is None else gb(avail * 1024)} GB available (floor "
+           f"{'?' if floor_kb is None else gb(floor_kb)} GB)")
+    g = gpu_last(c)
+    layers = load_json("gpu-health.json", {}).get("layers") or {}
+    lay = ", ".join(f"{n} {v['x']}/{v['y']}" for n, v in sorted(layers.items()))
+    if g:
+        held = ", ".join(f"{k} {n}" for k, n in sorted(g["holders"].items())) or "none listed"
+        gpu = (f"GPU {g['used_mib'] / 1024:.1f}/{g['total_mib'] / 1024:.1f} GB used, {g['free_mib'] / 1024:.1f} free "
+               f"(headroom {int(c.get('gpu_headroom_mib', 2048)) / 1024:.1f} GB; embedders' layers: {lay or '?'}; "
+               f"holders: {held})")
+    else:
+        gpu = f"GPU unread (embedders' layers: {lay or '?'})"
+    target, device = slots_by_device(c)
+    cap = t.get("lead_cap")
+    caps = (f"lead cap {cap['cap']} from memory ({gb(cap['room_kb'])} GB room / {gb(cap['p95_kb'])} GB a lead)"
+            if cap else "lead cap ? (no peaks or no memory rule)")
+    rr = t.get("rerankers") or {}
+    res = t.get("reranker_reserve")
+    rer = (f"rerankers {rr.get('n', 0)} ({gb(rr.get('rss_kb', 0))} GB RSS; "
+           f"{'?' if rr.get('gpu_held') is None else rr['gpu_held']} of {rr.get('gpu_slots', '?')} GPU slots held; "
+           + (f"reserve {gb(res['kb'])} GB: {res['how']}" if res else "reserve ?") + ")")
+    rec = {"busy_cores": busy, "nproc": t.get("nproc"), "cpu_band": [lo, hi], "cpu_in_band": band,
+           "mem_available_mb": avail, "floor_kb": floor_kb, "gpu": g, "layers": layers,
+           "embedders": {n: {k: sv.get(k) for k in ("state", "judged", "tasks_per_min", "waiting", "quiet_s")}
+                         for n, sv in (emb.get("servers") or {}).items()},
+           "embedder_state": emb.get("state"), "slots_target": target, "slots_device": device, "lead_cap": cap,
+           "rerankers": rr, "reranker_reserve": res}
+    line = (f"Balance: {cpu}; {ram}; {gpu}; embedders: {embed_line(emb, short=True)}; slots {target} by device "
+            f"({device}); {caps}; {rer}")
+    return rec, line
+
+
 def write_status(t, started_w2, waits, land_state, new_returns, failures):
     items = unread()
     oldest_item = min(items, key=lambda i: i.stat().st_mtime) if items else None
@@ -1704,12 +2180,18 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
              last_start=(" ".join(started()[-1][:3]) if started() else None), failures=failures)
     (D / "status.json").write_text(json.dumps(s, indent=1))
     load = "/".join(f"{x:.1f}" for x in t["load"]) if t.get("load") else "?"
+    try:
+        bal, bal_line = balance(t, load_json("embed-health.json", {}), t.get("_c") or {})
+    except Exception as exc:  # noqa: BLE001 - the status line says so; the rest of the status is written
+        bal, bal_line = None, f"Balance: unreadable ({exc!r})"[:200]
+    s["balance"] = bal
     txt = ([f"TICK FAILED in part: {'; '.join(failures)} at {s['time']}"] if failures else []) + [
         f"dispatcher {s['time']}",
         f"leads running ({t['lead_count']}, from the processes): {', '.join(t['leads']) or 'none'}",
         f"load {load}; real busy cores {t.get('busy_cores')} of {t.get('nproc')} (the embedding server "
         f"{t.get('embedding_cores')}); memory available {t.get('mem_available_mb')} MB; gate_check (for comparison) {'open' if t['gate_open'] else 'SHUT'}"
         f" ({t['gate'][:120]}); disk {'open' if t['disk_open'] else 'SHUT'}",
+        bal_line,
         f"admission (by peaks, DEC-1008 item 5): {t['admit_reason'][:200]}",
         (f"peaks {t['peaks']['computed']}: a lead p95 {t['peaks']['lead_p95_mb']} MB, max {t['peaks']['lead_max_mb']} MB"
          if t.get("peaks") else "peaks: none (gate_check decides)"),
@@ -1729,6 +2211,10 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
     emb, slots = load_json("embed-health.json", {}), load_json("slot-progress.json", {})
     if emb.get("hung_since"):
         want["server"] = f"server: the embedding server {emb.get('state')} since {stamp(emb['hung_since'])}"
+    for name, sv in sorted((emb.get("servers") or {}).items()):  # DEC-1032: the other servers' incidents
+        if name != "shared" and sv.get("hung_since"):
+            want[f"server {name}"] = (f"server {name}: the {name} embedding server {sv.get('state')} since "
+                                      f"{stamp(sv['hung_since'])}")
     gpu = load_json("gpu-health.json", {})
     if gpu_stale_line(gpu):
         want["gpu"] = gpu_stale_line(gpu)
@@ -1751,11 +2237,12 @@ def write_status(t, started_w2, waits, land_state, new_returns, failures):
         for line in stale.read_text().splitlines():
             if line.strip():  # a line without a known key (the v4 form) is the inbox's
                 k = line.split(":", 1)[0]
-                have.setdefault(k if k in ("sentinel", "server", "gpu", "inbox") or k.startswith("slot ") else "inbox",
-                                line)
+                have.setdefault(k if k in ("sentinel", "server", "gpu", "inbox") or k.startswith(("slot ", "server "))
+                                else "inbox", line)
     except OSError:
         pass
-    order = ["sentinel", "server", "gpu"] + sorted(k for k in want if k.startswith("slot ")) + ["inbox"]
+    order = ["sentinel", "server"] + sorted(k for k in want if k.startswith("server ")) + ["gpu"] \
+        + sorted(k for k in want if k.startswith("slot ")) + ["inbox"]
     keep = [have.get(k) or want[k] for k in order if k in want]  # a cause's line kept as first written
     if keep:
         text = "\n".join(keep) + "\n"
