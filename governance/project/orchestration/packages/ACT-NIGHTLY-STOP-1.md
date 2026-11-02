@@ -1,7 +1,7 @@
 # ACT-NIGHTLY-STOP-1 — Stop every scheduled nightly run (DEC-1049, amending DEC-1047)
 
 For the owner's operator, in a plain terminal or a Claude session (it changes only the crontab, not `gov`).
-Written 2026-11-02 22:10 by the CTO. Dry-run on a copy of the live crontab: exactly the three nightly lines change, the
+Written 2026-11-02 21:59 by the CTO. Dry-run on a copy of the live crontab: exactly the three nightly lines change, the
 dispatcher's every-minute line and the 09:30 runs sweep stay, and the undo restores the crontab byte for byte.
 
 ## Why
