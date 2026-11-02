@@ -2,13 +2,16 @@
 
 Ticket `DAEO-clon` (W2-112), profile FULL. Written by an independent test designer (MR-3) from the ticket's KPI
 lines and its sources, in parallel with the engineer (DEC-963), without reading the implementation. Revised for
-KPI 7 as corrected under DEC-1033 (`9124fc25aa2a`: the fallback goes through the GPU slot rule, never the CPU) and
-for DEC-1034 (the settings, "about 2 s", the log and alert's place, the bundle and `gov status` in the ticket's
-paths, the launch sandbox's sessions).
+KPI 7 as corrected under DEC-1033 (`9124fc25aa2a`: the fallback goes through the GPU slot rule, never the CPU),
+for DEC-1034 (the settings, "about 2 s", the log's place, the bundle and `gov status` in the ticket's paths, the
+launch sandbox's sessions; DEC-1035 decided P-W2-112-T2 (c), with (a) as W2-127) and for DEC-1036 (the CTO,
+delegated): T5 (b) "below its GPU share the service does not start; searches fall back through the slot rule or go
+unranked, named (no reranker on the CPU anywhere, DEC-1033)"; T6 (b) "the service holds one of the two GPU slots
+(it waits for a slot like any reranker, or fails named), so at most one private reranker beside it".
 
 Sources: the ticket's KPIs; P-RERANKER-1 (the owner's proposal: the socket's place, the lock, the idle end, the
 queue, the fallbacks); DEC-979 item 4, DEC-982, DEC-374, DEC-397, DEC-419 (DP-6), DEC-1031 item 2, DEC-1032,
-DEC-1033, DEC-1034; ADR-0002 §2; P1-LOAD-BALANCE-1 (the GPU budget); ACT-RERANK-GPU-SLOTS-1 and ACT-RERANK-WAIT-1
+DEC-1033, DEC-1034, DEC-1035, DEC-1036; ADR-0002 §2; P1-LOAD-BALANCE-1 (the GPU budget); ACT-RERANK-GPU-SLOTS-1 and ACT-RERANK-WAIT-1
 with `governance/project/orchestration/tools/gov_reranker_gpu_slot.py` (the GPU slot rule).
 
 ## How to run
@@ -46,7 +49,7 @@ TMPDIR=<a writable temporary folder> PYTHONPATH=<worktree>/src \
   its `HOME` (in its environment or its command line) and removes its folder, however the case ends.
 - **Parallel:** each case has its own `HOME` and lock folder, so the suite can run in parallel; nothing is
   serial-only.
-- Run time: about 32 s on the base; each case well under a minute.
+- Run time: about 35 s on the base; each case well under a minute.
 
 ## The interface the tests rely on
 
@@ -61,11 +64,12 @@ Beyond the base's public `gov.retrieval.rerank` (`rerank(query, candidates, rera
 | A request's time limit | `GOV_RERANK_TIMEOUT_S` (seconds), in the searches' environment | DEC-1034 item 3 |
 | "About 2 s" | bounds the connection; the answer is bounded by the request's time limit. A search whose service is down answers within 20 s (2 s, a private reranker's start, a loaded machine's slack), plus the slot wait where a case makes it wait | the KPI, DEC-1034 item 3 |
 | Over the cap | 20,000 texts in one request (the cap is well below) | P-RERANKER-1, DEC-1034 |
-| The GPU slot rule | `gov-os-rerank-gpu-<i>.lock` in `GOV_RERANK_GPU_LOCK_DIR`, an exclusive `flock` held for the reranker's life; `GOV_RERANK_GPU_SLOTS`, `GOV_RERANK_GPU_WAIT_S`; never the CPU without `GOV_RERANK_ALLOW_CPU=1` | KPI 7, ACT-RERANK-WAIT-1 |
-| The fallback log and the CPU alert | a file under `~/.cache/gov-os/` written since the search began (the fallback's mentions rerank, fall back, unavailable or private; the alert names the CPU) | DEC-1034 item 3 |
-| The bundle's `rerank` entry | at the bundle's top level or in its `merge`; `unavailable` with its reason when unranked (the reason any other text in the entry, or in a key beside it whose name holds "reason"); otherwise which reranker answered (the service, "shared" also taken; a "private" one) and its device (`cuda`/`gpu`, `cpu`) | DEC-1034 item 2, KPI 4, 6, 7 |
+| The GPU slot rule | `gov-os-rerank-gpu-<i>.lock` in `GOV_RERANK_GPU_LOCK_DIR`, an exclusive `flock` held for the reranker's life; `GOV_RERANK_GPU_SLOTS`, `GOV_RERANK_GPU_WAIT_S`; never the CPU without `GOV_RERANK_ALLOW_CPU=1`. The service holds one of the two slots like any reranker | KPI 7, ACT-RERANK-WAIT-1, DEC-1036 T6 (b) |
+| No reranker on the CPU | no model loads on the CPU anywhere: not the service (below its share or with no GPU it does not start), not a fallback | DEC-1033, DEC-1036 T5 (b) |
+| The fallback log | a file under `~/.cache/gov-os/` written since the search began, mentioning the fallback (rerank, fall back, unavailable or private); below the service's share, also its reason (the GPU, its share or its memory) | DEC-1034 item 3, DEC-1036 |
+| The bundle's `rerank` entry | at the bundle's top level or in its `merge`; `unavailable` with its reason when unranked (the reason any other text in the entry, or in a key beside it whose name holds "reason"); otherwise which reranker answered (the service, "shared" also taken; a "private" one) and its device (`cuda`/`gpu`); never the CPU | DEC-1034 item 2, KPI 4, 6, 7, DEC-1036 |
 | `gov status`'s count | `gov status --json`: a whole number of at least the fallbacks made, under an entry whose key holds "rerank" | KPI 4, DEC-1034 items 2 and 3 |
-| The stand-in GPU | 14 GiB of 16 free (room) or 1 GiB (below any share of 2.5 to 3.5 GB), so no exact share is assumed | DEC-1032 |
+| The stand-in GPU | 14 GiB of 16 free (room) or 1 GiB (below any share of 2.5 to 3.5 GB), so no exact share is assumed. With 1 GiB free a search may be answered by a private reranker on a free slot or go on unranked: whether a private reranker weighs the GPU's free memory is not stated, so either is taken | DEC-1032, DEC-1036 |
 
 How the service is seen from outside: the socket file; the sockets listening at its path (`/proc/net/unix`); the
 stand-in model's log (who loaded the model, on which device, how many GPU slots were held then, who scored which
@@ -147,19 +151,23 @@ is the machine's state and is not planted.
 
 These hold only that the record exists and carries figures of each kind; the figures are the reviewer's.
 
-### Success 6: the service's GPU budget — `test_w2_112_gpu.py`, `test_w2_112_bundle.py`
+### Success 6 (as decided by DEC-1036 T5 (b)): the service's GPU budget; no reranker on the CPU — `test_w2_112_gpu.py`, `test_w2_112_bundle.py`
 
 | Test | Red reason on the base |
 |---|---|
 | `test_with_room_on_the_gpu_the_service_runs_its_one_model_there` | no service stays up after the first search |
-| `test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu[less-than-its-share-free]`, `[no-gpu]` | no service stays up after the first search |
+| `test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[less-than-its-share-free]` | green on the base (no service ever starts; its private reranker loads on the stand-in GPU) |
+| `test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[no-gpu]` | the base's private reranker loads on the CPU |
+| `test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder[less-than-its-share-free]`, `[no-gpu]` | no file under `~/.cache/gov-os/` logs the fallback with its reason |
 | `test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu` | six searches put 6 copies of the model on the GPU |
-| `test_the_service_alerts_when_it_starts_on_the_cpu_below_its_share` | no service stays up after the first search (then: the alert in `~/.cache/gov-os/`) |
-| `test_w2_112_bundle.py::test_the_bundle_names_the_cpu_when_the_service_runs_there` ("named") | the bundle has no `rerank` entry |
+| `test_w2_112_bundle.py::test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason[less-than-its-share-free]`, `[no-gpu]` ("named") | the bundle has no `rerank` entry |
 | `test_w2_112_bundle.py::test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers` | the bundle has no `rerank` entry |
 
-"Never more than one copy on the GPU" is read as the service's: one service loads one copy however many searches
-start it (also in the 20-concurrent case). Fallback private rerankers are bounded by the GPU slot rule (KPI 7).
+Below its share, a search answered at all is answered by a private reranker on the GPU; otherwise it goes on
+unranked with its reason; with no GPU it goes on unranked. Whether a record of the service's refusal to start is
+kept is not stated: only that the fallback's reason reaches the log and the bundle. "Never more than one copy on
+the GPU" is read as the service's: one service loads one copy however many searches start it (also in the
+20-concurrent case); the slot rule bounds the rest (the service holds one of the two slots, DEC-1036 T6 (b)).
 
 ### Success 7 (corrected under DEC-1033): the fallback through the GPU slot rule, never the CPU — `test_w2_112_slots.py`, `test_w2_112_bundle.py`
 
@@ -169,7 +177,10 @@ start it (also in the 20-concurrent case). Fallback private rerankers are bounde
 | `test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu` | the base ignores the slots: it reranks at once |
 | `test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees` | the private reranker loads 1.5 s before a slot frees |
 | `test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu]`, `[gpu-hidden]` | the private reranker loads on the CPU |
-| `test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason` | the base reranks the bundle (`merge.reranked: true`) |
+| `test_the_service_holds_one_of_the_two_gpu_slots` (DEC-1036 T6 (b)) | no service stays up after the first search |
+| `test_with_the_service_up_and_the_other_slot_held_a_fallback_waits_then_goes_on_unranked` (T6 (b)) | no service stays up after the first search |
+| `test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded` (T6 (b)) | the base ignores the slots: its private reranker scores the search |
+| `test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason[service-down]`, `[no-service-yet]` (T6 (b)) | the base reranks the bundle (`merge.reranked: true`) |
 | `test_w2_112_bundle.py::test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down` | the bundle has no `rerank` entry |
 
 The stopgap's retirement (ACT-RERANK-GPU-SLOTS-1's `.pth`) is an owner ACT the lead prepares, not code; no test.
@@ -179,7 +190,7 @@ The stopgap's retirement (ACT-RERANK-GPU-SLOTS-1's `.pth`) is an owner ACT the l
 | Failure | Tests |
 |---|---|
 | A search that fails, hangs, or returns another session's scores because of the service | the 20-concurrent case, arrival order, the cap, the time limit, the same inputs from several sessions, every fallback and slot case, the sandboxed session (each session is bounded: hung at 120 s; a fallback within 20 s plus any slot wait) |
-| Two services started at once, or a socket another user can open | the two-together, 20-concurrent and one-copy cases, the socket case, the case after the service died, the killed mid-run case |
+| Two services started at once, or a socket another user can open | the two-together, 20-concurrent and one-copy cases, the service's one slot, the socket case, the case after the service died, the killed mid-run case |
 | Answers that differ from a private reranker's on the same inputs and device | the three answers cases; every scored result is checked against the private reranker's order and scores |
 
 ## What fails inside the launch sandbox for that reason alone
@@ -187,8 +198,9 @@ The stopgap's retirement (ACT-RERANK-GPU-SLOTS-1's `.pth`) is an owner ACT the l
 Where `socket(AF_UNIX)` is refused, the four broken-service cases (`test_a_service_that_does_not_answer_is_passed_over`
 `[full]`, `[silent]`, `test_a_service_that_answers_with_an_error_is_passed_over[error]`, `[garbage]`) fail at
 making the stand-in, whatever the code; on the base they pass elsewhere. Once the service exists, every case that
-needs it running (the service, concurrency, answers, GPU service cases, the killed and failing service cases, and
-the service-naming bundle cases) would also fail inside that sandbox for this reason alone.
+needs it running (the service, concurrency, answers, GPU service cases, the service's GPU slot, the killed and
+failing service cases, and the service-naming bundle case) would also fail inside that sandbox for this reason
+alone.
 
 ## Earlier tests this ticket would turn red
 

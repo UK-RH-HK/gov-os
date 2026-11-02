@@ -2,8 +2,10 @@
 
 - KPI 4: where no private reranker can start either, "the bundle is marked `rerank: unavailable` (DEC-374)"; each
   fallback is logged "and `gov status` counts them".
-- KPI 6: below its share of the GPU the service starts on the CPU, "named".
-- KPI 7: without a GPU slot the search goes on unranked, "named: `merge.reranked` false with its reason".
+- KPI 6 as decided by DEC-1036 T5 (b): below its GPU share the service does not start; searches fall back through
+  the slot rule or go unranked, named; no reranker on the CPU anywhere.
+- KPI 7: without a GPU slot the search goes on unranked, "named: `merge.reranked` false with its reason"; and by
+  DEC-1036 T6 (b), with both slots held before any service exists the service cannot start on the GPU either.
 - DEC-1034 item 2: the bundle carries a `rerank` entry: `unavailable` with its reason when unranked; otherwise which
   reranker answered and its device. `src/gov/retrieval/retrieve.py` and `src/gov/status/command.py` are in the
   ticket's paths.
@@ -146,13 +148,17 @@ def test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_ca
     assert reasons, f"the bundle says `rerank: unavailable` without its reason: {value!r}"
 
 
-def test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason(boxes, tools, project):
+@pytest.mark.parametrize("how", ["service-down", "no-service-yet"])
+def test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason(boxes, tools, project, how):
+    # "service-down": the service cannot start, and the fallback finds no slot (KPI 7). "no-service-yet": both slots
+    # are held before any service exists, so the service cannot start on the GPU either (DEC-1036 T6 (b)).
     box = boxes(settings={support.WAIT_SETTING: 2})
-    box.block_service()
+    if how == "service-down":
+        box.block_service()
     box.hold_slots()
     bundle = _retrieve(box, tools, project)
     assert bundle["merge"].get("reranked") is False, \
-        f"with the service down and both GPU slots held the bundle says reranked: {bundle['merge']}"
+        f"with both GPU slots held ({how}) the bundle says reranked: {bundle['merge']}"
     value, reasons = _entry(bundle)
     assert support.unavailable(value), f"the bundle's rerank entry does not say `unavailable`: {value!r}"
     assert any(re.search(r"slot|gpu", reason, re.IGNORECASE) for reason in reasons), \
@@ -170,15 +176,25 @@ def test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers(boxes
         f"the bundle's rerank entry does not name the service and the GPU it ran on: {value!r}{support.note()}"
 
 
-def test_the_bundle_names_the_cpu_when_the_service_runs_there(boxes, tools, project):
-    box = boxes(gpu=support.SHORT)
+@pytest.mark.parametrize("gpu", [support.SHORT, support.NO_GPU], ids=["less-than-its-share-free", "no-gpu"])
+def test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason(boxes, tools, project, gpu):
+    # DEC-1036 T5 (b): below its share the service does not start; the search falls back through the slot rule
+    # (a private reranker on a free GPU slot) or goes on unranked, named with its reason; never the CPU.
+    box = boxes(gpu=gpu)
     bundle = _retrieve(box, tools, project)
-    assert bundle["merge"].get("reranked") is True, f"the bundle was not reranked: {bundle['merge']}"
-    value, _ = _entry(bundle)
+    value, reasons = _entry(bundle)
     text = json.dumps(value)
-    assert SERVICE.search(text) and ON_CPU.search(text), \
-        (f"below its share of the GPU the service runs on the CPU, and the bundle's rerank entry does not name the "
-         f"service and the CPU: {value!r}{support.note()}")
+    assert not ON_CPU.search(text), f"the bundle names the CPU below the service's share of the GPU: {value!r}"
+    if bundle["merge"].get("reranked") is True:
+        assert gpu is not support.NO_GPU, f"with no GPU the bundle was reranked, so on the CPU: {value!r}"
+        assert PRIVATE.search(text) and ON_GPU.search(text), \
+            f"the bundle was reranked below the service's share, but not by a private reranker on the GPU: {value!r}"
+    else:
+        assert support.unavailable(value), f"an unranked bundle's rerank entry does not say `unavailable`: {value!r}"
+        assert any(re.search(r"gpu|cuda|share|memory|slot", reason, re.IGNORECASE) for reason in reasons), \
+            f"the unranked bundle does not give its reason (the GPU, its share, its memory or a slot): {reasons!r}"
+    on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
+    assert on_cpu == [], f"a model was loaded on the CPU ({on_cpu}): no reranker on the CPU anywhere (DEC-1036)"
 
 
 def test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down(boxes, tools, project):

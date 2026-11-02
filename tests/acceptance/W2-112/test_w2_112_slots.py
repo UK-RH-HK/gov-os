@@ -12,8 +12,11 @@ waits up to ``GOV_RERANK_GPU_WAIT_S``, then the search goes on unranked; never t
 removes the stopgap module from the environment, so the box's reranker environment holds no such module: the rule
 here can only be the product's. Each box has its own lock folder (never ``/tmp``); the case holds slots itself.
 
-The service cannot start in these cases (a folder stands where its socket goes), so every answer is a fallback's.
-"Named with its reason" is read in the bundle: ``test_w2_112_bundle.py``.
+DEC-1036 T6 (b): "the service holds one of the two GPU slots (it waits for a slot like any reranker, or fails
+named), so at most one private reranker beside it". The last three cases hold that.
+
+In the first cases the service cannot start (a folder stands where its socket goes), so every answer is a
+fallback's. "Named with its reason" is read in the bundle: ``test_w2_112_bundle.py``.
 """
 
 from __future__ import annotations
@@ -100,3 +103,53 @@ def test_a_fallback_never_runs_a_reranker_on_the_cpu(boxes, why):
     on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
     assert on_cpu == [], f"the fallback ran a reranker on the CPU ({why}): KPI 7 forbids it"
     check_unranked(report["result"], given, f"the search whose fallback has no GPU ({why})")
+
+
+# ---- DEC-1036 T6 (b): the service holds one of the two GPU slots
+
+
+def test_the_service_holds_one_of_the_two_gpu_slots(box):
+    service = box.warm()
+    loaded = [record for record in box.loads() if record["pid"] == service][0]
+    assert loaded["slots_held"] and loaded["slots_held"] >= 1, \
+        f"the service loaded its model while no GPU slot was held in {support.LOCK_DIR_SETTING} (DEC-1036 T6 (b))"
+    held = box.slots_held()
+    assert held == 1, f"with the service up and nothing else running, {held} GPU slots are held, not the service's one"
+
+
+def test_with_the_service_up_and_the_other_slot_held_a_fallback_waits_then_goes_on_unranked(boxes):
+    wait = 2.0
+    box = boxes(settings={support.WAIT_SETTING: wait})
+    service = box.warm()
+    taken = box.hold_free_slots()
+    assert len(taken) == 1, \
+        f"with the service up, the test could take {len(taken)} GPU slots ({taken}): the service is to hold one of two"
+    box.for_pid(service, predict_error=True)  # the service now answers with an error: the search falls back
+    query, given = query_of("beside"), candidates("beside", 5)
+    report = box.search(query, given)
+    assert raised(report) is None, f"the search raised: {raised(report)}"
+    check_unranked(report["result"], given, "the search whose service failed while both slots were held")
+    assert report["seconds"] >= wait * 0.75, \
+        f"the fallback went on after {report['seconds']:.1f} s: it did not wait {wait:g} s for a GPU slot"
+    assert report["seconds"] <= wait + support.FALLBACK_S, f"the search took {report['seconds']:.1f} s"
+    beside = [(record["pid"], record["device"]) for record in box.loads() if record["pid"] != service]
+    assert beside == [], \
+        (f"a private reranker loaded the model beside the service with no GPU slot free ({beside}): at most one "
+         "private reranker beside it, on a slot, never the CPU")
+
+
+def test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded(boxes):
+    wait = 2.0
+    box = boxes(settings={support.WAIT_SETTING: wait})
+    box.hold_slots()
+    query, given = query_of("no-slot"), candidates("no-slot", 5)
+    report = box.search(query, given)
+    assert raised(report) is None, f"the search raised with both GPU slots held: {raised(report)}"
+    check_unranked(report["result"], given, "the search with both GPU slots held before any service")
+    # The service waits for a slot like any reranker, then the search's fallback does too: two waits at most.
+    assert report["seconds"] <= 2 * wait + support.FALLBACK_S, f"the search took {report['seconds']:.1f} s"
+    loads = [(record["pid"], record["device"]) for record in box.loads()]
+    assert loads == [], \
+        (f"a model was loaded although both GPU slots were held ({loads}): the service cannot start on the GPU "
+         "without a slot, and no reranker runs on the CPU")
+    assert box.live_loads() == [], "a service holds the model without a GPU slot"
