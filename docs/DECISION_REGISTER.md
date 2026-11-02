@@ -12949,3 +12949,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.426 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861) and delegated: DEC-1043. Next free id: DEC-1044. |
+
+### DEC-1044 — W2-42a: three builder tests of the old unmatched-glob refusal revised by its engineer (delegated)
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-936 item 2.5 and the emergency DEC-1040: P2, reversible, inside W2-42a's KPI line 4; the engineer's recommendation; confidence high; for the owner to overturn) · **Under:** DEC-1040, DEC-1028 item 4
+- **Decision:** W2-42a's KPI line 4 (an unmatched glob is the literal path bash passes, not unresolvable) reverses three builder tests of `tests/unit/guard/test_decide.py` that expect an unmatched glob refused (`test_glob_matching_nothing_denied`, `TestBracketGlob::test_bracket_glob_matching_nothing_denied`, `TestProbe3SymlinkGlobBrace::test_bracket_glob_through_symlink_denied`; in the symlink case bash itself fails on the literal path, so nothing is written). W2-42a's allowed paths gain `tests/unit/guard/test_decide.py`; its engineer revises the three to the literal-path rule, each still checking that a write into a protected folder by that literal path is refused (builder tests, not acceptance tests: MR-3 holds). The W2-42a tests branch merged into `w2/W2-42a` (`5cca6398e8ed`) and TESTS-READY written.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.427 | 2026-11-02 | Orchestrator (delegated): DEC-1044. Next free id: DEC-1045. |
