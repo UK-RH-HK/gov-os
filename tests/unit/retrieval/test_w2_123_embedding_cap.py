@@ -306,3 +306,13 @@ def test_the_determinism_check_accepts_equal_vectors_and_refuses_a_change_or_a_m
     finally:
         for endpoint in (steady, drifting, missing):
             endpoint.close()
+
+
+def test_the_defaults_are_the_measured_ones_and_the_evidence_states_their_choice():
+    evidence = (REPO / "docs" / "changes" / "W2-123-evidence.md").read_text(encoding="utf-8")
+    chosen = [line for line in evidence.splitlines() if line.startswith("Chosen setting:")]
+    assert len(chosen) == 1
+    assert "parallel requests 1 for both servers" in chosen[0] and "8 logical CPUs at nice 10" in chosen[0]
+    assert ollama.DEFAULT_PARALLEL == {"shared": 1, "query": 1}
+    assert (ollama.DEFAULT_CPU_COUNT, ollama.DEFAULT_NICE) == (8, 10)
+    assert (ollama.DEFAULT_PROBE_SLOW_S, ollama.DEFAULT_PROBE_HUNG_S) == (10.0, 120.0)

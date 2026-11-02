@@ -49,11 +49,13 @@ RESTARTS_REL = ".gov-os/machine/embedding-restarts.jsonl"  # one line per stop o
 SECTION = "embedding_servers"
 SERVERS = ("shared", "query")
 PARALLEL_SETTING = "OLLAMA_NUM_PARALLEL"  # Ollama's own setting for the requests a runner answers at once
-# The defaults until W2-123's measure (KPI 3) chooses them, the same on every machine:
-DEFAULT_PARALLEL = {"shared": 1, "query": 1}  # one request at a time, as the shared server ran before (DEC-1014)
-DEFAULT_CPU_COUNT = 8  # ACT-OLLAMA-CAP-1's cap, as a count: the highest-numbered 8 CPUs this process may run on
-DEFAULT_NICE = 10  # ACT-OLLAMA-CAP-1 and -2's lower priority
-DEFAULT_PROBE_SLOW_S = 10.0  # the engineer's choice until the measure: a warm vector comes back in well under it
+# The measured defaults, the same on every machine (W2-123 KPI 3: docs/changes/W2-123-evidence.md, §4):
+# one request at a time: Ollama starts the embedding runner with -np 1 whatever the setting (evidence, figure 1)
+DEFAULT_PARALLEL = {"shared": 1, "query": 1}
+# ACT-OLLAMA-CAP-1's cap as a count, the highest-numbered 8 CPUs this process may run on; not the limit (figure 2)
+DEFAULT_CPU_COUNT = 8
+DEFAULT_NICE = 10  # ACT-OLLAMA-CAP-1 and -2's lower priority (evidence, figure 2)
+DEFAULT_PROBE_SLOW_S = 10.0  # above a cold model load to the first vector (evidence, figure 5)
 DEFAULT_PROBE_HUNG_S = 120.0  # semantic.TIMEOUT_S: past it a rebuild's own request gives up on the server
 PROBE_TEXT = "Gov OS embedding server health probe"
 STOP_WAIT_S = 10.0  # how long a stopped server's port is waited for before its processes are killed
