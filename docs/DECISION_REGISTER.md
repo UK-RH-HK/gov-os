@@ -12957,3 +12957,11 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.427 | 2026-11-02 | Orchestrator (delegated): DEC-1044. Next free id: DEC-1045. |
+
+### DEC-1045 — Gitleaks scanning lifted on this repository (switched off by configuration; the feature stays built); its real-gitleaks tests in the nightly only; a full scan weekly only on the owner's approval
+- **Status:** ACCEPTED (owner, 2026-11-02 ~20:57, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-953 (the lifted gates), DEC-968, DEC-1039, DEC-1041 · **Changes:** DEC-893 and DEC-953 §5 practices 6 and 10 (gitleaks on staged content and on close outputs), DEC-966 item 4's nightly full scan, the landing's gitleaks pre-check (DEC-989's `land.py`), `sync_context.py`'s scan, the rebuild's memory-indexing scan (W1-15, DEC-285 to DEC-290) and the secrets-indexing family check, for this repository only
+- **Decision:** (1) All gitleaks scanning is lifted on this repository: the memory-indexing scan in rebuilds, the landing's pre-check, the scans in the closes, the nightly's scan (and, the orchestrator's reading, the CTO's own staged-content scans before record commits and the record branch's sync). Reason: the repository and its GitHub remote are private and will never be shared, so the scanning costs far more than it protects here. A full scan runs once a week only when the owner approves it. (2) The tests that run the real gitleaks run only in the nightly full suite; between tickets only the scoped tests and the acceptance tests, as decided (DEC-968). (3) The feature stays built in the Gov OS and switched off on this repository by configuration, as DEC-953 did for the other lifted gates: every other repository keeps it on by default; the switch is named wherever it acts (`gov check`, `gov doctor`, a rebuild's report), never silent. (4) Applied now in the CTO's tools and the committed orchestration scripts; in the pinned `gov` from re-pin window 2 (the product's configuration switch is an emergency patch with its tests and one review).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.428 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1045. Next free id: DEC-1046. |
