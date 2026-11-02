@@ -1,7 +1,7 @@
 # W2-42a evidence: the product's guard reads what a Bash command writes (DEC-1028 item 4, DEC-1040 item 2)
 
-Engineer's record for `DAEO-03ub`. Base `a58ba344`. The acceptance tests had not been run when this record was
-first written; their results are added below when the CTO merges them.
+Engineer's record for `DAEO-03ub`. Base `a58ba344`. The CTO merged the acceptance tests at `5cca6398`. Their
+results, the second round of fixes and the new log rows are in "Round 2" at the end.
 
 ## The change
 - **`src/gov/guard/bash_writes.py` (new).** ACT-GUARD-FIX-3's reviewed module (`.claude/hooks/bash_writes.py`,
@@ -136,3 +136,49 @@ judges a `python3 -c` string. This closes a gap. It is not a new false refusal.
   writes. A reviewer applying a patch in a `/tmp` clone is now refused.
 - **The loop-variable test is textual.** It errs to refusing: a standalone word equal to the variable's name
   anywhere in the command keeps the listing rule.
+
+## Round 2 (after the acceptance tests merged at `5cca6398`; stopped by the owner's order, PARTIAL)
+
+**The acceptance tests (results only).**
+- First run: 443 passed, 9 failed. The failures:
+  - failure line 1 on row 46's form: a Python heredoc the shell rewrites;
+  - KPI 8: a Python file written, then run;
+  - failure line 2: `eval`/`sh -c` of an unknown word, and an unbalanced string inside `sh -c`;
+  - KPI 7: a secret or hidden name continued over a line;
+  - KPI 10: a `wc` or `date` substitution.
+- The fixes (`aac18cca`):
+  - an unquoted Python heredoc the shell rewrites unpredictably is unresolvable;
+  - a Python file the command writes and runs is judged as its code (its targets, or unresolvable);
+  - an `sh -c`/`eval` word that does not expand, or a string the scan cannot read, is unresolvable;
+  - the read judge also reads the command with each backslash-newline removed;
+  - `wc` counts and `date +<digits>` are placed numeric listings.
+- **Second run: 452 passed.**
+
+**DEC-1044.** `tests/unit/guard/test_decide.py`'s three unmatched-glob cases were revised to the literal-path rule.
+Each still checks that a write into a protected folder by that literal path is refused.
+
+**Log rows 80–84** (written after the designer drew the fixtures), replayed through the hook:
+
+| Row | Before | Now | Verdict |
+|---|---|---|---|
+| 80 | refused | refused | **true, logged false by mistake:** the command ran `ls` on the hidden half's folder by name |
+| 81 | refused | refused | the hook's own `bash_writes.py` by design: a heredoc-written probe naming the tests, run by `python3`, with computed writes |
+| 82 | refused | **allowed** | python3 heredoc |
+| 83 | refused | **allowed** | `$(…)` in single-quoted arguments; the fix: single-quoted text is no substitution, and an apostrophe inside double quotes opens none |
+| 84 (log line 85) | refused | **allowed** | the same fix |
+
+**The scoped set.** `select_tests.py`, without `tests/unit/secrets_check` and the secret-filter cases (DEC-1045),
+at `aac18cca`: 12582 passed, 10 failed, 7 skipped.
+- **W1-02, the unmatched glob** (`test_a_target_the_guard_cannot_resolve_is_denied[glob-that-matches-nothing]`
+  and its `-touch` case, and `test_a_glob_is_judged_by_what_it_expands_to`): these acceptance cases pin the old
+  rule (DEC-115). KPI 4 reverses it, so they need a test designer's revision.
+- **W2-05 `test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep`:** `bash_writes.py` holds the
+  literal `"git"`, and its revision check runs `git rev-parse` through `reads._git` (since round 2). It needs a row
+  in `docs/research/AR-2-git-sweep.md`, which is outside the ticket's paths.
+- **W1-02 `test_decision_p95_is_under_100_ms`** (2 cases): p95 was 101–143 ms on a loaded machine. It was not yet
+  compared with the base: that run was stopped by the owner's order. Importing `bash_writes` adds about 5 ms.
+- **Likely unrelated, not yet confirmed against the base:**
+  - W1-46 npm install: the fixture repository has no `.claude/hooks/pretooluse.py`;
+  - W2-50 secrets-scan scale: a gitleaks suite (DEC-1045);
+  - W2-54 `green_here`: no store in this worktree;
+  - containment `test_committed_rename_names_old_path`.

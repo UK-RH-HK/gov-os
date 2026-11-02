@@ -37,7 +37,6 @@ import ast
 import os
 import re
 import shlex
-import subprocess
 import warnings
 from contextlib import contextmanager
 from itertools import product
@@ -970,11 +969,10 @@ def _is_rev(word, where):
     is a path (fail closed)."""
     if where is None or where.startswith(UNKNOWN) or not word or word.startswith("-"):
         return False
+    from gov.guard.reads import PolicyError, _git  # the read policy's git (AR-2's sweep, row 61)
     try:
-        p = subprocess.run(["git", "-C", where, "rev-parse", "--verify", "--quiet", word + "^{commit}"],
-                           capture_output=True, text=True, timeout=5)
-        return p.returncode == 0
-    except (OSError, subprocess.SubprocessError, ValueError):
+        return _git(where, "rev-parse", "--verify", "--quiet", word + "^{commit}").returncode == 0
+    except (PolicyError, ValueError):
         return False
 
 
