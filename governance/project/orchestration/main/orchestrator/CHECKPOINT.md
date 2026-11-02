@@ -147,6 +147,14 @@ query-GPU line `b0156a41` (its lead messaged); (iii) dispatcher v4.6 being built
 commit); (iv) seeding everywhere being built by an engineer agent (tools; review, then commit); W2-126 (the vector
 cache) filed+claimed `2a3c998f`, run 1 = tests only, queued; (v) the assessment after. After the query ACT: set
 dispatch/config.json `gpu_expected.query` true. Plan + v2 ACT committed `d03ce368`.
+**13:03 EMERGENCY (owner) DEC-1033 `7fa7fe54`.** ACT-QUERY-GPU-1 NOT applied, never (semantic.py's `_on_cpu` gate). Stopped
+at safe points (`log/emergency-stops-20261102.md`): the landing of six, the W2-05+W2-96 re-close, W2-04's lead. Running:
+W2-122, W2-123 (returning run 2 DONE), W2-112 (started 13:01 past the gate). Fixes in parallel, each to one review
+then live: (a) W2-112; (b) engineer agent on branch `emg/query` (worktree EMG-query): any-device query vector +
+ollama.py start without NO_GPU, then the operator's restart ACT; reranker interim: engineer agent on
+tools/gov_reranker_gpu_slot.py (wait for a slot or go without reranking, named; never the CPU), then the operator's
+install ACT; (c) dispatcher v4.6 agent; (d) seeding agent (it is editing merge_queue.py in the MAIN tree, uncommitted).
+Before snapshot: `log/emergency-before-20261102.txt`. After all four: the after figures, then the owner lifts it.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

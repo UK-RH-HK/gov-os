@@ -1,0 +1,1 @@
+2026-11-02 12:44:29 ACT-QUERY-GPU-1 handed to the owner's operator (DEC-1028 item 6): no main-tree commit by the CTO until the owner says done.

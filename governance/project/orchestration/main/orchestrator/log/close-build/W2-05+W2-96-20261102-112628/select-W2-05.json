@@ -1,0 +1,1240 @@
+{
+ "scope": "scoped",
+ "why_full": [],
+ "core_changed": [
+  "src/gov/check/audit_validator.py",
+  "src/gov/check/claims.py",
+  "src/gov/check/pathmap.py",
+  "src/gov/check/runner.py",
+  "src/gov/cli/main.py",
+  "src/gov/close/batch.py",
+  "src/gov/close/command.py",
+  "src/gov/close/nightly.py",
+  "src/gov/close/repo.py",
+  "src/gov/close/tool.py",
+  "src/gov/close/traceability.py",
+  "src/gov/guard/containment.py",
+  "src/gov/guard/decide.py",
+  "src/gov/retrieval/lexical.py",
+  "src/gov/store/loader.py",
+  "src/gov/tasks/tickets.py"
+ ],
+ "unplaced": [],
+ "base": "9e332ca4d83b01f27848266a3fb018f75191eaa9",
+ "head": "1e5d339530c24d190904451eb3564cb642eff870",
+ "governance_left_out": [
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0003.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0005.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0007.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0010.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0014.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0019.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0023.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0024.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0028.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0031.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0035.md",
+  "docs/checkpoints/DAEO-0z8c/CP-DAEO-0z8c-0038.md",
+  "docs/probes/DAEO-0z8c/PR-DAEO-0z8c-dec970.md",
+  "docs/probes/DAEO-0z8c/PR-DAEO-0z8c-dec971.md",
+  "docs/probes/DAEO-0z8c/PR-DAEO-0z8c.md"
+ ],
+ "changed": [
+  "docs/research/AR-2-git-sweep.md",
+  "src/gov/adapters/portability.py",
+  "src/gov/adopt/project.py",
+  "src/gov/check/audit_validator.py",
+  "src/gov/check/claims.py",
+  "src/gov/check/pathmap.py",
+  "src/gov/check/runner.py",
+  "src/gov/checkpoint/record.py",
+  "src/gov/ci/command.py",
+  "src/gov/cli/main.py",
+  "src/gov/close/batch.py",
+  "src/gov/close/command.py",
+  "src/gov/close/nightly.py",
+  "src/gov/close/repo.py",
+  "src/gov/close/tool.py",
+  "src/gov/close/traceability.py",
+  "src/gov/closure/__init__.py",
+  "src/gov/codeintel/__init__.py",
+  "src/gov/decisions/checker.py",
+  "src/gov/doctor/command.py",
+  "src/gov/guard/containment.py",
+  "src/gov/guard/decide.py",
+  "src/gov/pause/command.py",
+  "src/gov/retrieval/lexical.py",
+  "src/gov/retrieval/retrieve_check.py",
+  "src/gov/status/command.py",
+  "src/gov/store/loader.py",
+  "src/gov/tasks/tickets.py",
+  "src/gov/telemetry/counter.py",
+  "src/gov/util/__init__.py",
+  "src/gov/util/gitenv.py",
+  "template/.rulesync/hooks.jsonc",
+  "tests/acceptance/W1-02/README.md",
+  "tests/acceptance/W1-02/test_w1_02_deadline.py",
+  "tests/acceptance/W1-02/test_w1_02_deadline_in_time.py",
+  "tests/acceptance/W1-02/test_w1_02_unknown_tools_failure.py",
+  "tests/acceptance/W1-02/w1_02_deadline_support.py",
+  "tests/acceptance/W2-05/README.md",
+  "tests/acceptance/W2-05/conftest.py",
+  "tests/acceptance/W2-05/test_w2_05_bisect_step.py",
+  "tests/acceptance/W2-05/test_w2_05_code_index_tool.py",
+  "tests/acceptance/W2-05/test_w2_05_declared_check.py",
+  "tests/acceptance/W2-05/test_w2_05_hooks_source.py",
+  "tests/acceptance/W2-05/test_w2_05_linked_worktree.py",
+  "tests/acceptance/W2-05/test_w2_05_planted.py",
+  "tests/acceptance/W2-05/test_w2_05_settings.py",
+  "tests/acceptance/W2-05/test_w2_05_sweep.py",
+  "tests/acceptance/W2-05/w2_05_support.py",
+  "tests/acceptance/W2-72/README.md",
+  "tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py",
+  "tests/acceptance/W2-72/w2_72_support.py",
+  "tests/unit/gitenv/test_batch2.py",
+  "tests/unit/gitenv/test_bisect_step.py",
+  "tests/unit/gitenv/test_gitenv.py",
+  "tests/unit/gitenv/test_hooks_lifted.py",
+  "tests/unit/gitenv/test_lexical_pinned.py",
+  "tests/unit/gitenv/test_program_env.py",
+  "tests/unit/gitenv/test_runner_env.py"
+ ],
+ "selected": [
+  {
+   "target": "tests/acceptance/W2-05/",
+   "why": [
+    {
+     "reason": "OWN"
+    },
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-0z8c",
+     "paths": [
+      "docs/research/AR-2-git-sweep.md",
+      "src/gov/adapters/portability.py",
+      "src/gov/adopt/project.py",
+      "src/gov/check/audit_validator.py",
+      "src/gov/check/claims.py",
+      "src/gov/check/pathmap.py",
+      "src/gov/check/runner.py",
+      "src/gov/checkpoint/record.py",
+      "src/gov/ci/command.py",
+      "src/gov/cli/main.py",
+      "src/gov/close/batch.py",
+      "src/gov/close/command.py",
+      "src/gov/close/nightly.py",
+      "src/gov/close/repo.py",
+      "src/gov/close/tool.py",
+      "src/gov/close/traceability.py",
+      "src/gov/closure/__init__.py",
+      "src/gov/codeintel/__init__.py",
+      "src/gov/decisions/checker.py",
+      "src/gov/doctor/command.py",
+      "src/gov/guard/containment.py",
+      "src/gov/guard/decide.py",
+      "src/gov/pause/command.py",
+      "src/gov/retrieval/lexical.py",
+      "src/gov/retrieval/retrieve_check.py",
+      "src/gov/status/command.py",
+      "src/gov/store/loader.py",
+      "src/gov/tasks/tickets.py",
+      "src/gov/telemetry/counter.py",
+      "src/gov/util/__init__.py",
+      "src/gov/util/gitenv.py",
+      "template/.rulesync/hooks.jsonc",
+      "tests/unit/gitenv/test_batch2.py",
+      "tests/unit/gitenv/test_bisect_step.py",
+      "tests/unit/gitenv/test_gitenv.py",
+      "tests/unit/gitenv/test_hooks_lifted.py",
+      "tests/unit/gitenv/test_lexical_pinned.py",
+      "tests/unit/gitenv/test_program_env.py",
+      "tests/unit/gitenv/test_runner_env.py"
+     ]
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W2-05/README.md",
+      "tests/acceptance/W2-05/conftest.py",
+      "tests/acceptance/W2-05/test_w2_05_bisect_step.py",
+      "tests/acceptance/W2-05/test_w2_05_code_index_tool.py",
+      "tests/acceptance/W2-05/test_w2_05_declared_check.py",
+      "tests/acceptance/W2-05/test_w2_05_hooks_source.py",
+      "tests/acceptance/W2-05/test_w2_05_linked_worktree.py",
+      "tests/acceptance/W2-05/test_w2_05_planted.py",
+      "tests/acceptance/W2-05/test_w2_05_settings.py",
+      "tests/acceptance/W2-05/test_w2_05_sweep.py",
+      "tests/acceptance/W2-05/w2_05_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/unit",
+   "why": [
+    {
+     "reason": "UNIT"
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/unit/gitenv/test_batch2.py",
+      "tests/unit/gitenv/test_bisect_step.py",
+      "tests/unit/gitenv/test_gitenv.py",
+      "tests/unit/gitenv/test_hooks_lifted.py",
+      "tests/unit/gitenv/test_lexical_pinned.py",
+      "tests/unit/gitenv/test_program_env.py",
+      "tests/unit/gitenv/test_runner_env.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-106/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-0mtg",
+     "paths": [
+      "template/.rulesync/hooks.jsonc"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-68/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2gc7",
+     "paths": [
+      "src/gov/close/batch.py",
+      "src/gov/close/command.py",
+      "src/gov/close/repo.py",
+      "src/gov/store/loader.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-2lwj",
+     "paths": [
+      "src/gov/check/audit_validator.py",
+      "src/gov/check/claims.py",
+      "src/gov/check/pathmap.py",
+      "src/gov/check/runner.py",
+      "src/gov/close/batch.py",
+      "src/gov/close/command.py",
+      "src/gov/close/nightly.py",
+      "src/gov/close/repo.py",
+      "src/gov/close/tool.py",
+      "src/gov/close/traceability.py",
+      "src/gov/codeintel/__init__.py",
+      "src/gov/guard/containment.py",
+      "src/gov/retrieval/retrieve_check.py",
+      "src/gov/store/loader.py",
+      "src/gov/tasks/tickets.py",
+      "src/gov/telemetry/counter.py"
+     ]
+    },
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "src/gov/adapters/portability.py",
+      "src/gov/checkpoint/record.py",
+      "src/gov/closure/__init__.py",
+      "src/gov/decisions/checker.py"
+     ],
+     "coupling": "every close runs the watchdog, the context and the decision checker (I2 \u00a74.1)"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-38/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-3ef2",
+     "paths": [
+      "src/gov/adapters/portability.py",
+      "template/.rulesync/hooks.jsonc"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-10/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-4yyl",
+     "paths": [
+      "src/gov/store/loader.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-95/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-57hm",
+     "paths": [
+      "src/gov/check/pathmap.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-58/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-5j8b",
+     "paths": [
+      "src/gov/guard/decide.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-21/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-5x4l",
+     "paths": [
+      "src/gov/retrieval/retrieve_check.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-39/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-5ylr",
+     "paths": [
+      "src/gov/doctor/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-45/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-6cc2",
+     "paths": [
+      "src/gov/guard/containment.py",
+      "src/gov/guard/decide.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-31/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-6mk8",
+     "paths": [
+      "src/gov/telemetry/counter.py"
+     ]
+    },
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "src/gov/checkpoint/record.py"
+     ],
+     "coupling": "gov telemetry builds the ticket's context (I2 \u00a74.1)"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-15/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-7nne",
+     "paths": [
+      "src/gov/adapters/portability.py",
+      "src/gov/check/audit_validator.py",
+      "src/gov/check/claims.py",
+      "src/gov/check/pathmap.py",
+      "src/gov/check/runner.py",
+      "template/.rulesync/hooks.jsonc"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-53/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-7rr2",
+     "paths": [
+      "src/gov/close/batch.py",
+      "src/gov/close/command.py",
+      "src/gov/close/nightly.py",
+      "src/gov/close/repo.py",
+      "src/gov/close/tool.py",
+      "src/gov/close/traceability.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-32/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-8goq",
+     "paths": [
+      "src/gov/status/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-03/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-8qvp",
+     "paths": [
+      "src/gov/guard/containment.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-28/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-9279",
+     "paths": [
+      "src/gov/pause/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-55/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-arrl",
+     "paths": [
+      "src/gov/decisions/checker.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-77/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-b6hm",
+     "paths": [
+      "src/gov/close/nightly.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-11/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-be7u",
+     "paths": [
+      "src/gov/decisions/checker.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-66/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-c1uz",
+     "paths": [
+      "src/gov/close/command.py",
+      "src/gov/close/nightly.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-41/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-cdoi",
+     "paths": [
+      "src/gov/adopt/project.py",
+      "src/gov/doctor/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-57/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-cy5o",
+     "paths": [
+      "src/gov/adapters/portability.py",
+      "src/gov/close/command.py",
+      "src/gov/doctor/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-drvn",
+     "paths": [
+      "src/gov/cli/main.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-65/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-e82f",
+     "paths": [
+      "template/.rulesync/hooks.jsonc"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-02/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-emkd",
+     "paths": [
+      "src/gov/guard/containment.py",
+      "src/gov/guard/decide.py"
+     ]
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W1-02/README.md",
+      "tests/acceptance/W1-02/test_w1_02_deadline.py",
+      "tests/acceptance/W1-02/test_w1_02_deadline_in_time.py",
+      "tests/acceptance/W1-02/test_w1_02_unknown_tools_failure.py",
+      "tests/acceptance/W1-02/w1_02_deadline_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-40/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fdkq",
+     "paths": [
+      "src/gov/ci/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-fygv",
+     "paths": [
+      "src/gov/check/audit_validator.py",
+      "src/gov/check/claims.py",
+      "src/gov/check/pathmap.py",
+      "src/gov/check/runner.py"
+     ]
+    },
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "src/gov/adapters/portability.py",
+      "src/gov/decisions/checker.py",
+      "src/gov/retrieval/retrieve_check.py"
+     ],
+     "coupling": "declared checks: every module a declared check runs maps to W1-26 (I2 \u00a74.1)"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-01/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-g0ip",
+     "paths": [
+      "src/gov/close/batch.py",
+      "src/gov/close/command.py",
+      "src/gov/close/nightly.py",
+      "src/gov/close/repo.py",
+      "src/gov/close/tool.py",
+      "src/gov/close/traceability.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-46/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-jdqr",
+     "paths": [
+      "src/gov/cli/main.py",
+      "src/gov/guard/containment.py",
+      "src/gov/guard/decide.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-20/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-jozo",
+     "paths": [
+      "src/gov/closure/__init__.py",
+      "src/gov/codeintel/__init__.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-59/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-kh9l",
+     "paths": [
+      "src/gov/check/runner.py",
+      "src/gov/cli/main.py",
+      "src/gov/retrieval/retrieve_check.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-50/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-kl5e",
+     "paths": [
+      "src/gov/guard/decide.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-16/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-lkeb",
+     "paths": [
+      "src/gov/codeintel/__init__.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-47/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-o4fg",
+     "paths": [
+      "src/gov/guard/containment.py",
+      "src/gov/guard/decide.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-07/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-r9ss",
+     "paths": [
+      "src/gov/close/batch.py",
+      "src/gov/close/command.py",
+      "src/gov/close/nightly.py",
+      "src/gov/close/repo.py",
+      "src/gov/close/tool.py",
+      "src/gov/close/traceability.py",
+      "src/gov/telemetry/counter.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-25/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-rrxp",
+     "paths": [
+      "src/gov/checkpoint/record.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-17/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-rxln",
+     "paths": [
+      "src/gov/retrieval/lexical.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-09/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-topz",
+     "paths": [
+      "src/gov/tasks/tickets.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-50/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-xnbx",
+     "paths": [
+      "src/gov/guard/containment.py",
+      "src/gov/guard/decide.py",
+      "src/gov/pause/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-xw3k",
+     "paths": [
+      "src/gov/doctor/command.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-72/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-ye2a",
+     "paths": [
+      "src/gov/guard/containment.py"
+     ]
+    },
+    {
+     "reason": "TEST_CHANGED",
+     "paths": [
+      "tests/acceptance/W2-72/README.md",
+      "tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py",
+      "tests/acceptance/W2-72/w2_72_support.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-03/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-ym8a",
+     "paths": [
+      "src/gov/decisions/checker.py",
+      "src/gov/store/loader.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-108/",
+   "why": [
+    {
+     "reason": "OVERLAP",
+     "ticket": "DAEO-zoex",
+     "paths": [
+      "src/gov/retrieval/lexical.py"
+     ]
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-42/",
+   "why": [
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "src/gov/cli/main.py"
+     ],
+     "coupling": "text read: W1-42 reads src/gov/cli/main.py's command names and the kernel's skill and brief templates (I2 \u00a74.1)"
+    },
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-28/test_w1_28_fixture_copies.py",
+   "why": [
+    {
+     "reason": "COUPLING",
+     "paths": [
+      "tests/acceptance/W1-02/test_w1_02_deadline.py",
+      "tests/acceptance/W1-02/test_w1_02_deadline_in_time.py",
+      "tests/acceptance/W1-02/test_w1_02_unknown_tools_failure.py",
+      "tests/acceptance/W1-02/w1_02_deadline_support.py",
+      "tests/acceptance/W2-05/conftest.py",
+      "tests/acceptance/W2-05/test_w2_05_bisect_step.py",
+      "tests/acceptance/W2-05/test_w2_05_code_index_tool.py",
+      "tests/acceptance/W2-05/test_w2_05_declared_check.py",
+      "tests/acceptance/W2-05/test_w2_05_hooks_source.py",
+      "tests/acceptance/W2-05/test_w2_05_linked_worktree.py",
+      "tests/acceptance/W2-05/test_w2_05_planted.py",
+      "tests/acceptance/W2-05/test_w2_05_settings.py",
+      "tests/acceptance/W2-05/test_w2_05_sweep.py",
+      "tests/acceptance/W2-05/w2_05_support.py",
+      "tests/acceptance/W2-72/test_w2_72_merge_tree_that_cannot_run.py",
+      "tests/acceptance/W2-72/w2_72_support.py"
+     ],
+     "coupling": "file scan: W1-28's held-out copy check reads every Python source under tests/acceptance/ and runs the copying fixtures it finds (I1 \u00a74.1, DEC-385, DEC-912 item 3)"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_envelope.py",
+   "why": [
+    {
+     "reason": "EVERY_CLOSE"
+    },
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_read_act.py",
+   "why": [
+    {
+     "reason": "EVERY_CLOSE"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_registry.py",
+   "why": [
+    {
+     "reason": "EVERY_CLOSE"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-06/test_w1_06_approvals.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-08/test_w1_08_path_map.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_path_compliance.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-54/test_w2_54_green_here.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-49/test_w1_49_threshold.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-01/test_w1_01_history.py::test_implementer_commits_stay_inside_allowed_paths",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-48/",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-26/test_w1_26_probe_records.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-30/test_w1_30_r11_declared_here.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-10/test_w1_10_completeness.py::test_every_committed_ticket_and_adr_of_this_repository_is_in_the_graph",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W2-02/test_w2_02_green_here.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-08/test_w1_08_ticket.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-08/test_w1_08_probe.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-06/test_w1_06_install_approvals.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_config.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-07/test_w1_07_config_details.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_r5.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_r6.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_r7.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  },
+  {
+   "target": "tests/acceptance/W1-27/test_w1_27_doctor_unmeasured_r3.py",
+   "why": [
+    {
+     "reason": "RECORD_READING"
+    }
+   ]
+  }
+ ],
+ "pytest_options": [
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-01/test_w1_01_bootstrap_record.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-01/test_w1_01_integration_merges.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-01/test_w1_01_settings_deny.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-04",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-05",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-06/test_w1_06_ccusage.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-06/test_w1_06_digests.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-06/test_w1_06_pins.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-06/test_w1_06_registry.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-06/test_w1_06_vendor.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-06/test_w1_06_vendor_digest.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_floor.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_frontmatter.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_id_grammar.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_lesson.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_schemas_exist.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-08/test_w1_08_templates.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-12",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-13",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-14",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-18",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-19",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-22",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-23",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-24",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-29",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-33/test_w1_33_kernel_role_files.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-33/test_w1_33_roster.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-34",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-35",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-36",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-37",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-44",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-49/test_w1_49_live_session.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-49/test_w1_49_precompact.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-49/test_w1_49_registration.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-49/test_w1_49_sessionstart.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W1-49/test_w1_49_written_part.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-02/test_w2_02_code_under_test.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-02/test_w2_02_failure.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-02/test_w2_02_record_types.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-02/test_w2_02_unmeasured.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-02/test_w2_02_verdict_conditions.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-02/test_w2_02_wbs_grammar.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-107",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-16",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-49",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-51",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_audit_report.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_cpu_embedder.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_dropped_order.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_query_cache.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_query_vector.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_shared_gpu.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-54/test_w2_54_time_limit.py",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-61",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-62",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-64",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-69",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-71",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-76",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-84",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-86",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-87",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-90",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-96",
+  "--ignore=/home/usain/gov-os-runs/W2-00/close/W2-05+W2-96-20261102-112628/tests/acceptance/W2-97",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_a_listed_owner_commit_is_not_an_offender",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_a_listed_owner_commit_is_not_an_offender",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_an_unlisted_owner_commit_stays_an_offender",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_an_unlisted_owner_commit_stays_an_offender",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_exact_listed_commit_is_exempt",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_only_the_exact_listed_commit_is_exempt",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_a_dependency_is_read_in_either_form_of_the_id",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_a_dependency_is_read_in_either_form_of_the_id",
+  "--deselect=tests/acceptance/W1-01/test_w1_01_history.py::test_no_install_is_recorded_before_w1_05",
+  "--deselect=acceptance/W1-01/test_w1_01_history.py::test_no_install_is_recorded_before_w1_05"
+ ],
+ "ignore": [
+  "tests/acceptance/W1-01/test_w1_01_bootstrap_record.py",
+  "tests/acceptance/W1-01/test_w1_01_integration_merges.py",
+  "tests/acceptance/W1-01/test_w1_01_settings_deny.py",
+  "tests/acceptance/W1-04/",
+  "tests/acceptance/W1-05/",
+  "tests/acceptance/W1-06/test_w1_06_ccusage.py",
+  "tests/acceptance/W1-06/test_w1_06_digests.py",
+  "tests/acceptance/W1-06/test_w1_06_pins.py",
+  "tests/acceptance/W1-06/test_w1_06_registry.py",
+  "tests/acceptance/W1-06/test_w1_06_vendor.py",
+  "tests/acceptance/W1-06/test_w1_06_vendor_digest.py",
+  "tests/acceptance/W1-08/test_w1_08_floor.py",
+  "tests/acceptance/W1-08/test_w1_08_frontmatter.py",
+  "tests/acceptance/W1-08/test_w1_08_id_grammar.py",
+  "tests/acceptance/W1-08/test_w1_08_lesson.py",
+  "tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py",
+  "tests/acceptance/W1-08/test_w1_08_schemas_exist.py",
+  "tests/acceptance/W1-08/test_w1_08_templates.py",
+  "tests/acceptance/W1-12/",
+  "tests/acceptance/W1-13/",
+  "tests/acceptance/W1-14/",
+  "tests/acceptance/W1-18/",
+  "tests/acceptance/W1-19/",
+  "tests/acceptance/W1-22/",
+  "tests/acceptance/W1-23/",
+  "tests/acceptance/W1-24/",
+  "tests/acceptance/W1-29/",
+  "tests/acceptance/W1-33/test_w1_33_guard_and_launcher.py",
+  "tests/acceptance/W1-33/test_w1_33_kernel_role_files.py",
+  "tests/acceptance/W1-33/test_w1_33_roster.py",
+  "tests/acceptance/W1-34/",
+  "tests/acceptance/W1-35/",
+  "tests/acceptance/W1-36/",
+  "tests/acceptance/W1-37/",
+  "tests/acceptance/W1-44/",
+  "tests/acceptance/W1-49/test_w1_49_live_session.py",
+  "tests/acceptance/W1-49/test_w1_49_precompact.py",
+  "tests/acceptance/W1-49/test_w1_49_registration.py",
+  "tests/acceptance/W1-49/test_w1_49_sessionstart.py",
+  "tests/acceptance/W1-49/test_w1_49_written_part.py",
+  "tests/acceptance/W2-02/test_w2_02_code_under_test.py",
+  "tests/acceptance/W2-02/test_w2_02_failure.py",
+  "tests/acceptance/W2-02/test_w2_02_record_types.py",
+  "tests/acceptance/W2-02/test_w2_02_unmeasured.py",
+  "tests/acceptance/W2-02/test_w2_02_verdict_conditions.py",
+  "tests/acceptance/W2-02/test_w2_02_wbs_grammar.py",
+  "tests/acceptance/W2-107/",
+  "tests/acceptance/W2-16/",
+  "tests/acceptance/W2-49/",
+  "tests/acceptance/W2-51/",
+  "tests/acceptance/W2-54/test_w2_54_audit_report.py",
+  "tests/acceptance/W2-54/test_w2_54_cpu_embedder.py",
+  "tests/acceptance/W2-54/test_w2_54_dropped_order.py",
+  "tests/acceptance/W2-54/test_w2_54_query_cache.py",
+  "tests/acceptance/W2-54/test_w2_54_query_vector.py",
+  "tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py",
+  "tests/acceptance/W2-54/test_w2_54_shared_gpu.py",
+  "tests/acceptance/W2-54/test_w2_54_time_limit.py",
+  "tests/acceptance/W2-61/",
+  "tests/acceptance/W2-62/",
+  "tests/acceptance/W2-64/",
+  "tests/acceptance/W2-69/",
+  "tests/acceptance/W2-71/",
+  "tests/acceptance/W2-76/",
+  "tests/acceptance/W2-84/",
+  "tests/acceptance/W2-86/",
+  "tests/acceptance/W2-87/",
+  "tests/acceptance/W2-90/",
+  "tests/acceptance/W2-96/",
+  "tests/acceptance/W2-97/"
+ ],
+ "deselect": [
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_interim_rule_stays_in_force_once_introduced",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_a_listed_owner_commit_is_not_an_offender",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_an_unlisted_owner_commit_stays_an_offender",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_exact_listed_commit_is_exempt",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_a_dependency_is_read_in_either_form_of_the_id",
+  "tests/acceptance/W1-01/test_w1_01_history.py::test_no_install_is_recorded_before_w1_05"
+ ],
+ "per_test_timeout": 900
+}

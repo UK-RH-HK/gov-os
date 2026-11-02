@@ -1,2 +1,6 @@
 2026-11-02 11:26:29 W2-05 (DAEO-0z8c, FULL) merges b4a747f13520 on head 1e5d339530c2
 2026-11-02 11:26:29 W2-96 (DAEO-ouet, FULL) merges 107514f50607 on head 1e5d339530c2
+2026-11-02 12:59:04 clone rebuilt in 5555 s
+2026-11-02 12:59:10 W2-05 selection: scoped []; 74 targets; governance left out 15
+2026-11-02 12:59:20 W2-96 selection: scoped []; 65 targets; governance left out 9
+2026-11-02 12:59:20 run scope scoped: 83 targets; core changed 17, unplaced 0

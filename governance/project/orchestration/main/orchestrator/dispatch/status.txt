@@ -1,14 +1,14 @@
-dispatcher 2026-11-02 12:44:04
-leads running (3, from the processes): W2-04, W2-122, W2-123
-load 63.6/57.6/47.3; real busy cores 19.86 of 20 (the embedding server 6.23); memory available 10276 MB; gate_check (for comparison) SHUT (SHUT leads=3 load=63.6/47.3 nproc=20 have=13941200kB need=12452480kB: load 63.6/47.3 >= nproc 20); disk open
-admission (by peaks, DEC-1008 item 5): real CPU: 19.86 busy cores + 1.88 for the embedding server's p95 >= 20 - margin 2
+dispatcher 2026-11-02 13:03:08
+leads running (3, from the processes): W2-112, W2-122, W2-123
+load 39.9/40.9/43.8; real busy cores 19.52 of 20 (the embedding server 5.2); memory available 10963 MB; gate_check (for comparison) SHUT (SHUT leads=3 load=39.9/43.8 nproc=20 have=15434356kB need=11706672kB: load 39.9/43.8 >= nproc 20); disk open
+admission (by peaks, DEC-1008 item 5): real CPU: 19.52 busy cores + 2.91 for the embedding server's p95 >= 20 - margin 2
 peaks 2026-11-02 12:26:09: a lead p95 4105 MB, max 9580 MB
-FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 22 min, /home/usain/gov-os-worktrees/W2-122); /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 987667, 11 min, /home/usain/gov-os-worktrees/W2-04)
-heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue busy; land: in flight; main tree clean on w2/integrate
+FINDING: heavy step(s) outside a slot: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 39 min, /home/usain/gov-os-worktrees/W2-122)
+heavy slots held: gov-os-heavy-slot-1.lock, gov-os-heavy-slot-2.lock, gov-os-heavy-slot-3.lock; queue free; land: nothing to land; main tree NOT clean on w2/integrate
 inbox unread: 0
-ready list: W2-112 DAEO-clon: not admitted: real CPU: 19.86 busy cores + 1.88 for the embedding server's p95 >= 20 - margin 2; W2-126 DAEO-jpr0: not admitted: real CPU: 19.86 busy cores + 1.88 for the embedding server's p95 >= 20 - margin 2; W2-123 DAEO-qzrq: running; W2-04 DAEO-u4oz: running; W2-122 DAEO-blwa: running
+ready list: stagger: last start 86 s ago (< 120 s)
 sentinel: watched
-guard harvest: last 2026-11-02 12:37:36, rc 0, 83.1 s of 300 s
-embedding server: healthy (1.28 s)
-GPU: RTX 5070 Ti 7.4/15.9 GB, 23 %; holders: embedder shared (0), reranker (3); layers: shared 29/29, query cpu-only by design
-heavy slot holders: slot 1 pid 571803 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm ) idle 0 min; slot 2 pid 906293 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock bash -c rm ) idle 0 min; slot 3 pid 3982619 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min
+guard harvest: last 2026-11-02 12:59:02, rc 0, 52.6 s of 300 s
+embedding server: healthy (0.06 s)
+GPU: RTX 5070 Ti 6.6/15.9 GB, 9 %; holders: embedder shared (0), reranker (2); layers: shared 29/29, query cpu-only by design
+heavy slot holders: slot 1 pid 1366161 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock python3 -m ) idle 0 min; slot 2 pid 1321153 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m ) idle 0 min; slot 3 pid 3982619 (flock -n -o -E 213 /tmp/gov-os-heavy-slot-3.lock python3 -m ) idle 0 min

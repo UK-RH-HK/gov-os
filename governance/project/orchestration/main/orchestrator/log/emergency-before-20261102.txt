@@ -1,0 +1,12 @@
+# Before (DEC-1033), 2026-11-02 13:02:55
+ 13:02:55 up 16 days,  5:55,  0 user,  load average: 35.88, 40.19, 43.63
+               total        used        free      shared  buff/cache   available
+Mem:           24030       13224        1378         576       10544       10806
+6768 MiB, 16303 MiB, 0 %
+rerankers: 6
+load 36.1/40.9/44.0; real busy cores 18.9 of 20 (the embedding server 3.28); memory available 11678 MB; gate_check (for comparison) SHUT (SHUT leads=3 load=36.1/44.0 nproc=20 have=15625364kB need=1170
+GPU: RTX 5070 Ti 4.6/15.9 GB, 1 %; holders: embedder shared (0), reranker (2); layers: shared 29/29, query cpu-only by design
+Embedding servers' logs, 2026-11-02 09:00:00 to 2026-11-02 13:00:00 (the logs' own clock)
+- shared: 2943 embed requests, 106 failed, p50 1.18 s, p95 60.0 s, 337 over 30 s, 0 over 120 s; events {'cuda_error': 0, 'load': 1, 'runner_exit': 0, 'panic': 0, 'error': 0}
+  load: 2026-11-02 11:15:03 load_tensors: offloaded 29/29 layers to GPU
+- query: 348 embed requests, 4 failed, p50 14.98 s, p95 52.78 s, 63 over 30 s, 0 over 120 s; events {'cuda_error': 0, 'load': 0, 'runner_exit': 0, 'panic': 0, 'error': 0}
