@@ -3,7 +3,7 @@
 "When the service is down the search falls back to a private reranker through the GPU slot rule (it waits for one
 of the slots, else the search goes on unranked, named: `merge.reranked` false with its reason); it never runs a
 reranker on the CPU (DEC-1033: on the CPU a query takes over 100 s)." The stopgap's retirement is an owner ACT the
-lead prepares, not code: no test.
+lead prepares, written in the research record: ``test_w2_112_retirement_act.py``.
 
 The rule as ACT-RERANK-WAIT-1 states it: a reranker holds one of ``GOV_RERANK_GPU_SLOTS`` lock files
 (``gov-os-rerank-gpu-<i>.lock``, an exclusive ``flock``) in ``GOV_RERANK_GPU_LOCK_DIR`` for its life; without one it
