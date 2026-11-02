@@ -96,6 +96,14 @@ the ready list. P-W2-04-7 -> package item H `60a9b4a1`, pinged.
 **10:25:** DEC-1026 `5f3d143b` (delegated, package A (d)): W2-123 run 2 builds the bounded embed retry in semantic.py
 (ticket `4c3f3ecd`); brief `briefs/W2-123-A5-r2-retry.md` first on the ready list; W2-123's old approval moved to
 `merge-queue/held/W2-123-at-9bb92097c811.json`. Seven pending in `dispatch/land.pending.txt`; land them WITH W2-123's new head.
+**10:50 (owner) DEC-1027 `feb80819`, B-H; A to follow.** Applied: F ACT-GUARD-FIX-3 applied by the operator `e662684a`
+(guard4 PASS); the push test by day 10:37:42, approved in 8 s (owner to confirm the phone push). H: common brief 6a
+`4fdee1e6`, W2-61h's lead messaged; W2-125 `DAEO-jfm3` filed. C: W2-124 `DAEO-mb2t` filed (K5), W2-122's KPI 5 moved
+`42dad22d`, W2-122 run 2 brief `W2-122-A5-r2-nok5.md` queued. B: W2-66b `DAEO-zuiy` filed+claimed, worktree, brief
+queued; **W2-05 + W2-96 re-close against tonight's nightly once it has a verdict** (watch bnsm55ns4); **W2-55's run
+held: asked the owner how its table stays current** (my package mis-described P-W2-55-HOOK). E: ACT-STOP-WAITER-1
+`36970e6f` (script + 6 tests) for the operator. P1-GUARD-PARSER-W2 `f614ec78` pinged. Guard 71 = first false positive
+under the new hook (F4 rule).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

@@ -1,32 +1,40 @@
 # W2-123 (DAEO-qzrq) lead checkpoint
 
-## State (2026-11-02 03:16 UTC): returned DONE, with three packages for the owner that do not block the landing
-- Branch w2/W2-123, head 9bb92097c811 (the lead's gov checkpoint record CP-DAEO-qzrq-0004 only); verified head 17d88232b287.
-- Commits: e404e268f3fb engineer; b87da348bbb2 independent-test-designer; 65627b745bf3 orchestrator merge; 3dabcdaca633 engineer;
-  34717de9e43a and 77b44861d351 independent-test-designer (README map, Rewrite-Reason each); 986a77619a32 orchestrator merge;
-  17d88232b287 engineer (evidence); 9bb92097c811 orchestrator (checkpoint record). trailer_gate: 13 commits judged, 0 lacking.
-- The tests worktree and branch w2/W2-123-tests are removed (merged).
-- Verification (log/verify/): rebuild-3 ok (incremental, 37.7 s); gov.__file__ in this worktree; select_tests: scoped, core_changed
-  [src/gov/retrieval/ollama.py], unplaced []; parallel 4386 passed / 7 failed / 2 skipped (1,696 s); serial 4 passed / 3 failed
-  (2,078 s); gov check exit 3 (context-reproducibility and retrieval-regression time limits; core-mutation on DAEO-a3u2's ticket);
-  collect-only: 19195/19197 collected (2 deselected), no error. The 7 parallel failures (W2-05 x3, W2-59 x4) fail alone on the
-  base too (log/rerun-base). The W2-54 serial failures and the two gov check time limits: the real query server answers one fresh
-  query in 86.8 s (head) / timed out at 120 s (base); this ticket adds 4 ms per question (time_ensure.py).
-- gov accept (eng-3): 7/7 lines pass, 39 passed, 0 unmapped.
+## State (2026-11-02, run 2: the bounded retry, DEC-1026)
+- Run 1 ended DONE at 9bb92097c811 (verified 17d88232b287); its record is in git history and packages.md.
+- Run 2: merged w2/integrate at 94298e0a8 (--no-ff, Task DAEO-qzrq, Role orchestrator; clean). The ticket file now
+  holds src/gov/retrieval/semantic.py and the new first success line (bounded retry).
+- Lead's interface spec for run 2: briefs/interface-spec-r2.md (R1 what is retried: only a rebuild's chunk batches,
+  only on time-out; R2 RETRY_WAITS_S = (10.0, 30.0), TIMEOUT_S unchanged; R3 refresh() gains `retries`, the failure
+  reason is fixed, the rebuild's JSON states tries/waits only on failure because command.py is outside the paths).
+- Tests worktree /home/usain/gov-os-worktrees/W2-123-tests (branch w2/W2-123-tests at 94298e0a8) added.
+- Running in parallel (tripwire-before-7.json taken before both):
+  - td-2 (independent-test-designer, sandboxed gov launch, cwd the tests worktree): log/td-2.json, log/td-2.exit
+  - eng-4 (engineer, sandboxed gov launch, this worktree): log/eng-4.json, log/eng-4.exit
+- Run 1's TESTS-READY renamed TESTS-READY.run1; the run-2 TESTS-READY must say "run 2".
 
-## What a resume must do: nothing in this worktree; the orchestrator lands it. Packages: packages.md.
+## Done since (10:40 UTC)
+- eng-4 returned DONE: 181bb54c0050 (engineer; trailers ok; semantic.py +34 -12, test_w2_123_retry.py unit +152).
+- td-2 returned DONE: 0c97cee70eaa (test designer; trailers ok incl. Rewrite-Reason; retry tests 9 cases + README map).
+- Red check by lead on base (tests worktree src): 9 failed, reasons as README (log/red-r2/).
+- Merged tests at e17efc47ba15; TESTS-READY says run 2. gov accept (lead): 8/8 lines pass, 48 passed, 0 unmapped.
+- Tests worktree removed (--force: only td's pytest temp, 13M) and branch deleted.
+- Neither worker ran gov retrieve (both briefs said so). Both met the read-only TMPDIR in the sandbox: pytest-of-usain/
+  in this worktree grew (engineer's runs).
 
-## Measures: measure/ (FIGURES.md, sweep-1.jsonl, det_matrix-2242.jsonl, np_check-2314.log, rebuild-2-record.json, measure2-failed-0024.log).
+## Next (now): verification under log/verify-r2/ (rebuild, select_tests, scoped run, serial, gov check, collect-only)
 
-## Left for the orchestrator to remove
-- /home/usain/gov-os-worktrees/W2-123/pytest-of-usain/ (28K, 9 inodes; eng-1's pytest temp, the sandbox's TMPDIR being read-only).
-- /tmp/gov-os-lead-W2-123 (48M, 3,397 inodes).
-- My session scratchpad /tmp/claude-1000/-home-usain-gov-os-worktrees-W2-123/00ea7924-7196-40be-b03c-12ea54569340/scratchpad (measure scripts and logs; copies in measure/).
+## Next (as first planned)
+1. On td-2's return: tripwire compare, check twelve fields and commit trailers; merge w2/W2-123-tests when eng-4 is
+   not running (message file, Task/Role trailers); write TESTS-READY ("run 2").
+2. On eng-4's return: tripwire compare, trailers; then (after the merge) a fresh engineer batch (eng-5) runs gov accept
+   only, if eng-4 did not.
+3. Red check of the new tests at the merge base (scratch clone), the rebuild (rebuild_slot.sh), select_tests, the
+   scoped run once (verify_lock.sh), output under log/verify-r2/; gov accept (all lines); collect-only; trailer_gate;
+   keyword_warn; remove the tests worktree and branch; gov checkpoint record; return DONE with the head.
 
-## Loop count: kept by lead.
+## Residual to name in the return
+- On success after a retry, the rebuild's JSON shows only "recreated" (command.py outside the paths): tries/waits
+  are in semantic.refresh's report then. A one-line follow-up in src/gov/rebuild/command.py if the owner wants it.
 
-## Brief gaps: see the return's brief_gaps section (also listed in the earlier version of this file).
-
-## Guard refusals
-- 2026-11-01 23:22 | rm -rf of pytest-of-usain/ | permission prompt, not the hook | true (DEC-922) | 1 min
-- 2026-11-02 02:40 | inline python3 -c that read tests/acceptance/serial-only.txt | hook: "a command that may write the acceptance tests" | false-positive | 2 min; the same read as a script file (serial_kept.py)
+## Loop count: kept by lead. Brief gaps / guard refusals (run 2): none yet.

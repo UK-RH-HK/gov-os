@@ -1,0 +1,2 @@
+2026-11-02 10:20:09 admitted by the dispatcher; launching W2-123
+disk gate open: 845 GiB free, 64356653 inodes free

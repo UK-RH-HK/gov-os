@@ -1,0 +1,3 @@
+log: (interim)
+Interim: W2-04
+status: interim result de81824b: W2-04: an emptied mandatory file blocks, the room ending exactly names what is left, an all-refused check is unmeasured

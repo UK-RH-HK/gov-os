@@ -1,0 +1,5 @@
+Merge w2/W2-04-tests into w2/W2-04: the repair round's acceptance tests (independent test designer, DEC-1025): an emptied mandatory file, further_batch on an exact fit or no room, the check when every ticket refuses
+
+Task: DAEO-u4oz
+Implements: CAP-15.d,DEC-860,DEC-1025
+Role: orchestrator

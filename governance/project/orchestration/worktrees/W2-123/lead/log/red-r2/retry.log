@@ -1,0 +1,59 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+E   AssertionError: refresh's report has no `retries` (R3): {'available': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'reason': None}
+    assert 'retries' in {'available': True, 'facet': 'semantic', 'reason': None, 'state': 'AVAILABLE'}
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:348: AssertionError: refresh's report has no `retries` (R3): {'available': True, 'facet': 'semantic', 'state': 'AVAILABLE', 'reason': None}
+E   AssertionError: the timed-out batch was not tried again exactly once: [{'batch': 0, 'try': 1, 'at': 1395851.3435514, 'outcome': 'held'}]; report {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert ['held'] == ['held', 'answered']
+      
+      Right contains one more item: 'answered'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:359: AssertionError: the timed-out batch was not tried again exactly once: [{'batch': 0, 'try': 1, 'at': 1395851.3435514, 'outcome': 'held'}]; report {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E   AssertionError: the timed-out batch was not tried three times: [{'batch': 0, 'try': 1, 'at': 1395853.257660329, 'outcome': 'held'}]; report {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert ['held'] == ['held', 'held', 'answered']
+      
+      Right contains 2 more items, first extra item: 'held'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:374: AssertionError: the timed-out batch was not tried three times: [{'batch': 0, 'try': 1, 'at': 1395853.257660329, 'outcome': 'held'}]; report {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E   AssertionError: the batch was not tried 3 times: [{'batch': 0, 'try': 1, 'at': 1395855.129623331, 'outcome': 'held'}]
+    assert 1 == 3
+     +  where 1 = len([{'at': 1395855.129623331, 'batch': 0, 'outcome': 'held', 'try': 1}])
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:395: AssertionError: the batch was not tried 3 times: [{'batch': 0, 'try': 1, 'at': 1395855.129623331, 'outcome': 'held'}]
+E   AssertionError: the batch that kept timing out was not tried 3 times: [{'batch': 1, 'try': 1, 'at': 1395856.992535117, 'outcome': 'held'}]; report {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert ['held'] == ['held', 'held', 'held']
+      
+      Right contains 2 more items, first extra item: 'held'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:415: AssertionError: the batch that kept timing out was not tried 3 times: [{'batch': 1, 'try': 1, 'at': 1395856.992535117, 'outcome': 'held'}]; report {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E   AssertionError: the batch that kept timing out was not tried 3 times: [{'batch': 1, 'try': 1, 'at': 1395861.396508211, 'outcome': 'held'}]; {'status': 'not_recreated', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert ['held'] == ['held', 'held', 'held']
+      
+      Right contains 2 more items, first extra item: 'held'
+      Use -v to get more diff
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:437: AssertionError: the batch that kept timing out was not tried 3 times: [{'batch': 1, 'try': 1, 'at': 1395861.396508211, 'outcome': 'held'}]; {'status': 'not_recreated', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E   AssertionError: `retries` is not an empty list (R3): {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert None == []
+     +  where None = <built-in method get of dict object at 0x7348255d8ac0>('retries')
+     +    where <built-in method get of dict object at 0x7348255d8ac0> = {'available': False, 'facet': 'semantic', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b', 'state': 'FACET_UNAVAILABLE'}.get
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:460: AssertionError: `retries` is not an empty list (R3): {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E   AssertionError: `retries` is not an empty list (R3): {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert None == []
+     +  where None = <built-in method get of dict object at 0x73481c111a40>('retries')
+     +    where <built-in method get of dict object at 0x73481c111a40> = {'available': False, 'facet': 'semantic', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b', 'state': 'FACET_UNAVAILABLE'}.get
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:460: AssertionError: `retries` is not an empty list (R3): {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+E   AssertionError: `retries` is not an empty list (R3): {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+    assert None == []
+     +  where None = <built-in method get of dict object at 0x73481c112600>('retries')
+     +    where <built-in method get of dict object at 0x73481c112600> = {'available': False, 'facet': 'semantic', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b', 'state': 'FACET_UNAVAILABLE'}.get
+/home/usain/gov-os-worktrees/W2-123-tests/tests/acceptance/W2-123/test_w2_123_retry.py:460: AssertionError: `retries` is not an empty list (R3): {'available': False, 'facet': 'semantic', 'state': 'FACET_UNAVAILABLE', 'reason': 'Ollama did not embed with qwen3-embedding:0.6b'}
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_with_no_request_timed_out_the_stage_is_built_and_retries_is_an_empty_list
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_a_request_that_times_out_once_is_tried_again_after_the_first_wait_and_the_stage_is_built
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_a_request_that_times_out_twice_is_tried_a_third_time_after_a_longer_wait_and_the_stage_is_built
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_each_try_waits_no_longer_than_the_timeout_and_the_waits_between_tries_are_taken
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_after_the_last_failed_try_refresh_reports_the_tries_and_the_waits_and_sends_no_later_batch
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no_partial_store_is_reported_built
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry[http-error]
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry[not-json]
+FAILED tests/acceptance/W2-123/test_w2_123_retry.py::test_a_failure_that_is_not_a_time_out_ends_the_stage_at_once_without_a_retry[no-vector]
+9 failed in 17.47s

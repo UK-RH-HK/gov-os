@@ -10,3 +10,5 @@
 2026-11-02 09:24:08 W2-61h W2-61h-A5-verify.md W2-61h-A5-verify.json
 2026-11-02 09:28:06 W2-91 W2-91-A5-td.md W2-91-A5-td.json
 2026-11-02 10:18:05 W2-04 W2-04-A5-r5-repair.md W2-04-A5-r5-repair.json
+2026-11-02 10:20:09 W2-123 W2-123-A5-r2-retry.md W2-123-A5-r2-retry.json
+2026-11-02 10:39:08 W2-122 W2-122-A5-r2-nok5.md W2-122-A5-r2-nok5.json

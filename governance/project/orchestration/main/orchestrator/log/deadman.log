@@ -703,3 +703,34 @@
 {"at": "2026-11-02 10:13:28", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 09:40:54", "pending_tool": null, "age_min": 32, "verdict": "alive"}
 {"at": "2026-11-02 10:15:38", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 09:40:54", "pending_tool": null, "age_min": 34, "verdict": "alive"}
 {"at": "2026-11-02 10:17:52", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 09:40:54", "pending_tool": null, "age_min": 36, "verdict": "alive"}
+{"at": "2026-11-02 10:20:07", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:20:01", "pending_tool": "Bash", "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:22:17", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:20:16", "pending_tool": null, "age_min": 2, "verdict": "alive"}
+{"at": "2026-11-02 10:24:32", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:20:16", "pending_tool": null, "age_min": 4, "verdict": "alive"}
+{"at": "2026-11-02 10:26:46", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:20:16", "pending_tool": null, "age_min": 6, "verdict": "alive"}
+{"at": "2026-11-02 10:29:00", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:27:33", "pending_tool": null, "age_min": 1, "verdict": "alive"}
+{"at": "2026-11-02 10:31:11", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:27:33", "pending_tool": null, "age_min": 3, "verdict": "alive"}
+{"at": "2026-11-01 04:00:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 133, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 133 min | approve or restart it", "sent": ["log: dry"]}
+{"at": "2026-11-01 03:00:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 73, "verdict": "alive"}
+{"at": "2026-11-01 12:59:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 12:00:00", "pending_tool": null, "age_min": 59, "verdict": "alive"}
+{"at": "2026-11-01 13:01:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 12:00:00", "pending_tool": null, "age_min": 61, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is idle since 12:00 (its turn ended and nothing woke it), 61 min | approve or restart it", "sent": ["log: dry"]}
+{"at": "2026-11-02 10:31:25", "verdict": "TEST", "sent": ["push: dry"]}
+{"at": "2026-11-01 04:00:00", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 133, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 133 min | approve or restart it", "sent": []}
+{"at": "2026-11-02 10:31:26", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 1965, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 1965 min | approve or restart it", "sent": []}
+{"at": "2026-11-02 10:31:26", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:26", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:27", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:26", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:28", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:26", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:28", "transcript": "cto.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "age_min": 1965, "verdict": "ALERT", "line": "P1 DEADMAN | the CTO session is waiting on a tool (Bash; likely a permission prompt) since 01:46, 1965 min | approve or restart it", "sent": []}
+{"at": "2026-11-02 10:31:28", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "verdict": "standby: handover: the fresh session starts at 01:30"}
+{"at": "2026-11-02 10:31:29", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "verdict": "standby: handover: the fresh session starts at 01:30"}
+{"at": "2026-11-02 10:31:30", "transcript": "s.jsonl", "last_assistant": "2026-11-01 01:46:20", "pending_tool": "Bash", "verdict": "standby: handover: the fresh session starts at 01:30"}
+{"at": "2026-11-02 10:31:30", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:30", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:31", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:30", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:32", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:30", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:32", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:30", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:33", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:30", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:31:34", "transcript": "s.jsonl", "last_assistant": "2026-11-02 10:31:30", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:33:25", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:27:33", "pending_tool": null, "age_min": 5, "verdict": "alive"}
+{"at": "2026-11-02 10:35:39", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:35:38", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:37:49", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:37:42", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:40:03", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:40:00", "pending_tool": null, "age_min": 0, "verdict": "alive"}
+{"at": "2026-11-02 10:42:18", "transcript": "07f25884-3736-441a-8f80-ff5cef3fd2e0.jsonl", "last_assistant": "2026-11-02 10:42:16", "pending_tool": null, "age_min": 0, "verdict": "alive"}

@@ -1,1 +1,1 @@
-{"at": "2026-11-02 10:19:18", "rc": 0, "secs": 12.1, "limit_s": 300, "tail": "guard refusals since ACT 1: 71 total, 67 false positives, 0 unclassified"}
+{"at": "2026-11-02 10:40:21", "rc": 0, "secs": 16.5, "limit_s": 300, "tail": "guard refusals since ACT 1: 72 total, 67 false positives, 1 unclassified"}

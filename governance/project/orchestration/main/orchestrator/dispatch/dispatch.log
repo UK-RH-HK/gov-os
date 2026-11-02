@@ -154,3 +154,9 @@
 2026-11-02 10:18:05 return: W2-104-A5-run2-dec1020.json -> inbox/20261102-101805-W2-104-A5-run2-dec1020.txt
 2026-11-02 10:18:05 started W2-04 (DAEO-u4oz) W2-04-A5-r5-repair.md -> W2-04-A5-r5-repair.json (launcher exit 0)
 2026-11-02 10:19:18 guard harvest: rc 0 in 12.1 s
+2026-11-02 10:20:09 started W2-123 (DAEO-qzrq) W2-123-A5-r2-retry.md -> W2-123-A5-r2-retry.json (launcher exit 0)
+2026-11-02 10:27:05 interim result: W2-04 de81824b W2-04: an emptied mandatory file blocks, the room ending exactly names what is l
+2026-11-02 10:29:30 guard harvest: rc 0 in 21.8 s
+2026-11-02 10:39:08 started W2-122 (DAEO-blwa) W2-122-A5-r2-nok5.md -> W2-122-A5-r2-nok5.json (launcher exit 0)
+2026-11-02 10:40:21 guard harvest: rc 0 in 16.5 s
+2026-11-02 10:41:05 guard refusals: 1 new

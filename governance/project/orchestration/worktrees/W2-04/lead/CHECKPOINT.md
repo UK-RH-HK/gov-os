@@ -1,5 +1,43 @@
 # W2-04 (DAEO-u4oz) lead checkpoint
 
+## Resume 5 (DEC-1025, 2026-11-02): the repair round, then review 2 (the last)
+- Head was b37b5c8f1741, clean. Merged w2/integrate --no-ff: a5a53c6096c3 (Task, Implements, Role; message file
+  merge-integrate-1.txt); disjoint paths, no conflict. Register now to DEC-1025; JUDGEMENT.md current.
+- Spec addendum 3: briefs/spec-add-3.md (S5 emptied/whitespace file or dep -> BLOCKED or read:false; S7 exact fit /
+  zero room -> further_batch from first unstacked ranked item + dropped "budget exceeded"; S8a all refuse -> unmeasured).
+- Tests worktree /home/usain/gov-os-worktrees/W2-04-tests, branch w2/W2-04-tests from 611d1ae12f94 (round-2 tests,
+  no implementation). Tripwire snapshot 8 (both workers).
+- Launched in parallel: td-4 (xhigh, sandboxed, briefs/td-4.filled.md, log/td-4.json/.rc) and eng-6 (high, sandboxed,
+  briefs/eng-6.filled.md, log/eng-6.json/.rc). Engineer told NOT to run gov accept (lead runs it after merge).
+- eng-6 DONE 10:27 (session 3c6ee063, 48 turns, 5 min; twelve fields ok): de81824be2e8 (Task, Role engineer,
+  Implements CAP-15.d, DEC-860, DEC-1025, Co-Authored-By); code +28/-7, tests +150/-12; unit/context 95P. Emptied ->
+  BLOCKED (details empty: true); exact fit/zero room -> further = ranked[taken:taken+largest limit or 10] + dropped;
+  all refused -> unmeasured, rc 1. Rewrote 3 builder tests of the old reading (DEC-866 noted). gov retrieve not used.
+  One here-doc slip (empty body, nothing appended). Residual: sessionstart.py swallows context errors (out of scope).
+- td-4 returned 10:36 (session 55e84373, 60 turns, 13 min; twelve fields ok; status PACKAGES, non-blocking):
+  42e73adb7954 (Task, Role td, Implements CAP-15.d, DEC-860, DEC-1025, Rewrite-Reason DEC-1025, Co-Authored-By);
+  +29 cases (test_w2_04_emptied.py 24; batches exact-fit 3; check 2), 1 revised. P-R3-1 (brief summary "not read"
+  words) and P-R3-2 (message or details) -> lead P3: (a) both (BLOCKED passes under every option). Scratch left in
+  its sandbox TMPDIR /tmp/gov-launch-independent-test-designer-7i2rhqdb (4 files; rm refused).
+- Tripwire-8: this tree head; tests tree head + W2-04 folder (allowed); main, W2-123(-tests): other sessions.
+- Merged tests: a0c79a6c970e (Task, Implements, Role). TESTS-READY written. Tests worktree + branch removed.
+- Red check (scratch worktree at a5a53c6096c3 + new tests, removed): 27F/3P: F1 24 red, F2 exact-on-batch-end and
+  no-room red, F3 all-refuse red; green: inside-batch exact fit, revised case, one-refuses-one-fits (as expected).
+- gov accept (lead, once) at a0c79a6c970e started, out /tmp/gov-os-lead-W2-04/accept-3.{json,err,rc}.
+- gov accept at a0c79a6c970e: pass, all 7 KPI lines, 89P/0F/1S (s5 35P, s7 13P), unmapped 11P.
+- select-5: scoped, core_changed [], unplaced [], 192 opts = select-4; serial-5 = serial-4 (4 W2-54).
+- collect-4: 19327/19329 collected (2 deselected), no error. keyword_warn 0. gov.__file__ in this tree.
+- trailer_gate during the rebuild: 20 commits, 0 lacking, but "CAP-15.d does not resolve" x20 (store mid-rebuild?):
+  RE-RUN after rebuild-8.
+- chain_5.sh started ~10:39 (disk gate open 844 GiB; rebuild-8 via rebuild_slot.sh with PYTHONPATH; then
+  run_scoped_5.sh: parallel-5, serial-5). rc in log/chain-5.rc.
+- Review 2 brief ready: briefs/rev-2.md + fill_rev2.py (needs briefs/rev-2.results.part written after the run).
+  Launch: gov launch independent-auditor, --model claude-sonnet-5-5 --effort max, read-only tools.
+- Next: wait chain-5; gov check --json; trailer_gate again; results part; review 2; verdict.py; record; DONE. (--no-ff, message file); TESTS-READY; red check of new
+  cases on b37b5c8f1741's code (scratch clone in /tmp/gov-os-lead-W2-04); gov accept once; rebuild_slot (with
+  PYTHONPATH); select_tests; run_scoped (parallel+serial); gov check; collect-only; trailer_gate; keyword_warn; review 2
+  (sonnet 5.5, effort max, independent-auditor); verdict.py; record committed if READY; DONE.
+
 ## Resume 4 (the CTO, 2026-11-02): the FULL review on b37b5c8f1741, then DONE
 - Head b37b5c8f1741, tree clean, hooks dir: samples only. No test run, no rebuild (the code is the verified code).
 - rev-1.md updated: JUDGEMENT.md carried as on w2/integrate (DEC-1010 item 1's section added; diff checked word for
