@@ -94,6 +94,9 @@ embedded files.
 
 `tests/acceptance/W2-86/test_w2_86_kernel_template_embedding.py::test_guard_outside_template_every_verdict_as_at_the_base`
 compares every verdict outside `template/` with W2-86's base `9dc5288161c4`. DEC-957 embeds the root files,
-`governance/**` and `schemas/**`, all of them outside `template/`, so that case turns red. It is not revised here.
-Its revision is a P2 question under DEC-957's rubric, it lies outside this ticket's test paths, and it goes back
-in the return.
+`governance/**` and `schemas/**`, all of them outside `template/`, so that case turned red. It was revised under
+DEC-1013 TD-2 (a) in commit `a31d314e5091`, which added its path to this ticket's paths. DEC-957's three newly
+embedded sets are now left out of its comparison: the tracked root files, every tracked file under `governance/**`
+and every tracked file under `schemas/**`. The sets are defined the same way as `newly_embedded_area` in
+`w2_91_support.py`. Every other tracked path outside `template/` is still compared with the base, in both
+directions, and the case fails if nothing is left to compare.
