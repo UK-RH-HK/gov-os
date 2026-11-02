@@ -21,6 +21,12 @@ allowed_paths:
 - src/gov/retrieval/vector_cache.py
 - tests/unit/retrieval/test_w2_126*
 - docs/changes/W2-126-evidence.md
+- tests/conftest.py
+- tests/unit/retrieval/test_semantic_query_vector.py
+- tests/unit/retrieval/test_emg_query_device.py
+- tests/unit/retrieval/test_semantic_cpu_embedder.py
+- tests/unit/retrieval/test_w2_108_freshness_once.py
+- tests/unit/semantic/test_semantic.py
 kpis:
   success:
   - 'Before it embeds a chunk or a question, the semantic stage and `query_vector` look up a machine-wide cache keyed by the model, its revision and the sha256 of the exact text sent; a hit uses the stored vector and sends nothing to the embedder; a miss embeds and stores the vector; the cache sits in the user''s own folder (one file, mode 0600), shared by every tree and clone on the machine [DEC-1032, P1-LOAD-BALANCE-1 b.1]'
