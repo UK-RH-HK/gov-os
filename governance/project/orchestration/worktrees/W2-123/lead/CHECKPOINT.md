@@ -1,65 +1,25 @@
 # W2-123 (DAEO-qzrq) lead checkpoint
 
-## State (2026-11-02, run 2: the bounded retry, DEC-1026)
-- Run 1 ended DONE at 9bb92097c811 (verified 17d88232b287); its record is in git history and packages.md.
-- Run 2: merged w2/integrate at 94298e0a8 (--no-ff, Task DAEO-qzrq, Role orchestrator; clean). The ticket file now
-  holds src/gov/retrieval/semantic.py and the new first success line (bounded retry).
-- Lead's interface spec for run 2: briefs/interface-spec-r2.md (R1 what is retried: only a rebuild's chunk batches,
-  only on time-out; R2 RETRY_WAITS_S = (10.0, 30.0), TIMEOUT_S unchanged; R3 refresh() gains `retries`, the failure
-  reason is fixed, the rebuild's JSON states tries/waits only on failure because command.py is outside the paths).
-- Tests worktree /home/usain/gov-os-worktrees/W2-123-tests (branch w2/W2-123-tests at 94298e0a8) added.
-- Running in parallel (tripwire-before-7.json taken before both):
-  - td-2 (independent-test-designer, sandboxed gov launch, cwd the tests worktree): log/td-2.json, log/td-2.exit
-  - eng-4 (engineer, sandboxed gov launch, this worktree): log/eng-4.json, log/eng-4.exit
-- Run 1's TESTS-READY renamed TESTS-READY.run1; the run-2 TESTS-READY must say "run 2".
+## State (2026-11-02 ~13:55 UTC): run 2 returned DONE
+- Branch w2/W2-123, head 3de9bcf44d91 (the lead's gov checkpoint record CP-DAEO-qzrq-0008 only); verified head
+  2a4455be0785.
+- Run 2 commits: 94298e0a8467 orchestrator merge of w2/integrate (ticket file with DEC-1026 line); 181bb54c0050
+  engineer (retry in semantic.py + unit tests); 0c97cee70eaa test designer (retry tests, README renumbered,
+  Rewrite-Reason); e17efc47ba15 orchestrator merge of tests; 7ab6f739 orchestrator merge of w2/integrate at 2458fedd
+  (DEC-1033 emergency patch, success-7/8 amended; ollama.py conflict resolved by eng-5, staged, committed by the lead);
+  c316ceac7755 test designer (GPU cases revised, Rewrite-Reason DEC-1033); 2a4455be0785 orchestrator merge of tests;
+  3de9bcf44d91 orchestrator checkpoint record. trailer_gate: 24 judged, 0 lacking.
+- gov accept at 2a4455be: 9/9 lines pass, 50 passed, 0 unmapped. Unit suites (eng-5, merged code): 176 passed, 1 skip.
+- Scoped run (pre-merge head e17efc47): parallel 4515 passed / 11 failed (none caused here); serial part killed by the
+  2 h background limit after 6 of 8 entries (one F in test_w2_54_sandboxed_worker.py); no rerun on the merged head
+  (CTO asked for unit tests + gov accept after the merge; machine in DEC-1033 emergency). gov check not run in run 2.
+- Collect-only at 2a4455be: 19330/19332 (2 deselected), exit 0. select_tests at 2a4455be: scoped, core_changed
+  [ollama.py, semantic.py], unplaced [].
+- Tests worktree and branch removed.
+- Packages: packages-r2.md (P-W2-123-4 to W2-126; P-W2-123-5 superseded by DEC-1033's patch).
 
-## Done since (10:40 UTC)
-- eng-4 returned DONE: 181bb54c0050 (engineer; trailers ok; semantic.py +34 -12, test_w2_123_retry.py unit +152).
-- td-2 returned DONE: 0c97cee70eaa (test designer; trailers ok incl. Rewrite-Reason; retry tests 9 cases + README map).
-- Red check by lead on base (tests worktree src): 9 failed, reasons as README (log/red-r2/).
-- Merged tests at e17efc47ba15; TESTS-READY says run 2. gov accept (lead): 8/8 lines pass, 48 passed, 0 unmapped.
-- Tests worktree removed (--force: only td's pytest temp, 13M) and branch deleted.
-- Neither worker ran gov retrieve (both briefs said so). Both met the read-only TMPDIR in the sandbox: pytest-of-usain/
-  in this worktree grew (engineer's runs).
+## What a resume must do: nothing; the orchestrator lands it.
 
-## Next (now): verification under log/verify-r2/ (rebuild, select_tests, scoped run, serial, gov check, collect-only)
-
-## Verification so far (log/verify-r2/)
-- gov.__file__ -> /home/usain/gov-os-worktrees/W2-123/src/gov/__init__.py; select_tests: scoped, core_changed
-  [src/gov/retrieval/ollama.py, src/gov/retrieval/semantic.py], unplaced []; collect-only 19266/19268 (2 deselected),
-  exit 0; trailer_gate: 19 commits judged, 0 lacking; keyword_warn 0.
-- rebuild 1 (10:39-11:12, exit 75): semantic not_recreated with the BARE NO_EMBEDDING after 1896.5 s (three rebuilds
-  at once on the shared server): a non-time-out failure, so not retried by design. The failing batch (first missing)
-  embedded fine at 11:20 in 2.6 s (probe_batch.log): transient. 2280 chunks missing then. Shared server pid 414672
-  never restarted. => PACKAGE: extend the retry to transient non-time-out failures (HTTP 5xx / connection reset)?
-- rebuild 2 (incremental) started ~11:21: log/verify-r2/rebuild-2.{log,exit}. Then verify_r2.sh (scoped run once),
-  then gov check in heavy_slot.
-
-## 13:20 UTC: the CTO's messages (cross-session, W2O V3)
-- DEC-1032 line: returned as package P-W2-123-5 (live NOT_ON_CPU risk found and sent); the CTO agreed. Then the
-  owner's EMERGENCY DEC-1033: w2/integrate holds the patch (6ed6a5ae: semantic.py any-device vector, ollama.py query
-  start without NO_GPU) and 0fa24eda (success-7 amended to "GPU visible", success-8 kept, Rewrite-Reason DEC-1033).
-  CTO asks: merge w2/integrate before DONE, resolve keeping both, unit tests and gov accept once. P-W2-123-4 goes to
-  W2-126 (now on w2/integrate as 5e67a14d). Also name in the return whether run 1's query start keeps the cap.
-- git merge-tree: semantic.py merges cleanly; ollama.py conflicts (2 hunks).
-- Scoped run (pre-merge head e17efc47): parallel 4515 passed / 11 failed (5 known W2-05/W2-59; 6 test_dispatcher
-  from 66b08891, red in any worktree, skip guard 7f81f91a on w2/integrate); serial part running (log/verify-r2/).
-- td-3 launched 13:20 in W2-123-tests (at e17efc47): revise GPU-hidden cases, map to success-8. tripwire-before-8.
-- Next: when serial ends: git merge --no-ff w2/integrate (message file), leave ollama.py conflicted; launch eng-5
-  (briefs/eng-5.md) to resolve and stage; then commit the merge; merge td-3's branch; gov accept; unit tests seen in
-  eng-5's return; remove tests worktree; gov checkpoint record; return DONE.
-
-## Next (as first planned)
-1. On td-2's return: tripwire compare, check twelve fields and commit trailers; merge w2/W2-123-tests when eng-4 is
-   not running (message file, Task/Role trailers); write TESTS-READY ("run 2").
-2. On eng-4's return: tripwire compare, trailers; then (after the merge) a fresh engineer batch (eng-5) runs gov accept
-   only, if eng-4 did not.
-3. Red check of the new tests at the merge base (scratch clone), the rebuild (rebuild_slot.sh), select_tests, the
-   scoped run once (verify_lock.sh), output under log/verify-r2/; gov accept (all lines); collect-only; trailer_gate;
-   keyword_warn; remove the tests worktree and branch; gov checkpoint record; return DONE with the head.
-
-## Residual to name in the return
-- On success after a retry, the rebuild's JSON shows only "recreated" (command.py outside the paths): tries/waits
-  are in semantic.refresh's report then. A one-line follow-up in src/gov/rebuild/command.py if the owner wants it.
-
-## Loop count: kept by lead. Brief gaps / guard refusals (run 2): none yet.
+## Left for the orchestrator to remove
+- /home/usain/gov-os-worktrees/W2-123/pytest-of-usain/ (184K, 45 inodes; engineers' pytest temp, sandbox TMPDIR read-only).
+- /tmp/gov-os-lead-W2-123 (71M, 5,956 inodes).

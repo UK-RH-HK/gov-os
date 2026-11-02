@@ -1,0 +1,7 @@
+log: W2-123-A5-r2-retry.json
+W2: W2-123
+status: DONE. Head 3de9bcf44d91 (my checkpoint record only), verified head 2a4455be0785. `gov accept` passes 9/9 lines. Not run on the merged head: the scoped set's serial part and `gov check`.
+
+task: W2-123 (DAEO-qzrq) run 2: the rebuild retries a timed-out embedding request, at most three tries (DEC-1026); then, as the CTO asked, merge the DEC-1033 emergency patch and revise run 1's GPU tests to match it.
+status: DONE. Head 3de9bcf44d91 (my checkpoint record only), verified head 2a4455be0785. `gov accept` passes 9/9 lines. Not run on the merged head: the scoped set's serial part and `gov check`.
+work_completed: Merged `w2/integrate` at 94298e0a8467 to get the new KPI line. Wrote a shared interface spec (`briefs/interface-spec-r2.md`) so the test designer and engineer, working in par

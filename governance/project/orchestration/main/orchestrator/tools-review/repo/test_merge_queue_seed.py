@@ -59,6 +59,7 @@ REFRESH = ('#!/usr/bin/env bash\n'
            'ln -sfn "$next" "$GOV_STORE_LINK.tmp" && mv -T "$GOV_STORE_LINK.tmp" "$GOV_STORE_LINK"\n')
 PYTEST = f"{sys.executable} -m pytest -q -p no:cacheprovider"
 OK = "def test_ok():\n    pass\n"
+THROWAWAY = "the head without the batch: a throwaway worktree"
 ASSERT_RED = "def test_known():\n    assert False\n"
 VALUE_RED = "def test_known():\n    raise ValueError('x')\n"
 
@@ -245,7 +246,7 @@ def test_a_held_store_lock_is_not_waited_for_and_the_refresh_runs(w):
         fcntl.flock(lock, fcntl.LOCK_EX)
         r = run(w)
     assert r.returncode == 0 and "a refresh holds the integration store's lock" in r.stdout, r.stdout
-    assert w.link.resolve().name == "store-a" and refreshes(w, wait=20.0) == 1
+    assert "integration store promoted" not in r.stdout and refreshes(w, wait=20.0) == 1  # the refresh, not us
 
 
 # ---- the head without the batch: never rebuilt ---------------------------------------------------------------------
@@ -265,7 +266,7 @@ def test_a_red_the_baseline_had_is_judged_on_the_integration_stores_tree_without
     r = run(w, "--base", base)
     assert r.returncode == 0, r.stdout + r.stderr
     assert record(w)["unowned"] == ["tests/test_known.py::test_known"]
-    assert "the head without the batch: the integration store's tree" in r.stdout
+    assert THROWAWAY in r.stdout
     trees = [Path(p[0]).name for p in prepares(w)]
     assert trees.count("alt") == 1 and set(trees) <= {"merged", "alt", "store-b"}  # alt only at the baseline
     assert [p[1] for p in prepares(w) if Path(p[0]).name == "alt"] == [base]
@@ -295,7 +296,7 @@ def test_a_baseline_red_the_batch_breaks_again_is_the_batchs_on_the_stores_tree(
     r = run(w, "--base", base)
     assert r.returncode == 3 and head(w) == old, r.stdout + r.stderr
     assert json.loads((w.q / "ejected/A.json").read_text())["failing"] == ["tests/test_known.py::test_known"]
-    assert "the head without the batch: the integration store's tree" in r.stdout
+    assert THROWAWAY in r.stdout
 
 
 def nightly(w, h, junit, run_extra=""):
@@ -320,7 +321,7 @@ def test_the_nightly_of_the_head_answers_green_without_any_run_there(w):
     r = run(w, "--base", base, *nightly(w, h, junit))
     assert r.returncode == 3, r.stdout + r.stderr
     assert "green on the head without the batch in that head's own nightly (no run)" in r.stdout
-    assert "the integration store's tree" not in r.stdout and refreshes(w) == 0
+    assert THROWAWAY not in r.stdout and refreshes(w) == 0
 
 
 def test_the_nightly_of_the_head_red_alone_stops_without_a_run_but_never_clears_by_itself(w):
@@ -332,7 +333,7 @@ def test_the_nightly_of_the_head_red_alone_stops_without_a_run_but_never_clears_
     r = run(w, "--base", base, *nightly(w, h, junit, "red-alone tests/test_since.py::test_since: 1 failed\n"))
     assert r.returncode == 4 and "red since the baseline" in r.stderr, r.stdout + r.stderr
     assert "red alone on the head without the batch in that head's own nightly" in r.stdout
-    assert "the integration store's tree" not in r.stdout
+    assert THROWAWAY not in r.stdout
 
 
 def test_a_store_behind_the_head_is_refreshed_first_never_a_clone_rebuilt(w):
@@ -346,20 +347,66 @@ def test_a_store_behind_the_head_is_refreshed_first_never_a_clone_rebuilt(w):
     assert [Path(p[0]).name for p in prepares(w)].count("alt") == 1  # the baseline's, nothing at the head
 
 
-def test_without_base_the_trace_runs_on_the_stores_tree_and_a_test_that_changes_it_is_undone(w):
-    since = ("import pathlib\n\n\ndef test_since():\n"
+def worktrees(w):
+    return sorted(line.split()[1] for line in git(w.repo, "worktree", "list", "--porcelain").splitlines()
+                  if line.startswith("worktree "))
+
+
+def untouched(w, before_refs, ready, ready_status, ready_head):
+    """The integration store's ready tree exactly as found (never run in), the repository's refs as they were (bar
+    a landing), and no throwaway worktree left registered."""
+    assert git(ready, "status", "--porcelain") == ready_status and git(ready, "rev-parse", "HEAD") == ready_head
+    after = [x for x in git(w.repo, "for-each-ref", "--format=%(refname) %(objectname)").splitlines()
+             if not x.startswith("refs/heads/w2/integrate ")]
+    assert after == [x for x in before_refs if not x.startswith("refs/heads/w2/integrate ")]
+    assert worktrees(w) == sorted([str(w.repo.resolve()), str(w.link) + "-a", str(w.link) + "-b"])
+
+
+def test_without_base_the_trace_runs_in_a_throwaway_tree_and_a_changed_one_is_never_used_again(w):
+    dirty = ("import pathlib\n\n\ndef test_{0}():\n"
              "    (pathlib.Path(__file__).parent / 'test_ok.py').write_text('changed by a test')\n"
+             "    (pathlib.Path(__file__).parents[1] / 'left.txt').write_text('residue')\n"
              "    assert False\n")
-    h = on_integrate(w, {"tests/test_since.py": since}, "a red merge")
+    h = on_integrate(w, {"tests/test_d1.py": dirty.format("d1"), "tests/test_d2.py": dirty.format("d2")}, "red merges")
     store_at(w, h)
+    ready = w.link.resolve()
     enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
+    refs = git(w.repo, "for-each-ref", "--format=%(refname) %(objectname)").splitlines()
     r = run(w)
     assert r.returncode == 0, r.stdout + r.stderr
-    assert record(w)["unowned"] == ["tests/test_since.py::test_since"]
+    assert sorted(record(w)["unowned"]) == ["tests/test_d1.py::test_d1", "tests/test_d2.py::test_d2"]
     assert "alt" not in [Path(p[0]).name for p in prepares(w)]
-    assert "a re-run changed the integration store's tree" in r.stdout
-    tree = Path(str(w.link) + "-a")
-    assert git(tree, "status", "--porcelain") == "" and git(tree, "rev-parse", "HEAD") == h
+    assert r.stdout.count(THROWAWAY) == 2 and "a re-run changed the throwaway tree" in r.stdout
+    untouched(w, refs, ready, "", h)
+
+
+def test_residue_in_the_ready_tree_or_a_killed_runs_tree_never_decides_a_red(w):
+    """Review A1: the batch breaks again a red a later merge fixed. Residue in the integration store's ready tree
+    (or in a throwaway a killed run left) that would make it red on the head must not keep it cleared."""
+    known = "import sys, pathlib\nsys.path.insert(0, str(pathlib.Path(__file__).parents[1] / 'src'))\nimport k\n\n\n" \
+            "def test_known():\n    assert k.V == 1\n"
+    base = on_integrate(w, {"src/k.py": "V = 0\n", "tests/test_known.py": known}, "a known red at the nightly")
+    fixed = on_integrate(w, {"src/k.py": "V = 1\n"}, "a later merge fixes it")
+    c = ticket(w, "A", {"src/k.py": "V = 0\n"}, start=fixed)
+    h = on_integrate(w, {"src/other.py": "Y = 1\n"}, "an unrelated merge")
+    store_at(w, h)
+    ready = w.link.resolve()
+    (ready / "src/k.py").write_text("V = 0\n")  # a killed run's residue: red there
+    (ready / "src/extra.py").write_text("residue\n")
+    stale = w.tmp / "work" / "20000101-000000-000000" / f"head-{h[:12]}-0"
+    stale.parent.mkdir(parents=True)
+    git(w.repo, "worktree", "add", "-q", "--detach", str(stale), h)
+    (stale / "src/k.py").write_text("V = 0\n")
+    ready_status = git(ready, "status", "--porcelain")
+    refs = git(w.repo, "for-each-ref", "--format=%(refname) %(objectname)").splitlines()
+    old = head(w)
+    enter(w, "A", c)
+    r = run(w, "--base", base)
+    assert r.returncode == 3 and head(w) == old, r.stdout + r.stderr  # the batch's: ejected, nothing lands
+    assert json.loads((w.q / "ejected/A.json").read_text())["failing"] == ["tests/test_known.py::test_known"]
+    assert THROWAWAY in r.stdout and f"a throwaway worktree a killed run left removed: {stale}" in r.stdout
+    assert not stale.exists()
+    untouched(w, refs, ready, ready_status, h)
 
 
 def test_junit_cases_names_the_passed_and_leaves_out_the_skipped(tmp_path):

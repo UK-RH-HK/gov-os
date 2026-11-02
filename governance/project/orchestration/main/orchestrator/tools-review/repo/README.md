@@ -173,10 +173,15 @@ on three things; without it the queue works as before. `land.py` passes it, with
 - **The head without the batch is never rebuilt.** A red the baseline cleared, or one the batch may own, is first
   judged from the nightly of exactly that head (its `run.txt` names it, it has a verdict and JUnit files): green there
   means not on the head; red alone there with the same failure means on the head only for a red that would stop the
-  queue, never to keep one cleared. Otherwise the case is re-run alone, `--rounds` rounds, as before, in the
-  integration store's ready tree (a worktree already built at that head), under a shared hold of the store's lock;
-  a store behind the head is refreshed first (its standby half, incrementally), and a Stop if it still is not at the
-  head. A run that changes that tree is undone (`checkout --force`, `clean -fdq`, the ignored stores kept) and named.
+  queue, never to keep one cleared. Otherwise the case is re-run alone, `--rounds` rounds, as before, in a throwaway
+  detached worktree of that head (`git worktree add --detach <work>/head-<id>-<n>`), made in the run's work folder,
+  holding a copy of the integration store's stores (the whole store, the same commit: nothing embedded; copied under a
+  shared hold of the store's lock, the only time it is held) and its code index made anew. Nothing ever runs in the
+  integration store's own tree (review of 2026-11-02, A1, A2). The throwaway tree is checked before every case against
+  its state when made (HEAD, changes, ignored files, its stores' stamps); a case that changed it gets a new one. The
+  run removes its own throwaway worktrees (`git worktree remove --force`, only paths named `head-*` in its work
+  folder); one a killed run left is removed at the next run's start. A store behind the head is refreshed first (its
+  standby half, incrementally), and a Stop if it still is not at the head.
   With no `--base`, the trace against the head without the batch runs there too. The `alt` clone is built only at the
   baseline (a red its nightly's record does not clear) and for the culprit search.
 - Tests: `tests/unit/orchestration/test_merge_queue_seed.py`; the seeder's: `.gov-runtime/scratch/orchestrator/tools/test_seed_store.py`.

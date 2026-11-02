@@ -192,3 +192,8 @@
 2026-11-02 13:02:05 started but never ran: W2-04 W2-04-A5-r5-repair.json
 2026-11-02 13:02:05 land finished: {'W2-11=c9f99b28b88b': 'no outcome in the output (refused or stopped)', 'W2-105=fa653609cc93': 'no outcome in the output (refused or stopped)', 'W2-90b=73c18fea1e1f': 'no outcome in the output (refused or stopped)', 'W2-81=e78e6af7530d': 'no outcome in the output (refused or stopped)', 'W2-91=55b47e075b3b': 'no outcome in the output (refused or stopped)', 'W2-92=448a835a9dca': 'no outcome in the output (refused or stopped)'}
 2026-11-02 13:09:51 guard harvest: rc 0 in 41.4 s
+2026-11-02 13:20:33 guard harvest: rc 0 in 28.4 s
+2026-11-02 13:30:41 guard harvest: rc 0 in 31.4 s
+2026-11-02 13:41:28 guard harvest: rc 0 in 19.7 s
+2026-11-02 13:43:09 interim result: W2-112 566c68f0 W2-112 (DAEO-clon): merge w2/integrate (DEC-1033 emergency patches) before the e
+2026-11-02 13:48:05 return: W2-123-A5-r2-retry.json -> inbox/20261102-134805-W2-123-A5-r2-retry.txt

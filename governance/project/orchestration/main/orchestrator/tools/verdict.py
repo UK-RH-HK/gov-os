@@ -16,9 +16,11 @@ SCOPES, ORDINARY, CONSEQ = {"in", "out"}, {"yes", "no"}, {"fails open", "loses w
 
 
 def ready(text):
-    m = BLOCK.search(text or "")
-    if not m:
+    """The LAST verdict block decides: a later review round appends its own block (DEC-1010: at most two rounds)."""
+    blocks = list(BLOCK.finditer(text or ""))
+    if not blocks:
         return None, []
+    m = blocks[-1]
     try:
         data = json.loads(m.group(1))
         kpis = data["kpis"]

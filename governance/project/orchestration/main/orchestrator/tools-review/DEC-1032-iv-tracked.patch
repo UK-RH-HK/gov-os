@@ -1,7 +1,7 @@
-diff --git a/governance/project/orchestration/nightly/nightly.sh b/governance/project/orchestration/nightly/nightly.sh
-index e02357ea..f1abbdc8 100644
---- a/governance/project/orchestration/nightly/nightly.sh
-+++ b/governance/project/orchestration/nightly/nightly.sh
+diff --git a/a/governance/project/orchestration/nightly/nightly.sh b/b/governance/project/orchestration/nightly/nightly.sh
+index e02357e..f1abbdc 100644
+--- a/a/governance/project/orchestration/nightly/nightly.sh
++++ b/b/governance/project/orchestration/nightly/nightly.sh
 @@ -107,6 +107,14 @@ PLUG=$CLONE/src/gov/close/pytest_plugin
  # One store rebuild at a time on this machine (owner, DEC-939 item 2, until W2-76 builds it into gov rebuild).
  # The nightly's rebuild scans every file in full (DEC-966 item 4, W2-107): GOV_SECRETS_FULL_SCAN=1 reads nothing from
@@ -17,11 +17,11 @@ index e02357ea..f1abbdc8 100644
  env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" GOV_SECRETS_FULL_SCAN=1 flock /tmp/gov-os-rebuild.lock python3 -m gov.cli.main rebuild --json \
    > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; exit 2; }
  echo "clone rebuilt" >> "$OUT/run.txt"
-diff --git a/governance/project/orchestration/tools/README.md b/governance/project/orchestration/tools/README.md
-index 182452c5..b1357d33 100644
---- a/governance/project/orchestration/tools/README.md
-+++ b/governance/project/orchestration/tools/README.md
-@@ -154,3 +154,29 @@ the baseline and closes each ticket that lands in the same step.
+diff --git a/a/governance/project/orchestration/tools/README.md b/b/governance/project/orchestration/tools/README.md
+index 182452c..3926815 100644
+--- a/a/governance/project/orchestration/tools/README.md
++++ b/b/governance/project/orchestration/tools/README.md
+@@ -154,3 +154,34 @@ the baseline and closes each ticket that lands in the same step.
    <tree>` takes a heavy-job slot and rebuilds with a lock of the tree's own (`GOV_REBUILD_LOCK`), so rebuilds of
    different trees run side by side, at most as many as there are slots.
  - `land.py` passes `--warm` and the baseline nightly's record. Tests: `tests/unit/orchestration/test_merge_queue_speed.py`.
@@ -44,17 +44,22 @@ index 182452c5..b1357d33 100644
 +- **The head without the batch is never rebuilt.** A red the baseline cleared, or one the batch may own, is first
 +  judged from the nightly of exactly that head (its `run.txt` names it, it has a verdict and JUnit files): green there
 +  means not on the head; red alone there with the same failure means on the head only for a red that would stop the
-+  queue, never to keep one cleared. Otherwise the case is re-run alone, `--rounds` rounds, as before, in the
-+  integration store's ready tree (a worktree already built at that head), under a shared hold of the store's lock;
-+  a store behind the head is refreshed first (its standby half, incrementally), and a Stop if it still is not at the
-+  head. A run that changes that tree is undone (`checkout --force`, `clean -fdq`, the ignored stores kept) and named.
++  queue, never to keep one cleared. Otherwise the case is re-run alone, `--rounds` rounds, as before, in a throwaway
++  detached worktree of that head (`git worktree add --detach <work>/head-<id>-<n>`), made in the run's work folder,
++  holding a copy of the integration store's stores (the whole store, the same commit: nothing embedded; copied under a
++  shared hold of the store's lock, the only time it is held) and its code index made anew. Nothing ever runs in the
++  integration store's own tree (review of 2026-11-02, A1, A2). The throwaway tree is checked before every case against
++  its state when made (HEAD, changes, ignored files, its stores' stamps); a case that changed it gets a new one. The
++  run removes its own throwaway worktrees (`git worktree remove --force`, only paths named `head-*` in its work
++  folder); one a killed run left is removed at the next run's start. A store behind the head is refreshed first (its
++  standby half, incrementally), and a Stop if it still is not at the head.
 +  With no `--base`, the trace against the head without the batch runs there too. The `alt` clone is built only at the
 +  baseline (a red its nightly's record does not clear) and for the culprit search.
 +- Tests: `tests/unit/orchestration/test_merge_queue_seed.py`; the seeder's: `.gov-runtime/scratch/orchestrator/tools/test_seed_store.py`.
-diff --git a/governance/project/orchestration/tools/merge_queue.py b/governance/project/orchestration/tools/merge_queue.py
-index c82f8c07..5b87033a 100644
---- a/governance/project/orchestration/tools/merge_queue.py
-+++ b/governance/project/orchestration/tools/merge_queue.py
+diff --git a/a/governance/project/orchestration/tools/merge_queue.py b/b/governance/project/orchestration/tools/merge_queue.py
+index c82f8c0..2350254 100644
+--- a/a/governance/project/orchestration/tools/merge_queue.py
++++ b/b/governance/project/orchestration/tools/merge_queue.py
 @@ -8,6 +8,10 @@ tested. On red the branch stays; the ticket that caused the red is ejected, the
      python3 merge_queue.py approve --queue <dir> --ticket <W2> --by <who>
      python3 merge_queue.py run --repo <repo> --queue <dir> [--integration <branch>] [--work <dir>] [--test-cmd <cmd>]
@@ -66,7 +71,7 @@ index c82f8c07..5b87033a 100644
  
  Exit codes of run: 0 every approved entry landed (or none); 3 at least one ejected; 4 a step could not be done, or
  another run holds the queue's lock (entries kept, the branch unmoved by that step). See README.md beside this file.
-@@ -31,6 +35,12 @@ ORCH_TOOLS = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scrat
+@@ -31,6 +35,14 @@ ORCH_TOOLS = Path("/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scrat
  WORK = Path.home() / "gov-os-runs/W2-00/merge-queue"
  REBUILD_LOCK = "/tmp/gov-os-rebuild.lock"
  REBUILD_SLOT = ORCH_TOOLS / "rebuild_slot.sh"  # DEC-1001 (d): a rebuild in a heavy-job slot, a lock of its own tree
@@ -76,10 +81,12 @@ index c82f8c07..5b87033a 100644
 +SEEDER = Path(os.environ.get("MERGE_QUEUE_SEEDER") or ORCH_TOOLS / "seed_store.py")
 +REFRESH = Path(os.environ.get("MERGE_QUEUE_REFRESH") or ORCH_TOOLS / "refresh_integration_store.sh")
 +STORE_REL = ".gov-runtime/store.db"
++QUERY_REL = ".gov-runtime/query-vector-cache.db"
++HEAD_TREE = "head-"  # the throwaway worktrees of the head without the batch: <work>/head-<id>-<n>
  SLOT = ORCH_TOOLS / "verify_lock.sh"  # a heavy-job slot (DEC-979 D1, DEC-983): waits for one, exits with the run's code
  NODE = "/home/usain/.nvm/versions/node/v22.23.3/bin"
  MAP_REL = "governance/project/test-map.yaml"
-@@ -227,7 +237,18 @@ def record_only_change(names, places):
+@@ -227,7 +239,18 @@ def record_only_change(names, places):
  
  
  def failing_cases(xml_paths, where, targets):
@@ -99,7 +106,7 @@ index c82f8c07..5b87033a 100644
      relative to its rootdir, which without an ini file is the targets' common folder: each folder from there up to
      `where` is tried for the file the dotted classname names."""
      where = Path(where)
-@@ -249,7 +270,8 @@ def failing_cases(xml_paths, where, targets):
+@@ -249,7 +272,8 @@ def failing_cases(xml_paths, where, targets):
      out = []
      for p in xml_paths:
          for case in ET.parse(p).iter("testcase"):
@@ -109,7 +116,7 @@ index c82f8c07..5b87033a 100644
                  continue
              if case.get("file"):
                  node = f"{case.get('file')}::{case.get('name')}"
-@@ -257,7 +279,7 @@ def failing_cases(xml_paths, where, targets):
+@@ -257,7 +281,7 @@ def failing_cases(xml_paths, where, targets):
                  node = locate(case.get("classname").split("."), case.get("name"))
              else:  # a collection error: pytest names the module (dotted) in `name`
                  node = locate(case.get("name", "").split("."), None)
@@ -118,7 +125,61 @@ index c82f8c07..5b87033a 100644
      return out
  
  
-@@ -372,6 +394,13 @@ class Queue:
+@@ -314,6 +338,53 @@ def totals(xml_paths):
+     return t
+ 
+ 
++def copy_store_file(source, target):
++    """One store file copied: an SQLite file through its backup (a consistent state while it may be read), any other
++    file as bytes; the target replaced whole."""
++    import sqlite3
++    target.parent.mkdir(parents=True, exist_ok=True)
++    tmp = target.with_name(target.name + ".copy")
++    with open(source, "rb") as f:
++        is_sqlite = f.read(16) == b"SQLite format 3\0"
++    if is_sqlite:
++        reading = sqlite3.connect(Path(source).resolve().as_uri() + "?mode=ro", uri=True, timeout=60.0)
++        try:
++            writing = sqlite3.connect(tmp, timeout=60.0)
++            try:
++                reading.backup(writing)
++            finally:
++                writing.close()
++        finally:
++            reading.close()
++    else:
++        shutil.copyfile(source, tmp)
++    os.replace(tmp, target)
++
++
++def snapshot(tree):
++    """A tree's state for the re-runs: HEAD, its tracked and untracked changes, its ignored entries (caches left out)
++    and the stamps of every file under .gov-runtime. Any difference: the tree is not used again."""
++    def git_out(*a):
++        return subprocess.run(["git", "-C", str(tree), *a], capture_output=True, text=True).stdout
++    ignored = sorted(x for x in git_out("status", "--porcelain", "--ignored", "-uall").splitlines()
++                     if not re.search(r"(__pycache__/|\.pyc$|\.pytest_cache/|^!! \.gov-runtime/)", x))
++    stamps = []
++    rt = Path(tree) / ".gov-runtime"
++    for p in sorted(rt.rglob("*")) if rt.is_dir() else []:
++        rel = str(p.relative_to(tree))
++        # left out: SQLite's shared-memory index and an empty write-ahead log (a reader makes them), the query-vector
++        # cache (a search writes it; it changes no answer) and the code-graph tool's logs
++        if rel.endswith("-shm") or (rel.endswith("-wal") and p.is_file() and p.stat().st_size == 0) \
++                or QUERY_REL in rel or "/codeintel/home/logs" in "/" + rel:
++            continue
++        try:
++            st = p.lstat()
++            stamps.append((str(p.relative_to(tree)), st.st_size, st.st_mtime_ns))
++        except OSError:
++            stamps.append((str(p), None, None))
++    return git_out("rev-parse", "HEAD").strip(), tuple(ignored), tuple(stamps)
++
++
+ # ---- the queue folder ---------------------------------------------------------------------------------------------
+ 
+ class Stop(Exception):
+@@ -372,6 +443,14 @@ class Queue:
          self.rounds = a.rounds
          self.ejected, self.handled, self.n, self.with_rc = [], set(), 0, {}
          self.log = self.work = self.clone = self.alt = self.base = self._base_record = None
@@ -129,10 +190,11 @@ index c82f8c07..5b87033a 100644
 +        self.store = Path(store).expanduser() if store else None
 +        self.built = {}  # tree -> the commit its stores were last rebuilt at, successfully, in this run
 +        self._head_record = {}  # head -> the nightly's record of exactly that head (or None)
++        self.head_trees, self.head_trees_made = {}, []  # head -> (throwaway worktree, its state when made)
          name = sh(["git", "-C", str(self.repo), "config", "user.name"]).stdout.strip()
          email = sh(["git", "-C", str(self.repo), "config", "user.email"]).stdout.strip()
          self.ident = ["-c", f"user.name={name or 'orchestrator'}", "-c", f"user.email={email or 'orchestrator@localhost'}"]
-@@ -494,12 +523,48 @@ class Queue:
+@@ -494,12 +573,48 @@ class Queue:
              merged.append((e, self.git(where, "rev-parse", "HEAD")))
          return merged, failed
  
@@ -183,7 +245,7 @@ index c82f8c07..5b87033a 100644
          return r.returncode == 0
  
      # -- the tests
-@@ -628,43 +693,66 @@ class Queue:
+@@ -628,43 +743,55 @@ class Queue:
                  need.append(node)
          reds = need
          if reds:
@@ -193,16 +255,6 @@ index c82f8c07..5b87033a 100644
 -            self.build(self.alt, self.base or head, [])
 -            if not self.prepared(self.alt):
 -                raise Stop(f"the prepare command failed on {where}")
--            for node in reds:
--                verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(self.alt, node),
--                                        self.rounds)
--                if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
--                    kw, kb = self.kinds(self.clone, node), self.kinds(self.alt, node)
--                    if not same_failure(kw, kb):
--                        verdict = "owned"
--                        self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
--                out[verdict].append(node)
--                self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
 +            # its reds known), never against code made by undoing merges; without it, the head without the batch,
 +            # which is never rebuilt where the integration store is given (DEC-1032 (iv), head_tree).
 +            if self.base:
@@ -210,24 +262,19 @@ index c82f8c07..5b87033a 100644
 +                self.build(self.alt, self.base, [])
 +                if not self.prepared(self.alt):
 +                    raise Stop(f"the prepare command failed on {where}")
-+                other, hold = self.alt, None
-+            else:
-+                other, hold = self.head_held(head)
-+            try:
-+                for node in reds:
-+                    verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(other, node),
-+                                            self.rounds)
-+                    if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
-+                        kw, kb = self.kinds(self.clone, node), self.kinds(other, node)
-+                        if not same_failure(kw, kb):
-+                            verdict = "owned"
-+                            self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
-+                    out[verdict].append(node)
-+                    self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
-+            finally:
-+                self.restore(other, head)
-+                if hold:
-+                    hold.close()
+             for node in reds:
+-                verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(self.alt, node),
++                other = self.alt if self.base else self.head_tree(head)  # a throwaway tree, checked before each case
++                verdict, c = trace_node(lambda: self.alone(self.clone, node), lambda: self.alone(other, node),
+                                         self.rounds)
+                 if self.base and verdict == "unowned":  # cleared only if it fails there the same way (DEC-989)
+-                    kw, kb = self.kinds(self.clone, node), self.kinds(self.alt, node)
++                    kw, kb = self.kinds(self.clone, node), self.kinds(other, node)
+                     if not same_failure(kw, kb):
+                         verdict = "owned"
+                         self.note(f"red at {where} too but not the same failure ({kw} here, {kb} there): {node}")
+                 out[verdict].append(node)
+                 self.note(f"red alone, traced against {where} ({c}): {verdict}: {node}")
          if self.base and (out["owned"] or out["unowned"]):
 -            self.alt = self.alt or self.fresh("alt")
              # The head without the batch decides the rest (code that exists; nothing is undone). A red the
@@ -244,8 +291,9 @@ index c82f8c07..5b87033a 100644
 -                    same_failure(self.kinds(self.alt, n), self.kinds(self.clone, n))
 +            # DEC-1032 (iv): that head is never rebuilt: the nightly's record of exactly that head answers first (a
 +            # case green there is not on the head; a case red alone there with the same failure is, for a red that
-+            # would stop the queue, never for one it would clear), else the case is re-run alone, as before, on the
-+            # integration store's tree, already built at that head (head_tree).
++            # would stop the queue, never for one it would clear), else the case is re-run alone, as before, in a
++            # throwaway worktree of that head holding the integration store's stores (head_tree): never in the
++            # integration store's own tree.
 +            def on_head(n, clearing):
 +                known = self.head_known(head, n)
 +                if known == "passed":
@@ -255,14 +303,9 @@ index c82f8c07..5b87033a 100644
 +                    self.note(f"red alone on the head without the batch in that head's own nightly, the same "
 +                              f"failure ({known}; no run): {n}")
 +                    return True
-+                tree, hold = self.head_held(head)
-+                try:
-+                    return red_alone(lambda: self.alone(tree, n), self.rounds) and \
-+                        same_failure(self.kinds(tree, n), self.kinds(self.clone, n))
-+                finally:
-+                    self.restore(tree, head)
-+                    if hold:
-+                        hold.close()
++                tree = self.head_tree(head)
++                return red_alone(lambda: self.alone(tree, n), self.rounds) and \
++                    same_failure(self.kinds(tree, n), self.kinds(self.clone, n))
              for n in list(out["unowned"]):
 -                if not on_head(n):
 +                if not on_head(n, clearing=True):
@@ -275,7 +318,7 @@ index c82f8c07..5b87033a 100644
              if since:
                  rest = [n for n in out["owned"] if n not in since]
                  raise Stop(f"red since the baseline {self.base[:12]}, already on {head[:12]} without the batch "
-@@ -702,6 +790,183 @@ class Queue:
+@@ -702,6 +829,212 @@ class Queue:
          _, junits = self.tests(where, "alone", [node])
          return failure_kinds(junits)
  
@@ -284,11 +327,15 @@ index c82f8c07..5b87033a 100644
 +        return self.store.with_name(self.store.name + ".lock")  # refresh_integration_store.sh takes the same
 +
 +    def head_tree(self, head):
-+        """A tree at `head` (the head without the batch) whose stores are built, never rebuilt here: the integration
-+        store's ready tree when it is at that head; when it is not, its normal refresh first (its standby half,
-+        incrementally, then the link moved), and a Stop if it still is not. It is used under a shared hold of the
-+        store's lock (hold_store), so no refresh moves it meanwhile. Without --integration-store, the earlier way:
-+        the alt clone checked out and rebuilt at the head (once per head while it stays there)."""
++        """A tree at `head` (the head without the batch) with its stores, never rebuilt and never the integration
++        store's own tree (review of 2026-11-02, A1, A2): a throwaway detached worktree of `head`, made in this run's
++        work folder, holding a copy of the integration store's stores built at that head (the whole store, the same
++        commit: nothing to embed) and its code index made anew (no embedding). It is checked before every use against
++        its state when made (HEAD, no tracked or untracked change, the same ignored files, its stores' stamps); a
++        case that changed anything gets a new one. Removed when the run ends (remove_head_trees); one a killed run
++        left is removed at the next run's start (sweep_head_trees). When the integration store is not at `head`: its
++        normal refresh first, and a Stop if it still is not. Without --integration-store, the earlier way: the alt
++        clone checked out and rebuilt at the head (once per head while it stays there)."""
 +        if self.store is None:
 +            if self.alt and self.built.get(str(self.alt)) == head and \
 +                    sh(["git", "-C", str(self.alt), "rev-parse", "HEAD"]).stdout.strip() == head:
@@ -298,52 +345,77 @@ index c82f8c07..5b87033a 100644
 +            if not self.prepared(self.alt):
 +                raise Stop("the prepare command failed on the head without the batch")
 +            return self.alt
++        have = self.head_trees.get(head)
++        if have:
++            if snapshot(have[0]) == have[1]:
++                return have[0]
++            self.note(f"a re-run changed the throwaway tree {have[0].name}: a new one is made")
++            self.remove_head_tree(have[0])
++            del self.head_trees[head]
++        tree = self.work / f"{HEAD_TREE}{head[:12]}-{len(self.head_trees_made)}"
++        self.head_trees_made.append(tree)
++        r = sh(["git", "-C", str(self.repo), "worktree", "add", "-q", "--detach", str(tree), head])
++        if r.returncode:
++            raise Stop(f"the throwaway worktree of the head {head[:12]} cannot be added: {r.stderr.strip()[:200]}")
++        copied = self.copy_head_stores(head, tree)
++        index = sh([sys.executable, "-c", "import sys; from gov.codeintel import index; index(sys.argv[1])", str(tree)],
++                   cwd=tree, env=self.env(tree))
++        self.note(f"the head without the batch: a throwaway worktree {tree.name} at {head[:12]} with the integration "
++                  f"store's stores ({', '.join(copied)}; no rebuild, nothing embedded); its code index "
++                  + ("made anew" if index.returncode == 0 else f"not made ({(index.stderr.strip().splitlines() or ['?'])[-1][:120]})"))
++        self.head_trees[head] = (tree, snapshot(tree))
++        return tree
++
++    def copy_head_stores(self, head, tree):
++        """The integration store's stores, built at `head`, copied into `tree` under a shared hold of the store's lock
++        (a refresh or a promotion takes it whole, so the ready half cannot move while it is copied); only read there.
++        A store behind the head is refreshed first (its standby half, incrementally), then a Stop if it still is not.
++        Returns the files copied."""
 +        for attempt in (0, 1):
-+            tree = self.store.resolve()
-+            at = sh(["git", "-C", str(tree), "rev-parse", "HEAD"]).stdout.strip()
-+            if at == head and (tree / STORE_REL).is_file():
-+                if getattr(self, "_head_noted", None) != (str(tree), head):
-+                    self._head_noted = (str(tree), head)
-+                    self.note(f"the head without the batch: the integration store's tree {tree}, already built at "
-+                              f"{head[:12]} (no rebuild)")
-+                return tree
++            ready = self.store.resolve()
++            with open(self.store_lock(), "a") as hold:
++                fcntl.flock(hold, fcntl.LOCK_SH)
++                ready = self.store.resolve()
++                at = sh(["git", "-C", str(ready), "rev-parse", "HEAD"]).stdout.strip()
++                if at == head and (ready / STORE_REL).is_file():
++                    copied = []
++                    for rel in (STORE_REL, QUERY_REL):
++                        if (ready / rel).is_file():
++                            copy_store_file(ready / rel, tree / rel)
++                            copied.append(rel)
++                    return copied
 +            if attempt == 0:
-+                self.note(f"the integration store {tree} is at {at[:12] or 'an unreadable head'}, not at the head "
++                self.note(f"the integration store {ready} is at {at[:12] or 'an unreadable head'}, not at the head "
 +                          f"{head[:12]}: its normal refresh first (its standby half, incrementally; no clone rebuilt)")
 +                if not self.refresh(wait=True):
 +                    break
 +        raise Stop(f"the head without the batch cannot be judged without rebuilding a clone: the integration store "
 +                   f"{self.store} is not at {head[:12]} and its refresh did not bring it there")
 +
-+    def head_held(self, head):
-+        """head_tree's tree and a shared hold of the integration store's lock while cases run in it (a refresh or a
-+        promotion takes the lock whole, so neither moves the tree under a run; none for the queue's own clones):
-+        (tree, the open lock file to close, or None). The tree is checked again under the hold."""
-+        for _ in range(3):
-+            tree = self.head_tree(head)
-+            if self.store is None or tree in (self.clone, self.alt):
-+                return tree, None
-+            f = open(self.store_lock(), "a")
-+            fcntl.flock(f, fcntl.LOCK_SH)
-+            if sh(["git", "-C", str(tree), "rev-parse", "HEAD"]).stdout.strip() == head:
-+                return tree, f
-+            f.close()  # moved between the look and the hold: looked at again
-+        raise Stop(f"the integration store's tree kept moving away from {head[:12]}")
-+
-+    def restore(self, tree, head):
-+        """The integration store's tree left as found after cases ran in it: at `head`, no tracked change and no
-+        untracked file (its ignored stores kept); a test that changed it is named. The queue's own clones are not
-+        touched here."""
-+        if self.store is None or tree is None or tree in (self.clone, self.alt):
++    def remove_head_tree(self, tree):
++        """One throwaway worktree of this queue's own removed (git worktree remove --force); never another path."""
++        if not tree.name.startswith(HEAD_TREE):
 +            return
-+        at = sh(["git", "-C", str(tree), "rev-parse", "HEAD"]).stdout.strip()
-+        dirty = sh(["git", "-C", str(tree), "status", "--porcelain"]).stdout.strip()
-+        if at != head or dirty:
-+            sh(["git", "-C", str(tree), "checkout", "-q", "--force", "--detach", head])
-+            sh(["git", "-C", str(tree), "clean", "-fdq"])
-+            self.note(f"a re-run changed the integration store's tree {tree} ("
-+                      + ("moved to " + at[:12] if at != head else "") + (" " if at != head and dirty else "")
-+                      + ("files: " + dirty.replace(chr(10), "; ")[:200] if dirty else "") + f"): restored to {head[:12]}")
++        sh(["git", "-C", str(self.repo), "worktree", "remove", "--force", str(tree)])
++        shutil.rmtree(tree, ignore_errors=True)
++
++    def remove_head_trees(self):
++        for tree in self.head_trees_made:
++            self.remove_head_tree(tree)
++        sh(["git", "-C", str(self.repo), "worktree", "prune"])
++
++    def sweep_head_trees(self, root):
++        """The throwaway worktrees a killed run left (their path: <work root>/<stamp>/head-..., registered in this
++        repository) removed before this run makes any; nothing else is touched."""
++        root, cur = Path(root).resolve(), None
++        for line in sh(["git", "-C", str(self.repo), "worktree", "list", "--porcelain"]).stdout.splitlines():
++            if not line.startswith("worktree "):
++                continue
++            path = Path(line[len("worktree "):])
++            if path.parent.parent == root and path.name.startswith(HEAD_TREE) and path.parent != self.work:
++                self.note(f"a throwaway worktree a killed run left removed: {path}")
++                self.remove_head_tree(path)
++        sh(["git", "-C", str(self.repo), "worktree", "prune"])
 +
 +    def head_known(self, head, node):
 +        """What the nightly of exactly `head` (its run file's `head <id>` line; its JUnit folder beside the others;
@@ -459,7 +531,7 @@ index c82f8c07..5b87033a 100644
      def culprits(self, head, merged, owned):
          """DEC-979 item 3: eject only the tickets that caused the reds; the rest are returned for a new run."""
          entries = [e for e, _ in merged]
-@@ -712,6 +977,7 @@ class Queue:
+@@ -712,6 +1045,7 @@ class Queue:
                                        "closed)", head)
          files = {e["ticket"]: set(self.git(self.clone, "diff", "--name-only", m + "^1", m).split()) for e, m in merged}
          cur = {}
@@ -467,7 +539,7 @@ index c82f8c07..5b87033a 100644
  
          def prepare(cand):
              cur["c"] = cand
-@@ -803,6 +1069,7 @@ class Queue:
+@@ -803,6 +1137,7 @@ class Queue:
              else:
                  self.advance(head, result)
                  self._landed(head, result, merged, skipped, out, light, started)
@@ -475,7 +547,24 @@ index c82f8c07..5b87033a 100644
                  return
              pending = [e for e, _ in merged]
              continue
-@@ -944,6 +1211,12 @@ def main(argv=None):
+@@ -883,6 +1218,8 @@ class Queue:
+                 self.log.mkdir(parents=True)
+                 self.work = Path(self.a.work or WORK).resolve() / stamp
+                 self.work.mkdir(parents=True)
++                if self.store is not None:
++                    self.sweep_head_trees(self.work.parent)
+                 self.clone = self.fresh("merged")
+             self.handled.update(e["ticket"] for e in pending)
+             self.batch(pending, started)
+@@ -916,6 +1253,7 @@ def run(a):
+         return 4
+     finally:
+         if q.work:
++            q.remove_head_trees()  # its own throwaway worktrees, before their folder goes
+             shutil.rmtree(q.work, ignore_errors=True)
+         lock.close()
+ 
+@@ -944,6 +1282,12 @@ def main(argv=None):
      r.add_argument("--base-run", help="the baseline nightly's run file, whose `red-alone <case>:` lines it reads")
      r.add_argument("--base", help="the known state reds are traced against: the last nightly with a verdict until a "
                                    "green one after ACT 1, then the last green one (DEC-989); default the head")
@@ -488,3 +577,427 @@ index c82f8c07..5b87033a 100644
      a = ap.parse_args(argv)
      return {"enqueue": enqueue, "approve": approve, "run": run}[a.cmd](a)
  
+diff --git a/b/test_merge_queue_seed.py b/b/test_merge_queue_seed.py
+new file mode 100644
+index 0000000..18a9103
+--- /dev/null
++++ b/b/test_merge_queue_seed.py
+@@ -0,0 +1,418 @@
++"""The merge queue without cold rebuilds (owner, DEC-1032 step (iv)): a clone with no store is seeded from the
++integration store before its first rebuild; the landed result's stores become the integration store's (heads equal),
++else its normal refresh; the head without the batch is read from that head's nightly or re-run on the integration
++store's tree, never rebuilt. Planted repositories, a planted integration store (two worktrees behind a link) and stub
++seeder, prepare and refresh commands only: nothing here touches this repository's branches, its stores, the real
++integration store or ~/gov-os-runs."""
++import importlib.util
++import json
++import os
++import subprocess
++import sys
++import time
++from pathlib import Path
++from types import SimpleNamespace
++
++import pytest
++
++TOOL = Path(os.environ.get("MQ_TOOL") or Path(__file__).resolve().parents[3]
++            / "governance/project/orchestration/tools/merge_queue.py")
++_spec = importlib.util.spec_from_file_location("merge_queue_seed", TOOL)
++mq = importlib.util.module_from_spec(_spec)
++_spec.loader.exec_module(mq)
++
++SELECT = ("import json, sys\n"
++          "print(json.dumps({'scope': 'scoped', 'selected': [{'target': 'tests'}], 'pytest_options': [],\n"
++          "                  'core_changed': [], 'unplaced': []}))\n")
++# The prepare stand-in: one line per call (the tree, its head, its arguments); it leaves a store naming that head.
++PREPARE = ("import json, os, pathlib, subprocess, sys\n"
++           "head = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()\n"
++           "open(os.environ['MQ_T_PREPARES'], 'a').write(json.dumps([os.getcwd(), head, sys.argv[1:]]) + '\\n')\n"
++           "p = pathlib.Path('.gov-runtime/store.db')\n"
++           "p.parent.mkdir(exist_ok=True)\n"
++           "p.write_text('built at ' + head)\n")
++# The seeder stand-in: seed_store.py's answer; copies the base's store (the link followed) unless the tree has one.
++SEEDER = ("import json, os, pathlib, shutil, sys\n"
++          "open(os.environ['MQ_T_SEEDS'], 'a').write(json.dumps(sys.argv[1:]) + '\\n')\n"
++          "if os.environ.get('MQ_T_SEED_FAIL'):\n"
++          "    sys.exit('the seeder broke')\n"
++          "tree, base = pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[sys.argv.index('--base') + 1]).resolve()\n"
++          "if os.environ.get('MQ_T_PRODUCT'):\n"
++          "    print(json.dumps({'mode': 'product', 'status': 'deferred', 'rebuild_args': ['--seed', str(base)]}))\n"
++          "    sys.exit(0)\n"
++          "dst = tree / '.gov-runtime/store.db'\n"
++          "if dst.exists() and '--replace' not in sys.argv:\n"
++          "    print(json.dumps({'mode': 'copy', 'status': 'none', 'reason': 'own store', 'rebuild_args': []}))\n"
++          "    sys.exit(0)\n"
++          "dst.parent.mkdir(exist_ok=True)\n"
++          "shutil.copy(base / '.gov-runtime/store.db', dst)\n"
++          "print(json.dumps({'mode': 'copy', 'status': 'seeded', 'kept': 'whole store', 'vectors': 1,\n"
++          "                  'rebuild_args': []}))\n")
++# The refresh stand-in (refresh_integration_store.sh's contract): the standby half built at the ref, the link moved.
++REFRESH = ('#!/usr/bin/env bash\n'
++           'echo refresh >> "$MQ_T_REFRESHES"\n'
++           'want=$(git -C "$GOV_STORE_REPO" rev-parse "$GOV_STORE_REF")\n'
++           'cur=$(readlink -f "$GOV_STORE_LINK")\n'
++           'case "$cur" in *-a) next=$GOV_STORE_LINK-b ;; *) next=$GOV_STORE_LINK-a ;; esac\n'
++           'git -C "$next" checkout -q --force --detach "$want" || exit 2\n'
++           'mkdir -p "$next/.gov-runtime" && echo "refreshed at $want" > "$next/.gov-runtime/store.db"\n'
++           'ln -sfn "$next" "$GOV_STORE_LINK.tmp" && mv -T "$GOV_STORE_LINK.tmp" "$GOV_STORE_LINK"\n')
++PYTEST = f"{sys.executable} -m pytest -q -p no:cacheprovider"
++OK = "def test_ok():\n    pass\n"
++THROWAWAY = "the head without the batch: a throwaway worktree"
++ASSERT_RED = "def test_known():\n    assert False\n"
++VALUE_RED = "def test_known():\n    raise ValueError('x')\n"
++
++
++def git(d, *a):
++    return subprocess.run(["git", "-C", str(d), "-c", "user.name=t", "-c", "user.email=t@t", *a],
++                          capture_output=True, text=True, check=True).stdout.strip()
++
++
++def commit(d, files, msg, task=None):
++    for rel, text in files.items():
++        p = d / rel
++        p.parent.mkdir(parents=True, exist_ok=True)
++        p.write_text(text)
++    git(d, "add", "-A")
++    git(d, "commit", "-q", "-m", msg, *(["--trailer", f"Task: {task}"] if task else []))
++    return git(d, "rev-parse", "HEAD")
++
++
++@pytest.fixture
++def w(tmp_path, monkeypatch):
++    repo = tmp_path / "repo"
++    repo.mkdir()
++    git(repo, "init", "-q", "-b", "main")
++    root = commit(repo, {"tests/test_ok.py": OK, ".gitignore": ".gov-runtime/\n__pycache__/\n"}, "root")
++    git(repo, "checkout", "-q", "-b", "w2/integrate")
++    git(repo, "checkout", "-q", "main")
++    files = {}
++    for name, text in (("select.py", SELECT), ("prepare.py", PREPARE), ("seeder.py", SEEDER), ("refresh.sh", REFRESH)):
++        files[name] = tmp_path / name
++        files[name].write_text(text)
++    link = tmp_path / "wt" / "store"
++    link.parent.mkdir()
++    for half in ("a", "b"):
++        git(repo, "worktree", "add", "-q", "--detach", str(link) + "-" + half, root)
++        (Path(str(link) + "-" + half) / ".gov-runtime").mkdir()
++        (Path(str(link) + "-" + half) / ".gov-runtime/store.db").write_text(f"built at {root}")
++    link.symlink_to(str(link) + "-a")
++    env = {"MQ_T_PREPARES": tmp_path / "prepares.jsonl", "MQ_T_SEEDS": tmp_path / "seeds.jsonl",
++           "MQ_T_REFRESHES": tmp_path / "refreshes.txt", "MERGE_QUEUE_SEEDER": files["seeder.py"],
++           "MERGE_QUEUE_REFRESH": files["refresh.sh"]}
++    for k, v in env.items():
++        monkeypatch.setenv(k, str(v))
++    return SimpleNamespace(tmp=tmp_path, repo=repo, root=root, q=tmp_path / "q", link=link, f=files)
++
++
++def on_integrate(w, files, msg):
++    git(w.repo, "checkout", "-q", "w2/integrate")
++    c = commit(w.repo, files, msg)
++    git(w.repo, "checkout", "-q", "main")
++    return c
++
++
++def ticket(w, name, files, start=None):
++    git(w.repo, "checkout", "-q", "-b", f"w2/{name}", start or w.root)
++    c = commit(w.repo, files, f"{name} work", f"T-{name}")
++    git(w.repo, "checkout", "-q", "main")
++    return c
++
++
++def tool(*args):
++    return subprocess.run([sys.executable, str(TOOL), *map(str, args)], capture_output=True, text=True)
++
++
++def enter(w, name, c):
++    assert tool("enqueue", "--queue", w.q, "--ticket", name, "--task", f"T-{name}", "--branch", f"w2/{name}",
++                "--commit", c, "--repo", w.repo).returncode == 0
++    assert tool("approve", "--queue", w.q, "--ticket", name, "--by", "CTO").returncode == 0
++
++
++def run(w, *extra, store=True):
++    return tool("run", "--repo", w.repo, "--queue", w.q, "--work", w.tmp / "work", "--test-cmd", PYTEST,
++                "--select-cmd", f"{sys.executable} {w.f['select.py']}",
++                "--prepare-cmd", f"{sys.executable} {w.f['prepare.py']}", "--rounds", "1",
++                *(["--integration-store", w.link] if store else []), *extra)
++
++
++def store_at(w, commit_id):
++    """The integration store's ready half moved to `commit_id`, built there (as a refresh leaves it)."""
++    tree = w.link.resolve()
++    git(tree, "checkout", "-q", "--force", "--detach", commit_id)
++    (tree / ".gov-runtime/store.db").write_text(f"built at {commit_id}")
++
++
++def head(w):
++    return git(w.repo, "rev-parse", "w2/integrate")
++
++
++def record(w):
++    return json.loads((w.q / "records" / f"{head(w)[:12]}.json").read_text())
++
++
++def lines(path):
++    return [json.loads(x) for x in Path(path).read_text().splitlines()] if Path(path).exists() else []
++
++
++def prepares(w):
++    return lines(w.tmp / "prepares.jsonl")
++
++
++def refreshes(w, wait=0.0):
++    p = w.tmp / "refreshes.txt"
++    end = time.time() + wait
++    while wait and not p.exists() and time.time() < end:
++        time.sleep(0.1)
++    return len(p.read_text().split()) if p.exists() else 0
++
++
++def landed_ticket(w):
++    """A ticket whose merge is not its approved commit's code (integrate moved since it started), so the run is
++    not skipped and the merged clone is rebuilt at the landed commit."""
++    later = on_integrate(w, {"src/later.py": "X = 1\n"}, "an unrelated merge")
++    store_at(w, later)
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
++    return later
++
++
++# ---- the seed ----------------------------------------------------------------------------------------------------
++
++def test_a_clone_without_a_store_is_seeded_before_its_first_rebuild(w):
++    landed_ticket(w)
++    r = run(w)
++    assert r.returncode == 0, r.stdout + r.stderr
++    seeds = lines(w.tmp / "seeds.jsonl")
++    assert seeds[0][0] == "seed" and seeds[0][1].endswith("/merged") and \
++        seeds[0][seeds[0].index("--base") + 1] == str(w.link)
++    assert "seed of merged from" in r.stdout and ": seeded (copy)" in r.stdout
++    first = prepares(w)[0]
++    assert first[0].endswith("/merged") and first[2] == []  # a copy seed: the rebuild itself takes no argument
++
++
++def test_in_product_mode_the_rebuild_gets_the_products_seed(w, monkeypatch):
++    monkeypatch.setenv("MQ_T_PRODUCT", "1")
++    landed_ticket(w)
++    r = run(w)
++    assert r.returncode == 0, r.stdout + r.stderr
++    first = prepares(w)[0]
++    assert first[0].endswith("/merged") and first[2] == ["--seed", str(w.link) + "-a"]  # the ready half then
++
++
++def test_a_seeder_that_fails_leaves_the_normal_rebuild_named(w, monkeypatch):
++    monkeypatch.setenv("MQ_T_SEED_FAIL", "1")
++    landed_ticket(w)
++    r = run(w)
++    assert r.returncode == 0, r.stdout + r.stderr
++    assert "seed of merged not applied" in r.stdout and "a normal rebuild" in r.stdout
++    assert prepares(w)[0][2] == []
++
++
++def test_without_the_integration_store_nothing_is_seeded(w):
++    landed_ticket(w)
++    assert run(w, store=False).returncode == 0
++    assert not lines(w.tmp / "seeds.jsonl") and refreshes(w) == 0
++
++
++# ---- the promotion -----------------------------------------------------------------------------------------------
++
++def test_the_landed_result_is_promoted_into_the_standby_half_and_the_link_moves(w):
++    landed_ticket(w)
++    r = run(w)
++    assert r.returncode == 0, r.stdout + r.stderr
++    new = head(w)
++    standby = Path(str(w.link) + "-b")
++    assert w.link.resolve() == standby.resolve() and git(standby, "rev-parse", "HEAD") == new
++    assert "integration store promoted" in r.stdout
++    seed = lines(w.tmp / "seeds.jsonl")[-1]
++    assert seed[1] == str(standby) and "--replace" in seed and seed[seed.index("--base") + 1].endswith("/merged")
++    assert prepares(w)[-1][:2] == [str(standby), new]  # the rebuild that finds nothing to embed, at the landed head
++    assert refreshes(w, wait=1.0) == 0  # the integration store's own refresh not needed
++
++
++def test_a_skipped_run_is_not_promoted_and_the_normal_refresh_runs(w):
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))  # its merge is its own code: the run is skipped
++    r = run(w)
++    assert r.returncode == 0 and "run skipped" in r.stdout, r.stdout + r.stderr
++    assert "integration store not promoted: the merged clone's stores were not rebuilt" in r.stdout
++    assert refreshes(w, wait=20.0) == 1
++
++
++def test_a_held_store_lock_is_not_waited_for_and_the_refresh_runs(w):
++    import fcntl
++    landed_ticket(w)
++    with open(str(w.link) + ".lock", "a") as lock:
++        fcntl.flock(lock, fcntl.LOCK_EX)
++        r = run(w)
++    assert r.returncode == 0 and "a refresh holds the integration store's lock" in r.stdout, r.stdout
++    assert "integration store promoted" not in r.stdout and refreshes(w, wait=20.0) == 1  # the refresh, not us
++
++
++# ---- the head without the batch: never rebuilt ---------------------------------------------------------------------
++
++def no_rebuild_but_the_merged_and_the_promotion(w, base=None):
++    """No prepare ran in an alt clone, nor in the tree the head without the batch was re-run in."""
++    trees = [Path(p[0]).name for p in prepares(w)]
++    assert "alt" not in trees or base, trees
++    return trees
++
++
++def test_a_red_the_baseline_had_is_judged_on_the_integration_stores_tree_without_a_rebuild(w):
++    base = on_integrate(w, {"tests/test_known.py": ASSERT_RED}, "a known red at the nightly")
++    later = on_integrate(w, {"src/later.py": "X = 1\n"}, "a later merge")
++    store_at(w, later)
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
++    r = run(w, "--base", base)
++    assert r.returncode == 0, r.stdout + r.stderr
++    assert record(w)["unowned"] == ["tests/test_known.py::test_known"]
++    assert THROWAWAY in r.stdout
++    trees = [Path(p[0]).name for p in prepares(w)]
++    assert trees.count("alt") == 1 and set(trees) <= {"merged", "alt", "store-b"}  # alt only at the baseline
++    assert [p[1] for p in prepares(w) if Path(p[0]).name == "alt"] == [base]
++
++
++def test_a_red_since_the_baseline_seen_on_the_stores_tree_stops_and_blames_nobody(w):
++    base = on_integrate(w, {"src/later.py": "X = 1\n"}, "the nightly's head")
++    since = on_integrate(w, {"tests/test_since.py": ASSERT_RED.replace("known", "since")}, "a merge after it")
++    store_at(w, since)
++    old = head(w)
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
++    r = run(w, "--base", base)
++    assert r.returncode == 4 and head(w) == old, r.stdout + r.stderr
++    assert "red since the baseline" in r.stderr and (w.q / "approved/A.json").exists()
++    assert [Path(p[0]).name for p in prepares(w)].count("alt") == 1
++
++
++def test_a_baseline_red_the_batch_breaks_again_is_the_batchs_on_the_stores_tree(w):
++    known = "import sys, pathlib\nsys.path.insert(0, str(pathlib.Path(__file__).parents[1] / 'src'))\nimport k\n\n\n" \
++            "def test_known():\n    assert k.V == 1\n"
++    base = on_integrate(w, {"src/k.py": "V = 0\n", "tests/test_known.py": known}, "a known red at the nightly")
++    fixed = on_integrate(w, {"src/k.py": "V = 1\n"}, "a later merge fixes it")
++    c = ticket(w, "A", {"src/k.py": "V = 0\n"}, start=fixed)
++    store_at(w, on_integrate(w, {"src/other.py": "Y = 1\n"}, "an unrelated merge"))
++    old = head(w)
++    enter(w, "A", c)
++    r = run(w, "--base", base)
++    assert r.returncode == 3 and head(w) == old, r.stdout + r.stderr
++    assert json.loads((w.q / "ejected/A.json").read_text())["failing"] == ["tests/test_known.py::test_known"]
++    assert THROWAWAY in r.stdout
++
++
++def nightly(w, h, junit, run_extra=""):
++    log, junits = w.tmp / "nightly", w.tmp / "junit"
++    (log / "20990101-0400").mkdir(parents=True)
++    (junits / "20990101-0400").mkdir(parents=True)
++    (log / "20990101-0400/run.txt").write_text(f"x nightly\nhead {h[:12]}\n{run_extra}verdict: green\n")
++    (junits / "20990101-0400/parallel.xml").write_text(junit)
++    return ["--nightly-log", log, "--nightly-junit", junits]
++
++
++def test_the_nightly_of_the_head_answers_green_without_any_run_there(w):
++    known = "import sys, pathlib\nsys.path.insert(0, str(pathlib.Path(__file__).parents[1] / 'src'))\nimport k\n\n\n" \
++            "def test_known():\n    assert k.V == 1\n"
++    base = on_integrate(w, {"src/k.py": "V = 0\n", "tests/test_known.py": known}, "a known red at the nightly")
++    fixed = on_integrate(w, {"src/k.py": "V = 1\n"}, "a later merge fixes it")
++    c = ticket(w, "A", {"src/k.py": "V = 0\n"}, start=fixed)
++    h = on_integrate(w, {"src/other.py": "Y = 1\n"}, "an unrelated merge")
++    enter(w, "A", c)  # the store is left at the root: a run there would have to refresh it first
++    junit = ('<testsuite><testcase classname="tests.test_known" name="test_known"/>'
++             '<testcase classname="tests.test_ok" name="test_ok"/></testsuite>')
++    r = run(w, "--base", base, *nightly(w, h, junit))
++    assert r.returncode == 3, r.stdout + r.stderr
++    assert "green on the head without the batch in that head's own nightly (no run)" in r.stdout
++    assert THROWAWAY not in r.stdout and refreshes(w) == 0
++
++
++def test_the_nightly_of_the_head_red_alone_stops_without_a_run_but_never_clears_by_itself(w):
++    base = on_integrate(w, {"src/later.py": "X = 1\n"}, "the nightly's head")
++    h = on_integrate(w, {"tests/test_since.py": ASSERT_RED.replace("known", "since")}, "a merge after it")
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
++    junit = ('<testsuite><testcase classname="tests.test_since" name="test_since">'
++             '<failure message="assert False">x</failure></testcase></testsuite>')
++    r = run(w, "--base", base, *nightly(w, h, junit, "red-alone tests/test_since.py::test_since: 1 failed\n"))
++    assert r.returncode == 4 and "red since the baseline" in r.stderr, r.stdout + r.stderr
++    assert "red alone on the head without the batch in that head's own nightly" in r.stdout
++    assert THROWAWAY not in r.stdout
++
++
++def test_a_store_behind_the_head_is_refreshed_first_never_a_clone_rebuilt(w):
++    base = on_integrate(w, {"tests/test_known.py": ASSERT_RED}, "a known red at the nightly")
++    on_integrate(w, {"src/later.py": "X = 1\n"}, "a later merge")  # the store stays at the root
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
++    r = run(w, "--base", base)
++    assert r.returncode == 0, r.stdout + r.stderr
++    assert "its normal refresh first" in r.stdout and refreshes(w) >= 1
++    assert record(w)["unowned"] == ["tests/test_known.py::test_known"]
++    assert [Path(p[0]).name for p in prepares(w)].count("alt") == 1  # the baseline's, nothing at the head
++
++
++def worktrees(w):
++    return sorted(line.split()[1] for line in git(w.repo, "worktree", "list", "--porcelain").splitlines()
++                  if line.startswith("worktree "))
++
++
++def untouched(w, before_refs, ready, ready_status, ready_head):
++    """The integration store's ready tree exactly as found (never run in), the repository's refs as they were (bar
++    a landing), and no throwaway worktree left registered."""
++    assert git(ready, "status", "--porcelain") == ready_status and git(ready, "rev-parse", "HEAD") == ready_head
++    after = [x for x in git(w.repo, "for-each-ref", "--format=%(refname) %(objectname)").splitlines()
++             if not x.startswith("refs/heads/w2/integrate ")]
++    assert after == [x for x in before_refs if not x.startswith("refs/heads/w2/integrate ")]
++    assert worktrees(w) == sorted([str(w.repo.resolve()), str(w.link) + "-a", str(w.link) + "-b"])
++
++
++def test_without_base_the_trace_runs_in_a_throwaway_tree_and_a_changed_one_is_never_used_again(w):
++    dirty = ("import pathlib\n\n\ndef test_{0}():\n"
++             "    (pathlib.Path(__file__).parent / 'test_ok.py').write_text('changed by a test')\n"
++             "    (pathlib.Path(__file__).parents[1] / 'left.txt').write_text('residue')\n"
++             "    assert False\n")
++    h = on_integrate(w, {"tests/test_d1.py": dirty.format("d1"), "tests/test_d2.py": dirty.format("d2")}, "red merges")
++    store_at(w, h)
++    ready = w.link.resolve()
++    enter(w, "A", ticket(w, "A", {"tests/test_a.py": OK}))
++    refs = git(w.repo, "for-each-ref", "--format=%(refname) %(objectname)").splitlines()
++    r = run(w)
++    assert r.returncode == 0, r.stdout + r.stderr
++    assert sorted(record(w)["unowned"]) == ["tests/test_d1.py::test_d1", "tests/test_d2.py::test_d2"]
++    assert "alt" not in [Path(p[0]).name for p in prepares(w)]
++    assert r.stdout.count(THROWAWAY) == 2 and "a re-run changed the throwaway tree" in r.stdout
++    untouched(w, refs, ready, "", h)
++
++
++def test_residue_in_the_ready_tree_or_a_killed_runs_tree_never_decides_a_red(w):
++    """Review A1: the batch breaks again a red a later merge fixed. Residue in the integration store's ready tree
++    (or in a throwaway a killed run left) that would make it red on the head must not keep it cleared."""
++    known = "import sys, pathlib\nsys.path.insert(0, str(pathlib.Path(__file__).parents[1] / 'src'))\nimport k\n\n\n" \
++            "def test_known():\n    assert k.V == 1\n"
++    base = on_integrate(w, {"src/k.py": "V = 0\n", "tests/test_known.py": known}, "a known red at the nightly")
++    fixed = on_integrate(w, {"src/k.py": "V = 1\n"}, "a later merge fixes it")
++    c = ticket(w, "A", {"src/k.py": "V = 0\n"}, start=fixed)
++    h = on_integrate(w, {"src/other.py": "Y = 1\n"}, "an unrelated merge")
++    store_at(w, h)
++    ready = w.link.resolve()
++    (ready / "src/k.py").write_text("V = 0\n")  # a killed run's residue: red there
++    (ready / "src/extra.py").write_text("residue\n")
++    stale = w.tmp / "work" / "20000101-000000-000000" / f"head-{h[:12]}-0"
++    stale.parent.mkdir(parents=True)
++    git(w.repo, "worktree", "add", "-q", "--detach", str(stale), h)
++    (stale / "src/k.py").write_text("V = 0\n")
++    ready_status = git(ready, "status", "--porcelain")
++    refs = git(w.repo, "for-each-ref", "--format=%(refname) %(objectname)").splitlines()
++    old = head(w)
++    enter(w, "A", c)
++    r = run(w, "--base", base)
++    assert r.returncode == 3 and head(w) == old, r.stdout + r.stderr  # the batch's: ejected, nothing lands
++    assert json.loads((w.q / "ejected/A.json").read_text())["failing"] == ["tests/test_known.py::test_known"]
++    assert THROWAWAY in r.stdout and f"a throwaway worktree a killed run left removed: {stale}" in r.stdout
++    assert not stale.exists()
++    untouched(w, refs, ready, ready_status, h)
++
++
++def test_junit_cases_names_the_passed_and_leaves_out_the_skipped(tmp_path):
++    x = tmp_path / "r.xml"
++    x.write_text('<testsuite><testcase classname="t" name="a"/><testcase classname="t" name="b">'
++                 '<skipped/></testcase><testcase classname="t" name="c"><failure message="assert 0"/></testcase>'
++                 '</testsuite>')
++    assert mq.passing_cases([x], tmp_path, ["t.py"]) == ["t.py::a"]
++    assert mq.failing_cases([x], tmp_path, ["t.py"]) == [("t.py::c", {"AssertionError"})]

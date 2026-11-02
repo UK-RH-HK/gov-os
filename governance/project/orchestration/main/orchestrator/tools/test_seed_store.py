@@ -376,6 +376,15 @@ def planted(tmp):
         git(tree, "commit", "-q", "-m", "two")
         cold = tmp / "cold"
         git(tmp, "clone", "-q", str(tree), str(cold))
+        same = tmp / "same"  # a copy at the base's own commit (a new worktree at the head; the promotion)
+        git(tmp, "clone", "-q", str(base), str(same))
+        os.environ["SEED_LOG"] = str(tmp / "seed.jsonl")
+        whole = ss.seed(same, base, mode="copy", who="planted same")
+        assert whole["status"] == "seeded" and whole["kept"] == "whole store", whole
+        emb.texts.clear()
+        rc, res, s_same, err = gov_rebuild(same, env)
+        assert rc == 0 and res["stores"]["semantic"]["status"] == "recreated", (rc, res, err)
+        same_texts, same_timing = len(emb.texts), res.get("timing")
         os.environ["SEED_LOG"] = str(tmp / "seed.jsonl")
         ans = ss.seed(tree, base, mode="copy", who="planted")
         assert ans["status"] == "seeded" and ans["kept"] == "vectors only", ans
@@ -390,6 +399,7 @@ def planted(tmp):
         cold_texts = len(emb.texts)
         same = vectors(tree) == vectors(cold)
         return {"base_cold_texts": base_texts, "tree_seeded_texts": seeded_texts, "tree_cold_texts": cold_texts,
+                "same_commit_seeded_texts": same_texts, "same_commit_timing": same_timing,
                 "seeded_equals_cold": same, "seeded_sent": sent, "seed": ans, "seconds": {
                     "base_cold": s_base, "tree_seeded": s_seeded, "tree_cold": s_cold},
                 "seeded_timing": seeded_timing, "cold_timing": res.get("timing")}
@@ -402,6 +412,7 @@ def test_a_seeded_rebuild_embeds_only_the_changed_chunks_and_equals_a_cold_one(t
     monkeypatch.setenv("SEED_LOG", str(tmp_path / "seed.jsonl"))
     m = planted(tmp_path)
     assert m["seeded_equals_cold"], "the seeded tree's vectors are not the cold tree's"
+    assert m["same_commit_seeded_texts"] == 0, m  # the whole store at the same commit: nothing to embed
     assert 0 < m["tree_seeded_texts"] < m["tree_cold_texts"], m
     joined = "\n".join(m["seeded_sent"])
     assert "fenugreek" in joined or "tamarind" in joined  # the added and changed notes were embedded

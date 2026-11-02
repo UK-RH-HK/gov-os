@@ -1,1 +1,1 @@
-2026-11-02 12:09:11 ACT-RERANK-CPU-1 and ACT-W1-01-EXEMPT-1 handed to the owner's operator (DEC-1028 item 6): no main-tree commit by the CTO until the owner says done; in flight and committing at their end: the landing of six (land-dispatch-20261102-112108), the close of W2-05+W2-96 (close-two-20261102-1127).
+2026-11-02 13:51:06 ACT-QUERY-GPU-2 handed to the owner's operator (DEC-1028 item 6): no main-tree commit by the CTO or its tools until the owner says done; the W2-123 landing waits.

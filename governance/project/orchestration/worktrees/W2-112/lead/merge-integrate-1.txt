@@ -1,0 +1,6 @@
+W2-112 (DAEO-clon): merge w2/integrate (DEC-1033 emergency patches) before the engineer and the measure
+
+Task: DAEO-clon
+Implements: DEC-1033,DEC-1032
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

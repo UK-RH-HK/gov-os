@@ -166,6 +166,15 @@ after idle = HUNG; F2 5xx counted as progress): engineer fixing F1-F4 live-by-re
 (health only). Seeding (d) built and NOT live (`tools-review/`, both patches + seed_store.py, new_worktree.sh,
 rebuild_counts.py); in review (`reviews/emg-seeding.md`). After install: refresh the integration store once by hand
 past 6ed6a5ae (it is at 6ebd7b56 of 11-01). W2-123: success-7/8 amended `0fa24eda`; P-W2-123-4 to W2-126 `5e67a14d`.
+**13:33 (owner):** the 19:30 after figures include a seeded close's time beside today's cold median (30 min) and
+confirm no close runs cold (rebuild_counts.py). Plan: once seeding is live (~15:30), run the stopped W2-05+W2-96
+re-close as the measured seeded close, unless the owner objects.
+**13:55:** fix (d) seeding LIVE `648e5067` (review 2 rounds; READY true after a strict block; verdict.py now reads the
+LAST block, fixed + test). Fix (c) dispatcher v4.6 LIVE `b06ee350` (G1/G2 installed on the owner's word, DEC-1035).
+W2-127 `DAEO-1vka` filed (`8e0daae2`): the reranker socket in the sandbox, after W2-112. All three leads have the patch;
+ACT-QUERY-GPU-2 handed over 13:55 (HOLD on). After it: set dispatch/config.json gpu_expected.query true; land W2-123
+(DONE, head 3de9bcf44d91, verified 2a4455be0785) via the queue (now seeded); W2-122 DONE soon; then the seeded close of
+W2-05+W2-96 as the measurement; refresh the integration store once by hand (it is at 6ebd7b56).
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.

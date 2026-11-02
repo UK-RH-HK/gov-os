@@ -93,3 +93,49 @@ ADR-0001 questions applied to each finding: "Can an honest agent hit this in ord
  {"kpi": "dispatcher-duties-unharmed", "verdict": "pass", "findings": []}
 ]}
 ```
+
+## Round 2 (DEC-1010, the last): health-by-progress, and a glance at F4
+
+Tests: 162 passed in 93.79 s. I re-reproduced the scenarios in isolation, with `inbox_item`, `log` and `now` replaced and no live write.
+
+### Fixes checked
+
+- F1 fixed. The same scenario (idle 600 s, then a request in flight with `oldest_s` 0.4) now gives WAITING and no item. HUNG needs `embed_stall_s` of waiting with no progress. `wait_since` is kept while the wait goes on and is reset by a pass that sees nothing waiting. `stalled_from` is the later of the last progress and the wait start.
+- F2 half fixed. Only a 2xx or a completed task counts as progress, and a failure does not clear HUNG (the incident branch holds). A crash loop of 500s now gives FAILING. See G1.
+- F3 fixed: `sent` now needs `bytes_sent > 0`.
+- F4 re-priced: the reserve is `rerank_gpu_slots` times the measured per-process peak, capped by the old p95, with the p95 used under 30 samples. See G2.
+
+### New findings
+
+#### G1 (medium, in scope): FAILING counts 4xx as a server failure, and it can hold starts with nothing left to clear it
+
+- Scenario: the shared server is quiet and a client sends three bad requests in a row (an oversized input gets 400, or a wrong model name gets 404) with no 2xx between them. This is an ordinary client fault.
+- Reproduced: three `| 400 | ... POST "/api/embed"` lines give FAILING and one `server-failing` item. After 38 further passes with no new lines it is still FAILING. `fails_in_a_row` persists until a 2xx, and IDLE or WAITING never clears it.
+- Effect: FAILING is in `SERVER_DOWN`, so starts are held. If the machine is idle, nothing starts, so nothing embeds, so no 2xx arrives. The hold ends only when some other client succeeds. This loses throughput, and it is a false alert for a healthy server.
+- Fix: count only 5xx (and perhaps timeouts or 499) as the server's failure. Also let FAILING decay: clear it after some time with nothing waiting, or let the test request clear it.
+- Ordinary work: yes, because a bad input is routine.
+- Consequence: loses work (starts held with no recovery path).
+
+#### G2 (low, in scope): the reranker reserve rests on a very short sample
+
+- 30 samples is about 10 passes with 3 rerankers, so the "per-process peak since 13:00" can be a few minutes of data.
+- A reranker's load spike (the kind's historic max was 14 GB) is easily missed at one sample a pass. The reserve can then fall to about 2 × 2.2 GB, below the true peak, and admission lets work in that the memory cannot hold. This fails open for memory.
+- The memory floor and the lead check still stand behind it.
+- Fix: also require a minimum span (for example at least 24 h of samples), or keep a floor of the old p95 divided by the old process count.
+- Ordinary work: yes. Consequence: fails open (bounded by the floor).
+
+#### G3 (note, out of scope): if `reranker-peak.json` has the current era but lacks `samples` or `max_kb`, the KeyError fails the balance block closed, and admission refuses with a config_error naming the cause. This needs a manual corruption to happen.
+
+### Verdict (round 2)
+
+```verdict
+{"kpis": [
+ {"kpi": "health-by-progress", "verdict": "fail", "findings": [
+  {"id": "G1", "scope": "in", "ordinary_work": "yes", "consequence": "loses work"}]},
+ {"kpi": "admission-on-every-resource", "verdict": "pass", "findings": [
+  {"id": "G2", "scope": "in", "ordinary_work": "yes", "consequence": "fails open"}]},
+ {"kpi": "gpu-alerts", "verdict": "pass", "findings": []},
+ {"kpi": "dispatcher-duties-unharmed", "verdict": "pass", "findings": [
+  {"id": "G3", "scope": "out", "ordinary_work": "no", "consequence": "other"}]}
+]}
+```
