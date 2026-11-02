@@ -83,8 +83,38 @@ def setup(home, tmp_path):
     worker.write_text(WORKER)
     env = {k: v for k, v in os.environ.items()
            if k != "CUDA_VISIBLE_DEVICES" and not k.startswith(("GOV_RERANK_", "PYTHON"))}
-    env.update(GOV_RERANK_GPU_LOCK_DIR=str(locks), MARKS=str(marks), HOME=str(home))
+    env.update(GOV_RERANK_GPU_LOCK_DIR=str(locks), MARKS=str(marks), HOME=str(home),
+               GOV_RERANK_GPU_LIMITS=str(tmp_path / "limits.json"))  # none planted: the default of 2 (DEC-1039)
     return str(home / rerank.PYTHON_REL), worker, env, marks
+
+
+@pytest.mark.parametrize("planted, slots", [(3, 3), (0, 2), ("three", 2), (None, 2)])
+def test_the_slot_count_follows_the_dispatchers_derived_number(setup, tmp_path, planted, slots):
+    """DEC-1037 (4), DEC-1039 (1b): with GOV_RERANK_GPU_SLOTS unset, the count is the dispatcher's `rerank_gpu_slots`
+    (limits.json); 0 (no GPU), a non-number or no file: 2. Each worker past the count waits, then ends named."""
+    python, worker, env, _ = setup
+    if planted is not None:
+        (tmp_path / "limits.json").write_text(json.dumps({"rerank_gpu_slots": planted}))
+    started = [start(python, worker, env) for _ in range(slots)]
+    try:
+        assert sorted(first_line(p)["slot"] for p in started) == [str(i) for i in range(slots)]
+        extra = start(python, worker, env, GOV_RERANK_GPU_WAIT_S="0")
+        out, err = extra.communicate(timeout=15)
+        assert extra.returncode == 75 and out == ""
+    finally:
+        stop(*started)
+
+
+def test_the_environment_wins_over_the_derived_number(setup, tmp_path):
+    python, worker, env, _ = setup
+    (tmp_path / "limits.json").write_text(json.dumps({"rerank_gpu_slots": 3}))
+    started = [start(python, worker, env, GOV_RERANK_GPU_SLOTS="1")]
+    try:
+        assert first_line(started[0])["slot"] == "0"
+        extra = start(python, worker, env, GOV_RERANK_GPU_SLOTS="1", GOV_RERANK_GPU_WAIT_S="0")
+        assert extra.wait(timeout=15) == 75
+    finally:
+        stop(*started)
 
 
 def start(python, script, env, *args, **extra):

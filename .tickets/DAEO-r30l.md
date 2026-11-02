@@ -23,6 +23,9 @@ allowed_paths:
 - tests/unit/resources/**
 - src/gov/rebuild/watch.py
 - tests/unit/rebuild/test_w2_20*
+- src/gov/secrets/__init__.py
+- src/gov/codeintel/__init__.py
+- tests/unit/secrets_check/test_w2_20_*
 kpis:
   success:
   - gov resources reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under ~/.gov-os/machine/, whichever repository started it.

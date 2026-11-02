@@ -91,7 +91,7 @@ Draft of 2026-10-30. One line each. The register is the authority. What DEC-953 
 - DEC-861: the orchestrator commits the owner's decisions (`Decided-by: owner`) and never pushes. The owner's push is the acceptance.
 - DEC-463: the record comes before the change it authorises.
 - DEC-819, DEC-887: context is committed, with the raw record on `record/w2`. Secrets, held-out material and derived stores are never committed.
-- DEC-953 §5 practices 6 and 10, DEC-893: gitleaks runs on staged content and on close outputs. A seconds-long check (YAML, schema, placeholders) runs before record commits.
+- DEC-1045 (changing DEC-953 §5 practices 6 and 10, DEC-893, DEC-966 item 4): no gitleaks scan on this repository (rebuilds, landings, closes, the nightly, record commits), switched off by `governance/project/secrets.yaml`; the real-gitleaks tests run only in the nightly; a weekly full scan only on the owner's approval. A seconds-long check (YAML, schema, placeholders) runs before record commits.
 - DEC-720, DEC-848: `w2/integrate` is never rewritten, and merges use `--no-ff`. The owner pushes daily.
 - DEC-182: commits keep their `Task:`, `Implements:` and `Role:` trailers. Nothing refuses on them.
 - DEC-952, DEC-792: RESUME HERE (under 8,000 characters) names this list first. The handover each morning goes to a fresh session.
