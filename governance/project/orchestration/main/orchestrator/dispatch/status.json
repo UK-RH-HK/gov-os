@@ -1,51 +1,48 @@
 {
- "time": "2026-11-02 13:51:05",
+ "time": "2026-11-02 14:17:09",
  "leads": [
-  "W2-112",
-  "W2-122"
+  "W2-112"
  ],
- "lead_count": 2,
+ "lead_count": 1,
  "load": [
-  18.29,
-  20.05,
-  25.61
+  16.58,
+  12.47,
+  14.87
  ],
- "mem_available_mb": 15603,
+ "mem_available_mb": 15411,
  "gate_open": true,
- "gate": "OPEN leads=2 load=18.3/25.6 nproc=20 have=18998368kB need=9566436kB",
+ "gate": "OPEN leads=1 load=16.6/14.9 nproc=20 have=16366144kB need=7426200kB",
  "disk_open": true,
- "disk": "disk gate open: 842 GiB free, 64177489 inodes free",
+ "disk": "disk gate open: 841 GiB free, 64169720 inodes free",
  "slots_held": [
-  "gov-os-heavy-slot-2.lock"
+  "gov-os-heavy-slot-1.lock"
  ],
- "land_running": false,
+ "land_running": true,
  "close_running": false,
  "closing_w2s": [],
- "queue_busy": false,
+ "queue_busy": true,
  "main_clean": true,
  "main_dirty": [],
  "main_branch": "w2/integrate",
  "lead_ticket_ids": [
-  "DAEO-clon",
-  "DAEO-blwa"
+  "DAEO-clon"
  ],
  "lead_rss_kb": {
-  "W2-112": 919640,
-  "W2-122": 2100480
+  "W2-112": 584528
  },
  "outside_slot": [
-  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 82 min, /home/usain/gov-os-worktrees/W2-122)"
+  "/usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 106 min, /home/usain/gov-os-worktrees/W2-122)"
  ],
  "pending_launches": [],
  "services_kb": {
-  "embedding": 1266960,
+  "embedding": 1264980,
   "codegraph": 0
  },
- "busy_cores": 15.68,
- "embedding_cores": 8.11,
+ "busy_cores": 16.21,
+ "embedding_cores": 5.02,
  "cpu_measuring": false,
  "nproc": 20,
- "rerankers_outside_kb": 2598792,
+ "rerankers_outside_kb": 3601504,
  "outside_reranker_possible": true,
  "peaks": {
   "computed": "2026-11-02 13:27:09",
@@ -53,74 +50,69 @@
   "lead_max_mb": 9580
  },
  "rerankers": {
-  "n": 2,
-  "rss_kb": 4368172,
+  "n": 1,
+  "rss_kb": 3601504,
   "each_kb": [
-   2598792,
-   1769380
+   3601504
   ],
-  "outside_kb": 2598792,
-  "gpu_held": 1,
+  "outside_kb": 3601504,
+  "gpu_held": 0,
   "gpu_slots": 2
  },
  "reranker_reserve": {
   "kb": 9872128,
-  "how": "the rerankers' p95 (53 of 30 samples, 0.1 of 24 h, since 2026-11-02 13:00)",
-  "samples": 53,
-  "span_s": 180,
-  "peak_kb": 3515876,
+  "how": "the rerankers' p95 (88 of 30 samples, 0.5 of 24 h, since 2026-11-02 13:00)",
+  "samples": 88,
+  "span_s": 1744,
+  "peak_kb": 3601504,
   "allowed": 2
  },
  "gpu_last": {
-  "used_mib": 7519,
+  "used_mib": 3162,
   "total_mib": 16303,
-  "free_mib": 8784,
-  "age_s": 56,
-  "holders": {
-   "reranker": 1
-  }
+  "free_mib": 13141,
+  "age_s": 64,
+  "holders": {}
  },
  "slots_target": 3,
  "slots_device": "gpu 29/29",
  "admit": false,
- "admit_reason": "a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 82 min, /home/usain/gov-os-worktrees/W2-122)",
+ "admit_reason": "real CPU: 16.21 busy cores + 3.06 for the embedding server's p95 >= 20 - margin 2",
  "lead_cap": {
   "cap": 0,
-  "room_kb": 1125760,
+  "room_kb": -505708,
   "p95_kb": 2223276
  },
- "inbox_unread": 2,
- "inbox_oldest_age_s": 476,
+ "inbox_unread": 0,
+ "inbox_oldest_age_s": null,
  "started_this_tick": null,
  "ready_waits": {
   "W2-112 DAEO-clon": "running",
-  "W2-126 DAEO-jpr0": "not admitted: a heavy step runs outside a slot over 5 min: /usr/bin/python3 -P -m gov.retrieval.retrieve_check (pid 848440, 82 min, /home/usain/gov-os-worktrees/W2-122)",
+  "W2-126 DAEO-jpr0": "not admitted: real CPU: 16.21 busy cores + 3.06 for the embedding server's p95 >= 20 - margin 2",
   "W2-123 DAEO-qzrq": "already started for W2-123-A5-r2-retry.json",
-  "W2-122 DAEO-blwa": "running"
+  "W2-122 DAEO-blwa": "already started for W2-122-A5-r2-nok5.json"
  },
- "land": "nothing to land",
+ "land": "in flight",
  "land_pending": [],
  "new_returns": [],
  "last_start": "2026-11-02 13:01:43 W2-112",
  "failures": [],
  "balance": {
-  "busy_cores": 15.68,
+  "busy_cores": 16.21,
   "nproc": 20,
   "cpu_band": [
    14,
    18
   ],
   "cpu_in_band": "within",
-  "mem_available_mb": 15603,
+  "mem_available_mb": 15411,
   "floor_kb": 3145728,
   "gpu": {
-   "used_mib": 7520,
+   "used_mib": 3164,
    "total_mib": 16303,
-   "free_mib": 8783,
+   "free_mib": 13139,
    "age_s": 0,
-   "holders": {
-    "reranker": 1
-   }
+   "holders": {}
   },
   "layers": {
    "shared": {
@@ -131,58 +123,57 @@
   },
   "embedders": {
    "shared": {
-    "state": "IDLE",
+    "state": "BUSY",
     "judged": true,
-    "tasks_per_min": 0,
-    "waiting": 0,
-    "quiet_s": 360
+    "tasks_per_min": 1270,
+    "waiting": 1,
+    "quiet_s": 0
    },
    "query": {
     "state": "BUSY",
     "judged": true,
-    "tasks_per_min": 17,
-    "waiting": 1,
+    "tasks_per_min": 6,
+    "waiting": 0,
     "quiet_s": 0
    }
   },
-  "embedder_state": "IDLE",
+  "embedder_state": "BUSY",
   "slots_target": 3,
   "slots_device": "gpu 29/29",
   "lead_cap": {
    "cap": 0,
-   "room_kb": 1125760,
+   "room_kb": -505708,
    "p95_kb": 2223276
   },
   "rerankers": {
-   "n": 2,
-   "rss_kb": 4368172,
+   "n": 1,
+   "rss_kb": 3601504,
    "each_kb": [
-    2598792,
-    1769380
+    3601504
    ],
-   "outside_kb": 2598792,
-   "gpu_held": 1,
+   "outside_kb": 3601504,
+   "gpu_held": 0,
    "gpu_slots": 2
   },
   "reranker_reserve": {
    "kb": 9872128,
-   "how": "the rerankers' p95 (53 of 30 samples, 0.1 of 24 h, since 2026-11-02 13:00)",
-   "samples": 53,
-   "span_s": 180,
-   "peak_kb": 3515876,
+   "how": "the rerankers' p95 (88 of 30 samples, 0.5 of 24 h, since 2026-11-02 13:00)",
+   "samples": 88,
+   "span_s": 1744,
+   "peak_kb": 3601504,
    "allowed": 2
   }
  },
  "sentinel": "watched",
  "guard_harvest": {
-  "at": "2026-11-02 13:41:28",
+  "at": "2026-11-02 14:13:28",
   "rc": 0,
-  "secs": 19.7,
+  "secs": 19.5,
   "limit_s": 300,
   "tail": "guard refusals since ACT 1: 73 total, 69 false positives, 0 unclassified"
  },
  "embedding_server": {
-  "passes": 940,
+  "passes": 966,
   "last_check_at": 1793624949.9938116,
   "last_result": "ok",
   "last_secs": 0.21,
@@ -190,56 +181,56 @@
   "fails": 0,
   "first_fail_at": null,
   "hung_since": null,
-  "last_ok_at": 1793627105.9988446,
-  "state": "IDLE",
+  "last_ok_at": 1793629029.6210918,
+  "state": "BUSY",
   "servers": {
    "shared": {
     "off": {
      "path": "/home/usain/.ollama/serve-11434.log",
-     "off": 362973281,
+     "off": 363713402,
      "ino": 1239422
     },
-    "tasks_per_min": 0,
-    "requests_per_min": 0,
-    "read_at": 1793627465.6702738,
-    "last_progress_at": 1793627105.9988446,
-    "judged": true,
-    "why": "",
-    "quiet_s": 360,
-    "waiting": 0,
-    "oldest_wait_s": 0.0,
-    "listening": true,
-    "down_passes": 0,
-    "state": "IDLE",
-    "fails_in_a_row": 0,
-    "last_fail_code": null,
-    "failed_per_min": 0,
-    "wait_since": null,
-    "stalled_s": 0,
-    "client_errors": 0
-   },
-   "query": {
-    "off": {
-     "path": "/home/usain/.ollama/serve-11435.log",
-     "off": 5914730,
-     "ino": 610161
-    },
-    "tasks_per_min": 17,
-    "requests_per_min": 9,
-    "read_at": 1793627465.6703513,
-    "last_progress_at": 1793627465.6703513,
+    "tasks_per_min": 1270,
+    "requests_per_min": 39,
+    "read_at": 1793629029.6210918,
+    "last_progress_at": 1793629029.6210918,
     "judged": true,
     "why": "",
     "quiet_s": 0,
     "waiting": 1,
-    "oldest_wait_s": 0.2,
+    "oldest_wait_s": 0.3,
     "listening": true,
     "down_passes": 0,
     "state": "BUSY",
     "fails_in_a_row": 0,
     "last_fail_code": null,
     "failed_per_min": 0,
-    "wait_since": 1793627346.2014127,
+    "wait_since": 1793629029.321092,
+    "stalled_s": 0,
+    "client_errors": 0
+   },
+   "query": {
+    "off": {
+     "path": "/home/usain/.ollama/serve-11435.log",
+     "off": 5950289,
+     "ino": 610161
+    },
+    "tasks_per_min": 6,
+    "requests_per_min": 3,
+    "read_at": 1793629029.6400454,
+    "last_progress_at": 1793629029.6400454,
+    "judged": true,
+    "why": "",
+    "quiet_s": 0,
+    "waiting": 0,
+    "oldest_wait_s": 0.0,
+    "listening": true,
+    "down_passes": 0,
+    "state": "BUSY",
+    "fails_in_a_row": 0,
+    "last_fail_code": null,
+    "failed_per_min": 0,
+    "wait_since": null,
     "stalled_s": 0,
     "client_errors": 0
    }
@@ -248,32 +239,25 @@
  },
  "slot_holders": [
   {
-   "slot": "2",
-   "pid": 1588589,
-   "cpu": 3585,
-   "since": 1793627465.8227923,
+   "slot": "1",
+   "pid": 1728873,
+   "cpu": 1452,
+   "since": 1793629029.8292067,
    "reported": false,
-   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-2.lock python3 -m gov.cli.main check --json",
-   "cwd": "/home/usain/gov-os-worktrees/W2-122"
+   "cmd": "flock -n -o -E 213 /tmp/gov-os-heavy-slot-1.lock bash -c rm -f \"$0\"; exec \"$@\" /tmp/gov-os-heavy-prio-1728869 /usr/bin/python3 -m gov.cli.main rebuild --json",
+   "cwd": "/home/usain/gov-os-runs/W2-00/merge-queue/warm/merged"
   }
  ],
  "gpu": {
-  "line": "GPU: RTX 5070 Ti 7.3/15.9 GB, 9 %; holders: embedder shared (0), reranker (1); layers: shared 29/29, query cpu-only by design",
+  "line": "GPU: RTX 5070 Ti 3.1/15.9 GB, 31 %; holders: embedder shared (0), reranker (0); layers: shared 29/29, query cpu-only by design",
   "state": {
    "ok": true,
-   "at": 1793627465.713799,
+   "at": 1793629029.7016194,
    "name": "NVIDIA GeForce RTX 5070 Ti",
-   "used_mib": 7520,
+   "used_mib": 3164,
    "total_mib": 16303,
-   "util": 9,
-   "holders": [
-    {
-     "pid": 1651527,
-     "name": "[Not Found]",
-     "mib": null,
-     "kind": "reranker"
-    }
-   ]
+   "util": 31,
+   "holders": []
   },
   "layers": {
    "shared": {

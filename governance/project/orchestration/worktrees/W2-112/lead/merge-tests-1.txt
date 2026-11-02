@@ -1,0 +1,6 @@
+W2-112 (DAEO-clon): merge the independent acceptance tests (w2/W2-112-tests at a26963a87707)
+
+Task: DAEO-clon
+Implements: DEC-963,DEC-1032
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

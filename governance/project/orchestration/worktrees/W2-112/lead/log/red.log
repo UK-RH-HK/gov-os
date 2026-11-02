@@ -1,0 +1,972 @@
+FFFFFFFFFFFFFF.F....FF...FFFFFFFF.FFFFFFFFFFF                            [100%]
+=================================== FAILURES ===================================
+____ test_the_services_answers_match_a_private_rerankers_on_the_same_inputs ____
+
+box = <w2_112_support.Box object at 0x72653c963aa0>
+
+    def test_the_services_answers_match_a_private_rerankers_on_the_same_inputs(box):
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_answers.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c963aa0>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+________ test_candidates_the_service_scores_alike_keep_the_order_given _________
+
+box = <w2_112_support.Box object at 0x72653c963b90>
+
+    def test_candidates_the_service_scores_alike_keep_the_order_given(box):
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_answers.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c963b90>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model _
+
+box = <w2_112_support.Box object at 0x72653c96b0e0>
+
+    def test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model(box):
+        # Several sessions at once, three of them with the same inputs and the others with their own: whatever the
+        # service scores together, each answer is the private one for its own inputs.
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_answers.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c96b0e0>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank _
+
+boxes = <function boxes.<locals>.make at 0x72653c9ab1a0>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p')
+
+    def test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank(boxes, tools, project):
+        box = boxes(environment=False)  # a sandboxed worker: no reranker environment, so no service and no private one
+        bundle = _retrieve(box, tools, project)
+        assert bundle["merge"].get("reranked") is False, f"the bundle says reranked: {bundle['merge']}"
+>       value, reasons = _entry(bundle)
+                         ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 3}], 'budget': {'bundle': {'limit': 6000, 'used': 48}, 'rounds': {'limit': 1, 'used': 0}}, 'cont......}, {'batch': 1, 'chunk_id': 'a603d8f61246ae107cf65522', 'end_line': 3, 'id': 'a603d8f61246ae107cf65522', ...}], ...}
+
+    def _entry(bundle):
+        where, value, reasons = support.rerank_entry(bundle)
+>       assert where is not None, \
+            (f"the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: "
+             f"{sorted(bundle)} / {bundle.get('merge')}")[:800]
+E       AssertionError: the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: ['batches', 'budget', 'continuation', 'evidence', 'expansions', 'facets', 'gaps', 'merge', 'stopping_reason'] / {'candidates': 3, 'duplicates': 0, 'dropped': [], 'reranked': False}
+E       assert None is not None
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:134: AssertionError
+__ test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason __
+
+boxes = <function boxes.<locals>.make at 0x72653c8c9940>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p')
+
+    def test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason(boxes, tools, project):
+        box = boxes(settings={support.WAIT_SETTING: 2})
+        box.block_service()
+        box.hold_slots()
+        bundle = _retrieve(box, tools, project)
+>       assert bundle["merge"].get("reranked") is False, \
+            f"with the service down and both GPU slots held the bundle says reranked: {bundle['merge']}"
+E       AssertionError: with the service down and both GPU slots held the bundle says reranked: {'candidates': 3, 'duplicates': 0, 'dropped': [], 'reranked': True}
+E       assert True is False
+E        +  where True = <built-in method get of dict object at 0x72653c8fae40>('reranked')
+E        +    where <built-in method get of dict object at 0x72653c8fae40> = {'candidates': 3, 'dropped': [], 'duplicates': 0, 'reranked': True}.get
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:154: AssertionError
+____ test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers ____
+
+boxes = <function boxes.<locals>.make at 0x72653c8ca0c0>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p')
+
+    def test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers(boxes, tools, project):
+        box = boxes(gpu=support.ROOM)
+        bundle = _retrieve(box, tools, project)
+        assert bundle["merge"].get("reranked") is True, f"the bundle was not reranked: {bundle['merge']}"
+>       value, _ = _entry(bundle)
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 3}], 'budget': {'bundle': {'limit': 6000, 'used': 48}, 'rounds': {'limit': 1, 'used': 0}}, 'cont......}, {'batch': 1, 'chunk_id': 'a603d8f61246ae107cf65522', 'end_line': 3, 'id': 'a603d8f61246ae107cf65522', ...}], ...}
+
+    def _entry(bundle):
+        where, value, reasons = support.rerank_entry(bundle)
+>       assert where is not None, \
+            (f"the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: "
+             f"{sorted(bundle)} / {bundle.get('merge')}")[:800]
+E       AssertionError: the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: ['batches', 'budget', 'continuation', 'evidence', 'expansions', 'facets', 'gaps', 'merge', 'stopping_reason'] / {'candidates': 3, 'duplicates': 0, 'dropped': [], 'reranked': True}
+E       assert None is not None
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:134: AssertionError
+__________ test_the_bundle_names_the_cpu_when_the_service_runs_there ___________
+
+boxes = <function boxes.<locals>.make at 0x72653c8ca480>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p')
+
+    def test_the_bundle_names_the_cpu_when_the_service_runs_there(boxes, tools, project):
+        box = boxes(gpu=support.SHORT)
+        bundle = _retrieve(box, tools, project)
+        assert bundle["merge"].get("reranked") is True, f"the bundle was not reranked: {bundle['merge']}"
+>       value, _ = _entry(bundle)
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 3}], 'budget': {'bundle': {'limit': 6000, 'used': 48}, 'rounds': {'limit': 1, 'used': 0}}, 'cont......}, {'batch': 1, 'chunk_id': 'a603d8f61246ae107cf65522', 'end_line': 3, 'id': 'a603d8f61246ae107cf65522', ...}], ...}
+
+    def _entry(bundle):
+        where, value, reasons = support.rerank_entry(bundle)
+>       assert where is not None, \
+            (f"the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: "
+             f"{sorted(bundle)} / {bundle.get('merge')}")[:800]
+E       AssertionError: the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: ['batches', 'budget', 'continuation', 'evidence', 'expansions', 'facets', 'gaps', 'merge', 'stopping_reason'] / {'candidates': 3, 'duplicates': 0, 'dropped': [], 'reranked': True}
+E       assert None is not None
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:134: AssertionError
+_ test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down _
+
+boxes = <function boxes.<locals>.make at 0x72653c8cab60>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p')
+
+    def test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down(boxes, tools, project):
+        box = boxes(gpu=support.ROOM)
+        box.block_service()
+        bundle = _retrieve(box, tools, project)
+        assert bundle["merge"].get("reranked") is True, f"the fallback did not rerank the bundle: {bundle['merge']}"
+>       value, _ = _entry(bundle)
+                   ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+bundle = {'batches': [{'size': 3}], 'budget': {'bundle': {'limit': 6000, 'used': 48}, 'rounds': {'limit': 1, 'used': 0}}, 'cont......}, {'batch': 1, 'chunk_id': 'a603d8f61246ae107cf65522', 'end_line': 3, 'id': 'a603d8f61246ae107cf65522', ...}], ...}
+
+    def _entry(bundle):
+        where, value, reasons = support.rerank_entry(bundle)
+>       assert where is not None, \
+            (f"the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: "
+             f"{sorted(bundle)} / {bundle.get('merge')}")[:800]
+E       AssertionError: the bundle carries no `rerank` entry (DEC-1034 item 2), at its top level or in its merge: ['batches', 'budget', 'continuation', 'evidence', 'expansions', 'facets', 'gaps', 'merge', 'stopping_reason'] / {'candidates': 3, 'duplicates': 0, 'dropped': [], 'reranked': True}
+E       assert None is not None
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:134: AssertionError
+______________ test_gov_status_counts_the_searches_that_fell_back ______________
+
+boxes = <function boxes.<locals>.make at 0x72653c8cb100>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p')
+
+    def test_gov_status_counts_the_searches_that_fell_back(boxes, tools, project):
+        box = boxes()
+        box.block_service()
+        for _ in range(2):
+            bundle = _retrieve(box, tools, project)
+            assert bundle["merge"].get("reranked") is True, "the fallback private reranker did not rerank the bundle"
+        done = subprocess.run([sys.executable, "-m", "gov.cli.main", "status", "--json", "--root", str(project)],
+                              capture_output=True, text=True, env=_env(box, tools), cwd=str(box.work), timeout=600,
+                              stdin=subprocess.DEVNULL)
+        try:
+            answer = json.loads(done.stdout)
+        except ValueError:
+            pytest.fail(f"gov status --json gave no JSON (exit {done.returncode}): {done.stderr[-1500:]}", pytrace=False)
+    
+        def counts(value, under=False):
+            if isinstance(value, dict):
+                return [n for key, item in value.items() for n in counts(item, under or "rerank" in str(key).lower())]
+            if isinstance(value, list):
+                return [n for item in value for n in counts(item, under)]
+            return [value] if under and isinstance(value, int) and not isinstance(value, bool) else []
+    
+>       assert any(number >= 2 for number in counts(answer)), \
+            f"gov status does not count the 2 searches that fell back (no count under a rerank entry): {done.stdout[:1500]}"
+E       AssertionError: gov status does not count the 2 searches that fell back (no count under a rerank entry): {"ok": true, "command": "status", "result": {"root": "/tmp/gov-os-lead-W2-112/r0/p", "config_files": ["path-map.yaml"], "tickets": {"ready": [], "blocked": [], "claimed": []}, "decision_packages": [], "readiness": [], "governance_share": {"share": "not measured", "reason": "no session of a ticket is recorded (DEC-491), so the counter is asked with none named, ticket by ticket; no figure across tickets exists", "tickets": []}, "pause": {"paused": false, "flag": "absent", "mirror": false}, "doctor": {"healthy": true, "parts": {"tools": "unmeasured", "hooks": "unmeasured", "path_map": "pass", "path_compliance": "pass", "index_freshness": "pass", "canaries": "unmeasured", "framework_lock": "unmeasured", "isolation": "pass", "claude_code": "pass", "held_out": "report", "adoption_level": "pass"}}, "not_read": []}, "session": ""}
+E         
+E       assert False
+E        +  where False = any(<generator object test_gov_status_counts_the_searches_that_fell_back.<locals>.<genexpr> at 0x72653c621220>)
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:216: AssertionError
+_ test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores _
+
+boxes = <function boxes.<locals>.make at 0x72653c8cb6a0>
+
+    def test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores(boxes):
+        box = boxes(gpu=GPU_ROOM)
+        box.config(load_delay=0.3, predict_delay=0.05)
+        tags = [f"c{number:02d}" for number in range(20)]
+        started = time.monotonic()
+        reports = box.together([{"query": query_of(tag), "candidates": candidates(tag, 12)} for tag in tags])
+        for tag, report in zip(tags, reports):
+            assert raised(report) is None, f"concurrent search {tag} raised: {raised(report)}"
+            check_scored(report["result"], query_of(tag), candidates(tag, 12), f"concurrent search {tag}")
+        loads = box.loads()
+>       assert len(loads) == 1, \
+            (f"20 concurrent searches loaded the model {len(loads)} times (processes {[r['pid'] for r in loads]}): one "
+             "process is to answer them all")
+E       AssertionError: 20 concurrent searches loaded the model 20 times (processes [1705017, 1705015, 1705009, 1705016, 1705012, 1705027, 1705011, 1705019, 1705028, 1705023, 1705014, 1705025, 1705010, 1705020, 1705013, 1705018, 1705022, 1705024, 1705026, 1705021]): one process is to answer them all
+E       assert 20 == 1
+E        +  where 20 = len([{'args': ["'Qwen/Qwen3-Reranker-0.6B'"], 'attempt': 1, 'cuda_visible_devices': None, 'device': 'cuda', ...}, {'args':......}, {'args': ["'Qwen/Qwen3-Reranker-0.6B'"], 'attempt': 6, 'cuda_visible_devices': None, 'device': 'cuda', ...}, ...])
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:35: AssertionError
+_________________ test_requests_are_answered_in_arrival_order __________________
+
+box = <w2_112_support.Box object at 0x72653c971f40>
+
+    def test_requests_are_answered_in_arrival_order(box):
+>       box.warm()
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c971f40>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+____ test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering ____
+
+box = <w2_112_support.Box object at 0x72653c968e30>
+
+    def test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering(box):
+>       box.warm()
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c968e30>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+___________ test_a_search_with_more_texts_than_the_cap_still_answers ___________
+
+box = <w2_112_support.Box object at 0x72653c8e4b90>
+
+    def test_a_search_with_more_texts_than_the_cap_still_answers(box):
+>       box.warm()
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c8e4b90>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_________ test_a_request_past_its_time_limit_does_not_hold_the_search __________
+
+boxes = <function boxes.<locals>.make at 0x72653c944680>
+
+    def test_a_request_past_its_time_limit_does_not_hold_the_search(boxes):
+        limit = 3.0
+        box = boxes(settings={support.TIMEOUT_SETTING: limit})
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c8e5640>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_when_the_services_model_cannot_load_the_search_still_gets_a_private_rerankers_answer _
+
+box = <w2_112_support.Box object at 0x72653c8e6b70>
+
+    def test_when_the_services_model_cannot_load_the_search_still_gets_a_private_rerankers_answer(box):
+        box.config(fail_loads=1)  # the first load under this HOME fails: the one the service tries first
+        query, given = query_of("noload"), candidates("noload", 6)
+        report = box.search(query, given)
+>       _fell_back(box, report, query, given, "the search whose service could not load its model")
+
+tests/acceptance/W2-112/test_w2_112_fallback.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-112/test_w2_112_fallback.py:36: in _fell_back
+    check_scored(report["result"], query, given, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = [{'chunk_id': 'noload-0', 'end_line': 3, 'parent_id': 'parent-of-noload-0', 'path': 'notes/noload-0.md', ...}, {'chunk...d', ...}, {'chunk_id': 'noload-5', 'end_line': 3, 'parent_id': 'parent-of-noload-5', 'path': 'notes/noload-5.md', ...}]
+query = 'where does session noload keep its ledger'
+given = [{'chunk_id': 'noload-0', 'end_line': 3, 'parent_id': 'parent-of-noload-0', 'path': 'notes/noload-0.md', ...}, {'chunk...d', ...}, {'chunk_id': 'noload-5', 'end_line': 3, 'parent_id': 'parent-of-noload-5', 'path': 'notes/noload-5.md', ...}]
+who = 'the search whose service could not load its model'
+
+    def check_scored(result, query: str, given: list[dict], who: str = "the search") -> None:
+        """``result`` is the private reranker's answer: the same order, the same scores within rounding, nothing lost."""
+        assert isinstance(result, list), f"{who} did not return a list of candidates: {result!r}"[:600]
+        want = expected(query, given)
+>       assert [entry.get("chunk_id") for entry in result] == [entry["chunk_id"] for entry in want], \
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            (f"{who}: the order is not the one a private reranker gives on the same inputs (equal scores keep the order "
+             f"given): got {[entry.get('chunk_id') for entry in result]}, expected {[e['chunk_id'] for e in want]}")
+E       AssertionError: the search whose service could not load its model: the order is not the one a private reranker gives on the same inputs (equal scores keep the order given): got ['noload-0', 'noload-1', 'noload-2', 'noload-3', 'noload-4', 'noload-5'], expected ['noload-5', 'noload-0', 'noload-3', 'noload-4', 'noload-2', 'noload-1']
+
+tests/acceptance/W2-112/w2_112_support.py:326: AssertionError
+_ test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back _
+
+box = <w2_112_support.Box object at 0x72653c8e72f0>
+
+    def test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back(box):
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_fallback.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c8e72f0>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+__________ test_a_service_killed_mid_run_leaves_every_search_answered __________
+
+box = <w2_112_support.Box object at 0x72653cb95f10>
+
+    def test_a_service_killed_mid_run_leaves_every_search_answered(box):
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_fallback.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653cb95f10>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+__________ test_each_fallback_is_logged_under_the_users_cache_folder ___________
+
+box = <w2_112_support.Box object at 0x72653c8e7530>
+
+    def test_each_fallback_is_logged_under_the_users_cache_folder(box):
+        box.block_service()
+        since = time.time()
+        query, given = query_of("logged"), candidates("logged", 4)
+        report = box.search(query, given)
+        _fell_back(box, report, query, given, "the search whose service cannot start")
+        found = box.cache_texts(since)
+        pattern = re.compile(r"rerank|fall|fell|unavailable|private", re.IGNORECASE)
+>       assert any(pattern.search(text) for text in found), \
+            (f"the fallback was not logged in a file under ~/{support.CACHE_REL}/ (DEC-1034 item 3); files written "
+             f"there since the search began: {found!r}")[:1500]
+E       AssertionError: the fallback was not logged in a file under ~/.cache/gov-os/ (DEC-1034 item 3); files written there since the search began: []
+E       assert False
+E        +  where False = any(<generator object test_each_fallback_is_logged_under_the_users_cache_folder.<locals>.<genexpr> at 0x72653ca12b20>)
+
+tests/acceptance/W2-112/test_w2_112_fallback.py:166: AssertionError
+________ test_with_room_on_the_gpu_the_service_runs_its_one_model_there ________
+
+boxes = <function boxes.<locals>.make at 0x72653c9479c0>
+
+    def test_with_room_on_the_gpu_the_service_runs_its_one_model_there(boxes):
+        box = boxes(gpu=support.ROOM)
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_gpu.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c8e43e0>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu[less-than-its-share-free] _
+
+boxes = <function boxes.<locals>.make at 0x72653c944b80>
+gpu = {'free': 1073741824, 'name': 'Stand-in GPU', 'present': True, 'total': 17179869184}
+
+    @pytest.mark.parametrize("gpu", [support.SHORT, support.NO_GPU], ids=["less-than-its-share-free", "no-gpu"])
+    def test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu(boxes, gpu):
+        box = boxes(gpu=gpu)
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_gpu.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c8e51f0>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu[no-gpu] _
+
+boxes = <function boxes.<locals>.make at 0x72653c910220>
+gpu = {'present': False}
+
+    @pytest.mark.parametrize("gpu", [support.SHORT, support.NO_GPU], ids=["less-than-its-share-free", "no-gpu"])
+    def test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu(boxes, gpu):
+        box = boxes(gpu=gpu)
+>       service = box.warm()
+                  ^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_gpu.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c9689b0>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_____ test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu _____
+
+boxes = <function boxes.<locals>.make at 0x72653c910540>
+
+    def test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu(boxes):
+        box = boxes(gpu=support.ROOM)
+        box.config(load_delay=0.5)
+        tags = [f"g{number}" for number in range(6)]
+        reports = box.together([{"query": query_of(tag), "candidates": candidates(tag, 4)} for tag in tags])
+        for tag, report in zip(tags, reports):
+            assert raised(report) is None, f"search {tag} raised: {raised(report)}"
+            check_scored(report["result"], query_of(tag), candidates(tag, 4), f"search {tag}")
+        on_gpu = [record["pid"] for record in box.loads() if record["device"] == "cuda"]
+>       assert len(on_gpu) == 1, f"six searches starting together put {len(on_gpu)} copies of the model on the GPU"
+E       AssertionError: six searches starting together put 6 copies of the model on the GPU
+E       assert 6 == 1
+E        +  where 6 = len([1705282, 1705279, 1705283, 1705280, 1705284, 1705281])
+
+tests/acceptance/W2-112/test_w2_112_gpu.py:61: AssertionError
+______ test_the_service_alerts_when_it_starts_on_the_cpu_below_its_share _______
+
+boxes = <function boxes.<locals>.make at 0x72653c910860>
+
+    def test_the_service_alerts_when_it_starts_on_the_cpu_below_its_share(boxes):
+        box = boxes(gpu=support.SHORT)
+        since = time.time()
+>       box.warm()
+
+tests/acceptance/W2-112/test_w2_112_gpu.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c96c140>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_the_record_gives_memory_before_and_after_with_10_concurrent_searches_and_their_times _
+
+    def test_the_record_gives_memory_before_and_after_with_10_concurrent_searches_and_their_times():
+>       text = _record()
+               ^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_record.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _record() -> str:
+        path = support.REPO_ROOT / RECORD_REL
+>       assert path.is_file(), f"there is no {RECORD_REL}: the KPI's measurements are recorded there"
+E       AssertionError: there is no docs/research/W2-112-shared-reranker.md: the KPI's measurements are recorded there
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/gov-os-lead-W2-112/red/docs/research/W2-112-shared-reranker.md').is_file
+
+tests/acceptance/W2-112/test_w2_112_record.py:23: AssertionError
+_ test_the_record_gives_the_gpus_memory_with_the_embedder_and_the_service_under_20_concurrent_searches _
+
+    def test_the_record_gives_the_gpus_memory_with_the_embedder_and_the_service_under_20_concurrent_searches():
+>       text = _record()
+               ^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_record.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _record() -> str:
+        path = support.REPO_ROOT / RECORD_REL
+>       assert path.is_file(), f"there is no {RECORD_REL}: the KPI's measurements are recorded there"
+E       AssertionError: there is no docs/research/W2-112-shared-reranker.md: the KPI's measurements are recorded there
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/gov-os-lead-W2-112/red/docs/research/W2-112-shared-reranker.md').is_file
+
+tests/acceptance/W2-112/test_w2_112_record.py:23: AssertionError
+_ test_the_first_search_starts_one_service_that_outlives_it_and_serves_the_next_session _
+
+box = <w2_112_support.Box object at 0x72653c9709b0>
+
+    def test_the_first_search_starts_one_service_that_outlives_it_and_serves_the_next_session(box):
+        first, given = query_of("first"), candidates("first", 6)
+        report = box.search(first, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], first, given, "the first search")
+        holders = [record["pid"] for record in box.live_loads()]
+>       assert len(holders) == 1, \
+            (f"after the first search ended, {len(holders)} live processes hold the model ({holders}): the first search "
+             f"is expected to start one service that stays up for every other session (a private reranker ends with its "
+             f"search){support.note()}")
+E       AssertionError: after the first search ended, 0 live processes hold the model ([]): the first search is expected to start one service that stays up for every other session (a private reranker ends with its search)
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/acceptance/W2-112/test_w2_112_service.py:39: AssertionError
+_ test_the_service_runs_the_pinned_model_from_the_reranker_environment_offline _
+
+box = <w2_112_support.Box object at 0x72653c96fda0>
+
+    def test_the_service_runs_the_pinned_model_from_the_reranker_environment_offline(box):
+        # The same pinned model, revision and environment as today (ADR-0002 §2, DEC-397); offline, as today.
+        query, given = query_of("pins"), candidates("pins", 4)
+        report = box.search(query, given)
+        assert raised(report) is None, f"the search raised: {raised(report)}"
+        loads = box.loads()
+        assert loads, "no model was loaded for a search that had candidates to rerank"
+        for record in loads:
+            assert record["model"] == support.MODEL, f"the model loaded is {record['model']!r}, not {support.MODEL}"
+            assert record["revision"] == support.REVISION, \
+                f"the revision loaded is {record['revision']!r}, not {support.REVISION} (given as revision=)"
+            assert os.path.realpath(record["prefix"]) == os.path.realpath(box.venv), \
+                f"the model was loaded in {record['prefix']}, not in the reranker environment {box.venv} (DEC-397)"
+            assert record["hf_hub_offline"] == "1", "the model was loaded without HF_HUB_OFFLINE=1: it could be fetched"
+        services = [record for record in loads if support.alive(record["pid"])]
+>       assert len(services) == 1, \
+            f"no service holds the pinned model after the search ended ({len(services)} live holders)"
+E       AssertionError: no service holds the pinned model after the search ended (0 live holders)
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/acceptance/W2-112/test_w2_112_service.py:70: AssertionError
+_ test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port _
+
+box = <w2_112_support.Box object at 0x72653c96f800>
+
+    def test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port(box):
+>       box.warm()
+
+tests/acceptance/W2-112/test_w2_112_service.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c96f800>, tag = 'warm'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+____________ test_two_searches_starting_together_start_one_service _____________
+
+box = <w2_112_support.Box object at 0x72653c96dc40>
+
+    def test_two_searches_starting_together_start_one_service(box):
+        box.config(load_delay=0.5)  # a slow start widens the race the lock closes
+        tags = ("left", "right")
+        reports = box.together([{"query": query_of(tag), "candidates": candidates(tag, 5)} for tag in tags])
+        for tag, report in zip(tags, reports):
+            assert raised(report) is None, f"search {tag} raised: {raised(report)}"
+            check_scored(report["result"], query_of(tag), candidates(tag, 5), f"search {tag}")
+        loads = box.loads()
+>       assert len(loads) == 1, \
+            f"two searches starting together loaded the model {len(loads)} times ({[r['pid'] for r in loads]}): one"
+E       AssertionError: two searches starting together loaded the model 2 times ([1705385, 1705384]): one
+E       assert 2 == 1
+E        +  where 2 = len([{'args': ["'Qwen/Qwen3-Reranker-0.6B'"], 'attempt': 1, 'cuda_visible_devices': None, 'device': 'cuda', ...}, {'args': ["'Qwen/Qwen3-Reranker-0.6B'"], 'attempt': 2, 'cuda_visible_devices': None, 'device': 'cuda', ...}])
+
+tests/acceptance/W2-112/test_w2_112_service.py:100: AssertionError
+_ test_the_service_ends_itself_after_its_idle_time_and_the_next_search_starts_it_again _
+
+boxes = <function boxes.<locals>.make at 0x72653c911260>
+
+    def test_the_service_ends_itself_after_its_idle_time_and_the_next_search_starts_it_again(boxes):
+        idle = 4.0
+        box = boxes(settings={support.IDLE_SETTING: idle})
+>       service = box.warm("idle-0")
+                  ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_service.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653cb975c0>, tag = 'idle-0'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second _
+
+box = <w2_112_support.Box object at 0x72653c8e6c90>
+
+    def test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second(box):
+>       killed = box.warm("before")
+                 ^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-112/test_w2_112_service.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <w2_112_support.Box object at 0x72653c8e6c90>, tag = 'before'
+
+    def warm(self, tag: str = "warm") -> int:
+        """Start the service with one search and return the process that loaded its model."""
+        query, given = query_of(tag), candidates(tag, 4)
+        report = self.search(query, given)
+        assert raised(report) is None, f"the first search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the first search")
+        holders = [record["pid"] for record in self.live_loads()]
+>       assert len(holders) == 1, \
+               ^^^^^^^^^^^^^^^^^
+            (f"after one search ended, {len(holders)} live processes hold the model ({holders}): one service is "
+             f"expected to stay up for the next session{note()}")
+E       AssertionError: after one search ended, 0 live processes hold the model ([]): one service is expected to stay up for the next session
+
+tests/acceptance/W2-112/w2_112_support.py:710: AssertionError
+_ test_with_a_gpu_slot_free_the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot _
+
+box = <w2_112_support.Box object at 0x72653c8e68a0>
+
+    def test_with_a_gpu_slot_free_the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot(box):
+        box.block_service()
+        query, given = query_of("slot-free"), candidates("slot-free", 5)
+        report = box.search(query, given)
+        assert raised(report) is None, f"the search raised: {raised(report)}"
+        assert report["seconds"] <= support.FALLBACK_S, f"the search took {report['seconds']:.1f} s with a slot free"
+        check_scored(report["result"], query, given, "the search whose service cannot start")
+        loads = _scorer_loads(box, query)
+        assert loads, "no private reranker that scored the search loaded the model"
+        for record in loads:
+            assert record["device"] == "cuda", \
+                f"the fallback private reranker loaded its model on {record['device']}, not on the GPU (KPI 7)"
+>           assert record["slots_held"] and record["slots_held"] >= 1, \
+                ("the fallback private reranker loaded its model while no GPU slot was held in "
+                 f"{support.LOCK_DIR_SETTING}: it did not go through the GPU slot rule")
+E           AssertionError: the fallback private reranker loaded its model while no GPU slot was held in GOV_RERANK_GPU_LOCK_DIR: it did not go through the GPU slot rule
+E           assert (0)
+
+tests/acceptance/W2-112/test_w2_112_slots.py:46: AssertionError
+_ test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu _
+
+boxes = <function boxes.<locals>.make at 0x72653c8d85e0>
+
+    def test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu(boxes):
+        wait = 2.0
+        box = boxes(settings={support.WAIT_SETTING: wait})
+        box.block_service()
+        box.hold_slots()
+        query, given = query_of("slots-held"), candidates("slots-held", 5)
+        report = box.search(query, given)
+        assert raised(report) is None, f"the search raised with both GPU slots held: {raised(report)}"
+>       check_unranked(report["result"], given, "the search with both GPU slots held")
+
+tests/acceptance/W2-112/test_w2_112_slots.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = [{'chunk_id': 'slots-held-3', 'end_line': 3, 'parent_id': 'parent-of-slots-held-3', 'path': 'notes/slots-held-3.md', ....chunk_id': 'slots-held-0', 'end_line': 3, 'parent_id': 'parent-of-slots-held-0', 'path': 'notes/slots-held-0.md', ...}]
+given = [{'chunk_id': 'slots-held-0', 'end_line': 3, 'parent_id': 'parent-of-slots-held-0', 'path': 'notes/slots-held-0.md', ....chunk_id': 'slots-held-4', 'end_line': 3, 'parent_id': 'parent-of-slots-held-4', 'path': 'notes/slots-held-4.md', ...}]
+who = 'the search with both GPU slots held'
+
+    def check_unranked(result, given: list[dict], who: str = "the search") -> None:
+        """``result`` is the order given, no candidate scored, nothing lost (DEC-374)."""
+        assert isinstance(result, list), f"{who} did not return a list of candidates: {result!r}"[:600]
+>       assert [entry.get("chunk_id") for entry in result] == [entry["chunk_id"] for entry in given], \
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{who}: unranked, the order given must be kept: got {[entry.get('chunk_id') for entry in result]}"
+E       AssertionError: the search with both GPU slots held: unranked, the order given must be kept: got ['slots-held-3', 'slots-held-1', 'slots-held-2', 'slots-held-4', 'slots-held-0']
+
+tests/acceptance/W2-112/w2_112_support.py:343: AssertionError
+______ test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees _______
+
+boxes = <function boxes.<locals>.make at 0x72653c8d8e00>
+
+    def test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees(boxes):
+        box = boxes(settings={support.WAIT_SETTING: 8})
+        box.block_service()
+        box.hold_slots()
+        query, given = query_of("slot-frees"), candidates("slot-frees", 5)
+        session = box.start({"query": query, "candidates": given})
+        time.sleep(1.5)
+        freed = box.release_slots()
+        report = session.wait()
+        assert raised(report) is None, f"the search raised: {raised(report)}"
+        check_scored(report["result"], query, given, "the search that waited for a GPU slot")
+        loads = _scorer_loads(box, query)
+        assert loads, "no private reranker that scored the search loaded the model"
+        for record in loads:
+>           assert record["time"] >= freed - 0.05, \
+                (f"the private reranker loaded its model {freed - record['time']:.2f} s before a GPU slot freed: it did "
+                 "not wait for a slot")
+E           AssertionError: the private reranker loaded its model 5.04 s before a GPU slot freed: it did not wait for a slot
+E           assert 1793627936.9798114 >= (1793627942.0247345 - 0.05)
+
+tests/acceptance/W2-112/test_w2_112_slots.py:84: AssertionError
+___________ test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu] ___________
+
+boxes = <function boxes.<locals>.make at 0x72653c8d8400>, why = 'no-gpu'
+
+    @pytest.mark.parametrize("why", ["no-gpu", "gpu-hidden"])
+    def test_a_fallback_never_runs_a_reranker_on_the_cpu(boxes, why):
+        box = boxes(gpu=support.NO_GPU if why == "no-gpu" else support.ROOM)
+        box.block_service()
+        env = box.env(CUDA_VISIBLE_DEVICES="-1") if why == "gpu-hidden" else None
+        query, given = query_of(f"cpu-{why}"), candidates(f"cpu-{why}", 5)
+        report = box.search(query, given, env=env)
+        assert raised(report) is None, f"the search raised ({why}): {raised(report)}"
+        assert report["seconds"] <= support.SLOT_WAIT_S + support.FALLBACK_S, \
+            f"the search took {report['seconds']:.1f} s ({why})"
+        on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
+>       assert on_cpu == [], f"the fallback ran a reranker on the CPU ({why}): KPI 7 forbids it"
+E       AssertionError: the fallback ran a reranker on the CPU (no-gpu): KPI 7 forbids it
+E       assert [1705464] == []
+E         
+E         Left contains one more item: 1705464
+E         Use -v to get more diff
+
+tests/acceptance/W2-112/test_w2_112_slots.py:101: AssertionError
+_________ test_a_fallback_never_runs_a_reranker_on_the_cpu[gpu-hidden] _________
+
+boxes = <function boxes.<locals>.make at 0x72653c911b20>, why = 'gpu-hidden'
+
+    @pytest.mark.parametrize("why", ["no-gpu", "gpu-hidden"])
+    def test_a_fallback_never_runs_a_reranker_on_the_cpu(boxes, why):
+        box = boxes(gpu=support.NO_GPU if why == "no-gpu" else support.ROOM)
+        box.block_service()
+        env = box.env(CUDA_VISIBLE_DEVICES="-1") if why == "gpu-hidden" else None
+        query, given = query_of(f"cpu-{why}"), candidates(f"cpu-{why}", 5)
+        report = box.search(query, given, env=env)
+        assert raised(report) is None, f"the search raised ({why}): {raised(report)}"
+        assert report["seconds"] <= support.SLOT_WAIT_S + support.FALLBACK_S, \
+            f"the search took {report['seconds']:.1f} s ({why})"
+        on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
+>       assert on_cpu == [], f"the fallback ran a reranker on the CPU ({why}): KPI 7 forbids it"
+E       AssertionError: the fallback ran a reranker on the CPU (gpu-hidden): KPI 7 forbids it
+E       assert [1705467] == []
+E         
+E         Left contains one more item: 1705467
+E         Use -v to get more diff
+
+tests/acceptance/W2-112/test_w2_112_slots.py:101: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_when_the_service_cannot_start_the_search_falls_back_to_a_private_reranker
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_does_not_answer_is_passed_over[full]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_does_not_answer_is_passed_over[silent]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_answers_with_an_error_is_passed_over[error]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_answers_with_an_error_is_passed_over[garbage]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored[no reranker environment]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored[no model loads]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_nothing_is_started_before_a_search_needs_the_reranker
+FAILED tests/acceptance/W2-112/test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs
+FAILED tests/acceptance/W2-112/test_w2_112_answers.py::test_candidates_the_service_scores_alike_keep_the_order_given
+FAILED tests/acceptance/W2-112/test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_names_the_cpu_when_the_service_runs_there
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_gov_status_counts_the_searches_that_fell_back
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_requests_are_answered_in_arrival_order
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_search_with_more_texts_than_the_cap_still_answers
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_past_its_time_limit_does_not_hold_the_search
+FAILED tests/acceptance/W2-112/test_w2_112_fallback.py::test_when_the_services_model_cannot_load_the_search_still_gets_a_private_rerankers_answer
+FAILED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back
+FAILED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered
+FAILED tests/acceptance/W2-112/test_w2_112_fallback.py::test_each_fallback_is_logged_under_the_users_cache_folder
+FAILED tests/acceptance/W2-112/test_w2_112_gpu.py::test_with_room_on_the_gpu_the_service_runs_its_one_model_there
+FAILED tests/acceptance/W2-112/test_w2_112_gpu.py::test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu[less-than-its-share-free]
+FAILED tests/acceptance/W2-112/test_w2_112_gpu.py::test_without_its_share_of_the_gpu_free_the_service_starts_on_the_cpu[no-gpu]
+FAILED tests/acceptance/W2-112/test_w2_112_gpu.py::test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu
+FAILED tests/acceptance/W2-112/test_w2_112_gpu.py::test_the_service_alerts_when_it_starts_on_the_cpu_below_its_share
+FAILED tests/acceptance/W2-112/test_w2_112_record.py::test_the_record_gives_memory_before_and_after_with_10_concurrent_searches_and_their_times
+FAILED tests/acceptance/W2-112/test_w2_112_record.py::test_the_record_gives_the_gpus_memory_with_the_embedder_and_the_service_under_20_concurrent_searches
+FAILED tests/acceptance/W2-112/test_w2_112_service.py::test_the_first_search_starts_one_service_that_outlives_it_and_serves_the_next_session
+FAILED tests/acceptance/W2-112/test_w2_112_service.py::test_the_service_runs_the_pinned_model_from_the_reranker_environment_offline
+FAILED tests/acceptance/W2-112/test_w2_112_service.py::test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port
+FAILED tests/acceptance/W2-112/test_w2_112_service.py::test_two_searches_starting_together_start_one_service
+FAILED tests/acceptance/W2-112/test_w2_112_service.py::test_the_service_ends_itself_after_its_idle_time_and_the_next_search_starts_it_again
+FAILED tests/acceptance/W2-112/test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second
+FAILED tests/acceptance/W2-112/test_w2_112_slots.py::test_with_a_gpu_slot_free_the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot
+FAILED tests/acceptance/W2-112/test_w2_112_slots.py::test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu
+FAILED tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees
+FAILED tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu]
+FAILED tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_never_runs_a_reranker_on_the_cpu[gpu-hidden]
+36 failed, 9 passed in 31.90s

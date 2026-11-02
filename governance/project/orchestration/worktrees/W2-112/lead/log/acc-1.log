@@ -1,0 +1,181 @@
+........F...FF................F...............F....                      [100%]
+=================================== FAILURES ===================================
+_ test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason[no-gpu] _
+
+boxes = <function boxes.<locals>.make at 0x7050831d2fc0>
+tools = PosixPath('/tmp/gov-os-lead-W2-112/r0')
+project = PosixPath('/tmp/gov-os-lead-W2-112/r0/p'), gpu = {'present': False}
+
+    @pytest.mark.parametrize("gpu", [support.SHORT, support.NO_GPU], ids=["less-than-its-share-free", "no-gpu"])
+    def test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason(boxes, tools, project, gpu):
+        # DEC-1036 T5 (b): below its share the service does not start; the search falls back through the slot rule
+        # (a private reranker on a free GPU slot) or goes on unranked, named with its reason; never the CPU.
+        box = boxes(gpu=gpu)
+        bundle = _retrieve(box, tools, project)
+        value, reasons = _entry(bundle)
+        text = json.dumps(value)
+>       assert not ON_CPU.search(text), f"the bundle names the CPU below the service's share of the GPU: {value!r}"
+E       AssertionError: the bundle names the CPU below the service's share of the GPU: {'by': 'private', 'device': 'cpu', 'reason': 'the shared reranker did not answer (ConnectionError: the service ended before it listened (the GPU has too little free memory for its share))'}
+E       assert not <re.Match object; span=(29, 32), match='cpu'>
+E        +  where <re.Match object; span=(29, 32), match='cpu'> = <built-in method search of re.Pattern object at 0x705083423e20>('{"by": "private", "device": "cpu", "reason": "the shared reranker did not answer (ConnectionError: the service ended before it listened (the GPU has too little free memory for its share))"}')
+E        +    where <built-in method search of re.Pattern object at 0x705083423e20> = re.compile('\\bcpu\\b', re.IGNORECASE).search
+
+tests/acceptance/W2-112/test_w2_112_bundle.py:187: AssertionError
+_________________ test_requests_are_answered_in_arrival_order __________________
+
+box = <w2_112_support.Box object at 0x7050833abec0>
+
+    def test_requests_are_answered_in_arrival_order(box):
+        box.warm()
+        box.config(predict_delay=0.4)  # each scoring call holds the model, so the requests behind it queue
+        tags = [f"q{number}" for number in range(6)]
+        answers, errors = {}, {}
+    
+        def client(number, tag):
+            time.sleep(number * 0.15)
+            texts = [item["text"] for item in candidates(tag, 3)]
+            try:
+                answers[tag] = (texts, ask(box.socket, query_of(tag), texts, timeout=60))
+            except OSError as error:
+                errors[tag] = repr(error)
+    
+        threads = [threading.Thread(target=client, args=(number, tag)) for number, tag in enumerate(tags)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(90)
+        assert not errors, f"requests on the service's socket failed: {errors}"
+        for tag in tags:
+            texts, answer = answers[tag]
+>           assert is_scores(answer, len(texts)), f"request {tag} was answered {answer!r}, not one score per text"[:400]
+E           AssertionError: request q0 was answered {'scores': [4.205566887617493, -2.1869047301328237, 7.646952698060616], 'device': 'cuda'}, not one score per text
+E           assert False
+E            +  where False = is_scores({'device': 'cuda', 'scores': [4.205566887617493, -2.1869047301328237, 7.646952698060616]}, 3)
+E            +    where 3 = len(["[path: notes/q0-0.md]\nSession q0, passage 0: the keeper's ledger, line 0.", "[path: notes/q0-1.md]\nSession q0, passage 1: the keeper's ledger, line 7.", "[path: notes/q0-2.md]\nSession q0, passage 2: the keeper's ledger, line 14."])
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:69: AssertionError
+____ test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering ____
+
+box = <w2_112_support.Box object at 0x7050833a8f20>
+
+    def test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering(box):
+        box.warm()
+        texts = [f"text {number}" for number in range(support.OVER_CAP)]
+        try:
+            answer = ask(box.socket, query_of("cap"), texts, timeout=30)
+        except (OSError, TimeoutError) as error:
+            answer = f"refused by the connection: {error!r}"
+        assert not is_scores(answer, len(texts)), \
+            f"a request of {support.OVER_CAP} texts was scored in full: there is no cap on a request's texts"
+        small = [item["text"] for item in candidates("after-cap", 4)]
+        again = ask(box.socket, query_of("after-cap"), small, timeout=30)
+>       assert is_scores(again, len(small)) and all(
+            abs(got - score(query_of("after-cap"), text)) <= support.TOLERANCE for got, text in zip(again, small)), \
+            f"after refusing a request over the cap, the service answered {again!r} to a normal one"[:400]
+E       AssertionError: after refusing a request over the cap, the service answered {'scores': [0.8212530299797294, -9.277502397205524, 4.336268482589389, -2.6426027374240135], 'device': 'cuda'} to a normal one
+E       assert (False)
+E        +  where False = is_scores({'device': 'cuda', 'scores': [0.8212530299797294, -9.277502397205524, 4.336268482589389, -2.6426027374240135]}, 4)
+E        +    where 4 = len(["[path: notes/after-cap-0.md]\nSession after-cap, passage 0: the keeper's ledger, line 0.", "[path: notes/after-cap-1...eeper's ledger, line 14.", "[path: notes/after-cap-3.md]\nSession after-cap, passage 3: the keeper's ledger, line 21."])
+
+tests/acceptance/W2-112/test_w2_112_concurrency.py:96: AssertionError
+_ test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[no-gpu] _
+
+boxes = <function boxes.<locals>.make at 0x7050831fbc40>
+gpu = {'present': False}
+
+    @pytest.mark.parametrize("gpu", BELOW, ids=BELOW_IDS)
+    def test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu(boxes, gpu):
+        box = boxes(gpu=gpu)
+        for number in (1, 2):  # a second search does not start it either
+            query, given = query_of(f"below-{number}"), candidates(f"below-{number}", 5)
+            report = box.search(query, given)
+            who = f"search {number} with {gpu}"
+            assert raised(report) is None, f"{who} raised: {raised(report)}"
+            assert report["seconds"] <= support.SLOT_WAIT_S + support.FALLBACK_S, f"{who} took {report['seconds']:.1f} s"
+            on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
+>           assert on_cpu == [], \
+                f"{who}: a model was loaded on the CPU ({on_cpu}): no reranker runs on the CPU anywhere (DEC-1036, DEC-1033)"
+E           AssertionError: search 1 with {'present': False}: a model was loaded on the CPU ([1718293]): no reranker runs on the CPU anywhere (DEC-1036, DEC-1033)
+E           assert [1718293] == []
+E             
+E             Left contains one more item: 1718293
+E             Use -v to get more diff
+
+tests/acceptance/W2-112/test_w2_112_gpu.py:62: AssertionError
+___________ test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu] ___________
+
+boxes = <function boxes.<locals>.make at 0x7050833318a0>, why = 'no-gpu'
+
+    @pytest.mark.parametrize("why", ["no-gpu", "gpu-hidden"])
+    def test_a_fallback_never_runs_a_reranker_on_the_cpu(boxes, why):
+        box = boxes(gpu=support.NO_GPU if why == "no-gpu" else support.ROOM)
+        box.block_service()
+        env = box.env(CUDA_VISIBLE_DEVICES="-1") if why == "gpu-hidden" else None
+        query, given = query_of(f"cpu-{why}"), candidates(f"cpu-{why}", 5)
+        report = box.search(query, given, env=env)
+        assert raised(report) is None, f"the search raised ({why}): {raised(report)}"
+        assert report["seconds"] <= support.SLOT_WAIT_S + support.FALLBACK_S, \
+            f"the search took {report['seconds']:.1f} s ({why})"
+        on_cpu = [record["pid"] for record in box.loads() if record["device"] == "cpu"]
+>       assert on_cpu == [], f"the fallback ran a reranker on the CPU ({why}): KPI 7 forbids it"
+E       AssertionError: the fallback ran a reranker on the CPU (no-gpu): KPI 7 forbids it
+E       assert [1718697] == []
+E         
+E         Left contains one more item: 1718697
+E         Use -v to get more diff
+
+tests/acceptance/W2-112/test_w2_112_slots.py:104: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/acceptance/W2-112/test_w2_112_answers.py::test_the_services_answers_match_a_private_rerankers_on_the_same_inputs
+PASSED tests/acceptance/W2-112/test_w2_112_answers.py::test_candidates_the_service_scores_alike_keep_the_order_given
+PASSED tests/acceptance/W2-112/test_w2_112_answers.py::test_the_same_inputs_get_the_same_answer_whichever_session_asks_and_whatever_shares_the_model
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_is_marked_rerank_unavailable_with_its_reason_when_nothing_can_rerank
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason[service-down]
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_with_both_gpu_slots_held_the_bundle_is_unranked_named_with_its_reason[no-service-yet]
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_names_the_service_and_its_gpu_when_the_service_answers
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason[less-than-its-share-free]
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_the_bundle_names_a_private_reranker_and_its_gpu_when_the_service_is_down
+PASSED tests/acceptance/W2-112/test_w2_112_bundle.py::test_gov_status_counts_the_searches_that_fell_back
+PASSED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_twenty_concurrent_searches_are_answered_by_one_process_each_with_its_own_scores
+PASSED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_search_with_more_texts_than_the_cap_still_answers
+PASSED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_past_its_time_limit_does_not_hold_the_search
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_when_the_service_cannot_start_the_search_falls_back_to_a_private_reranker
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_when_the_services_model_cannot_load_the_search_still_gets_a_private_rerankers_answer
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_does_not_answer_is_passed_over[full]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_does_not_answer_is_passed_over[silent]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_answers_with_an_error_is_passed_over[error]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_that_answers_with_an_error_is_passed_over[garbage]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_whose_model_fails_answers_with_an_error_and_the_search_falls_back
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_service_killed_mid_run_leaves_every_search_answered
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored[no reranker environment]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_where_no_private_reranker_can_start_either_the_order_given_is_kept_unscored[no model loads]
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_a_session_that_cannot_make_a_unix_socket_falls_back_quickly_without_an_error
+PASSED tests/acceptance/W2-112/test_w2_112_fallback.py::test_each_fallback_is_logged_under_the_users_cache_folder
+PASSED tests/acceptance/W2-112/test_w2_112_gpu.py::test_with_room_on_the_gpu_the_service_runs_its_one_model_there
+PASSED tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[less-than-its-share-free]
+PASSED tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder[less-than-its-share-free]
+PASSED tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_the_fallback_and_its_reason_are_logged_under_the_users_cache_folder[no-gpu]
+PASSED tests/acceptance/W2-112/test_w2_112_gpu.py::test_searches_starting_together_put_one_copy_of_the_model_on_the_gpu
+PASSED tests/acceptance/W2-112/test_w2_112_record.py::test_the_record_gives_memory_before_and_after_with_10_concurrent_searches_and_their_times
+PASSED tests/acceptance/W2-112/test_w2_112_record.py::test_the_record_gives_the_gpus_memory_with_the_embedder_and_the_service_under_20_concurrent_searches
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_nothing_is_started_before_a_search_needs_the_reranker
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_the_first_search_starts_one_service_that_outlives_it_and_serves_the_next_session
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_the_service_runs_the_pinned_model_from_the_reranker_environment_offline
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_the_socket_is_in_the_users_folder_the_users_alone_and_there_is_no_network_port
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_two_searches_starting_together_start_one_service
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_the_service_ends_itself_after_its_idle_time_and_the_next_search_starts_it_again
+PASSED tests/acceptance/W2-112/test_w2_112_service.py::test_after_the_service_died_a_later_search_starts_a_new_one_and_never_a_second
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_with_a_gpu_slot_free_the_fallback_private_reranker_loads_on_the_gpu_holding_a_slot
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_with_both_gpu_slots_held_a_fallback_waits_then_goes_on_unranked_with_no_model_on_the_cpu
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_waits_for_a_gpu_slot_and_takes_the_one_that_frees
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_never_runs_a_reranker_on_the_cpu[gpu-hidden]
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_the_service_holds_one_of_the_two_gpu_slots
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_with_the_service_up_and_the_other_slot_held_a_fallback_waits_then_goes_on_unranked
+PASSED tests/acceptance/W2-112/test_w2_112_slots.py::test_with_both_slots_held_before_any_service_the_search_goes_on_unranked_with_no_model_loaded
+FAILED tests/acceptance/W2-112/test_w2_112_bundle.py::test_below_its_share_the_bundle_never_names_the_cpu_and_gives_its_reason[no-gpu]
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_requests_are_answered_in_arrival_order
+FAILED tests/acceptance/W2-112/test_w2_112_concurrency.py::test_a_request_over_the_cap_is_refused_and_the_service_keeps_answering
+FAILED tests/acceptance/W2-112/test_w2_112_gpu.py::test_below_its_share_or_without_a_gpu_the_service_does_not_start_and_nothing_loads_on_the_cpu[no-gpu]
+FAILED tests/acceptance/W2-112/test_w2_112_slots.py::test_a_fallback_never_runs_a_reranker_on_the_cpu[no-gpu]
+5 failed, 46 passed in 86.48s (0:01:26)

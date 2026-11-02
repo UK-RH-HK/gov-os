@@ -1,0 +1,66 @@
+{
+  "ticket": "DAEO-clon",
+  "outcome": "fail",
+  "error_kind": null,
+  "lines": [
+    {
+      "kpi": "success-1",
+      "outcome": "pass",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-2",
+      "outcome": "fail",
+      "passed": 3,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-3",
+      "outcome": "pass",
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-4",
+      "outcome": "fail",
+      "passed": 8,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-5",
+      "outcome": "pass",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-6",
+      "outcome": "fail",
+      "passed": 3,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "kpi": "success-7",
+      "outcome": "fail",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "unmapped": {
+    "passed": 7,
+    "failed": 3,
+    "skipped": 0
+  },
+  "totals": {
+    "passed": 38,
+    "failed": 7,
+    "skipped": 0
+  }
+}

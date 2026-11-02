@@ -1,0 +1,6 @@
+W2-112 (DAEO-clon): merge the acceptance tests revised for DEC-1036 (w2/W2-112-tests at faa66e1a9d98)
+
+Task: DAEO-clon
+Implements: DEC-963,DEC-1033,DEC-1032
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

@@ -1,0 +1,6 @@
+W2-112 (DAEO-clon): merge w2/integrate (DEC-1036: KPI 6 and three unit test files in the ticket's paths)
+
+Task: DAEO-clon
+Implements: DEC-1036
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

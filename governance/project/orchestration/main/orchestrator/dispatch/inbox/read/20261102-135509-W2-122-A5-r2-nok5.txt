@@ -1,0 +1,7 @@
+log: W2-122-A5-r2-nok5.json
+W2: W2-122
+status: DONE. The code head I verified is `b9398da0b934`. The branch head is `3fc448601e2d`, which adds only my `gov checkpoint` record on top.
+
+task: W2-122 (DAEO-blwa) run 2: land the seeding without KPI 5 (DEC-1027 C): merge w2/integrate, retire the K5 tests, take the K5 behaviour out, run gov accept and the scoped run, return DONE.
+status: DONE. The code head I verified is `b9398da0b934`. The branch head is `3fc448601e2d`, which adds only my `gov checkpoint` record on top.
+work_completed: Run 1's head `bd50a9581893` was present and the tree was clean. I merged `w2/integrate` (`42dad22d`, the ticket file without KPI 5) as `5e789d62395f`. I recreated the tests worktree and launched the test designer (td-3) and the engineer (eng-7) at

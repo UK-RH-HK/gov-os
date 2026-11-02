@@ -2,6 +2,10 @@
 
 ## RESUME HERE — handover of 2026-11-01 22:45 GMT, for the fresh session after the reload (DEC-994, DEC-1018)
 
+**EMERGENCY IN FORCE (DEC-1033, 2026-11-02 13:01): read `.gov-runtime/scratch/orchestrator/EMERGENCY-PLAN-2026-11-02.md`
+FIRST: it holds each fix's state and time, what was stopped and where it resumes, the decisions since DEC-1033, the
+ACTs, the re-pin question and the after figures due. It supersedes the older notes below where they differ.**
+
 **Read first:** `governance/project/prompts/w2-orchestrator.md` §0; `governance/project/orchestration/DECISIONS-IN-FORCE.md`;
 this block. Older history: `drafts/CHECKPOINT-ARCHIVE-to-2026-11-01.md` (read only for a named question). Register: DEC-1009
 to DEC-1018 are today's; next free id DEC-1019.
@@ -175,6 +179,8 @@ W2-127 `DAEO-1vka` filed (`8e0daae2`): the reranker socket in the sandbox, after
 ACT-QUERY-GPU-2 handed over 13:55 (HOLD on). After it: set dispatch/config.json gpu_expected.query true; land W2-123
 (DONE, head 3de9bcf44d91, verified 2a4455be0785) via the queue (now seeded); W2-122 DONE soon; then the seeded close of
 W2-05+W2-96 as the measurement; refresh the integration store once by hand (it is at 6ebd7b56).
+**14:00:** W2-112's T5 (b) and T6 (b) decided and told to its lead; DEC-1036 drafted in `drafts/DEC-1036.md`: commit it
+and W2-112's KPI 6 lines when the ACT hold ends.
 
 **At start, in order (the earlier session's list; items 1-5 done above):**
 1. `echo "$GOV_ROLE $GOV_TICKET"` = `orchestrator DAEO-sdxk`; `git status --porcelain` in the main tree empty.
