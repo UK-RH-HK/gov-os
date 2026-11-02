@@ -6,6 +6,8 @@ A fresh independent test designer (MR-3) wrote these tests before the implementa
 
 **Round 2 (DEC-1005; "Round 2", at the end): 61 cases in 10 files.** Four cases were revised and five added. At the base (`d2ff95b2`): **40 failed, 19 passed, 2 skipped** (the same 19 pass, and every added case is red).
 
+**Round 3, the repair round (DEC-1025; "Round 3", at the end): 90 cases in 11 files.** One case was revised and 29 added. At the base (`611d1ae12f94`, this tree's `src/` holding none of the ticket's work): **69 failed, 19 passed, 2 skipped**, about 35 s (the same 19 pass, and every added case is red).
+
 ## How the suite runs, and the code it runs (DEC-732)
 
 From the root of the tree that holds the suite:
@@ -33,6 +35,8 @@ From the root of the tree that holds the suite:
 | ledger | `conftest.py` (`ledger`) | 48 pages. Each holds the ticket's title (`Beacon ledger`) and its KPI line, each on a line of its own. Every fourth page is large (about 260 tokens), the rest small (about 25). Room for all of them at the default ceiling. Indexed. |
 | ties | `test_w2_04_reproducible.py` | Four files with identical text in `docs/ties/`, six matching notes whose paths sort before them, one note no query matches (`docs/semantic/gulls.md`). Indexed. |
 | quay | `test_w2_04_query.py` | Title `Harbour lamps, north quay`. KPI line `The tide gauge records the vermilion datum at dawn.` `docs/notes/datum.md` holds the KPI line and no word of the title. Indexed. |
+| emptied (round 3) | `test_w2_04_emptied.py` (`emptied`) | No index. `TK-W204-EMPTY` cites the charter and `CAP-15` and names `TK-W204-EMPTYDEP` in `deps`. The store is built from `HEAD`. Each case writes one file in the working tree and puts it back afterwards. |
+| refusing (round 3) | `test_w2_04_context_check.py` | No index. A charter of about 35,000 tokens. `TK-W204-OVER-A` and `TK-W204-OVER-B` cite it, and `TK-W204-OK` fits. |
 
 The lexical route matches a line's exact text. So in the ledger, every page holds the title and the KPI line verbatim, and any query built from the title, the KPI lines or their words finds every page. The lexical route ranks its hits by path, so the ledger's pages are ranked by path.
 
@@ -111,6 +115,7 @@ The fixture holds its premise. `row_order` reads the temporary store's `lexical_
 | `test_a_mandatory_file_that_cannot_be_read_blocks_or_is_marked_not_read` (2: deleted, no permission) | `BLOCKED` naming the id and the file, or `"read": false`. Never shown as read. | **green** (W1-24's follow-up, DEC-552) |
 | `test_a_register_entry_whose_span_cannot_be_read_blocks_or_is_marked_not_read` (3: deleted, emptied, no permission) | The store holds the entry and the working tree's register is gone, empty or unreadable. The context blocks naming DEC-102 and the register, or marks it not read, or shows it read with its own `content_hash` (span read from the store). Never the empty hash, never 0 tokens. | red for **emptied**: shown read with the hash of empty content. Deleted and no permission are **green** (BLOCKED, naming the file). |
 | `test_a_source_that_no_longer_stands_blocks_naming_its_status` (6: SUPERSEDED, RETIRED, REJECTED × register entry, decision file) | `BLOCKED`, naming the id and its status. | **green**, each (DEC-552, DEC-568). Held now that decisions are read as entries. |
+| `test_w2_04_emptied.py::test_an_emptied_mandatory_file_blocks_or_is_marked_not_read_never_read` (round 3, addendum 3's S5, F1; 24: capability, dependency ticket × empty, one newline, mixed whitespace × `--json`, `--dry-run`, `--brief`, `--brief --dry-run`) | The store is built from `HEAD`. Then, in the working tree only, a truncating write leaves the cited capability file, or the dependency ticket named in `deps`, empty or holding only whitespace. The charter the ticket also cites stays readable. Two outcomes are allowed. (1) `BLOCKED`: `ok: false`, a non-zero exit, and the message or `details` naming the id and the file. (2) The input is listed with `"read": false`, and its `mandatory` entry never shows it as read. No map that names it and is not marked `"read": false` carries the sha256 of empty content or of the whitespace, or 0 tokens or the whitespace's count (R10). With `--brief`, no summary line names it without saying it was not read (R9), and the packet file the brief writes (if any) is held to (2). Premise: before the write, the store lists both inputs at their files, and the context shows each one read with its file's sha256. | red, each: `ok: true` with the input listed with the sha256 of what is left in its file (`e3b0…`, `01ba…`, `743b…`); with `--brief`, the summary lists `CAP-15 (capability, ACCEPTED)` or `TK-W204-EMPTYDEP (ticket, in_progress)` |
 
 ### KPI 6 (S6; W2-M126): the supplementary query: `test_w2_04_query.py`
 
@@ -127,7 +132,8 @@ The fixture holds its premise. `row_order` reads the temporary store's `lexical_
 | `test_when_room_is_left_after_one_batch_the_next_batch_is_taken` (round 2) | Read through `supplementary_batches`, with room for every page. Every batch but the last read its `limit` (one that read fewer ended the evidence, so nothing was left to take). The last read fewer than its limit, or none. The stack is every item the batches read, in their order. When the evidence passes the first batch's limit, there are at least two batches and more stacked than the largest limit. No limit exceeds the room's tokens (each item costs at least one). | red: no `supplementary_batches` |
 | `test_with_less_room_the_stack_stops_at_the_first_item_that_does_not_fit` | From the full stack, it takes the first item k that has a smaller item ranked below it. The budget holds the items above k and is one token short of k. The stack is exactly the items above k: nothing ranked below k. | red: an item ranked below k is stacked (greedy fill) |
 | `test_further_batch_begins_with_the_first_item_that_did_not_fit_in_rank_order` | `further_batch` is a list of `{id, path}`. It begins with item k, is the ranked items from k on, and holds no stacked item. | red: no `further_batch` |
-| `test_further_batch_is_at_most_one_batch_long` (round 2) | Under the tight budget, read through `supplementary_batches`. The stack is the first items the batches read. `0 < len(further_batch) <=` the largest `limit`. It begins with the first ranked item not stacked, continues in the batches' order, and holds no stacked item. | red: no `supplementary_batches` |
+| `test_further_batch_is_at_most_one_batch_long` (round 2; revised in round 3, `Rewrite-Reason: DEC-1025`) | Under the tight budget, read through `supplementary_batches`. The stack is the first items the batches read. `0 < len(further_batch) <=` the largest `limit`. It begins with the first ranked item not stacked, continues **in rank order** (the room-for-all run's stack, R2; round 2 compared it with the batches' reads), and holds no stacked item. | red: no `supplementary_batches` |
+| `test_when_the_room_ends_exactly_further_batch_names_what_is_left` (round 3, addendum 3's S7, F2; 3: the room ends on a batch's last item, inside a batch, no room) | The budgets are set from the room-for-all run's own figures (R12): the room is exactly the tokens of the first `k` ranked items. `k` is the first batch's item count, half of it, or 0. Each run is `ok: true`, holds its ceiling at exactly the budget, and its stack is the first `k` ranked items. `further_batch` is not empty. It begins with ranked item `k`, continues in rank order and holds no stacked item. It is at most the largest `limit` of the run's batches, or of the room-for-all run's when there is no room. Each of its items is in `dropped` with the reason `budget exceeded` (R13). No batch is taken with a room of 0, and no batch's `limit` exceeds the room it had when it was taken. With no room, `supplementary` and `supplementary_batches` are empty. | red: no `supplementary_batches` (on a batch's last item, inside a batch); no `further_batch` (no room) |
 | `test_a_lookup_failure_is_named_in_dropped_by_its_kind` | A damaged index (its chunk table dropped) is named in `dropped` as `index unavailable`, and nothing is stacked. | **green** (W2-L180, fixed in W1-24's follow-up) |
 | `test_supplementary_batches_is_present_and_of_its_form` (round 2; 4: room for all, a tight budget, no index, a damaged index) | The addendum's S7a and "The packet's keys". The packet's keys are the eight it carried before and exactly the four added. `supplementary_batches` is a list of `{items: [{id, path}], limit}` with `len(items) <= limit` and `limit >= 1`. `supplementary` is the first items of the batches' items. With no index or a damaged one, nothing is stacked or left. With a damaged one, `dropped` names the failure. Two builds give the same batches and hash. | red: the four keys are absent |
 
@@ -139,6 +145,8 @@ The fixture holds its premise. `row_order` reads the temporary store's `lexical_
 | `test_an_unheld_file_beside_a_ticket_keeps_the_check_red` | A README beside a ticket keeps the check red and is named. | **green** (DEC-628) |
 | `test_a_ticket_file_with_another_ending_is_named_never_unseen` (2: `.MD`, `.markdown`) | The output names the file or its id. | red: green, and it is never named |
 | `test_two_ticket_files_with_one_id_are_named_as_a_duplicate_and_not_green` | Exit non-zero, and a line naming the id says "duplicate". | red: green |
+| `test_when_every_ticket_refuses_over_the_ceiling_the_check_is_unmeasured_never_green` (round 3, addendum 3's S8a, F3) | Two tickets, each citing a charter of about 35,000 tokens, so each is over the default ceiling by its mandatory inputs alone. A line begins `unmeasured:` and says no packet was built (R11). A `REFUSED:` line names each ticket. Exit non-zero. | red: `context-reproducibility: green` (the base never refuses) |
+| `test_when_one_ticket_refuses_and_one_fits_the_check_stays_green_with_its_refused_line` (round 3, S8a, what it keeps) | One ticket over the ceiling and one that fits. A `REFUSED:` line names the first and none names the second. No line begins `unmeasured:`. Exit 0. No earlier case showed this. | red: no `REFUSED:` line (the base never refuses) |
 
 ### Rows W2-L183 and W2-M134 (S9, S10): `test_w2_04_one_read_and_notes.py`
 
@@ -272,10 +280,42 @@ A fresh independent test designer revised the suite from the specification and i
 
 - **R5. "Every batch but the last read its limit."** A batch that read fewer items than its limit ended the evidence, so no further batch had anything to take. With room for everything the last batch reads fewer than its limit, or none.
 - **R6. "The stack holds more than one batch"** is required when the matching evidence passes the first batch's limit. A limit at or above the evidence (48 pages and more) gives one batch, and the case then holds only the rules. A limit is bounded only by the room's tokens: each item costs at least one, so no batch reads more items than the room has tokens.
-- **R7. `further_batch` is among the items the batches read.** Naming what is next means reading it, and a read is a batch the context took (S7a: "one entry per batch the context took").
+- **R7. `further_batch` is among the items the batches read.** Naming what is next means reading it, and a read is a batch the context took (S7a: "one entry per batch the context took"). **Superseded by DEC-1025** (addendum 3's S7: "an item of `further_batch` need not be one that an entry of `supplementary_batches` read"). Round 3 compares `further_batch` with the rank order ("Round 3").
 - **R8. "The context asked the semantic route nothing."** The real semantic search embeds its question, so a context that calls it sends an embedder text. The stand-in's log stands in for the embedder's.
 
 ### Earlier suites revised in round 2
 
 - **W2-54:** `tests/acceptance/W2-54/README.md`, "W2-04 (DEC-1005)". `test_w2_54_dropped_order.py` (14 cases) and the three embedder cases changed.
 - **W1-41:** `tests/acceptance/W1-41/README.md`, "Rewrite (W2-04, DEC-1005)". Two cases changed.
+
+## Round 3, the repair round (DEC-1025, 2026-11-02)
+
+Review 1 of the build found three behaviours the suite did not cover. The CTO decided one repair round (DEC-1025, delegated, deciding P-W2-04-6 (a) and P-W2-04-8 (a)). A fresh independent test designer received them as described behaviours (DEC-136), in the specification's addendum 3, and wrote the cases from that text without reading the implementation. The commit carries `Rewrite-Reason: DEC-1025`. No expectation is lowered (DEC-866). The one revised case asserts everything it did, and compares against the rank order instead of the batches' reads.
+
+### What changed in this folder
+
+| case | finding | what it guards |
+|---|---|---|
+| **added** `test_w2_04_emptied.py::test_an_emptied_mandatory_file_blocks_or_is_marked_not_read_never_read` (24) | F1, the one that blocked: an emptied mandatory file or dependency ticket was shown read with the empty-content hash (KPI 5, row W2-H034) | an emptied or whitespace-only capability or dependency ticket, in the working tree after a store built from `HEAD`: `BLOCKED` by name or `"read": false`, never read. Under `--json`, `--dry-run`, `--brief` and `--brief --dry-run` (KPI 5 table) |
+| **revised** `test_w2_04_batches.py::test_further_batch_is_at_most_one_batch_long` | F2: R7 is superseded. An item of `further_batch` need not be one a batch read | `further_batch` against the rank order. Non-empty, at most the largest `limit`, no stacked item, the stack a prefix of the batches' items: all kept (KPI 7 table) |
+| **added** `test_w2_04_batches.py::test_when_the_room_ends_exactly_further_batch_names_what_is_left` (3) | F2: on an exact fit, or with no room, `further_batch` was empty although ranked evidence remained | the room ending on a batch's last item, inside a batch, or at 0 (KPI 7 table) |
+| **added** `test_w2_04_context_check.py::test_when_every_ticket_refuses_over_the_ceiling_the_check_is_unmeasured_never_green` | F3: the check was green when every ticket refused | `unmeasured:` (no packet was built), a `REFUSED:` line for each ticket, a non-zero exit (S8 table) |
+| **added** `test_w2_04_context_check.py::test_when_one_ticket_refuses_and_one_fits_the_check_stays_green_with_its_refused_line` | F3, what it keeps | green, with the `REFUSED:` line, no `unmeasured:` line (S8 table) |
+
+### Red at the base
+
+Run at the base `611d1ae12f94` (this tree's `src/` holds none of the ticket's work): **69 failed, 19 passed, 2 skipped**. The 40 cases red before stay red. The 29 added cases are red. The same 19 pass. No case fails for a defect of its own. A throwaway self-check outside the tree fed the new cases' logic with simulated packets and outputs:
+
+- correct batching at limits of 7, 20 and 100 passed every new and revised case;
+- the F2 defect (naming only what a batch read) failed the exact-fit and no-room shapes;
+- each F1 outcome that is allowed passed, and each forbidden one failed.
+
+The red reason of each case is in its table row above.
+
+### Readings taken in round 3
+
+- **R9. A brief summary that lists an input as not read** names it on a line that says so: `not read` (the summary's own word for an external reference, `(external, not read)`), `unread`, or `read: false`. A summary line that names the id without one of these lists it as present and read. A summary that does not name the id does not list it as read. The packet file the brief writes, when there is one, is held to the packet's rule.
+- **R10. "Never shown as read"** is held in two places. The packet's `mandatory` list must not show the input as read (an entry without `"read": false`). And any map anywhere in the result that names the id and is not marked `"read": false` (the `authority` block, for one) may not carry the sha256 of empty content or of the whitespace, nor 0 tokens or the whitespace's own count. A `"read": false` entry may carry whatever it carries.
+- **R11. "Says no packet was built"**: the `unmeasured:` line names a packet with a negation (`no`, `none`, `not`). "every ticket's context computation failed" says nothing of a packet. A `REFUSED:` line is any line of the check's output that holds `REFUSED:` and names the ticket.
+- **R12. The exact-room budgets** come from the room-for-all run's own figures. Its stack is the rank order (R2). The mandatory size is `tokens` less the supplementary items' tokens. The first batch's item count is `k` for "a batch's last item". Where that batch holds every ranked item (one batch for all the evidence, allowed by R6), `k` is all but the last ranked item. "Inside a batch" is half of that `k` (at least one). In the tight run the batches are the implementation's own, so the case holds the rules in every shape and does not assume where a batch ends. The room each batch had is the room less the tokens of the items stacked before it.
+- **R13. `dropped`** holds each item of `further_batch` by its `id` with the reason `budget exceeded` (`dropped`'s entries carry `id` and `reason`, W2-54's form). Its one order is held by W2-54's cases and not repeated here. Two chunks of one file share an `id` and a `path`, so "holds no stacked item" is checked by name only for the pairs that name one ranked item. Their places are held by the comparison with the rank order.
