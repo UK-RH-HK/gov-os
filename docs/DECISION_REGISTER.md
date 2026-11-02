@@ -12808,3 +12808,12 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.411 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1029. Next free id: DEC-1030. |
+
+### DEC-1030 — The dispatcher watches the whole machine: the GPU, its holders, each model's layers, and the servers' crashes (standing)
+- **Status:** ACCEPTED (owner, 2026-11-02, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-02)`; standing) · **Under:** DEC-1007, DEC-1012, DEC-1015 item 2, DEC-1003, DEC-1029
+- **Context:** the GPU crashed twice in the night of 2026-11-01/02 and the shared embedder fell back to the CPU (0/29 layers); neither the dispatcher nor the morning package saw it.
+- **Decision:** (1) From now the dispatcher watches the GPU: its memory and use, which processes hold it (the rerankers included), and whether each embedding model runs on it (its layers on the GPU); a crash in a server's log, or a model loading with 0 layers on the GPU, becomes an inbox item and a push to the owner at once. (2) The load-balancing plan says which work runs on the GPU (embedding, the shared reranker), how much of its memory each may take, and how the dispatcher keeps the rerankers from crowding the embedder off it. (3) The morning package reports every crash or error in the servers' logs overnight, not only the tests. (4) The same in the Gov OS (DEC-1003): the GPU as a resource the gate and the dispatcher measure and schedule (W2-20, W2-121), as KPI proposals.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.412 | 2026-11-02 | Owner (recorded by the orchestrator, DEC-861): DEC-1030. Next free id: DEC-1031. |
