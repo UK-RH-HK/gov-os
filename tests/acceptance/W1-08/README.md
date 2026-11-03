@@ -358,3 +358,24 @@ project's configuration (`CONFIG_INVALID`). That validation is written by hand o
 file and does not read it; each tool refuses its own key today (`INVALID_TIMEOUT`, `INVALID_WORKERS`,
 `CITATIONS_CONFIG_INVALID`, `TRAILERS_BASE_UNKNOWN`). The decision orders the schema, and the cases hold the
 schema.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: JSON Schemas exist for MADR decision, ticket (class, role, depends_on, allowed_paths, kpis, profile, sources, est_loc, acceptance_tes... | `test_w1_08_schemas_exist.py::test_a_committed_schema_file_exists_for_the_record_type`, `test_w1_08_schemas_exist.py::test_the_schema_is_a_valid_json_schema`, `test_w1_08_schemas_exist.py::test_each_record_type_has_its_own_schema_file` | README |
+| S2: Every record type has a template that validates against its schema; this repository path map classifies every tracked path [CAP-06.a] | `test_w1_08_lesson.py::test_the_lesson_template_carries_an_id_of_the_lesson_form`, `test_w1_08_templates.py::test_a_committed_template_exists_for_the_record_type`, `test_w1_08_templates.py::test_the_template_validates_against_its_schema` | README |
+| S3: The path-map schema gives each namespace a sensitivity class, permitted roles, retention, export policy, embedding policy, provenance... | `test_w1_08_path_map.py::test_every_namespace_of_the_path_map_declares_the_field`, `test_w1_08_path_map.py::test_a_namespace_without_the_field_is_refused`, `test_w1_08_path_map.py::test_a_namespace_that_declares_nothing_is_refused` | README |
+| S4: The path-map schema classes every namespace as governance/development memory or customer/runtime product data, and one namespace cann... | `test_w1_08_path_map.py::test_every_namespace_is_governance_memory_or_product_data`, `test_w1_08_path_map.py::test_each_memory_class_is_accepted`, `test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither` | README |
+| S5: The overlay schema carries the project floor (enabled capabilities and policy strengths); it identifies each constitutional system at... | `test_w1_08_floor.py::test_a_path_map_without_one_of_the_two_capabilities_is_refused`, `test_w1_08_floor.py::test_a_capability_is_a_closed_map_with_a_boolean_enabled`, `test_w1_08_floor.py::test_enabled_code_intelligence_lists_its_languages` | README |
+| S6: The shared frontmatter records state_class for every record type [CAP-07.b] | `test_w1_08_frontmatter.py::test_the_template_records_the_state_class_of_its_record_type`, `test_w1_08_frontmatter.py::test_a_record_without_a_state_class_is_refused`, `test_w1_08_frontmatter.py::test_the_six_state_classes_are_accepted_and_no_other` | README |
+| S7: Lesson records carry a scope of PROJECT, PRODUCT or FRAMEWORK [CAP-41.c] | `test_w1_08_lesson.py::test_the_lesson_template_carries_a_scope_and_a_severity_in_lower_case`, `test_w1_08_lesson.py::test_each_scope_is_accepted`, `test_w1_08_lesson.py::test_a_scope_outside_the_three_is_refused` | README |
+| S8: The lesson schema requires both a scope (project, product or framework) and a severity (low, medium, high or critical), so the Wave 3... | `test_w1_08_lesson.py::test_a_lesson_without_the_field_is_refused`, `test_w1_08_lesson.py::test_each_severity_is_accepted`, `test_w1_08_lesson.py::test_a_severity_outside_the_four_is_refused` | README |
+| F1: A schema accepts a ticket without kpis, role or allowed_paths | `test_w1_08_ticket.py::test_a_ticket_without_the_field_is_refused`, `test_w1_08_ticket.py::test_a_ticket_without_kpis_role_and_allowed_paths_is_refused`, `test_w1_08_ticket.py::test_the_ticket_template_carries_the_nine_fields` | README |
+| F2: Two schemas define the same id grammar differently | `test_w1_08_id_grammar.py::test_the_shared_definition_is_a_grammar`, `test_w1_08_id_grammar.py::test_a_lesson_id_is_the_letter_l_and_four_or_more_digits`, `test_w1_08_id_grammar.py::test_the_five_id_grammars_are_defined_in_one_file_only` | README |
+
+Tier 2's cap here: 60 functions (10 KPI lines x 6); 25 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).

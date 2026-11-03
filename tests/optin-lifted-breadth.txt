@@ -52,3 +52,44 @@ rep: tests/acceptance/W1-07/test_w1_07_config_details.py  # one row per parametr
 rep: tests/acceptance/W1-07/test_w1_07_envelope.py::test_the_exit_code_is_the_same_without_json  # one row
 rep: tests/acceptance/W1-07/test_w1_07_read_act.py::test_a_read_command_leaves_uncommitted_work_as_it_was  # one row
 rep: tests/acceptance/W1-07/test_w1_07_read_act.py::test_a_read_command_leaves_a_dev_tier_clone_clean  # one row
+
+# acceptance/W1-08
+tests/acceptance/W1-08/test_w1_08_path_map.py::test_the_gov_cli_loads_the_committed_path_map  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_the_path_map_schema_names_the_optional_key  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_an_optional_key_in_a_wrong_shape_is_refused  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_a_path_map_without_the_optional_keys_validates_as_before  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_an_optional_key_in_a_valid_shape_validates  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_a_path_map_with_all_five_keys_validates  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_no_optional_key_is_required  # cap
+tests/acceptance/W1-08/test_w1_08_path_map_tool_keys.py::test_a_top_level_key_the_schema_does_not_know_is_no_finding_as_before  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_kernel_has_one_schema_for_the_probe_record  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_names_no_path_of_a_project  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_is_a_valid_json_schema  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_a_well_formed_record  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_accepts_this_repository_s_probe_records  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_refuses_a_record_without_a_required_field  # cap
+tests/acceptance/W1-08/test_w1_08_probe.py::test_the_probe_schema_refuses_a_field_of_a_wrong_type_or_value  # cap
+tests/acceptance/W1-08/test_w1_08_schemas_exist.py::test_each_record_type_has_its_own_schema_file  # cap
+tests/acceptance/W1-08/test_w1_08_schemas_exist.py::test_a_committed_shared_definitions_file_exists  # cap
+tests/acceptance/W1-08/test_w1_08_schemas_exist.py::test_the_shared_definitions_file_is_a_valid_json_schema  # cap
+tests/acceptance/W1-08/test_w1_08_templates.py::test_the_template_validates_against_its_schema  # cap
+tests/acceptance/W1-08/test_w1_08_templates.py::test_the_template_validates_as_it_is_written  # cap
+tests/acceptance/W1-08/test_w1_08_templates.py::test_the_schema_refuses_a_record_that_is_not_a_map  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_ticket_template_carries_the_nine_fields  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_ticket_schema_defines_the_field  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_three_profiles_are_accepted_and_no_other  # cap
+tests/acceptance/W1-08/test_w1_08_ticket.py::test_the_committed_tickets_validate_against_the_ticket_schema  # cap
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_path_map_without_the_floor_key_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_strength_below_the_kernel_minimum_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_policy_value_that_is_not_a_strength_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_floor.py::test_a_system_without_one_of_the_three_statuses_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_the_six_state_classes_are_accepted_and_no_other  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_a_record_without_id_type_or_status_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_the_optional_identity_fields_are_defined_and_optional  # one row
+rep: tests/acceptance/W1-08/test_w1_08_frontmatter.py::test_no_template_stores_what_gov_derives  # one row
+rep: tests/acceptance/W1-08/test_w1_08_id_grammar.py::test_the_id_of_the_record_is_governed_by_the_shared_grammar  # one row
+rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_scope_outside_the_three_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_lesson.py::test_a_severity_outside_the_four_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_whose_paths_are_not_a_list_of_patterns_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_that_declares_nothing_is_refused  # one row
+rep: tests/acceptance/W1-08/test_w1_08_path_map.py::test_a_namespace_cannot_be_both_or_neither  # one row
