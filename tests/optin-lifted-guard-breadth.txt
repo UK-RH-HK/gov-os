@@ -443,3 +443,9 @@ rep: tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py::test_the_temp_fold
 rep: tests/acceptance/W1-28/test_w1_28_launch_temp_folder.py::test_a_refused_launch_leaves_no_temp_folder  # fold: a row beyond the representatives
 rep: tests/acceptance/W1-28/test_w1_28_roles.py::test_a_worker_cannot_pause  # fold: a row beyond the representatives
 rep: tests/acceptance/W1-28/test_w1_28_roles.py::test_a_worker_is_refused_whatever_role_it_names_with_the_role_option  # fold: a row beyond the representatives
+
+# W1-45
+tests/acceptance/W1-45/test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests[conftest]  # fold: a row beyond the representatives
+tests/acceptance/W1-45/test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests[existing-test]  # fold: a row beyond the representatives
+tests/acceptance/W1-45/test_w1_45_orchestrator_scope.py::test_orchestrator_cannot_write_under_acceptance_tests[new-test]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-45/test_w1_45_orchestrator_scope.py::test_orchestrator_bash_write_under_acceptance_tests_is_denied  # fold: a row beyond the representatives
