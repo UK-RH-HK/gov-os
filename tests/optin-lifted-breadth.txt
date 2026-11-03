@@ -908,11 +908,9 @@ tests/acceptance/W1-40/test_w1_40_workflow_text.py::test_no_lefthook_hook_is_ins
 rep: tests/acceptance/W1-40/test_w1_40_ci_evidence.py  # one row per parametrised function
 
 # acceptance/W1-41
-tests/acceptance/W1-41/test_w1_41_legacy.py::test_no_legacy_rule_file_stays_where_an_agent_tool_loads_instructions  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_adapter_generation_is_run_or_named  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_legacy_rule_file_that_cannot_be_parsed_is_not_retired  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_legacy_rule_file_that_cannot_be_read_is_not_retired  # cap
-tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_chat_database_is_marked_non_authoritative  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_chat_database_is_retired_after_its_knowledge_is_in_records  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_chat_database_with_nothing_extracted_is_not_retired  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_an_extraction_from_another_content_of_the_database_does_not_count  # cap
@@ -928,7 +926,6 @@ tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_no_longer_stands
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_retirement_of_the_memory_store_is_a_cit_e  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_the_index_is_refreshed_after_the_retirement  # cap
-tests/acceptance/W1-41/test_w1_41_legacy.py::test_retired_systems_contribute_no_active_decision  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_what_the_path_map_keeps_is_untouched_by_the_retirement  # cap
 tests/acceptance/W1-41/test_w1_41_legacy.py::test_a_file_deleted_from_the_active_tree_stays_reachable_too  # cap
 tests/acceptance/W1-41/test_w1_41_migration.py::test_the_rollback_points_are_the_ones_the_plan_recorded  # cap
