@@ -223,3 +223,7 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: A superseded record is cited as current | `test_w1_21_authority.py::test_the_fixture_offers_every_superseded_record_to_the_filter`, `test_w1_21_authority.py::test_current_records_are_cited`, `test_w1_21_authority.py::test_a_superseded_record_found_by_the_exact_string_is_not_cited` | README |
 
 Tier 2's cap here: 54 functions (9 KPI lines x 6); 31 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+
+Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061):
+memory is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32.
+It is applied after D-4b's measure 3; until then the hit@5 rows above judge against 80.

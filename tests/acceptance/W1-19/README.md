@@ -534,3 +534,7 @@ features' cases are in `lifted` (`tests/optin-lifted*.txt`, `--optin=lifted`).
 | F2: Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py::test_the_rerank_process_stays_within_two_and_a_half_gigabytes`, `test_w1_19_real_models.py::test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it`, `test_w1_19_real_models.py::test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` | README |
 
 Tier 2's cap here: 30 functions (5 KPI lines x 6); 11 functions moved to the opt-in suite `breadth` (listed in `tests/optin-breadth.txt`).
+
+Inventory row R4 (`HIT_AT_5_PASS_LINE` 80 → 85, DEC-833's floor) is **deferred** (the CTO, inside DEC-1061):
+memory is near 55 % today, so raising the pass line now would turn the real-model hit@5 cases red until W2-32.
+It is applied after D-4b's measure 3; until then the hit@5 rows above judge against 80.
