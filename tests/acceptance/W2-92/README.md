@@ -50,9 +50,23 @@ Two forms, both valid once the implementation lands:
    `rerank` is pinned as that code gives it with no reranker (`by: unavailable`, reason `the reranker given could
    not be loaded`, or `nothing to rerank` for an empty bundle). So `rerank` is part of the baseline, not a W2-92
    change, and any other added or changed field, order or content still fails `test_u1`.
+   **Revised under DEC-1055 (D-4b) for W2-13's S2** (the fusion receives the lexical route's ranked list, BM25):
+   the pins are W2-13's head `d6cba69e`, recorded by the test designer through the same call. The plain question
+   (and "unknown id", whose id is in no planted line and names no record, so it adds nothing) gives the six pages
+   that hold the phrase, then the three chunks BM25 finds for its words (`README.md`, the register's head, the
+   lantern note); the batched pages and their continuation follow that order; the ticket's lesson and ticket chunks
+   come in BM25 order, the lesson still first (DEC-424). Every other field is as before, and any other change
+   still fails `test_u1`.
 2. **Live** (`test_u2`): the plain question's evidence is the plain fused order of the lexical route, the only route
    of today that answers in these projects (`gov.retrieval.lexical.search` then `gov.retrieval.fusion.rrf`, as W2-87
-   does), and the pinned answer is that order.
+   does), and the pinned answer is that order. Since W2-13's S2 the route's list for the fusion is its `ranked`
+   list (else its `hits`), as `retrieve` takes it (`Api.plain_order`). `test_f4` holds the no-code-index answer to
+   the same order (before: its length, the six pages).
+3. **The budget** (`test_u4`, revised under DEC-1055 for the CTO's decision P-W2-13-R3 (a)): DEC-419 DP-3, W1-21's
+   approved spec, has the bundle budget bound parent expansion only, never dropping a child hit. Each page carries
+   the budget asked for, and a page that names an expansion is within it; a page whose gathered chunks alone pass
+   the budget (W2-13's longer lexical list does, at 400) is not cut and expands nothing. Before, each page's whole
+   bundle had to be within 400. Whether the budget should bound the whole bundle is W2-32's S5, with its own tests.
 
 Facts of the base, observed through the public interface and used by the tests:
 

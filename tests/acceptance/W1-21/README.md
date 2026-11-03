@@ -203,6 +203,32 @@ the sandbox reaches no shared Ollama). Commit trailer: `Rewrite-Reason: DEC-798 
 query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
 expectation`.
 
+## Two cases re-pinned for W2-13 (DEC-1055, D-4b, 2026-11-03)
+
+W2-13 (DAEO-zqvn) gives the fusion the lexical route's ranked list (BM25, S2). Two cases of this suite read
+something that change moved; the test designer re-pins them, keeping what each guards.
+
+- `test_w1_21_family_check.py::test_the_check_is_red_when_the_dev_tiers_fail_the_baselines`. **Before:** the dev
+  tiers as they are, with the stand-in vectors, on the premise that they score under the pass line (hit@5 73.2).
+  With W2-13's ranked route they score 80.5, so the check was green and the case red. **After:** the failure is
+  planted, not left to the retrieval's quality: the case links the dev tiers (never changed) beside a copy of their
+  dev query set whose every `must_cite` path is one no tier holds, so no query can be a hit and hit@5 is 0. The
+  check must measure them (no "unmeasured" in its output) and be red. A check that is green whatever it measures,
+  or that does not compare hit@5 with its baseline, still fails the case. Without dev tiers on the machine the case
+  skips with the reason (as `test_w1_21_dev_tier.py` does); before, it passed there on "unmeasured", which proved
+  nothing about the baselines.
+- `test_w1_21_expansion.py::test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded`. **Before:** the
+  whole bundle within the budget (`0 < used <= 1500`). DP-3 (DEC-419, this suite's approved spec) says the bundle
+  budget bounds parent expansion only and a child hit is never dropped for it; with W2-13's longer lexical list the
+  gathered children alone pass 1,500 (2,007), which DP-3 allows. **After** (the CTO's decision P-W2-13-R3 (a)): the
+  child is cited as it was found, no expansion of it is named, the budget is the one asked for and something was
+  counted, and a bundle that names an expansion is within the budget. No claim on the gathered children. Whether the
+  budget should bound the whole bundle is W2-32's S5, later, with its own tests.
+
+The stand-in figure "hit@5 73.2" in the sections above is the figure before W2-13. No other expectation, pass line
+or threshold changes. Commit trailers: `Rewrite-Reason: W2-13's S2 (the fusion receives the lexical route's ranked
+list); DEC-419 DP-3 for the budget case (P-W2-13-R3 (a))`.
+
 ## KPI map after D-4's cut (DEC-1061)
 
 Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed

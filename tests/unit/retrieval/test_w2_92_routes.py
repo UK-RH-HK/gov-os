@@ -346,7 +346,8 @@ def test_a_missing_or_unreadable_record_store_is_named_and_the_other_routes_answ
     assert bundle["facets"]["closure"]["available"] is False and named in bundle["facets"]["closure"]["reason"]
     assert bundle["facets"]["code"] == {"available": True, "reason": None} and bundle["facets"]["lexical"]["available"]
     assert bundle["stopping_reason"] == "FACET_UNAVAILABLE"
-    assert [(item["path"], item["routes"]) for item in bundle["evidence"]] == [("src/fus.py", ["code"])]
+    # W2-13 (S2, DEC-725): the lexical route's ranked list holds the question's word ``fuse_scores`` beside the code's
+    assert [(item["path"], item["routes"]) for item in bundle["evidence"]] == [("src/fus.py", ["lexical", "code"])]
     assert sorted(retrieve(repo, "fuse_scores", reranker=lambda: None)["evidence"][0]["routes"]) == ["code", "lexical"]
     assert bundle == retrieve(repo, "fuse_scores and DEC-001", ids=("DEC-001",), reranker=lambda: None)
 

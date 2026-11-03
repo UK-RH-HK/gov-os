@@ -75,3 +75,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
   - The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.
 
 **Delegated (CTO, 2026-11-03, P2 under DEC-957; DEC-1057 R-8: a line here, not a register entry):** `src/gov/retrieval/retrieve.py` added to the allowed paths, so that S2's fusion takes the ranked lexical list W2-92's merged `retrieve()` now carries (one line, `answer.get("ranked", answer["hits"])`); D-4b (DEC-1055) finishes W2-13 on top of W2-92.
+
+**Delegated (CTO, 2026-11-03, P2; DEC-1057 R-8):** P-W2-13-R3 (a): the bundle budget bounds parent expansion only, as W1-21's approved spec DEC-419 DP-3 says (a cut of the gathered children was tried and reverted, `ea486253`/`80cdd7ff`); whether the budget should bound the whole bundle (DEC-860) is W2-32's S5, with its own tests. The 13 cases of W2-92, W2-87, W1-21 and W1-19 that W2-13's S2 and DP-3 changed were re-pinned by a test designer (`d71df8f8`). Merged as built in D-4b (`8550788b`).

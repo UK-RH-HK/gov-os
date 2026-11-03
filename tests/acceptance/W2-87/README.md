@@ -46,6 +46,16 @@ lexical route alone, the plain fused order is the lexical order (path, then line
 `1 / (60 + rank)`; the tests check that precondition through `gov.retrieval.lexical.search` and
 `gov.retrieval.fusion.rrf` before relying on it.
 
+**Revised under DEC-1055 (D-4b) for W2-13's S2.** Since W2-13 the lexical route gives the fusion its `ranked` list
+(the exact string's chunks first, in BM25 order, then BM25's for the words), not its `hits` in path order.
+`Api.fused_order` is the plain fused order of that list (`ranked` where the answer holds one, else `hits`, as
+`retrieve` takes it). `test_3b` compares the bundle with it (before: with the `hits` order, which the fusion no
+longer takes). For `test_2b` the plant is kept, not loosened: the cut's specification (`docs/spec/cut-gate.md`) has
+no word of the phrase in its title and a longer text than the reports, so BM25 ranks it seventh, after the six
+reports, as path order did; 2b now checks that premise on `fused_order` before the arithmetic (before, BM25's title
+weight put the specification first, so no lift was needed and the bound was not tested). `Api.plain_order` (the
+`hits` order) is unchanged for the premises of `test_1` and `test_2a`, which are not revised here.
+
 | KPI line | Test | Red on today's code because |
 |---|---|---|
 | Success 1 and failure 1: every governing chunk (DEC-102, the ADR, the specification, the capability) ranks above every test and report chunk, with and without the reranker | `test_1_every_governing_chunk_outranks_every_test_and_report[no-reranker, stub-alike, cli]` | Today's order is the plain one: the assessment report (`docs/assessment/`) ranks above the specification (`docs/spec/`) and the capability (`records/capabilities/`), by path. The stub scores every text 0, so the rerank keeps that order; the command, with no reranker in its empty HOME, gives the same. |

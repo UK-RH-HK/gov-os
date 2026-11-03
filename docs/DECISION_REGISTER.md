@@ -13114,3 +13114,12 @@ removed by a small ACT once the product's automatic start carries the caps (W2-2
 | Version | Date | Change |
 |---|---|---|
 | 0.445 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1061. Next free id: DEC-1062. |
+
+### DEC-1062 — P-SELECT-GRAPH (a): the code graph in the scoped selection, a measured trial in D-9 first
+- **Status:** ACCEPTED (owner, 2026-11-03, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-11-03)`) · **Under:** DEC-1052 (questions 2, 3, 5), DEC-968 · **Source:** `governance/project/orchestration/packages/P-SELECT-GRAPH.md` (`21325f30`)
+- **Decision:** option (a): in D-9, a research agent replays the last two weeks' merges whose reds were traced to a change, and computes for each the test map's selection, the union's (the test map, the callers of every changed symbol with their unit tests, and the acceptance tests of every `gov` subcommand the change reaches), which reds each would have caught, and the extra cases and their seconds. It is adopted only if the union catches regressions the test map missed, at a bounded cost: **a median of at most +30 % scoped cases**. **The trial's result comes to the owner before anything is built.**
+- **Basis:** question 3 (tests where the risk is) and question 2 (a regression the map misses reaches the integration branch), with question 5 setting the order (a trial before the product).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.446 | 2026-11-03 | Owner (recorded by the orchestrator, DEC-861): DEC-1062. Next free id: DEC-1063. |
