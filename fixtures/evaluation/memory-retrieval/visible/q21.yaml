@@ -1,0 +1,12 @@
+category: decision
+commit: f46b96537d74
+question: "What compaction threshold is set for a session's context window?"
+gold_answer: >-
+  None. By DEC-838 every session uses its model's full window (1M tokens for Opus 5.5); no launch sets a compaction
+  threshold and no brief or rule asks a session to stop or compact early: a session compacts only when its model's
+  window is nearly full, and usage, not money, is the limit. The earlier 300k threshold (DEC-636 and the other entries
+  that held the 300k rule) is superseded by DEC-838.
+sources:
+  - path: docs/DECISION_REGISTER.md
+    heading: "### DEC-838 — Context windows: every session uses its model's full window; usage is the limit (item 2; standing)"
+    lines: [9137, 9144]

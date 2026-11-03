@@ -56,6 +56,7 @@ record_only:
   - "governance/project/orchestration/**.md"
   - "governance/project/orchestration/packages/*.patch"
   - "governance/project/orchestration/packages/*.diff"
+  - "governance/project/orchestration/tools/win_toast.ps1"
 
 # DEC-889 item 2, P-IS-2 (a): every test that reads a record-only path, directly or by scanning the tree, runs on
 # every close. The first list: gate (f)'s files, W2-54's green-here cases, W1-33's definitions and W1-49's window,
@@ -126,9 +127,16 @@ couplings:
     suites: ["tests/acceptance/W1-31/", "tests/acceptance/W1-37/", "tests/acceptance/W1-38/", "tests/unit/telemetry"]
     why: "the session-start and PreCompact hooks are also run by these suites (I3 §4.1 item 5)"
   - paths: ["governance/project/path-map.yaml", ".gitleaks.toml", "template/.gitleaks.toml"]
-    suites: ["tests/acceptance/W1-16/", "tests/acceptance/W1-17/", "tests/acceptance/W1-19/", "tests/acceptance/W1-20/",
-             "tests/acceptance/W1-21/", "tests/acceptance/W1-22/", "tests/acceptance/W1-24/", "tests/acceptance/W2-54/"]
-    why: "fixture inputs: the live path map and the gitleaks configurations are copied into these suites' fixtures (I3 §4.1 item 6)"
+    suites: ["tests/acceptance/W1-16/", "tests/acceptance/W1-17/", "tests/acceptance/W1-20/",
+             "tests/acceptance/W1-22/", "tests/acceptance/W1-24/", "tests/acceptance/W2-54/"]
+    why: "fixture inputs: the live path map and the gitleaks configurations are copied into these suites' fixtures (I3 §4.1 item 6); W1-19 and W1-21 left out by DEC-1061 item 9 (T-6)"
+  # DEC-1061 item 9 (DEC-1052 T-6): the real-model suites are selected by a model-path change only: the embedder (its
+  # model pin, the Ollama client, the vector cache), the reranker (its pin, service and worker) and the dev tier's baseline
+  - paths: ["src/gov/retrieval/semantic.py", "src/gov/retrieval/ollama.py", "src/gov/retrieval/vector_cache.py",
+            "src/gov/retrieval/rerank.py", "src/gov/retrieval/rerank_service.py", "src/gov/retrieval/rerank_worker.py",
+            "src/gov/retrieval/retrieve_baseline.yaml"]
+    suites: ["tests/acceptance/W1-19/", "tests/acceptance/W1-21/"]
+    why: "model paths: the embedding and reranker code and configuration W1-19 and W1-21 run against the real models (DEC-1061 item 9, T-6)"
   - paths: ["**.service", "**.socket", "**.timer"]
     suites: ["tests/acceptance/W1-18/"]
     why: "fixture input: W1-18 lists the working tree's service, socket and timer units (I3 §4.1 item 6)"

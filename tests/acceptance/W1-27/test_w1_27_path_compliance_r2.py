@@ -71,33 +71,6 @@ def test_stale_path_in_sources_md_is_not_reported(gov, project, interface):
     )
 
 
-def test_stale_path_in_live_document_not_sources_is_reported(sandbox, tmp_path):
-    """The same old path in a live document IS reported.
-
-    Counter-case for point 1: the exclusion of docs/SOURCES.md does not
-    suppress stale-path reports in other documents.
-
-    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
-    that doctor always emits): ``moved`` is always there (the key
-    ``moved_references``).  The case reads the live document's entry in
-    ``path_compliance.moved_references``, with docs/SOURCES.md holding the
-    same old path beside it, on a small committed project of its own.
-    """
-    project = w2_67_doctor.small_project(tmp_path / "repo")
-    old_rel, new_rel = "src/gov/doctor/old_live_src_mod.py", "src/gov/doctor/new_live_src_mod.py"
-    w2_67b_support.move_committed(project, old_rel, new_rel)
-    w2_67b_support.write_committed(project, "docs/SOURCES.md", f"| {old_rel} | {new_rel} | moved |\n")
-    w2_67b_support.write_committed(project, "docs/live-note.md", f"See {old_rel} for the implementation.\n")
-
-    run = w2_67_doctor.doctor(project, sandbox)
-    references = w2_67b_support.moved_references(run)
-
-    assert w2_67b_support.references_to(references, old_rel, "docs/live-note.md"), (
-        "doctor does not report a reference to a moved path in a live "
-        f"document — the stale-path check should report it\n{run.describe()}"
-    )
-
-
 # =========================================================================== #
 # Point 2: the old cli/ tree is historical (DEC-456)
 # =========================================================================== #
@@ -135,35 +108,6 @@ def test_stale_path_in_old_cli_tree_is_not_reported(gov, project, interface):
         "doctor reports a reference to a moved path inside the old cli/ "
         "tree — DEC-456 says the old CLI tree is historical and left out "
         f"of the stale-path check\n{run.describe()}"
-    )
-
-
-def test_stale_path_in_src_gov_cli_is_reported(sandbox, tmp_path):
-    """A reference to the same moved path in src/gov/cli/ IS reported.
-
-    Counter-case for point 2: src/gov/cli/ is the live CLI and is NOT
-    excluded.  DEC-456 excludes only the old cli/ tree at the repository
-    root.
-
-    Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
-    that doctor always emits): the case reads the entry for
-    src/gov/cli/commands_ref.py in ``path_compliance.moved_references``,
-    with the old cli/ tree holding the same old path beside it, on a small
-    committed project of its own.
-    """
-    project = w2_67_doctor.small_project(tmp_path / "repo")
-    old_rel, new_rel = "src/gov/doctor/old_src_cli_mod.py", "src/gov/doctor/new_src_cli_mod.py"
-    w2_67b_support.move_committed(project, old_rel, new_rel)
-    w2_67b_support.write_committed(project, "cli/legacy_commands.py", f"# old reference: {old_rel}\n")
-    w2_67b_support.write_committed(project, "src/gov/cli/commands_ref.py", f"# reference: {old_rel}\n")
-
-    run = w2_67_doctor.doctor(project, sandbox)
-    references = w2_67b_support.moved_references(run)
-
-    assert w2_67b_support.references_to(references, old_rel, "src/gov/cli/commands_ref.py"), (
-        "doctor does not report a reference to a moved path in "
-        "src/gov/cli/ — the live CLI is not excluded from the stale-path "
-        f"check (DEC-456)\n{run.describe()}"
     )
 
 

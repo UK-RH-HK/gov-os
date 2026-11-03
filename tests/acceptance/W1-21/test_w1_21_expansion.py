@@ -62,7 +62,10 @@ def test_a_child_hit_is_expanded_to_its_parent_and_the_expansion_is_named(api, p
 
 def test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded(api, project):
     """The section is some 8 600 characters, the chunk at most 1 200: under a budget of 1 500 the child stands as
-    it was found, the bundle stays within its budget, and no expansion of it is named."""
+    it was found and no expansion of it is named. The budget bounds parent expansion only and a child hit is never
+    dropped for it (DEC-419 DP-3): the gathered children are counted, not cut, so ``used`` may pass the limit, and
+    then nothing is expanded. Revised under DEC-1055 for P-W2-13-R3 (a): the case asked the whole bundle to stay
+    within the budget, which DP-3 does not say (whether it should is W2-32's S5, with its own tests)."""
     chunk, parent = the_hit(api, project, support.EXPANSION_PHRASE)
     bundle = support.check_bundle(api.retrieve(project, support.EXPANSION_PHRASE, bundle_budget=support.BUDGET_SMALL),
                                   root=project)
@@ -71,7 +74,9 @@ def test_a_parent_that_does_not_fit_the_bundle_budget_is_not_expanded(api, proje
         f"the hit is cited as lines {item[support.E_START]}-{item[support.E_END]} under a budget its parent exceeds"
     assert not named(bundle, chunk), "an expansion is named that the budget does not allow"
     budget = bundle[support.K_BUDGET][support.B_BUNDLE]
-    assert budget[support.B_LIMIT] == support.BUDGET_SMALL and 0 < budget[support.B_USED] <= support.BUDGET_SMALL, budget
+    assert budget[support.B_LIMIT] == support.BUDGET_SMALL and budget[support.B_USED] > 0, budget
+    assert not bundle[support.K_EXPANSIONS] or budget[support.B_USED] <= support.BUDGET_SMALL, \
+        f"a parent was expanded past the bundle budget: {budget}; expansions {bundle[support.K_EXPANSIONS]}"
 
 
 def test_a_bundle_budget_of_nothing_expands_nothing(api, project, ollama):

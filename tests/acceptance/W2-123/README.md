@@ -190,3 +190,25 @@ answered 200 in 2.6 s at 11:16).
   was not tried 3 times": one try), the other 8 pass. Against a throwaway copy of that `src/` outside the tree whose
   `_ask` reads a 5xx, a `ConnectionError` and a refused `URLError` as a time-out: 9 passed.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 35 in the full run, 15 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: A rebuild's embedding request that times out behind other clients on the shared server is retried, bounded (at most three tries with a growing ... | `test_w2_123_retry.py::test_after_the_last_failed_try_the_rebuild_states_the_tries_and_waits_and_no_partial_store_is_reported_built`, `test_w2_123_retry.py::test_after_the_last_failed_try_refresh_reports_the_tries_and_the_waits_and_sends_no_later_batch`, `test_w2_123_retry.py::test_a_server_error_at_every_try_is_tried_within_the_bound_and_the_stage_ends_unavailable` | the ticket's words |
+| S2: When the Gov OS starts its shared embedding server (`ensure_available`), it sets the number of parallel requests and the CPU cap from one confi... | `test_w2_123_start.py::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner`, `test_w2_123_start.py::test_a_server_already_answering_is_used_and_the_settings_a_start_would_use_are_stated`, `test_w2_123_start.py::test_shared_start_without_configuration_uses_the_default_resolved_from_the_callers_cpus` | the ticket's words |
+| S3: Determinism: with parallel requests the embedder returns the same vector for the same text as with one request at a time (checked on a fixed se... | `test_w2_123_determinism.py::test_equal_vectors_are_accepted_with_that_many_requests_in_flight` (2 of 2), `test_w2_123_determinism.py::test_a_difference_below_the_stored_precision_is_not_a_difference`, `test_w2_123_determinism.py::test_vectors_changed_by_parallel_requests_refuse_the_setting` | the ticket's words |
+| S4: Measured, in docs/changes/W2-123-evidence.md: throughput (chunks per second) and a cold rebuild's semantic stage at 1, 2, 4 and 8 parallel requ... | `test_w2_123_evidence.py::test_the_evidence_file_holds_the_sixteen_measured_cases_and_the_chosen_setting` | the ticket's words |
+| S5: A product feature for every adopted repository: the parallel requests and the CPU cap are read from the gate's configuration file (W2-20), with... | `test_w2_123_start.py::test_shared_start_uses_the_configured_cap_and_parallel_requests_inherited_by_its_runner`, `test_w2_123_start.py::test_shared_start_without_configuration_uses_the_default_resolved_from_the_callers_cpus` | the ticket's words |
+| S6: The shared embedding server comes with a health probe (a fixed text embedded within a configured time, stated healthy, slow or hung) and a safe... | `test_w2_123_restart.py::test_a_hung_server_of_the_gov_os_is_stopped_with_its_runner_and_started_again_under_its_cap`, `test_w2_123_restart.py::test_a_down_server_is_started_under_its_cap_and_recorded`, `test_w2_123_restart.py::test_a_server_that_answers_is_never_restarted` (2 of 2) | the ticket's words |
+| S7: Both servers the Gov OS starts (`ensure_available` and `ensure_query_available`) start under their cap from the gate's configuration file (W2-2... | `test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_with_the_gpu_as_the_caller_set_it` (2 of 2), `test_w2_123_start.py::test_query_start_uses_its_own_entry_and_leaves_the_gpu_as_the_caller_set_it` (2 of 2) | the ticket's words |
+| S8: The query embedder may use the GPU (DEC-1032 amends DEC-798 and DEC-975; DEC-1033 replaces DEC-798): `ensure_query_available` starts the query ... | `test_w2_123_restart.py::test_the_query_server_restarts_under_its_own_cap_with_the_gpu_as_the_caller_set_it` (2 of 2), `test_w2_123_start.py::test_query_start_uses_its_own_entry_and_leaves_the_gpu_as_the_caller_set_it` (2 of 2) | the ticket's words |
+| F1: Parallel requests that change a vector; a server started uncapped; a setting chosen without its measure [DEC-1014] | `test_w2_123_determinism.py::test_vectors_changed_by_parallel_requests_refuse_the_setting` | the ticket's words |

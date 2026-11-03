@@ -104,8 +104,12 @@ OWN_PATH = {
 }
 
 # Copied from this repository, file by file, from git's listing. Never ``governance/project/held-out.yaml``.
-PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", SETTINGS_REL, "pyproject.toml",
-                     ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL, ":(exclude)template/governance/kernel/vendor")
+# ``.claude/hooks`` since ACT-GUARD-FIX-4: the settings' PreToolUse line runs
+# ``$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse.py``, so a project that copies the settings without it refuses every
+# call (D-4's red fix R-2, DEC-1061). In the project, ``role_reads`` finds no ``role_paths:`` and checks nothing.
+PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", ".claude/hooks", SETTINGS_REL,
+                     "pyproject.toml", ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL,
+                     ":(exclude)template/governance/kernel/vendor")
 PROJECT_FILES = {
     "README.md": "# Launch fixture project\n",
     ".gitignore": ".gov-runtime/\n__pycache__/\n",

@@ -155,7 +155,7 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     answers = {lexical.FACET: lexical.search(root, query, refresh=False),
                semantic.FACET: semantic.search(root, query, refresh=False)}
     facets = {name: {"available": answer["available"], "reason": answer["reason"]} for name, answer in answers.items()}
-    routes = {name: answer["hits"] for name, answer in answers.items()}
+    routes = {name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()}  # W2-13: ranked lexical
     chunks = {chunk["chunk_id"]: chunk for chunk in lexical.chunks(root)} if facets[lexical.FACET]["available"] else {}
     closure_gaps, start = [], [*([ticket] if ticket else []), *ids]
     depth = closures.depth_of_radius(radius if start else min(radius, 1))  # W2-92: a question's records at R0 or R1
@@ -224,6 +224,8 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     frontmatter_cache: dict[str, tuple[str | None, str | None]] = {}
 
     for hit in gathering:
+        if hit["chunk_id"] not in chunks:  # W2-13 R4: a hit whose chunk the lexical index does not hold is skipped
+            continue
         chunk = chunks[hit["chunk_id"]]
         record_id = record_of.get(chunk["path"])
 

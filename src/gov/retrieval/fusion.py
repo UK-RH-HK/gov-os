@@ -3,7 +3,8 @@
 ``rrf`` merges the routes' ranked lists into one, each chunk once (deduplication by chunk hash: the ``chunk_id`` of
 W1-17). ``search`` asks the lexical and the semantic route, fuses them and reranks the head of the merged set once,
 as S0b2's R1 does (DEC-406): the first ``RERANK_TOP`` chunks, each scored on its path and the start of its text. A
-route that is unavailable gives no hit and is reported in ``facets``; nothing raises for it.
+route that is unavailable gives no hit and is reported in ``facets``; nothing raises for it. The lexical route's
+list is its ``ranked`` chunks: the exact string's first, then the BM25-ranked words' (W2-13, DEC-725).
 """
 
 from __future__ import annotations
@@ -59,12 +60,12 @@ def search(root: Path, query: str, limit: int | None, refresh: bool = True, rera
     """
     answers = {lexical.FACET: lexical.search(root, query, refresh),
                semantic.FACET: semantic.search(root, query, refresh)}
-    fused = rrf({name: answer["hits"] for name, answer in answers.items()})
+    fused = rrf({name: answer.get("ranked", answer["hits"]) for name, answer in answers.items()})
     records = {record["chunk_id"]: record for record in _records(root, fused[:RERANK_TOP])}
     scored = [{**record, "text": f"[path: {record['path']}]\n{record['text'][:RERANK_CHARS]}"}
               for record in records.values()]
     hits = [{**hit, "text": records[hit["chunk_id"]]["text"]} for hit in rerank(query, scored, reranker)]
     return {"hits": hits[:limit],
-            "facets": {name: {key: value for key, value in answer.items() if key != "hits"}
+            "facets": {name: {key: value for key, value in answer.items() if key not in ("hits", "ranked")}
                        for name, answer in answers.items()},
             "reranked": any("rerank_score" in hit for hit in hits)}

@@ -36,12 +36,16 @@ def test_gov_check_list_still_works(project, sandbox, interface):
 # Exit codes (S1, CAP-39.d)
 # --------------------------------------------------------------------------
 
-def test_exit_0_when_all_checks_green(full_project, sandbox, interface):
-    """Exit code 0: no hard-block check is RED."""
-    run = support.run_check(full_project, sandbox)
+def test_exit_0_when_all_checks_green(green_project, sandbox, interface):
+    """Exit code 0: no hard-block check is RED.
+
+    Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R2: the case copied the whole working tree (46 s) and
+    then skipped, because that copy is not green, so S1's exit-0 half was never asserted. It now runs on the small
+    green base (``green_project``, W2-67: green before any defect) and asserts: the envelope is ``ok`` and the exit
+    code is 0. It never skips."""
+    run = support.run_check(green_project, sandbox)
     envelope = support.envelope_of(run, interface)
-    if not envelope["ok"]:
-        pytest.skip("the full project does not pass gov check yet")
+    assert envelope["ok"], f"gov check is not ok on the green base, so exit 0 cannot be shown\n{run.describe()}"
     assert run.returncode == support.EXIT_OK, \
         f"all checks pass but exit code is {run.returncode}\n{run.describe()}"
 
