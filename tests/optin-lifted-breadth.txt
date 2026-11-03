@@ -297,3 +297,21 @@ rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_references_name_eve
 rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_dead_code_names_the_unreferenced_functions_and_no_live_one  # one row
 rep: tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py  # one row per parametrised function
 rep: tests/acceptance/W1-16/test_w1_16_paths_and_roots.py  # one row per parametrised function
+
+# acceptance/W1-17
+tests/acceptance/W1-17/test_w1_17_incremental.py::test_an_index_brought_up_to_date_equals_one_built_from_nothing  # cap
+tests/acceptance/W1-17/test_w1_17_incremental.py::test_the_index_is_in_the_shared_store_beside_the_record_graph  # cap
+tests/acceptance/W1-17/test_w1_17_incremental.py::test_building_the_index_changes_no_tracked_file  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_every_chunk_record_carries_a_parent_that_contains_it  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_the_chunks_of_one_file_are_listed_by_its_path  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_a_chunk_of_a_document_has_its_section_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_two_sections_of_one_document_are_two_parents  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_a_chunk_of_code_has_a_function_or_a_module_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_a_chunk_inside_a_python_function_has_that_function_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_python_code_outside_any_function_has_the_module_as_parent  # cap
+tests/acceptance/W1-17/test_w1_17_parents.py::test_chunk_and_parent_ids_are_the_same_in_a_second_build  # cap
+rep: tests/acceptance/W1-17/test_w1_17_corpus.py  # one row per parametrised function
+rep: tests/acceptance/W1-17/test_w1_17_digest.py  # one row per parametrised function
+rep: tests/acceptance/W1-17/test_w1_17_exact_query.py::test_a_string_with_query_syntax_characters_is_read_as_the_string_it_is  # one row
+rep: tests/acceptance/W1-17/test_w1_17_family_check.py  # one row per parametrised function
+rep: tests/acceptance/W1-17/test_w1_17_freshness.py  # one row per parametrised function
