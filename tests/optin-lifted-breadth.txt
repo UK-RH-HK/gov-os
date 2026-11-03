@@ -1048,3 +1048,20 @@ rep: tests/acceptance/W2-04/test_w2_04_batches.py  # one row per parametrised fu
 rep: tests/acceptance/W2-04/test_w2_04_ceiling.py  # one row per parametrised function
 rep: tests/acceptance/W2-04/test_w2_04_context_check.py  # one row per parametrised function
 rep: tests/acceptance/W2-04/test_w2_04_refusal.py  # one row per parametrised function
+
+# acceptance/W2-05
+tests/acceptance/W2-05/test_w2_05_planted.py::test_a_hooked_commit_in_a_linked_worktree_scans_the_index_git_gives_it  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_under_planted_trace_variables_writes_no_trace  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_under_a_planted_git_dir_reads_its_own_repository  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_read_merge_in_a_partial_clone_fetches_nothing  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_the_containment_check_catches_the_change_whatever_its_environment_holds  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_the_guard_hook_does_not_run_the_git_first_on_path  # cap
+tests/acceptance/W2-05/test_w2_05_planted.py::test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs  # cap
+tests/acceptance/W2-05/test_w2_05_settings.py::test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore  # cap
+tests/acceptance/W2-05/test_w2_05_sweep.py::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep  # cap
+tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_sweep_lists_the_starts_of_the_code_index_tool_as_calls_that_start_git  # cap
+tests/acceptance/W2-05/test_w2_05_sweep.py::test_the_one_helper_is_there_and_the_sweep_names_it  # cap
+rep: tests/acceptance/W2-05/test_w2_05_declared_check.py  # one row per parametrised function
+rep: tests/acceptance/W2-05/test_w2_05_hooks_source.py  # one row per parametrised function
+rep: tests/acceptance/W2-05/test_w2_05_planted.py::test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it  # one row

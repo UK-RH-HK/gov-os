@@ -571,3 +571,18 @@ The file, at `d1533bf30a10`, in a launched session: 24 cases, 4 failed and 20 pa
 green with the exception; the other 20 are to stay green.
 
 W2-05 has 65 cases with these 14.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Every check, test helper and command that runs git in another folder clears the inherited GIT_* variables. One helper does it, and th... | `test_w2_05_code_index_tool.py::test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable`, `test_w2_05_sweep.py::test_the_sweep_record_lists_the_calls_in_a_table`, `test_w2_05_sweep.py::test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep` | README |
+| S2: A hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (the DEC-710 case) [AR-2]. | `test_w2_05_linked_worktree.py::test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it`, `test_w2_05_linked_worktree.py::test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change`, `test_w2_05_linked_worktree.py::test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file` | README |
+| S3: Lefthook install and uninstall leave .claude/settings.json byte-identical to the committed file, and adapter-portability stays green ... | `test_w2_05_settings.py::test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore`, `test_w2_05_settings.py::test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean`, `test_w2_05_settings.py::test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore` | README |
+| F1: A planted GIT_DIR or GIT_INDEX_FILE in a hook's environment reaches no child git call. | `test_w2_05_planted.py::test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy`, `test_w2_05_planted.py::test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index`, `test_w2_05_planted.py::test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret` | README |
+
+Tier 2's cap here: 24 functions (4 KPI lines x 6); 12 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
