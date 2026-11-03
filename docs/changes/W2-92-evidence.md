@@ -6,7 +6,10 @@ The ticket as built at `448a835a9dca` (lead run 3, DONE; code head `e95eb4ad12ca
 the ticket's code. `retrieve.py`'s public shape is the branch's (`retrieve(root, query, *, ids, ticket, radius,
 batch_size, bundle_budget, continuation, reranker)`), as W2-13 will build on it.
 
-**Verified on:** the merge commit `ebba014ac355` (the store rebuilt there with `--seed`, 2026-11-03).
+**Verified on:** the merge commit `ebba014ac355` (the store rebuilt there with `--seed`, 2026-11-03); S4 and F1
+again on `7f4d519b`, the merge of the test designer's revision `w2/W2-92-tests` at `507df49a68f8` (below), where
+`gov accept` passes 30 of 30, 7 of 7 lines. The ticket's code is the same at both (the revision changes only
+`tests/acceptance/W2-92/README.md` and `test_w2_92_unchanged.py`).
 
 ## The KPI lines and how each is verified
 
@@ -19,17 +22,19 @@ worktree. Unit = `pytest tests/unit/retrieval/test_w2_92_routes.py tests/unit/re
 | S1 the record route | `gov accept` line success-1; unit cases on start ids, titles, the closure join | `gov accept`; unit | pass, 9 of 9; unit pass | `ebba014ac355` |
 | S2 the code route | `gov accept` line success-2; unit cases on small pages, the cue gate, one session per process | `gov accept`; unit | pass, 7 of 7; unit pass | `ebba014ac355` |
 | S3 a missing or unreadable index or store named per route | `gov accept` line success-3; unit cases on a missing or unreadable index and record store (DEC-1006 P-1, DEC-1019) | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
-| S4 nothing else changes; two runs give one bundle | `gov accept` line success-4; unit `test_a_question_naming_nothing_gets_todays_bundle`; a direct comparison on this tree's store (below) | `gov accept`; unit; the comparison (scratch `/tmp/gov-os-emg-w2-92/cmp_run.sh`) | **fail, 4 of 9 (5 failed)**; unit pass; direct comparison: same bundle | `ebba014ac355` |
+| S4 nothing else changes; two runs give one bundle | `gov accept` line success-4; unit `test_a_question_naming_nothing_gets_todays_bundle`; a direct comparison on this tree's store (below) | `gov accept`; unit; the comparison (scratch `/tmp/gov-os-emg-w2-92/cmp_run.sh`) | pass, 9 of 9 (at `ebba014ac355` before the revision: 4 of 9, 5 failed); unit pass; direct comparison: same bundle | `7f4d519b` (`gov accept`); `ebba014ac355` (unit, comparison) |
 | S5 W2-61's measure re-run, both figures together | the measure record `docs/research/W2-92-memory-measure.md` (run 2 at `d72c96fc029c`: hit@5 11 of 20, full evidence 13 of 20, control 11 and 11) | measure: D-4b measure 1 | earlier record as cited; re-measured: D-4b measure 1 | `d72c96fc029c` (record); D-4b measure 1 |
-| F1 a no-record question gets a different bundle | `gov accept` line failure-1 (the same 9 cases as success-4) | `gov accept` | **fail, 4 of 9 (5 failed)** | `ebba014ac355` |
+| F1 a no-record question gets a different bundle | `gov accept` line failure-1 (the same 9 cases as success-4) | `gov accept` | pass, 9 of 9 (at `ebba014ac355` before the revision: 4 of 9, 5 failed) | `7f4d519b` |
 | F2 a whole-graph query or one over the row cap | `gov accept` line failure-2; unit small-page cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F3 a missing index reported ok or failing the whole answer | `gov accept` line failure-3; unit missing-index cases | `gov accept`; unit | pass, 6 of 6; unit pass | `ebba014ac355` |
 | F4 a figure without the other, or the hidden half read or run | the measure record (§4 gives both figures together; §8: the hidden half neither read nor run) | measure: D-4b measure 1 | earlier record as cited; re-measured: D-4b measure 1 | `d72c96fc029c` (record); D-4b measure 1 |
 
 `gov accept` totals at `ebba014ac355`: 25 passed, 5 failed, 0 skipped; 5 of 7 lines pass (2026-11-03 15:39-15:41
-UTC). At the pre-merge head `448a835a9dca`, run the same day in a clone: 30 passed, 7 of 7 lines.
+UTC). At the pre-merge head `448a835a9dca`, run the same day in a clone: 30 passed, 7 of 7 lines. **At `7f4d519b`
+(after the revision): 30 passed, 0 failed, 0 skipped, 0 unmapped; 7 of 7 lines pass (2026-11-03 16:24:25-16:25:53
+UTC).**
 
-## S4 and F1: red after the merge, from W2-112's new bundle field
+## S4 and F1: red after the merge, from W2-112's new bundle field; the cases revised (P-W2-92-D4B-1 (a))
 
 - **What fails:** the 5 cases mapped to both success-4 and failure-1. They passed at `448a835a9dca` today (30 of 30),
   so the merge brings the red in, not the machine.
@@ -41,8 +46,11 @@ UTC). At the pre-merge head `448a835a9dca`, run the same day in a clone: 30 pass
   question naming no record or symbol, the merged code twice and `w2/integrate`'s code once (the main tree at
   `f451207018ce`, whose `src/` equals `23625eb2aebe`'s) give the same bundle, field for field, `rerank` included.
 - **Not fixed here:** taking the field out of `retrieve.py` would undo W2-112, and the cases are the test designer's
-  (MR-3). Decided by the CTO: a revision of the cases' reference by the test designer (recommended), or a merge with
-  the two lines named red.
+  (MR-3).
+- **The revision (the CTO's P-W2-92-D4B-1, option (a)):** a test designer revised S4/F1's reference on
+  `w2/W2-92-tests` at `507df49a68f8` (parent `0024c753aaf6`): the pinned bundles are the integrated code's
+  (`w2/integrate` at `23625eb2aebe`), with W2-112's `rerank` field part of the baseline and pinned to its value; a
+  planted extra field still fails the 5 cases. Merged into `w2/W2-92` as `7f4d519b`; `gov accept` there: 30 of 30.
 
 ## The rebuild and the scoped set
 
