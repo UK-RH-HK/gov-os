@@ -1156,3 +1156,10 @@ rep: tests/acceptance/W2-49/test_w2_49_cit_e.py  # one row per parametrised func
 rep: tests/acceptance/W2-49/test_w2_49_cit_p.py::test_cit_p_names_each_impacted_ticket  # one row
 rep: tests/acceptance/W2-49/test_w2_49_cit_p.py::test_cit_p_presents_dec_105_three_options_with_their_cost  # one row
 rep: tests/acceptance/W2-49/test_w2_49_contract.py  # one row per parametrised function
+
+# acceptance/W2-51
+rep: tests/acceptance/W2-51/test_w2_51_cit_p.py  # one row per parametrised function
+rep: tests/acceptance/W2-51/test_w2_51_counts.py::test_a_triage_count_that_disagrees_with_its_rows_fails_naming_it  # one row
+rep: tests/acceptance/W2-51/test_w2_51_exit_criterion_7.py  # one row per parametrised function
+rep: tests/acceptance/W2-51/test_w2_51_plan_reading.py::test_every_check_prints_one_line_with_pass_and_a_named_reason  # one row
+rep: tests/acceptance/W2-51/test_w2_51_plan_reading.py::test_an_item_delivered_only_by_a_ticket_with_a_malformed_id_is_not_delivered  # one row

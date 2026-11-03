@@ -177,3 +177,18 @@ asserts four things:
   (DEC-386).
 
 No earlier test was rewritten.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: It reads the Wave 2 plan (the WBS ticket table, the Wave 2 tickets in .tickets/ by wbs_id or external-ref when it has none, a letter ... | `test_w2_51_plan_reading.py::test_a_wave_2_ticket_missing_from_the_wbs_table_fails_naming_it`, `test_w2_51_plan_reading.py::test_a_ticket_with_only_external_ref_is_read_as_a_wave_2_ticket` | by its words (every function of the suite kept) |
+| S2: The two-way check of exit criterion 7: every Contract item in Wave 2, and every lite item of Contract v4.2, is delivered by a Wave 2 ... | `test_w2_51_plan_reading.py::test_a_malformed_id_is_not_taken_as_a_wave_2_ticket`, `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_line_fails_naming_it` | by its words (every function of the suite kept) |
+| S3: A Contract item moved to Wave 2 with no CIT-P line, or a CIT-P line with no change, fails it (W2-49's failure KPI) [DEC-741]. | `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_line_fails_naming_it`, `test_w2_51_cit_p.py::test_an_item_moved_to_wave_2_with_no_cit_p_file_at_all_fails_naming_it` | by its words (every function of the suite kept) |
+| S4: The list's and the triage's counts agree with their rows. | `test_w2_51_counts.py::test_the_list_and_the_triage_counts_agree_with_their_rows`, `test_w2_51_counts.py::test_a_list_severity_heading_that_disagrees_with_its_rows_fails_naming_it` | by its words (every function of the suite kept) |
+| F1: It never reads ~/gov-os-workbench or docs/source/ by default; a check that would need them is reported as not run, by name [DEC-744]. | `test_w2_51_outside_inputs.py::test_checks_that_would_need_the_workbench_or_docs_source_are_reported_not_run_by_name`, `test_w2_51_outside_inputs.py::test_decoy_workbench_and_docs_source_change_nothing_in_the_output` | by its words (every function of the suite kept) |
+| F2: An input it cannot read is a named failure, never a pass. | `test_w2_51_unreadable_inputs.py::test_an_input_it_cannot_read_is_a_named_failure_never_a_pass`, `test_w2_51_outside_inputs.py::test_decoy_workbench_and_docs_source_change_nothing_in_the_output` | by its words (every function of the suite kept) |
