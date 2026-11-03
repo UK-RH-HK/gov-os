@@ -45,6 +45,34 @@ No file here carries a held-out path, and no test opens, lists or stats anything
 - **The owner's commit of the file is the confirmation of the value** (DEC-218). No test can tell whether a
   configured path is the oracle's.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 108 in the full run, 785 in `breadth`, 87 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: The guard's PreToolUse hook denies any Bash call carrying dangerouslyDisableSandbox: true, whatever the role [CAP-62.a] | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `cap-62`, DEC-1061 (7)) | lifted |
+| S2: The containment check is registered on PostToolUseFailure as well as PostToolUse, in this repository's settings and in the kernel template; a c... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-5) | lifted |
+| S3: The repository's committed .claude/settings.json carries a Read deny rule with the qualification oracle's absolute path; the oracle path is hel... | `test_w1_47_oracle_rule.py::test_the_committed_settings_carry_a_read_deny_rule_built_from_every_configured_path` | part A's row, by its words |
+| S4: The guard denies any tool call whose input names the oracle path (a Read, Grep, Glob or Bash call, or any other tool), for every role, the orch... | `test_w1_47_kernel_template.py::test_the_template_s_guard_hides_a_held_out_path`, `test_w1_47_oracle_guard.py::test_a_call_that_names_the_oracle_path_is_denied` (6 of 186), `test_w1_47_oracle_guard.py::test_a_call_that_names_the_oracle_path_is_denied_wherever_the_path_is` (6 of 36), `test_w1_47_oracle_naming.py::test_a_call_that_holds_the_path_anywhere_in_its_input_is_denied` (3 of 51), `test_w1_47_oracle_config.py::test_a_broken_configuration_makes_the_guard_fail_closed` (4 of 88), `test_w1_47_oracle_config.py::test_a_repaired_configuration_opens_the_guard_again` | part A's row, by its words |
+| S5: The committed .claude/settings.json carries no install or download ask rule: this ticket removes the Bash ask rules for pip, pip3, python -m pi... | `test_w1_47_settings_rules.py::test_the_other_deny_rules_are_in_place` (2 of 5), `test_w1_47_settings_rules.py::test_the_install_rules_were_removed_not_moved` (2 of 2) | part A's row, by its words |
+| S6: The guard's install rule recognises uv add, uv sync, uv run --with and uvx as installs, with or without options before the subcommand: from the... | `test_w1_47_uv_installs.py::test_engineer_test_designer_and_auditor_are_denied` (4 of 123) | part A's row, by its words |
+| S7: The guard function that resolves a role's allowed paths fails closed when its session-role argument is missing: without that argument the orche... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (G-4) | lifted |
+| F1: A Bash call carrying dangerouslyDisableSandbox: true reaches execution | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `cap-62`, DEC-1061 (7)) | lifted |
+| F2: Any tool call whose input names the oracle path is allowed, whatever the tool and whatever the call does (a read, a listing, a search, a write ... | `test_w1_47_kernel_template.py::test_the_template_s_guard_hides_a_held_out_path`, `test_w1_47_oracle_guard.py::test_a_call_that_names_the_oracle_path_is_denied` (6 of 186), `test_w1_47_oracle_guard.py::test_a_subagent_s_call_that_names_the_oracle_path_is_denied` (3 of 6), `test_w1_47_oracle_naming.py::test_a_call_that_holds_the_path_anywhere_in_its_input_is_denied` (3 of 51), `test_w1_47_oracle_naming.py::test_a_call_that_reaches_the_path_without_writing_it_out_is_denied` (3 of 75), `test_w1_47_oracle_config.py::test_a_broken_configuration_fails_closed_with_no_role`, `test_w1_47_oracle_config.py::test_a_broken_configuration_fails_closed_through_the_committed_settings` | part A's row, by its words |
+| F3: The committed Read deny rule is missing from .claude/settings.json, or its path differs from the oracle's absolute path | `test_w1_47_oracle_rule.py::test_the_committed_settings_carry_a_read_deny_rule_built_from_every_configured_path`, `test_w1_47_oracle_rule.py::test_the_settings_file_names_a_configured_path_in_its_read_deny_rule_only` | part A's row, by its words |
+| F4: An acceptance test of this ticket reads or names the qualification oracle | `test_w1_47_oracle_rule.py::test_no_acceptance_test_of_this_ticket_names_a_configured_path` | part A's row, by its words |
+| F5: The committed .claude/settings.json still carries an install or download ask rule, or the Bash(sudo:*) deny rule is gone | `test_w1_47_settings_rules.py::test_the_committed_settings_carry_no_install_or_download_ask_rule` | part A's row, by its words |
+| F6: uv add, uv sync, uv run --with or uvx runs from the orchestrator without an ask, or from engineer, independent test designer or independent aud... | `test_w1_47_uv_installs.py::test_engineer_test_designer_and_auditor_are_denied` (4 of 123), `test_w1_47_uv_installs.py::test_the_orchestrator_is_asked_in_every_permission_mode` (4 of 24) | part A's row, by its words |
+| F7: An implementation file of this ticket reads the qualification oracle, or names its path anywhere but governance/project/held-out.yaml and the c... | `test_w1_47_oracle_rule.py::test_the_settings_file_names_a_configured_path_in_its_read_deny_rule_only`, `test_w1_47_oracle_rule.py::test_no_implementation_file_names_a_configured_path` | part A's row, by its words |
+
 ## KPI lines, tests and red reasons
 
 "Red reason" is what the test says before implementation. "Green already" means the case passes today; the reason is

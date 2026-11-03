@@ -100,12 +100,14 @@ COUPLINGS = (
                                                           "tests/acceptance/W1-38", "tests/unit/telemetry")),
     ("template/governance/kernel/hooks/precompact.py", ("tests/acceptance/W1-31", "tests/acceptance/W1-37",
                                                         "tests/acceptance/W1-38", "tests/unit/telemetry")),
+    # Rewrite-Reason: DEC-1061 item 9, T-6 (D4-LIST-B §4 row 2): W1-19 and W1-21 (the real-model suites) are selected
+    # only by model-path changes, no longer by the fixture-inputs coupling (FIXTURE_INPUTS_NOT_REACHING below).
     (support.PATH_MAP_REL, tuple(f"tests/acceptance/{w}" for w in
-                                 ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                                 ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     (".gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                             ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                             ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     ("template/.gitleaks.toml", tuple(f"tests/acceptance/{w}" for w in
-                                      ("W1-16", "W1-17", "W1-19", "W1-20", "W1-21", "W1-22", "W1-24", "W2-54"))),
+                                      ("W1-16", "W1-17", "W1-20", "W1-22", "W1-24", "W2-54"))),
     ("src/gov/checkpoint/record.py", ("tests/acceptance/W1-30", "tests/acceptance/W1-31")),
     ("src/gov/decisions/checker.py", ("tests/acceptance/W1-30",)),
     ("src/gov/closure/command.py", ("tests/acceptance/W1-30",)),
@@ -340,6 +342,21 @@ def test_each_coupling_imports_cannot_see_is_declared(test_map, path, suites):
     assert not missing, f"no coupling takes a change of {path} to {missing}"
 
 
+# DEC-1061 item 9, T-6: a change of the live path map or a gitleaks configuration does not reach the real-model suites
+# (their real-model files run only on a model-path change, select_tests.py's rule, and in the nightly).
+FIXTURE_INPUTS_NOT_REACHING = ((support.PATH_MAP_REL, ".gitleaks.toml", "template/.gitleaks.toml"),
+                               ("tests/acceptance/W1-19", "tests/acceptance/W1-21"))
+
+
+@pytest.mark.parametrize("path", FIXTURE_INPUTS_NOT_REACHING[0])
+def test_a_fixture_input_change_does_not_reach_the_real_model_suites(test_map, path):
+    """T-6 (DEC-1061 item 9): the path map's and the gitleaks configurations' coupling leaves out W1-19 and W1-21."""
+    reached = [t for entry in _couplings(test_map) if _placed(entry["paths"], path) for t in entry["suites"]]
+    wrong = [t for t in reached for suite in FIXTURE_INPUTS_NOT_REACHING[1]
+             if t.rstrip("/") == suite or t.startswith(suite + "/")]
+    assert not wrong, f"a change of {path} still reaches the real-model suites through a coupling: {wrong}"
+
+
 # W1-27's ``test_w2_67_copies.py`` loads these conftests by file path (``conftest_of``), which no import shows.
 W2_67_COPIES = "tests/acceptance/W1-27/test_w2_67_copies.py"
 LOADED_BY_FILE_PATH = ("W1-07", "W1-25", "W1-27")
@@ -496,13 +513,22 @@ def test_every_module_a_declared_check_runs_reaches_w1_26(test_map):
 
 # -- DEC-896 item 2: test_inputs moved; KPI 8 and 9: the settings -----------------
 
+MOVED_TEST_INPUTS = ("fixtures/**", "template/**", "schemas/**")   # the inputs DEC-896 item 2 moved
+
+
 def test_the_path_map_s_test_inputs_are_in_the_test_map(test_map):
-    inputs = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
-    if inputs is None:
-        pytest.skip("the path map no longer holds test_inputs (the orchestrator's edit is done)")
+    """DEC-896 item 2: ``test_inputs`` moved from the path map to the test map.
+
+    Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R1: the case skipped forever once the move was done
+    (it compared with the path map's copy). It now asserts the move itself: the test map holds the moved inputs as
+    readable patterns, and the path map holds no ``test_inputs`` beside them."""
     moved = _need(test_map).get("test_inputs")
-    assert isinstance(moved, list) and set(inputs) <= set(moved), \
-        f"the test map does not hold the path map's test_inputs {inputs}: {moved!r}"
+    assert isinstance(moved, list) and moved and all(support.readable_pattern(p) for p in moved), \
+        f"the test map's test_inputs is not a list of patterns: {moved!r}"
+    missing = [p for p in MOVED_TEST_INPUTS if p not in moved]
+    assert not missing, f"the test map's test_inputs lacks {missing}: {moved!r}"
+    left = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
+    assert left is None, f"the path map still holds test_inputs beside the test map's: {left!r}"
 
 
 def test_the_per_test_limit_is_above_the_slowest_test_measured(test_map):

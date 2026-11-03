@@ -21,6 +21,10 @@ stay there and in `ARCHIVE-SUPERSEDED.md`. A new line names the basis test it pa
 - DEC-1052 G-14, DEC-1054, DEC-1056, DEC-1059 (live since ACT-G14, `4edd196c`): role separation by path checks; the test designer never reads the ticket's new
   code or new unit-test files; the engineer never reads its own ticket's acceptance tests, wherever they sit; shared
   test files, other tickets' tests and the integrated code stay readable (DEC-963).
+- DEC-1065 (standing): no CPU fallback for embeddings anywhere (the shared GPU embedders unreachable: the semantic part
+  unavailable, named, keywords answer; never a private embedder on the CPU, as the reranker's ACT-RERANK-WAIT-1);
+  search respects role separation (`gov retrieve` filtered by the caller's `role_paths`, before W2-127 and the restart).
+  DEC-1064: sandboxed workers run no `gov retrieve` and no real-model test until then.
 - DEC-1060: lens B's q03 rewritten to DEC-1033's rule; a measure question never rewards a replaced decision.
 - DEC-1053: D-0 done; `w2/W2-78` and the in-flight branches with unmerged work wait for D-9.
 - DEC-1050: this repository kept; no full `gov check` in leads' runs (T-1); attribution once each way (Q-1); the

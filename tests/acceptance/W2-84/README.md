@@ -73,6 +73,31 @@ path), `sleep` (sleeps 12 seconds on `worktree`, past the guard's 5-second git t
 so that only a guard that times out refuses), `record` (writes every call's arguments to a log of the test's own, then
 passes it on).
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 0 in the full run, 0 in `breadth`, 329 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: A session that an evaluation set measures (by its role or by its ticket) is refused the set's hidden part under every tree of the repository: t... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| S2: Matched by real path: a symbolic link, from inside or outside any tree, to a hidden file, to a hidden folder, or to a tree itself, is refused a... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| S3: No git route shows a hidden file's content to a measured session from another tree or from the object store the worktrees share: git show <rev>... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| S4: Fail closed: when the trees cannot be listed (git worktree list fails or times out, or the runs root cannot be read), the measured session's ca... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| S5: Nothing else changes: (a) secrets, (b) the held-out material and (c) the counterpart's work are judged exactly as before; a set's visible part ... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| S6: The CIT-E (docs/changes/W2-84-CIT-E.md) records the guard change the owner approved under CAP-33 (DEC-950 item 1), in the form of W2-58's [CAP-... | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| F1: A measured session reads, lists or searches a hidden file of any tree: the main tree, a worktree, a run clone, or through a link into one. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| F2: A tree or a folder that cannot be listed or walked treated as holding no hidden part. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| F3: A git route that shows a hidden file's content to a measured session from another tree or from the shared object store. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| F4: Any of (a) to (c) weakened, or a refusal added for a session that no set measures. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+| F5: A test that reads, writes or plants anything in the real fixtures/evaluation/**/hidden/** or the real ~/gov-os-runs/. | none: the line's feature is lifted (`--optin=lifted`): **lifted only** (tag `hidden-half`, G-3; DEC-1061 (4): deleted with the guard's rule at D-9). Until then the hidden half's refusal stays covered in... | lifted |
+
 ## The KPI lines and their tests
 
 ### Success

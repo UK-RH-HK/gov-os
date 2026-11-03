@@ -16,6 +16,8 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on: [DAEO-s9qc, DAEO-ym8a]
 allowed_paths:
+- src/gov/store/loader.py
+- tests/unit/store/**
 - src/gov/retrieval/graph_route.py
 - src/gov/retrieval/code_route.py
 - src/gov/retrieval/retrieve.py
@@ -28,6 +30,7 @@ kpis:
   - 'A missing or unreadable code index or record store is named in the bundle''s stopping reasons for that route, never silently ok and never a failure of the whole answer [DEC-957, DEC-860]'
   - 'Nothing else changes: the budget, the batches, the continuation, DEC-424''s records ahead and W2-87''s authority order; two runs on one store give the same bundle [DEC-424, DEC-860]'
   - 'W2-61''s measure is re-run on the visible half, control at the base and the head, both figures together (hit@5 against CAP-10''s floor of 85 and the owner''s target of 95 %, full evidence against 99 %), with the graph and code-graph questions named, in docs/research/W2-92-memory-measure.md [DEC-957, DEC-833]'
+  - 'S6 A plain question costs about one second (DEC-1065 (4)): the record route no longer parses every record''s front matter in each process (the titles kept in the store at rebuild, or read only when a question names a record); a cold gov retrieve on this repository''s store answers a plain question within about 1.2 s at the median of ten, measured by the CTO on the shared servers; nothing else in the bundle changes (S4) [DEC-1065]'
   failure:
   - 'A question that names no record or symbol gets a different bundle than today.'
   - 'A whole-graph query, or one over the tool''s row cap.'
@@ -59,3 +62,5 @@ Card: MEMORY-SPEC-MAP gaps 2 and 3, resolved by the owner in DEC-957 ("a ticket 
 - **What changes:** two new route modules, and `retrieve.py`'s route list (one call each). The ranking (W2-87) and what is left out (W2-55) are not touched.
 - **Order and overlaps:** after W2-87 (`DAEO-s9qc`, running), which holds `retrieve.py`; W2-13 holds `fusion*` and `lexical*`: read only; W2-32 holds `src/gov/retrieval/**` broadly (open): this ticket takes its two new files and `retrieve.py`'s route list only, and W2-32 merges back after it.
 - **Judged with** W2-61h's enlarged set (graph and code-graph categories), once it is in.
+
+**DEC-1065 (4) placed here (CTO, 2026-11-03):** S6 added; `graph_route.start_ids` parses ~840 records' front matter with the pure-Python loader in each process (2.9 s; the C loader 0.34 s); the store drops the title it parses at rebuild (`store/loader.py:281`).

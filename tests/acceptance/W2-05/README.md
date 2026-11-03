@@ -571,3 +571,21 @@ The file, at `d1533bf30a10`, in a launched session: 24 cases, 4 failed and 20 pa
 green with the exception; the other 20 are to stay green.
 
 W2-05 has 65 cases with these 14.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 30 in the full run, 35 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: Every check, test helper and command that runs git in another folder clears the inherited GIT_* variables. One helper does it, and the sweep re... | `test_w2_05_code_index_tool.py::test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable` | the ticket's words |
+| S2: A hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (the DEC-710 case) [AR-2]. | `test_w2_05_linked_worktree.py::test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it` (2 of 2), `test_w2_05_linked_worktree.py::test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change`, `test_w2_05_linked_worktree.py::test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file` | the ticket's words |
+| S3: Lefthook install and uninstall leave .claude/settings.json byte-identical to the committed file, and adapter-portability stays green [AR-2]. | `test_w2_05_settings.py::test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore` (2 of 2), `test_w2_05_settings.py::test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`, `test_w2_05_settings.py::test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean` | the ticket's words |
+| F1: A planted GIT_DIR or GIT_INDEX_FILE in a hook's environment reaches no child git call. | `test_w2_05_planted.py::test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy` (2 of 2), `test_w2_05_planted.py::test_read_merge_under_a_planted_git_dir_reads_its_own_repository`, `test_w2_05_planted.py::test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index` (2 of 2) | the ticket's words |

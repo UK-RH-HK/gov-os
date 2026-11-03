@@ -107,9 +107,9 @@ ROWS = {
             ("a ticket lead per ticket, started in that worktree with its identity",
              [r"\blead", r"worktree", r"identit"]),
             ("no two tickets in flight with overlapping paths", [r"overlap", r"path"]),
-            ("a stated ceiling of tickets in flight",
-             [r"ceiling|at most|up to|no more than|maximum|limit", r"ticket",
-              r"in flight|at a time|at once|parallel|concurrent|running"]),
+            # Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R3: the clause "a stated ceiling of tickets
+            # in flight" enforced DEC-737/776/786, replaced by DEC-847 and then DEC-942 (no fixed number of leads;
+            # capacity is the resource gate's, whose clauses below stay). The clause is removed; the row stays.
             ("the resource gate before each start",
              [r"resource gate", r"before (each|every|any|a)\b|(each|every) start"]),
             ("the gate reads free memory", [r"memory", r"free|available"]),

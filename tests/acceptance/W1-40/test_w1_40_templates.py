@@ -2,8 +2,14 @@
 
 W1-39's Copier template is not built yet. The cases assume the least of it (README, package P-5): a ``.jinja``
 file is rendered by Jinja with its standard delimiters, and these files ask for no answer, so rendering one with
-nothing gives the file a product gets. This repository's own ``lefthook.yml`` and workflow are that rendered
-form: the product gets the same gate the kernel runs under.
+nothing gives the file a product gets. This repository's own ``lefthook.yml`` is that rendered form: the product
+gets the same gate the kernel runs under.
+
+Rewrite-Reason: DEC-1061 item 9, T-11 (D4-LIST-B §4 row 5): CI is off in this repository (its ``ci.yml`` runs only
+on ``workflow_dispatch``), so this repository's workflow is no longer the template's render. The two cases that
+compared them ("every workflow has its template and renders to it", "the template holds no workflow the repository
+lacks") are deleted: no KPI line names them; the workflow cases judge the rendered template instead
+(``w1_40_support.push_workflows``).
 """
 
 from __future__ import annotations
@@ -33,25 +39,6 @@ def test_the_hook_template_renders_to_the_repositorys_hook_file():
         "template/lefthook.yml.jinja does not render to the repository's lefthook.yml")
 
 
-def test_every_workflow_has_its_template_and_the_template_renders_to_it():
-    own = support.workflow_files()
-    assert own, "no workflow under .github/workflows/"
-    for path in own:
-        rel = path.relative_to(support.WORKFLOWS)
-        template = support.TEMPLATE_WORKFLOWS / f"{rel}.jinja"
-        assert template.is_file(), f"template/.github/workflows/{rel}.jinja is absent"
-        assert _render(template) == path.read_text(encoding="utf-8"), (
-            f"template/.github/workflows/{rel}.jinja does not render to .github/workflows/{rel}")
-
-
-def test_the_template_holds_no_workflow_the_repository_lacks():
-    assert support.TEMPLATE_WORKFLOWS.is_dir(), "template/.github/workflows/ is absent"
-    for template in sorted(support.TEMPLATE_WORKFLOWS.rglob("*.jinja")):
-        rel = template.relative_to(support.TEMPLATE_WORKFLOWS)
-        assert (support.WORKFLOWS / str(rel)[:-len(".jinja")]).is_file(), (
-            f"template/.github/workflows/{rel} has no rendered form under .github/workflows/")
-
-
 def test_the_workflow_template_keeps_github_expressions_whole():
     """``${{ ... }}`` belongs to GitHub: rendered by Jinja unescaped, it would vanish or fail."""
     templates = sorted(support.TEMPLATE_WORKFLOWS.rglob("*.jinja")) if support.TEMPLATE_WORKFLOWS.is_dir() else []
@@ -61,3 +48,14 @@ def test_the_workflow_template_keeps_github_expressions_whole():
         raw = template.read_text(encoding="utf-8")
         assert rendered.count("${{") == raw.count("${{"), (
             f"{template.name}: a GitHub expression does not survive rendering")
+
+
+def test_this_repositorys_own_workflow_runs_only_when_started_by_hand():
+    """T-11 (DEC-1061 item 9): CI is off here. This repository's ``.github/workflows/ci.yml`` is kept (so the
+    template's render can still be compared by hand) but a push starts nothing: its only trigger is
+    ``workflow_dispatch``."""
+    path = support.WORKFLOWS / "ci.yml"
+    assert path.is_file(), ".github/workflows/ci.yml is absent"
+    assert support.triggers(support.load_workflow(path)) == {"workflow_dispatch"}, (
+        f".github/workflows/ci.yml runs on {sorted(support.triggers(support.load_workflow(path)))}: "
+        "T-11 reduces its trigger to workflow_dispatch")

@@ -129,3 +129,21 @@ reached this batch through the ticket lead's request.
 4. A daemon the function starts may inherit the caller's output streams. A caller that reads them through a pipe
    would then wait for the daemon. The tests avoid this by sending the child's streams to files, so they do not
    assert it either way.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated in round 2 of the cut (DEC-1061; the review's F3, F4): each line of the ticket's `kpis:` is placed
+by its own words (or by the designer, or by part A's row for that line), never by the README's layout; each
+case named here runs in the full run, with every row of a class the line names; tier 2's cap then cut only
+the rest. The rest stay built: `breadth` (`tests/optin-lifted*breadth*.txt`, `--optin=breadth`) and, for the
+switched-off features, `lifted` (the other `tests/optin-lifted*.txt`, `--optin=lifted`). The placement is data
+(`placement.json`, with the designer's `overrides.json`), checked by code against the default collection.
+
+Cases: 15 in the full run, 0 in `breadth`, 0 in `lifted`.
+
+| KPI line | case(s) in the full run (rows in the full run of the function's rows) | placed by |
+|---|---|---|
+| S1: gov starts ollama serve on demand and relies on the 5-min idle unload; no always-on unit | `test_w1_18_on_demand_start.py::test_with_the_endpoint_down_ollama_serve_is_started_on_demand` (3 of 3), `test_w1_18_on_demand_start.py::test_starting_sets_up_no_unit_and_no_keep_alive_override` | the ticket's words |
+| S2: When Ollama is unavailable retrieval degrades to FTS-only with a warning and the facet state recorded | `test_w1_18_fallback.py::test_without_an_executable_the_result_is_fts_only_with_the_facet_state`, `test_w1_18_fallback.py::test_a_daemon_that_never_becomes_healthy_gives_the_same_degraded_result`, `test_w1_18_fallback.py::test_degrading_writes_no_file` | the ticket's words |
+| F1: A query hangs > 30 s waiting for Ollama | `test_w1_18_deadline.py::test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline`, `test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call`, `test_w1_18_deadline.py::test_the_default_deadline_is_20_seconds` | the ticket's words |
+| F2: Semantic results are silently omitted without a warning | `test_w1_18_fallback.py::test_a_degraded_result_is_never_silent` (2 of 2) | the ticket's words |
