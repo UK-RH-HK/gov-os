@@ -190,8 +190,28 @@ def planted_vectors(box, ollama, tmp_path_factory):
     return root
 
 
+def test_a_namespace_not_indexed_and_embedded_is_refused_naming_it(box, tmp_path):
+    """The row "not indexed, embedded", revised (the CTO, P2): the vectors are built from the keyword index's chunks,
+    so a namespace kept out of the keyword index cannot be embedded. The validator refuses the combination with
+    ``CONFIG_INVALID`` naming the namespace; it is never accepted silently. Planted in a scratch copy of the project."""
+    root = s6.build_project(tmp_path / "repo", embedded_kept_out=True)
+    error = s6.load_config(box, root).error()
+    assert error is not None, \
+        f"the path map's validator accepted namespace {s6.KEPT_OUT_NAMESPACE!r} with lexical_policy: not indexed " \
+        f"and embedding_policy: embedded"
+    assert error.get("code") == "CONFIG_INVALID" and s6.KEPT_OUT_NAMESPACE in (error.get("message") or ""), \
+        f"the refusal is not CONFIG_INVALID naming the namespace {s6.KEPT_OUT_NAMESPACE!r}: {error}"
+    run = box.gov("rebuild", "--json", "--no-embeddings", "--root", str(root))
+    envelope = run.envelope()
+    assert run.returncode != 0 and envelope.get("ok") is False, \
+        f"gov rebuild ran on a path map with a namespace not indexed and embedded\n{run.describe()}"
+    refusal = envelope.get("error") or {}
+    assert refusal.get("code") == "CONFIG_INVALID" and s6.KEPT_OUT_NAMESPACE in (refusal.get("message") or ""), \
+        run.describe()
+    assert not (root / support.STORE_REL).exists(), "gov rebuild built a store from a path map it should refuse"
+
+
 VECTOR_CASES = {
-    "not indexed, embedded: in the vectors only": (s6.VECTORS_ONLY_FILE, {support.ROUTE_SEMANTIC}),
     "indexed, not embedded: in the keyword index only": (s6.INDEXED_FILE, {support.ROUTE_LEXICAL}),
     "not indexed, not embedded: in neither": (s6.EVALUATION_FILE, set()),
 }

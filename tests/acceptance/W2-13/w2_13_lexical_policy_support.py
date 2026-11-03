@@ -9,7 +9,9 @@ out is named in the rebuild's report; the evaluation set's own documents (lens B
 The planted project has four namespaces, disjoint, every tracked path in exactly one (``gov.check.pathmap``):
 
 - ``evaluation``: ``not indexed``, ``not embedded`` (D-7's shape: kept out of both indexes);
-- ``vectors-only``: ``not indexed``, ``embedded`` (kept out of the keyword index, in the vectors);
+- ``kept-out``: ``not indexed``, ``not embedded`` (a second namespace kept out). ``not indexed`` with ``embedded``
+  is refused by the validator (the CTO, P2: the vectors are built from the keyword index's chunks); only a scratch
+  copy plants it (``build_project(..., embedded_kept_out=True)``);
 - ``indexed``: ``indexed``, ``not embedded`` (the field given, its other value);
 - ``governance``: no ``lexical_policy``, ``embedded`` (the rest, the path map itself included).
 
@@ -38,7 +40,7 @@ FIELD = "lexical_policy"
 # name -> (patterns, lexical_policy or None for absent, embedding_policy)
 NAMESPACES = {
     "evaluation": (["evaluation/**"], NOT_INDEXED, NOT_EMBEDDED),
-    "vectors-only": (["vectors-only/**"], NOT_INDEXED, EMBEDDED),
+    "kept-out": (["kept-out/**"], NOT_INDEXED, NOT_EMBEDDED),
     "indexed": (["indexed/**"], INDEXED, NOT_EMBEDDED),
     "governance": (["*", "docs/**", "governance/**"], None, EMBEDDED),
 }
@@ -67,8 +69,8 @@ FILES = [
             _doc("Lens report", ("zorquix", "vexlumbra"), "EV-5521")),
     Planted("evaluation/cases/q01.yaml", "evaluation", ("jondrakel", "quivvet"), "EV-5522",
             "question: Where is the jondrakel quivvet rule kept?\nexpected: [EV-5522]\n"),
-    Planted("vectors-only/notes.md", "vectors-only", ("plimzot", "wyxander"), "VO-3301",
-            _doc("Vector notes", ("plimzot", "wyxander"), "VO-3301")),
+    Planted("kept-out/notes.md", "kept-out", ("plimzot", "wyxander"), "KO-3301",
+            _doc("Kept notes", ("plimzot", "wyxander"), "KO-3301")),
     Planted("indexed/log.md", "indexed", ("draxolum", "fennquist"), "IX-7710",
             _doc("Indexed log", ("draxolum", "fennquist"), "IX-7710")),
     Planted("docs/plain.md", "governance", ("glonkrib", "sartivex"), "PL-1180",
@@ -79,7 +81,7 @@ KEPT_OUT = [planted for planted in FILES if NAMESPACES[planted.namespace][1] == 
 KEPT_IN = [planted for planted in FILES if NAMESPACES[planted.namespace][1] != NOT_INDEXED]
 ABSENT_FILE = BY_PATH["docs/plain.md"]  # its namespace has no lexical_policy
 INDEXED_FILE = BY_PATH["indexed/log.md"]  # its namespace says ``indexed``
-VECTORS_ONLY_FILE = BY_PATH["vectors-only/notes.md"]  # not indexed, embedded
+KEPT_OUT_NAMESPACE = "kept-out"  # the namespace the scratch copy marks ``embedded``, which the validator refuses
 EVALUATION_FILE = BY_PATH["evaluation/lens-report.md"]  # not indexed, not embedded
 
 # The repository's own evaluation documents (DEC-1066 (3)): what D-7 marks ``not indexed``.
@@ -115,13 +117,17 @@ def planted_namespaces(with_policy=True):
             for name, (patterns, lexical, embedding) in NAMESPACES.items()}
 
 
-def build_project(project, with_policy=True):
+def build_project(project, with_policy=True, embedded_kept_out=False):
     """The planted project (``with_policy``) or its control (no ``lexical_policy`` anywhere): one commit. Not
-    indexed."""
+    indexed. ``embedded_kept_out``: the scratch copy whose ``kept-out`` namespace says ``not indexed`` and
+    ``embedded``, the combination the validator refuses."""
     project = Path(project)
     project.mkdir(parents=True, exist_ok=True)
     support.git(project, "init", "-q", "-b", "main")
-    write_path_map(project, planted_namespaces(with_policy))
+    namespaces = planted_namespaces(with_policy)
+    if embedded_kept_out:
+        namespaces[KEPT_OUT_NAMESPACE]["embedding_policy"] = EMBEDDED
+    write_path_map(project, namespaces)
     support.write(project, ".gitignore", ".gov-runtime/\n")
     support.write(project, "README.md", "# A project\n\nOrdinary text about the project.\n")
     for planted in FILES:
