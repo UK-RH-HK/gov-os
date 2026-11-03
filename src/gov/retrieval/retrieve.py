@@ -195,23 +195,6 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     gathering = fused[offset:offset + total_slots]
     remaining = fused[offset + total_slots:]
 
-    batches_list: list[dict] = []
-    batch_assignments: dict[str, int] = {}
-    for i in range(rounds_limit + 1):
-        start_idx = i * batch_size
-        end_idx = min(start_idx + batch_size, len(gathering))
-        batch_chunk = gathering[start_idx:end_idx]
-        if not batch_chunk and i > 0:
-            break
-        batches_list.append({"size": len(batch_chunk)})
-        for hit in batch_chunk:
-            batch_assignments[hit["chunk_id"]] = i + 1
-
-    rounds_used = min(rounds_limit, max(0, len(batches_list) - 1))
-
-    gaps = list(closure_gaps)
-    gaps += [{"path": hit["path"], "chunk_id": hit["chunk_id"], "reason": NOT_GATHERED} for hit in remaining]
-
     files: dict[str, list[bytes]] = {}
 
     def span(rel: str, first: int, last: int) -> bytes:
@@ -222,8 +205,9 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
     dropped: dict[str, dict] = {}
     candidates = []
     frontmatter_cache: dict[str, tuple[str | None, str | None]] = {}
+    spent = 0  # W2-13 R3 (DEC-860): the gathered chunks' tokens; the gathering stops where the next would overrun
 
-    for hit in gathering:
+    for at, hit in enumerate(gathering):
         if hit["chunk_id"] not in chunks:  # W2-13 R4: a hit whose chunk the lexical index does not hold is skipped
             continue
         chunk = chunks[hit["chunk_id"]]
@@ -259,9 +243,32 @@ def retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None, bun
                 continue
 
         body = span(chunk["path"], chunk["start_line"], chunk["end_line"])
+        cost = _tokens(body.decode("utf-8", "replace"))
+        if candidates and spent + cost > limit:  # the rest is not gathered: the continuation starts at this hit
+            gathering, remaining = gathering[:at], gathering[at:] + remaining
+            break
+        spent += cost
         candidates.append({**chunk, "routes": hit["routes"], "body": body,
-                           "text": f"[path: {chunk['path']}]\n{body.decode('utf-8', 'replace')[:RERANK_CHARS]}",
-                           "_batch": batch_assignments[hit["chunk_id"]]})
+                           "text": f"[path: {chunk['path']}]\n{body.decode('utf-8', 'replace')[:RERANK_CHARS]}"})
+
+    batches_list: list[dict] = []
+    batch_assignments: dict[str, int] = {}
+    for i in range(rounds_limit + 1):
+        start_idx = i * batch_size
+        end_idx = min(start_idx + batch_size, len(gathering))
+        batch_chunk = gathering[start_idx:end_idx]
+        if not batch_chunk and i > 0:
+            break
+        batches_list.append({"size": len(batch_chunk)})
+        for hit in batch_chunk:
+            batch_assignments[hit["chunk_id"]] = i + 1
+    for candidate in candidates:
+        candidate["_batch"] = batch_assignments[candidate["chunk_id"]]
+
+    rounds_used = min(rounds_limit, max(0, len(batches_list) - 1))
+
+    gaps = list(closure_gaps)
+    gaps += [{"path": hit["path"], "chunk_id": hit["chunk_id"], "reason": NOT_GATHERED} for hit in remaining]
 
     try:
         ranked, reranked_by = rerank(query, candidates, reranker), last_outcome()

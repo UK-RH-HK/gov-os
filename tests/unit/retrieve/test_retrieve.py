@@ -52,22 +52,41 @@ def root(tmp_path, monkeypatch):
     return tmp_path
 
 
+ROOMY = 1_000_000  # a bundle budget everything fits in: since W2-13 (DEC-860) the budget bounds the gathered chunks too
+
+
 def test_one_batch_that_holds_everything_says_so(root):
-    bundle = retrieve(root, PHRASE, bundle_budget=0, reranker=lambda: None)
+    bundle = retrieve(root, PHRASE, bundle_budget=ROOMY, reranker=lambda: None)
     assert bundle["stopping_reason"] == "SATURATED" and bundle["continuation"] is None and bundle["gaps"] == []
     assert bundle["merge"]["candidates"] == bundle["batches"][0]["size"] == len(bundle["evidence"]) == 5
     assert bundle["budget"]["rounds"]["limit"] >= 1 and bundle["budget"]["rounds"]["used"] == 0
 
 
 def test_a_batch_size_limit_gathers_multiple_batches_and_lists_gaps(root):
-    whole = retrieve(root, PHRASE, bundle_budget=0, reranker=lambda: None)
-    bundle = retrieve(root, PHRASE, batch_size=2, bundle_budget=0, reranker=lambda: None)
+    whole = retrieve(root, PHRASE, bundle_budget=ROOMY, reranker=lambda: None)
+    bundle = retrieve(root, PHRASE, batch_size=2, bundle_budget=ROOMY, reranker=lambda: None)
     assert bundle["stopping_reason"] == "BUDGET_EXHAUSTED_WITH_GAPS"
     assert bundle["continuation"] is not None
     assert all(b["size"] <= 2 for b in bundle["batches"])
     cited = {item["chunk_id"] for item in bundle["evidence"]}
     gaps_not_gathered = {gap["chunk_id"] for gap in bundle["gaps"] if gap["reason"] == "NOT_GATHERED"}
     assert gaps_not_gathered == {item["chunk_id"] for item in whole["evidence"]} - cited
+
+
+def test_a_small_budget_bounds_each_page_and_the_continuation_reaches_every_chunk(root):
+    everything = retrieve(root, PHRASE, bundle_budget=ROOMY, reranker=lambda: None)["evidence"]
+    whole = {item["chunk_id"] for item in everything}
+    seen, token, pages = set(), None, 0
+    while pages < 20:
+        bundle = retrieve(root, PHRASE, bundle_budget=60, continuation=token, reranker=lambda: None)
+        pages += 1
+        assert bundle["budget"]["bundle"]["used"] <= 60 or len(bundle["evidence"]) == 1, bundle["budget"]
+        seen |= {item["chunk_id"] for item in bundle["evidence"]}
+        token = bundle["continuation"]
+        if token is None:
+            break
+        assert bundle["stopping_reason"] == "BUDGET_EXHAUSTED_WITH_GAPS"
+    assert pages > 1 and token is None and seen == whole
 
 
 def test_two_chunks_of_one_parent_expand_it_once(root):
