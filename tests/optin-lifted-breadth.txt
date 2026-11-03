@@ -117,3 +117,45 @@ tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_matches
 tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_is_executable  # cap
 tests/acceptance/W1-09/test_w1_09_vendoring.py::test_the_vendored_script_works_without_the_installed_one  # cap
 rep: tests/acceptance/W1-09/test_w1_09_claims.py  # one row per parametrised function
+
+# acceptance/W1-10
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_commit_before_2026_10_03_falls_back_to_the_message_body  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_commit_from_2026_10_03_is_read_from_the_final_block_only  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_commit_without_trailers_has_none  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_changed_file_returns_its_commits_with_their_trailers  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_the_trailers_of_a_file_resolve_to_records  # cap
+tests/acceptance/W1-10/test_w1_10_load.py::test_a_file_no_commit_changed_has_no_commits  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_record_that_names_its_own_successor_is_not_active  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_active_set_without_a_type_covers_every_record_type  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_active_set_of_a_type_without_active_records_is_empty  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_records_by_type_and_status_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_records_by_type_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_records_by_status_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_query_that_matches_nothing_returns_nothing  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_edges_of_a_type_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_every_implements_and_validates_edge_of_a_requirement_is_returned  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_the_edges_of_one_source_are_exact  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_record_without_links_has_no_edges  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_link_named_from_both_sides_is_one_edge  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_superseded_by_gives_a_supersedes_edge_from_the_successor  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_dangling_references_are_reported_by_id  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_dangling_reference_is_still_an_edge  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_reference_that_resolves_is_not_dangling  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_dangling_reference_goes_once_its_target_is_committed  # cap
+tests/acceptance/W1-10/test_w1_10_queries.py::test_a_trailer_that_names_no_record_is_reported_by_id  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_without_a_named_register_the_store_is_what_it_is_today  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_each_entry_of_the_named_register_is_a_decision_record  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_record_answers_the_filters_of_the_record_query  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_heading_that_is_no_entry_is_no_record  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_the_named_register_changes_the_digest_and_loads_to_the_same_digest_twice  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_the_register_is_read_from_the_commit  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_register_named_only_in_the_working_tree_is_not_loaded  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_that_supersedes_decisions_gives_the_edge  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_partial_supersession_and_the_other_relations_give_no_edge  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_entry_with_no_readable_status_is_no_record_and_is_named  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_recorded_as_a_decision_file_and_as_an_entry_is_the_file_and_is_named  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_an_id_under_two_headings_of_the_register_is_no_record_and_is_named  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_named_register_that_cannot_be_read_refuses_the_load  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves  # cap
+tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails  # cap
+rep: tests/acceptance/W1-10/test_w1_10_determinism.py  # one row per parametrised function

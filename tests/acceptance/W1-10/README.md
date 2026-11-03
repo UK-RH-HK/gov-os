@@ -382,3 +382,19 @@ external references, W1-30's round 13 piece 6) will hold decision records where 
 were not run against a built store by the designer; a case of theirs that changes is a rewrite with its
 reason.
 
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: Frontmatter of every record and Implements:/Task: trailers load into .gov-runtime/store.db deterministically (same digest twice) [CAP... | `test_w1_10_load.py::test_load_writes_the_store_as_a_sqlite_database`, `test_w1_10_load.py::test_load_writes_nothing_in_the_project_outside_gov_runtime`, `test_w1_10_load.py::test_the_frontmatter_of_every_record_is_loaded` | README |
+| S2: Queries return the exact ACTIVE set, IMPLEMENTS/VALIDATES/SUPERSEDES/DEPENDS_ON edges and dangling references by id [CAP-08.a, CAP-09.b] | `test_w1_10_queries.py::test_the_active_decisions_are_exactly_those_active_and_not_superseded`, `test_w1_10_queries.py::test_a_record_another_record_supersedes_is_not_active`, `test_w1_10_queries.py::test_a_record_that_names_its_own_successor_is_not_active` | README |
+| S3: Full load of a dev tier < 5 s | `test_w1_10_dev_tier.py::test_a_full_load_of_a_dev_tier_takes_less_than_5_seconds`, `test_w1_10_dev_tier.py::test_a_dev_tier_loads_to_the_same_digest_twice`, `test_w1_10_dev_tier.py::test_a_full_load_of_a_dev_tier_takes_less_than_5_seconds` | README |
+| S4: The graph stores all eight typed edges: EVIDENCE_FOR, CONSTRAINS, IMPLEMENTS, TESTS, GENERATES, VALIDATES, SUPERSEDES, DEPENDS_ON [CA... | `test_w1_10_edges.py::test_the_graph_stores_the_typed_edge`, `test_w1_10_edges.py::test_the_edges_between_records_are_exactly_those_of_the_frontmatter`, `test_w1_10_edges.py::test_every_edge_has_one_of_the_eight_types` | README |
+| F1: A record present in git is missing from the graph | `test_w1_10_completeness.py::test_every_record_of_the_fixture_is_in_the_graph`, `test_w1_10_completeness.py::test_a_record_committed_later_is_in_the_graph_after_a_load`, `test_w1_10_completeness.py::test_a_changed_status_is_in_the_graph_after_a_load` | README |
+| F2: Graph content depends on file order or time | `test_w1_10_determinism.py::test_a_later_load_gives_the_same_digest`, `test_w1_10_determinism.py::test_a_load_into_a_new_store_gives_the_same_digest`, `test_w1_10_determinism.py::test_a_clone_elsewhere_gives_the_same_digest_and_content` | README |
+
+Tier 2's cap here: 36 functions (6 KPI lines x 6); 39 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
