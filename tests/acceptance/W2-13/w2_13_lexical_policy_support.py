@@ -137,11 +137,15 @@ def build_project(project, with_policy=True, embedded_kept_out=False):
 
 
 def build_one_namespace(project, value):
-    """A project whose one namespace holds every path and says ``lexical_policy: <value>``. One commit."""
+    """A project whose one namespace holds every path and says ``lexical_policy: <value>``. One commit. The namespace
+    is ``embedded``, except for ``not indexed``, which P2 allows only with ``not embedded`` (the vectors come from
+    the keyword index's chunks). Every invalid value the cases plant differs from ``not indexed``, so it stays
+    ``embedded`` and the refusal can come only from the value itself."""
     project = Path(project)
     project.mkdir(parents=True, exist_ok=True)
     support.git(project, "init", "-q", "-b", "main")
-    write_path_map(project, {"everything": {**namespace(["**"], None, EMBEDDED, absent=True), FIELD: value}})
+    embedding = NOT_EMBEDDED if value == NOT_INDEXED else EMBEDDED
+    write_path_map(project, {"everything": {**namespace(["**"], None, embedding, absent=True), FIELD: value}})
     support.write(project, ".gitignore", ".gov-runtime/\n")
     support.write(project, "docs/page.md", ABSENT_FILE.text)
     support.commit(project, "one namespace")
