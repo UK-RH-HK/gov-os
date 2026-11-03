@@ -271,6 +271,7 @@ tests/acceptance/W1-03/test_w1_03_probe_findings.py  # post-command containment 
 tests/acceptance/W1-03/test_w1_03_test_independence.py  # post-command containment (G-5; DEC-1061 (3a))
 
 # W1-05
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_the_orchestrator_asks_the_owner  # post-command containment (G-5; DEC-1061 (3a))
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_containment_check_reports_a_change_outside_the_ticket_paths  # post-command containment (G-5; DEC-1061 (3a))
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_containment_check_restores_an_acceptance_test  # post-command containment (G-5; DEC-1061 (3a))
 tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_the_containment_check_runs_after_a_failed_call  # post-command containment (G-5; DEC-1061 (3a))

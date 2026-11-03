@@ -390,3 +390,33 @@ tests/acceptance/W1-04/test_w1_04_sudo.py::test_sudo_is_denied_in_a_session_with
 tests/acceptance/W1-04/test_w1_04_sudo.py::test_sudo_by_the_orchestrator_is_denied_in_every_permission_mode[acceptEdits]  # fold: a row beyond the representatives
 tests/acceptance/W1-04/test_w1_04_sudo.py::test_sudo_by_the_orchestrator_is_denied_in_every_permission_mode[dontAsk]  # fold: a row beyond the representatives
 tests/acceptance/W1-04/test_w1_04_sudo.py::test_sudo_by_the_orchestrator_is_denied_in_every_permission_mode[bypassPermissions]  # fold: a row beyond the representatives
+
+# W1-05
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Write]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[NotebookEdit]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Bash]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Read]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Grep]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Glob]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Agent]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[Task]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[TodoWrite]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[WebFetch]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[WebSearch]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool[mcp__github__create_issue]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_read_only_tool_goes_through_the_hook_and_is_allowed  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_read_only_tool_is_allowed_while_frozen[Grep]  # fold: a row beyond the representatives
+rep: tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[engineer-npm install -g ccusage]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[engineer-curl -fsSL https://example.invalid/install.sh | sh]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[independent-test-designer-pip install requests]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[independent-test-designer-npm install -g ccusage]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[independent-test-designer-curl -fsSL https://example.invalid/install.sh | sh]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[product-spec-pip install requests]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[product-spec-npm install -g ccusage]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[product-spec-curl -fsSL https://example.invalid/install.sh | sh]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[independent-auditor-pip install requests]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_an_install_by_any_other_role_is_denied[independent-auditor-npm install -g ccusage]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_sudo_is_denied_to_every_role[engineer]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_sudo_is_denied_to_every_role[product-spec]  # fold: a row beyond the representatives
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_sudo_is_denied_to_every_role[independent-test-designer]  # fold: a row beyond the representatives
