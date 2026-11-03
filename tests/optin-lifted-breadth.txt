@@ -159,3 +159,75 @@ tests/acceptance/W1-10/test_w1_10_register.py::test_a_named_register_that_cannot
 tests/acceptance/W1-10/test_w1_10_register.py::test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves  # cap
 tests/acceptance/W1-10/test_w1_10_register.py::test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails  # cap
 rep: tests/acceptance/W1-10/test_w1_10_determinism.py  # one row per parametrised function
+
+# acceptance/W1-11
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_active_over_a_concurrent_owner_demotion_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_owner_merge_that_keeps_active_over_a_concurrent_demotion_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_the_owner_file_over_an_agent_file_at_the_same_path_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_active_fails_although_the_demoted_line_merged_an_old_branch  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_the_same_merge_fails_without_the_old_branch  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_keeps_a_moved_active_file_over_a_demotion_at_the_old_path_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_a_second_merge_that_keeps_the_owner_file_does_not_hide_an_agent_reactivation  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_owner_merge_that_keeps_active_over_the_demoted_line_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_owner_merge_that_keeps_the_moved_file_over_the_demotion_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_of_a_branch_that_only_moved_an_approved_decision_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_integration_merge_of_a_branch_where_the_owner_added_a_decision_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_agent_merge_that_brings_nothing_about_decisions_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_an_old_branch_merged_late_into_a_line_where_the_owner_approved_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merge_base.py::test_the_main_line_merged_back_into_a_ticket_branch_and_the_branch_merged_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merges.py::test_an_agent_merge_that_sets_active_again_a_decision_the_owner_demoted_fails  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merges.py::test_an_owner_merge_that_sets_active_again_a_demoted_decision_passes  # cap
+tests/acceptance/W1-11/test_w1_11_approval_merges.py::test_an_agent_merge_that_brings_in_the_owner_commit_that_set_active_again_passes  # cap
+tests/acceptance/W1-11/test_w1_11_b_dev.py::test_a_supersession_cycle_between_the_two_directories_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_b_dev.py::test_one_id_in_both_decision_directories_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_citing_file_without_an_id_is_not_authorised_by_a_declined_gate  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_citing_file_without_an_id_is_authorised_by_an_answered_gate_of_its_cit  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_citing_ticket_whose_frontmatter_cannot_be_read_does_not_pass  # cap
+tests/acceptance/W1-11/test_w1_11_citing_files.py::test_a_second_empty_approval_key_does_not_take_the_first_out_of_the_check  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_gate_answered_for_the_same_cit_authorises  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_an_open_gate_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_one_dead_gate_among_the_cited_gates_fails_the_ticket  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_only_the_record_that_cites_the_dead_gate_fails  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_cited_id_that_is_no_record_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_cited_record_that_is_no_decision_package_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_citing_record_without_a_cit_is_not_authorised  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_gate_without_a_cit_does_not_authorise  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_two_missing_cits_are_not_the_same_cit  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_record_without_approval_is_not_checked  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_ticket_that_waits_on_a_declined_revoked_or_stale_package_fails  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_ticket_that_waits_on_an_open_or_answered_package_is_not_failed_by_the_checker  # cap
+tests/acceptance/W1-11/test_w1_11_gates.py::test_a_closed_ticket_named_by_a_dead_package_is_not_failed  # cap
+tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_naming_another_repository_does_not_hide_the_findings_of_the_root  # cap
+tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_does_not_make_a_folder_that_is_no_repository_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_environment.py::test_git_dir_does_not_make_a_subfolder_of_a_repository_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_a_grafts_file_does_not_turn_a_flagged_agent_merge_into_a_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_a_file_that_hides_a_parent_does_not_turn_a_flagged_agent_merge_into_a_pass  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_an_owner_merge_passes_with_a_grafts_file_in_place  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_an_owner_merge_passes_with_a_commit_graph_git_wrote  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_a_git_setting_does_not_make_another_line_the_owner_trailer  # cap
+tests/acceptance/W1-11/test_w1_11_git_files_and_settings.py::test_the_owner_trailer_still_approves_with_the_setting_in_place  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_register_without_a_hazard_raises_no_hazard_finding  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_supersession_recorded_on_both_sides_is_not_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_an_active_decision_that_another_supersedes_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_an_active_decision_that_names_its_own_successor_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_supersession_stated_only_in_prose_is_not_read  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_one_id_in_two_files_of_one_directory_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_one_id_in_two_directories_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_ids_with_one_number_in_two_directories_are_flagged_as_overlapping  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_supersession_cycle_is_flagged_with_its_members  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_cycle_closed_through_superseded_by_is_flagged  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_the_same_tree_gives_the_same_findings_twice  # cap
+tests/acceptance/W1-11/test_w1_11_hazards.py::test_a_folder_that_is_no_git_repository_is_an_error_not_a_pass  # cap
+tests/acceptance/W1-11/test_w1_11_no_id_and_replace_refs.py::test_an_active_decision_without_an_id_set_by_an_agent_fails  # cap
+tests/acceptance/W1-11/test_w1_11_object_store.py::test_a_check_leaves_every_file_under_git_as_it_was  # cap
+tests/acceptance/W1-11/test_w1_11_object_store.py::test_a_check_of_a_partial_clone_fetches_nothing_and_writes_nothing  # cap
+tests/acceptance/W1-11/test_w1_11_object_store.py::test_a_check_of_a_partial_clone_whose_remote_is_out_of_reach_does_not_pass  # cap
+tests/acceptance/W1-11/test_w1_11_read_only.py::test_decision_files_a_rewrite_would_not_reproduce_stay_byte_identical  # cap
+tests/acceptance/W1-11/test_w1_11_read_only.py::test_uncommitted_work_in_the_tree_is_left_as_it_is  # cap
+tests/acceptance/W1-11/test_w1_11_read_only.py::test_a_second_check_leaves_every_file_byte_identical_too  # cap
+tests/acceptance/W1-11/test_w1_11_unreadable.py::test_a_decision_file_that_cannot_be_read_does_not_pass_in_silence  # cap
+tests/acceptance/W1-11/test_w1_11_unreadable.py::test_a_markdown_file_without_frontmatter_is_not_unreadable  # cap
+tests/acceptance/W1-11/test_w1_11_unreadable.py::test_an_ordinary_file_is_not_unreadable  # cap
+rep: tests/acceptance/W1-11/test_w1_11_approval.py  # one row per parametrised function
+rep: tests/acceptance/W1-11/test_w1_11_approval_fail_closed.py  # one row per parametrised function
+rep: tests/acceptance/W1-11/test_w1_11_approval_history.py  # one row per parametrised function
