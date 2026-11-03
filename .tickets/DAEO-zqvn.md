@@ -18,6 +18,8 @@ depends_on:
 - DAEO-g0ip
 - DAEO-ym8a
 allowed_paths:
+- src/gov/config/loader.py
+- src/gov/check/pathmap.py
 - src/gov/retrieval/supplementary.py
 - src/gov/context/__init__.py
 - src/gov/context/command.py
@@ -40,6 +42,7 @@ kpis:
   - Lexical search returns "unavailable" instead of raising [W2-M071]. Retrieval latency stays within the retrieve budget on the dev tiers.
   - 'A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap, as the owner ruled for RETR-X-02 (DEC-900, AR-9), and as W1-21 asserts; W1-42''s RETR-X-02 case is retired, so this ticket''s own acceptance tests hold the requirement [AR-9, W2-M296, DEC-900].'
   - 'S5 Search respects role separation (DEC-1065 (2)): gov retrieve''s results (every route) and gov context''s supplementary block are filtered by the caller''s role_paths (GOV_ROLE or --role, and GOV_TICKET; the same path checks as the guard''s, from one product module): an engineer never receives its own ticket''s acceptance tests, a test designer never the ticket''s new code; what is filtered is named in the bundle (how many, by which rule), never dropped silently; no role_paths section means no filter [DEC-1065, DEC-1056, DEC-1063]'
+  - 'S6 The keyword index honours the path map (DEC-1066 (3), G4): a namespace whose `lexical_policy` is `not indexed` keeps its files out of the keyword index (absent: indexed, as today); the path map''s validator accepts the field with its two values; a file kept out is named in the rebuild''s report; the evaluation set''s own documents (lens B''s report, `fixtures/evaluation/**`) are what D-7 marks so [DEC-1066, DEC-1052 M-4]'
   failure:
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - 'The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.'
@@ -91,3 +94,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-13), as approved (DEC-729). The list row
 **S5 (CTO, 2026-11-03, P2):** `src/gov/context/__init__.py` added to the paths: `gov context --role` must reach the supplementary block's filter (S5 names `GOV_ROLE` or `--role`); the one red case of S5 outside the sandbox is the `--role` variant.
 
 **S5 (CTO, 2026-11-03, P2):** `src/gov/context/command.py` added too: its `context(...)` call must pass the parsed `--role` (the one line the engineer named).
+
+**DEC-1066 (3) placed here (CTO, 2026-11-03):** S6 added (W2-13 owns the keyword index): `lexical.py` takes every tracked file today (no exclusion list); the path map gains `lexical_policy`.

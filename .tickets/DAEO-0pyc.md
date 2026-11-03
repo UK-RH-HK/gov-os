@@ -30,9 +30,9 @@ kpis:
   - A retrieval miss is recorded as a memory-quality event with its root cause, its repair and a held-out regression case [CAP-19.c].
   - A reranker that dies after loading is reported, not raised [W2-M104].
   - The fusion limit is honoured [W2-M103].
-  - 'At most the three gaps that W2-15a named, from these: ranked-lexical tuning: field weights, tokenizer, and the exact-identifier boost'
-  - 'At most the three gaps that W2-15a named, from these: chunking: span size, overlap and parent expansion, with a re-embed'
-  - 'At most the three gaps that W2-15a named, from these: the hit@5 85 row on the dev queryset [W2-M341]: Each gets one round plus its probe; its effect is measured by W2-15b. What remains is a named residual.'
+  - 'S6 (G2, round 3; DEC-1066) Ranked-lexical tuning for code questions: code ranked above tests and assessments for a question about code, call sites preferred for an --id question; one round plus its probe, measured by D-4b (a rebuild and the measure); F1 reverts a round that lowers a baseline figure beyond its noise band'
+  - 'S7 (G1, round 1; DEC-1066) The models read the whole chunk: the embedder and the reranker read each chunk in full (no 512/500-character cut below the chunk''s size; the manifest''s cut changes, so a full re-embed by S1), and parent expansion keeps its expanded parents across continuations (no span sent twice); one round, measured by D-4b'
+  - 'S8 (G3, round 2; DEC-1066, DEC-1065 (3)) The fusion keeps each route''s top hits: no route''s first hits are outscored by an unranked set (the closure route ranked or down-weighted), each route''s first hits keep a place in the first batch, and the semantic route''s hits survive the fusion and the rerank; one round, measured by D-4b'
   - 'If memory is below 85 % after two improvement rounds, the orchestrator escalates to the owner with the reasons; at the third the owner decides: a discovery and research ticket benchmarking market tools in a separate worktree, accepting the level reached, or another course. At 85 % or above but under the owner''s target of 95 %, with room for improvement found, memory is not closed: an escalation to the owner [DEC-954 Q9e, DEC-957]'
   - 'S10 No CPU fallback for embeddings (DEC-1065 (1)): when the shared GPU embedders cannot be reached (the launch sandbox included), a search reports its semantic part unavailable with a named code and answers by keywords; gov never starts a private embedder (ensure_available and ensure_query_available check health only; only an explicit restart of the shared servers from their committed configs starts one); a vector computed on the CPU is refused, never cached or stored; a rebuild refuses to embed on the CPU [DEC-1065, DEC-1031, ACT-RERANK-WAIT-1]'
   failure:
@@ -130,3 +130,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-32), as approved (DEC-729). The list row
 
 
 **DEC-1065 (1) placed here (CTO, 2026-11-03):** S10 added; every CPU-embedder start goes through `ollama.py`'s `ensure_available` (the search, the refresh in rebuild and close, the seed, the sandbox), all in this ticket's paths.
+
+**DEC-1066 (owner, 2026-11-03):** S6-S8 re-worded to the chosen gaps, in the round order G1 (S7), G3 (S8, the fusion: W2-32's KPIs changed to cover it), G2 (S6).
