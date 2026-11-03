@@ -513,13 +513,22 @@ def test_every_module_a_declared_check_runs_reaches_w1_26(test_map):
 
 # -- DEC-896 item 2: test_inputs moved; KPI 8 and 9: the settings -----------------
 
+MOVED_TEST_INPUTS = ("fixtures/**", "template/**", "schemas/**")   # the inputs DEC-896 item 2 moved
+
+
 def test_the_path_map_s_test_inputs_are_in_the_test_map(test_map):
-    inputs = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
-    if inputs is None:
-        pytest.skip("the path map no longer holds test_inputs (the orchestrator's edit is done)")
+    """DEC-896 item 2: ``test_inputs`` moved from the path map to the test map.
+
+    Rewrite-Reason: DEC-1061 with DEC-1040 (1), inventory row R1: the case skipped forever once the move was done
+    (it compared with the path map's copy). It now asserts the move itself: the test map holds the moved inputs as
+    readable patterns, and the path map holds no ``test_inputs`` beside them."""
     moved = _need(test_map).get("test_inputs")
-    assert isinstance(moved, list) and set(inputs) <= set(moved), \
-        f"the test map does not hold the path map's test_inputs {inputs}: {moved!r}"
+    assert isinstance(moved, list) and moved and all(support.readable_pattern(p) for p in moved), \
+        f"the test map's test_inputs is not a list of patterns: {moved!r}"
+    missing = [p for p in MOVED_TEST_INPUTS if p not in moved]
+    assert not missing, f"the test map's test_inputs lacks {missing}: {moved!r}"
+    left = yaml.safe_load((ROOT / support.PATH_MAP_REL).read_text(encoding="utf-8")).get("test_inputs")
+    assert left is None, f"the path map still holds test_inputs beside the test map's: {left!r}"
 
 
 def test_the_per_test_limit_is_above_the_slowest_test_measured(test_map):
