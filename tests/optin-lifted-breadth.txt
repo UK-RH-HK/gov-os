@@ -1173,3 +1173,9 @@ rep: tests/acceptance/W2-54/test_w2_54_dropped_order.py::test_a_store_whose_inde
 rep: tests/acceptance/W2-54/test_w2_54_query_cache.py  # one row per parametrised function
 rep: tests/acceptance/W2-54/test_w2_54_query_vector.py  # one row per parametrised function
 rep: tests/acceptance/W2-54/test_w2_54_time_limit.py  # one row per parametrised function
+
+# acceptance/W2-55
+rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_a_place_that_does_not_enforce_gives_no_finding  # one row
+rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweep_of_2026_10_20_is_found  # one row
+rep: tests/acceptance/W2-55/test_w2_55_propagation.py::test_the_sweeps_kept_and_closed_places_give_no_finding  # one row
+rep: tests/acceptance/W2-55/test_w2_55_tags.py  # one row per parametrised function
