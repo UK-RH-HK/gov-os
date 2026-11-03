@@ -275,3 +275,25 @@ rep: tests/acceptance/W1-14/test_w1_14_refusals.py::test_a_specification_that_is
 # acceptance/W1-15
 rep: tests/acceptance/W1-15/test_w1_15_check_time_limit.py  # one row per parametrised function
 rep: tests/acceptance/W1-15/test_w1_15_product_data.py  # one row per parametrised function
+
+# acceptance/W1-16
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_the_clean_files_are_in_the_code_graph  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_the_secrets_indexing_check_of_w1_15_is_green_on_the_index  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_a_file_the_path_map_classes_as_product_data_is_not_in_the_code_graph  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_a_secret_added_after_the_first_index_leaves_the_graph  # cap
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py::test_no_dev_canary_reaches_the_code_index  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_the_tool_alone_serves_its_ui_unless_the_setting_of_its_home_says_false  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_call_of_the_wrapper_leaves_the_ui_off  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_second_index_keeps_the_ui_off  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_first_call_that_builds_no_index_does_not_serve_the_ui  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_ui_variables_of_the_callers_environment_do_not_turn_the_ui_on  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_repository_and_a_symbol_named_like_the_switch_do_not_turn_the_ui_on  # cap
+tests/acceptance/W1-16/test_w1_16_ui_off.py::test_a_setting_left_in_the_home_is_turned_off_by_the_next_call  # cap
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_callers_and_impact_hit_at_five_is_at_least_sixty_percent  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_callers_and_impact_are_answered_in_every_language  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_a_renamed_symbol_is_answered_under_its_new_name_only  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_definitions_name_every_file_that_defines_the_symbol  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_references_name_every_file_with_a_call_site  # one row
+rep: tests/acceptance/W1-16/test_w1_16_code_answers.py::test_dead_code_names_the_unreferenced_functions_and_no_live_one  # one row
+rep: tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py  # one row per parametrised function
+rep: tests/acceptance/W1-16/test_w1_16_paths_and_roots.py  # one row per parametrised function

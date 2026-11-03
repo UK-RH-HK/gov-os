@@ -699,3 +699,21 @@ No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rew
 - **DP-5** (third batch) The 16-character floor when a body begins with `_` or `-`: does the first character count?
 - **DP-6** (third batch) Who removes a repository's daemon directory, and what the suite's own `CBM_RUNTIME_DIR`
   still means.
+
+## KPI map after D-4's cut (DEC-1061)
+
+Regenerated at the cut (tier 2: each KPI line's own case kept first, then at most 6 functions per line;
+a parametrised function keeps its first row in the full run unless it is a line's own case). The rest stay
+built in the opt-in suite `lifted` (`tests/optin-lifted*.txt`), run report-only with `--optin=lifted`.
+
+| KPI line | case(s) in the full run | placed by |
+|---|---|---|
+| S1: The index lives in a per-repository home under .gov-runtime/; list_projects in one repository shows only its own project [CAP-12.b] | `test_w1_16_home.py::test_the_wrapper_offers_its_public_interface`, `test_w1_16_home.py::test_the_home_is_under_the_repositorys_gov_runtime`, `test_w1_16_home.py::test_two_repositories_have_two_homes` | README |
+| S2: A secret-exclusion test proves no planted secret enters the codebase-memory index [CAP-03.e, CAP-12.b] | `test_w1_16_secret_exclusion.py::test_the_tool_alone_would_index_a_planted_secret`, `test_w1_16_secret_exclusion.py::test_the_filter_drops_exactly_the_planted_files`, `test_w1_16_secret_exclusion.py::test_no_planted_secret_is_in_any_file_under_gov_runtime` | README |
+| S3: Definitions, references, callers, impact and dead code are answered across Rust, Python and TypeScript on the dev tiers, before and a... | `test_w1_16_code_answers.py::test_the_expected_answers_stand_in_the_source_of_the_tier`, `test_w1_16_code_answers.py::test_the_question_set_covers_the_three_languages`, `test_w1_16_code_answers.py::test_callers_and_impact_hit_at_five_is_at_least_sixty_percent` | README |
+| S4: The gov-token rule of template/.gitleaks.toml and .gitleaks.toml flags a prefixed string (sk, pk, rk or tok, then _ or -) only when i... | moved to `lifted` (the feature is off here): `test_w1_16_token_rule`, `test_the_token_rule_carries_no_allowlist` | README (lifted) |
+| F1: A file whose only match is an ordinary identifier with a token prefix is kept out of an index | moved to `lifted` (the feature is off here): `test_w1_16_token_rule`, `test_a_file_whose_only_match_is_an_ordinary_identifier_is_indexable` | README (lifted) |
+| F2: An index file of this repository exists outside .gov-runtime/ after a run | `test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run`, `test_w1_16_home.py::test_the_tools_default_home_is_not_used`, `test_w1_16_home.py::test_this_repository_is_not_indexed_by_the_run` | README |
+| F3: A planted secret is found in the code graph | `test_w1_16_secret_exclusion.py::test_no_planted_secret_comes_back_from_the_code_graph`, `test_w1_16_secret_exclusion.py::test_a_file_with_a_secret_is_not_in_the_code_graph`, `test_w1_16_secret_exclusion.py::test_no_planted_secret_is_in_any_file_under_gov_runtime` | README |
+
+Tier 2's cap here: 42 functions (7 KPI lines x 6); 12 functions moved to `lifted` (listed in `tests/optin-lifted-breadth.txt`).
